@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-11 18:13:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:27:17
+ * @LastEditTime: 2025-03-25 11:11:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,29 +27,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoleSpecification extends BaseSpecification {
 
-    public static Specification<RoleEntity> searchBySuper(RoleRequest request) {
+    public static Specification<RoleEntity> search(RoleRequest request) {
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            //
             // 过滤 level = LevelEnum.PLATFORM.name()
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
-            //
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-    }
-
-    public static Specification<RoleEntity> searchByOrg(RoleRequest request) {
-        // log.info("request: {}", request);
-        return (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            //
-            // if (StringUtils.hasText(request.getClient())) {
-            // predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));
-            // }
+            // 过滤 orgUid
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

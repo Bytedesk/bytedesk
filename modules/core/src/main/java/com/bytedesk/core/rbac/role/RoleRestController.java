@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 08:47:48
+ * @LastEditTime: 2025-03-25 11:20:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.core.rbac.role;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,15 +31,6 @@ import lombok.AllArgsConstructor;
 public class RoleRestController extends BaseRestController<RoleRequest> {
 
     private final RoleRestService roleService;
-
-    @PreAuthorize("hasRole('SUPER')")
-    @GetMapping("/query/super")
-    public ResponseEntity<?> queryBySuper(RoleRequest request) {
-
-        Page<RoleResponse> roles = roleService.queryBySuper(request);
-        
-        return ResponseEntity.ok(JsonResult.success(roles));
-    }
 
     @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
