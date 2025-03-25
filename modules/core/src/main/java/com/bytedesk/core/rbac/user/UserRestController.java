@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 17:53:13
+ * @LastEditTime: 2025-03-25 11:52:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,14 +13,18 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,9 +98,43 @@ public class UserRestController extends BaseRestController<UserRequest> {
     @PreAuthorize("hasRole('SUPER')")
     @Override
     public Object export(UserRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        // query data to export
+        Page<UserResponse> userPage = userRestService.queryByOrg(request);
+        // 
+        try {
+            //
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            // download filename
+            String fileName = "成员-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
+
+            // 转换数据
+            List<UserExcel> excelList = userPage.getContent().stream().map(userResponse -> userRestService.convertToExcel(userResponse)).toList();
+            // write to excel
+            EasyExcel.write(response.getOutputStream(), UserExcel.class)
+                    .autoCloseStream(Boolean.FALSE)
+                    .sheet("member")
+                    .doWrite(excelList);
+
+        } catch (Exception e) {
+            // reset response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            //
+            return JsonResult.error(e.getMessage());
+        }
+
+        return "";
     }
+
+    // @GetMapping("/export")
+    // public void export(UserRequest request, HttpServletResponse response) {
+    //     List<UserEntity> entities = userRestService.findAll(request);
+    //     List<UserExcel> excelList = userRestService.convertToExcel(entities);
+    //     ConvertUtils.exportExcel(response, "用户列表", UserExcel.class, excelList);
+    // }
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
