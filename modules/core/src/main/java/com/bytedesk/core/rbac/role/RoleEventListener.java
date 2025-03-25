@@ -58,7 +58,7 @@ public class RoleEventListener {
         roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID, k -> new HashSet<>())
                 .add(authorityEntity.getUid());
         
-        // 团队成员和客服、用户: 仅赋予部分权限：ticket、robot、kbase
+        // 团队成员和客服、用户: 仅赋予部分权限：member、ticket、robot、kbase
         if (authorityEntity.getUid().startsWith("ticket")
                 || authorityEntity.getUid().startsWith("robot")
                 || authorityEntity.getUid().startsWith("kbase")) {
