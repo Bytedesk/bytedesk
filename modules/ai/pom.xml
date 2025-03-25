@@ -21,7 +21,7 @@
 		<langchain4j.version>1.0.0-beta1</langchain4j.version>
 		<!-- <agentsflex.version>1.0.0-rc.6</agentsflex.version> -->
 		<ollama4j.version>1.0.93</ollama4j.version>
-		<spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
+		<spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version>
 		<!-- <spring-ai.version>1.0.0-M6</spring-ai.version> -->
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
@@ -92,16 +92,52 @@
 			<artifactId>spring-ai-redis-store-spring-boot-starter</artifactId>
 		</dependency>
 
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
+		</dependency> -->
+
 		<!-- ERROR: column cannot have more than 2000 dimensions for hnsw index -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
 		</dependency> -->
 
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/oracle.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-oracle-store-spring-boot-starter</artifactId>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pinecone.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-pinecone-store-spring-boot-starter</artifactId>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/qdrant.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-qdrant-store-spring-boot-starter</artifactId>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/typesense.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-typesense-spring-boot-starter</artifactId>
+		</dependency> -->
+
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
 		</dependency> -->
 
 		<!-- mcp -->

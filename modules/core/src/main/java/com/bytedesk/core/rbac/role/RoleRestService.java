@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 21:58:57
+ * @LastEditTime: 2025-03-25 08:32:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,8 +71,19 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         @Override
         public Page<RoleResponse> queryByUser(RoleRequest request) {
+                UserEntity user = authService.getUser();
+                if (user == null) {
+                        return null;
+                }
+                request.setUserUid(user.getUid());
+                // 
+                return queryByOrg(request);
+        }
+
+        @Override
+        public Page<RoleResponse> queryByUid(RoleRequest request) {
                 // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+                throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
         }
 
         @Cacheable(value = "role", key = "#uid", unless = "#result == null")
