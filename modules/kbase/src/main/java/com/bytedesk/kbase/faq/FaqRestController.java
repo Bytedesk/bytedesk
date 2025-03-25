@@ -38,7 +38,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     private final FaqRestService faqService;
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
 
@@ -47,8 +47,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     public ResponseEntity<?> queryByUser(FaqRequest request) {
         
         Page<FaqResponse> page = faqService.queryByUser(request);
@@ -56,8 +56,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         
         FaqResponse faq = faqService.queryByUid(request);

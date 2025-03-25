@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 22:15:41
+ * @LastEditTime: 2025-03-25 13:39:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.kbase.kbase;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +34,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
 
     private final KbaseRestService knowledgeService;
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
-    @GetMapping("/query/org")
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
 
@@ -45,7 +43,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
         
@@ -54,7 +52,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
         // TODO Auto-generated method stub
@@ -62,7 +60,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
     }
 
     // query detail
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(KbaseRequest request) {
 
@@ -75,7 +73,6 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
     }
 
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
@@ -85,7 +82,6 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
     }
 
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
 
@@ -95,7 +91,6 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
     }
 
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
-    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
 
