@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 15:16:01
+ * @LastEditTime: 2025-03-25 14:11:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
@@ -40,7 +39,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     private final RobotRestService robotService;
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
@@ -49,7 +48,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByUser(RobotRequest request) {
         
@@ -58,7 +57,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByUid(RobotRequest request) {
 
@@ -78,7 +77,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
     
     // 员工/客服创建智能体会话
-    @PreAuthorize(BytedeskConsts.HAS_ANY_ROLE)
+    @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
     @PostMapping("/create/llm/thread")
     public ResponseEntity<?> createLlmThread(@RequestBody ThreadRequest request) {
@@ -89,7 +88,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     // 创建客服助手会话
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'AGENT')")
+    @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
     @PostMapping("/create/agent/assistant/thread")
     public ResponseEntity<?> createAgentAssistantThread(@RequestBody ThreadRequest request) {
@@ -131,7 +130,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
     @ActionAnnotation(title = "robot", action = "update", description = "update robot thread")
     @PostMapping("/update/thread")
     public ResponseEntity<?> updateThread(@RequestBody ThreadRequest request) {

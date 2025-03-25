@@ -18,7 +18,7 @@ import java.util.List;
 // import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.team.member.MemberResponseSimple;
+import com.bytedesk.team.member.MemberProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,7 +51,7 @@ public class GroupResponse extends BaseResponse {
 
     private Boolean isExternal;
 
-    private List<MemberResponseSimple> members;
+    private List<MemberProtobuf> members;
 
     private List<UserProtobuf> admins;
 

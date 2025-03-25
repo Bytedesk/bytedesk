@@ -19,7 +19,7 @@ import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
-import com.bytedesk.team.member.MemberResponseSimple;
+import com.bytedesk.team.member.MemberProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -72,7 +72,7 @@ public class AgentResponse extends BaseResponse {
     private Integer currentThreadCount;
 
     // private UserResponse user;
-    private MemberResponseSimple member;
+    private MemberProtobuf member;
 
     private String userUid;
     // private UserProtobuf user;

@@ -17,7 +17,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kanban.module.ModuleResponse;
-import com.bytedesk.team.member.MemberResponseSimple;
+import com.bytedesk.team.member.MemberProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,7 +44,7 @@ public class ProjectResponse extends BaseResponse {
 
     private Integer order;
 
-    private List<MemberResponseSimple> members;
+    private List<MemberProtobuf> members;
 
     private List<ModuleResponse> modules;
 
