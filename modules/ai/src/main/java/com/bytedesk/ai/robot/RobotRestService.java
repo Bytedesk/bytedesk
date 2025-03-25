@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 18:12:39
+ * @LastEditTime: 2025-03-25 15:31:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -264,7 +264,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     // 创建客服助手机器人会话
-    public ThreadResponse createAgentAssistantThread(ThreadRequest request) {
+    public ThreadResponse createAssistantThread(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
             throw new RuntimeException("should login first");
@@ -288,15 +288,17 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.LLM.name())
                 .state(ThreadStateEnum.STARTED.name())
                 .unreadCount(0)
                 .user(ConvertUtils.convertToUserProtobufString(owner))
                 // .owner(owner)
+                .orgUid(owner.getOrgUid())
                 .build();
-        thread.setUid(uidUtils.getUid());
-        thread.setOrgUid(owner.getOrgUid());
+        // thread.setUid(uidUtils.getUid());
+        // thread.setOrgUid(owner.getOrgUid());
         //
         RobotEntity robot = robotOptional.get();
         robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());

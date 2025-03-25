@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 14:11:47
+ * @LastEditTime: 2025-03-25 15:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,10 +90,10 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     // 创建客服助手会话
     @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
-    @PostMapping("/create/agent/assistant/thread")
-    public ResponseEntity<?> createAgentAssistantThread(@RequestBody ThreadRequest request) {
+    @PostMapping("/create/assistant/thread")
+    public ResponseEntity<?> createAssistantThread(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = robotService.createAgentAssistantThread(request);
+        ThreadResponse thread = robotService.createAssistantThread(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
