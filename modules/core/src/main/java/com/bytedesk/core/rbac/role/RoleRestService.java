@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 08:32:20
+ * @LastEditTime: 2025-03-25 11:20:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,16 +55,9 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         private final ModelMapper modelMapper;
 
-        public Page<RoleResponse> queryBySuper(RoleRequest request) {
-                Pageable pageable = request.getPageable();
-                Specification<RoleEntity> specification = RoleSpecification.searchBySuper(request);
-                Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
-                return rolePage.map(this::convertToResponse);
-        }
-
         public Page<RoleResponse> queryByOrg(RoleRequest request) {
                 Pageable pageable = request.getPageable();
-                Specification<RoleEntity> specification = RoleSpecification.searchByOrg(request);
+                Specification<RoleEntity> specification = RoleSpecification.search(request);
                 Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
                 return rolePage.map(this::convertToResponse);
         }
@@ -80,10 +73,14 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return queryByOrg(request);
         }
 
+        @Cacheable(value = "role", key = "#uid", unless = "#result == null")
         @Override
         public RoleResponse queryByUid(RoleRequest request) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+                Optional<RoleEntity> roleOptional = findByUid(request.getUid());
+                if (roleOptional.isPresent()) {
+                        return convertToResponse(roleOptional.get());
+                }
+                return null;
         }
 
         @Cacheable(value = "role", key = "#uid", unless = "#result == null")
