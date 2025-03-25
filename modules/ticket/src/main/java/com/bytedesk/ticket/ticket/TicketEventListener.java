@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:24:55
+ * @LastEditTime: 2025-03-25 17:21:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,12 +26,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicRequest;
-import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
@@ -39,7 +34,7 @@ import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
-import com.bytedesk.ticket.ticket.event.TicketUpdateWorkgroupEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +54,7 @@ public class TicketEventListener {
 
     private final TicketService ticketService;
 
-    private final TopicCacheService topicCacheService;
+    // private final TopicCacheService topicCacheService;
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
@@ -69,7 +64,8 @@ public class TicketEventListener {
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
         variables.put(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticket.getUid());
-        variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, ticket.getWorkgroup().getUid());
+        // variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, ticket.getDepartment().getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID, ticket.getDepartmentUid());
         variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, ticket.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
         //
@@ -138,13 +134,13 @@ public class TicketEventListener {
             }
         }
         // 订阅工单会话
-        UserEntity owner = ticket.getOwner();
-        TopicRequest topicRequest = TopicRequest.builder()
-                .topic(TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getWorkgroup().getUid(), ticket.getUid()))
-                // .userUid(owner.getUid())
-                .build();
-            topicRequest.setUserUid(owner.getUid());
-        topicCacheService.push(JSON.toJSONString(topicRequest));
+        // UserEntity owner = ticket.getOwner();
+        // TopicRequest topicRequest = TopicRequest.builder()
+        //         .topic(TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid()))
+        //         // .userUid(owner.getUid())
+        //         .build();
+        //     topicRequest.setUserUid(owner.getUid());
+        // topicCacheService.push(JSON.toJSONString(topicRequest));
     }
 
     // 监听工单更新事件
@@ -177,12 +173,12 @@ public class TicketEventListener {
     }
 
     @EventListener
-    public void handleTicketUpdateWorkgroupEvent(TicketUpdateWorkgroupEvent event) {
-        log.info("TicketEventListener handleTicketUpdateWorkgroupEvent: {}", event);
+    public void handleTicketUpdateDepartmentEvent(TicketUpdateDepartmentEvent event) {
+        log.info("TicketEventListener handleTicketUpdateDepartmentEvent: {}", event);
         TicketEntity ticket = event.getTicket();
-        // 更新当前技能组workgroupUid
-        runtimeService.setVariable(ticket.getProcessInstanceId(), TicketConsts.TICKET_VARIABLE_WORKGROUP_UID,
-                event.getNewWorkgroupUid());
+        // 更新当前技能组DepartmentUid
+        runtimeService.setVariable(ticket.getProcessInstanceId(), TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID,
+                event.getNewDepartmentUid());
     }
 
     // 监听上传BPMN流程图

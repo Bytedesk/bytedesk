@@ -34,8 +34,8 @@ public class TicketConvertUtils {
             ticketResponse.setUser(user);
         }
         // 
-        if (StringUtils.hasText(entity.getWorkgroupString())) {
-            UserProtobuf workgroup = entity.getWorkgroup();
+        if (StringUtils.hasText(entity.getDepartmentString())) {
+            UserProtobuf workgroup = entity.getDepartment();
             ticketResponse.setWorkgroup(workgroup);
         }
         // 
