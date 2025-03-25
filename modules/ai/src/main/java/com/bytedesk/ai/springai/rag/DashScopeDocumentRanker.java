@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-25 10:15:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 10:16:59
+ * @LastEditTime: 2025-03-25 10:22:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,11 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Post-Retrieval
+ * 处理从联网搜索种获得的 Document，以获得最佳输出。
+ * https://java2ai.com/blog/spring-ai-alibaba-module-rag/?spm=0.29160081.0.0.75c73b5blqQmqQ
+ */
 @Slf4j
 public class DashScopeDocumentRanker implements DocumentRanker {
 
