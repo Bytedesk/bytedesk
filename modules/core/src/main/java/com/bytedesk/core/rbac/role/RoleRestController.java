@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 08:32:01
+ * @LastEditTime: 2025-03-25 08:47:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,9 +64,9 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
     @Override
     public ResponseEntity<?> queryByUid(RoleRequest request) {
         
-        Page<RoleResponse> roles = roleService.queryByUid(request);
+        RoleResponse role = roleService.queryByUid(request);
 
-        return ResponseEntity.ok(JsonResult.success(roles));
+        return ResponseEntity.ok(JsonResult.success(role));
     }
 
     @PreAuthorize("hasAuthority('ROLE_CREATE')")
