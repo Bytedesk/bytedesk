@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 15:42:07
+ * @LastEditTime: 2025-03-25 16:10:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -206,6 +206,13 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         // org/robot/robotUid/userUid/randomUid
         String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
+        // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
+        if (!request.getForceNew()) {
+            Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
+            if (threadOptional.isPresent()) {
+                return threadService.convertToResponse(threadOptional.get());
+            }
+        }
         //
         RobotEntity robotEntity = robotOptional.get();
         robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
@@ -217,6 +224,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .topic(topic)
                 .type(ThreadTypeEnum.LLM.name())
                 .unreadCount(0)
+                .hide(request.getHide())
                 .user(user)
                 .agent(robot)
                 .userUid(owner.getUid())
@@ -261,52 +269,53 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return threadService.convertToResponse(savedThread);
     }
 
-    // 创建客服助手机器人会话
-    public ThreadResponse createAssistantThread(ThreadRequest request) {
-        UserEntity owner = authService.getUser();
-        if (owner == null) {
-            throw new RuntimeException("should login first");
-        }
-        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(RobotConsts.ROBOT_NAME_AGENT_ASSISTANT,
-                owner.getOrgUid());
-        if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot not found");
-        }
-        // org/robot/robotUid/userUid/randomUid
-        String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotOptional.get().getUid(), owner.getUid(),
-                uidUtils.getUid());
-        // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
-        if (!request.getForceNew()) {
-            Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
-            if (threadOptional.isPresent()) {
-                return threadService.convertToResponse(threadOptional.get());
-            }
-        }
-        //
-        RobotEntity robotEntity = robotOptional.get();
-        String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
-        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
-        // 
-        // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
-        ThreadEntity thread = ThreadEntity.builder()
-                .uid(uidUtils.getUid())
-                .topic(topic)
-                .type(ThreadTypeEnum.LLM.name())
-                .unreadCount(0)
-                .user(user)
-                .agent(robot)
-                .userUid(owner.getUid())
-                .owner(owner)
-                .orgUid(owner.getOrgUid())
-                .build();
-        //
-        ThreadEntity savedThread = threadService.save(thread);
-        if (savedThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
 
-        return threadService.convertToResponse(savedThread);
-    }
+    // 创建客服助手机器人会话
+    // public ThreadResponse createAssistantThread(ThreadRequest request) {
+    //     UserEntity owner = authService.getUser();
+    //     if (owner == null) {
+    //         throw new RuntimeException("should login first");
+    //     }
+    //     Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(RobotConsts.ROBOT_NAME_AGENT_ASSISTANT,
+    //             owner.getOrgUid());
+    //     if (!robotOptional.isPresent()) {
+    //         throw new RuntimeException("robot not found");
+    //     }
+    //     // org/robot/robotUid/userUid/randomUid
+    //     String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotOptional.get().getUid(), owner.getUid(),
+    //             uidUtils.getUid());
+    //     // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
+    //     if (!request.getForceNew()) {
+    //         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
+    //         if (threadOptional.isPresent()) {
+    //             return threadService.convertToResponse(threadOptional.get());
+    //         }
+    //     }
+    //     //
+    //     RobotEntity robotEntity = robotOptional.get();
+    //     String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
+    //     String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+    //     // 
+    //     // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
+    //     ThreadEntity thread = ThreadEntity.builder()
+    //             .uid(uidUtils.getUid())
+    //             .topic(topic)
+    //             .type(ThreadTypeEnum.LLM.name())
+    //             .unreadCount(0)
+    //             .user(user)
+    //             .agent(robot)
+    //             .userUid(owner.getUid())
+    //             .owner(owner)
+    //             .orgUid(owner.getOrgUid())
+    //             .build();
+    //     //
+    //     ThreadEntity savedThread = threadService.save(thread);
+    //     if (savedThread == null) {
+    //         throw new RuntimeException("thread save failed");
+    //     }
+
+    //     return threadService.convertToResponse(savedThread);
+    // }
 
     @Transactional
     @Override
@@ -586,8 +595,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         RobotConfiguration config = robotJsonLoader.loadRobots();
         List<Robot> robots = config.getRobots();
         for (Robot robotJson : robots) {
-            String uid = robotJson.getUid();
-            if (!existsByUid(uid)) {
+            // 使用name代替uid，方便查询和创建机器人
+            String uid = robotJson.getName();
+            if (StringUtils.hasText(uid) && !existsByUid(uid)) {
                 String categoryUid = null;
                 Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndTypeAndLevelAndPlatform(
                         robotJson.getCategory(),
@@ -600,8 +610,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                             .type(CategoryTypeEnum.ROBOT.name())
                             .build();
-                    // categoryRequest.setType(CategoryTypeEnum.ROBOT.name());
-                    // categoryRequest.setOrgUid(orgUid);
                     CategoryResponse categoryResponse = categoryService.create(categoryRequest);
                     if (categoryResponse != null) {
                         categoryUid = categoryResponse.getUid();
@@ -612,13 +620,10 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                     categoryUid = categoryOptional.get().getUid();
                 }
                 //
-                // createPromptRobotFromJson(robotJson, categoryUid, level);
-                // String uid = robotJson.getUid(); // Utils.formatUid(orgUid,
-                // robotJson.getUid());
                 // 判断uid是否已经存在
-                if (StringUtils.hasText(uid) && existsByUid(uid)) {
-                    return;
-                }
+                // if (StringUtils.hasText(uid) && existsByUid(uid)) {
+                //     return;
+                // }
                 // Get locale data (default to zh_cn if available, fallback to en)
                 RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null
                         ? robotJson.getI18n().getZh_cn()
