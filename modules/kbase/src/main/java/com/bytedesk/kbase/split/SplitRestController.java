@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:39:29
+ * @LastEditTime: 2025-03-25 14:20:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -37,7 +36,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
 
     private final SplitRestService splitService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(SplitRequest request) {
         
@@ -46,6 +45,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
         return ResponseEntity.ok(JsonResult.success(splits));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(SplitRequest request) {
         
@@ -54,6 +54,14 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
         return ResponseEntity.ok(JsonResult.success(splits));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_READ')")
+    @Override
+    public ResponseEntity<?> queryByUid(SplitRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(SplitRequest request) {
         
@@ -62,6 +70,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
         return ResponseEntity.ok(JsonResult.success(split));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(SplitRequest request) {
         
@@ -70,6 +79,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
         return ResponseEntity.ok(JsonResult.success(split));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(SplitRequest request) {
         
@@ -78,6 +88,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(SplitRequest request, HttpServletResponse response) {
         // query data to export
@@ -111,10 +122,6 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
         return "";
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(SplitRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
     
 }
