@@ -74,6 +74,10 @@
 - 工单流程可视化
 - ...
 
+### OpenManus
+
+- 浏览器自动化执行
+
 ### [社交群组](./modules/social/readme.zh.md)
 
 - 类似 Discord

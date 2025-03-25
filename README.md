@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 15:05:16
+ * @LastEditTime: 2025-03-25 09:56:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,6 +82,10 @@ Bytedesk is still in the early stage of rapid iteration, the documentation may l
 - process
 - ticket process
 - ...
+
+### OpenManus
+
+- browser automation
 
 ### [Social Group](./modules/social/readme.md)
 
