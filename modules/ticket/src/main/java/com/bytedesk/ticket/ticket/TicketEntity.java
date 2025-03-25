@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 16:48:16
+ * @LastEditTime: 2025-03-25 16:51:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -77,12 +77,9 @@ public class TicketEntity extends BaseEntity {
     private String topic;
 
     // 对应工单会话，工单会话uid。每一个在线客服会话，可以创建多个工单，每个工单对应一个工单会话
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private ThreadEntity thread;
     private String threadUid;
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private CategoryEntity category;
+    // 关联category，工单分类
     private String categoryUid;
 
     // user, 使用UserProtobuf json格式化
@@ -93,14 +90,11 @@ public class TicketEntity extends BaseEntity {
 
     // 使用UserProtobuf json格式化
     // 一个工单一个工作组，一个工作组可以有多个工单
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private WorkgroupEntity workgroup;
-    @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    // private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
+    // private String department = BytedeskConsts.EMPTY_JSON_STRING;
+    private String departmentUid; // 部门
 
     // 使用UserProtobuf json格式化
     // 一个工单一个处理人，一个处理人可以处理多个工单
@@ -110,12 +104,7 @@ public class TicketEntity extends BaseEntity {
     
     // 使用UserProtobuf json格式化
     // 一个工单一个报告人，一个报告人可以报告多个工单
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private UserEntity reporter;        // 报告人
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String reporter = BytedeskConsts.EMPTY_JSON_STRING;
 
@@ -185,12 +174,12 @@ public class TicketEntity extends BaseEntity {
         return reporter;
     }
 
-    // 获取工单的工作组
-    public UserProtobuf getWorkgroup() {
-        return JSON.parseObject(workgroup, UserProtobuf.class);
-    }
-    public String getWorkgroupString() {
-        return workgroup;
-    }
+    // 获取工单的部门
+    // public UserProtobuf getDepartment() {
+    //     return JSON.parseObject(department, UserProtobuf.class);
+    // }
+    // public String getDepartmentString() {
+    //     return department;
+    // }
 
 } 
