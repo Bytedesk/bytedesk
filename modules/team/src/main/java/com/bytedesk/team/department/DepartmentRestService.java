@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -46,9 +44,9 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     private final MemberRestService memberService;
 
-    public Page<DepartmentResponse> queryByOrg(DepartmentRequest departmentRequest) {
-        Pageable pageable = PageRequest.of(departmentRequest.getPageNumber(), departmentRequest.getPageSize(), Sort.Direction.ASC,"id");
-        Specification<DepartmentEntity> specification = DepartmentSpecification.search(departmentRequest);
+    public Page<DepartmentResponse> queryByOrg(DepartmentRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<DepartmentEntity> specification = DepartmentSpecification.search(request);
         Page<DepartmentEntity> page = departmentRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
