@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 18:37:37
+ * @LastEditTime: 2025-03-25 14:16:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
 
     private final DepartmentRestService departmentService;
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(DepartmentRequest request) {
 
@@ -47,13 +47,20 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
     @Override
     public ResponseEntity<?> queryByUser(DepartmentRequest request) {
         
         Page<DepartmentResponse> departmentPage = departmentService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(departmentPage));
+    }
+
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
+    @Override
+    public ResponseEntity<?> queryByUid(DepartmentRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @PreAuthorize("hasAuthority('MEMBER_CREATE')")
@@ -91,12 +98,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
-    @Override
-    public ResponseEntity<?> queryByUid(DepartmentRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     
 }
