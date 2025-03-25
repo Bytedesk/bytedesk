@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 14:38:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 09:05:36
+ * @LastEditTime: 2025-03-25 17:25:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,10 +34,10 @@ public class TicketConvertUtils {
             ticketResponse.setUser(user);
         }
         // 
-        if (StringUtils.hasText(entity.getDepartmentString())) {
-            UserProtobuf workgroup = entity.getDepartment();
-            ticketResponse.setWorkgroup(workgroup);
-        }
+        // if (StringUtils.hasText(entity.getDepartmentString())) {
+        //     UserProtobuf workgroup = entity.getDepartment();
+        //     ticketResponse.setWorkgroup(workgroup);
+        // }
         // 
         if (StringUtils.hasText(entity.getAssigneeString())) {
             UserProtobuf assignee = entity.getAssignee();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 22:02:01
+ * @LastEditTime: 2025-03-25 17:33:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,9 +69,8 @@ public class TicketSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.equal(root.get("topic"), request.getTopic()));
             }
-            if (StringUtils.hasText(request.getWorkgroupUid())) {
-                predicates.add(criteriaBuilder.like(root.get("workgroup"), 
-                    "%" + "\"uid\":\"" + request.getWorkgroupUid() + "\"" + "%"));
+            if (StringUtils.hasText(request.getDepartmentUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
             }
             // 处理 ALL 查询 - 我创建的或待我处理的
             if ((request.getReporter() != null && StringUtils.hasText(request.getReporter().getUid())) || StringUtils.hasText(request.getAssigneeUid())) {

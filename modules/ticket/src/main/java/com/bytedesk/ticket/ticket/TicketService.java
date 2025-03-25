@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 22:03:15
+ * @LastEditTime: 2025-03-25 17:24:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -222,20 +222,20 @@ public class TicketService {
      */
     public Page<TicketResponse> queryUnassigned(TicketRequest request) {
         // 如果workgroupUid为空，则查询所有待分配的工单
-        if (!StringUtils.hasText(request.getWorkgroupUid())) {
+        if (!StringUtils.hasText(request.getDepartmentUid())) {
             return queryAllUnassigned(request);
         }
 
         Pageable pageable = request.getPageable();
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskCandidateGroup(request.getWorkgroupUid())
+                .taskCandidateGroup(request.getDepartmentUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .listPage(pageable.getPageNumber(), pageable.getPageSize());
 
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskCandidateGroup(request.getWorkgroupUid())
+                .taskCandidateGroup(request.getDepartmentUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .count();
 

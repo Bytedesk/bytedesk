@@ -36,13 +36,11 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.workgroup.WorkgroupEntity;
-import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
-import com.bytedesk.ticket.ticket.event.TicketUpdateWorkgroupEvent;
+import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRepository;
@@ -70,7 +68,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final AgentRestService agentRestService;
 
-    private final WorkgroupRestService workgroupRestService;
+    // private final WorkgroupRestService workgroupRestService;
 
     private final ThreadRestService threadRestService;
 
@@ -116,22 +114,22 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setUid(uidUtils.getUid());
         ticket.setStatus(TicketStatusEnum.NEW.name());
         // 默认是工作组工单，暂不启用一对一
-        ticket.setType(TicketTypeEnum.WORKGROUP.name());
+        ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         ticket.setOwner(owner);
         //
-        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
-        if (workgroupOptional.isPresent()) {
-            UserProtobuf workgroupProtobuf = UserProtobuf.builder()
-                    .nickname(workgroupOptional.get().getNickname())
-                    .avatar(workgroupOptional.get().getAvatar())
-                    .build();
-            workgroupProtobuf.setUid(workgroupOptional.get().getUid());
-            workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-            String workgroupJson = JSON.toJSONString(workgroupProtobuf);
-            ticket.setDepartment(workgroupJson);
-        } else {
-            throw new RuntimeException("workgroup not found");
-        }
+        // Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
+        // if (workgroupOptional.isPresent()) {
+        //     UserProtobuf workgroupProtobuf = UserProtobuf.builder()
+        //             .nickname(workgroupOptional.get().getNickname())
+        //             .avatar(workgroupOptional.get().getAvatar())
+        //             .build();
+        //     workgroupProtobuf.setUid(workgroupOptional.get().getUid());
+        //     workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+        //     String workgroupJson = JSON.toJSONString(workgroupProtobuf);
+        //     ticket.setDepartment(workgroupJson);
+        // } else {
+        //     throw new RuntimeException("workgroup not found");
+        // }
         //
         if (StringUtils.hasText(request.getAssigneeUid())) {
             Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
@@ -242,12 +240,12 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         }
 
         // 发布事件，判断workgroupUid是否被修改
-        if (StringUtils.hasText(request.getWorkgroupUid()) && StringUtils.hasText(ticket.getDepartmentString())) {
-            String oldWorkgroupUid = ticket.getDepartment().getUid();
-            if (oldWorkgroupUid != null && !oldWorkgroupUid.equals(request.getWorkgroupUid())) {
-                TicketUpdateWorkgroupEvent ticketUpdateWorkgroupEvent = new TicketUpdateWorkgroupEvent(ticket,
-                        oldWorkgroupUid, request.getWorkgroupUid());
-                applicationEventPublisher.publishEvent(ticketUpdateWorkgroupEvent);
+        if (StringUtils.hasText(request.getDepartmentUid())) {
+            String oldWorkgroupUid = ticket.getDepartmentUid();
+            if (oldWorkgroupUid != null && !oldWorkgroupUid.equals(request.getDepartmentUid())) {
+                TicketUpdateDepartmentEvent TicketUpdateDepartmentEvent = new TicketUpdateDepartmentEvent(ticket,
+                        oldWorkgroupUid, request.getDepartmentUid());
+                applicationEventPublisher.publishEvent(TicketUpdateDepartmentEvent);
             }
         }
 
@@ -269,18 +267,19 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             }
         }
 
-        if (StringUtils.hasText(request.getWorkgroupUid())) {
-            Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
-            if (workgroupOptional.isPresent()) {
-                UserProtobuf workgroupProtobuf = UserProtobuf.builder()
-                        .nickname(workgroupOptional.get().getNickname())
-                        .avatar(workgroupOptional.get().getAvatar())
-                        .build();
-                workgroupProtobuf.setUid(workgroupOptional.get().getUid());
-                workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-                ticket.setDepartment(JSON.toJSONString(workgroupProtobuf));
-            }
-        }
+        // if (StringUtils.hasText(request.getWorkgroupUid())) {
+        //     Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
+        //     if (workgroupOptional.isPresent()) {
+        //         UserProtobuf workgroupProtobuf = UserProtobuf.builder()
+        //                 .nickname(workgroupOptional.get().getNickname())
+        //                 .avatar(workgroupOptional.get().getAvatar())
+        //                 .build();
+        //         workgroupProtobuf.setUid(workgroupOptional.get().getUid());
+        //         workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+        //         ticket.setDepartment(JSON.toJSONString(workgroupProtobuf));
+        //     }
+        // }
+        // 
         return ticket;
     }
 
@@ -347,26 +346,27 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 userProtobuf.setType(UserTypeEnum.AGENT.name());
                 visitorJson = JSON.toJSONString(userProtobuf);
             }
-        } else if (ticket.getType().equals(TicketTypeEnum.WORKGROUP.name())) {
-            topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid());
-            // 使用在线客服工单会话user info
-            if (StringUtils.hasText(ticket.getThreadUid())) {
-                String threadUid = ticket.getThreadUid();
-                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
-                if (serviceThreadOptional.isPresent()) {
-                    visitorJson = serviceThreadOptional.get().getUser();
-                } else {
-                    //
-                    UserProtobuf userProtobuf = UserProtobuf.builder()
-                            .nickname(ticket.getDepartment().getNickname())
-                            .avatar(ticket.getDepartment().getAvatar())
-                            .build();
-                    userProtobuf.setUid(ticket.getDepartment().getUid());
-                    userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-                    visitorJson = JSON.toJSONString(userProtobuf);
-                }
-            }
-        }
+        } 
+        // else if (ticket.getType().equals(TicketTypeEnum.WORKGROUP.name())) {
+        //     topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid());
+        //     // 使用在线客服工单会话user info
+        //     if (StringUtils.hasText(ticket.getThreadUid())) {
+        //         String threadUid = ticket.getThreadUid();
+        //         Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
+        //         if (serviceThreadOptional.isPresent()) {
+        //             visitorJson = serviceThreadOptional.get().getUser();
+        //         } else {
+        //             //
+        //             UserProtobuf userProtobuf = UserProtobuf.builder()
+        //                     .nickname(ticket.getDepartment().getNickname())
+        //                     .avatar(ticket.getDepartment().getAvatar())
+        //                     .build();
+        //             userProtobuf.setUid(ticket.getDepartment().getUid());
+        //             userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
+        //             visitorJson = JSON.toJSONString(userProtobuf);
+        //         }
+        //     }
+        // }
         // 每次创建新工单会话，不能使用已存在的会话
         ThreadEntity thread = ThreadEntity.builder()
                 .type(ThreadTypeEnum.TICKET.name())
