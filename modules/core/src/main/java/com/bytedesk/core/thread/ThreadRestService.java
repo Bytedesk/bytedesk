@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:57:25
+ * @LastEditTime: 2025-03-26 07:20:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -434,11 +434,12 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public ThreadResponse autoClose(ThreadEntity thread) {
         // log.info(thread.getUid() + "自动关闭");
         ThreadRequest threadRequest = ThreadRequest.builder()
+                .uid(thread.getUid())
                 .topic(thread.getTopic())
                 .autoClose(true)
                 .state(ThreadStateEnum.CLOSED.name())
                 .build();
-        threadRequest.setUid(thread.getUid());
+        // threadRequest.setUid(thread.getUid());
         return close(threadRequest);
     }
 
@@ -459,7 +460,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 ? I18Consts.I18N_AUTO_CLOSED
                 : I18Consts.I18N_AGENT_CLOSED;
         thread.setContent(content);
-        
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -538,7 +538,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });
-        // return threadRepository.findByTypesInAndStateAndDeletedFalse(types, ThreadStateEnum.STARTED.name());
         return threadRepository.findByTypesInAndStateNotAndDeletedFalse(types, ThreadStateEnum.CLOSED.name());
     }
 
