@@ -13,21 +13,10 @@
  */
 package com.bytedesk.ai.springai.rag;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.rag.postretrieval.ranking.DocumentRanker;
-import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
-import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-
-import reactor.core.publisher.Flux;
-
 /**
+ * 大模型输出
  * https://java2ai.com/blog/spring-ai-alibaba-module-rag/?spm=0.29160081.0.0.75c73b5blqQmqQ
  */
 @Service
