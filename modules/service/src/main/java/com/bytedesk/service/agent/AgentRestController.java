@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 17:41:49
+ * @LastEditTime: 2025-03-25 13:36:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('AGENT_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -60,7 +60,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('AGENT_READ')")
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
@@ -69,14 +69,14 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('AGENT_READ')")
     @Override
     public ResponseEntity<?> queryByUid(AgentRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('AGENT_READ')")
     @ActionAnnotation(title = "agent", action = "detail", description = "query agent profile")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(AgentRequest request) {
@@ -87,6 +87,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('AGENT_READ')")
     @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {

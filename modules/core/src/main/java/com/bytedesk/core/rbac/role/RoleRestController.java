@@ -32,7 +32,8 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
 
     private final RoleRestService roleService;
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(RoleRequest request) {
         
@@ -41,7 +42,8 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
         return ResponseEntity.ok(JsonResult.success(roles));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(RoleRequest request) {
 
