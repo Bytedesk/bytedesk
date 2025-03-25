@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 13:35:53
+ * @LastEditTime: 2025-03-25 14:49:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
     private final RoleRestService roleService;
 
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    // @PreAuthorize("hasAuthority('ROLE_READ')") // 创建成员时依赖，暂时放开
     @Override
     public ResponseEntity<?> queryByOrg(RoleRequest request) {
         
