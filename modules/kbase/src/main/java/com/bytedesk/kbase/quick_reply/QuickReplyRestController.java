@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 21:25:30
+ * @LastEditTime: 2025-03-25 12:58:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,8 +104,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            // String fileName = "kbase-quick_reply-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            String fileName = "快捷回复-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "quick_reply-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据

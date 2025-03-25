@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 12:08:57
+ * @LastEditTime: 2025-03-25 12:57:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -95,7 +95,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @PreAuthorize("hasAuthority('USER_EXPORT')")
+    @PreAuthorize("hasRole('SUPER')")
     @Override
     public Object export(UserRequest request, HttpServletResponse response) {
         // query data to export
@@ -106,7 +106,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "用户-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "user-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
@@ -129,12 +129,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return "";
     }
 
-    // @GetMapping("/export")
-    // public void export(UserRequest request, HttpServletResponse response) {
-    //     List<UserEntity> entities = userRestService.findAll(request);
-    //     List<UserExcel> excelList = userRestService.convertToExcel(entities);
-    //     ConvertUtils.exportExcel(response, "用户列表", UserExcel.class, excelList);
-    // }
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
@@ -167,7 +161,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-
     @ActionAnnotation(title = "user", action = "changeEmail", description = "changeEmail")
     @PostMapping("/change/email")
     public ResponseEntity<?> changeEmail(@RequestBody UserRequest userRequest, HttpServletRequest request) {
@@ -198,7 +191,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-
     @ActionAnnotation(title = "user", action = "logout", description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
@@ -216,7 +208,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
     // public ResponseEntity<?> testSuperAuthority() {
     //     return ResponseEntity.ok("you have super authority");
     // }
-
 
     /** no need to add ROLE_ prefix, system will auto add */
     // @GetMapping(value = "/test/cs")
