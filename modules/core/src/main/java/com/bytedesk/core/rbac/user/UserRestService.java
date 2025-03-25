@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 10:31:17
+ * @LastEditTime: 2025-03-25 11:51:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,9 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -142,5 +144,24 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    
+    public List<UserEntity> findAll(UserRequest request) {
+        Specification<UserEntity> specification = UserSpecification.search(request);
+        return userRepository.findAll(specification);
+    }
+
+    // public List<UserExcel> convertToExcel(List<UserEntity> entities) {
+    //     return entities.stream().map(this::convertToExcel).collect(Collectors.toList());
+    // }
+
+    public UserExcel convertToExcel(UserResponse entity) {
+        UserExcel excel = new UserExcel();
+        excel.setNickname(entity.getNickname());
+        excel.setEmail(entity.getEmail());
+        excel.setMobile(entity.getMobile());
+        excel.setDescription(entity.getDescription());
+        // excel.setAvatar(entity.getAvatar());
+        // excel.setPlatform(entity.getPlatform());
+        // excel.setOrgUid(entity.getOrgUid());
+        return excel;
+    }
 }
