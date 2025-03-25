@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 21:59:41
+ * @LastEditTime: 2025-03-25 16:48:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -104,12 +104,7 @@ public class TicketEntity extends BaseEntity {
 
     // 使用UserProtobuf json格式化
     // 一个工单一个处理人，一个处理人可以处理多个工单
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private AgentEntity assignee;        // 处理人
     @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String assignee = BytedeskConsts.EMPTY_JSON_STRING;
     

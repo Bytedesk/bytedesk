@@ -111,10 +111,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("user not found");
         }
         // String userUid = user.getUid();
-        // 检查用户是否有创建工单的权限
-        // if (!identityService.hasPrivilege(userId, "TICKET_CREATE")) {
-        // throw new AccessDeniedException("No permission to create ticket");
-        // }
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());

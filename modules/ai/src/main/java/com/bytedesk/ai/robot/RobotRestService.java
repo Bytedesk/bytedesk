@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 16:10:30
+ * @LastEditTime: 2025-03-25 16:34:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -199,19 +199,30 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         UserProtobuf agent = JSON.parseObject(request.getAgent(), UserProtobuf.class);
         String robotUid = agent.getUid();
-        //
-        Optional<RobotEntity> robotOptional = findByUid(robotUid);
-        if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot " + robotUid + " not found");
+        if (!StringUtils.hasText(robotUid)) {
+            throw new RuntimeException("robotUid is required");
         }
-        // org/robot/robotUid/userUid/randomUid
-        String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
+        // 
+        String topic = null;
+        if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
+            // org/robot/robotUid/userUid
+            topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
+        } else {
+            // org/robot/robotUid/userUid/randomUid
+            topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
+        }
+        
         // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
         if (!request.getForceNew()) {
             Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
             if (threadOptional.isPresent()) {
                 return threadService.convertToResponse(threadOptional.get());
             }
+        }
+        //
+        Optional<RobotEntity> robotOptional = findByUid(robotUid);
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + robotUid + " not found");
         }
         //
         RobotEntity robotEntity = robotOptional.get();
