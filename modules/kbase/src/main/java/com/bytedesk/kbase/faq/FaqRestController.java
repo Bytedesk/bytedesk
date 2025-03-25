@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 21:50:05
+ * @LastEditTime: 2025-03-25 12:58:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,7 +112,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
             response.setCharacterEncoding("utf-8");
             // download filename
             // String fileName = "Faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            String fileName = "常见问题-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据

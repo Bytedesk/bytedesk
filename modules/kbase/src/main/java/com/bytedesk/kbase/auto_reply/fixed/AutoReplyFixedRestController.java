@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:39:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 22:59:37
+ * @LastEditTime: 2025-03-25 12:59:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,7 +96,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
             response.setCharacterEncoding("utf-8");
             // download filename
             // String fileName = "kbase-auto_reply-fixed-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            String fileName = "固定自动回复-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "auto_reply-fixed-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
