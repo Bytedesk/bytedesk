@@ -32,6 +32,11 @@ public class MemberSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            
+            // 查询member.user.username
+            if (StringUtils.hasText(request.getUsername())) {
+                predicates.add(criteriaBuilder.like(root.get("user").get("username"), "%" + request.getUsername() + "%"));
+            }
             // 
             if (StringUtils.hasText(request.getDeptUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));

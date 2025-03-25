@@ -38,6 +38,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class MemberRequest extends BaseRequest {
 
+    private String username;
+
     @NotBlank
     private String nickname;
 
