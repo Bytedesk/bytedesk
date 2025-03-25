@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 16:51:48
+ * @LastEditTime: 2025-03-25 17:34:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,7 +93,6 @@ public class TicketEntity extends BaseEntity {
     // @Builder.Default
     // @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     // private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
-    // private String department = BytedeskConsts.EMPTY_JSON_STRING;
     private String departmentUid; // 部门
 
     // 使用UserProtobuf json格式化

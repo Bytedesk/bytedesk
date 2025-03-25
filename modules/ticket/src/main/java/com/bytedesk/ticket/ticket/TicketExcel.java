@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 18:16:29
+ * @LastEditTime: 2025-03-25 17:33:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,9 +55,9 @@ public class TicketExcel {
     @ColumnWidth(20)
     private String user;
 
-    @ExcelProperty(value = "技能组")
+    @ExcelProperty(value = "部门")
     @ColumnWidth(20)
-    private String workgroup;
+    private String department;
 
     @ExcelProperty(value = "指定处理人")
     @ColumnWidth(20)
