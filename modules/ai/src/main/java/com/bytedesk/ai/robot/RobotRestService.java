@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 15:31:16
+ * @LastEditTime: 2025-03-25 15:42:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,13 +52,11 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStateEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
@@ -277,7 +275,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         // org/robot/robotUid/userUid/randomUid
         String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotOptional.get().getUid(), owner.getUid(),
                 uidUtils.getUid());
-
         // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
         if (!request.getForceNew()) {
             Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
@@ -285,24 +282,23 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 return threadService.convertToResponse(threadOptional.get());
             }
         }
-
+        //
+        RobotEntity robotEntity = robotOptional.get();
+        String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
+        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        // 
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.LLM.name())
-                .state(ThreadStateEnum.STARTED.name())
                 .unreadCount(0)
-                .user(ConvertUtils.convertToUserProtobufString(owner))
-                // .owner(owner)
+                .user(user)
+                .agent(robot)
+                .userUid(owner.getUid())
+                .owner(owner)
                 .orgUid(owner.getOrgUid())
                 .build();
-        // thread.setUid(uidUtils.getUid());
-        // thread.setOrgUid(owner.getOrgUid());
-        //
-        RobotEntity robot = robotOptional.get();
-        robot.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
-        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
