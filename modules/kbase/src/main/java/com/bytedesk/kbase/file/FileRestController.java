@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 12:59:47
+ * @LastEditTime: 2025-03-25 13:42:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -37,7 +36,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
 
     private final FileRestService fileService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(FileRequest request) {
         
@@ -46,6 +45,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(files));
     }
 
+    @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(FileRequest request) {
         
