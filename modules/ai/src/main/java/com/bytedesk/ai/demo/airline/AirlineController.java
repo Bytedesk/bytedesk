@@ -36,17 +36,17 @@ import reactor.core.publisher.Flux;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @RestController
-@RequestMapping("/springai/demo/airline")
+@RequestMapping("//demo/airline")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
-public class SpringAIAirlineController {
+public class AirlineController {
 
 	@Qualifier("dashScopeCustomerSupportAssistant")
 	private final ChatClient dashScopeCustomerSupportAssistant;
 	
 	private final FlightBookingService flightBookingService;
 
-	// http://127.0.0.1:9003/springai/demo/airline/chat?chatId=1&userMessage=退票？
+	// http://127.0.0.1:9003//demo/airline/chat?chatId=1&userMessage=退票？
 	@GetMapping(path = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<String> chat(String chatId, String userMessage) {
 		return this.dashScopeCustomerSupportAssistant.prompt()
@@ -58,7 +58,7 @@ public class SpringAIAirlineController {
 				.content();
 	}
 
-	// http://127.0.0.1:9003/springai/demo/airline/bookings
+	// http://127.0.0.1:9003//demo/airline/bookings
 	@GetMapping("/bookings")
 	public ResponseEntity<JsonResult<?>> getBookings() {
 

@@ -203,8 +203,9 @@
 			<version>${jsonp.version}</version>
 		</dependency>
 
-
+		<!-- Open Manus -->
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<!-- https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk/examples/java/src/test/java/dev/selenium/actions_api/ActionsTest.java -->
 		<dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>

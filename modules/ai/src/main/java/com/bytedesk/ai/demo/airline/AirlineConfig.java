@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 11:15:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 10:07:11
+ * @LastEditTime: 2025-03-25 09:27:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
         "spring.ai.ollama.embedding.enabled",
         "spring.ai.vectorstore.redis.initialize-schema"
 }, havingValue = "true", matchIfMissing = true)
-public class SpringAIAirlineConfig {
+public class AirlineConfig {
 
     // https://java2ai.com/docs/1.0.0-M5.1/practices/playground-flight-booking/?spm=4347728f.3651acb5.0.0.491e3bbcfEUpsq
     // private String customerSupportAssistantSystemPrompt = """
