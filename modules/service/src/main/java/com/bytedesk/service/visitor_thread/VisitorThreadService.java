@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 10:11:03
+ * @LastEditTime: 2025-03-26 07:27:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.rbac.user.UserProtobuf;
+// import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
@@ -89,20 +89,20 @@ public class VisitorThreadService
         return visitorThreadRepository.findFirstByTopic(topic);
     }
 
-    public VisitorThreadEntity copyFromThread(ThreadEntity thread) {
-        //
-        VisitorThreadEntity visitorThread = modelMapper.map(thread, VisitorThreadEntity.class);
-        //
-        String visitorString = thread.getUser();
-        UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
-        visitorThread.setVisitorUid(visitor.getUid());
-        //
-        VisitorThreadEntity savedThread = save(visitorThread);
-        if (savedThread == null) {
-            throw new RuntimeException("Could not save visitor thread");
-        }
-        return savedThread;
-    }
+    // public VisitorThreadEntity copyFromThread(ThreadEntity thread) {
+    //     //
+    //     VisitorThreadEntity visitorThread = modelMapper.map(thread, VisitorThreadEntity.class);
+    //     //
+    //     String visitorString = thread.getUser();
+    //     UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
+    //     visitorThread.setVisitorUid(visitor.getUid());
+    //     //
+    //     VisitorThreadEntity savedThread = save(visitorThread);
+    //     if (savedThread == null) {
+    //         throw new RuntimeException("Could not save visitor thread");
+    //     }
+    //     return savedThread;
+    // }
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         // 
