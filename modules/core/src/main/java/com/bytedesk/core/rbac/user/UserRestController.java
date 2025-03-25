@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 11:52:58
+ * @LastEditTime: 2025-03-25 12:08:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,6 +59,12 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
+    @Override
+    public ResponseEntity<?> queryByUid(UserRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
     @PreAuthorize("hasRole('SUPER')")
     @ActionAnnotation(title = "user", action = "create", description = "create user info")
     @Override
@@ -89,13 +95,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
-    @PreAuthorize("hasRole('SUPER')")
+    @PreAuthorize("hasAuthority('USER_EXPORT')")
     @Override
     public Object export(UserRequest request, HttpServletResponse response) {
         // query data to export
@@ -106,7 +106,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             // download filename
-            String fileName = "成员-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            String fileName = "用户-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
