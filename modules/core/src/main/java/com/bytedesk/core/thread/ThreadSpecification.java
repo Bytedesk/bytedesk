@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 13:46:15
+ * @LastEditTime: 2025-03-26 15:13:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,8 +53,54 @@ public class ThreadSpecification extends BaseSpecification {
             maxDateSubquery.select(maxExpression)
                 .where(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
 
-            // 添加条件：当前记录的updatedAt等于该topic下的最大updatedAt
-            predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
+            // 如果ownerUid不为空，优先选择owner不为空的记录
+            if (StringUtils.hasText(request.getOwnerUid())) {
+                // 创建子查询来获取同一topic中匹配ownerUid的最新记录
+                Subquery<LocalDateTime> ownerMaxDateSubquery = query.subquery(LocalDateTime.class);
+                var ownerSubRoot = ownerMaxDateSubquery.from(ThreadEntity.class);
+                
+                Path<LocalDateTime> ownerUpdatedAtPath = ownerSubRoot.get("updatedAt");
+                Expression<LocalDateTime> ownerMaxExpression = criteriaBuilder.greatest(ownerUpdatedAtPath);
+                
+                ownerMaxDateSubquery.select(ownerMaxExpression)
+                    .where(criteriaBuilder.and(
+                        criteriaBuilder.equal(ownerSubRoot.get("topic"), root.get("topic")),
+                        criteriaBuilder.isNotNull(ownerSubRoot.get("owner")),
+                        criteriaBuilder.equal(ownerSubRoot.get("owner").get("uid"), request.getOwnerUid())
+                    ));
+                
+                // 创建子查询来检查同一topic中是否存在匹配ownerUid的记录
+                Subquery<Long> ownerExistsSubquery = query.subquery(Long.class);
+                var ownerExistsSubRoot = ownerExistsSubquery.from(ThreadEntity.class);
+                
+                ownerExistsSubquery.select(criteriaBuilder.count(ownerExistsSubRoot))
+                    .where(criteriaBuilder.and(
+                        criteriaBuilder.equal(ownerExistsSubRoot.get("topic"), root.get("topic")),
+                        criteriaBuilder.isNotNull(ownerExistsSubRoot.get("owner")),
+                        criteriaBuilder.equal(ownerExistsSubRoot.get("owner").get("uid"), request.getOwnerUid())
+                    ));
+                
+                // 两种情况：
+                // 1. 如果存在匹配ownerUid的记录，取该组记录中updatedAt最新的一条
+                // 2. 如果不存在匹配ownerUid的记录，取所有记录中updatedAt最新的一条
+                predicates.add(
+                    criteriaBuilder.or(
+                        criteriaBuilder.and(
+                            criteriaBuilder.greaterThan(ownerExistsSubquery, 0L),
+                            criteriaBuilder.isNotNull(root.get("owner")),
+                            criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()),
+                            criteriaBuilder.equal(root.get("updatedAt"), ownerMaxDateSubquery)
+                        ),
+                        criteriaBuilder.and(
+                            criteriaBuilder.equal(ownerExistsSubquery, 0L),
+                            criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery)
+                        )
+                    )
+                );
+            } else {
+                // 如果没有指定ownerUid，则使用原来的逻辑：按updatedAt最新的记录
+                predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
+            }
             
             // 根据组件类型过滤
             if (StringUtils.hasText(request.getComponentType())) {
