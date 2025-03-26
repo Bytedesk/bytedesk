@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-16 15:56:42
+ * @LastEditTime: 2025-03-26 13:27:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 // import java.util.Date;
 
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -60,4 +61,12 @@ public class MessageProtobuf implements Serializable {
 	private UserProtobuf user;
 
 	private String extra;
+
+	public static MessageProtobuf parseFromJson(String user) {
+        return JSON.parseObject(user, MessageProtobuf.class);
+    }
+
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }

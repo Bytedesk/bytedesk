@@ -397,6 +397,7 @@ public class TicketService {
                 ThreadEntity thread = threadOptional.get();
                 // 添加claimer到会话中
                 thread.getTicketors().add(assigneeProtobuf.toJson());
+                // thread.setAgent(assigneeProtobuf.toJson());
                 // 保存
                 threadRestService.save(thread);
                 // 添加订阅
