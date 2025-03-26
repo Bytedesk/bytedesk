@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 17:24:29
+ * @LastEditTime: 2025-03-26 12:09:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -307,10 +307,18 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
 
-        // 判断状态是否为NEW或退回状态，如果不是，则不能认领
+        // 判断状态是否为NEW或ASSIGNED或退回状态，如果不是，则不能认领
         if (!ticket.getStatus().equals(TicketStatusEnum.NEW.name()) &&
+                !ticket.getStatus().equals(TicketStatusEnum.ASSIGNED.name()) &&
                 !ticket.getStatus().equals(TicketStatusEnum.UNCLAIMED.name())) {
             throw new RuntimeException("已经被认领，工单状态为" + ticket.getStatus() + "，不能重复认领: " + request.getUid());
+        }
+
+        // 如果是ASSIGNED状态，判断是否为本人
+        if (ticket.getStatus().equals(TicketStatusEnum.ASSIGNED.name())) {
+            if (!ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
+                throw new RuntimeException("工单已经被分配，非本人不能认领: " + request.getUid());
+            }
         }
 
         // 2. 查询任务
