@@ -14,8 +14,8 @@
     </userTask>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="createTicket"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="createTicket" targetRef="assignToGroup"></sequenceFlow>
-    <userTask id="assignToGroup" name="部门处理" flowable:candidateGroups="${departmentUid}">
-      <documentation>部门成员处理工单</documentation>
+    <userTask id="assignToGroup" name="待认领工单" flowable:candidateGroups="${departmentUid}">
+      <documentation>部门成员认领工单</documentation>
       <extensionElements>
         <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
         <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>

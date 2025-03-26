@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 16:04:03
+ * @LastEditTime: 2025-03-26 16:34:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -345,9 +345,6 @@ public class TicketService {
                     .avatar(member.getAvatar())
                     .type(UserTypeEnum.MEMBER.name())
                     .build();
-            // assigneeProtobuf.setUid(assigneeOptional.get().getUid());
-            // assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-            // String assigneeJson = JSON.toJSONString(assigneeProtobuf);
             ticket.setAssignee(assigneeProtobuf.toJson());
             ticket.setStatus(TicketStatusEnum.CLAIMED.name());
 
