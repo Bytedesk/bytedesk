@@ -188,7 +188,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/filter")
     public ResponseEntity<?> queryTicketFilter(TicketRequest request) {
+
         Page<TicketResponse> page = ticketService.queryTicketFilter(request);
+
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
@@ -198,7 +200,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/created")
     public ResponseEntity<?> queryCreated(TicketRequest request) {
+
         Page<TicketResponse> page = ticketService.queryCreated(request);
+
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
@@ -208,7 +212,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @GetMapping("/query/claimed")
     public ResponseEntity<?> queryClaimed(TicketRequest request) {
+
         Page<TicketResponse> page = ticketService.queryClaimed(request);
+
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
@@ -218,7 +224,9 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @GetMapping("/query/unassigned")
     public ResponseEntity<?> queryUnassigned(TicketRequest request) {
+
         Page<TicketResponse> page = ticketService.queryUnassigned(request);
+
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
@@ -267,6 +275,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @PostMapping("/transfer")
     public ResponseEntity<?> transferTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.transferTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));
@@ -280,6 +289,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/hold")
     public ResponseEntity<?> holdTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.holdTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));
@@ -293,6 +303,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/resume")
     public ResponseEntity<?> resumeTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.resumeTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));
@@ -306,6 +317,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/pend")
     public ResponseEntity<?> pendTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.pendTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));
@@ -319,6 +331,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @PostMapping("/reopen")
     public ResponseEntity<?> reopenTicket(@RequestBody TicketRequest request) {
+        
         TicketResponse response = ticketService.reopenTicket(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("工单不存在"));

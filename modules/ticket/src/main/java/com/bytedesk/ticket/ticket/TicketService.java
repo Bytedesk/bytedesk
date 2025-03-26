@@ -88,24 +88,25 @@ public class TicketService {
         Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
 
         // 3. 获取这些工单的当前任务
-        List<TicketResponse> responses = ticketPage.getContent().stream()
-                .map(ticket -> {
-                    // 查询工单对应的当前任务
-                    Task task = taskService.createTaskQuery()
-                            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                            .processInstanceId(ticket.getProcessInstanceId())
-                            .singleResult();
-                    // 如果任务为空，则返回null
-                    if (task == null) {
-                        return null;
-                    }
-                    // 如果任务不为空，则返回工单响应
-                    return TicketConvertUtils.convertToResponse(ticket);
-                })
-                .filter(Objects::nonNull)
-                .toList();
+        // List<TicketResponse> responses = ticketPage.getContent().stream()
+        //         .map(ticket -> {
+        //             // 查询工单对应的当前任务
+        //             Task task = taskService.createTaskQuery()
+        //                     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+        //                     .processInstanceId(ticket.getProcessInstanceId())
+        //                     .singleResult();
+        //             // 如果任务为空，则返回null
+        //             if (task == null) {
+        //                 return null;
+        //             }
+        //             // 如果任务不为空，则返回工单响应
+        //             return TicketConvertUtils.convertToResponse(ticket);
+        //         })
+        //         .filter(Objects::nonNull)
+        //         .toList();
+        // return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
 
-        return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
+        return ticketPage.map(TicketConvertUtils::convertToResponse);
     }
 
     /**
