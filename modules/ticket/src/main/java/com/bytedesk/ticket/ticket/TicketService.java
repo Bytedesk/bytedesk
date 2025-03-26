@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 17:32:54
+ * @LastEditTime: 2025-03-26 17:41:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -128,8 +128,8 @@ public class TicketService {
             log.info("工单认领成功: taskId={}, assigneeUid={}", task.getId(), assigneeUid);
 
             // 只添加任务评论，指定userId参数为assigneeUid
-            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                    "CLAIMED", "工单被 " + assigneeName + " 认领");
+            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(), TicketStatusEnum.CLAIMED.name(), 
+                    "工单被 " + assigneeName + " 认领");
             comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
             taskService.saveComment(comment);
 
@@ -214,6 +214,7 @@ public class TicketService {
         // 
         String assigneeUid = request.getAssignee().getUid();
         Assert.notNull(assigneeUid, "处理人uid不能为空");
+        String assigneeName = request.getAssignee().getNickname();
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -255,7 +256,8 @@ public class TicketService {
         try {
             // 5. 添加任务评论，记录开始处理
             Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                    "PROCESSING", "工单开始处理");
+                    TicketStatusEnum.PROCESSING.name(), 
+                    "工单由" + assigneeName + "开始处理");
             comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
             taskService.saveComment(comment);
 
@@ -289,6 +291,7 @@ public class TicketService {
         // 
         String assigneeUid = request.getAssignee().getUid();
         Assert.notNull(assigneeUid, "处理人uid不能为空");
+        String assigneeName = request.getAssignee().getNickname();
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -331,7 +334,7 @@ public class TicketService {
 
         // 只添加任务评论
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "UNCLAIMED", "工单被退回到工作组");
+                TicketStatusEnum.UNCLAIMED.name(), "工单被 " + assigneeName + "退回到工作组");
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 
@@ -351,7 +354,7 @@ public class TicketService {
     }
 
     /**
-     * 转派工单
+     * 转派工单: TRANSFERRED
      * CLAIMED -> CLAIMED (转派)
      */
     @Transactional
@@ -390,7 +393,7 @@ public class TicketService {
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "TRANSFERRED", "工单被转派给 " + assigneeUid);
+                TicketStatusEnum.TRANSFERRED.name(), "工单被转派给 " + assigneeUid);
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 
@@ -545,8 +548,10 @@ public class TicketService {
         taskService.setAssignee(task.getId(), null);
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 "PENDING", "工单被待回应");
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+        taskService.saveComment(comment);
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PENDING.name());
@@ -596,8 +601,10 @@ public class TicketService {
         taskService.setAssignee(task.getId(), assigneeUid);
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 "REOPENED", "工单被重新打开");
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+        taskService.saveComment(comment);
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PROCESSING.name());
@@ -647,8 +654,10 @@ public class TicketService {
             taskService.setAssignee(task.getId(), assigneeUid);
 
             // comment
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                     "ESCALATED", "工单被升级");
+            comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+            taskService.saveComment(comment);
 
             // 5. 更新工单状态
             ticket.setStatus(TicketStatusEnum.ESCALATED.name());
@@ -701,8 +710,10 @@ public class TicketService {
         try {
             // 4. 添加评论。
             // 注意添加评论一定要放在complete之前，否则会报错找不到task
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                     "RESOLVED", "工单已解决");
+            comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+            taskService.saveComment(comment);
 
             // 5. 完成任务
             taskService.complete(task.getId());
@@ -769,8 +780,10 @@ public class TicketService {
             // 6. 添加评论
             String commentType = request.getVerified() ? "VERIFIED_OK" : "VERIFIED_FAIL";
             String commentMessage = request.getVerified() ? "客户确认工单已解决" : "客户反馈工单未解决";
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                     commentType, commentMessage);
+            comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+            taskService.saveComment(comment);
 
             // 7. 完成任务
             taskService.complete(task.getId(), variables);
