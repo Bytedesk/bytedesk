@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 11:45:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-07 15:04:05
+ * @LastEditTime: 2025-03-26 09:25:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkgroupSpecification extends BaseSpecification {
 
     public static Specification<WorkgroupEntity> search(WorkgroupRequest request) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

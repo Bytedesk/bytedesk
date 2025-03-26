@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 10:11:40
+ * @LastEditTime: 2025-03-26 09:15:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -191,6 +191,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         ThreadEntity thread = threadOptional.get();
     
         // 未满则接待
+        thread.setUserUid(agent.getUid());
         thread.setStarted();
         thread.setUnreadCount(1);
         thread.setContent(agent.getServiceSettings().getWelcomeTip());
@@ -240,6 +241,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
 
         // 进入排队队列
+        thread.setUserUid(agent.getUid());
         thread.setQueuing();
         thread.setUnreadCount(0);
         thread.setContent(content);
@@ -312,6 +314,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
 
             // 更新线程状态
+            thread.setUserUid(robot.getUid());
             thread.setState(ThreadStateEnum.ROBOTING.name());
             thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
             thread.setContent(robot.getServiceSettings().getWelcomeTip());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 07:27:01
+ * @LastEditTime: 2025-03-26 09:05:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -154,6 +154,7 @@ public class VisitorThreadService
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.AGENT.name())
+                .userUid(agent.getUid()) // 客服uid
                 .owner(agent.getMember().getUser())
                 .user(visitor)
                 .client(visitorRequest.getClient())
@@ -191,6 +192,7 @@ public class VisitorThreadService
                 .topic(topic)
                 .type(ThreadTypeEnum.ROBOT.name())
                 .state(ThreadStateEnum.STARTED.name())
+                .userUid(robot.getUid()) // 机器人uid
                 .user(visitor)
                 .client(visitorRequest.getClient())
                 .orgUid(robot.getOrgUid())

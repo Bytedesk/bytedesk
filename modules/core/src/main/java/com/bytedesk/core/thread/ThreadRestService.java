@@ -78,6 +78,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         if (user == null) {
             throw new RuntimeException("user not found");
         }
+        request.setUserUid(user.getUid());
         request.setOwnerUid(user.getUid());
         // 
         return queryByOrg(request);
