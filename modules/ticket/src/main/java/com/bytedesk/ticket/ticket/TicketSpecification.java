@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 17:33:57
+ * @LastEditTime: 2025-03-26 10:56:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,26 +73,26 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
             }
             // 处理 ALL 查询 - 我创建的或待我处理的
-            if ((request.getReporter() != null && StringUtils.hasText(request.getReporter().getUid())) || StringUtils.hasText(request.getAssigneeUid())) {
+            if (StringUtils.hasText(request.getReporterString()) || StringUtils.hasText(request.getAssigneeString())) {
                 if (Boolean.TRUE.equals(request.getAssignmentAll())) {
                     List<Predicate> orPredicates = new ArrayList<>();
                     
                     // 处理 reporter 条件
-                    if (request.getReporter() != null && StringUtils.hasText(request.getReporter().getUid())) {
+                    if (StringUtils.hasText(request.getReporterString())) {
                         orPredicates.add(criteriaBuilder.like(root.get("reporter"), 
                             "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
                     }
                     
                     // 处理 assignee 条件
-                    if (StringUtils.hasText(request.getAssigneeUid())) {
-                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
+                    if (StringUtils.hasText(request.getAssigneeString())) {
+                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssignee().getUid())) {
                             orPredicates.add(criteriaBuilder.or(
                                 criteriaBuilder.isNull(root.get("assignee")),
                                 criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
                             ));
                         } else {
                             orPredicates.add(criteriaBuilder.like(root.get("assignee"), 
-                                "%" + "\"uid\":\"" + request.getAssigneeUid() + "\"" + "%"));
+                                "%" + "\"uid\":\"" + request.getAssignee().getUid() + "\"" + "%"));
                         }
                     }
                     
@@ -102,19 +102,19 @@ public class TicketSpecification extends BaseSpecification {
                     }
                 } else {
                     // 单一条件查询
-                    if (request.getReporter() != null && StringUtils.hasText(request.getReporter().getUid())) {
+                    if (StringUtils.hasText(request.getReporterString())) {
                         predicates.add(criteriaBuilder.like(root.get("reporter"), 
                             "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
                     }
-                    if (StringUtils.hasText(request.getAssigneeUid())) {
-                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
+                    if (StringUtils.hasText(request.getAssigneeString())) {
+                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssignee().getUid())) {
                             predicates.add(criteriaBuilder.or(
                                 criteriaBuilder.isNull(root.get("assignee")),
                                 criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
                             ));
                         } else {
                             predicates.add(criteriaBuilder.like(root.get("assignee"), 
-                                "%" + "\"uid\":\"" + request.getAssigneeUid() + "\"" + "%"));
+                                "%" + "\"uid\":\"" + request.getAssignee().getUid() + "\"" + "%"));
                         }
                     }
                 }

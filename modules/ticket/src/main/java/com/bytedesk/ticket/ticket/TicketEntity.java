@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 17:34:02
+ * @LastEditTime: 2025-03-26 10:20:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -84,9 +84,9 @@ public class TicketEntity extends BaseEntity {
 
     // user, 使用UserProtobuf json格式化
     // 关联service thread ThreadEntity的user字段，访客信息
-    @Builder.Default
-    @Column(name = "ticket_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String user = BytedeskConsts.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // @Column(name = "ticket_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    // private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 使用UserProtobuf json格式化
     // 一个工单一个工作组，一个工作组可以有多个工单
@@ -95,12 +95,14 @@ public class TicketEntity extends BaseEntity {
     // private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
     private String departmentUid; // 部门
 
+    // 统一使用member entity
     // 使用UserProtobuf json格式化
     // 一个工单一个处理人，一个处理人可以处理多个工单
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String assignee = BytedeskConsts.EMPTY_JSON_STRING;
     
+    // 统一使用member entity
     // 使用UserProtobuf json格式化
     // 一个工单一个报告人，一个报告人可以报告多个工单
     @Builder.Default
@@ -150,12 +152,12 @@ public class TicketEntity extends BaseEntity {
 
 
     // 获取工单的访客
-    public UserProtobuf getUser() {
-        return JSON.parseObject(user, UserProtobuf.class);
-    }
-    public String getUserString() {
-        return user;
-    }
+    // public UserProtobuf getUser() {
+    //     return JSON.parseObject(user, UserProtobuf.class);
+    // }
+    // public String getUserString() {
+    //     return user;
+    // }
 
     // 获取工单的处理人
     public UserProtobuf getAssignee() {
