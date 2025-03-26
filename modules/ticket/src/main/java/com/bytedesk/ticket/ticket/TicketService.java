@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:39:33
+ * @LastEditTime: 2025-03-26 15:24:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -113,37 +113,34 @@ public class TicketService {
     /**
      * 查询企业orgUid所有工单
      */
-    public Page<TicketResponse> queryTicket(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        //
-        List<Task> tasks = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .orderByTaskCreateTime().desc()
-                .listPage(pageable.getPageNumber(), pageable.getPageSize());
-
-        long total = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .orderByTaskCreateTime().desc()
-                .count();
-
-        List<TicketResponse> responses = tasks.stream()
-                .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
-                    Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-                    if (ticket.isPresent()) {
-                        return TicketConvertUtils.convertToResponse(ticket.get());
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
-    }
+    // public Page<TicketResponse> queryTicket(TicketRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     //
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .orderByTaskCreateTime().desc()
+    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    //     long total = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .orderByTaskCreateTime().desc()
+    //             .count();
+    //     List<TicketResponse> responses = tasks.stream()
+    //             .map(task -> {
+    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
+    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+    //                 if (ticket.isPresent()) {
+    //                     return TicketConvertUtils.convertToResponse(ticket.get());
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             })
+    //             .filter(Objects::nonNull)
+    //             .toList();
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 查询我创建的工单

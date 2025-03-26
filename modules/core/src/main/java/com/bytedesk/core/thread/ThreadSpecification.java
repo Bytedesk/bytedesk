@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.utils.BdPinyinUtils;
 
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
@@ -207,8 +208,16 @@ public class ThreadSpecification extends BaseSpecification {
             // 
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
-                orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getSearchText() + "%"));
-                orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getSearchText() + "%"));
+                String searchText = request.getSearchText();
+                String pinyinText = BdPinyinUtils.toPinYin(searchText);
+                
+                orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + searchText + "%"));
+                
+                // 添加拼音搜索
+                orPredicates.add(criteriaBuilder.like(root.get("contentPinyin"), "%" + pinyinText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("userPinyin"), "%" + pinyinText + "%"));
+                
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             // 按更新时间排序

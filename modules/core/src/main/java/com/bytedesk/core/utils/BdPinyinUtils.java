@@ -15,6 +15,8 @@ package com.bytedesk.core.utils;
 
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.github.houbb.pinyin.bs.PinyinBs;
 import com.github.houbb.pinyin.support.style.PinyinToneStyles;
 
@@ -36,9 +38,48 @@ public class BdPinyinUtils {
      * @since 0.0.3
      */
     public static String toPinYin(String text) {
-        // final String text = "我爱中文";
+        if (!StringUtils.hasText(text)) {
+            return "";
+        }
+        
+        // 检查是否包含中文字符
+        boolean containsChinese = false;
+        for (char c : text.toCharArray()) {
+            if (isChinese(c)) {
+                containsChinese = true;
+                break;
+            }
+        }
+        
+        // 如果不包含中文，直接返回原始文本
+        if (!containsChinese) {
+            return text;
+        }
+        
+        // 转换为拼音
         return PinyinBs.newInstance().style(PinyinToneStyles.normal()).toPinyin(text);
-        // Assert.assertEquals("wo ai zhong wen", pinyin);
+    }
+
+    /**
+     * 判断字符是否是中文
+     */
+    public static boolean isChinese(char c) {
+        Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+        return ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || 
+               ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS ||
+               ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A ||
+               ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B;
+    }
+    
+    /**
+     * 获取字符串的拼音首字母
+     */
+    public static String getFirstLetters(String text) {
+        if (!StringUtils.hasText(text)) {
+            return "";
+        }
+        
+        return PinyinBs.newInstance().style(PinyinToneStyles.firstLetter()).toPinyin(text);
     }
 
     /**
