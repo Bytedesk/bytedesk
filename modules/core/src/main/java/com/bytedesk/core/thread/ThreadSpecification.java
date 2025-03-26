@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:48:53
+ * @LastEditTime: 2025-03-26 09:00:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,11 +118,13 @@ public class ThreadSpecification extends BaseSpecification {
             
             // ownerUid
             if (StringUtils.hasText(request.getOwnerUid())) {
-                List<Predicate> ownerPredicates = new ArrayList<>();
-                ownerPredicates.add(criteriaBuilder.equal(root.get("hide"), false));
-                ownerPredicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
+                // List<Predicate> ownerPredicates = new ArrayList<>();
+                // ownerPredicates.add(criteriaBuilder.equal(root.get("hide"), false));
+                // ownerPredicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
                 // 将ownerUid相关条件合并为一个条件
-                filterPredicates.add(criteriaBuilder.and(ownerPredicates.toArray(new Predicate[0])));
+                // filterPredicates.add(criteriaBuilder.and(ownerPredicates.toArray(new Predicate[0])));
+                // 
+                predicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
             }
             
             // 将三组条件之间用OR连接（只要满足其中一组条件即可）
