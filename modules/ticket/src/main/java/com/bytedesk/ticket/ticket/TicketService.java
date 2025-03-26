@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 16:53:48
+ * @LastEditTime: 2025-03-26 17:32:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -82,6 +82,7 @@ public class TicketService {
         // 
         String assigneeUid = request.getAssignee().getUid();
         Assert.notNull(assigneeUid, "处理人uid不能为空");
+        String assigneeName = request.getAssignee().getNickname();
         // 1. 先查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
@@ -126,9 +127,11 @@ public class TicketService {
             taskService.claim(task.getId(), assigneeUid);
             log.info("工单认领成功: taskId={}, assigneeUid={}", task.getId(), assigneeUid);
 
-            // 只添加任务评论
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                    "CLAIMED", "工单被 " + assigneeUid + " 认领");
+            // 只添加任务评论，指定userId参数为assigneeUid
+            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                    "CLAIMED", "工单被 " + assigneeName + " 认领");
+            comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+            taskService.saveComment(comment);
 
         } catch (Exception e) {
             log.error("工单认领失败: ", e);
@@ -251,8 +254,10 @@ public class TicketService {
 
         try {
             // 5. 添加任务评论，记录开始处理
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+            Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                     "PROCESSING", "工单开始处理");
+            comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+            taskService.saveComment(comment);
 
             // 6. 设置任务变量
             Map<String, Object> variables = new HashMap<>();
@@ -325,8 +330,10 @@ public class TicketService {
         taskService.unclaim(task.getId());
 
         // 只添加任务评论
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 "UNCLAIMED", "工单被退回到工作组");
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+        taskService.saveComment(comment);
 
         // 更新工单状态
         ticket.setAssignee(null);
@@ -382,8 +389,10 @@ public class TicketService {
         taskService.setAssignee(task.getId(), assigneeUid);
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 "TRANSFERRED", "工单被转派给 " + assigneeUid);
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+        taskService.saveComment(comment);
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
@@ -429,8 +438,10 @@ public class TicketService {
         }
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 "HOLDING", "工单被挂起");
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+        taskService.saveComment(comment);
 
         // 4. 挂起任务
         taskService.setAssignee(task.getId(), null);
@@ -482,8 +493,10 @@ public class TicketService {
         taskService.setAssignee(task.getId(), assigneeUid);
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 "RESUMED", "工单被恢复");
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
+        taskService.saveComment(comment);
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.RESUMED.name());
