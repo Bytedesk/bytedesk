@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:21:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 14:39:01
+ * @LastEditTime: 2025-03-26 12:01:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ticket.ticket;
 // 工单状态
 public enum TicketStatusEnum {
     NEW,            // 新建 - 工单刚创建
+    ASSIGNED,       // 已分配 - 工单被分配给客服处理人
     CLAIMED,        // 已认领 - 工单被客服主动认领
     UNCLAIMED,      // 已退回 - 工单被处理人退回到工作组
     PROCESSING,    // 处理中 - 处理人正在处理工单
