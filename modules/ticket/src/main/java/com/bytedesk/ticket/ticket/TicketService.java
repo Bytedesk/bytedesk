@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 17:41:35
+ * @LastEditTime: 2025-03-26 17:43:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -442,7 +442,7 @@ public class TicketService {
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "HOLDING", "工单被挂起");
+                TicketStatusEnum.HOLDING.name(), "工单被挂起");
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 
@@ -497,7 +497,7 @@ public class TicketService {
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "RESUMED", "工单被恢复");
+                            TicketStatusEnum.RESUMED.name(), "工单被恢复");
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 
@@ -549,7 +549,7 @@ public class TicketService {
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "PENDING", "工单被待回应");
+                        TicketStatusEnum.PENDING.name(), "工单被待回应");
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 
@@ -602,7 +602,7 @@ public class TicketService {
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "REOPENED", "工单被重新打开");
+                    TicketStatusEnum.REOPENED.name(), "工单被重新打开");
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 
@@ -655,7 +655,7 @@ public class TicketService {
 
             // comment
             Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                    "ESCALATED", "工单被升级");
+                                TicketStatusEnum.ESCALATED.name(), "工单被升级");
             comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
             taskService.saveComment(comment);
 
@@ -711,7 +711,7 @@ public class TicketService {
             // 4. 添加评论。
             // 注意添加评论一定要放在complete之前，否则会报错找不到task
             Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                    "RESOLVED", "工单已解决");
+                            TicketStatusEnum.RESOLVED.name(), "工单已解决");
             comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
             taskService.saveComment(comment);
 
