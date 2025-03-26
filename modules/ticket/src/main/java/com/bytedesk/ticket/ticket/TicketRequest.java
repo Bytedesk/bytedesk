@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 11:29:19
+ * @LastEditTime: 2025-03-26 15:47:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,9 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.Set;
 
+import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
@@ -46,16 +49,15 @@ public class TicketRequest extends BaseRequest {
     private String threadUid;
     private String categoryUid;
     // 
-    // private String workgroupUid;
     private String departmentUid;
     // 
     private Boolean assignmentAll;
-    // private String assigneeUid;
-    // private String assignee; // 原始json字符串
     private UserProtobuf assignee;
-    // private String reporterUid;
-    // private String reporter;  // 原始 JSON 字符串
     private UserProtobuf reporter;
+    
+    // 添加原始字符串字段存储JSON
+    private String assigneeString;
+    private String reporterString;
     // 
     private String startDate;
     private String endDate;
@@ -73,55 +75,51 @@ public class TicketRequest extends BaseRequest {
     // 客户验证
     private Boolean verified;
 
-    // 添加 getter 方法转换为 UserProtobuf
-    // public UserProtobuf getAssignee() {
-    //     if (StringUtils.hasText(assignee)) {
-    //         try {
-    //             // 处理可能的双重转义情况
-    //             String jsonStr = assignee;
-    //             if (assignee.startsWith("\"") && assignee.endsWith("\"")) {
-    //                 jsonStr = assignee.substring(1, assignee.length() - 1)
-    //                     .replace("\\\"", "\"");
-    //             }
-    //             return JSON.parseObject(jsonStr, UserProtobuf.class);
-    //         } catch (Exception e) {
-    //             log.error("Failed to parse assignee JSON: {}", assignee, e);
-    //             return null;
-    //         }
-    //     }
-    //     return null;
-    // }
-
     public String getAssigneeJson() {
-        if (assignee == null) {
-            return null;
+        if (assignee != null) {
+            return assignee.toJson();
+        } else if (StringUtils.hasText(assigneeString)) {
+            try {
+                assignee = JSON.parseObject(assigneeString, UserProtobuf.class);
+                return assigneeString;
+            } catch (Exception e) {
+                log.error("解析assignee字符串失败: {}", assigneeString, e);
+            }
         }
-        return assignee.toJson();
+        return null;
     }
         
-    // 添加 getter 方法转换为 UserProtobuf
-    // public UserProtobuf getReporter() {
-    //     if (StringUtils.hasText(reporter)) {
-    //         try {
-    //             // 处理可能的双重转义情况
-    //             String jsonStr = reporter;
-    //             if (reporter.startsWith("\"") && reporter.endsWith("\"")) {
-    //                 jsonStr = reporter.substring(1, reporter.length() - 1)
-    //                     .replace("\\\"", "\"");
-    //             }
-    //             return JSON.parseObject(jsonStr, UserProtobuf.class);
-    //         } catch (Exception e) {
-    //             log.error("Failed to parse reporter JSON: {}", reporter, e);
-    //             return null;
-    //         }
-    //     }
-    //     return null;
-    // }
-
     public String getReporterJson() {
-        if (reporter == null) {
-            return null;
+        if (reporter != null) {
+            return reporter.toJson();
+        } else if (StringUtils.hasText(reporterString)) {
+            try {
+                reporter = JSON.parseObject(reporterString, UserProtobuf.class);
+                return reporterString;
+            } catch (Exception e) {
+                log.error("解析reporter字符串失败: {}", reporterString, e);
+            }
         }
-        return reporter.toJson();
+        return null;
     }
-} 
+    
+    // 便捷方法，用于前端直接传uid的情况
+    public void setReporterUid(String uid) {
+        if (StringUtils.hasText(uid)) {
+            if (reporter == null) {
+                reporter = new UserProtobuf();
+            }
+            reporter.setUid(uid);
+        }
+    }
+    
+    // 便捷方法，用于前端直接传uid的情况
+    public void setAssigneeUid(String uid) {
+        if (StringUtils.hasText(uid)) {
+            if (assignee == null) {
+                assignee = new UserProtobuf();
+            }
+            assignee.setUid(uid);
+        }
+    }
+}

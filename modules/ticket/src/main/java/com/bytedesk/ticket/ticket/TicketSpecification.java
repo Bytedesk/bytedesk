@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 10:56:54
+ * @LastEditTime: 2025-03-26 15:46:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.utils.BdPinyinUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -48,10 +49,15 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
             if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText();
+                String pinyinText = BdPinyinUtils.toPinYin(searchText);
+                
                 predicates.add(criteriaBuilder.or(
-                    criteriaBuilder.like(root.get("uid"), "%" + request.getSearchText() + "%"),
-                    criteriaBuilder.like(root.get("title"), "%" + request.getSearchText() + "%"),
-                    criteriaBuilder.like(root.get("description"), "%" + request.getSearchText() + "%")
+                    criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("title"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("description"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("titlePinyin"), "%" + pinyinText + "%"),
+                    criteriaBuilder.like(root.get("descriptionPinyin"), "%" + pinyinText + "%")
                 ));
             }
             if (StringUtils.hasText(request.getStatus())) {
