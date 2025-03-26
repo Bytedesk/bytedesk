@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 11:20:55
+ * @LastEditTime: 2025-03-26 12:15:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+// import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.upload.UploadEntity;
@@ -52,7 +52,7 @@ public class TicketEventListener {
 
     private final ThreadRestService threadRestService;
 
-    private final TicketService ticketService;
+    // private final TicketService ticketService;
 
     // private final TopicCacheService topicCacheService;
 
@@ -123,16 +123,17 @@ public class TicketEventListener {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
             ticketRestService.save(ticketEntity);
-            // 认领任务
-            if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
-                TicketRequest request = new TicketRequest();
-                request.setUid(ticketEntity.getUid());
-                request.setAssignee(ticketEntity.getAssignee());
-                request.setOrgUid(ticketEntity.getOrgUid());
-                // 认领工单
-                ticketService.claimTicket(request);
-            }
+            // 认领任务，修改为用户手动认领
+            // if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
+            //     TicketRequest request = new TicketRequest();
+            //     request.setUid(ticketEntity.getUid());
+            //     request.setAssignee(ticketEntity.getAssignee());
+            //     request.setOrgUid(ticketEntity.getOrgUid());
+            //     // 认领工单
+            //     ticketService.claimTicket(request);
+            // }
         }
+        // 
         // 订阅工单会话
         // UserEntity owner = ticket.getOwner();
         // TopicRequest topicRequest = TopicRequest.builder()

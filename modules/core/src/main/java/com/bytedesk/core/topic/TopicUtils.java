@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 11:56:00
+ * @LastEditTime: 2025-03-26 12:24:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,8 +48,11 @@ public class TopicUtils {
     public static final String TOPIC_ORG_KB_PREFIX = "org/kb/";
     public static final String TOPIC_ORG_KBDOC_PREFIX = "org/kbdoc/";
     public static final String TOPIC_ORG_QUEUE_PREFIX = "org/queue/";
-    public static final String TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX = "org/ticket/agent/";
-    public static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX = "org/ticket/workgroup/";
+    // 
+    // public static final String TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX = "org/ticket/agent/";
+    // public static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX = "org/ticket/workgroup/";
+    // department ticket thread
+    public static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX = "org/ticket/department/";
 
     // topic格式定义：
     // 注意：开头没有 '/' ，防止stomp主题中将 '/' 替换为 '.'之后，在最前面多余一个 '.'
@@ -103,8 +106,11 @@ public class TopicUtils {
     private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
     private static final String TOPIC_ORG_UNIFIED_THREAD_PATTERN = TOPIC_ORG_UNIFIED_PREFIX + "%s/%s"; // "org/unified/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
-    private static final String TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN = TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/agent/%s/%s";
-    private static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/workgroup/%s/%s";
+    // private static final String TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN = TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/agent/%s/%s";
+    // private static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/workgroup/%s/%s";
+    // department ticket thread
+    private static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN = TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/department/%s/%s";
+
 
     public static String getUserTopic(String userUid) {
         return String.format(TOPIC_USER_PATTERN, userUid);
@@ -295,31 +301,39 @@ public class TopicUtils {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    // 工单会话
+    // 工单会话 department ticket thread
 
-    public static Boolean isOrgAgentTicketTopic(String topic) {
-        return topic.startsWith(TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX);
+    public static Boolean isOrgDepartmentTicketThreadTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX);
     }
 
-    public static Boolean isOrgWorkgroupTicketTopic(String topic) {
-        return topic.startsWith(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX);
+    public static String formatOrgDepartmentTicketThreadTopic(String departmentUid, String ticketUid) {
+        return String.format(TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN, departmentUid, ticketUid);
     }
 
-    public static String formatOrgAgentTicketThreadTopic(String agentUid, String ticketUid) {
-        return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid);
-    }
+    // public static Boolean isOrgAgentTicketTopic(String topic) {
+    //     return topic.startsWith(TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX);
+    // }
 
-    public static String formatOrgAgentTicketThreadTopicInternal(String agentUid, String ticketUid) {
-        return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
-    }
+    // public static Boolean isOrgWorkgroupTicketTopic(String topic) {
+    //     return topic.startsWith(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX);
+    // }
 
-    public static String formatOrgWorkgroupTicketThreadTopic(String workgroupUid, String ticketUid) {
-        return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid);
-    }
+    // public static String formatOrgAgentTicketThreadTopic(String agentUid, String ticketUid) {
+    //     return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid);
+    // }
 
-    public static String formatOrgWorkgroupTicketThreadTopicInternal(String workgroupUid, String ticketUid) {
-        return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
-    }
+    // public static String formatOrgAgentTicketThreadTopicInternal(String agentUid, String ticketUid) {
+    //     return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
+    // }
+
+    // public static String formatOrgWorkgroupTicketThreadTopic(String workgroupUid, String ticketUid) {
+    //     return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid);
+    // }
+
+    // public static String formatOrgWorkgroupTicketThreadTopicInternal(String workgroupUid, String ticketUid) {
+    //     return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
+    // }
 
     //////////////////////////////////////////////////////////////////////////
     // 统一客服入口
