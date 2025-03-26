@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:15:05
+ * @LastEditTime: 2025-03-26 17:02:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,7 +64,6 @@ public class TicketEventListener {
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
         variables.put(TicketConsts.TICKET_VARIABLE_TICKET_UID, ticket.getUid());
-        // variables.put(TicketConsts.TICKET_VARIABLE_WORKGROUP_UID, ticket.getDepartment().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID, ticket.getDepartmentUid());
         variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, ticket.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, ticket.getOrgUid());
