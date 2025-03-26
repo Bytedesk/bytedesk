@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:00:39
+ * @LastEditTime: 2025-03-26 12:03:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -125,7 +125,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
         ticket.setUserUid(userUid); // 创建人
-        ticket.setStatus(TicketStatusEnum.NEW.name());
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         ticket.setOwner(owner); // 创建人
@@ -133,8 +132,11 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());
         //
-        if (StringUtils.hasText(request.getAssigneeJson()) && StringUtils.hasText(request.getAssignee().getUid())) {
-            ticket.setStatus(TicketStatusEnum.CLAIMED.name());
+        if (StringUtils.hasText(request.getAssigneeJson()) 
+            && StringUtils.hasText(request.getAssignee().getUid())) {
+            ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+        } else {
+            ticket.setStatus(TicketStatusEnum.NEW.name());
         }
         // 
         ticket.setReporter(request.getReporterJson());
