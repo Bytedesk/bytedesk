@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:21:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 17:38:59
+ * @LastEditTime: 2025-03-26 17:45:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,5 +28,7 @@ public enum TicketStatusEnum {
     RESOLVED,       // 已解决 - 工单问题已解决，等待确认
     ESCALATED,      // 已升级 - 工单已升级到更高级别处理
     CLOSED,         // 已关闭 - 工单处理完成并确认
-    CANCELLED;      // 已取消 - 工单被取消（如重复提交）
+    CANCELLED,      // 已取消 - 工单被取消（如重复提交）
+    VERIFIED_OK,    // 已验证 - 客户已确认工单解决
+    VERIFIED_FAIL   // 已验证 - 客户已确认工单未解决
 }

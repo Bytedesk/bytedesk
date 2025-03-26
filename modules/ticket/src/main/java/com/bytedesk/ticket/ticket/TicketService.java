@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 17:43:47
+ * @LastEditTime: 2025-03-26 17:45:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,8 +35,6 @@ import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
-// import com.bytedesk.ticket.message.event.TicketMessageEvent;
-// import com.bytedesk.ticket.message.event.TicketMessageType;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
@@ -51,7 +49,6 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-// import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -778,7 +775,7 @@ public class TicketService {
             variables.put("verified", request.getVerified());
 
             // 6. 添加评论
-            String commentType = request.getVerified() ? "VERIFIED_OK" : "VERIFIED_FAIL";
+            String commentType = request.getVerified() ? TicketStatusEnum.VERIFIED_OK.name() : TicketStatusEnum.VERIFIED_FAIL.name();
             String commentMessage = request.getVerified() ? "客户确认工单已解决" : "客户反馈工单未解决";
             Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                     commentType, commentMessage);
