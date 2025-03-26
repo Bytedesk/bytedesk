@@ -52,7 +52,6 @@ public class TicketConsts {
     // variables
     public static final String TICKET_VARIABLE_TICKET_UID = "ticketUid";
 
-    // public static final String TICKET_VARIABLE_WORKGROUP_UID = "workgroupUid";
     public static final String TICKET_VARIABLE_DEPARTMENT_UID = "departmentUid";
 
     public static final String TICKET_VARIABLE_REPORTER_UID = "reporterUid";
