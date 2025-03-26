@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 16:34:57
+ * @LastEditTime: 2025-03-26 16:53:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,208 +67,9 @@ public class TicketService {
     private final TaskService taskService;
     private final TicketRepository ticketRepository;
     private final HistoryService historyService;
-    // private final AgentRestService agentRestService;
     private final MemberRestService memberRestService;
-    // private final ApplicationEventPublisher eventPublisher;
-    // private final TicketRestService ticketRestService;
     private final ThreadRestService threadRestService;
     private final TopicService topicService;
-
-    /**
-     * 查询工单，并过滤掉没有任务的工单
-     * 支持specification查询
-     */
-    // public Page<TicketResponse> queryTicketFilter(TicketRequest request) {
-    //     Pageable pageable = request.getPageable();
-    //     Specification<TicketEntity> spec = TicketSpecification.search(request);
-    //     // 2. 获取符合条件的工单
-    //     Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
-    //     // 3. 获取这些工单的当前任务
-    //     // List<TicketResponse> responses = ticketPage.getContent().stream()
-    //     // .map(ticket -> {
-    //     // // 查询工单对应的当前任务
-    //     // Task task = taskService.createTaskQuery()
-    //     // .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //     // .processInstanceId(ticket.getProcessInstanceId())
-    //     // .singleResult();
-    //     // // 如果任务为空，则返回null
-    //     // if (task == null) {
-    //     // return null;
-    //     // }
-    //     // // 如果任务不为空，则返回工单响应
-    //     // return TicketConvertUtils.convertToResponse(ticket);
-    //     // })
-    //     // .filter(Objects::nonNull)
-    //     // .toList();
-    //     // return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
-    //     return ticketPage.map(TicketConvertUtils::convertToResponse);
-    // }
-
-    /**
-     * 查询企业orgUid所有工单
-     */
-    // public Page<TicketResponse> queryTicket(TicketRequest request) {
-    //     Pageable pageable = request.getPageable();
-    //     //
-    //     List<Task> tasks = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .orderByTaskCreateTime().desc()
-    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
-    //     long total = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .orderByTaskCreateTime().desc()
-    //             .count();
-    //     List<TicketResponse> responses = tasks.stream()
-    //             .map(task -> {
-    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
-    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-    //                 if (ticket.isPresent()) {
-    //                     return TicketConvertUtils.convertToResponse(ticket.get());
-    //                 } else {
-    //                     return null;
-    //                 }
-    //             })
-    //             .filter(Objects::nonNull)
-    //             .toList();
-    //     return new PageImpl<>(responses, pageable, total);
-    // }
-
-    /**
-     * 查询我创建的工单
-     */
-    // public Page<TicketResponse> queryCreated(TicketRequest request) {
-    //     Pageable pageable = request.getPageable();
-    //     //
-    //     List<Task> tasks = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .taskAssignee(request.getReporter().getUid())
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .orderByTaskCreateTime().desc()
-    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
-    //     long total = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .taskAssignee(request.getReporter().getUid())
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .count();
-    //     List<TicketResponse> responses = tasks.stream()
-    //             .map(task -> {
-    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
-    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-    //                 if (ticket.isPresent()) {
-    //                     return TicketConvertUtils.convertToResponse(ticket.get());
-    //                 } else {
-    //                     return null;
-    //                 }
-    //             })
-    //             .filter(Objects::nonNull)
-    //             .toList();
-    //     return new PageImpl<>(responses, pageable, total);
-    // }
-
-    /**
-     * 查询待我处理的工单
-     */
-    // public Page<TicketResponse> queryClaimed(TicketRequest request) {
-    //     Pageable pageable = request.getPageable();
-    //     List<Task> tasks = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .taskAssignee(request.getAssignee().getUid())
-    //             .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .orderByTaskCreateTime().desc()
-    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
-    //     long total = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .taskAssignee(request.getAssignee().getUid())
-    //             .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .orderByTaskCreateTime().desc()
-    //             .count();
-    //     List<TicketResponse> responses = tasks.stream()
-    //             .map(task -> {
-    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
-    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-    //                 if (ticket.isPresent()) {
-    //                     return TicketConvertUtils.convertToResponse(ticket.get());
-    //                 } else {
-    //                     return null;
-    //                 }
-    //             })
-    //             .filter(Objects::nonNull)
-    //             .toList();
-    //     return new PageImpl<>(responses, pageable, total);
-    // }
-
-    /**
-     * 查询待分配的工单
-     */
-    // public Page<TicketResponse> queryUnassigned(TicketRequest request) {
-    //     // 如果workgroupUid为空，则查询所有待分配的工单
-    //     if (!StringUtils.hasText(request.getDepartmentUid())) {
-    //         return queryAllUnassigned(request);
-    //     }
-    //     Pageable pageable = request.getPageable();
-    //     List<Task> tasks = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .taskCandidateGroup(request.getDepartmentUid())
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
-    //     long total = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .taskCandidateGroup(request.getDepartmentUid())
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .count();
-    //     List<TicketResponse> responses = tasks.stream()
-    //             .map(task -> {
-    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
-    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-    //                 if (ticket.isPresent()) {
-    //                     return TicketConvertUtils.convertToResponse(ticket.get());
-    //                 } else {
-    //                     return null;
-    //                 }
-    //             })
-    //             .filter(Objects::nonNull)
-    //             .toList();
-    //     return new PageImpl<>(responses, pageable, total);
-    // }
-
-    /**
-     * 查询所有待分配的工单
-     */
-    // public Page<TicketResponse> queryAllUnassigned(TicketRequest request) {
-    //     // 查询所有待分配的工单
-    //     Pageable pageable = request.getPageable();
-    //     //
-    //     List<Task> tasks = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
-    //     long total = taskService.createTaskQuery()
-    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-    //             .count();
-    //     List<TicketResponse> responses = tasks.stream()
-    //             .map(task -> {
-    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
-    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-    //                 if (ticket.isPresent()) {
-    //                     return TicketConvertUtils.convertToResponse(ticket.get());
-    //                 } else {
-    //                     return null;
-    //                 }
-    //             })
-    //             .filter(Objects::nonNull)
-    //             .toList();
-    //     return new PageImpl<>(responses, pageable, total);
-    // }
 
     /**
      * 认领工单
@@ -407,6 +208,9 @@ public class TicketService {
     public TicketResponse startTicket(TicketRequest request) {
         log.info("开始处理工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -477,6 +281,9 @@ public class TicketService {
     public TicketResponse unclaimTicket(TicketRequest request) {
         log.info("开始退回工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -493,7 +300,7 @@ public class TicketService {
             throw new RuntimeException("非已认领工单，不能退回: " + request.getUid());
         }
         // 判断认领人是否为本人，如果不是，则不能退回
-        if (!ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
+        if (!ticket.getAssignee().getUid().equals(assigneeUid)) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能退回: " + request.getUid());
         }
 
@@ -501,7 +308,7 @@ public class TicketService {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-                .taskAssignee(request.getAssignee().getUid())
+                .taskAssignee(assigneeUid)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -544,6 +351,9 @@ public class TicketService {
     public TicketResponse transferTicket(TicketRequest request) {
         log.info("开始转派工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -569,11 +379,11 @@ public class TicketService {
         }
 
         // 4. 转派任务
-        taskService.setAssignee(task.getId(), request.getAssignee().getUid());
+        taskService.setAssignee(task.getId(), assigneeUid);
 
         // comment
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "TRANSFERRED", "工单被转派给 " + request.getAssignee().getUid());
+                "TRANSFERRED", "工单被转派给 " + assigneeUid);
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
@@ -590,6 +400,9 @@ public class TicketService {
     public TicketResponse holdTicket(TicketRequest request) {
         log.info("开始挂起工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -638,6 +451,10 @@ public class TicketService {
         log.info("开始恢复工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
+
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
@@ -662,7 +479,7 @@ public class TicketService {
         }
 
         // 4. 恢复任务
-        taskService.setAssignee(task.getId(), request.getAssignee().getUid());
+        taskService.setAssignee(task.getId(), assigneeUid);
 
         // comment
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
@@ -683,6 +500,10 @@ public class TicketService {
     public TicketResponse pendTicket(TicketRequest request) {
         log.info("开始待回应工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -730,6 +551,10 @@ public class TicketService {
         log.info("开始重新打开工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
+
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
@@ -755,7 +580,7 @@ public class TicketService {
         }
 
         // 4. 重新打开任务
-        taskService.setAssignee(task.getId(), request.getAssignee().getUid());
+        taskService.setAssignee(task.getId(), assigneeUid);
 
         // comment
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
@@ -776,6 +601,10 @@ public class TicketService {
     public TicketResponse escalateTicket(TicketRequest request) {
         log.info("开始升级工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -802,7 +631,7 @@ public class TicketService {
 
         try {
             // 4. 升级任务
-            taskService.setAssignee(task.getId(), request.getAssignee().getUid());
+            taskService.setAssignee(task.getId(), assigneeUid);
 
             // comment
             taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
@@ -827,6 +656,10 @@ public class TicketService {
     public TicketResponse resolveTicket(TicketRequest request) {
         log.info("开始解决工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
+
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -883,6 +716,10 @@ public class TicketService {
         log.info("开始验证工单: uid={}, verified={}, orgUid={}",
                 request.getUid(), request.getVerified(), request.getOrgUid());
 
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
+
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
@@ -896,7 +733,7 @@ public class TicketService {
         }
 
         // 3. 判断验证人是否为提交人
-        if (!ticket.getReporter().getUid().equals(request.getAssignee().getUid())) {
+        if (!ticket.getReporter().getUid().equals(assigneeUid)) {
             throw new RuntimeException("非工单提交人，不能验证: " + request.getUid());
         }
 
@@ -955,6 +792,10 @@ public class TicketService {
         log.info("开始关闭工单: uid={}, status={}, orgUid={}",
                 request.getUid(), request.getStatus(), request.getOrgUid());
 
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
+
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
@@ -1000,6 +841,10 @@ public class TicketService {
     public TicketResponse cancelTicket(TicketRequest request) {
         log.info("开始取消工单: uid={}, status={}, orgUid={}",
                 request.getUid(), request.getStatus(), request.getOrgUid());
+
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
