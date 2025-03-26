@@ -108,14 +108,15 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (owner == null) {
             throw new RuntimeException("user not found");
         }
-        // String userUid = user.getUid();
+        String userUid = owner.getUid();
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
+        ticket.setUserUid(userUid); // 创建人
         ticket.setStatus(TicketStatusEnum.NEW.name());
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.DEPARTMENT.name());
-        ticket.setOwner(owner);
+        ticket.setOwner(owner); // 创建人
         //
         // Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         // if (workgroupOptional.isPresent()) {
