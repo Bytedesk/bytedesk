@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 13:38:15
+ * @LastEditTime: 2025-03-26 09:52:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
 
     private final WorkgroupRestService workgroupService;
 
-    @PreAuthorize("hasAuthority('WORKGROUP_READ')")
+    // @PreAuthorize("hasAuthority('WORKGROUP_READ')") // 前端很多地方需要查询工作组列表，所以不需要权限
     public ResponseEntity<?> queryByOrg(WorkgroupRequest request) {
 
         Page<WorkgroupResponse> workgroups = workgroupService.queryByOrg(request);
@@ -43,7 +43,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
-    @PreAuthorize("hasAuthority('WORKGROUP_READ')")
+    // @PreAuthorize("hasAuthority('WORKGROUP_READ')")
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRequest request) {
         
@@ -52,7 +52,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
-    @PreAuthorize("hasAuthority('WORKGROUP_READ')")
+    // @PreAuthorize("hasAuthority('WORKGROUP_READ')")
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
         // TODO Auto-generated method stub

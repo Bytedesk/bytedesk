@@ -51,7 +51,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    @PreAuthorize("hasAuthority('AGENT_READ')")
+    // @PreAuthorize("hasAuthority('AGENT_READ')") 前端很多地方需要查询，所以不需要权限
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -60,7 +60,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('AGENT_READ')")
+    // @PreAuthorize("hasAuthority('AGENT_READ')")
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
@@ -69,14 +69,14 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
-    @PreAuthorize("hasAuthority('AGENT_READ')")
+    // @PreAuthorize("hasAuthority('AGENT_READ')")
     @Override
     public ResponseEntity<?> queryByUid(AgentRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @PreAuthorize("hasAuthority('AGENT_READ')")
+    // @PreAuthorize("hasAuthority('AGENT_READ')")
     @ActionAnnotation(title = "agent", action = "detail", description = "query agent profile")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(AgentRequest request) {
@@ -86,7 +86,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    @PreAuthorize("hasAuthority('AGENT_READ')")
+    // @PreAuthorize("hasAuthority('AGENT_READ')")
     @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
