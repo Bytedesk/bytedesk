@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 15:46:33
+ * @LastEditTime: 2025-03-26 15:58:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
-// import com.bytedesk.core.utils.BdPinyinUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -49,15 +48,10 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
             if (StringUtils.hasText(request.getSearchText())) {
-                String searchText = request.getSearchText();
-                // String pinyinText = BdPinyinUtils.toPinYin(searchText);
-                
                 predicates.add(criteriaBuilder.or(
-                    criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("title"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("description"), "%" + searchText + "%")
-                    // criteriaBuilder.like(root.get("titlePinyin"), "%" + pinyinText + "%"),
-                    // criteriaBuilder.like(root.get("descriptionPinyin"), "%" + pinyinText + "%")
+                    criteriaBuilder.like(root.get("uid"), "%" + request.getSearchText() + "%"),
+                    criteriaBuilder.like(root.get("title"), "%" + request.getSearchText() + "%"),
+                    criteriaBuilder.like(root.get("description"), "%" + request.getSearchText() + "%")
                 ));
             }
             if (StringUtils.hasText(request.getStatus())) {
@@ -79,26 +73,26 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
             }
             // 处理 ALL 查询 - 我创建的或待我处理的
-            if (StringUtils.hasText(request.getReporterJson()) || StringUtils.hasText(request.getAssigneeJson())) {
+            if ((StringUtils.hasText(request.getReporterUid())) || StringUtils.hasText(request.getAssigneeUid())) {
                 if (Boolean.TRUE.equals(request.getAssignmentAll())) {
                     List<Predicate> orPredicates = new ArrayList<>();
                     
                     // 处理 reporter 条件
-                    if (StringUtils.hasText(request.getReporterJson())) {
+                    if (request.getReporter() != null && StringUtils.hasText(request.getReporterUid())) {
                         orPredicates.add(criteriaBuilder.like(root.get("reporter"), 
-                            "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
+                            "%" + "\"uid\":\"" + request.getReporterUid() + "\"" + "%"));
                     }
                     
                     // 处理 assignee 条件
-                    if (StringUtils.hasText(request.getAssigneeJson())) {
-                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssignee().getUid())) {
+                    if (StringUtils.hasText(request.getAssigneeUid())) {
+                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
                             orPredicates.add(criteriaBuilder.or(
                                 criteriaBuilder.isNull(root.get("assignee")),
                                 criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
                             ));
                         } else {
                             orPredicates.add(criteriaBuilder.like(root.get("assignee"), 
-                                "%" + "\"uid\":\"" + request.getAssignee().getUid() + "\"" + "%"));
+                                "%" + "\"uid\":\"" + request.getAssigneeUid() + "\"" + "%"));
                         }
                     }
                     
@@ -108,19 +102,19 @@ public class TicketSpecification extends BaseSpecification {
                     }
                 } else {
                     // 单一条件查询
-                    if (StringUtils.hasText(request.getReporterJson())) {
+                    if (StringUtils.hasText(request.getReporterUid())) {
                         predicates.add(criteriaBuilder.like(root.get("reporter"), 
-                            "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
+                            "%" + "\"uid\":\"" + request.getReporterUid() + "\"" + "%"));
                     }
-                    if (StringUtils.hasText(request.getAssigneeJson())) {
-                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssignee().getUid())) {
+                    if (StringUtils.hasText(request.getAssigneeUid())) {
+                        if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
                             predicates.add(criteriaBuilder.or(
                                 criteriaBuilder.isNull(root.get("assignee")),
                                 criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
                             ));
                         } else {
                             predicates.add(criteriaBuilder.like(root.get("assignee"), 
-                                "%" + "\"uid\":\"" + request.getAssignee().getUid() + "\"" + "%"));
+                                "%" + "\"uid\":\"" + request.getAssigneeUid() + "\"" + "%"));
                         }
                     }
                 }

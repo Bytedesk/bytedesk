@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 15:24:43
+ * @LastEditTime: 2025-03-26 16:04:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -82,33 +78,31 @@ public class TicketService {
      * 查询工单，并过滤掉没有任务的工单
      * 支持specification查询
      */
-    public Page<TicketResponse> queryTicketFilter(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TicketEntity> spec = TicketSpecification.search(request);
-        // 2. 获取符合条件的工单
-        Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
-
-        // 3. 获取这些工单的当前任务
-        // List<TicketResponse> responses = ticketPage.getContent().stream()
-        // .map(ticket -> {
-        // // 查询工单对应的当前任务
-        // Task task = taskService.createTaskQuery()
-        // .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-        // .processInstanceId(ticket.getProcessInstanceId())
-        // .singleResult();
-        // // 如果任务为空，则返回null
-        // if (task == null) {
-        // return null;
-        // }
-        // // 如果任务不为空，则返回工单响应
-        // return TicketConvertUtils.convertToResponse(ticket);
-        // })
-        // .filter(Objects::nonNull)
-        // .toList();
-        // return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
-
-        return ticketPage.map(TicketConvertUtils::convertToResponse);
-    }
+    // public Page<TicketResponse> queryTicketFilter(TicketRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     Specification<TicketEntity> spec = TicketSpecification.search(request);
+    //     // 2. 获取符合条件的工单
+    //     Page<TicketEntity> ticketPage = ticketRepository.findAll(spec, pageable);
+    //     // 3. 获取这些工单的当前任务
+    //     // List<TicketResponse> responses = ticketPage.getContent().stream()
+    //     // .map(ticket -> {
+    //     // // 查询工单对应的当前任务
+    //     // Task task = taskService.createTaskQuery()
+    //     // .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //     // .processInstanceId(ticket.getProcessInstanceId())
+    //     // .singleResult();
+    //     // // 如果任务为空，则返回null
+    //     // if (task == null) {
+    //     // return null;
+    //     // }
+    //     // // 如果任务不为空，则返回工单响应
+    //     // return TicketConvertUtils.convertToResponse(ticket);
+    //     // })
+    //     // .filter(Objects::nonNull)
+    //     // .toList();
+    //     // return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
+    //     return ticketPage.map(TicketConvertUtils::convertToResponse);
+    // }
 
     /**
      * 查询企业orgUid所有工单
@@ -145,149 +139,136 @@ public class TicketService {
     /**
      * 查询我创建的工单
      */
-    public Page<TicketResponse> queryCreated(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        //
-        List<Task> tasks = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskAssignee(request.getReporter().getUid())
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .orderByTaskCreateTime().desc()
-                .listPage(pageable.getPageNumber(), pageable.getPageSize());
-
-        long total = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskAssignee(request.getReporter().getUid())
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .count();
-
-        List<TicketResponse> responses = tasks.stream()
-                .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
-                    Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-                    if (ticket.isPresent()) {
-                        return TicketConvertUtils.convertToResponse(ticket.get());
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
-    }
+    // public Page<TicketResponse> queryCreated(TicketRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     //
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .taskAssignee(request.getReporter().getUid())
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .orderByTaskCreateTime().desc()
+    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    //     long total = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .taskAssignee(request.getReporter().getUid())
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .count();
+    //     List<TicketResponse> responses = tasks.stream()
+    //             .map(task -> {
+    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
+    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+    //                 if (ticket.isPresent()) {
+    //                     return TicketConvertUtils.convertToResponse(ticket.get());
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             })
+    //             .filter(Objects::nonNull)
+    //             .toList();
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 查询待我处理的工单
      */
-    public Page<TicketResponse> queryClaimed(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        List<Task> tasks = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskAssignee(request.getAssignee().getUid())
-                .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .orderByTaskCreateTime().desc()
-                .listPage(pageable.getPageNumber(), pageable.getPageSize());
-
-        long total = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskAssignee(request.getAssignee().getUid())
-                .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .orderByTaskCreateTime().desc()
-                .count();
-
-        List<TicketResponse> responses = tasks.stream()
-                .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
-                    Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-                    if (ticket.isPresent()) {
-                        return TicketConvertUtils.convertToResponse(ticket.get());
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
-    }
+    // public Page<TicketResponse> queryClaimed(TicketRequest request) {
+    //     Pageable pageable = request.getPageable();
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .taskAssignee(request.getAssignee().getUid())
+    //             .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .orderByTaskCreateTime().desc()
+    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    //     long total = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .taskAssignee(request.getAssignee().getUid())
+    //             .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .orderByTaskCreateTime().desc()
+    //             .count();
+    //     List<TicketResponse> responses = tasks.stream()
+    //             .map(task -> {
+    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
+    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+    //                 if (ticket.isPresent()) {
+    //                     return TicketConvertUtils.convertToResponse(ticket.get());
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             })
+    //             .filter(Objects::nonNull)
+    //             .toList();
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 查询待分配的工单
      */
-    public Page<TicketResponse> queryUnassigned(TicketRequest request) {
-        // 如果workgroupUid为空，则查询所有待分配的工单
-        if (!StringUtils.hasText(request.getDepartmentUid())) {
-            return queryAllUnassigned(request);
-        }
-
-        Pageable pageable = request.getPageable();
-        List<Task> tasks = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskCandidateGroup(request.getDepartmentUid())
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .listPage(pageable.getPageNumber(), pageable.getPageSize());
-
-        long total = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskCandidateGroup(request.getDepartmentUid())
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .count();
-
-        List<TicketResponse> responses = tasks.stream()
-                .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
-                    Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-                    if (ticket.isPresent()) {
-                        return TicketConvertUtils.convertToResponse(ticket.get());
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
-    }
+    // public Page<TicketResponse> queryUnassigned(TicketRequest request) {
+    //     // 如果workgroupUid为空，则查询所有待分配的工单
+    //     if (!StringUtils.hasText(request.getDepartmentUid())) {
+    //         return queryAllUnassigned(request);
+    //     }
+    //     Pageable pageable = request.getPageable();
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .taskCandidateGroup(request.getDepartmentUid())
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    //     long total = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .taskCandidateGroup(request.getDepartmentUid())
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .count();
+    //     List<TicketResponse> responses = tasks.stream()
+    //             .map(task -> {
+    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
+    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+    //                 if (ticket.isPresent()) {
+    //                     return TicketConvertUtils.convertToResponse(ticket.get());
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             })
+    //             .filter(Objects::nonNull)
+    //             .toList();
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 查询所有待分配的工单
      */
-    public Page<TicketResponse> queryAllUnassigned(TicketRequest request) {
-        // 查询所有待分配的工单
-        Pageable pageable = request.getPageable();
-        //
-        List<Task> tasks = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .listPage(pageable.getPageNumber(), pageable.getPageSize());
-
-        long total = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
-                .count();
-
-        List<TicketResponse> responses = tasks.stream()
-                .map(task -> {
-                    String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
-                            TicketConsts.TICKET_VARIABLE_TICKET_UID);
-                    Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
-                    if (ticket.isPresent()) {
-                        return TicketConvertUtils.convertToResponse(ticket.get());
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new PageImpl<>(responses, pageable, total);
-    }
+    // public Page<TicketResponse> queryAllUnassigned(TicketRequest request) {
+    //     // 查询所有待分配的工单
+    //     Pageable pageable = request.getPageable();
+    //     //
+    //     List<Task> tasks = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .listPage(pageable.getPageNumber(), pageable.getPageSize());
+    //     long total = taskService.createTaskQuery()
+    //             .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+    //             .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
+    //             .count();
+    //     List<TicketResponse> responses = tasks.stream()
+    //             .map(task -> {
+    //                 String ticketUid = (String) runtimeService.getVariable(task.getExecutionId(),
+    //                         TicketConsts.TICKET_VARIABLE_TICKET_UID);
+    //                 Optional<TicketEntity> ticket = ticketRepository.findByUid(ticketUid);
+    //                 if (ticket.isPresent()) {
+    //                     return TicketConvertUtils.convertToResponse(ticket.get());
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             })
+    //             .filter(Objects::nonNull)
+    //             .toList();
+    //     return new PageImpl<>(responses, pageable, total);
+    // }
 
     /**
      * 认领工单
