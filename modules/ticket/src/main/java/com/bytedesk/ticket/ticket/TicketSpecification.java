@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.utils.BdPinyinUtils;
+// import com.bytedesk.core.utils.BdPinyinUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -50,14 +50,14 @@ public class TicketSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getSearchText())) {
                 String searchText = request.getSearchText();
-                String pinyinText = BdPinyinUtils.toPinYin(searchText);
+                // String pinyinText = BdPinyinUtils.toPinYin(searchText);
                 
                 predicates.add(criteriaBuilder.or(
                     criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"),
                     criteriaBuilder.like(root.get("title"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("description"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("titlePinyin"), "%" + pinyinText + "%"),
-                    criteriaBuilder.like(root.get("descriptionPinyin"), "%" + pinyinText + "%")
+                    criteriaBuilder.like(root.get("description"), "%" + searchText + "%")
+                    // criteriaBuilder.like(root.get("titlePinyin"), "%" + pinyinText + "%"),
+                    // criteriaBuilder.like(root.get("descriptionPinyin"), "%" + pinyinText + "%")
                 ));
             }
             if (StringUtils.hasText(request.getStatus())) {
