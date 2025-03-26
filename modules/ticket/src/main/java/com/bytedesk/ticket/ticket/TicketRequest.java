@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 10:54:59
+ * @LastEditTime: 2025-03-26 11:29:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.Set;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
@@ -25,7 +24,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
-import org.springframework.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
@@ -53,9 +51,11 @@ public class TicketRequest extends BaseRequest {
     // 
     private Boolean assignmentAll;
     // private String assigneeUid;
-    private String assignee; // 原始json字符串
+    // private String assignee; // 原始json字符串
+    private UserProtobuf assignee;
     // private String reporterUid;
-    private String reporter;  // 原始 JSON 字符串
+    // private String reporter;  // 原始 JSON 字符串
+    private UserProtobuf reporter;
     // 
     private String startDate;
     private String endDate;
@@ -74,48 +74,54 @@ public class TicketRequest extends BaseRequest {
     private Boolean verified;
 
     // 添加 getter 方法转换为 UserProtobuf
-    public UserProtobuf getAssignee() {
-        if (StringUtils.hasText(assignee)) {
-            try {
-                // 处理可能的双重转义情况
-                String jsonStr = assignee;
-                if (assignee.startsWith("\"") && assignee.endsWith("\"")) {
-                    jsonStr = assignee.substring(1, assignee.length() - 1)
-                        .replace("\\\"", "\"");
-                }
-                return JSON.parseObject(jsonStr, UserProtobuf.class);
-            } catch (Exception e) {
-                log.error("Failed to parse assignee JSON: {}", assignee, e);
-                return null;
-            }
-        }
-        return null;
-    }
+    // public UserProtobuf getAssignee() {
+    //     if (StringUtils.hasText(assignee)) {
+    //         try {
+    //             // 处理可能的双重转义情况
+    //             String jsonStr = assignee;
+    //             if (assignee.startsWith("\"") && assignee.endsWith("\"")) {
+    //                 jsonStr = assignee.substring(1, assignee.length() - 1)
+    //                     .replace("\\\"", "\"");
+    //             }
+    //             return JSON.parseObject(jsonStr, UserProtobuf.class);
+    //         } catch (Exception e) {
+    //             log.error("Failed to parse assignee JSON: {}", assignee, e);
+    //             return null;
+    //         }
+    //     }
+    //     return null;
+    // }
 
-    public String getAssigneeString() {
-        return assignee;
+    public String getAssigneeJson() {
+        if (assignee == null) {
+            return null;
+        }
+        return assignee.toJson();
     }
         
     // 添加 getter 方法转换为 UserProtobuf
-    public UserProtobuf getReporter() {
-        if (StringUtils.hasText(reporter)) {
-            try {
-                // 处理可能的双重转义情况
-                String jsonStr = reporter;
-                if (reporter.startsWith("\"") && reporter.endsWith("\"")) {
-                    jsonStr = reporter.substring(1, reporter.length() - 1)
-                        .replace("\\\"", "\"");
-                }
-                return JSON.parseObject(jsonStr, UserProtobuf.class);
-            } catch (Exception e) {
-                log.error("Failed to parse reporter JSON: {}", reporter, e);
-                return null;
-            }
-        }
-        return null;
-    }
+    // public UserProtobuf getReporter() {
+    //     if (StringUtils.hasText(reporter)) {
+    //         try {
+    //             // 处理可能的双重转义情况
+    //             String jsonStr = reporter;
+    //             if (reporter.startsWith("\"") && reporter.endsWith("\"")) {
+    //                 jsonStr = reporter.substring(1, reporter.length() - 1)
+    //                     .replace("\\\"", "\"");
+    //             }
+    //             return JSON.parseObject(jsonStr, UserProtobuf.class);
+    //         } catch (Exception e) {
+    //             log.error("Failed to parse reporter JSON: {}", reporter, e);
+    //             return null;
+    //         }
+    //     }
+    //     return null;
+    // }
 
-    public String getReporterString() {
-        return reporter;
+    public String getReporterJson() {
+        if (reporter == null) {
+            return null;
+        }
+        return reporter.toJson();
     }
 } 
