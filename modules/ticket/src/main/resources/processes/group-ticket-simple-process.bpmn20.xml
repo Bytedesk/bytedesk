@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="BytedeskTicket" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
-  <process id="groupTicketSimpleProcess" name="工作组工单简单流程" isExecutable="true">
+  <process id="groupTicketSimpleProcess" name="部门工单简单流程" isExecutable="true">
     <extensionElements>
       <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
       <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
@@ -14,8 +14,8 @@
     </userTask>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="createTicket"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="createTicket" targetRef="assignToGroup"></sequenceFlow>
-    <userTask id="assignToGroup" name="工作组处理" flowable:candidateGroups="${workgroupUid}">
-      <documentation>工作组成员处理工单</documentation>
+    <userTask id="assignToGroup" name="部门处理" flowable:candidateGroups="${departmentUid}">
+      <documentation>部门成员处理工单</documentation>
       <extensionElements>
         <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
         <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
