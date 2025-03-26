@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 09:23:34
+ * @LastEditTime: 2025-03-26 13:40:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,6 +113,21 @@ public class ThreadSpecification extends BaseSpecification {
                 if (!monitorPredicates.isEmpty()) {
                     // 将所有monitorUids条件合并为一个条件
                     filterPredicates.add(criteriaBuilder.or(monitorPredicates.toArray(new Predicate[0])));
+                }
+            }
+
+            // ticketorUids
+            if (request.getTicketorUids()!= null &&!request.getTicketorUids().isEmpty()) {
+                List<Predicate> ticketorPredicates = new ArrayList<>();
+                for (String ticketorUid : request.getTicketorUids()) {
+                    if (StringUtils.hasText(ticketorUid)) {
+                        // 使用LIKE查询匹配ticketors字段中包含特定uid的记录
+                        ticketorPredicates.add(criteriaBuilder.like(root.get("ticketors"), "%" + ticketorUid + "%"));
+                    }
+                }
+                if (!ticketorPredicates.isEmpty()) {
+                    // 将所有ticketorUids条件合并为一个条件
+                    filterPredicates.add(criteriaBuilder.or(ticketorPredicates.toArray(new Predicate[0])));
                 }
             }
             
