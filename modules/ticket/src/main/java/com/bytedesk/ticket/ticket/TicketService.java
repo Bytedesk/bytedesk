@@ -187,7 +187,7 @@ public class TicketService {
         Pageable pageable = request.getPageable();
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskAssignee(request.getAssigneeUid())
+                .taskAssignee(request.getAssignee().getUid())
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
@@ -195,7 +195,7 @@ public class TicketService {
 
         long total = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-                .taskAssignee(request.getAssigneeUid())
+                .taskAssignee(request.getAssignee().getUid())
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .orderByTaskCreateTime().desc()
@@ -298,7 +298,7 @@ public class TicketService {
     @Transactional
     public TicketResponse claimTicket(TicketRequest request) {
         log.info("开始认领工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 先查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -332,7 +332,7 @@ public class TicketService {
         }
 
         // 3. 认领任务
-        String assigneeUid = request.getAssigneeUid();
+        String assigneeUid = request.getAssignee().getUid();
         if (!StringUtils.hasText(assigneeUid)) {
             throw new RuntimeException("处理人uid不能为空");
         }
@@ -419,7 +419,7 @@ public class TicketService {
     @Transactional
     public TicketResponse startTicket(TicketRequest request) {
         log.info("开始处理工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -438,7 +438,7 @@ public class TicketService {
             throw new RuntimeException("工单未被认领，不能开始处理: " + request.getUid());
         }
 
-        if (!ticket.getAssignee().getUid().equals(request.getAssigneeUid())) {
+        if (!ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
             throw new RuntimeException("非工单处理人，不能开始处理: " + request.getUid());
         }
 
@@ -489,7 +489,7 @@ public class TicketService {
     @Transactional
     public TicketResponse unclaimTicket(TicketRequest request) {
         log.info("开始退回工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -506,7 +506,7 @@ public class TicketService {
             throw new RuntimeException("非已认领工单，不能退回: " + request.getUid());
         }
         // 判断认领人是否为本人，如果不是，则不能退回
-        if (!ticket.getAssignee().getUid().equals(request.getAssigneeUid())) {
+        if (!ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能退回: " + request.getUid());
         }
 
@@ -514,7 +514,7 @@ public class TicketService {
         Task task = taskService.createTaskQuery()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
-                .taskAssignee(request.getAssigneeUid())
+                .taskAssignee(request.getAssignee().getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -556,7 +556,7 @@ public class TicketService {
     @Transactional
     public TicketResponse transferTicket(TicketRequest request) {
         log.info("开始转派工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -582,11 +582,11 @@ public class TicketService {
         }
 
         // 4. 转派任务
-        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+        taskService.setAssignee(task.getId(), request.getAssignee().getUid());
 
         // comment
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "TRANSFERRED", "工单被转派给 " + request.getAssigneeUid());
+                "TRANSFERRED", "工单被转派给 " + request.getAssignee().getUid());
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
@@ -602,7 +602,7 @@ public class TicketService {
     @Transactional
     public TicketResponse holdTicket(TicketRequest request) {
         log.info("开始挂起工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -649,7 +649,7 @@ public class TicketService {
     @Transactional
     public TicketResponse resumeTicket(TicketRequest request) {
         log.info("开始恢复工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -675,7 +675,7 @@ public class TicketService {
         }
 
         // 4. 恢复任务
-        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+        taskService.setAssignee(task.getId(), request.getAssignee().getUid());
 
         // comment
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
@@ -695,7 +695,7 @@ public class TicketService {
     @Transactional
     public TicketResponse pendTicket(TicketRequest request) {
         log.info("开始待回应工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -741,7 +741,7 @@ public class TicketService {
     @Transactional
     public TicketResponse reopenTicket(TicketRequest request) {
         log.info("开始重新打开工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -768,7 +768,7 @@ public class TicketService {
         }
 
         // 4. 重新打开任务
-        taskService.setAssignee(task.getId(), request.getAssigneeUid());
+        taskService.setAssignee(task.getId(), request.getAssignee().getUid());
 
         // comment
         taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
@@ -788,7 +788,7 @@ public class TicketService {
     @Transactional
     public TicketResponse escalateTicket(TicketRequest request) {
         log.info("开始升级工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -815,7 +815,7 @@ public class TicketService {
 
         try {
             // 4. 升级任务
-            taskService.setAssignee(task.getId(), request.getAssigneeUid());
+            taskService.setAssignee(task.getId(), request.getAssignee().getUid());
 
             // comment
             taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
@@ -839,7 +839,7 @@ public class TicketService {
     @Transactional
     public TicketResponse resolveTicket(TicketRequest request) {
         log.info("开始解决工单: uid={}, assigneeUid={}, orgUid={}",
-                request.getUid(), request.getAssigneeUid(), request.getOrgUid());
+                request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
@@ -909,7 +909,7 @@ public class TicketService {
         }
 
         // 3. 判断验证人是否为提交人
-        if (!ticket.getReporter().getUid().equals(request.getAssigneeUid())) {
+        if (!ticket.getReporter().getUid().equals(request.getAssignee().getUid())) {
             throw new RuntimeException("非工单提交人，不能验证: " + request.getUid());
         }
 

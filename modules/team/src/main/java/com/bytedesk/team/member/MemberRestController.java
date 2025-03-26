@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 18:36:43
+ * @LastEditTime: 2025-03-26 10:45:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     @Override
     public ResponseEntity<?> queryByUser(MemberRequest request) {
         //
-        Page<MemberResponse> memberResponse = memberService.queryByUser(request);
+        MemberResponse memberResponse = memberService.query(request);
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 14:32:33
+ * @LastEditTime: 2025-03-26 10:45:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,14 +89,14 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         return queryByOrg(request);
     }
 
-    // public MemberResponse query(MemberRequest request) {
-    //     UserEntity user = authService.getUser();
-    //     Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
-    //     if (!memberOptional.isPresent()) {
-    //         return null;
-    //     }
-    //     return convertToResponse(memberOptional.get());
-    // }
+    public MemberResponse query(MemberRequest request) {
+        UserEntity user = authService.getUser();
+        Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
+        if (!memberOptional.isPresent()) {
+            return null;
+        }
+        return convertToResponse(memberOptional.get());
+    }
 
     public MemberResponse queryByUserUid(MemberRequest request) {
         Optional<MemberEntity> memberOptional = findByUserUid(request.getUid());

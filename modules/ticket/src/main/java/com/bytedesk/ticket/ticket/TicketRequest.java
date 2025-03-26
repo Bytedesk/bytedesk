@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 18:13:42
+ * @LastEditTime: 2025-03-26 10:54:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,7 +52,8 @@ public class TicketRequest extends BaseRequest {
     private String departmentUid;
     // 
     private Boolean assignmentAll;
-    private String assigneeUid;
+    // private String assigneeUid;
+    private String assignee; // 原始json字符串
     // private String reporterUid;
     private String reporter;  // 原始 JSON 字符串
     // 
@@ -72,7 +73,28 @@ public class TicketRequest extends BaseRequest {
     // 客户验证
     private Boolean verified;
 
-    
+    // 添加 getter 方法转换为 UserProtobuf
+    public UserProtobuf getAssignee() {
+        if (StringUtils.hasText(assignee)) {
+            try {
+                // 处理可能的双重转义情况
+                String jsonStr = assignee;
+                if (assignee.startsWith("\"") && assignee.endsWith("\"")) {
+                    jsonStr = assignee.substring(1, assignee.length() - 1)
+                        .replace("\\\"", "\"");
+                }
+                return JSON.parseObject(jsonStr, UserProtobuf.class);
+            } catch (Exception e) {
+                log.error("Failed to parse assignee JSON: {}", assignee, e);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public String getAssigneeString() {
+        return assignee;
+    }
         
     // 添加 getter 方法转换为 UserProtobuf
     public UserProtobuf getReporter() {
@@ -91,5 +113,9 @@ public class TicketRequest extends BaseRequest {
             }
         }
         return null;
+    }
+
+    public String getReporterString() {
+        return reporter;
     }
 } 

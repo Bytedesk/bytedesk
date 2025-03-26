@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 17:21:53
+ * @LastEditTime: 2025-03-26 10:29:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -127,7 +127,7 @@ public class TicketEventListener {
             if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
                 TicketRequest request = new TicketRequest();
                 request.setUid(ticketEntity.getUid());
-                request.setAssigneeUid(ticketEntity.getAssignee().getUid());
+                request.setAssignee(ticketEntity.getAssigneeString());
                 request.setOrgUid(ticketEntity.getOrgUid());
                 // 认领工单
                 ticketService.claimTicket(request);
