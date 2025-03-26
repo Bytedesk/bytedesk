@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:03:17
+ * @LastEditTime: 2025-03-26 12:38:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,13 +32,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
@@ -46,6 +42,7 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -160,6 +157,17 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             }
         }
         savedTicket.setAttachments(attachments);
+        
+        // 未绑定客服会话的情况下，创建工单客服会话
+        if (!StringUtils.hasText(ticket.getThreadUid())) {
+            // 如果创建工单的时候没有绑定会话，则创建会话
+            ThreadEntity thread = createTicketThread(ticket);
+            if (thread != null) {
+                ticket.setTopic(thread.getTopic());
+                ticket.setThreadUid(thread.getUid());
+            }
+        }
+        
         // 保存工单
         savedTicket = save(savedTicket);
         if (savedTicket == null) {
@@ -264,63 +272,27 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             throw new RuntimeException("user not found");
         }
         //
-        String visitorJson = BytedeskConsts.EMPTY_JSON_STRING;
-        String topic = "";
-        //
-        if (ticket.getType().equals(TicketTypeEnum.AGENT.name())) {
-            topic = TopicUtils.formatOrgAgentTicketThreadTopic(ticket.getAssignee().getUid(), ticket.getUid());
-            // 使用在线客服工单会话user info
-            if (StringUtils.hasText(ticket.getThreadUid())) {
-                String threadUid = ticket.getThreadUid();
-                Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
-                if (serviceThreadOptional.isPresent()) {
-                    visitorJson = serviceThreadOptional.get().getUser();
-                }
-            } else {
-                //
-                UserProtobuf userProtobuf = UserProtobuf.builder()
-                        .nickname(ticket.getAssignee().getNickname())
-                        .avatar(ticket.getAssignee().getAvatar())
-                        .build();
-                userProtobuf.setUid(ticket.getAssignee().getUid());
-                userProtobuf.setType(UserTypeEnum.AGENT.name());
-                visitorJson = JSON.toJSONString(userProtobuf);
-            }
-        } 
-        // else if (ticket.getType().equals(TicketTypeEnum.WORKGROUP.name())) {
-        //     topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid());
-        //     // 使用在线客服工单会话user info
-        //     if (StringUtils.hasText(ticket.getThreadUid())) {
-        //         String threadUid = ticket.getThreadUid();
-        //         Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
-        //         if (serviceThreadOptional.isPresent()) {
-        //             visitorJson = serviceThreadOptional.get().getUser();
-        //         } else {
-        //             //
-        //             UserProtobuf userProtobuf = UserProtobuf.builder()
-        //                     .nickname(ticket.getDepartment().getNickname())
-        //                     .avatar(ticket.getDepartment().getAvatar())
-        //                     .build();
-        //             userProtobuf.setUid(ticket.getDepartment().getUid());
-        //             userProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-        //             visitorJson = JSON.toJSONString(userProtobuf);
-        //         }
-        //     }
-        // }
-        // 每次创建新工单会话，不能使用已存在的会话
+        String topic = TopicUtils.formatOrgDepartmentTicketThreadTopic(ticket.getDepartmentUid(), ticket.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        if (threadOptional.isPresent()) {
+            return threadOptional.get();
+        }
+        String user = ConvertUtils.convertToUserProtobufString(owner);
+        // 创建工单会话
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.TICKET.name())
-                .state(ThreadStateEnum.STARTED.name())
+                .unreadCount(0)
+                .state(ThreadStateEnum.NEW.name())
                 .topic(topic)
-                .user(visitorJson)
+                .hide(true) // 暂时不在会话列表中显示，只在工单中显示
+                .user(user)
+                // .agent(user) // claimed agent
+                .userUid(owner.getUid())
                 .owner(owner)
                 .client(ticket.getClient())
                 .orgUid(ticket.getOrgUid())
                 .build();
-        // thread.setUid(uidUtils.getUid());
-        // thread.setOrgUid(ticket.getOrgUid());
-        // thread.setClient(ticket.getClient());
         //
         return threadRestService.save(thread);
     }

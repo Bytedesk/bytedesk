@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:09:45
+ * @LastEditTime: 2025-03-26 12:39:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
@@ -35,9 +36,8 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicService;
-// import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.team.member.MemberEntity;
+import com.bytedesk.team.member.MemberRestService;
 import com.bytedesk.ticket.consts.TicketConsts;
 // import com.bytedesk.ticket.message.event.TicketMessageEvent;
 // import com.bytedesk.ticket.message.event.TicketMessageType;
@@ -71,9 +71,10 @@ public class TicketService {
     private final TaskService taskService;
     private final TicketRepository ticketRepository;
     private final HistoryService historyService;
-    private final AgentRestService agentRestService;
+    // private final AgentRestService agentRestService;
+    private final MemberRestService memberRestService;
     // private final ApplicationEventPublisher eventPublisher;
-    private final TicketRestService ticketRestService;
+    // private final TicketRestService ticketRestService;
     private final ThreadRestService threadRestService;
     private final TopicService topicService;
 
@@ -89,21 +90,21 @@ public class TicketService {
 
         // 3. 获取这些工单的当前任务
         // List<TicketResponse> responses = ticketPage.getContent().stream()
-        //         .map(ticket -> {
-        //             // 查询工单对应的当前任务
-        //             Task task = taskService.createTaskQuery()
-        //                     .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
-        //                     .processInstanceId(ticket.getProcessInstanceId())
-        //                     .singleResult();
-        //             // 如果任务为空，则返回null
-        //             if (task == null) {
-        //                 return null;
-        //             }
-        //             // 如果任务不为空，则返回工单响应
-        //             return TicketConvertUtils.convertToResponse(ticket);
-        //         })
-        //         .filter(Objects::nonNull)
-        //         .toList();
+        // .map(ticket -> {
+        // // 查询工单对应的当前任务
+        // Task task = taskService.createTaskQuery()
+        // .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+        // .processInstanceId(ticket.getProcessInstanceId())
+        // .singleResult();
+        // // 如果任务为空，则返回null
+        // if (task == null) {
+        // return null;
+        // }
+        // // 如果任务不为空，则返回工单响应
+        // return TicketConvertUtils.convertToResponse(ticket);
+        // })
+        // .filter(Objects::nonNull)
+        // .toList();
         // return new PageImpl<>(responses, pageable, ticketPage.getTotalElements());
 
         return ticketPage.map(TicketConvertUtils::convertToResponse);
@@ -299,7 +300,9 @@ public class TicketService {
     public TicketResponse claimTicket(TicketRequest request) {
         log.info("开始认领工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
-
+        // 
+        String assigneeUid = request.getAssignee().getUid();
+        Assert.notNull(assigneeUid, "处理人uid不能为空");
         // 1. 先查询工单
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
@@ -316,7 +319,7 @@ public class TicketService {
 
         // 如果是ASSIGNED状态，判断是否为本人
         if (ticket.getStatus().equals(TicketStatusEnum.ASSIGNED.name())) {
-            if (!ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
+            if (!ticket.getAssignee().getUid().equals(assigneeUid)) {
                 throw new RuntimeException("工单已经被分配，非本人不能认领: " + request.getUid());
             }
         }
@@ -339,13 +342,8 @@ public class TicketService {
             throw new RuntimeException("工单任务不存在或已被认领: " + request.getUid());
         }
 
-        // 3. 认领任务
-        String assigneeUid = request.getAssignee().getUid();
-        if (!StringUtils.hasText(assigneeUid)) {
-            throw new RuntimeException("处理人uid不能为空");
-        }
-
         try {
+            // 3. 认领任务
             taskService.claim(task.getId(), assigneeUid);
             log.info("工单认领成功: taskId={}, assigneeUid={}", task.getId(), assigneeUid);
 
@@ -359,16 +357,20 @@ public class TicketService {
         }
 
         // 4. 更新工单状态
-        Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(assigneeUid);
+        Optional<MemberEntity> assigneeOptional = memberRestService.findByUid(assigneeUid);
         if (assigneeOptional.isPresent()) {
+            MemberEntity member = assigneeOptional.get();
+            // 更新assignee
             UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-                    .nickname(assigneeOptional.get().getNickname())
-                    .avatar(assigneeOptional.get().getAvatar())
+                    .uid(member.getUid())
+                    .nickname(member.getNickname())
+                    .avatar(member.getAvatar())
+                    .type(UserTypeEnum.MEMBER.name())
                     .build();
-            assigneeProtobuf.setUid(assigneeOptional.get().getUid());
-            assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-            String assigneeJson = JSON.toJSONString(assigneeProtobuf);
-            ticket.setAssignee(assigneeJson);
+            // assigneeProtobuf.setUid(assigneeOptional.get().getUid());
+            // assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+            // String assigneeJson = JSON.toJSONString(assigneeProtobuf);
+            ticket.setAssignee(assigneeProtobuf.toJson());
             ticket.setStatus(TicketStatusEnum.CLAIMED.name());
 
             // 4. 更新流程变量
@@ -378,29 +380,30 @@ public class TicketService {
             variables.put(TicketConsts.TICKET_VARIABLE_CLAIM_TIME, new Date());
             runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
 
-            // 5. 创建工单会话
+            // 5. 创建工单会话，迁移到工单创建时创建
             // serviceThreadTopic跟threadUid合并
-            if (!StringUtils.hasText(ticket.getThreadUid())) {
-                ThreadEntity thread = ticketRestService.createTicketThread(ticket);
-                if (thread != null) {
-                    ticket.setTopic(thread.getTopic());
-                    ticket.setThreadUid(thread.getUid());
-                }
-            }
-            
+            // if (!StringUtils.hasText(ticket.getThreadUid())) {
+            //     // 如果创建工单的时候没有绑定会话，则创建会话
+            //     ThreadEntity thread = ticketRestService.createTicketThread(ticket);
+            //     if (thread != null) {
+            //         ticket.setTopic(thread.getTopic());
+            //         ticket.setThreadUid(thread.getUid());
+            //     }
+            // }
+
             // 将claimer添加到会话中
             Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
             if (threadOptional.isPresent()) {
                 ThreadEntity thread = threadOptional.get();
                 // 添加claimer到会话中
-                thread.getTicketors().add(assigneeJson);
+                thread.getTicketors().add(assigneeProtobuf.toJson());
                 // 保存
                 threadRestService.save(thread);
                 // 添加订阅
-                String acceptUserUid = assigneeOptional.get().getUserUid();
-                topicService.create(thread.getTopic(), acceptUserUid);
+                String userUid = member.getUser().getUid();
+                topicService.create(thread.getTopic(), userUid);
             }
-            
+
             // 6. 发布工单分配消息事件
             // 此处没有使用ticket自带消息机制，便于扩展
             // eventPublisher.publishEvent(TicketMessageEvent.builder()
@@ -936,12 +939,12 @@ public class TicketService {
             // 5. 设置验证结果变量
             Map<String, Object> variables = new HashMap<>();
             variables.put("verified", request.getVerified());
-            
+
             // 6. 添加评论
             String commentType = request.getVerified() ? "VERIFIED_OK" : "VERIFIED_FAIL";
             String commentMessage = request.getVerified() ? "客户确认工单已解决" : "客户反馈工单未解决";
-            taskService.addComment(task.getId(), ticket.getProcessInstanceId(), 
-                commentType, commentMessage);
+            taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                    commentType, commentMessage);
 
             // 7. 完成任务
             taskService.complete(task.getId(), variables);
