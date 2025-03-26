@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 17:04:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 15:58:23
+ * @LastEditTime: 2025-03-26 16:17:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.ticket.ticket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -24,8 +23,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.ticket.consts.TicketConsts;
-import com.bytedesk.core.constant.BytedeskConsts;
-
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,7 +75,7 @@ public class TicketSpecification extends BaseSpecification {
                     List<Predicate> orPredicates = new ArrayList<>();
                     
                     // 处理 reporter 条件
-                    if (request.getReporter() != null && StringUtils.hasText(request.getReporterUid())) {
+                    if (StringUtils.hasText(request.getReporterUid())) {
                         orPredicates.add(criteriaBuilder.like(root.get("reporter"), 
                             "%" + "\"uid\":\"" + request.getReporterUid() + "\"" + "%"));
                     }
@@ -86,10 +83,13 @@ public class TicketSpecification extends BaseSpecification {
                     // 处理 assignee 条件
                     if (StringUtils.hasText(request.getAssigneeUid())) {
                         if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
-                            orPredicates.add(criteriaBuilder.or(
-                                criteriaBuilder.isNull(root.get("assignee")),
-                                criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
-                            ));
+                            // 查询状态为NEW的工单
+                            orPredicates.add(criteriaBuilder.equal(root.get("status"), TicketStatusEnum.NEW.name()));
+                            // 查询未分配的工单，即 assignee 为空或为空字符串 JSON 的情况
+                            // orPredicates.add(criteriaBuilder.or(
+                            //     criteriaBuilder.isNull(root.get("assignee")),
+                            //     criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
+                            // ));
                         } else {
                             orPredicates.add(criteriaBuilder.like(root.get("assignee"), 
                                 "%" + "\"uid\":\"" + request.getAssigneeUid() + "\"" + "%"));
@@ -108,10 +108,11 @@ public class TicketSpecification extends BaseSpecification {
                     }
                     if (StringUtils.hasText(request.getAssigneeUid())) {
                         if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssigneeUid())) {
-                            predicates.add(criteriaBuilder.or(
-                                criteriaBuilder.isNull(root.get("assignee")),
-                                criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
-                            ));
+                            predicates.add(criteriaBuilder.equal(root.get("status"), TicketStatusEnum.NEW.name()));
+                            // predicates.add(criteriaBuilder.or(
+                            //     criteriaBuilder.isNull(root.get("assignee")),
+                            //     criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING)
+                            // ));
                         } else {
                             predicates.add(criteriaBuilder.like(root.get("assignee"), 
                                 "%" + "\"uid\":\"" + request.getAssigneeUid() + "\"" + "%"));
@@ -119,11 +120,13 @@ public class TicketSpecification extends BaseSpecification {
                     }
                 }
             }
+            
             // 处理日期范围查询
             if (StringUtils.hasText(request.getStartDate())) {
                 LocalDateTime startDate = LocalDateTime.parse(request.getStartDate(), formatter);
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate));
             }
+
             if (StringUtils.hasText(request.getEndDate())) {
                 LocalDateTime endDate = LocalDateTime.parse(request.getEndDate(), formatter);
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate));
@@ -136,19 +139,4 @@ public class TicketSpecification extends BaseSpecification {
         };
     }
 
-    public static Specification<TicketEntity> equalOrgUid(String orgUid) {
-        return (root, query, cb) -> cb.equal(root.get("orgUid"), orgUid);
-    }
-    
-    public static Specification<TicketEntity> equalPriority(String priority) {
-        return (root, query, cb) -> cb.equal(root.get("priority"), priority);
-    }
-    
-    public static Specification<TicketEntity> equalStatus(String status) {
-        return (root, query, cb) -> cb.equal(root.get("status"), status);
-    }
-    
-    public static Specification<TicketEntity> betweenCreatedAt(Date startTime, Date endTime) {
-        return (root, query, cb) -> cb.between(root.get("createdAt"), startTime, endTime);
-    }
 }
