@@ -520,7 +520,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
-        return threadRepository.findFirstByTopicAndDeletedOrderByUpdatedAtDesc(topic, false);
+        return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
     // 找到某个访客当前对应某技能组未关闭会话
