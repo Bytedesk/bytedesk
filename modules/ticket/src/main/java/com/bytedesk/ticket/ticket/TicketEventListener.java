@@ -136,7 +136,7 @@ public class TicketEventListener {
         // 订阅工单会话
         // UserEntity owner = ticket.getOwner();
         // TopicRequest topicRequest = TopicRequest.builder()
-        //         .topic(TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid()))
+        //         .topic(TopicUtils.formatOrgTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid()))
         //         // .userUid(owner.getUid())
         //         .build();
         //     topicRequest.setUserUid(owner.getUid());

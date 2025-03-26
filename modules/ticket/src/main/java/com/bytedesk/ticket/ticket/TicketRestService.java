@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 11:22:19
+ * @LastEditTime: 2025-03-26 12:00:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.JSON;
@@ -47,9 +46,6 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
-import com.bytedesk.service.agent.AgentEntity;
-// import com.bytedesk.service.agent.AgentRestService;
-// import com.bytedesk.team.member.MemberRestService;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -137,59 +133,8 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());
         //
-        // Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
-        // if (workgroupOptional.isPresent()) {
-        //     UserProtobuf workgroupProtobuf = UserProtobuf.builder()
-        //             .nickname(workgroupOptional.get().getNickname())
-        //             .avatar(workgroupOptional.get().getAvatar())
-        //             .build();
-        //     workgroupProtobuf.setUid(workgroupOptional.get().getUid());
-        //     workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-        //     String workgroupJson = JSON.toJSONString(workgroupProtobuf);
-        //     ticket.setDepartment(workgroupJson);
-        // } else {
-        //     throw new RuntimeException("workgroup not found");
-        // }
-        //
-        if (StringUtils.hasText(request.getAssigneeJson())) {
+        if (StringUtils.hasText(request.getAssigneeJson()) && StringUtils.hasText(request.getAssignee().getUid())) {
             ticket.setStatus(TicketStatusEnum.CLAIMED.name());
-            // 
-            // 统一修改为member
-            // Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
-            // if (assigneeOptional.isPresent()) {
-            //     UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-            //             .nickname(assigneeOptional.get().getNickname())
-            //             .avatar(assigneeOptional.get().getAvatar())
-            //             .build();
-            //     assigneeProtobuf.setUid(assigneeOptional.get().getUid());
-            //     assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-            //     String assigneeJson = JSON.toJSONString(assigneeProtobuf);
-            //     ticket.setAssignee(assigneeJson);
-                
-            //     //
-            //     String userJson = BytedeskConsts.EMPTY_JSON_STRING;
-            //     // 使用在线客服工单会话user info
-            //     if (StringUtils.hasText(request.getThreadUid())) {
-            //         String threadUid = request.getThreadUid();
-            //         Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
-            //         if (serviceThreadOptional.isPresent()) {
-            //             userJson = serviceThreadOptional.get().getUser();
-            //             ticket.setUser(userJson);
-            //         }
-            //     }
-            // }
-        } else {
-            // ticket.setStatus(TicketStatusEnum.NEW.name());
-            // String userJson = BytedeskConsts.EMPTY_JSON_STRING;
-            // 使用在线客服工单会话user info
-            // if (StringUtils.hasText(request.getThreadUid())) {
-            //     String threadUid = request.getThreadUid();
-            //     Optional<ThreadEntity> serviceThreadOptional = threadRestService.findByUid(threadUid);
-            //     if (serviceThreadOptional.isPresent()) {
-            //         userJson = serviceThreadOptional.get().getUser();
-            //         ticket.setUser(userJson);
-            //     }
-            // }
         }
         // 
         ticket.setReporter(request.getReporterJson());
@@ -275,37 +220,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
         return convertToResponse(ticket);
     }
-
-    // private TicketEntity updateAssigneeAndWorkgroup(TicketEntity ticket, TicketRequest request) {
-    //     // if (StringUtils.hasText(request.getAssigneeUid())) {
-    //     //     Optional<AgentEntity> assigneeOptional = agentRestService.findByUid(request.getAssigneeUid());
-    //     //     if (assigneeOptional.isPresent()) {
-    //     //         UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-    //     //                 .nickname(assigneeOptional.get().getNickname())
-    //     //                 .avatar(assigneeOptional.get().getAvatar())
-    //     //                 .build();
-    //     //         assigneeProtobuf.setUid(assigneeOptional.get().getUid());
-    //     //         assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-    //     //         ticket.setAssignee(JSON.toJSONString(assigneeProtobuf));
-    //     //         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
-    //     //     }
-    //     // }
-
-    //     // if (StringUtils.hasText(request.getWorkgroupUid())) {
-    //     //     Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
-    //     //     if (workgroupOptional.isPresent()) {
-    //     //         UserProtobuf workgroupProtobuf = UserProtobuf.builder()
-    //     //                 .nickname(workgroupOptional.get().getNickname())
-    //     //                 .avatar(workgroupOptional.get().getAvatar())
-    //     //                 .build();
-    //     //         workgroupProtobuf.setUid(workgroupOptional.get().getUid());
-    //     //         workgroupProtobuf.setType(UserTypeEnum.WORKGROUP.name());
-    //     //         ticket.setDepartment(JSON.toJSONString(workgroupProtobuf));
-    //     //     }
-    //     // }
-    //     // 
-    //     return ticket;
-    // }
 
     public TicketEntity updateAttachments(TicketEntity ticket, Set<String> uploadUids) {
         // 获取现有附件的 uploadUid 列表
@@ -409,34 +323,33 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         return threadRestService.save(thread);
     }
 
-    @Transactional
-    public void assignTicket(Long ticketId, AgentEntity assignee) {
-        // UserEntity user = authService.getUser();
-        // if (user == null) {
-        // throw new RuntimeException("user not found");
-        // }
-        // String userId = user.getUid();
-        // 检查用户是否是主管
-        // if (!identityService.isUserInGroup(userId, "supervisors")) {
-        // throw new AccessDeniedException("Only supervisors can assign tickets");
-        // }
-        // 分配工单...
-        TicketEntity ticket = findTicketById(ticketId);
-        UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-                .uid(assignee.getUid())
-                .nickname(assignee.getNickname())
-                .avatar(assignee.getAvatar())
-                .type(UserTypeEnum.AGENT.name())
-                .build();
-        // assigneeProtobuf.setUid(assignee.getUid());
-        // assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-        ticket.setAssignee(assigneeProtobuf.toJson());
-        ticket.setStatus("处理中");
-        ticket.setUpdatedAt(LocalDateTime.now());
-
-        // 更新流程变量
-        taskService.complete(getTaskIdByTicketId(ticketId), Map.of("assignee", assignee));
-    }
+    // @Transactional
+    // public void assignTicket(Long ticketId, AgentEntity assignee) {
+    //     // UserEntity user = authService.getUser();
+    //     // if (user == null) {
+    //     // throw new RuntimeException("user not found");
+    //     // }
+    //     // String userId = user.getUid();
+    //     // 检查用户是否是主管
+    //     // if (!identityService.isUserInGroup(userId, "supervisors")) {
+    //     // throw new AccessDeniedException("Only supervisors can assign tickets");
+    //     // }
+    //     // 分配工单...
+    //     TicketEntity ticket = findTicketById(ticketId);
+    //     UserProtobuf assigneeProtobuf = UserProtobuf.builder()
+    //             .uid(assignee.getUid())
+    //             .nickname(assignee.getNickname())
+    //             .avatar(assignee.getAvatar())
+    //             .type(UserTypeEnum.AGENT.name())
+    //             .build();
+    //     // assigneeProtobuf.setUid(assignee.getUid());
+    //     // assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
+    //     ticket.setAssignee(assigneeProtobuf.toJson());
+    //     ticket.setStatus("处理中");
+    //     ticket.setUpdatedAt(LocalDateTime.now());
+    //     // 更新流程变量
+    //     taskService.complete(getTaskIdByTicketId(ticketId), Map.of("assignee", assignee));
+    // }
 
     @Transactional
     public void verifyTicket(Long ticketId, boolean approved) {
