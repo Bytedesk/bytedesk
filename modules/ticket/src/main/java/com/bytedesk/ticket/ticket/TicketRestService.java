@@ -158,7 +158,6 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             }
         } else {
             ticket.setStatus(TicketStatusEnum.NEW.name());
-
             String userJson = BytedeskConsts.EMPTY_JSON_STRING;
             // 使用在线客服工单会话user info
             if (StringUtils.hasText(request.getThreadUid())) {
