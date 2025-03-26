@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 10:31:35
+ * @LastEditTime: 2025-03-26 11:22:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,6 +133,9 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         ticket.setOwner(owner); // 创建人
+        // 
+        ticket.setAssignee(request.getAssigneeJson());
+        ticket.setReporter(request.getReporterJson());
         //
         // Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(request.getWorkgroupUid());
         // if (workgroupOptional.isPresent()) {
@@ -148,7 +151,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         //     throw new RuntimeException("workgroup not found");
         // }
         //
-        if (StringUtils.hasText(request.getAssigneeString())) {
+        if (StringUtils.hasText(request.getAssigneeJson())) {
             ticket.setStatus(TicketStatusEnum.CLAIMED.name());
             // 
             // 统一修改为member
@@ -189,7 +192,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
             // }
         }
         // 
-        ticket.setReporter(request.getReporterString());
+        ticket.setReporter(request.getReporterJson());
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
         // 保存附件
@@ -235,7 +238,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         ticket.setStatus(request.getStatus());
 
         // 更新工作组和处理人信息
-        ticket.setAssignee(request.getAssigneeString());
+        ticket.setAssignee(request.getAssigneeJson());
         ticket.setDepartmentUid(request.getDepartmentUid());
         // ticket = updateAssigneeAndWorkgroup(ticket, request);
 

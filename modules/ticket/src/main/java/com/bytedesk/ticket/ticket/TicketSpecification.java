@@ -73,18 +73,18 @@ public class TicketSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
             }
             // 处理 ALL 查询 - 我创建的或待我处理的
-            if (StringUtils.hasText(request.getReporterString()) || StringUtils.hasText(request.getAssigneeString())) {
+            if (StringUtils.hasText(request.getReporterJson()) || StringUtils.hasText(request.getAssigneeJson())) {
                 if (Boolean.TRUE.equals(request.getAssignmentAll())) {
                     List<Predicate> orPredicates = new ArrayList<>();
                     
                     // 处理 reporter 条件
-                    if (StringUtils.hasText(request.getReporterString())) {
+                    if (StringUtils.hasText(request.getReporterJson())) {
                         orPredicates.add(criteriaBuilder.like(root.get("reporter"), 
                             "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
                     }
                     
                     // 处理 assignee 条件
-                    if (StringUtils.hasText(request.getAssigneeString())) {
+                    if (StringUtils.hasText(request.getAssigneeJson())) {
                         if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssignee().getUid())) {
                             orPredicates.add(criteriaBuilder.or(
                                 criteriaBuilder.isNull(root.get("assignee")),
@@ -102,11 +102,11 @@ public class TicketSpecification extends BaseSpecification {
                     }
                 } else {
                     // 单一条件查询
-                    if (StringUtils.hasText(request.getReporterString())) {
+                    if (StringUtils.hasText(request.getReporterJson())) {
                         predicates.add(criteriaBuilder.like(root.get("reporter"), 
                             "%" + "\"uid\":\"" + request.getReporter().getUid() + "\"" + "%"));
                     }
-                    if (StringUtils.hasText(request.getAssigneeString())) {
+                    if (StringUtils.hasText(request.getAssigneeJson())) {
                         if (TicketConsts.TICKET_FILTER_UNASSIGNED.equals(request.getAssignee().getUid())) {
                             predicates.add(criteriaBuilder.or(
                                 criteriaBuilder.isNull(root.get("assignee")),

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 13:44:29
+ * @LastEditTime: 2025-03-26 11:26:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
     private final ModelMapper modelMapper;
 
-    @PreAuthorize("hasAuthority('TICKET_READ')")
+    // @PreAuthorize("hasAuthority('TICKET_READ')") // 查询放开权限
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
 
@@ -62,7 +62,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_READ')")
+    // @PreAuthorize("hasAuthority('TICKET_READ')") 
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
 
@@ -71,7 +71,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_READ')")
+    // @PreAuthorize("hasAuthority('TICKET_READ')")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(TicketRequest request) {
 
@@ -80,7 +80,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_READ')")
+    // @PreAuthorize("hasAuthority('TICKET_READ')")
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
@@ -89,7 +89,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_READ')")
+    // @PreAuthorize("hasAuthority('TICKET_READ')")
     @Override
     public ResponseEntity<?> queryByUid(TicketRequest request) {
         // TODO Auto-generated method stub
