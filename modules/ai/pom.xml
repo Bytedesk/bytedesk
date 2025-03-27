@@ -23,7 +23,6 @@
 		<spring-ai.version>1.0.0-M6</spring-ai.version>
 		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
-		<!-- <mcp.version>0.7.0</mcp.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
 		<hanlp.version>0.0.15</hanlp.version>
 		<selenium.version>4.30.0</selenium.version>
