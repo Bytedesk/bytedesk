@@ -39,7 +39,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     private final RobotRestService robotService;
 
-    @PreAuthorize("hasAuthority('ROBOT_READ')")
+    // @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
@@ -48,7 +48,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('ROBOT_READ')")
+    // @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByUser(RobotRequest request) {
         
@@ -57,7 +57,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('ROBOT_READ')")
+    // @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByUid(RobotRequest request) {
 
