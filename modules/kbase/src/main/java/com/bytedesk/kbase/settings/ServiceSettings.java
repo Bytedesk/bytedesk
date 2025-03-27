@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 12:16:15
+ * @LastEditTime: 2025-03-27 16:41:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class ServiceSettings implements Serializable {
 
     private LocalDateTime topTipEnd;
 
-    // 满意度评价设置
+    // 满意度评价设置--------------------------------------------------
     // show rate btn on chat toolbar
     @NotBlank
     @Builder.Default
@@ -84,10 +84,16 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     private String inviteRateTip = I18Consts.I18N_INVITE_RATE_TIP;
     
-    // TODO: 自定义评价最低消息数量，未达到最低对话消息数，禁止评价
+    // 自定义评价最低消息数量，未达到最低对话消息数，禁止评价
     @NotBlank
     @Builder.Default
     private int rateMsgCount = 3;
+
+    // 5星评分、10星评分
+    @Builder.Default
+    private int rateStarCount = 5;
+
+    //-----------------------------------------------------------------------------------
 
     // 询前表单
     // 是否显示询前表单
@@ -99,6 +105,8 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
+
+    //-----------------------------------------------------------------------------------
 
     // show history message or not
     @NotBlank
@@ -124,6 +132,8 @@ public class ServiceSettings implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> welcomeFaqs = new ArrayList<>();
 
+    //-----------------------------------------------------------------------------------
+
     /** auto close time in minutes */
     @NotBlank
     @Builder.Default
@@ -134,6 +144,8 @@ public class ServiceSettings implements Serializable {
 
     @Builder.Default
     private String agentCloseTip = I18Consts.I18N_AGENT_CLOSE_TIP;
+
+    //-----------------------------------------------------------------------------------
 
     // 桌面版聊天窗口右侧iframe
     @Builder.Default
