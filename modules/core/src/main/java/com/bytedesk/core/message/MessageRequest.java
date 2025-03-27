@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 13:23:32
+ * @LastEditTime: 2025-03-27 14:54:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,8 +28,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageRequest extends BaseRequest {
     
-    // private String[] threads;
     private String topic;
+
+    private String threadUid;
     
     private String userUid;
 

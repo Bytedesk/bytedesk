@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-20 13:19:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 14:15:52
+ * @LastEditTime: 2025-03-27 14:50:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,6 +59,20 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
     }
 
     @Override
+    public ResponseEntity<?> queryByUid(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @GetMapping("/query/thread/uid")
+    public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
+
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @Override
     public ResponseEntity<?> create(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
@@ -82,10 +96,6 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
     
 }
