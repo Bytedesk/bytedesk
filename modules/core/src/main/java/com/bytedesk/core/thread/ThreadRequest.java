@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 11:48:37
+ * @LastEditTime: 2025-03-27 12:01:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,6 @@ public class ThreadRequest extends BaseRequest {
     @Builder.Default
     private Boolean rated = false;
 
-
     private UserProtobuf user;
     
     private String userNickname;
@@ -62,7 +61,6 @@ public class ThreadRequest extends BaseRequest {
 
     private String ownerUid;
 
-    // 
     @Builder.Default
     private Boolean top = false;
 
@@ -123,7 +121,6 @@ public class ThreadRequest extends BaseRequest {
     // group member uids
     @Builder.Default
     private List<String> memberUids = new ArrayList<>();
-    
 
     private String searchText;
 
