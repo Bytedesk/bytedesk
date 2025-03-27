@@ -122,7 +122,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // updateAvatar
-    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
+    // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改头像，不需要权限限制
     @ActionAnnotation(title = "agent", action = "updateAvatar", description = "update agent avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody AgentRequest request) {
@@ -132,7 +132,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
+    // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改在线状态，不需要权限限制
     @ActionAnnotation(title = "agent", action = "updateStatus", description = "update agent status")
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody AgentRequest request) {
@@ -142,7 +142,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    @PreAuthorize("hasAuthority('AGENT_UPDATE')")
+    // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改自动回复，不需要权限限制
     @ActionAnnotation(title = "agent", action = "updateAutoReply", description = "update agent autoreply")
     @PostMapping("/update/autoreply")
     public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {
