@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 16:32:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:19:15
+ * @LastEditTime: 2025-03-27 12:56:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,7 @@ public enum ThreadTypeEnum {
     // 
     LLM(14), // 机器人-直接调用大模型
     UNIFIED(15), // 统一客服入口
+    HISTORY(16), // 历史对话，用于管理后台查看历史对话
     ;
 
     private final int value;
