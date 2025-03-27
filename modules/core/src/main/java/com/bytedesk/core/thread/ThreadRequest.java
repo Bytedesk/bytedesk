@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 13:23:47
+ * @LastEditTime: 2025-03-27 11:48:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -133,4 +133,8 @@ public class ThreadRequest extends BaseRequest {
     // 强制重新创建新会话
     @Builder.Default
     private Boolean forceNew = false;
+
+    // 是否合并相同topic的记录
+    @Builder.Default
+    private Boolean mergeByTopic = false;
 }
