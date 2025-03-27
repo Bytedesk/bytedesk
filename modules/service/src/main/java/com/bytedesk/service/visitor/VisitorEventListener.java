@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:23:17
+ * @LastEditTime: 2025-03-27 21:40:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.black.event.BlackCreateEvent;
 import com.bytedesk.core.black.event.BlackDeleteEvent;
-import com.bytedesk.core.black.event.BlackUpdateEvent;
 import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
@@ -77,10 +76,10 @@ public class VisitorEventListener {
         }
     }
 
-    @EventListener
-    public void onBlackUpdateEvent(BlackUpdateEvent event) {
-        log.info("VisitorEventListener onBlackUpdateEvent");
-    }
+    // @EventListener
+    // public void onBlackUpdateEvent(BlackUpdateEvent event) {
+    //     log.info("VisitorEventListener onBlackUpdateEvent");
+    // }
 
     @EventListener
     public void onBlackDeleteEvent(BlackDeleteEvent event) {
@@ -117,8 +116,5 @@ public class VisitorEventListener {
             ipBlacklistService.deleteByUid(ipBlacklist.getUid());
         });
     }
-
-
-    
     
 }
