@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 11:49:55
+ * @LastEditTime: 2025-03-27 12:07:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,9 +101,6 @@ public class ThreadSpecification extends BaseSpecification {
                     // 如果没有指定ownerUid，则使用原来的逻辑：按updatedAt最新的记录
                     predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
                 }
-            } else {
-                // 如果不合并topic但指定了具体topic，则直接按topic等值查询
-                predicates.add(criteriaBuilder.equal(root.get("topic"), request.getTopic()));
             }
 
             // 根据组件类型过滤
