@@ -31,6 +31,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ApiRateLimiter;
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
@@ -145,6 +147,8 @@ public class VisitorRestControllerAnonymous {
     }
 
     // 访客发送http消息
+    @BlackIpFilter(title = "black", action = "sendRestMessage")
+    @BlackUserFilter(title = "black", action = "sendRestMessage")
     @TabooJsonFilter(title = "taboo", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
@@ -157,6 +161,8 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    @BlackIpFilter(title = "black", action = "sendSseVisitorMessage")
+    @BlackUserFilter(title = "black", action = "sendSseVisitorMessage")
     @TabooJsonFilter(title = "taboo", action = "sendSseVisitorMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

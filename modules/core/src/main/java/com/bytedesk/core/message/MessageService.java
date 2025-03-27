@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 10:04:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 11:46:15
+ * @LastEditTime: 2025-03-27 20:44:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class MessageService {
         }
 
         // Filter sensitive words
-        messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
+        // messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
 
         // Cache message for persistence
         messagePersistCache.pushForPersist(messageJson);
@@ -60,10 +60,10 @@ public class MessageService {
     }
 
     // 过滤敏感词
-    private String filterTaboo(String messageJson) {
-        // TODO: 过滤敏感词，将敏感词替换为*
-        // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-        return messageJson;
-    }
+    // private String filterTaboo(String messageJson) {
+    //     // TODO: 过滤敏感词，将敏感词替换为*
+    //     // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
+    //     return messageJson;
+    // }
 
 }

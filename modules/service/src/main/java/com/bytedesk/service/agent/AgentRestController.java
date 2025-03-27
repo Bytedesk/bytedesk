@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 13:37:51
+ * @LastEditTime: 2025-03-27 20:53:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.base.BaseRestController;
 // import com.bytedesk.core.rbac.role.RolePermissions;
@@ -169,9 +171,9 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-   
-
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @BlackIpFilter(title = "black", action = "sendAgentSseMessage")
+    @BlackUserFilter(title = "black", action = "sendAgentSseMessage")
     @TabooJsonFilter(title = "taboo", action = "sendAgentSseMessage")
     @ActionAnnotation(title = "agent", action = "sendAgentSseMessage", description = "sendAgentSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
