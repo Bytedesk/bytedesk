@@ -132,10 +132,10 @@ services:
       # zhipuai
       # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
       SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
-      SPRING_AI_ZHIPUAI_CHAT_ENABLED: false
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: true
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: false
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: true
       # ollama
       # ollama pull qwen2.5:1.5b
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
