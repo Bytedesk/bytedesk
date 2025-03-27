@@ -48,15 +48,25 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
     }
 
     @Override
+    public ResponseEntity<?> queryByUid(BlackRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @Override
     public ResponseEntity<?> create(BlackRequest request) {
+
+        BlackResponse response = blackService.create(request);
         
-        return ResponseEntity.ok(JsonResult.success(blackService.create(request)));
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
     public ResponseEntity<?> update(BlackRequest request) {
+
+        BlackResponse response = blackService.update(request);
         
-        return ResponseEntity.ok(JsonResult.success(blackService.update(request)));
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
@@ -73,10 +83,6 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 }
