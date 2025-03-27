@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:36:04
+ * @LastEditTime: 2025-03-27 21:33:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.ip.black;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,27 +33,47 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
 
     @Override
     public ResponseEntity<?> queryByOrg(IpBlacklistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipBlacklistRestService.queryByOrg(request)));
+
+        Page<IpBlacklistResponse> page = ipBlacklistRestService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(IpBlacklistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipBlacklistRestService.queryByUser(request)));
+
+        Page<IpBlacklistResponse> page = ipBlacklistRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(IpBlacklistRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Override
     public ResponseEntity<?> create(IpBlacklistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipBlacklistRestService.create(request)));
+
+        IpBlacklistResponse response = ipBlacklistRestService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
     public ResponseEntity<?> update(IpBlacklistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipBlacklistRestService.update(request)));
+
+        IpBlacklistResponse response = ipBlacklistRestService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
     public ResponseEntity<?> delete(IpBlacklistRequest request) {
+
         ipBlacklistRestService.delete(request);
+
         return ResponseEntity.ok(JsonResult.success());
     }
 
@@ -62,11 +83,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 
 }
