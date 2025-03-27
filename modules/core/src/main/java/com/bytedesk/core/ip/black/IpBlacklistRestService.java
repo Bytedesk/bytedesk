@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 20:56:29
+ * @LastEditTime: 2025-03-27 21:39:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,7 +83,7 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
         return ipBlacklistRepository.findByEndTimeBefore(dateTime);
     }
 
-
+    // api高频调用，自动添加系统黑名单
     public void addToBlacklistSystem(String ip) {
         //
         String ipLocation = ipService.getIpLocation(ip);
@@ -99,6 +99,7 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
         create(request);
     }
 
+    // 用户拉黑，同时拉黑ip
     public void addToBlacklist(String ip, 
         String ipLocation, 
         LocalDateTime endTime, 
