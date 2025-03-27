@@ -52,6 +52,8 @@ public class MessageResponse extends BaseResponse {
 
 	private String topic;
 
+    private String threadUid;
+    
 	private UserProtobuf user;
 
 	private MessageExtra extra;
