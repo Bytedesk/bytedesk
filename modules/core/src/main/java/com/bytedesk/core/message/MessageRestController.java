@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 14:20:07
+ * @LastEditTime: 2025-03-27 14:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/message")
 public class MessageRestController extends BaseRestController<MessageRequest> {
 
-    private final MessageRestService messageService;
+    private final MessageRestService messageRestService;
 
     private final IMessageSendService messageSendService;
 
@@ -57,14 +57,14 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @Override
     public ResponseEntity<?> queryByOrg(MessageRequest request) {
 
-        Page<MessageResponse> messagePage = messageService.queryByOrg(request);
+        Page<MessageResponse> messagePage = messageRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(messagePage));
     }
 
     public ResponseEntity<?> queryByUser(MessageRequest request) {
 
-        Page<MessageResponse> response = messageService.queryByUser(request);
+        Page<MessageResponse> response = messageRestService.queryByUser(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -72,7 +72,21 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(MessageRequest request) {
 
-        Page<MessageResponse> response = messageService.queryByOrg(request);
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @GetMapping("/query/thread/uid")
+    public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
+
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -136,7 +150,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @GetMapping("/export")
     public Object export(MessageRequest request, HttpServletResponse response) {
         // query data to export
-        Page<MessageResponse> messagePage = messageService.queryByOrg(request);
+        Page<MessageResponse> messagePage = messageRestService.queryByOrg(request);
         // 
         try {
             //
@@ -169,11 +183,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return "";
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     
 }
