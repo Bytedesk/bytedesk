@@ -75,7 +75,7 @@ declare class BytedeskWeb {
     private generateChatUrl;
     private setupMessageListener;
     preload(): void;
-    showChat(): void;
+    showChat(config?: Partial<BytedeskConfig>): void;
     hideChat(): void;
     private minimizeWindow;
     private toggleMaximize;
