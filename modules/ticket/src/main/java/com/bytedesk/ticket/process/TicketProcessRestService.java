@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 14:48:40
+ * @LastEditTime: 2025-03-28 16:18:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,14 +13,20 @@
  */
 package com.bytedesk.ticket.process;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -30,6 +36,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
+import com.bytedesk.ticket.consts.TicketConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TicketProcessRestService extends BaseRestService<TicketProcessEntity, TicketProcessRequest, TicketProcessResponse> {
+public class TicketProcessRestService
+        extends BaseRestService<TicketProcessEntity, TicketProcessRequest, TicketProcessResponse> {
 
     private final TicketProcessRepository processRepository;
 
@@ -47,10 +56,13 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
 
     private final AuthService authService;
 
+    private final RepositoryService repositoryService;
+
+    private final ResourceLoader resourceLoader;
+
     @Override
     public Page<TicketProcessResponse> queryByOrg(TicketProcessRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<TicketProcessEntity> spec = TicketProcessSpecification.search(request);
         Page<TicketProcessEntity> page = processRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -65,15 +77,11 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         }
         String userUid = user.getUid();
         request.setUserUid(userUid);
-        // 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<TicketProcessEntity> spec = TicketProcessSpecification.search(request);
-        Page<TicketProcessEntity> page = processRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+        //
+        return queryByOrg(request);
     }
 
-    @Cacheable(value = "process", key = "#uid", unless="#result==null")
+    @Cacheable(value = "process", key = "#uid", unless = "#result==null")
     @Override
     public Optional<TicketProcessEntity> findByUid(String uid) {
         return processRepository.findByUid(uid);
@@ -81,7 +89,7 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
 
     @Override
     public TicketProcessResponse create(TicketProcessRequest request) {
-        //  判断uid是否存在
+        // 判断uid是否存在
         if (StringUtils.hasText(request.getUid())) {
             Optional<TicketProcessEntity> optional = processRepository.findByUid(request.getUid());
             if (optional.isPresent()) {
@@ -92,9 +100,11 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
             request.setUid(uidUtils.getUid());
         }
         // 流程key不能重复
-        Optional<TicketProcessEntity> optionalKey = processRepository.findByKeyAndOrgUid(request.getKey(), request.getOrgUid());
+        Optional<TicketProcessEntity> optionalKey = processRepository.findByKeyAndOrgUid(request.getKey(),
+                request.getOrgUid());
         if (optionalKey.isPresent()) {
-            throw new RuntimeException("Process key " + request.getKey() + " in org " + request.getOrgUid() + " already exists");
+            throw new RuntimeException(
+                    "Process key " + request.getKey() + " in org " + request.getOrgUid() + " already exists");
         }
 
         UserEntity user = authService.getUser();
@@ -103,7 +113,7 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         } else {
             // 如果用户为空，则为系统自动创建
         }
-        
+
         TicketProcessEntity entity = modelMapper.map(request, TicketProcessEntity.class);
         // entity.setUid(uidUtils.getUid()); // 移动到开头
 
@@ -123,14 +133,13 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
             entity.setName(request.getName());
             entity.setContent(request.getContent());
             entity.setDescription(request.getDescription());
-            // 
+            //
             TicketProcessEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update process failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("TicketProcess not found");
         }
     }
@@ -151,8 +160,7 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("TicketProcess not found");
         }
     }
@@ -163,7 +171,8 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TicketProcessEntity entity) {
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TicketProcessEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
@@ -173,5 +182,66 @@ public class TicketProcessRestService extends BaseRestService<TicketProcessEntit
         return modelMapper.map(entity, TicketProcessResponse.class);
     }
 
- 
+    public void initProcess(String orgUid) {
+        // 检查是否已经部署
+        List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
+                .deploymentTenantId(orgUid)
+                .deploymentName(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
+                .list();
+
+        if (!existingDeployments.isEmpty()) {
+            log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
+            return;
+        }
+
+        // 读取并部署流程
+        try {
+            Resource resource = resourceLoader
+                    .getResource("classpath:" + TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE);
+            // String groupTicketBpmn20Xml = FileUtils.readFileToString(resource.getFile(),
+            // "UTF-8");
+            String groupTicketBpmn20Xml = "";
+
+            try (InputStream inputStream = resource.getInputStream()) {
+                groupTicketBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+
+            // 生成 processUid 并创建流程记录
+            String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE);
+            TicketProcessRequest processRequest = TicketProcessRequest.builder()
+                    .uid(processUid)
+                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
+                    .content(groupTicketBpmn20Xml)
+                    .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                    .description(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
+                    .orgUid(orgUid)
+                    .build();
+            // processRequest.setUid(processUid);
+            // processRequest.setContent(groupTicketBpmn20Xml);
+            // processRequest.setOrgUid(orgUid);
+            create(processRequest);
+
+            // 部署流程
+            Deployment deployment = repositoryService.createDeployment()
+                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
+                    .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE)
+                    .tenantId(orgUid)
+                    .deploy();
+
+            // 更新 TicketProcessEntity
+            Optional<TicketProcessEntity> processEntity = findByUid(processUid);
+            if (processEntity.isPresent()) {
+                processEntity.get().setDeploymentId(deployment.getId());
+                processEntity.get().setDeployed(true);
+                save(processEntity.get());
+            }
+
+            log.info("部署租户流程成功: deploymentId={}, tenantId={}",
+                    deployment.getId(), deployment.getTenantId());
+
+        } catch (IOException e) {
+            log.error("部署工单流程失败: tenantId={}", orgUid, e);
+        }
+    }
+
 }

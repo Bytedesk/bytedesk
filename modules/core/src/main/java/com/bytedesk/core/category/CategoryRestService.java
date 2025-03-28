@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:27:26
+ * @LastEditTime: 2025-03-28 17:06:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,9 +70,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     @Override
     public Page<CategoryResponse> queryByOrg(CategoryRequest request) {
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<CategoryEntity> specs = CategorySpecification.search(request);
         Page<CategoryEntity> page = categoryRepository.findAll(specs, pageable);
         return page.map(this::convertToResponse);
@@ -116,7 +114,6 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     public List<CategoryEntity> findByKbUid(String kbUid) {
         return categoryRepository.findByKbUidAndDeletedFalse(kbUid);
     }
-
 
     public Boolean existsByUid(String uid) {
         return categoryRepository.existsByUid(uid);

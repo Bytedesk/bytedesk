@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 17:45:49
+ * @LastEditTime: 2025-03-28 16:43:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -705,17 +705,20 @@ public class TicketService {
         }
 
         try {
-            // 4. 添加评论。
-            // 注意添加评论一定要放在complete之前，否则会报错找不到task
+            // 4. 添加评论
             Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                             TicketStatusEnum.RESOLVED.name(), "工单已解决");
             comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
             taskService.saveComment(comment);
 
-            // 5. 完成任务
-            taskService.complete(task.getId());
+            // 5. 设置流程变量，添加这段代码
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("verified", false); // 默认设置为false，等待客户验证
+            
+            // 6. 完成任务，传入变量
+            taskService.complete(task.getId(), variables);
 
-            // 6. 更新工单状态
+            // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
             ticket.setResolvedTime(LocalDateTime.now());
             ticketRepository.save(ticket);
@@ -787,7 +790,7 @@ public class TicketService {
 
             // 8. 更新工单状态
             if (request.getVerified()) {
-                ticket.setStatus(TicketStatusEnum.CLOSED.name());
+                ticket.setStatus(request.getVerified() ? TicketStatusEnum.VERIFIED_OK.name() : TicketStatusEnum.VERIFIED_FAIL.name());
                 ticket.setVerified(true);
                 ticket.setClosedTime(LocalDateTime.now());
             } else {
