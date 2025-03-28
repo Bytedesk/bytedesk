@@ -54,7 +54,13 @@ public class BdDateUtils {
             return null;
         }
         // 使用 DateTimeFormatter 直接格式化 LocalDateTime
-        return localDateTime.format(DateTimeFormatter.ofPattern(datetimeFormat));
+        // return localDateTime.format(DateTimeFormatter.ofPattern(datetimeFormat));
+        
+        // 使用应用配置的时区
+        // ZonedDateTime zonedDateTime = localDateTime.atZone(LocaleContextHolder.getTimeZone().toZoneId());
+        // 或者固定使用中国时区
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Shanghai"));
+        return DateTimeFormatter.ofPattern(datetimeFormat).format(zonedDateTime);
         
         // 或者如果一定要使用 SimpleDateFormat，可以这样转换：
         // try {

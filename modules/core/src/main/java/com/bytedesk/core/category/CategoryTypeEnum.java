@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 14:43:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 08:41:22
+ * @LastEditTime: 2025-03-28 17:03:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,5 +23,6 @@ public enum CategoryTypeEnum {
     BLOG,
     EMAIL,
     TABOO,
-    TICKET
+    TICKET,
+    FAQ
 }

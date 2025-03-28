@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:20:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:56:15
+ * @LastEditTime: 2025-03-28 16:22:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +26,6 @@ import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.faq.FaqConsts;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.worktime.WorktimeService;
@@ -64,10 +61,10 @@ public class WorkgroupEventListener {
             agentUids.add(agent.getUid());
         });
         // 
-        List<String> faqUids = Arrays.asList(
-            Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_1),
-            Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_2)
-        );
+        // List<String> faqUids = Arrays.asList(
+        //     Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_1),
+        //     Utils.formatUid(orgUid, FaqConsts.FAQ_DEMO_UID_2)
+        // );
         // 
         List<String> worktimeUids = new ArrayList<>();
         String worktimeUid = worktimeService.createDefault();
@@ -83,8 +80,8 @@ public class WorkgroupEventListener {
                 .build();
         // workgroupRequest.setUid(uidUtils.getUid());
         // workgroupRequest.setOrgUid(orgUid);
-        workgroupRequest.getServiceSettings().setFaqUids(faqUids);
-        workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
+        // workgroupRequest.getServiceSettings().setFaqUids(faqUids);
+        // workgroupRequest.getServiceSettings().setQuickFaqUids(faqUids);
         workgroupRequest.getMessageLeaveSettings().setWorktimeUids(worktimeUids);
 
         workgroupService.create(workgroupRequest);
