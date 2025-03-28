@@ -225,11 +225,13 @@ class R {
     });
   }
   getSupportText() {
-    const t = this.config.locale || "zh-cn", e = {
+    var i;
+    const t = ((i = this.config) == null ? void 0 : i.locale) || "zh-cn", e = {
       "zh-cn": "微语技术支持",
-      en: "Powered by Weiyuai",
-      "ja-JP": "Weiyuaiによる技術支援",
-      "ko-KR": "Weiyuai 기술 지원"
+      "zh-tw": "微語技術支援",
+      en: "Powered by Bytedesk",
+      ja: "Bytedeskによる技術支援",
+      ko: "Bytedesk 기술 지원"
     };
     return e[t] || e["zh-cn"];
   }
