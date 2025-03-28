@@ -75,6 +75,8 @@ declare interface InviteConfig {
     loop?: boolean;
     loopDelay?: number;
     loopCount?: number;
+    acceptText?: string;
+    rejectText?: string;
     onAccept?: () => void;
     onReject?: () => void;
     onClose?: () => void;
