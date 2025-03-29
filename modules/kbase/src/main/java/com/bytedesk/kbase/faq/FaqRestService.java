@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 17:03:24
+ * @LastEditTime: 2025-03-29 14:23:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -330,7 +329,7 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         return modelMapper.map(faq, FaqExcel.class);
     }
 
-    public FaqEntity convertExcelToFaq(FaqExcel excel, String kbUid, String orgUid) {
+    public FaqEntity convertExcelToFaq(FaqExcel excel, String uploadType, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Faq.class); // String categoryUid,
         FaqEntity faq = FaqEntity.builder().build();
         faq.setUid(uidUtils.getUid());
@@ -348,7 +347,8 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             // create category
             CategoryRequest categoryRequest = CategoryRequest.builder()
                     .name(excel.getCategory())
-                    .type(CategoryTypeEnum.FAQ.name())
+                    // .type(CategoryTypeEnum.FAQ.name())
+                    .type(uploadType)
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
