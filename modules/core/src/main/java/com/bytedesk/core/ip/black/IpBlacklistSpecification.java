@@ -30,7 +30,7 @@ public class IpBlacklistSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 
+            // 方便超级管理员super查询
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }

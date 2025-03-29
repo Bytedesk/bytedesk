@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 23:32:54
+ * @LastEditTime: 2025-03-29 23:33:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public class BlackSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 
+            // 方便超级管理员super查询
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
