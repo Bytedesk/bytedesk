@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 14:57:40
+ * @LastEditTime: 2025-03-29 15:49:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -202,13 +202,13 @@ public class TicketService {
 
     /**
      * 开始处理工单
-     * CLAIMED -> PROCESSING (开始处理)
+     * CLAIMED/REOPENED -> PROCESSING (开始处理)
      */
     @Transactional
     public TicketResponse startTicket(TicketRequest request) {
         log.info("开始处理工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
-        // 
+        
         String assigneeUid = request.getAssignee().getUid();
         Assert.notNull(assigneeUid, "处理人uid不能为空");
         String assigneeName = request.getAssignee().getNickname();
@@ -220,17 +220,20 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
 
-        // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
+        // 2. 判断工单状态 - 修改此处以支持REOPENED状态
+        if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.REOPENED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能开始处理: " + request.getUid());
         }
 
-        // 3. 判断处理人是否为本人
-        if (!StringUtils.hasText(ticket.getAssigneeString())) {
+        // 3. 判断处理人是否为本人 - 对于REOPENED状态，可能需要判断是否为原处理人
+        if (!StringUtils.hasText(ticket.getAssigneeString()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.REOPENED.name())) {
             throw new RuntimeException("工单未被认领，不能开始处理: " + request.getUid());
         }
 
-        if (!ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
+        if (StringUtils.hasText(ticket.getAssigneeString()) &&
+            !ticket.getAssignee().getUid().equals(request.getAssignee().getUid())) {
             throw new RuntimeException("非工单处理人，不能开始处理: " + request.getUid());
         }
 
