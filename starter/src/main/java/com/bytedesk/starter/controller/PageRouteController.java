@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 09:21:46
+ * @LastEditTime: 2025-03-29 09:55:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.starter.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import java.util.HashMap;
@@ -42,10 +44,10 @@ public class PageRouteController {
 			languages.put("zh", "简体中文");
 			languages.put("zh-TW", "繁體中文");
 			model.addAttribute("languages", languages);
-			
+
 			// 添加多语言文本
 			Map<String, Map<String, String>> i18n = new HashMap<>();
-			
+
 			// 英文
 			Map<String, String> en = new HashMap<>();
 			en.put("title", "ByteDesk");
@@ -76,7 +78,7 @@ public class PageRouteController {
 			en.put("airline", "Airline");
 			en.put("bytedesk", "BytedeskAI");
 			en.put("shopping", "Shopping");
-			
+
 			// 简体中文
 			Map<String, String> zh = new HashMap<>();
 			zh.put("title", "微语");
@@ -142,7 +144,7 @@ public class PageRouteController {
 			i18n.put("en", en);
 			i18n.put("zh", zh);
 			i18n.put("zh-TW", zhTW);
-			
+
 			model.addAttribute("i18n", i18n);
 
 			// 添加调试信息
@@ -166,7 +168,7 @@ public class PageRouteController {
 	}
 
 	// http://127.0.0.1:9003/home
-	@GetMapping({"/home",})
+	@GetMapping({ "/home", })
 	public String home(Model model) {
 		model.addAttribute("title", "微语首页");
 		model.addAttribute("chatUrl", "/chat/home");
@@ -177,9 +179,9 @@ public class PageRouteController {
 	 * docusaurus 文档
 	 * http://127.0.0.1:9003/docs
 	 */
-	@GetMapping({"/docs"})
-	public String docs() {
-		return "forward:/docs/index.html"; // 默认路径
+	@GetMapping({ "/docs", "/docs/" })
+	public String docs(HttpServletRequest request) {
+		return "redirect:/docs/index.html"; // 默认路径
 	}
 
 	/**
@@ -188,12 +190,12 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/admin
 	 */
 	@GetMapping({
-		"/admin", 
-		"/admin/", 
-		"/admin/{path:[^\\.]*}", 
-		"/admin/{path:[^\\.]*}/{path2:[^\\.]*}"}) 
-	public String admin(@PathVariable(required = false) String path, 
-						@PathVariable(required = false) String path2) {
+			"/admin",
+			"/admin/",
+			"/admin/{path:[^\\.]*}",
+			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}" })
+	public String admin(@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
 		return "forward:/admin/index.html"; // 默认路径
 	}
 
@@ -203,12 +205,12 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/agent
 	 */
 	@GetMapping({
-		"/agent", 
-		"/agent/", 
-		"/agent/{path:[^\\.]*}", 
-		"/agent/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String agent(@PathVariable(required = false) String path, 
-						@PathVariable(required = false) String path2) {
+			"/agent",
+			"/agent/",
+			"/agent/{path:[^\\.]*}",
+			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}" })
+	public String agent(@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
 		return "forward:/agent/index.html"; // 默认路径
 	}
 
@@ -218,13 +220,13 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/chat
 	 */
 	@GetMapping({
-		"/chat", 
-		"/chat/", 
-		"/chat/home", 
-		"/chat/demo/airline",
-		"/chat/demo/bytedesk",
-		"/chat/demo/shopping",
-		"/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|server|config}"})
+			"/chat",
+			"/chat/",
+			"/chat/home",
+			"/chat/demo/airline",
+			"/chat/demo/bytedesk",
+			"/chat/demo/shopping",
+			"/chat/{type:demo|frame|float|ticket|feedback|number|queue|center|helpcenter|server|config}" })
 	public String chat() {
 		return "forward:/chat/index.html";
 	}
@@ -237,12 +239,12 @@ public class PageRouteController {
 
 	// http://127.0.0.1:9003/agenticflow
 	@GetMapping({
-		"/agenticflow", 
-		"/agenticflow/", 
-		"/agenticflow/{path:[^\\.]*}", 
-		"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}"})
-	public String agenticflow(@PathVariable(required = false) String path, 
-							@PathVariable(required = false) String path2) {
+			"/agenticflow",
+			"/agenticflow/",
+			"/agenticflow/{path:[^\\.]*}",
+			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}" })
+	public String agenticflow(@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
 		return "forward:/agenticflow/index.html"; // 默认路径
 	}
 
@@ -255,16 +257,15 @@ public class PageRouteController {
 	 * 2. 其他所有路径都转发到 index.html，由 React Router 处理
 	 */
 	@GetMapping({
-		"/notebase",
-		"/notebase/",
-		"/notebase/{path:[^\\.]*}",
-		"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"
+			"/notebase",
+			"/notebase/",
+			"/notebase/{path:[^\\.]*}",
+			"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"
 	})
 	public String notebase(@PathVariable(required = false) String path,
-						 @PathVariable(required = false) String path2) {
+			@PathVariable(required = false) String path2) {
 		return "forward:/notebase/index.html";
 	}
-
 
 	/**
 	 * kanban
@@ -272,24 +273,22 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/kanban
 	 */
 	@GetMapping({
-		"/kanban",
-		"/kanban/",
-		"/kanban/{path:[^\\.]*}",
-		"/kanban/{path:[^\\.]*}/{path2:[^\\.]*}"
+			"/kanban",
+			"/kanban/",
+			"/kanban/{path:[^\\.]*}",
+			"/kanban/{path:[^\\.]*}/{path2:[^\\.]*}"
 	})
 	public String kanban(@PathVariable(required = false) String path,
-						 @PathVariable(required = false) String path2) {
+			@PathVariable(required = false) String path2) {
 		return "forward:/kanban/index.html";
 	}
 
 	/**
 	 * http://127.0.0.1:9003/download
 	 */
-	@GetMapping({"/{page:dev|download|contact|about}", "/{page:download|contact|about}.html"})
+	@GetMapping({ "/{page:dev|download|contact|about}", "/{page:download|contact|about}.html" })
 	public String handlePageRoutes(@PathVariable String page) {
 		return page;
 	}
-	
-	
 
 }
