@@ -85,7 +85,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         // 
         // add workgroup before
         WorkgroupRequest workgroupBeforeRequest = WorkgroupRequest.builder()
-                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_BEFORE)
+                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_PRESALES)
                 .nickname(I18Consts.I18N_WORKGROUP_BEFORE_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_BEFORE_DESCRIPTION)
                 .agentUids(agentUids)
@@ -94,7 +94,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         workgroupService.create(workgroupBeforeRequest);
         // add workgroup after
         WorkgroupRequest workgroupAfterRequest = WorkgroupRequest.builder()
-                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_AFTER)
+                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_AFTERSALES)
                 .nickname(I18Consts.I18N_WORKGROUP_AFTER_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_AFTER_DESCRIPTION)
                 .agentUids(agentUids)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 12:12:22
+ * @LastEditTime: 2025-03-29 11:00:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,8 +35,8 @@ public class BytedeskConsts {
     public static final String DEFAULT_UNIFIED_UID = "df_un_uid";
     public static final String DEFAULT_AGENT_UID = "df_ag_uid";
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid"; // 默认工作组uid
-    public static final String DEFAULT_WORKGROUP_UID_BEFORE = "df_wg_before"; // 售前
-    public static final String DEFAULT_WORKGROUP_UID_AFTER = "df_wg_after"; // 售后
+    public static final String DEFAULT_WORKGROUP_UID_PRESALES = "df_wg_presales"; // 售前
+    public static final String DEFAULT_WORKGROUP_UID_AFTERSALES = "df_wg_aftersales"; // 售后
     public static final String DEFAULT_DEPARTMENT_UID = "df_dp_uid";
     public static final String DEFAULT_MEMBER_UID = "df_mb_uid";
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
