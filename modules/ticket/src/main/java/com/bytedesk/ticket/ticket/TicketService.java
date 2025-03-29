@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 15:49:53
+ * @LastEditTime: 2025-03-29 16:20:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -814,7 +814,7 @@ public class TicketService {
 
     /**
      * 关闭工单
-     * PROCESSING -> CLOSED (关闭)
+     * PROCESSING/RESUMED -> CLOSED (关闭)
      */
     @Transactional
     public TicketResponse closeTicket(TicketRequest request) {
@@ -832,8 +832,9 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
 
-        // 2. 判断工单状态
-        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
+        // 2. 判断工单状态 - 修改此处，允许RESUMED状态也可以关闭
+        if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) && 
+            !ticket.getStatus().equals(TicketStatusEnum.RESUMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能关闭: " + request.getUid());
         }
 
@@ -848,15 +849,18 @@ public class TicketService {
             throw new RuntimeException("工单任务不存在: " + request.getUid());
         }
 
-        // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "CLOSED", "工单已关闭");
+        // 添加评论
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
+                TicketStatusEnum.CLOSED.name(), "工单已关闭");
+        comment.setUserId(assigneeUid); // 设置评论的userId为当前处理人
+        taskService.saveComment(comment);
 
         // 4. 关闭任务
         taskService.complete(task.getId());
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        ticket.setClosedTime(LocalDateTime.now()); // 添加关闭时间记录
         ticketRepository.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
