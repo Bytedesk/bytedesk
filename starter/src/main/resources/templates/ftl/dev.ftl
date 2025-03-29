@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico">
-    <title>${i18n['en']["title"]}</title>
+    <title>${i18n['zh']["title"]}</title>
     <style>
         :root {
             /* 浅色主题变量 */
