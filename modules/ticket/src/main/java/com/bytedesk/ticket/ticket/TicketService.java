@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 16:43:26
+ * @LastEditTime: 2025-03-29 14:57:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -790,7 +790,7 @@ public class TicketService {
 
             // 8. 更新工单状态
             if (request.getVerified()) {
-                ticket.setStatus(request.getVerified() ? TicketStatusEnum.VERIFIED_OK.name() : TicketStatusEnum.VERIFIED_FAIL.name());
+                ticket.setStatus(TicketStatusEnum.VERIFIED_OK.name());
                 ticket.setVerified(true);
                 ticket.setClosedTime(LocalDateTime.now());
             } else {
