@@ -154,7 +154,7 @@ public class GlobalControllerAdvice {
         //         .getRequest();
         // String acceptHeader = request.getHeader("Accept");
 
-        // 检查是否是SSE请求
+        // 检查是否是SSE请求，针对SSE请求返回text/event-stream类型
         // if (acceptHeader != null && acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
         //     // 对于SSE请求，使用text/event-stream媒体类型
         //     String sseErrorData = "data: {\"error\":true,\"message\":\"" + I18Consts.I18N_SENSITIVE_CONTENT + "\"}\n\n";
