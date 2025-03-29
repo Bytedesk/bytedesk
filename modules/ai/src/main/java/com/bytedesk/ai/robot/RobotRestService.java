@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 16:34:39
+ * @LastEditTime: 2025-03-29 15:26:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -195,7 +195,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     public ThreadResponse createLlmThread(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("should login first not found");
+            throw new RuntimeException("should login first");
         }
         UserProtobuf agent = JSON.parseObject(request.getAgent(), UserProtobuf.class);
         String robotUid = agent.getUid();
