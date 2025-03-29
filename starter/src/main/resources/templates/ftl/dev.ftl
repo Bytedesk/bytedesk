@@ -127,154 +127,62 @@
             color: var(--arrow-color);
         }
 
-        [lang] {
+        ['zh'] {
             display: none;
         }
 
-        [lang].active {
+        ['zh'].active {
             display: block;
         }
     </style>
 </head>
 
 <body>
-    <div class="switchers">
-        <div class="language-switcher">
-            <#list languages?keys as lang>
-                <button onclick="setLanguage('${lang}')">${languages[lang]}</button>
-            </#list>
-        </div>
-        <div class="theme-switcher">
-            <button onclick="setTheme('light')" title="浅色主题">🌞</button>
-            <button onclick="setTheme('dark')" title="深色主题">🌙</button>
-            <button onclick="setTheme('system')" title="跟随系统">💻</button>
-        </div>
-    </div>
 
-    <#list languages?keys as lang>
-        <div class="container" lang="${lang}">
-            <h1>${i18n[lang]["title"]}</h1>
-            <#--  <p>
-                username: admin@email.com<br>
-                password: admin
-            </p>  -->
 
-            <h2>${i18n[lang]["systemEntrance"]}</h2>
+            <h1>${i18n['zh']["title"]}</h1>
+
+            <h2>${i18n['zh']["systemEntrance"]}</h2>
             <ul>
-                <li><a href="/admin/" target="_blank">${i18n[lang]["adminDashboard"]}</a></li>
-                <li><a href="/agent/chat" target="_blank">${i18n[lang]["agentClient"]}</a></li>
-                <li><a href="/chat/demo" target="_blank">${i18n[lang]["visitorChat"]}</a></li>
-                <li><a href="/agenticflow/" target="_blank">${i18n[lang]["workFlow"]}</a></li>
-                <li><a href="/notebase/" target="_blank">${i18n[lang]["notebase"]}</a></li>
-                <li><a href="/kanban/" target="_blank">${i18n[lang]["kanban"]}</a></li>
+                <li><a href="/admin/" target="_blank">${i18n['zh']["adminDashboard"]}</a></li>
+                <li><a href="/agent/chat" target="_blank">${i18n['zh']["agentClient"]}</a></li>
+                <li><a href="/chat/demo" target="_blank">${i18n['zh']["visitorChat"]}</a></li>
+                <li><a href="/agenticflow/" target="_blank">${i18n['zh']["workFlow"]}</a></li>
+                <li><a href="/notebase/" target="_blank">${i18n['zh']["notebase"]}</a></li>
+                <li><a href="/kanban/" target="_blank">${i18n['zh']["kanban"]}</a></li>
             </ul>
 
-            <h2>${i18n[lang]["systemDevelopment"]}</h2>
+            <h2>${i18n['zh']["systemDevelopment"]}</h2>
             <ul>
-                <li><a href="/apidocs/index.html" target="_blank">${i18n[lang]["javaDoc"]}</a></li>
-                <li><a href="/swagger-ui/index.html" target="_blank">${i18n[lang]["apiDoc"]}</a></li>
-                <li><a href="/doc.html" target="_blank">${i18n[lang]["knife4jDoc"]}</a></li>
+                <li><a href="/apidocs/index.html" target="_blank">${i18n['zh']["javaDoc"]}</a></li>
+                <li><a href="/swagger-ui/index.html" target="_blank">${i18n['zh']["apiDoc"]}</a></li>
+                <li><a href="/doc.html" target="_blank">${i18n['zh']["knife4jDoc"]}</a></li>
                 <li><a href="/druid" target="_blank">Druid</a></li>
-                <li><a href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank">${i18n[lang]["docs"]}</a></li>
+                <li><a href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank">${i18n['zh']["docs"]}</a></li>
                 <li><a href="/web" target="_blank">Web</a></li>
             </ul>
 
-            <h2>${i18n[lang]["moduleDevelopment"]}</h2>
+            <h2>${i18n['zh']["moduleDevelopment"]}</h2>
             <ul>
-                <li><a href="/team/" target="_blank">${i18n[lang]["team"]}</a></li>
-                <li><a href="/service/" target="_blank">${i18n[lang]["service"]}</a></li>
-                <li><a href="/kbase/" target="_blank">${i18n[lang]["kbase"]}</a></li>
-                <li><a href="/ai/" target="_blank">${i18n[lang]["ai"]}</a></li>
-                <li><a href="/ticket/" target="_blank">${i18n[lang]["ticket"]}</a></li>
-                <li><a href="/social/" target="_blank">${i18n[lang]["social"]}</a></li>                
-                <li><a href="/voc/" target="_blank">${i18n[lang]["voiceOfCustomer"]}</a></li>
-                <li><a href="/plugins/kanban/" target="_blank">${i18n[lang]["kanban"]}</a></li>      
-                <#--  <li><a href="/forum/" target="_blank">${i18n[lang]["forum"]}</a></li>  -->
+                <li><a href="/team/" target="_blank">${i18n['zh']["team"]}</a></li>
+                <li><a href="/service/" target="_blank">${i18n['zh']["service"]}</a></li>
+                <li><a href="/kbase/" target="_blank">${i18n['zh']["kbase"]}</a></li>
+                <li><a href="/ai/" target="_blank">${i18n['zh']["ai"]}</a></li>
+                <li><a href="/ticket/" target="_blank">${i18n['zh']["ticket"]}</a></li>
+                <li><a href="/social/" target="_blank">${i18n['zh']["social"]}</a></li>                
+                <li><a href="/voc/" target="_blank">${i18n['zh']["voiceOfCustomer"]}</a></li>
+                <li><a href="/plugins/kanban/" target="_blank">${i18n['zh']["kanban"]}</a></li>      
+                <#--  <li><a href="/forum/" target="_blank">${i18n['zh']["forum"]}</a></li>  -->
             </ul>
 
             <#--  demo  -->
-            <#--  <h2>${i18n[lang]["demo"]}[TODO]</h2>
+            <#--  <h2>${i18n['zh']["demo"]}[TODO]</h2>
             <ul>
-                <li><a href="/chat/demo/airline" target="_blank">${i18n[lang]["airline"]}</a></li>
-                <li><a href="/chat/demo/bytedesk" target="_blank">${i18n[lang]["bytedesk"]}</a></li>
-                <li><a href="/chat/demo/shopping" target="_blank">${i18n[lang]["shopping"]}</a></li>
+                <li><a href="/chat/demo/airline" target="_blank">${i18n['zh']["airline"]}</a></li>
+                <li><a href="/chat/demo/bytedesk" target="_blank">${i18n['zh']["bytedesk"]}</a></li>
+                <li><a href="/chat/demo/shopping" target="_blank">${i18n['zh']["shopping"]}</a></li>
             </ul>  -->
-        </div>
-    </#list>
 
-
-    <#--  <script src="https://www.weiyuai.cn/embed/bytedesk-web.js"></script>  -->
-    <script>
-        // 默认显示英文并高亮英文按钮
-        document.querySelector('[lang="en"]').style.display = 'block';
-        document.querySelector('button[onclick*="en"]').classList.add('active');
-
-        function setLanguage(lang) {
-            // 隐藏所有语言
-            document.querySelectorAll('[lang]').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            // 显示选中的语言
-            document.querySelector('[lang="' + lang + '"]').style.display = 'block';
-
-            // 更新按钮状态
-            document.querySelectorAll('button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            // 修改按钮选择器以确保准确匹配
-            document.querySelector('button[onclick="setLanguage(\'' + lang + '\')"]').classList.add('active');
-
-            // 保存语言偏好
-            localStorage.setItem('preferred-language', lang);
-
-            // 更新客服配置
-            // updateChatConfig(lang);
-        }
-
-        // 恢复保存的语言偏好
-        const savedLang = localStorage.getItem('preferred-language');
-        if (savedLang) {
-            setLanguage(savedLang);
-        }
-
-        function setTheme(theme) {
-            if (theme === 'system') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-            } else {
-                document.documentElement.setAttribute('data-theme', theme);
-            }
-            
-            // 更新按钮状态
-            document.querySelectorAll('.theme-switcher button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector('.theme-switcher button[onclick*="' + theme + '"]').classList.add('active');
-
-            // 保存主题偏好
-            localStorage.setItem('preferred-theme', theme);
-        }
-
-        // 监听系统主题变化
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (localStorage.getItem('preferred-theme') === 'system') {
-                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-            }
-        });
-
-        // 初始化主题
-        const savedTheme = localStorage.getItem('preferred-theme') || 'system';
-        setTheme(savedTheme);
-
-        // 客服配置
-        // assets/js/chatconfig.js
-        function updateChatConfig(lang) {
-            // console.log('updateChatConfig');
-        }
-    </script>
-
-    
 
 </body>
 </html>
