@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:21:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 16:54:15
+ * @LastEditTime: 2025-03-29 23:33:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,12 @@ public class IpBlacklistSpecification extends BaseSpecification {
     public static Specification<IpBlacklistEntity> search(IpBlacklistRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // 
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
             // ip
             if (StringUtils.hasText(request.getIp())) {
                 predicates.add(criteriaBuilder.like(root.get("ip"), "%" + request.getIp() + "%"));
