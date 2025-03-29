@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 09:55:45
+ * @LastEditTime: 2025-03-29 10:17:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import java.util.HashMap;
@@ -177,11 +176,31 @@ public class PageRouteController {
 
 	/**
 	 * docusaurus 文档
+	 * 支持多语言路径：/docs, /docs/zh-CN, /docs/zh-TW
 	 * http://127.0.0.1:9003/docs
 	 */
-	@GetMapping({ "/docs", "/docs/" })
-	public String docs(HttpServletRequest request) {
-		return "redirect:/docs/index.html"; // 默认路径
+	@GetMapping({
+			"/docs",
+			"/docs/",
+			"/docs/{lang:zh-CN|zh-TW}",
+			"/docs/{lang:zh-CN|zh-TW}/",
+			"/docs/{path:[^\\.]*}",
+			"/docs/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/docs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}",
+			"/docs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}/{path2:[^\\.]*}"
+	})
+	public String docs(
+			@PathVariable(required = false) String lang,
+			@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
+
+		// 如果指定了语言，则使用对应语言的入口页面
+		if (lang != null) {
+			return "forward:/docs/" + lang + "/index.html";
+		}
+
+		// 默认使用英文入口页面
+		return "forward:/docs/index.html";
 	}
 
 	/**
@@ -194,8 +213,7 @@ public class PageRouteController {
 			"/admin/",
 			"/admin/{path:[^\\.]*}",
 			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}" })
-	public String admin(@PathVariable(required = false) String path,
-			@PathVariable(required = false) String path2) {
+	public String admin(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
 		return "forward:/admin/index.html"; // 默认路径
 	}
 
@@ -209,8 +227,7 @@ public class PageRouteController {
 			"/agent/",
 			"/agent/{path:[^\\.]*}",
 			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}" })
-	public String agent(@PathVariable(required = false) String path,
-			@PathVariable(required = false) String path2) {
+	public String agent(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
 		return "forward:/agent/index.html"; // 默认路径
 	}
 
