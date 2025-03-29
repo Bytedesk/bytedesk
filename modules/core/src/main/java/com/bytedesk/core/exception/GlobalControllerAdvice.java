@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 10:56:29
+ * @LastEditTime: 2025-03-29 13:53:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,7 +48,7 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> handleUsernameExistsException(UsernameExistsException e) {
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
-    
+
     @ExceptionHandler(EmailExistsException.class)
     public ResponseEntity<?> handleEmailExistsException(EmailExistsException e) {
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
@@ -97,18 +97,20 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
         // || e.getMessage().contains("/wechat/")
-        if (e.getMessage().contains("/vip/") ) {
-            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
+        if (e.getMessage().contains("/vip/")) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                    .body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
         }
-        // 
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage(),404));
+        //
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), 404));
         // // 如果你确定要进行后端跳转，并且你的应用支持这种做法，你可以使用以下方式：
         // String redirectUrl = "/error/404.html";
         // // 使用HttpStatus.SEE_OTHER（303）来表示重定向
         // // 也可以使用HttpStatus.FOUND（302），但303更明确地表示应使用GET方法重定向
-        // return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(redirectUrl)).build();
+        // return
+        // ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(redirectUrl)).build();
     }
-    
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         // 方便测试，打印异常堆栈信息
@@ -127,24 +129,42 @@ public class GlobalControllerAdvice {
         }
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
-    
+
     // 添加对ListenerExecutionFailedException的处理
     @ExceptionHandler(ListenerExecutionFailedException.class)
     public ResponseEntity<?> handleListenerExecutionFailedException(ListenerExecutionFailedException e) {
         log.error("JMS监听器执行失败: {}", e.getMessage());
         // 检查是否是敏感词导致的异常
-        if (e.getCause() instanceof IllegalArgumentException && 
-            e.getCause().getMessage() != null && 
-            e.getCause().getMessage().contains("敏感词")) {
+        if (e.getCause() instanceof IllegalArgumentException &&
+                e.getCause().getMessage() != null &&
+                e.getCause().getMessage().contains("敏感词")) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
         }
         return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_MESSAGE_PROCESSING_FAILED));
     }
-    
+
+    // 添加自定义TabooException处理
     // 添加自定义TabooException处理
     @ExceptionHandler(TabooException.class)
     public ResponseEntity<?> handleTabooException(TabooException e) {
         log.warn("敏感词异常: {}", e.getMessage());
+
+        // 获取当前请求
+        // HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+        //         .getRequest();
+        // String acceptHeader = request.getHeader("Accept");
+
+        // 检查是否是SSE请求
+        // if (acceptHeader != null && acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
+        //     // 对于SSE请求，使用text/event-stream媒体类型
+        //     String sseErrorData = "data: {\"error\":true,\"message\":\"" + I18Consts.I18N_SENSITIVE_CONTENT + "\"}\n\n";
+        //     return ResponseEntity
+        //             .status(HttpStatus.OK)
+        //             .contentType(MediaType.TEXT_EVENT_STREAM)
+        //             .body(sseErrorData);
+        // }
+
+        // 对于普通请求，使用JSON响应
         return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
     }
 
@@ -178,7 +198,8 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(value = AuthorizationDeniedException.class)
     public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonResult.error(I18Consts.I18N_AUTHORIZATION_DENIED, 403));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(JsonResult.error(I18Consts.I18N_AUTHORIZATION_DENIED, 403));
     }
 
     @ExceptionHandler(value = RequestRejectedException.class)
