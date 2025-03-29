@@ -31,6 +31,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
     private final FaqRestService faqService;
 
     // private final String categoryUid;
+    private final String uploadType;
 
     private final String kbUid;
 
