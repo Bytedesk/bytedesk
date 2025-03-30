@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:18:19
+ * @LastEditTime: 2025-03-30 10:23:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class VisitorEntity extends BaseEntity {
 	private String lang = LanguageEnum.ZH_CN.name();
 
 	@Embedded
-	private VisitorDevice device;
+	private VisitorDevice deviceInfo;
 
 	// used for agent notation
 	@Builder.Default
