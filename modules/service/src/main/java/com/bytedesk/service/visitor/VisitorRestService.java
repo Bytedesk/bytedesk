@@ -91,6 +91,9 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
                 visitor.setIpLocation(request.getIpLocation());
             }
             visitor.setVipLevel(request.getVipLevel());
+            if (visitor.getDevice() == null) {
+                visitor.setDevice(new VisitorDevice());
+            }
             visitor.getDevice().setBrowser(request.getBrowser());
             visitor.getDevice().setOs(request.getOs());
             visitor.getDevice().setDevice(request.getDevice());
