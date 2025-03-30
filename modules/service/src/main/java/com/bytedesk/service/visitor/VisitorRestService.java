@@ -91,12 +91,12 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
                 visitor.setIpLocation(request.getIpLocation());
             }
             visitor.setVipLevel(request.getVipLevel());
-            if (visitor.getDevice() == null) {
-                visitor.setDevice(new VisitorDevice());
+            if (visitor.getDeviceInfo() == null) {
+                visitor.setDeviceInfo(new VisitorDevice());
             }
-            visitor.getDevice().setBrowser(request.getBrowser());
-            visitor.getDevice().setOs(request.getOs());
-            visitor.getDevice().setDevice(request.getDevice());
+            visitor.getDeviceInfo().setBrowser(request.getBrowser());
+            visitor.getDeviceInfo().setOs(request.getOs());
+            visitor.getDeviceInfo().setDevice(request.getDevice());
             visitor.setExtra(request.getExtra());
             VisitorEntity savedVisitor = save(visitor);
             if (savedVisitor == null) {
@@ -113,7 +113,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         visitor = modelMapper.map(request, VisitorEntity.class);
         //
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
-        visitor.setDevice(device);
+        visitor.setDeviceInfo(device);
         //
         VisitorEntity savedVisitor = save(visitor);
         if (savedVisitor == null) {
