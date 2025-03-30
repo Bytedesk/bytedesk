@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-31 14:46:17
+ * @LastEditTime: 2025-03-30 21:29:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
-import com.bytedesk.core.base.BaseResponse;
+import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +24,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FaqResponseVisitor extends BaseResponse {
+public class FaqResponseVisitor implements Serializable {
+
+    protected String uid;
+
+    private String orgUid;
 
     private String question;
 
@@ -32,6 +36,5 @@ public class FaqResponseVisitor extends BaseResponse {
 
     private String type;
 
-    // private CategoryResponse category;
     private String categoryUid; // 分类
 }
