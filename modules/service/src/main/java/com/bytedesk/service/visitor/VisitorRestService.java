@@ -98,6 +98,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
             visitor.getDeviceInfo().setOs(request.getOs());
             visitor.getDeviceInfo().setDevice(request.getDevice());
             visitor.setExtra(request.getExtra());
+            // 
             VisitorEntity savedVisitor = save(visitor);
             if (savedVisitor == null) {
                 throw new RuntimeException("visitor not saved");
