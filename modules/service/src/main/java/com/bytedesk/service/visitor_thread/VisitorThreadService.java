@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 09:05:19
+ * @LastEditTime: 2025-03-30 21:36:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
-// import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadStateEnum;
@@ -90,25 +89,26 @@ public class VisitorThreadService
     }
 
     // public VisitorThreadEntity copyFromThread(ThreadEntity thread) {
-    //     //
-    //     VisitorThreadEntity visitorThread = modelMapper.map(thread, VisitorThreadEntity.class);
-    //     //
-    //     String visitorString = thread.getUser();
-    //     UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
-    //     visitorThread.setVisitorUid(visitor.getUid());
-    //     //
-    //     VisitorThreadEntity savedThread = save(visitorThread);
-    //     if (savedThread == null) {
-    //         throw new RuntimeException("Could not save visitor thread");
-    //     }
-    //     return savedThread;
+    // //
+    // VisitorThreadEntity visitorThread = modelMapper.map(thread,
+    // VisitorThreadEntity.class);
+    // //
+    // String visitorString = thread.getUser();
+    // UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
+    // visitorThread.setVisitorUid(visitor.getUid());
+    // //
+    // VisitorThreadEntity savedThread = save(visitorThread);
+    // if (savedThread == null) {
+    // throw new RuntimeException("Could not save visitor thread");
+    // }
+    // return savedThread;
     // }
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
-        // 
+        //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         String extra = ServiceConvertUtils
-                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+                .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -119,11 +119,6 @@ public class VisitorThreadService
                 .client(visitorRequest.getClient())
                 .orgUid(workgroup.getOrgUid())
                 .build();
-        // thread.setUid(uidUtils.getUid());
-        // thread.setOrgUid(workgroup.getOrgUid());
-        //
-        // String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
-        // thread.setUser(visitor);
         threadRestService.save(thread);
         //
         return thread;
@@ -148,8 +143,7 @@ public class VisitorThreadService
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
-        // thread.setUser(visitor);
-
+        //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
@@ -160,10 +154,6 @@ public class VisitorThreadService
                 .client(visitorRequest.getClient())
                 .orgUid(agent.getOrgUid())
                 .build();
-        // thread.setUid(uidUtils.getUid());
-        //
-        // thread.setOwner(agent.getMember().getUser());
-        // thread.setOrgUid(agent.getOrgUid());
         threadRestService.save(thread);
         //
         return thread;
@@ -184,7 +174,7 @@ public class VisitorThreadService
     }
 
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
-        // 
+        //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         //
         ThreadEntity thread = ThreadEntity.builder()
@@ -197,9 +187,6 @@ public class VisitorThreadService
                 .client(visitorRequest.getClient())
                 .orgUid(robot.getOrgUid())
                 .build();
-        // thread.setUid(uidUtils.getUid());
-        // thread.setOrgUid(robot.getOrgUid());
-        // thread.setUser(visitor);
         threadRestService.save(thread);
         //
         return thread;
