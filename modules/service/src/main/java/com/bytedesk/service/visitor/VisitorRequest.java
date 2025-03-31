@@ -90,11 +90,11 @@ public class VisitorRequest extends BaseRequest {
 	// 浏览的标题
 	private String title;
 	// 浏览的IP
-	@Builder.Default
-	private String ip = "127.0.0.1";
+	// @Builder.Default
+	private String ip;// = "127.0.0.1";
 	// 浏览的IP位置
-	@Builder.Default
-	private String ipLocation = "localhost";
+	// @Builder.Default
+	private String ipLocation;// = "localhost";
 
 	// 会员等级
 	@Builder.Default
