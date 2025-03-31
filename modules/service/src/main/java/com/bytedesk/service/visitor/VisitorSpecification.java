@@ -32,6 +32,14 @@ public class VisitorSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // ip
+            if (StringUtils.hasText(request.getIp())) {
+                predicates.add(criteriaBuilder.like(root.get("ip"), "%" + request.getIp() + "%"));
+            }
+            // ipLocation
+            if (StringUtils.hasText(request.getIpLocation())) {
+                predicates.add(criteriaBuilder.like(root.get("ipLocation"), "%" + request.getIpLocation() + "%"));
+            }
             // 方便超级管理员super查询
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
