@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 22:36:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 22:43:29
+ * @LastEditTime: 2025-04-01 23:01:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,14 +30,17 @@ import org.springframework.messaging.MessageHandler;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 
+/**
+ * https://docs.spring.io/spring-integration/reference/mail.html
+ */
 @Configuration
-@ConditionalOnProperty(name = "mail.integration.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "bytedesk.mail.integration.enabled", havingValue = "true", matchIfMissing = false)
 public class MailIntegrationConfig {
 
-    @Value("${mail.imap.url:imaps://username:password@imap.example.com:993/INBOX}")
+    @Value("${bytedesk.mail.imap.url:imaps://username:password@imap.example.com:993/INBOX}")
     private String imapUrl;
     
-    @Value("${mail.polling.delay:60000}")
+    @Value("${bytedesk.mail.polling.delay:60000}")
     private long pollingDelay;
     
     @Bean
@@ -79,4 +82,5 @@ public class MailIntegrationConfig {
             }
         };
     }
+
 }
