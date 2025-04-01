@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 14:28:38
+ * @LastEditTime: 2025-04-01 14:46:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,15 +48,24 @@ public class TicketThreadEventListener {
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         log.info("ticket - onThreadCreateEvent: {}", event);
         ThreadEntity thread = event.getThread();
+        if (thread == null) {
+            log.error("工单线程创建事件, 线程对象为空: {}", event);
+            return;
+        }
+        // 仅支持workgroup类型的会话
+        if (!thread.isWorkgroupType()) {
+            log.error("工单线程创建事件, 仅支持workgroup类型的会话: {}", event);
+            return;
+        }
         log.info("开始创建工单流程实例: threadUid={}, orgUid={}", thread.getUid(), thread.getOrgUid());
         // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
-        variables.put(TicketConsts.TICKET_VARIABLE_TICKET_UID, thread.getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_THREAD_UID, thread.getUid());
         // variables.put(TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID, thread.getDepartmentUid());
         // variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, thread.getReporter().getUid());
-        // variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, thread.getOrgUid());
-        // //
+        variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, thread.getOrgUid());
+        //
         // variables.put(TicketConsts.TICKET_VARIABLE_DESCRIPTION, thread.getDescription());
         // variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, thread.getReporter().getUid());
         // variables.put(TicketConsts.TICKET_VARIABLE_STATUS, thread.getStatus());
@@ -65,7 +74,7 @@ public class TicketThreadEventListener {
         
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
+                .processDefinitionKey(TicketConsts.THREAD_PROCESS_KEY_GROUP)
                 .tenantId(thread.getOrgUid())
                 // .name(thread.getTitle())
                 .businessKey(thread.getUid())

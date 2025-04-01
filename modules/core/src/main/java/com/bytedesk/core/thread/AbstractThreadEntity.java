@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 13:37:03
+ * @LastEditTime: 2025-04-01 14:54:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,11 +138,6 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_auto_close")
     private boolean autoClose = false;
-
-    // // 机器人
-    // @Builder.Default
-    // @Column(name = "is_robot")
-    // private boolean robot = false;
 
     // 备注
     @Column(name = "thread_note")
