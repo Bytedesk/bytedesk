@@ -83,6 +83,16 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(name = "is_rated")
     private boolean rated = false;
 
+    // 是否已经小结
+    @Builder.Default
+    @Column(name = "is_summarized")
+    private boolean summarized = false;
+
+    // 是否已经质检
+    @Builder.Default
+    @Column(name = "is_quality_checked")
+    private boolean qualityChecked = false;
+
     @Builder.Default
     @Column(name = "thread_state", nullable = false)
     private String state = ThreadStateEnum.NEW.name();
