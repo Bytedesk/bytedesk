@@ -1,4 +1,4 @@
-package com.bytedesk.core.service;
+package com.bytedesk.ticket.email.service;
 
 import java.util.Date;
 

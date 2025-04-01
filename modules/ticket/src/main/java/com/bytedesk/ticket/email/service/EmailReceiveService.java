@@ -1,4 +1,4 @@
-package com.bytedesk.core.email.service;
+package com.bytedesk.ticket.email.service;
 
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;

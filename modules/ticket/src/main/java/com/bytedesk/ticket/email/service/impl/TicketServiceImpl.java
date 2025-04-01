@@ -1,4 +1,4 @@
-package com.bytedesk.core.service.impl;
+package com.bytedesk.ticket.email.service.impl;
 
 import java.util.Date;
 
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.entity.Ticket;
 import com.bytedesk.core.repository.TicketRepository;
-import com.bytedesk.core.service.TicketService;
 import com.bytedesk.core.util.UUIDUtil;
+import com.bytedesk.ticket.email.service.TicketService;
 
 // 假设这是已有的类，我们在此添加邮件相关方法实现
 

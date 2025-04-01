@@ -1,4 +1,4 @@
-package com.bytedesk.core.email.service.impl;
+package com.bytedesk.ticket.email.service.impl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.email.service.EmailReceiveService;
 import com.bytedesk.core.entity.Ticket;
 import com.bytedesk.core.repository.TicketRepository;
-import com.bytedesk.core.service.TicketService;
 import com.bytedesk.core.util.UUIDUtil;
+import com.bytedesk.ticket.email.service.EmailReceiveService;
+import com.bytedesk.ticket.email.service.TicketService;
 
 import jakarta.mail.Address;
 import jakarta.mail.BodyPart;
