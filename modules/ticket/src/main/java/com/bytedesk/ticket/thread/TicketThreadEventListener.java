@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket;
+package com.bytedesk.ticket.thread;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -37,12 +37,12 @@ public class TicketThreadEventListener {
         log.info("ticket - onThreadCreateEvent: {}", event);
         ThreadEntity thread = event.getThread();
         if (thread == null) {
-            log.error("工单线程创建事件, 线程对象为空: {}", event);
+            // log.error("工单线程创建事件, 线程对象为空: {}", event);
             return;
         }
         // 仅支持workgroup类型的会话
         if (!thread.isWorkgroupType()) {
-            log.error("工单线程创建事件, 仅支持workgroup类型的会话: {}", event);
+            // log.error("工单线程创建事件, 仅支持workgroup类型的会话: {}", event);
             return;
         }
         log.info("开始创建工单流程实例: threadUid={}, orgUid={}", thread.getUid(), thread.getOrgUid());
