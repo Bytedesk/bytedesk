@@ -38,6 +38,8 @@ declare interface BytedeskConfig {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
     inviteConfig?: InviteConfig;
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
@@ -48,8 +50,6 @@ declare interface BytedeskConfig {
     animation?: Animation_2;
     window?: WindowConfig;
     theme?: Theme;
-    draggable?: boolean;
-    locale?: string;
     onInit?: () => void;
     onShowChat?: () => void;
     onHideChat?: () => void;
