@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 15:55:17
+ * @LastEditTime: 2025-04-01 09:25:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,9 +50,6 @@ import lombok.extern.slf4j.Slf4j;
 public class KbaseEventListener {
 
         private final KbaseRestService kbaseService;
-
-        // private final ArticleService articleService;
-        // private final CategoryService categoryService;
 
         private final KbaseStaticService kbaseStaticService;
 
