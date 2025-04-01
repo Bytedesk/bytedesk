@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 09:16:54
+ * @LastEditTime: 2025-04-01 16:46:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -276,6 +276,10 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
         if (owner == null) {
             throw new RuntimeException("user not found");
         }
+        // 
+        if (ticket.getDepartmentUid() == null || ticket.getDepartmentUid().isEmpty()) {
+            ticket.setDepartmentUid("all");
+        }
         //
         String topic = TopicUtils.formatOrgDepartmentTicketThreadTopic(ticket.getDepartmentUid(), ticket.getUid());
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
@@ -290,7 +294,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 .unreadCount(0)
                 .state(ThreadStateEnum.NEW.name())
                 .topic(topic)
-                // .hide(false) // 默认不隐藏
+                .hide(true) // 默认隐藏
                 .user(user)
                 // .agent(user) // 客服会话的创建者是客服
                 .userUid(owner.getUid())
