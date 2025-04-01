@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 19:31:02
+ * @LastEditTime: 2025-04-01 13:37:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -209,6 +209,12 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Convert(converter = JsonListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> ticketors = new ArrayList<>();
+
+    // 流程实例ID
+    private String processInstanceId;
+
+    // 流程定义实体UID
+    private String processEntityUid;
 
     // belongs to user
     @ManyToOne(fetch = FetchType.LAZY)

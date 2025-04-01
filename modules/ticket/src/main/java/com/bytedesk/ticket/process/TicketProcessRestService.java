@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 12:54:56
+ * @LastEditTime: 2025-04-01 13:51:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -222,6 +222,63 @@ public class TicketProcessRestService
             Deployment deployment = repositoryService.createDeployment()
                     .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                     .addClasspathResource(TicketConsts.TICKET_PROCESS_GROUP_PATH_SIMPLE)
+                    .tenantId(orgUid)
+                    .deploy();
+
+            // 更新 TicketProcessEntity
+            Optional<TicketProcessEntity> processEntity = findByUid(processUid);
+            if (processEntity.isPresent()) {
+                processEntity.get().setDeploymentId(deployment.getId());
+                processEntity.get().setDeployed(true);
+                save(processEntity.get());
+            }
+
+            log.info("部署租户流程成功: deploymentId={}, tenantId={}",
+                    deployment.getId(), deployment.getTenantId());
+
+        } catch (IOException e) {
+            log.error("部署工单流程失败: tenantId={}", orgUid, e);
+        }
+    }
+
+    public void initThreadGroupProcess(String orgUid) {
+        // 检查是否已经部署
+        List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
+                .deploymentTenantId(orgUid)
+                .deploymentName(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                .list();
+
+        if (!existingDeployments.isEmpty()) {
+            log.info("会话工单流程已存在，跳过部署: tenantId={}", orgUid);
+            return;
+        }
+
+        // 读取并部署流程
+        try {
+            Resource resource = resourceLoader
+                    .getResource("classpath:" + TicketConsts.THREAD_PROCESS_PATH_GROUP);
+            String groupThreadBpmn20Xml = "";
+
+            try (InputStream inputStream = resource.getInputStream()) {
+                groupThreadBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+
+            // 生成 processUid 并创建流程记录
+            String processUid = Utils.formatUid(orgUid, TicketConsts.THREAD_PROCESS_KEY_GROUP);
+            TicketProcessRequest processRequest = TicketProcessRequest.builder()
+                    .uid(processUid)
+                    .name(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                    .content(groupThreadBpmn20Xml)
+                    .key(TicketConsts.THREAD_PROCESS_KEY_GROUP)
+                    .description(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                    .orgUid(orgUid)
+                    .build();
+            create(processRequest);
+
+            // 部署流程
+            Deployment deployment = repositoryService.createDeployment()
+                    .name(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                    .addClasspathResource(TicketConsts.THREAD_PROCESS_PATH_GROUP)
                     .tenantId(orgUid)
                     .deploy();
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:00:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 17:16:38
+ * @LastEditTime: 2025-04-01 13:47:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ import com.bytedesk.core.constant.I18Consts;
 
 public class TicketConsts {
 
-    public  static final String TICKET_PROCESS_NAME_GROUP = I18Consts.I18N_PREFIX + "ticket.process.name.group";
+    public static final String TICKET_PROCESS_NAME_GROUP = I18Consts.I18N_PREFIX + "ticket.process.name.group";
 
     public static final String TICKET_PROCESS_NAME_GROUP_SIMPLE = I18Consts.I18N_PREFIX + "ticket.process.name.group.simple";
 
@@ -37,8 +37,12 @@ public class TicketConsts {
 
     public static final String TICKET_PROCESS_AGENT_PATH = "processes/agent-ticket-process.bpmn20.xml";
 
-    // 未分配
-    public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";
+    // thread-process
+    public static final String THREAD_PROCESS_NAME_GROUP = I18Consts.I18N_PREFIX + "thread.process.name.group";
+    
+    public static final String THREAD_PROCESS_KEY_GROUP = "groupThreadProcess";
+
+    public static final String THREAD_PROCESS_PATH_GROUP = "processes/group-thread-process.bpmn20.xml";
 
     // task definition key
     public static final String TICKET_USER_TASK_CREATE_TICKET = "createTicket";
@@ -80,5 +84,9 @@ public class TicketConsts {
     public static final String TICKET_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
 
     public static final String TICKET_VARIABLE_CLAIM_TIME = "claimTime"; // 认领时间
+
+    // 未分配
+    public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";
+
     
 }
