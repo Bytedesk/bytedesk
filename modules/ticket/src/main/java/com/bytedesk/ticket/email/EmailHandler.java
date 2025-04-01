@@ -13,46 +13,22 @@
  */
 package com.bytedesk.ticket.email;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHandler;
-import org.springframework.stereotype.Component;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+// import org.springframework.stereotype.Component;
 
-import jakarta.mail.internet.MimeMessage;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-/**
- * 邮件处理器
- */
-@Slf4j
-@Component
-public class EmailHandler {
+// /**
+//  * 邮件处理器
+//  */
+// @Slf4j
+// @Component
+// @ConditionalOnProperty(name = "bytedesk.mail.handler.legacy.enabled", havingValue = "false", matchIfMissing = true)
+// public class EmailHandler {
 
-    @Autowired
-    private EmailReceiveService emailReceiveService;
+//     @Autowired
+//     private EmailReceiveService emailReceiveService;
 
-    @Bean
-    @ServiceActivator(inputChannel = "receiveEmailChannel")
-    public MessageHandler handleMessage() {
-        return new MessageHandler() {
-            @Override
-            public void handleMessage(Message<?> message) {
-                try {
-                    Object payload = message.getPayload();
-                    log.debug("收到新邮件: {}", message);
-
-                    if (payload instanceof MimeMessage) {
-                        MimeMessage mimeMessage = (MimeMessage) payload;
-                        emailReceiveService.processEmail(mimeMessage);
-                    } else {
-                        log.warn("未知邮件格式: {}", payload.getClass().getName());
-                    }
-                } catch (Exception e) {
-                    log.error("处理邮件时出错", e);
-                }
-            }
-        };
-    }
-}
+//     // 移除重复的MessageHandler定义，由MailReceiverConfig提供
+// }
