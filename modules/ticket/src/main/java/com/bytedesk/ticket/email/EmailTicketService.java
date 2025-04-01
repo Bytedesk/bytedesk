@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 21:30:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 22:22:08
+ * @LastEditTime: 2025-04-01 22:48:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class EmailTicketService {
-    
-    // @Autowired
-    // private TicketRepository ticketRepository;
-    
-    // ...existing code...
     
 
     /**
