@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:24:19
+ * @LastEditTime: 2025-04-01 16:46:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -308,6 +308,8 @@ public class TopicUtils {
     }
 
     public static String formatOrgDepartmentTicketThreadTopic(String departmentUid, String ticketUid) {
+        
+
         return String.format(TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN, departmentUid, ticketUid);
     }
 
