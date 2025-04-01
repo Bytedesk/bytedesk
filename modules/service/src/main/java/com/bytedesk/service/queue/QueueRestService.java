@@ -19,9 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -46,8 +44,7 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
 
     @Override
     public Page<QueueResponse> queryByOrg(QueueRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<QueueEntity> specification = QueueSpecification.search(request);
         Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
@@ -61,8 +58,7 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
         }
         // set user uid
 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<QueueEntity> specification = QueueSpecification.search(request);
         Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
 

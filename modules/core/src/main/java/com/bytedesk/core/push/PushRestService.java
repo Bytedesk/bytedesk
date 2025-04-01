@@ -21,9 +21,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
@@ -337,8 +335,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     @Override
     public Page<PushResponse> queryByOrg(PushRequest request) {
 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<PushEntity> specification = PushSpecification.search(request);
         Page<PushEntity> page = pushRepository.findAll(specification, pageable);
 

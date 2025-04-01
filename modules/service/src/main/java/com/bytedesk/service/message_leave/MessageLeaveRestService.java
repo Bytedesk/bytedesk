@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -45,8 +43,7 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
     @Override
     public Page<MessageLeaveResponse> queryByOrg(MessageLeaveRequest request) {
 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
 
         Specification<MessageLeaveEntity> spec = MessageLeaveSpecification.search(request);
 
@@ -58,8 +55,7 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
     @Override
     public Page<MessageLeaveResponse> queryByUser(MessageLeaveRequest request) {
 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
 
         Specification<MessageLeaveEntity> spec = MessageLeaveSpecification.search(request);
 
