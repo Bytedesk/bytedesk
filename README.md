@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 09:56:58
+ * @LastEditTime: 2025-04-01 18:33:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -170,8 +170,8 @@ demo username: admin@email.com
 demo password: admin
 ```
 
-- [online preview](https://www.weiyuai.cn/admin/)
-- [demo](https://demo.weiyuai.cn)
+<!-- - [online preview](https://www.weiyuai.cn/admin/) -->
+<!-- - [demo](https://demo.weiyuai.cn) -->
 
 ## Open Source Client
 

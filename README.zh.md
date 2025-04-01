@@ -163,8 +163,8 @@ http://127.0.0.1:9003/
 默认密码: admin
 ```
 
-- [线上预览](https://www.weiyuai.cn/admin/)
-- [demo](https://demo.weiyuai.cn)
+<!-- - [线上预览](https://www.weiyuai.cn/admin/) -->
+<!-- - [demo](https://demo.weiyuai.cn) -->
 
 ## 开源客户端
 
