@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 18:08:56
+ * @LastEditTime: 2025-04-01 18:43:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -171,12 +171,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             // 客服离线 或 非接待状态
             return getOfflineMessage(visitorRequest, thread, workgroup);
         }
-
-        // 返回工作组会话
-        // return routeService.routeToWorkgroup(visitorRequest, thread.getTopic(),
-        // workgroup);
-        // return routeToWorkgroup(visitorRequest, thread.getTopic(), workgroup);
-
     }
 
     private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent,
