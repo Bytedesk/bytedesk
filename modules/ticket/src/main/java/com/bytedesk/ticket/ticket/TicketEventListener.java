@@ -130,25 +130,7 @@ public class TicketEventListener {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
             ticketRestService.save(ticketEntity);
-            // 认领任务，修改为用户手动认领
-            // if (StringUtils.hasText(ticketEntity.getAssigneeString())) {
-            //     TicketRequest request = new TicketRequest();
-            //     request.setUid(ticketEntity.getUid());
-            //     request.setAssignee(ticketEntity.getAssignee());
-            //     request.setOrgUid(ticketEntity.getOrgUid());
-            //     // 认领工单
-            //     ticketService.claimTicket(request);
-            // }
         }
-        // 
-        // 订阅工单会话
-        // UserEntity owner = ticket.getOwner();
-        // TopicRequest topicRequest = TopicRequest.builder()
-        //         .topic(TopicUtils.formatOrgTicketThreadTopic(ticket.getDepartment().getUid(), ticket.getUid()))
-        //         // .userUid(owner.getUid())
-        //         .build();
-        //     topicRequest.setUserUid(owner.getUid());
-        // topicCacheService.push(JSON.toJSONString(topicRequest));
     }
 
     // 监听工单更新事件

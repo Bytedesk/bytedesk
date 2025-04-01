@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 08:45:02
+ * @LastEditTime: 2025-04-01 13:37:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -109,4 +109,10 @@ public class ThreadResponse extends BaseResponse {
     private UserProtobuf user;
     //
     private UserProtobuf owner;
+
+    // 流程实例ID
+    private String processInstanceId;
+    
+    // 流程定义实体UID
+    private String processEntityUid;
 }
