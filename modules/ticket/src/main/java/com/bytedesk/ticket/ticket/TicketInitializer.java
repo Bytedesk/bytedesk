@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-03 13:34:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:34:06
+ * @LastEditTime: 2025-04-01 09:07:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,31 +56,19 @@ public class TicketInitializer implements SmartInitializingSingleton {
         for (String category : TicketCategories.getAllCategories()) {
             // log.info("initTicketCategory: {}", category);
 
-            // if (TicketCategories.isParentCategory(category)) { // 父类
             CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .uid(Utils.formatUid(orgUid, category))
                     .name(category)
                     .order(0)
+                    .type(CategoryTypeEnum.TICKET.name())
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
                     .build();
-            categoryRequest.setType(CategoryTypeEnum.TICKET.name());
-            categoryRequest.setUid(Utils.formatUid(orgUid, category));
-            categoryRequest.setOrgUid(orgUid);
-            categoryService.create(categoryRequest);
-            // } else { // 子类
-            // String parentCategory = TicketCategories.getParentCategory(category);
-            // CategoryRequest categoryRequest = CategoryRequest.builder()
-            // .parentUid(orgUid + parentCategory)
-            // .name(category)
-            // .order(0)
-            // .level(LevelEnum.ORGANIZATION.name())
-            // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-            // .build();
             // categoryRequest.setType(CategoryTypeEnum.TICKET.name());
-            // categoryRequest.setUid(orgUid + category);
+            // categoryRequest.setUid(Utils.formatUid(orgUid, category));
             // categoryRequest.setOrgUid(orgUid);
-            // categoryService.create(categoryRequest);
-            // }
+            categoryService.create(categoryRequest);
         }
     }
 
