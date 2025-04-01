@@ -143,22 +143,27 @@
 		</dependency>
 
 		<!-- Spring Integration Mail (用于轮询邮箱) -->
+        <!-- 主要用于构建邮件接收系统和邮件工作流 -->
+        <!-- https://docs.spring.io/spring-integration/reference/mail.html -->
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-mail</artifactId>
+            <scope>provided</scope>
 		</dependency>
 
 		<!-- Jakarta Mail API -->
-		<dependency>
+        <!-- 提供了发送和接收邮件的标准 Java API，只包含接口定义，不包含实现 -->
+		<!-- <dependency>
 			<groupId>jakarta.mail</groupId>
 			<artifactId>jakarta.mail-api</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<!-- Jakarta Mail 实现 -->
-		<dependency>
+        <!-- Eclipse Angus 是 Jakarta Mail 的参考实现，提供了实际的邮件操作功能实现 -->
+		<!-- <dependency>
 			<groupId>org.eclipse.angus</groupId>
 			<artifactId>angus-mail</artifactId>
-		</dependency>
+		</dependency> -->
 
         <!-- LDAP Security -->
 		<dependency>

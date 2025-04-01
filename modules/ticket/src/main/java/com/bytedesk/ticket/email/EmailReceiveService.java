@@ -1,20 +1,13 @@
-package com.bytedesk.ticket.email.service.impl;
+package com.bytedesk.ticket.email;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.entity.Ticket;
-import com.bytedesk.core.repository.TicketRepository;
-import com.bytedesk.core.util.UUIDUtil;
-import com.bytedesk.ticket.email.service.EmailReceiveService;
-import com.bytedesk.ticket.email.service.TicketService;
+import com.bytedesk.ticket.email.EmailReceiveService;
 
 import jakarta.mail.Address;
 import jakarta.mail.BodyPart;
@@ -22,22 +15,26 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 邮件接收服务实现
  */
+@Slf4j
 @Service
-public class EmailReceiveServiceImpl implements EmailReceiveService {
-    
-    private final Logger logger = LoggerFactory.getLogger(EmailReceiveServiceImpl.class);
-    
+public class EmailReceiveService {
+        
     @Value("${bytedesk.mail.receiver.handler:console}")
     private String mailHandler;
     
     @Autowired(required = false)
-    private TicketService ticketService;
+    private EmailTicketService ticketService;
 
-    @Override
+    /**
+     * 处理接收到的邮件
+     * @param message 邮件消息
+     * @throws MessagingException 邮件处理异常
+     */
     public void processEmail(MimeMessage message) throws MessagingException {
         try {
             String subject = message.getSubject();
@@ -45,13 +42,13 @@ public class EmailReceiveServiceImpl implements EmailReceiveService {
             String content = getContent(message);
             Date receivedDate = message.getReceivedDate();
             
-            logger.info("收到邮件: 主题='{}', 来自='{}', 时间='{}'", subject, from, receivedDate);
+            log.info("收到邮件: 主题='{}', 来自='{}', 时间='{}'", subject, from, receivedDate);
             
             // 根据配置的处理器类型进行处理
             switch (mailHandler) {
                 case "console":
                     // 仅打印到控制台
-                    logger.info("邮件内容:\n{}", content);
+                    log.info("邮件内容:\n{}", content);
                     break;
                     
                 case "ticket":
@@ -59,16 +56,16 @@ public class EmailReceiveServiceImpl implements EmailReceiveService {
                     if (ticketService != null) {
                         createTicketFromEmail(subject, from, content, receivedDate);
                     } else {
-                        logger.warn("未注入TicketService，无法创建工单");
+                        log.warn("未注入TicketService，无法创建工单");
                     }
                     break;
                     
                 default:
-                    logger.info("未知的邮件处理器类型: {}", mailHandler);
+                    log.info("未知的邮件处理器类型: {}", mailHandler);
                     break;
             }
         } catch (Exception e) {
-            logger.error("处理邮件时发生错误", e);
+            log.error("处理邮件时发生错误", e);
         }
     }
     
@@ -126,12 +123,12 @@ public class EmailReceiveServiceImpl implements EmailReceiveService {
             // 这里需要根据实际的TicketService接口来实现
             // 简单示例：
             if (ticketService != null) {
-                logger.info("从邮件创建工单: {} - {}", subject, fromEmail);
+                log.info("从邮件创建工单: {} - {}", subject, fromEmail);
                 // 调用工单服务创建工单
                 ticketService.createFromEmail(subject, fromEmail, content, date);
             }
         } catch (Exception e) {
-            logger.error("从邮件创建工单失败", e);
+            log.error("从邮件创建工单失败", e);
         }
     }
 }
