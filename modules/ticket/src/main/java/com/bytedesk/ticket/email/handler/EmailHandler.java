@@ -1,4 +1,4 @@
-package com.bytedesk.core.email.handler;
+package com.bytedesk.ticket.email.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.email.service.EmailReceiveService;
+import com.bytedesk.ticket.email.service.EmailReceiveService;
 
 import jakarta.mail.internet.MimeMessage;
 

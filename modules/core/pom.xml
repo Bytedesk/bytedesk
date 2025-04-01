@@ -51,31 +51,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Spring Boot Mail Starter -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Spring Integration Mail (用于轮询邮箱) -->
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-mail</artifactId>
-		</dependency>
-
-		<!-- Jakarta Mail API -->
-		<dependency>
-			<groupId>jakarta.mail</groupId>
-			<artifactId>jakarta.mail-api</artifactId>
-		</dependency>
-
-		<!-- Jakarta Mail 实现 -->
-		<dependency>
-			<groupId>org.eclipse.angus</groupId>
-			<artifactId>angus-mail</artifactId>
-		</dependency>
-
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		<!-- https://github.com/spring-projects/spring-statemachine -->
 		<!--

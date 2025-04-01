@@ -1,4 +1,4 @@
-package com.bytedesk.core.email.config;
+package com.bytedesk.ticket.email.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
