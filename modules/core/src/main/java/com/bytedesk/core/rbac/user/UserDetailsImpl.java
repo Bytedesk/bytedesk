@@ -42,6 +42,8 @@ public class UserDetailsImpl implements UserDetails {
     private String email;
     private String password;
     private String description;
+    private String country;
+    private String sex;
     // 
     private boolean enabled;
     private boolean superUser;
@@ -68,6 +70,8 @@ public class UserDetailsImpl implements UserDetails {
             String email, 
             String password,
             String description,
+            String country,
+            String sex,
             // 
             boolean enabled,
             boolean superUser,
@@ -92,6 +96,8 @@ public class UserDetailsImpl implements UserDetails {
         this.email = email;
         this.password = password;
         this.description = description;
+        this.country = country;
+        this.sex = sex;
         // 
         this.enabled = enabled;
         this.superUser = superUser;
@@ -99,6 +105,8 @@ public class UserDetailsImpl implements UserDetails {
         this.mobileVerified = mobileVerified;
         this.platform = platform;
         this.orgUid = orgUid;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         // 
         this.authorities = authorities;
         this.currentOrganization = currentOrganization;
@@ -123,6 +131,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 user.getDescription(),
+                user.getCountry(),
+                user.getSex(),
                 // 
                 user.isEnabled(),
                 user.isSuperUser(),
@@ -130,6 +140,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.isMobileVerified(),
                 user.getPlatform(),
                 user.getOrgUid(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 //
                 authorities,
                 user.getCurrentOrganization(),
