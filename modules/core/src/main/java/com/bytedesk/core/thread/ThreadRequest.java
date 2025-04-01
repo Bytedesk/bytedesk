@@ -144,8 +144,8 @@ public class ThreadRequest extends BaseRequest {
     private Boolean mergeByTopic = false;
 
     // 流程实例ID
-    private String processInstanceId;
+    // private String processInstanceId;
     
-    // 流程定义实体UID
-    private String processEntityUid;
+    // // 流程定义实体UID
+    // private String processEntityUid;
 }
