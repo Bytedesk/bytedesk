@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 07:20:37
+ * @LastEditTime: 2025-04-01 09:20:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,19 +31,27 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
+import com.bytedesk.core.tag.TagRequest;
+import com.bytedesk.core.tag.TagRestService;
+import com.bytedesk.core.tag.TagTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.utils.Utils;
 
 import io.jsonwebtoken.lang.Arrays;
 import lombok.AllArgsConstructor;
@@ -62,9 +70,12 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     private final UidUtils uidUtils;
 
-    // private final IMessageSendService messageSendService;
-
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final CategoryRestService categoryService;
+
+    private final TagRestService tagRestService;
+
 
     public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
         Pageable pageable = request.getPageable();
@@ -605,6 +616,42 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public ThreadResponse queryByUid(ThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    public void initThreadCategory(String orgUid) {
+        // log.info("initThreadCategory");
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        for (String category : ThreadCategories.getAllCategories()) {
+            // log.info("initThreadCategory: {}", category);
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .uid(Utils.formatUid(orgUid, category))
+                    .name(category)
+                    .order(0)
+                    .type(CategoryTypeEnum.THREAD.name())
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
+                    .build();
+            categoryService.create(categoryRequest);
+        }
+    }
+
+    public void initThreadTag(String orgUid) {
+        // log.info("initThreadTag");
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        for (String tag : ThreadTags.getAllTags()) {
+            // log.info("initThreadCategory: {}", category);
+            TagRequest tagRequest = TagRequest.builder()
+                    .uid(Utils.formatUid(orgUid, tag))
+                    .name(tag)
+                    .order(0)
+                    .type(TagTypeEnum.THREAD.name())
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
+                    .build();
+            tagRestService.create(tagRequest);
+        }
     }
 
 }
