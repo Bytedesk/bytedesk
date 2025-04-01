@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 15:00:27
+ * @LastEditTime: 2025-04-01 17:49:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -208,7 +208,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     // 流程实例ID
     // private String processInstanceId;
 
-    // // 流程定义实体UID
+    // 流程定义实体UID
     // private String processEntityUid;
 
     // belongs to user
