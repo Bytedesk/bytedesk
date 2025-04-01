@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 13:25:19
+ * @LastEditTime: 2025-04-01 09:16:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -43,6 +48,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -54,7 +60,10 @@ import com.bytedesk.ticket.comment.TicketCommentRepository;
 import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TicketRestService extends BaseRestService<TicketEntity, TicketRequest, TicketResponse> {
@@ -73,17 +82,13 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
 
     private final UidUtils uidUtils;
 
-    // private final AgentRestService agentRestService;
-
-    // private final MemberRestService memberRestService;
-
-    // private final WorkgroupRestService workgroupRestService;
-
     private final ThreadRestService threadRestService;
 
     private final UploadRestService uploadRestService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final CategoryRestService categoryService;
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
@@ -409,6 +414,25 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {
         return TicketConvertUtils.convertToResponse(entity);
+    }
+
+    public void initTicketCategory(String orgUid) {
+        log.info("initTicketCategory", orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        for (String category : TicketCategories.getAllCategories()) {
+            // log.info("initTicketCategory: {}", category);
+
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .uid(Utils.formatUid(orgUid, category))
+                    .name(category)
+                    .order(0)
+                    .type(CategoryTypeEnum.TICKET.name())
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
+                    .build();
+            categoryService.create(categoryRequest);
+        }
     }
 
 }

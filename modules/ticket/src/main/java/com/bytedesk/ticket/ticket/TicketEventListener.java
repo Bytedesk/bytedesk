@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 17:02:16
+ * @LastEditTime: 2025-04-01 09:18:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,9 +23,12 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 // import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadTypeEnum;
@@ -52,9 +55,14 @@ public class TicketEventListener {
 
     private final ThreadRestService threadRestService;
 
-    // private final TicketService ticketService;
-
-    // private final TopicCacheService topicCacheService;
+    @Order(3)
+    @EventListener
+    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+        OrganizationEntity organization = (OrganizationEntity) event.getSource();
+        String orgUid = organization.getUid();
+        log.info("ticket - organization created: {}", organization.getName());
+        ticketRestService.initTicketCategory(orgUid);
+    }
 
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {

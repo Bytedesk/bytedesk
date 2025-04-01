@@ -16,17 +16,7 @@ package com.bytedesk.core.thread;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.category.CategoryRequest;
-import com.bytedesk.core.category.CategoryRestService;
-import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
-// import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.core.tag.TagRequest;
-import com.bytedesk.core.tag.TagRestService;
-import com.bytedesk.core.tag.TagTypeEnum;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,17 +25,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ThreadInitializer implements SmartInitializingSingleton {
 
-    // private final AuthorityRestService authorityService;
-
-    private final CategoryRestService categoryService;
-
-    private final TagRestService tagRestService;
+    private final ThreadRestService threadRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        initThreadCategory();
-        initThreadTag();
+        // 创建默认的工单分类
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        threadRestService.initThreadCategory(orgUid);
+        threadRestService.initThreadTag(orgUid);
     }
 
     private void initAuthority() {
@@ -65,41 +53,9 @@ public class ThreadInitializer implements SmartInitializingSingleton {
         // }
     }
 
-    private void initThreadCategory() {
-        // log.info("initThreadCategory");
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        for (String category : ThreadCategories.getAllCategories()) {
-            // log.info("initThreadCategory: {}", category);
-            CategoryRequest categoryRequest = CategoryRequest.builder()
-                    .uid(Utils.formatUid(orgUid, category))
-                    .name(category)
-                    .order(0)
-                    .type(CategoryTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            categoryService.create(categoryRequest);
-        }
-    }
+    
 
-    private void initThreadTag() {
-        // log.info("initThreadTag");
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        for (String tag : ThreadTags.getAllTags()) {
-            // log.info("initThreadCategory: {}", category);
-            TagRequest tagRequest = TagRequest.builder()
-                    .uid(Utils.formatUid(orgUid, tag))
-                    .name(tag)
-                    .order(0)
-                    .type(TagTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            tagRestService.create(tagRequest);
-        }
-    }
+    
 
 
 }
