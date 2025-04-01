@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 10:12:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 14:10:29
+ * @LastEditTime: 2025-04-01 15:58:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@
 
 ## 流程概述
 
-该流程文件(`group-thread-process.bpmn20.xml`)定义了完整的在线客服会话流程，从访客发起咨询到满意度评价的全过程。流程采用Flowable工作流引擎实现，确保每个环节都有明确的处理逻辑和角色分配。
+该流程文件(`thread-group-process.bpmn20.xml`)定义了完整的在线客服会话流程，从访客发起咨询到满意度评价的全过程。流程采用Flowable工作流引擎实现，确保每个环节都有明确的处理逻辑和角色分配。
 
 ## 流程组成部分
 
