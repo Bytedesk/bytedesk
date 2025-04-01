@@ -35,7 +35,7 @@ public class TicketProcessEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("ticket process - organization created: {}", orgUid);
-        ticketProcessRestService.initTicketGroupSimpleProcess(orgUid);
+        ticketProcessRestService.initTicketGroupProcess(orgUid);
         ticketProcessRestService.initThreadGroupProcess(orgUid);
     }
 
