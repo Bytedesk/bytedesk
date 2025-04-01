@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -45,8 +43,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
 
     @Override
     public Page<QueueMemberResponse> queryByOrg(QueueMemberRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
         Page<QueueMemberEntity> page = queueMemberRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
@@ -60,8 +57,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         }
         // set user uid
 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.DESC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
         Page<QueueMemberEntity> page = queueMemberRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
