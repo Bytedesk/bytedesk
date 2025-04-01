@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 12:00:09
+ * @LastEditTime: 2025-04-01 09:57:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,10 +18,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.role.RoleEntity;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 
@@ -47,10 +49,13 @@ public class UserDetailsImpl implements UserDetails {
     private boolean mobileVerified;
     private String platform;
     // 
+    private String orgUid;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt; 
+    // 
     private OrganizationEntity currentOrganization;
     private Set<UserOrganizationRoleEntity> userOrganizationRoles;
-    // private Set<Role> roles;
-    // private Set<String> organizations;
+    private Set<RoleEntity> currentRoles;
     Collection<? extends GrantedAuthority> authorities;
 
     private UserDetailsImpl(
@@ -62,15 +67,22 @@ public class UserDetailsImpl implements UserDetails {
             String mobile,
             String email, 
             String password,
-            Collection<? extends GrantedAuthority> authorities,
-            OrganizationEntity currentOrganization,
-            Set<UserOrganizationRoleEntity> userOrganizationRoles,
             String description,
+            // 
+            boolean enabled,
             boolean superUser,
             boolean emailVerified,
             boolean mobileVerified,
             String platform,
-            boolean enabled) {
+            String orgUid,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            // 
+            Collection<? extends GrantedAuthority> authorities,
+            OrganizationEntity currentOrganization,
+            Set<RoleEntity> currentRoles,
+            Set<UserOrganizationRoleEntity> userOrganizationRoles
+            ) {
         this.id = id;
         this.uid = uid;
         this.username = username;
@@ -86,9 +98,11 @@ public class UserDetailsImpl implements UserDetails {
         this.emailVerified = emailVerified;
         this.mobileVerified = mobileVerified;
         this.platform = platform;
+        this.orgUid = orgUid;
         // 
         this.authorities = authorities;
         this.currentOrganization = currentOrganization;
+        this.currentRoles = currentRoles;
         this.userOrganizationRoles = userOrganizationRoles;
     }
 
@@ -108,15 +122,19 @@ public class UserDetailsImpl implements UserDetails {
                 user.getMobile(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities,
-                user.getCurrentOrganization(),
-                user.getUserOrganizationRoles(),
                 user.getDescription(),
+                // 
+                user.isEnabled(),
                 user.isSuperUser(),
                 user.isEmailVerified(),
                 user.isMobileVerified(),
                 user.getPlatform(),
-                user.isEnabled());
+                user.getOrgUid(),
+                //
+                authorities,
+                user.getCurrentOrganization(),
+                user.getCurrentRoles(),
+                user.getUserOrganizationRoles());
     }
 
     @Override
