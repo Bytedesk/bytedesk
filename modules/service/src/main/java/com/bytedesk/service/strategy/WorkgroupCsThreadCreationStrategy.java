@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 09:15:42
+ * @LastEditTime: 2025-04-01 18:08:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
-// import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -68,8 +67,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
     private final ThreadRestService threadService;
 
     private final VisitorThreadService visitorThreadService;
-
-    // private final RouteService routeService;
 
     private final IMessageSendService messageSendService;
 
@@ -106,7 +103,6 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
-            //  && !visitorRequest.getForceAgent()
             if (threadOptional.get().isStarted()) {
                 thread = threadOptional.get();
                 // 重新初始化会话，包括重置机器人状态等
