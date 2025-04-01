@@ -1072,7 +1072,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT4H");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE, 
+            TicketConsts.TICKET_PROCESS_KEY_GROUP, 
             variables
         );
         assertNotNull(processInstance);
