@@ -1,5 +1,12 @@
 com.bytedesk.ai
 com.bytedesk.ai.controller
+com.bytedesk.ai.demo.airline
+com.bytedesk.ai.demo.airline.data
+com.bytedesk.ai.demo.airline.services
+com.bytedesk.ai.demo.bytedesk
+com.bytedesk.ai.demo.manus
+com.bytedesk.ai.demo.shopping
+com.bytedesk.ai.demo.utils
 com.bytedesk.ai.model
 com.bytedesk.ai.provider
 com.bytedesk.ai.provider.vendors.ollama
@@ -12,9 +19,11 @@ com.bytedesk.ai.springai
 com.bytedesk.ai.springai.base
 com.bytedesk.ai.springai.dashscope
 com.bytedesk.ai.springai.deepseek
+com.bytedesk.ai.springai.gitee
 com.bytedesk.ai.springai.ollama
 com.bytedesk.ai.springai.ollama.config
 com.bytedesk.ai.springai.ollama.fallback
+com.bytedesk.ai.springai.rag
 com.bytedesk.ai.springai.siliconflow
 com.bytedesk.ai.springai.spring
 com.bytedesk.ai.springai.spring.event
@@ -23,12 +32,6 @@ com.bytedesk.ai.statistic
 com.bytedesk.ai.statistic.event
 com.bytedesk.ai.utils
 com.bytedesk.ai.utils.advisor
-com.bytedesk.ai.utils.demo.airline
-com.bytedesk.ai.utils.demo.airline.data
-com.bytedesk.ai.utils.demo.airline.services
-com.bytedesk.ai.utils.demo.bytedesk
-com.bytedesk.ai.utils.demo.shopping
-com.bytedesk.ai.utils.demo.utils
 com.bytedesk.ai.utils.output
 com.bytedesk.ai.utils.reader
 com.bytedesk.ai.utils.tools
@@ -105,7 +108,9 @@ com.bytedesk.core.rbac.auth
 com.bytedesk.core.rbac.auth.ldap
 com.bytedesk.core.rbac.auth.sso
 com.bytedesk.core.rbac.authority
+com.bytedesk.core.rbac.authority.event
 com.bytedesk.core.rbac.organization
+com.bytedesk.core.rbac.organization.event
 com.bytedesk.core.rbac.role
 com.bytedesk.core.rbac.role.event
 com.bytedesk.core.rbac.user
@@ -153,7 +158,6 @@ com.bytedesk.core.upload.cloud
 com.bytedesk.core.upload.event
 com.bytedesk.core.upload.storage
 com.bytedesk.core.url
-com.bytedesk.core.user
 com.bytedesk.core.utils
 com.bytedesk.core.visitor
 com.bytedesk.core.webhook
@@ -162,6 +166,7 @@ com.bytedesk.douyin.dian
 com.bytedesk.douyin.feige
 com.bytedesk.douyin.hudong
 com.bytedesk.douyin.mini
+com.bytedesk.eam
 com.bytedesk.forum
 com.bytedesk.forum.controller
 com.bytedesk.forum.exception
@@ -189,6 +194,7 @@ com.bytedesk.kbase.article.event
 com.bytedesk.kbase.auto_reply.fixed
 com.bytedesk.kbase.auto_reply.keyword
 com.bytedesk.kbase.auto_reply.settings
+com.bytedesk.kbase.batch
 com.bytedesk.kbase.comment
 com.bytedesk.kbase.comment.event
 com.bytedesk.kbase.config
@@ -244,8 +250,6 @@ com.bytedesk.service.queue_member
 com.bytedesk.service.queue_member.event
 com.bytedesk.service.queue.exception
 com.bytedesk.service.queue.settings
-com.bytedesk.service.rating
-com.bytedesk.service.routing
 com.bytedesk.service.settings
 com.bytedesk.service.statistic
 com.bytedesk.service.statistic_message
@@ -254,6 +258,7 @@ com.bytedesk.service.statistic_report.event
 com.bytedesk.service.statistic_thread
 com.bytedesk.service.strategy
 com.bytedesk.service.thread_invite
+com.bytedesk.service.thread_rating
 com.bytedesk.service.thread_summary
 com.bytedesk.service.thread_summary.event
 com.bytedesk.service.thread_transfer
