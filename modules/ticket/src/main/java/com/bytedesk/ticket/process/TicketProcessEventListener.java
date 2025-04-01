@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 12:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 16:28:43
+ * @LastEditTime: 2025-04-01 12:54:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,10 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TicketProcessEventListener {
 
-    // private final RepositoryService repositoryService;
-
-    // private final ResourceLoader resourceLoader;
-
     private final TicketProcessRestService ticketProcessRestService;
 
     @Order(8)
@@ -39,7 +35,7 @@ public class TicketProcessEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("ticket process - organization created: {}", orgUid);
-        ticketProcessRestService.initProcess(orgUid);
+        ticketProcessRestService.initTicketGroupSimpleProcess(orgUid);
     }
 
     // @EventListener
