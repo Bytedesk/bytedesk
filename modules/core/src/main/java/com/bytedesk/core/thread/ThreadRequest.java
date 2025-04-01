@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 12:01:46
+ * @LastEditTime: 2025-04-01 08:45:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,6 +52,14 @@ public class ThreadRequest extends BaseRequest {
     // 是否被评价
     @Builder.Default
     private Boolean rated = false;
+
+    // 是否已经小结
+    @Builder.Default
+    private Boolean summarized = false;
+
+    // 是否已经质检
+    @Builder.Default
+    private Boolean qualityChecked = false;
 
     private UserProtobuf user;
     

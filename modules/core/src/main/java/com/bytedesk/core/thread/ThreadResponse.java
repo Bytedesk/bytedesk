@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 18:24:32
+ * @LastEditTime: 2025-04-01 08:45:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,6 +53,12 @@ public class ThreadResponse extends BaseResponse {
 
     // 是否被评价
     private Boolean rated;
+
+    // 是否已经小结
+    private Boolean summarized;
+
+    // 是否已经质检
+    private Boolean qualityChecked;
 
     private String state;
 
