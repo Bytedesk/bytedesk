@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 13:51:41
+ * @LastEditTime: 2025-04-01 14:05:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -212,6 +212,7 @@ public class TicketProcessRestService
                     .uid(processUid)
                     .name(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                     .content(groupTicketBpmn20Xml)
+                    .type(TicketProcessTypeEnum.TICKET.name())
                     .key(TicketConsts.TICKET_PROCESS_KEY_GROUP_SIMPLE)
                     .description(TicketConsts.TICKET_PROCESS_NAME_GROUP_SIMPLE)
                     .orgUid(orgUid)
@@ -269,6 +270,7 @@ public class TicketProcessRestService
                     .uid(processUid)
                     .name(TicketConsts.THREAD_PROCESS_NAME_GROUP)
                     .content(groupThreadBpmn20Xml)
+                    .type(TicketProcessTypeEnum.THREAD.name())
                     .key(TicketConsts.THREAD_PROCESS_KEY_GROUP)
                     .description(TicketConsts.THREAD_PROCESS_NAME_GROUP)
                     .orgUid(orgUid)
