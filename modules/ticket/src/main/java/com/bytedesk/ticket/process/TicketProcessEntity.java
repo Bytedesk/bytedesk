@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:02:48
+ * @LastEditTime: 2025-04-01 14:04:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,9 +51,9 @@ public class TicketProcessEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // @Builder.Default
-    // @Column(name = "process_type", nullable = false)
-    // private String type = TicketProcessTypeEnum.TICKET.name();
+    @Builder.Default
+    @Column(name = "process_type", nullable = false)
+    private String type = TicketProcessTypeEnum.TICKET.name();
 
     // 是否已部署流程
     @Builder.Default
