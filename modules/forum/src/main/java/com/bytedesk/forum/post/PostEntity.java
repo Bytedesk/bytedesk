@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 11:42:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-06 12:25:38
+ * @LastEditTime: 2025-04-02 08:43:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,8 @@ package com.bytedesk.forum.post;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.constant.TypeConsts;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +35,7 @@ public class PostEntity extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
     @Column(name = "user_id", nullable = false)
