@@ -38,6 +38,8 @@ import lombok.experimental.Accessors;
 
 /**
  * visitor no need to login, without login can reduce the press of the database
+ * TODO: 对于平台型app来说，visitor不属于某个org，所有备注信息都应该按照org单独存储，
+ * TODO: 而不是和visitor合并到一起，将备注信息写入到customer表中
  */
 @Entity
 @Data
