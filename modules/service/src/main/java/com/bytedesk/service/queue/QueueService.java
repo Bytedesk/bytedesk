@@ -48,18 +48,18 @@ public class QueueService {
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, RobotEntity robotEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
-        QueueEntity queue = getOrCreateQueue(threadEntity, robotEntity.getNickname());
+        QueueEntity queue = getQueue(threadEntity, robotEntity.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf userProtobuf = UserProtobuf.builder()
+        UserProtobuf agentProtobuf = UserProtobuf.builder()
             .uid(robotEntity.getUid())
             .nickname(robotEntity.getNickname())
             .avatar(robotEntity.getAvatar())
             .build();
         // 2. 创建队列成员
-        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -69,18 +69,18 @@ public class QueueService {
     @Transactional
     public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
-        QueueEntity queue = getOrCreateQueue(threadEntity, agentEntity.getNickname());
+        QueueEntity queue = getQueue(threadEntity, agentEntity.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf userProtobuf = UserProtobuf.builder()
+        UserProtobuf agentProtobuf = UserProtobuf.builder()
             .uid(agentEntity.getUid())
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
             .build();
         // 2. 创建队列成员
-        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -90,18 +90,18 @@ public class QueueService {
     @Transactional
     public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, AgentEntity agentEntity, WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
-        QueueEntity queue = getOrCreateQueue(threadEntity, workgroupEntity.getNickname());
+        QueueEntity queue = getQueue(threadEntity, workgroupEntity.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf userProtobuf = UserProtobuf.builder()
+        UserProtobuf agentProtobuf = UserProtobuf.builder()
             .uid(agentEntity.getUid())
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
             .build();
         // 2. 创建队列成员
-        QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -109,7 +109,7 @@ public class QueueService {
     }
 
     @Transactional
-    private QueueEntity getOrCreateQueue(ThreadEntity threadEntity, String queueNickname) {
+    private QueueEntity getQueue(ThreadEntity threadEntity, String queueNickname) {
         String threadTopic = threadEntity.getTopic();
         String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(threadTopic);
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
@@ -124,8 +124,8 @@ public class QueueService {
                             .topic(queueTopic)
                             .type(threadEntity.getType())
                             .status(QueueStatusEnum.ACTIVE.name())
+                            .orgUid(threadEntity.getOrgUid())
                             .build();
-                        request.setOrgUid(threadEntity.getOrgUid());
                         return queueRestService.createQueue(request);
                     });
             } catch (Exception e) {
@@ -141,17 +141,10 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity getOrCreateQueueMember(ThreadEntity threadEntity, 
-        UserProtobuf userProtobuf, 
-        VisitorRequest visitorRequest, 
-        QueueEntity queue) {
-
+    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest request, QueueEntity queue) {
+        // 
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByQueueTopicAndQueueDayAndThreadUidAndStatus(
-            queue.getTopic(), 
-            queue.getDay(), 
-            threadEntity.getUid(), 
-            QueueMemberStatusEnum.WAITING.name()
-        );
+            queue.getTopic(), queue.getDay(), threadEntity.getUid(), QueueMemberStatusEnum.WAITING.name());
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
@@ -163,17 +156,17 @@ public class QueueService {
             .queueTopic(queue.getTopic())
             .queueDay(queue.getDay())
             .threadUid(threadEntity.getUid())
-            .visitorUid(visitorRequest.getUid())
-            .visitorNickname(visitorRequest.getNickname())
-            .visitorAvatar(visitorRequest.getAvatar())
-            .agentUid(userProtobuf.getUid())
-            .agentNickname(userProtobuf.getNickname())
-            .agentAvatar(userProtobuf.getAvatar())
+            .visitorUid(request.getUid())
+            .visitorNickname(request.getNickname())
+            .visitorAvatar(request.getAvatar())
+            .agentUid(agent.getUid())
+            .agentNickname(agent.getNickname())
+            .agentAvatar(agent.getAvatar())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
-            .client(visitorRequest.getClient())
+            .client(request.getClient())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
@@ -196,7 +189,6 @@ public class QueueService {
         Double avgWaitTime = queueMemberRepository.calculateAverageWaitTime(queueUid);
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
-
     
     public List<String> getQueuedThreads(QueueStatusEnum status) {
         // return queueRepository.findByStatus(status.name())
@@ -205,7 +197,6 @@ public class QueueService {
         //     .toList();
         return new ArrayList<>();
     }
-
     
     // public int getQueuePosition(String threadTopic) {
     //     QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
@@ -213,7 +204,6 @@ public class QueueService {
     //     return queueMemberRepository.countByQueueUidAndPriorityGreaterThan(
     //         member.getQueueUid(), member.getPriority());
     // }
-
     
     @Transactional
     public void updateStatus(String threadUid, QueueStatusEnum status) {
