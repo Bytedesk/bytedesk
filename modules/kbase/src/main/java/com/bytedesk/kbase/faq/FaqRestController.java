@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 12:58:25
+ * @LastEditTime: 2025-04-03 07:28:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     private final FaqRestService faqService;
 
-    @PreAuthorize("hasAuthority('KBASE_READ')")
+    // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
 
@@ -47,7 +47,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_READ')")
+    // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(FaqRequest request) {
         
@@ -56,7 +56,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_READ')")
+    // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         

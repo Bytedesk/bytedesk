@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 13:22:51
+ * @LastEditTime: 2025-04-03 07:23:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,11 +86,9 @@ public class QueueMemberEntity extends BaseEntity {
     private int queueNumber = 0;  // 排队号码
 
     @Builder.Default
-    @Column(nullable = false)
     private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
-    @Column(nullable = false)
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
 
     private LocalDateTime firstMessageTime;  // 访客首次发送消息时间
@@ -99,14 +97,14 @@ public class QueueMemberEntity extends BaseEntity {
 
     private LocalDateTime leaveTime;  // 离开时间
 
-    private String acceptType ;  // 接单方式, 自动、手动，不设置默认
+    private String acceptType ;  // 接入方式：自动、手动，不设置默认
 
     private LocalDateTime acceptTime;  // 开始服务时间
 
-    private LocalDateTime firstResponseTime;  // 首次人工响应时间
-
     @Builder.Default
     private boolean firstResponse = false;  // 是否首次响应
+
+    private LocalDateTime firstResponseTime;  // 首次人工响应时间
 
     private LocalDateTime lastResponseTime;  // 最后响应时间
 
