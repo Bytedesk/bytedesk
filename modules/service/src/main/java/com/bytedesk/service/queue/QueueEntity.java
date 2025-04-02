@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 17:18:07
+ * @LastEditTime: 2025-04-02 18:43:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,11 +47,12 @@ public class QueueEntity extends BaseEntity {
     @Column(name = "queue_nickname")
     private String nickname;
 
+    // 队列类型
     @Builder.Default
     @Column(name = "queue_type")
-    private String type = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
+    private String type = ThreadTypeEnum.WORKGROUP.name();  
 
-    // thread topic
+    // 区别于thread topic，此处的topic是队列的主题，用于访客监听排队人数变化
     @Column(name = "queue_topic")
     private String topic;
 
