@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 10:17:51
+ * @LastEditTime: 2025-04-02 14:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,7 +49,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.service.agent.event.AgentUpdateEvent;
+import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
@@ -263,7 +263,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         agent.setStatus(request.getStatus()); // 更新接待状态
         // 
-        int currentThreadCount = threadRestService.countByThreadTopicAndState(agent.getUid(), ThreadStatusEnum.STARTED.name());
+        int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadStatusEnum.CLOSED.name());
         agent.setCurrentThreadCount(currentThreadCount);
         log.info("agent: {}", agent.toString());
         // 
@@ -271,7 +271,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to save agent.");
         }
-        bytedeskEventPublisher.publishEvent(new AgentUpdateEvent(this, updatedAgent, AgentUpdateTypeEnum.STATUS.name()));
+        // 
+        bytedeskEventPublisher.publishEvent(new AgentUpdateStatusEvent(this, updatedAgent));
 
         return convertToResponse(updatedAgent);
     }
