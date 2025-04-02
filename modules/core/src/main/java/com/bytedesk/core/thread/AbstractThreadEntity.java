@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 08:58:41
+ * @LastEditTime: 2025-04-02 09:06:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,6 +66,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(name = "thread_type", nullable = false)
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
+    // 重构到相应的表里面
     // // 意图类型
     // @Builder.Default
     // private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
