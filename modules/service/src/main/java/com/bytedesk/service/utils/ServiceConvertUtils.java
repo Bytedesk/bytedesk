@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 16:55:16
+ * @LastEditTime: 2025-04-02 15:37:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.service.utils;
 
 import org.modelmapper.ModelMapper;
-
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -99,6 +98,71 @@ public class ServiceConvertUtils {
     //
     public static AgentResponse convertToAgentResponse(AgentEntity agent) {
         return modelMapper.map(agent, AgentResponse.class);
+        // try {
+        //     // 确保agent对象已经完全初始化（非代理状态）
+        //     Hibernate.initialize(agent);
+            
+        //     // 如果有成员关系，确保成员也已经初始化
+        //     if (agent.getMember() != null) {
+        //         Hibernate.initialize(agent.getMember());
+        //     }
+            
+        //     // 直接创建新的AgentResponse对象，手动设置必要的属性
+        //     AgentResponse response = new AgentResponse();
+        //     response.setUid(agent.getUid());
+        //     response.setOrgUid(agent.getOrgUid());
+        //     response.setNickname(agent.getNickname());
+        //     response.setAvatar(agent.getAvatar());
+        //     response.setMobile(agent.getMobile());
+        //     response.setEmail(agent.getEmail());
+        //     response.setDescription(agent.getDescription());
+        //     response.setStatus(agent.getStatus());
+        //     response.setConnected(agent.isConnected());
+        //     response.setMaxThreadCount(agent.getMaxThreadCount());
+        //     response.setCurrentThreadCount(agent.getCurrentThreadCount());
+            
+        //     // 复制其他必要的属性
+        //     if (agent.getServiceSettings() != null) {
+        //         ServiceSettingsResponse serviceSettings = modelMapper.map(agent.getServiceSettings(), ServiceSettingsResponse.class);
+        //         response.setServiceSettings(serviceSettings);
+        //     }
+        //     if (agent.getAutoReplySettings() != null) {
+        //         response.setAutoReplySettings(agent.getAutoReplySettings());
+        //     }
+        //     if (agent.getQueueSettings() != null) {
+        //         // response.setQueueSettings(agent.getQueueSettings());
+        //         QueueSettingsResponse queueSettings = modelMapper.map(agent.getQueueSettings(), QueueSettingsResponse.class);
+        //         response.setQueueSettings(queueSettings);
+        //     }
+        //     if (agent.getMessageLeaveSettings() != null) {
+        //         // response.setMessageLeaveSettings(agent.getMessageLeaveSettings());
+        //         MessageLeaveSettingsResponse messageLeaveSettings = modelMapper.map(agent.getMessageLeaveSettings(), MessageLeaveSettingsResponse.class);
+        //         response.setMessageLeaveSettings(messageLeaveSettings);
+        //     }
+        //     if (agent.getInviteSettings() != null) {
+        //         response.setInviteSettings(agent.getInviteSettings());
+        //     }
+            
+        //     // 设置userUid
+        //     if (agent.getUserUid() != null) {
+        //         response.setUserUid(agent.getUserUid());
+        //     }
+            
+        //     // 添加其他所需属性的设置
+        //     MemberProtobuf member = modelMapper.map(agent.getMember(), MemberProtobuf.class);
+        //     response.setMember(member);
+            
+        //     return response;
+        // } catch (Exception e) {
+        //     // 记录异常，但返回一个基本的响应对象
+        //     // 这样可以确保即使有映射错误，也能返回部分数据
+        //     AgentResponse response = new AgentResponse();
+        //     response.setUid(agent.getUid());
+        //     response.setOrgUid(agent.getOrgUid());
+        //     response.setNickname(agent.getNickname());
+        //     // 设置其他不依赖懒加载的基本属性
+        //     return response;
+        // }
     }
 
     public static UserProtobuf convertToUserProtobuf(AgentEntity agent) {
