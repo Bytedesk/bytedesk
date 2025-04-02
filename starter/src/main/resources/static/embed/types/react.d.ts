@@ -54,6 +54,7 @@ declare interface BytedeskConfig {
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onConfigChange?: (config: BytedeskConfig) => void;
 }
 
 export declare const BytedeskReact: ({ locale, ...props }: BytedeskReactProps) => JSX_2.Element;

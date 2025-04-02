@@ -52,6 +52,7 @@ export declare interface BytedeskConfig {
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onConfigChange?: (config: BytedeskConfig) => void;
 }
 
 declare class BytedeskWeb {
@@ -92,6 +93,7 @@ declare class BytedeskWeb {
     private createContextMenu;
     private showContextMenu;
     private hideContextMenu;
+    private togglePlacement;
 }
 export default BytedeskWeb;
 
