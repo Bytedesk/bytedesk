@@ -96,10 +96,10 @@
                     <ul id="supportCategory" class="uk-list uk-list-large uk-margin-medium-bottom">
                         <#list categories as category>
                             <button class="accordion">
-                                ${category.name!''}
-                                <#--  <a href="category/${category.uid}.html" target="_blank">${category.name!''}</a>  -->
+                                <#--  ${category.name!''}  -->
+                                <a href="category/${category.uid}.html">${category.name!''}</a>
                             </button>
-                            <div class="panel">
+                            <#--  <div class="panel">  -->
                                 <#--  <#list articles as article>
                                     <li><a href="article/${article.uid}.html" target="_blank">${article.title!''}</a></li>
                                 </#list>
@@ -108,7 +108,7 @@
                                         暂无文章
                                     </div>
                                 </#if>  -->
-                            </div>
+                            <#--  </div>  -->
                         </#list>
                         <!-- <li><a href="#">Getting Started</a></li> -->
                         <!-- <li><a class="uk-text-bold" href="#">Account Management</a> <span uk-icon="icon: chevron-right"></span></li> -->
