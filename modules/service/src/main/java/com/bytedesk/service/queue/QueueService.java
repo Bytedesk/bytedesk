@@ -158,6 +158,7 @@ public class QueueService {
         }
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
+            .uid(uidUtils.getUid())
             .queueUid(queue.getUid())
             .queueNickname(queue.getNickname())
             .queueTopic(queue.getTopic())
@@ -174,9 +175,10 @@ public class QueueService {
             .enqueueTime(LocalDateTime.now())
             .status(QueueMemberStatusEnum.WAITING.name())
             .client(visitorRequest.getClient())
+            .orgUid(threadEntity.getOrgUid())
             .build();
-        member.setUid(uidUtils.getUid());
-        member.setOrgUid(threadEntity.getOrgUid());
+        // member.setUid(uidUtils.getUid());
+        // member.setOrgUid(threadEntity.getOrgUid());
         // 
         return queueMemberRestService.save(member);
     }
