@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 10:06:59
+ * @LastEditTime: 2025-04-02 13:17:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -204,15 +204,29 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        // 
         ThreadEntity thread = threadOptional.get();
-
         // 客服离线或小休不接待状态，则进入留言
         thread.setOffline();
         thread.setUnreadCount(0);
         thread.setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
         thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         threadService.save(thread);
-        //
+
+        // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+                // 距离当前时间不超过30分钟，则直接使用之前的消息
+                // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+                messageSendService.sendProtobufMessage(messageProtobuf);
+                return messageProtobuf;
+            }
+        }
+
+        // 创建新的留言消息
         MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(agent, thread);
         // 保存留言消息
         messageRestService.save(message);
@@ -220,6 +234,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        // 
         return messageProtobuf;
     }
 

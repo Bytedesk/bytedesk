@@ -17,6 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -45,6 +46,10 @@ public class MessageUnreadEventListener {
             return;
         }
         log.info("message unread create event: {} {} {}", message.getUid(), message.getType(), message.getContent());
+        // 
+        if (ClientEnum.SYSTEM.name().equals(message.getClient())) {
+            return;
+        }
         // 缓存未读消息
         String threadTopic = message.getTopic();
         String userString = message.getUser();

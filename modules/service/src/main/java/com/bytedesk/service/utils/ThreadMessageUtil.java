@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 10:03:55
+ * @LastEditTime: 2025-04-02 13:07:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,8 +50,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -64,6 +65,7 @@ public class ThreadMessageUtil {
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(robot.getServiceSettings().getWelcomeTip())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
@@ -89,12 +91,13 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -110,12 +113,13 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -130,12 +134,13 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -150,12 +155,13 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.CONTINUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -171,12 +177,13 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return message;
@@ -192,12 +199,13 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(JSON.toJSONString(user))
+                .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .threadUid(thread.getUid())
                 .topic(thread.getTopic())
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         
         return message;
