@@ -54,10 +54,10 @@ public class QueueService {
         }
         // 
         UserProtobuf userProtobuf = UserProtobuf.builder()
+            .uid(robotEntity.getUid())
             .nickname(robotEntity.getNickname())
             .avatar(robotEntity.getAvatar())
             .build();
-        userProtobuf.setUid(robotEntity.getUid());
         // 2. 创建队列成员
         QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
@@ -75,10 +75,10 @@ public class QueueService {
         }
         // 
         UserProtobuf userProtobuf = UserProtobuf.builder()
+            .uid(agentEntity.getUid())
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
             .build();
-        userProtobuf.setUid(agentEntity.getUid());
         // 2. 创建队列成员
         QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
@@ -96,10 +96,11 @@ public class QueueService {
         }
         // 
         UserProtobuf userProtobuf = UserProtobuf.builder()
+            .uid(agentEntity.getUid())
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
             .build();
-        userProtobuf.setUid(agentEntity.getUid());
+        // userProtobuf.setUid(agentEntity.getUid());
         // 2. 创建队列成员
         QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
         // 3. 更新队列统计

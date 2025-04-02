@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 10:46:03
+ * @LastEditTime: 2025-04-02 10:03:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,42 +38,42 @@ import java.time.LocalDateTime;
 public class ThreadMessageUtil {
 
     public static MessageProtobuf getThreadUnifiedWelcomeMessage(ThreadEntity thread) {
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getAgent())
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
+        
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadRobotWelcomeMessage(RobotEntity robot, ThreadEntity thread) {
+
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(robot.getServiceSettings().getWelcomeTip())
+                .topic(thread.getTopic())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getAgent())
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
         //
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
@@ -81,138 +81,127 @@ public class ThreadMessageUtil {
     // 将此方法设为静态，以便在没有实例化类的情况下调用
     public static MessageProtobuf getThreadWelcomeMessage(AgentEntity agent, ThreadEntity thread) {
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        // ... 方法的实现保持不变 ...
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(agent.getServiceSettings().getWelcomeTip())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
+        
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getAgentThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        // ... 方法的实现保持不变 ...
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
+        
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadQueuingMessage(UserProtobuf user, ThreadEntity thread) {
-        // ... 方法的实现保持不变 ...
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
+        
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadContinueMessage(UserProtobuf user, ThreadEntity thread) {
-        // ... 方法的实现保持不变 ...
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(thread.getUid()) // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
                 .content(I18Consts.I18N_REENTER_TIP)
                 .type(MessageTypeEnum.CONTINUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(thread.getUid()); // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
+        
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageEntity getAgentThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
-
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        // ... 方法的实现保持不变 ...
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(agent.getMessageLeaveSettings().getMessageLeaveTip())
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
-        // return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        
         return message;
     }
 
     public static MessageEntity getThreadOfflineMessage(WorkgroupEntity workgroup, ThreadEntity thread) {
-
         UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
-        // ... 方法的实现保持不变 ...
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
         MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
                 .user(JSON.toJSONString(user))
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .topic(thread.getTopic())
+                .extra(JSON.toJSONString(extra))
                 .build();
-        message.setUid(UidUtils.getInstance().getUid());
-        message.setOrgUid(thread.getOrgUid());
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUpdatedAt(LocalDateTime.now());
-        message.setTopic(thread.getTopic());
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        message.setExtra(JSON.toJSONString(extra));
-        //
-        // return ConvertServiceUtils.convertToMessageProtobuf(message, thread);
+        
         return message;
     }
-
 
     // 检查无响应触发
     public static void checkNoResponse(String userUid, long lastActiveTime, ServiceSettings settings) {

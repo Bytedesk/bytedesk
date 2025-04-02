@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:54:47
+ * @LastEditTime: 2025-04-02 10:06:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,10 +132,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         } else {
             return handleOfflineAgent(thread, agent, queueMemberEntity);
         }
-
-        // 人工客服
-        // return routeService.routeToAgent(visitorRequest, thread, agent);
-        // return routeToAgent(visitorRequest, thread, agent);
     }
 
     private MessageProtobuf handleAvailableAgent(ThreadEntity threadFromRequest, AgentEntity agent,
@@ -195,7 +191,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         thread.setUnreadCount(0);
         thread.setContent(content);
         thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        // thread.setRobot(false);
         threadService.save(thread);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);

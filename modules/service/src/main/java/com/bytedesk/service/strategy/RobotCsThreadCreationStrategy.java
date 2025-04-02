@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:45:32
+ * @LastEditTime: 2025-04-02 10:00:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,15 +72,22 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
-        if (threadOptional.isPresent() && threadOptional.get().isRoboting()) {
-            thread = threadOptional.get();
+        if (threadOptional.isPresent()) {
             // 
-            thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
-            // 返回未关闭，或 非留言状态的会话
-            log.info("Already have a processing robot thread {}", topic);
+            if (threadOptional.get().isNew()) {
+                thread = threadOptional.get();
+            } else if (threadOptional.get().isRoboting()) {
+                thread = threadOptional.get();
+                // 
+                thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
+                // 返回未关闭，或 非留言状态的会话
+                log.info("Already have a processing robot thread {}", topic);
+                return getRobotContinueMessage(robot, thread);
+            }
+        }
 
-            return getRobotContinueMessage(robot, thread);
-        } else {
+        // 如果会话不存在，或者会话已经关闭，则创建新的会话
+        if (thread == null) {
             thread = visitorThreadService.createRobotThread(request, robot, topic);
         }
 
@@ -92,9 +99,7 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         thread.setStatus(ThreadStatusEnum.ROBOTING.name());
         thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        // thread.setRobot(true);
         thread.setUnreadCount(0);
-        // ThreadEntity savedThread =
         threadService.save(thread);
 
         // 增加接待数量
@@ -108,9 +113,6 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         queueMemberRestService.save(queueMemberEntity);
 
         return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
-
-        // return routeService.routeToRobot(visitorRequest, thread, robot);
-        // return routeToRobot(visitorRequest, thread, robot);
     }
 
     private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
