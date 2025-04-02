@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 08:58:14
+ * @LastEditTime: 2025-04-02 14:49:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -506,6 +506,11 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 获取当前接待会话数量
     public int countByThreadTopicAndState(String topic, String state) {
         return threadRepository.countByTopicAndStatusAndDeletedFalse(topic, state);
+    }
+
+    // count by topic and status not
+    public int countByThreadTopicAndStateNot(String topic, String state) {
+        return threadRepository.countByTopicAndStatusNotAndDeletedFalse(topic, state);
     }
 
     @Cacheable(value = "thread", key = "#uid", unless = "#result == null")

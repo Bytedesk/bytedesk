@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:17:30
+ * @LastEditTime: 2025-04-02 14:48:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,5 +72,13 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         @Query("SELECT COUNT(*) FROM ThreadEntity t WHERE t.topic = :topic AND t.status = :status AND t.deleted = false")
         int countByTopicAndStatusAndDeletedFalse(@Param("topic") String topic, @Param("status") String status);
+
+        // count by topic and status not
+        @Query("SELECT COUNT(*) FROM ThreadEntity t WHERE t.topic = :topic AND t.status != :status AND t.deleted = false")
+        int countByTopicAndStatusNotAndDeletedFalse(@Param("topic") String topic, @Param("status") String status);
+
+        @Query("SELECT t FROM ThreadEntity t WHERE t.topic = :topic AND t.status != :status AND t.deleted = false")
+        List<ThreadEntity> findByTopicAndStatusNotAndDeletedFalse(@Param("topic") String topic, @Param("status") String status);
+
 
 }
