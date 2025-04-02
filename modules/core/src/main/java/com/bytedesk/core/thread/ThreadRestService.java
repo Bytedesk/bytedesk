@@ -505,7 +505,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     // 获取当前接待会话数量
     public int countByThreadTopicAndState(String topic, String state) {
-        return threadRepository.countByTopicAndStateAndDeletedFalse(topic, state);
+        return threadRepository.countByTopicAndStatusAndDeletedFalse(topic, state);
     }
 
     @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
@@ -538,7 +538,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
         List<String> states = Arrays.asList(new String[] { ThreadStatusEnum.CLOSED.name() });
-        return threadRepository.findTopicAndStatesNotInAndDeleted(topic, states, false);
+        return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
     // TODO: how to cacheput or cacheevict?
@@ -550,7 +550,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });
-        return threadRepository.findByTypesInAndStateNotAndDeletedFalse(types, ThreadStatusEnum.CLOSED.name());
+        return threadRepository.findByTypesInAndStatusNotAndDeletedFalse(types, ThreadStatusEnum.CLOSED.name());
     }
 
     @Caching(put = {

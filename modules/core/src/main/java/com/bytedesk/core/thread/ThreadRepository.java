@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 14:50:43
+ * @LastEditTime: 2025-04-02 09:17:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,9 +29,6 @@ import com.bytedesk.core.rbac.user.UserEntity;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * 
- */
 @Repository
 @Tag(name = "thread - 会话")
 public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, JpaSpecificationExecutor<ThreadEntity> {
@@ -47,37 +44,33 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         Optional<ThreadEntity> findFirstByTopicAndDeletedOrderByCreatedAtDesc(String topic, Boolean deleted);
 
-        Optional<ThreadEntity> findFirstByTopicAndStateNotContainingAndDeleted(String topic, String state, Boolean deleted);
+        Optional<ThreadEntity> findFirstByTopicAndStatusNotContainingAndDeleted(String topic, String status, Boolean deleted);
 
-        // @Query(value = "select * from core_thread t where t.topic like ?1 and t.state not in ?2 and t.is_deleted = ?3", nativeQuery = true)
-        @Query(value = "select * from core_thread t where t.topic = ?1 and t.state not in ?2 and t.is_deleted = ?3 LIMIT 1", nativeQuery = true)
-        Optional<ThreadEntity> findTopicAndStatesNotInAndDeleted(String topicWithWildcard,
-                        List<String> states,
+        // @Query(value = "select * from core_thread t where t.topic like ?1 and t.status not in ?2 and t.is_deleted = ?3", nativeQuery = true)
+        @Query(value = "select * from core_thread t where t.topic = ?1 and t.status not in ?2 and t.is_deleted = ?3 LIMIT 1", nativeQuery = true)
+        Optional<ThreadEntity> findTopicAndStatusesNotInAndDeleted(String topicWithWildcard,
+                        List<String> statuses,
                         Boolean deleted);
 
         Page<ThreadEntity> findByOwnerAndHideAndDeleted(UserEntity owner, Boolean hide, Boolean deleted, Pageable pageable);
 
         List<ThreadEntity> findFirstByTopic(String topic);
+        
+        List<ThreadEntity> findByStatusAndDeleted(String status, Boolean deleted);
 
-        // FIXME: h2不兼容 JSON_EXTRACT
-        // FIXME: PostgreSQL ERROR: function json_extract(json, unknown) does not exist
-        // @Query(value = "SELECT * FROM core_thread WHERE
-        // JSON_EXTRACT(extra,'$.closed') = false", nativeQuery = true)
-        List<ThreadEntity> findByStateAndDeleted(String state, Boolean deleted);
+        @Query("SELECT t FROM ThreadEntity t WHERE t.status IN :statuses AND t.deleted = :deleted")
+        List<ThreadEntity> findByStatusesAndDeleted(@Param("statuses") List<String> statuses, Boolean deleted);
 
-        @Query("SELECT t FROM ThreadEntity t WHERE t.state IN :states AND t.deleted = :deleted")
-        List<ThreadEntity> findByStatesAndDeleted(@Param("states") List<String> states, Boolean deleted);
+        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.status not IN :statuses AND t.deleted = :deleted")
+        List<ThreadEntity> findByTypesInAndStatusesNotInAndDeleted(@Param("types") List<String> types, @Param("statuses") List<String> statuses, Boolean deleted);
 
-        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.state not IN :states AND t.deleted = :deleted")
-        List<ThreadEntity> findByTypesInAndStatesNotInAndDeleted(@Param("types") List<String> types, @Param("states") List<String> states, Boolean deleted);
+        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.status = :status AND t.deleted = false")
+        List<ThreadEntity> findByTypesInAndStatusAndDeletedFalse(@Param("types") List<String> types, @Param("status") String status);
 
-        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.state = :state AND t.deleted = false")
-        List<ThreadEntity> findByTypesInAndStateAndDeletedFalse(@Param("types") List<String> types, @Param("state") String state);
+        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.status != :status AND t.deleted = false")
+        List<ThreadEntity> findByTypesInAndStatusNotAndDeletedFalse(@Param("types") List<String> types, @Param("status") String status);
 
-        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.state != :state AND t.deleted = false")
-        List<ThreadEntity> findByTypesInAndStateNotAndDeletedFalse(@Param("types") List<String> types, @Param("state") String state);
-
-        @Query("SELECT COUNT(*) FROM ThreadEntity t WHERE t.topic = :topic AND t.state = :state AND t.deleted = false")
-        int countByTopicAndStateAndDeletedFalse(@Param("topic") String topic, @Param("state") String state);
+        @Query("SELECT COUNT(*) FROM ThreadEntity t WHERE t.topic = :topic AND t.status = :status AND t.deleted = false")
+        int countByTopicAndStatusAndDeletedFalse(@Param("topic") String topic, @Param("status") String status);
 
 }

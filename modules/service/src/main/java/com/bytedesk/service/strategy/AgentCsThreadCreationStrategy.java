@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:49:11
+ * @LastEditTime: 2025-04-02 09:54:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,6 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final VisitorThreadService visitorThreadService;
 
-    // private final RouteService routeService;
     private final IMessageSendService messageSendService;
 
     private final AgentRestService agentRestService;
@@ -95,7 +94,9 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             //
-            if (threadOptional.get().isStarted()) {
+            if (threadOptional.get().isNew()) {
+                thread = threadOptional.get();
+            } else if ( threadOptional.get().isStarted()) {
                 thread = threadOptional.get();
                 // 重新初始化会话额外信息，例如客服状态等
                 thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
@@ -109,17 +110,11 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
             } else if (threadOptional.get().isOffline()) {
                 thread = threadOptional.get();
             }
-            // else {
-            // // 关闭或者离线状态，返回初始化状态的会话
-            // thread = thread.reInit(false);
-            // }
         }
         //
         if (thread == null) {
             // 不存在会话，创建会话
             thread = visitorThreadService.createAgentThread(visitorRequest, agent, topic);
-            // 重新初始化会话额外信息，例如客服状态等
-            thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
         }
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
