@@ -11,16 +11,14 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.form;
+package com.bytedesk.service.form;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +31,7 @@ public class FormRestController extends BaseRestController<FormRequest> {
 
     private final FormRestService formService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(FormRequest request) {
         

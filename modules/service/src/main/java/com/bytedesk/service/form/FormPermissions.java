@@ -11,19 +11,16 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.form;
+package com.bytedesk.service.form;
 
-public class FormPermissions {
+// public class FormPermissions {
 
-    public static final String FORM_PREFIX = "FORM_";
-    // Form permissions
-    public static final String FORM_CREATE = "hasAuthority('FORM_CREATE')";
-    public static final String FORM_READ = "hasAuthority('FORM_READ')";
-    public static final String FORM_UPDATE = "hasAuthority('FORM_UPDATE')";
-    public static final String FORM_DELETE = "hasAuthority('FORM_DELETE')";
-    public static final String FORM_EXPORT = "hasAuthority('FORM_EXPORT')";
-
-    // 
-    
-    
-}
+//     public static final String FORM_PREFIX = "FORM_";
+//     // Form permissions
+//     public static final String FORM_CREATE = "hasAuthority('FORM_CREATE')";
+//     public static final String FORM_READ = "hasAuthority('FORM_READ')";
+//     public static final String FORM_UPDATE = "hasAuthority('FORM_UPDATE')";
+//     public static final String FORM_DELETE = "hasAuthority('FORM_DELETE')";
+//     public static final String FORM_EXPORT = "hasAuthority('FORM_EXPORT')";
+//     // 
+// }
