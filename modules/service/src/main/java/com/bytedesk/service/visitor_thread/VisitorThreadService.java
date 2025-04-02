@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:00:39
+ * @LastEditTime: 2025-04-02 09:50:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -88,27 +88,14 @@ public class VisitorThreadService
         return visitorThreadRepository.findFirstByTopic(topic);
     }
 
-    // public VisitorThreadEntity copyFromThread(ThreadEntity thread) {
-    // //
-    // VisitorThreadEntity visitorThread = modelMapper.map(thread,
-    // VisitorThreadEntity.class);
-    // //
-    // String visitorString = thread.getUser();
-    // UserProtobuf visitor = JSON.parseObject(visitorString, UserProtobuf.class);
-    // visitorThread.setVisitorUid(visitor.getUid());
-    // //
-    // VisitorThreadEntity savedThread = save(visitorThread);
-    // if (savedThread == null) {
-    // throw new RuntimeException("Could not save visitor thread");
-    // }
-    // return savedThread;
-    // }
-
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+        if (visitorRequest.isWeChat()) {
+            extra = visitorRequest.getThreadExtra();
+        }
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -119,9 +106,11 @@ public class VisitorThreadService
                 .client(visitorRequest.getClient())
                 .orgUid(workgroup.getOrgUid())
                 .build();
-        threadRestService.save(thread);
-        //
-        return thread;
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        return savedEntity;
     }
 
     public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
@@ -135,28 +124,41 @@ public class VisitorThreadService
             thread.setExtra(extra);
         }
         // 保存
-        threadRestService.save(thread);
-        //
-        return thread;
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        return savedEntity;
     }
 
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
+        // 考虑到客服信息发生变化，更新客服信息
+        String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
+        // 访客信息
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        // 考虑到配置可能变化，更新配置
+        String extra = ServiceConvertUtils
+                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.AGENT.name())
+                .agent(agentString)
                 .userUid(agent.getUid()) // 客服uid
                 .owner(agent.getMember().getUser())
                 .user(visitor)
+                .extra(extra)
                 .client(visitorRequest.getClient())
                 .orgUid(agent.getOrgUid())
                 .build();
-        threadRestService.save(thread);
-        //
-        return thread;
+        // 
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        return savedEntity;
     }
 
     public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
@@ -168,28 +170,37 @@ public class VisitorThreadService
         String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
         thread.setAgent(agentString);
         // 保存
-        threadRestService.save(thread);
-        //
-        return thread;
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        return savedEntity;
     }
 
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
         //
+        String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        String extra = ServiceConvertUtils
+                .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.ROBOT.name())
-                .status(ThreadStatusEnum.STARTED.name())
+                // .status(ThreadStatusEnum.ROBOTING.name()) // 收到第一条问题
+                .agent(robotString)
                 .userUid(robot.getUid()) // 机器人uid
                 .user(visitor)
                 .client(visitorRequest.getClient())
                 .orgUid(robot.getOrgUid())
+                .extra(extra)
                 .build();
-        threadRestService.save(thread);
-        //
-        return thread;
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        return savedEntity;
     }
 
     public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
@@ -201,9 +212,12 @@ public class VisitorThreadService
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         thread.setAgent(robotString);
         // 保存
-        threadRestService.save(thread);
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
         //
-        return thread;
+        return savedEntity;
     }
 
     public VisitorThreadEntity update(ThreadEntity thread) {

@@ -55,6 +55,10 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getStatus().equals(ThreadStatusEnum.CLOSED.name());
     }
 
+    public Boolean isNew() {
+        return getStatus().equals(ThreadStatusEnum.NEW.name());
+    }
+
     public Boolean isStarted() {
         // return getState().equals(ThreadStateEnum.STARTED.name());
         return getStatus().equals(ThreadStatusEnum.STARTED.name())

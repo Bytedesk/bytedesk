@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:48:47
+ * @LastEditTime: 2025-04-02 09:45:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,14 +51,9 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
 
     private final VisitorThreadService visitorThreadService;
 
-    // private final RouteService routeService;
     private final QueueService queueService;
 
     private final QueueMemberRestService queueMemberRestService;;
-
-    // private final MessageRestService messageRestService;
-
-    // private final WorkgroupRoutingService workgroupRoutingService;
 
     private final RobotRestService robotRestService;
 
@@ -77,7 +72,7 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
         //
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
-        if (threadOptional.isPresent() && threadOptional.get().isStarted()) {
+        if (threadOptional.isPresent() && threadOptional.get().isRoboting()) {
             thread = threadOptional.get();
             // 
             thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
@@ -87,7 +82,6 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
             return getRobotContinueMessage(robot, thread);
         } else {
             thread = visitorThreadService.createRobotThread(request, robot, topic);
-            thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
         }
 
         // 排队计数

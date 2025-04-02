@@ -197,25 +197,6 @@ public class QueueService {
         return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     }
 
-
-    
-    
-    // @Transactional
-    // public void dequeue(String threadTopic, QueueStatusEnum status) {
-    //     // 1. 查找队列成员
-    //     QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
-    //         .orElseThrow(() -> new RuntimeException("Queue member not found"));
-
-    //     // 2. 更新状态
-    //     member.updateStatus(status.name(), null);
-    //     queueMemberRepository.save(member);
-
-    //     // 3. 更新队列统计
-    //     QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
-    //         .orElseThrow(() -> new RuntimeException("Queue not found"));
-    //     updateQueueStats(queue);
-    // }
-
     
     public List<String> getQueuedThreads(QueueStatusEnum status) {
         // return queueRepository.findByStatus(status.name())
