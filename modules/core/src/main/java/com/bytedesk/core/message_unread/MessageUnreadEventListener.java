@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 10:42:42
+ * @LastEditTime: 2025-04-02 11:48:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,12 +22,9 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.message.event.MessageUpdateEvent;
-import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.stomp.StompConnectedEvent;
-// import com.bytedesk.core.topic.Topic;
-// import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
@@ -192,10 +189,10 @@ public class MessageUnreadEventListener {
         }
     }
 
-    @EventListener
-    public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
-        // log.info("message quartz five second event: " + event);
-    }
+    // @EventListener
+    // public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
+    //     // log.info("message quartz five second event: " + event);
+    // }
 
     @EventListener
     public void onMqttConnectEvent(MqttConnectedEvent event) {
