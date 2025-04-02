@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 16:16:49
+ * @LastEditTime: 2025-04-02 11:54:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,22 +14,24 @@
 package com.bytedesk.core.message_unread;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.ConvertUtils;
 
-// import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class MessageUnreadService {
+public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
 
     private final MessageUnreadRepository messageUnreadRepository;
 
@@ -37,17 +39,14 @@ public class MessageUnreadService {
 
     // 拉取的同时从数据库中删除，所以不需要缓存
     @Transactional
-    // @Cacheable(value = "message_unread", key = "#userUid", unless = "#result ==
-    // null")
+    // @Cacheable(value = "message_unread", key = "#userUid", unless = "#result == null")
     public List<MessageResponse> getMessages(String userUid) {
         List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
         delete(userUid);
         return messageUnreadList.stream().map(ConvertUtils::convertToMessageResponse).toList();
     }
 
-    // @Caching(put = {
-    // @CachePut(value = "message_unread", key = "#userUid"),
-    // })
+    // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void create(MessageEntity message, String userUid) {
         MessageUnreadEntity messageUnread = modelMapper.map(message, MessageUnreadEntity.class);
@@ -55,9 +54,7 @@ public class MessageUnreadService {
         messageUnreadRepository.save(messageUnread);
     }
 
-    // @Caching(evict = {
-    // @CacheEvict(value = "message_unread", key = "#userUid"),
-    // })
+    // @Caching(evict = { @CacheEvict(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void delete(String userUid) {
         // org.springframework.orm.ObjectOptimisticLockingFailureException: Row was
@@ -80,6 +77,67 @@ public class MessageUnreadService {
     // "#result == null")
     public int getUnreadCount(String userUid) {
         return messageUnreadRepository.countByUserUid(userUid);
+    }
+
+    @Override
+    public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<MessageUnreadResponse> queryByUser(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<MessageUnreadEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    @Override
+    public MessageUnreadResponse create(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public MessageUnreadResponse update(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public MessageUnreadEntity save(MessageUnreadEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+    }
+
+    @Override
+    public void delete(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            MessageUnreadEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    }
+
+    @Override
+    public MessageUnreadResponse convertToResponse(MessageUnreadEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
 }
