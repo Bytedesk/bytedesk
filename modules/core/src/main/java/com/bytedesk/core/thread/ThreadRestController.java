@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 08:54:58
+ * @LastEditTime: 2025-04-02 15:58:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -174,7 +174,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
 
         request.setAutoClose(false);
-        request.setState(ThreadStatusEnum.CLOSED.name());
+        request.setStatus(ThreadStatusEnum.CLOSED.name());
         ThreadResponse threadResponse = threadService.close(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));

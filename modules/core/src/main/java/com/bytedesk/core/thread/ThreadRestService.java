@@ -434,7 +434,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         //
         ThreadEntity thread = threadOptional.get();
-        thread.setStatus(threadRequest.getState());
+        thread.setStatus(threadRequest.getStatus());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -449,7 +449,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .uid(thread.getUid())
                 .topic(thread.getTopic())
                 .autoClose(true)
-                .state(ThreadStatusEnum.CLOSED.name())
+                .status(ThreadStatusEnum.CLOSED.name())
                 .build();
         // threadRequest.setUid(thread.getUid());
         return close(threadRequest);
@@ -466,7 +466,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             throw new RuntimeException("thread " + thread.getUid() + " is already closed");
         }
         thread.setAutoClose(threadRequest.getAutoClose());
-        thread.setStatus(threadRequest.getState());
+        thread.setStatus(threadRequest.getStatus());
         // 发布关闭消息, 通知用户
         String content = threadRequest.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED
