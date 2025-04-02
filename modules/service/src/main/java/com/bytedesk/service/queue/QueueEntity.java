@@ -51,13 +51,13 @@ public class QueueEntity extends BaseEntity {
     @Column(name = "queue_type")
     private String type = ThreadTypeEnum.WORKGROUP.name();  // 队列类型，AGENT或WORKGROUP
 
-    // agentUid or workgroupUid
+    // thread topic
     @Column(name = "queue_topic")
     private String topic;
 
     // 队列日期(YYYY-MM-DD)
     @Column(name = "queue_day")
-    private String day;  
+    private String day;
 
     // 队列状态
     @Builder.Default
@@ -136,6 +136,9 @@ public class QueueEntity extends BaseEntity {
 
     /**
      * 检查是否可以加入队列
+     * TODO: 需要根据队列的最大等待人数来判断
+     * TODO: 增加节假日判断
+     * @return true: 可以加入队列; false: 不可以加入队列
      */
     public boolean canEnqueue() {
         return status.equals(QueueStatusEnum.ACTIVE.name());
