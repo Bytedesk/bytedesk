@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 11:54:48
+ * @LastEditTime: 2025-04-02 12:55:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,8 +73,7 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
         messageUnreadRepository.deleteByUserUid(userUid);
     }
 
-    // @Cacheable(value = "message_unread_count", key = "#userUid", unless =
-    // "#result == null")
+    // @Cacheable(value = "message_unread_count", key = "#userUid", unless = "#result == null")
     public int getUnreadCount(String userUid) {
         return messageUnreadRepository.countByUserUid(userUid);
     }
