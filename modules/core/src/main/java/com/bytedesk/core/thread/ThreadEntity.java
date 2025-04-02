@@ -52,78 +52,78 @@ public class ThreadEntity extends AbstractThreadEntity {
     private static final long serialVersionUID = 1L;
     //
     public Boolean isClosed() {
-        return getState().equals(ThreadStateEnum.CLOSED.name());
+        return getStatus().equals(ThreadStatusEnum.CLOSED.name());
     }
 
     public Boolean isStarted() {
         // return getState().equals(ThreadStateEnum.STARTED.name());
-        return getState().equals(ThreadStateEnum.STARTED.name())
-             || getState().equals(ThreadStateEnum.TRANSFER_PENDING.name())
-             || getState().equals(ThreadStateEnum.TRANSFER_ACCEPTED.name())
-             || getState().equals(ThreadStateEnum.TRANSFER_REJECTED.name())
-             || getState().equals(ThreadStateEnum.TRANSFER_TIMEOUT.name())
-             || getState().equals(ThreadStateEnum.TRANSFER_CANCELED.name())
-             || getState().equals(ThreadStateEnum.INVITE_PENDING.name())
-             || getState().equals(ThreadStateEnum.INVITE_ACCEPTED.name())
-             || getState().equals(ThreadStateEnum.INVITE_REJECTED.name())
-             || getState().equals(ThreadStateEnum.INVITE_TIMEOUT.name())
-             || getState().equals(ThreadStateEnum.INVITE_CANCELED.name());
+        return getStatus().equals(ThreadStatusEnum.STARTED.name())
+             || getStatus().equals(ThreadStatusEnum.TRANSFER_PENDING.name())
+             || getStatus().equals(ThreadStatusEnum.TRANSFER_ACCEPTED.name())
+             || getStatus().equals(ThreadStatusEnum.TRANSFER_REJECTED.name())
+             || getStatus().equals(ThreadStatusEnum.TRANSFER_TIMEOUT.name())
+             || getStatus().equals(ThreadStatusEnum.TRANSFER_CANCELED.name())
+             || getStatus().equals(ThreadStatusEnum.INVITE_PENDING.name())
+             || getStatus().equals(ThreadStatusEnum.INVITE_ACCEPTED.name())
+             || getStatus().equals(ThreadStatusEnum.INVITE_REJECTED.name())
+             || getStatus().equals(ThreadStatusEnum.INVITE_TIMEOUT.name())
+             || getStatus().equals(ThreadStatusEnum.INVITE_CANCELED.name());
     }
 
     // is transfer pending
     public Boolean isTransferPending() {
-        return getState().equals(ThreadStateEnum.TRANSFER_PENDING.name());
+        return getStatus().equals(ThreadStatusEnum.TRANSFER_PENDING.name());
     }
 
     // is transfer accepted
     public Boolean isTransferAccepted() {
-        return getState().equals(ThreadStateEnum.TRANSFER_ACCEPTED.name());
+        return getStatus().equals(ThreadStatusEnum.TRANSFER_ACCEPTED.name());
     }
 
     public Boolean isTransferRejected() {
-        return getState().equals(ThreadStateEnum.TRANSFER_REJECTED.name());
+        return getStatus().equals(ThreadStatusEnum.TRANSFER_REJECTED.name());
     }
 
     public Boolean isTransferTimeout() {
-        return getState().equals(ThreadStateEnum.TRANSFER_TIMEOUT.name());
+        return getStatus().equals(ThreadStatusEnum.TRANSFER_TIMEOUT.name());
     }
 
     public Boolean isTransferCanceled() {
-        return getState().equals(ThreadStateEnum.TRANSFER_CANCELED.name());
+        return getStatus().equals(ThreadStatusEnum.TRANSFER_CANCELED.name());
     }
 
     // is invite pending
     public Boolean isInvitePending() {
-        return getState().equals(ThreadStateEnum.INVITE_PENDING.name());
+        return getStatus().equals(ThreadStatusEnum.INVITE_PENDING.name());
     }
 
     // is invite accepted
     public Boolean isInviteAccepted() {
-        return getState().equals(ThreadStateEnum.INVITE_ACCEPTED.name());
+        return getStatus().equals(ThreadStatusEnum.INVITE_ACCEPTED.name());
     }
 
     public Boolean isInviteRejected() {
-        return getState().equals(ThreadStateEnum.INVITE_REJECTED.name());
+        return getStatus().equals(ThreadStatusEnum.INVITE_REJECTED.name());
     }
 
     public Boolean isInviteTimeout() {
-        return getState().equals(ThreadStateEnum.INVITE_TIMEOUT.name());
+        return getStatus().equals(ThreadStatusEnum.INVITE_TIMEOUT.name());
     }
 
     public Boolean isInviteCanceled() {
-        return getState().equals(ThreadStateEnum.INVITE_CANCELED.name());
+        return getStatus().equals(ThreadStatusEnum.INVITE_CANCELED.name());
     }
 
     public Boolean isOffline() {
-        return getState().equals(ThreadStateEnum.OFFLINE.name());
+        return getStatus().equals(ThreadStatusEnum.OFFLINE.name());
     }
 
     public Boolean isRoboting() {
-        return getState().equals(ThreadStateEnum.ROBOTING.name());
+        return getStatus().equals(ThreadStatusEnum.ROBOTING.name());
     }
 
     public Boolean isQueuing() {
-        return getState().equals(ThreadStateEnum.QUEUING.name());
+        return getStatus().equals(ThreadStatusEnum.QUEUING.name());
     }
 
     public Boolean isCustomerService() {
@@ -166,22 +166,22 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     public ThreadEntity setOffline() {
-        setState(ThreadStateEnum.OFFLINE.name());
+        setStatus(ThreadStatusEnum.OFFLINE.name());
         return this;
     }
 
     public ThreadEntity setStarted() {
-        setState(ThreadStateEnum.STARTED.name());
+        setStatus(ThreadStatusEnum.STARTED.name());
         return this;
     }
 
     public ThreadEntity setClose() {
-        setState(ThreadStateEnum.CLOSED.name());
+        setStatus(ThreadStatusEnum.CLOSED.name());
         return this;
     }
 
     public ThreadEntity setQueuing() {
-        setState(ThreadStateEnum.QUEUING.name());
+        setStatus(ThreadStatusEnum.QUEUING.name());
         return this;
     }
 

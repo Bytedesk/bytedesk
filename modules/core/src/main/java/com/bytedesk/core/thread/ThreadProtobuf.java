@@ -39,7 +39,7 @@ public class ThreadProtobuf implements Serializable {
 
     private ThreadTypeEnum type;
 
-    private ThreadStateEnum state;
+    private ThreadStatusEnum status;
 
     private UserProtobuf user;
 

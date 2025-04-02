@@ -48,7 +48,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStateEnum;
+import com.bytedesk.core.thread.ThreadStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -355,7 +355,7 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         // 创建反向线程对象
         ThreadEntity reverseThread = ThreadEntity.builder().build();
         reverseThread.setUid(reverseUid);
-        reverseThread.setState(ThreadStateEnum.STARTED.name());
+        reverseThread.setStatus(ThreadStatusEnum.STARTED.name());
         reverseThread.setTopic(reverseTopic);
         reverseThread.setUnreadCount(0);
 
