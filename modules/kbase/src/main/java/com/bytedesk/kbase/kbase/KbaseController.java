@@ -30,7 +30,6 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.ArticleRestService;
-// import com.bytedesk.vip_kbase.knowledge_base.KbaseStaticService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
