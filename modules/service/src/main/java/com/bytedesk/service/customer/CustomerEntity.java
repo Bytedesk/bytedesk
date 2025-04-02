@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:52:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 08:41:39
+ * @LastEditTime: 2025-04-02 11:07:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,13 +11,20 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.customer;
+package com.bytedesk.service.customer;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +37,7 @@ import lombok.experimental.Accessors;
 
 /**
  * 客户留资，自动提取，手动添加
+ * TODO: 同步存储visitor备注信息
  * @author jackning 270580156@qq.com
  */
 @Entity
@@ -50,6 +58,7 @@ public class CustomerEntity extends BaseEntity {
 
     private String mobile;
 
+    // 备注信息note
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
     
@@ -90,17 +99,28 @@ public class CustomerEntity extends BaseEntity {
     // 跟进信息
     private String owner; // 负责人ID
     private String ownerName; // 负责人姓名
-    private java.util.Date lastContactTime; // 最后联系时间
-    private java.util.Date nextContactTime; // 下次联系时间
+    private LocalDateTime lastContactTime; // 最后联系时间
+    private LocalDateTime nextContactTime; // 下次联系时间
     
     // 交易相关
     private Double totalAmount; // 累计消费金额
     private Integer dealCount; // 成交次数
-    private java.util.Date lastDealTime; // 最后成交时间
-    
-    // 自定义字段存储
+    private LocalDateTime lastDealTime; // 最后成交时间
+
+    // 标签
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String customFields; // JSON格式存储自定义字段
+    private List<String> tagList = new ArrayList<>();
+
+	// extra info，customFields，开发者自定义URL参数，使用json格式存储，便于扩展
+	@Builder.Default
+	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 自定义字段存储
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // private String customFields; // JSON格式存储自定义字段
     
     // 备注信息
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

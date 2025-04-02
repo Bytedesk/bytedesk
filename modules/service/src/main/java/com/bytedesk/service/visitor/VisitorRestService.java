@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 13:44:00
+ * @LastEditTime: 2025-04-02 10:37:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,6 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.strategy.CsThreadCreationContext;
 import com.bytedesk.service.utils.ServiceConvertUtils;
-import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,9 +77,10 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         String uid =  request.getUid();
         if (!StringUtils.hasText(uid)) {
             request.setUid(uidUtils.getUid());
-        } else {
-            request.setUid(Utils.formatUid(request.getOrgUid(), uidUtils.getUid()));
         }
+        // else {
+        //  request.setUid(Utils.formatUid(request.getOrgUid(), uidUtils.getUid()));
+        // }
         log.info("visitor init, uid: {}", uid);
         VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
