@@ -100,7 +100,6 @@ public class QueueService {
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
             .build();
-        // userProtobuf.setUid(agentEntity.getUid());
         // 2. 创建队列成员
         QueueMemberEntity member = getOrCreateQueueMember(threadEntity, userProtobuf, visitorRequest, queue);
         // 3. 更新队列统计
@@ -177,8 +176,6 @@ public class QueueService {
             .client(visitorRequest.getClient())
             .orgUid(threadEntity.getOrgUid())
             .build();
-        // member.setUid(uidUtils.getUid());
-        // member.setOrgUid(threadEntity.getOrgUid());
         // 
         return queueMemberRestService.save(member);
     }
