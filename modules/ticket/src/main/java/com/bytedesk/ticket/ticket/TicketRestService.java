@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 16:46:47
+ * @LastEditTime: 2025-04-02 09:05:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStateEnum;
+import com.bytedesk.core.thread.ThreadStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
@@ -292,7 +292,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.TICKET.name())
                 .unreadCount(0)
-                .state(ThreadStateEnum.NEW.name())
+                .status(ThreadStatusEnum.NEW.name())
                 .topic(topic)
                 .hide(true) // 默认隐藏
                 .user(user)

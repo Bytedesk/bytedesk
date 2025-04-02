@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 09:20:19
+ * @LastEditTime: 2025-04-02 08:58:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -122,7 +122,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
         thread.setUid(uidUtils.getUid());
-        thread.setState(ThreadStateEnum.STARTED.name());
+        thread.setStatus(ThreadStatusEnum.STARTED.name());
         //
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
@@ -153,7 +153,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(thread.getType())
                 .topic(thread.getTopic())
                 .unreadCount(0)
-                .state(thread.getState())
+                .status(thread.getStatus())
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getUser())
                 .owner(owner)
@@ -186,7 +186,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
                 .unreadCount(0)
-                .state(ThreadStateEnum.NEW.name())
+                .status(ThreadStatusEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(JSON.toJSONString(userSimple))
@@ -253,7 +253,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(ThreadTypeEnum.CHANNEL.name())
                 .topic(topic)
                 .unreadCount(0)
-                .state(ThreadStateEnum.NEW.name())
+                .status(ThreadStatusEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(JSON.toJSONString(userSimple))
@@ -434,7 +434,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         //
         ThreadEntity thread = threadOptional.get();
-        thread.setState(threadRequest.getState());
+        thread.setStatus(threadRequest.getState());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -449,7 +449,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .uid(thread.getUid())
                 .topic(thread.getTopic())
                 .autoClose(true)
-                .state(ThreadStateEnum.CLOSED.name())
+                .state(ThreadStatusEnum.CLOSED.name())
                 .build();
         // threadRequest.setUid(thread.getUid());
         return close(threadRequest);
@@ -462,11 +462,11 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         //
         ThreadEntity thread = threadOptional.get();
-        if (ThreadStateEnum.CLOSED.name().equals(thread.getState())) {
+        if (ThreadStatusEnum.CLOSED.name().equals(thread.getStatus())) {
             throw new RuntimeException("thread " + thread.getUid() + " is already closed");
         }
         thread.setAutoClose(threadRequest.getAutoClose());
-        thread.setState(threadRequest.getState());
+        thread.setStatus(threadRequest.getState());
         // 发布关闭消息, 通知用户
         String content = threadRequest.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED
@@ -490,7 +490,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
         ThreadEntity thread = threadOptional.get();
-        thread.setState(ThreadStateEnum.STARTED.name());
+        thread.setStatus(ThreadStatusEnum.STARTED.name());
         thread.setAgent(threadRequest.getAgent());
         //
         ThreadEntity updateThread = save(thread);
@@ -537,7 +537,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 找到某个访客当前对应某技能组未关闭会话
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
-        List<String> states = Arrays.asList(new String[] { ThreadStateEnum.CLOSED.name() });
+        List<String> states = Arrays.asList(new String[] { ThreadStatusEnum.CLOSED.name() });
         return threadRepository.findTopicAndStatesNotInAndDeleted(topic, states, false);
     }
 
@@ -550,7 +550,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });
-        return threadRepository.findByTypesInAndStateNotAndDeletedFalse(types, ThreadStateEnum.CLOSED.name());
+        return threadRepository.findByTypesInAndStateNotAndDeletedFalse(types, ThreadStatusEnum.CLOSED.name());
     }
 
     @Caching(put = {
