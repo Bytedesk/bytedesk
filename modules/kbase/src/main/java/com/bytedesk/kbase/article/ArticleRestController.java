@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 18:08:17
+ * @LastEditTime: 2025-04-03 07:32:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,8 @@
  */
 package com.bytedesk.kbase.article;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,13 +35,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @AllArgsConstructor
 public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
-    private final ArticleRestService articleService;
+    private final ArticleRestService articleRestService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(ArticleRequest request) {
 
-        Page<ArticleResponse> page = articleService.queryByOrg(request);
+        Page<ArticleResponse> page = articleRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -47,7 +50,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @Override
     public ResponseEntity<?> queryByUser(ArticleRequest request) {
         
-        Page<ArticleResponse> page = articleService.queryByUser(request);
+        Page<ArticleResponse> page = articleRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -64,7 +67,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(ArticleRequest request) {
 
-        ArticleResponse article = articleService.queryDetail(request);
+        ArticleResponse article = articleRestService.queryDetail(request);
         if (article == null) {
             return ResponseEntity.ok(JsonResult.error("article not found"));
         }
@@ -76,7 +79,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleRequest request) {
 
-        ArticleResponse article = articleService.create(request);
+        ArticleResponse article = articleRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(article));
     }
@@ -85,7 +88,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody ArticleRequest request) {
 
-        ArticleResponse article = articleService.update(request);
+        ArticleResponse article = articleRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(article));
     }
@@ -94,7 +97,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody ArticleRequest request) {
 
-        articleService.delete(request);
+        articleRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
@@ -102,8 +105,36 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(ArticleRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        // query data to export
+        Page<ArticleEntity> articlePage = articleRestService.queryByOrgExcel(request);
+        // 
+        try {
+            //
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            // download filename
+            String fileName = "Article-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
+
+            // 转换数据
+            List<ArticleExcel> excelList = articlePage.getContent().stream().map(articleResponse -> articleRestService.convertToExcel(articleResponse)).toList();
+
+            // write to excel
+            EasyExcel.write(response.getOutputStream(), ArticleExcel.class)
+                    .autoCloseStream(Boolean.FALSE)
+                    .sheet("Article")
+                    .doWrite(excelList);
+
+        } catch (Exception e) {
+            // reset response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            // 
+            return JsonResult.error(e.getMessage());
+        }
+
+        return "";
     }
 
     

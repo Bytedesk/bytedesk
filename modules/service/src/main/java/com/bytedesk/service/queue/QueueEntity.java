@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 18:43:51
+ * @LastEditTime: 2025-04-03 07:10:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,8 @@ import lombok.experimental.SuperBuilder;
     }
 )
 public class QueueEntity extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
 
     // 队列名称
     @Column(name = "queue_nickname")

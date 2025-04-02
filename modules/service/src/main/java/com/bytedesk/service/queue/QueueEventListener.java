@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 22:19:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 15:31:26
+ * @LastEditTime: 2025-04-03 07:14:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,21 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueEventListener {
 
     private final QueueRestService queueRestService;
-    // private final IMessageSendService messageSendService;
-
-    // @EventListener
-    // public void onThreadCreateEvent(ThreadCreateEvent event) {
-    //     ThreadEntity thread = event.getThread();
-    //     // UserEntity user = thread.getOwner();
-    //     log.info("queue onThreadCreateEvent: {}", thread.getUid());
-    // }
-
-    // @EventListener
-    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-    //     ThreadEntity thread = event.getThread();
-    //     // UserEntity user = thread.getOwner();
-    //     log.info("queue onThreadUpdateEvent: {}", thread.getUid());
-    // }
 
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
@@ -65,7 +50,6 @@ public class QueueEventListener {
             log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
         }
     }
-    
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -83,6 +67,20 @@ public class QueueEventListener {
         } else {
             log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
         }
-
     }
+
+    // @EventListener
+    // public void onThreadCreateEvent(ThreadCreateEvent event) {
+    //     ThreadEntity thread = event.getThread();
+    //     // UserEntity user = thread.getOwner();
+    //     log.info("queue onThreadCreateEvent: {}", thread.getUid());
+    // }
+
+    // @EventListener
+    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
+    //     ThreadEntity thread = event.getThread();
+    //     // UserEntity user = thread.getOwner();
+    //     log.info("queue onThreadUpdateEvent: {}", thread.getUid());
+    // }
+
 }

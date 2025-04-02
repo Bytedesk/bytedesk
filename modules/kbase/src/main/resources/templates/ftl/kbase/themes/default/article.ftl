@@ -141,7 +141,7 @@
                         <!-- 文章内容 -->
                         <div class="entry-content uk-margin-medium-top">
                             <p id="supportArticleSummary" class="uk-text-lead">${article.summary!''}</p>
-                            <div id="supportArticleContent">${article.content!''}</div>
+                            <div id="supportArticleContent">${article.contentHtml!''}</div>
                             <span class="uk-article-meta uk-margin-remove-top">最近更新：${article.updatedAt}</span>
                         </div>
 
