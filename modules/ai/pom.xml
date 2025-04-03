@@ -64,9 +64,16 @@
 
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
+		<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
 		<dependency>
