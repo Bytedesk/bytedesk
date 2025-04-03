@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 13:59:50
+ * @LastEditTime: 2025-04-03 16:24:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -185,7 +185,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setStarted();
         thread.setUnreadCount(1);
         thread.setContent(agent.getServiceSettings().getWelcomeTip());
-        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         // 增加接待数量，待优化
         agent.increaseThreadCount();
         agentRestService.save(agent);
@@ -235,7 +235,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setQueuing();
         thread.setUnreadCount(0);
         thread.setContent(content);
-        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         // thread.setRobot(false);
         //
         threadService.save(thread);
