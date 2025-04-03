@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:59:18
+ * @LastEditTime: 2025-04-03 10:58:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 
@@ -56,11 +57,9 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
             throw new RuntimeException("user is null");
         }
         // set user uid
-
-        Pageable pageable = request.getPageable();
-        Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
-        Page<QueueMemberEntity> page = queueMemberRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "counter", key = "#uid")
@@ -127,7 +126,11 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
 
     @Override
     public QueueMemberResponse convertToResponse(QueueMemberEntity entity) {
-        return modelMapper.map(entity, QueueMemberResponse.class);
+        QueueMemberResponse response = modelMapper.map(entity, QueueMemberResponse.class);
+        response.setVisitor(UserProtobuf.parseFromJson(entity.getVisitor()));
+        response.setAgent(UserProtobuf.parseFromJson(entity.getAgent()));
+        response.setWorkgroup(UserProtobuf.parseFromJson(entity.getWorkgroup()));
+        return response;
     }
 
     public QueueMemberExcel convertToExcel(QueueMemberResponse response) {
