@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:27:19
+ * @LastEditTime: 2025-04-03 17:20:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 public class AgentInitializer implements SmartInitializingSingleton {
 
     private final AgentRestService agentService;
-    private final AgentRepository agentRepository;
+    // private final AgentRepository agentRepository;
     private final BytedeskProperties bytedeskProperties;
     private final AuthorityRestService authorityService;
 
@@ -42,15 +42,28 @@ public class AgentInitializer implements SmartInitializingSingleton {
     }
 
     public void init() {
-
-        if (agentRepository.count() > 0) {
-            return;
-        }
+        // if (agentRepository.count() > 0) {
+        //     return;
+        // }
         // 
-        String mobile = bytedeskProperties.getMobile();
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        String mobile = bytedeskProperties.getMobile();
+        String nickname = bytedeskProperties.getNickname();
+        String email = bytedeskProperties.getEmail();
+        String memberUid = BytedeskConsts.DEFAULT_MEMBER_UID;
         String agentUid = BytedeskConsts.DEFAULT_AGENT_UID;
-        agentService.createFromMember(mobile, orgUid, agentUid);
+        // 
+        // agentService.createFromMember(mobile, orgUid, agentUid);
+         // 创建默认客服
+         AgentRequest agentRequest = AgentRequest.builder()
+                .uid(agentUid)
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .mobile(member.getMobile())
+                .memberUid(member.getUid())
+                .orgUid(orgUid)
+                .build();
+        agentService.create(agentRequest);
     }
 
     private void initPermissions() {
