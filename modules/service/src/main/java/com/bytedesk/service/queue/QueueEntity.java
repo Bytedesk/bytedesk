@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 09:53:42
+ * @LastEditTime: 2025-04-03 16:55:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,16 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 队列实体类：
+ * 三个维度：
+ * 1. 客服账号，某个客服账号当天接待服务多少人
+ * 2. 工作组，某个工作组当天接待服务多少人
+ * 3. 机器人，某个机器人当天接待服务多少人
+ * 
+ * @author jackning
+ * @date 2024-02-22
+ */
 @Entity
 @Data
 @SuperBuilder

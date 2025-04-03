@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 16:24:08
+ * @LastEditTime: 2025-04-03 17:03:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,6 +90,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             log.info("Agent uid {} not found", agentUid);
             throw new RuntimeException("Agent uid " + agentUid + " not found");
         }
+        // 是否已经存在会话
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             //
@@ -126,9 +127,11 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 未满则接待
                 return handleAvailableAgent(thread, agent, queueMemberEntity);
             } else {
+                // 已满则排队
                 return handleQueuedAgent(thread, agent, queueMemberEntity);
             }
         } else {
+            // 客服离线或小休不接待状态，则进入留言
             return handleOfflineAgent(thread, agent, queueMemberEntity);
         }
     }
@@ -224,7 +227,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 return messageProtobuf;
             }
         }
-
+        // 
         // 创建新的留言消息
         MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(agent, thread);
         // 保存留言消息
