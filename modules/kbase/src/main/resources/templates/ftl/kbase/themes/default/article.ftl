@@ -95,10 +95,12 @@
                     <h3>类别</h3>
                     <ul id="supportCategory" class="uk-list uk-list-large uk-margin-medium-bottom">
                         <#list categories as category>
-                            <button class="accordion">
+                            <#--  <button class="accordion">  -->
                                 <#--  ${category.name!''}  -->
-                                <a href="category/${category.uid}.html">${category.name!''}</a>
-                            </button>
+                                <li>
+                                <a href="/helpcenter/${kbase.uid!''}/category/${category.uid}.html" target="_blank">${category.name!''}</a>
+                                </li>
+                            <#--  </button>  -->
                             <#--  <div class="panel">  -->
                                 <#--  <#list articles as article>
                                     <li><a href="article/${article.uid}.html" target="_blank">${article.title!''}</a></li>
