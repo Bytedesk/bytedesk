@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 16:13:13
+ * @LastEditTime: 2025-04-03 17:23:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,10 +86,13 @@ public class AgentEventListener {
                 .descriptionHtml(agent.getNickname() + "Kb")
                 .language(LanguageEnum.ZH_CN.name())
                 .level(LevelEnum.AGENT.name())
+                .type(KbaseTypeEnum.QUICKREPLY.name())
+                .agentUid(agent.getUid())
+                .orgUid(agent.getOrgUid())
                 .build();
-        kbaseQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
-        kbaseQuickReply.setOrgUid(agent.getOrgUid());
-        kbaseQuickReply.setAgentUid(agent.getUid());
+        // kbaseQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
+        // kbaseQuickReply.setOrgUid(agent.getOrgUid());
+        // kbaseQuickReply.setAgentUid(agent.getUid());
         knowledgebaseService.create(kbaseQuickReply);
     }
 
