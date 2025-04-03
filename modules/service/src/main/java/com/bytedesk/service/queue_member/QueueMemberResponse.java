@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 13:57:10
+ * @LastEditTime: 2025-04-03 16:48:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-// import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.service.queue.QueueResponse;
 
 import lombok.AllArgsConstructor;
@@ -37,17 +38,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueueMemberResponse extends BaseResponse {
 
-    // private String queueUid;  // 关联队列
+    private QueueResponse queue;  // 队列信息
 
-    // private String queueNickname;  // 队列名称
-
-    // private String queueTopic;  // 队列主题，用于查询
-
-    // private String queueDay;  // 队列日期，用于查询
-
-    private String threadUid;  // 关联会话
-
-    private String threadTopic;  // 会话主题，用于查询
+    private ThreadResponse thread;  // 会话信息
 
     @Builder.Default
     private Integer beforeNumber = 0;  // 前面排队人数
@@ -57,9 +50,6 @@ public class QueueMemberResponse extends BaseResponse {
 
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
-
-    // @Builder.Default
-    // private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
@@ -137,29 +127,20 @@ public class QueueMemberResponse extends BaseResponse {
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 处理状态（待处理、已处理、已关闭等）
-    // @Builder.Default
-    // private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    @Builder.Default
+    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     private String client;  // 客户来源渠道
-
-    // 便于统计
-    private String visitorUid;  // 访客UID
 
     // 排队用户信息
     private UserProtobuf visitor;
 
-    // 便于统计
-    private String agentUid;  // 客服UID
-
     // 接待客服信息
     private UserProtobuf agent;
-
-    // 便于统计
-    private String workgroupUid;  // 工作组UID
     
     // 接待工作组信息
     private UserProtobuf workgroup;
 
-    private QueueResponse queue;  // 队列信息
+    
     
 }
