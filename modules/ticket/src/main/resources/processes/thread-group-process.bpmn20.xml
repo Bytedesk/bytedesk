@@ -21,8 +21,15 @@
     <sequenceFlow id="flow5" sourceRef="transferToHuman" targetRef="isAgentsBusy">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needHumanService == true}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow6" sourceRef="isRobotEnabled" targetRef="isAgentsBusy">
+    <exclusiveGateway id="isAgentsOnline" name="坐席在线?"></exclusiveGateway>
+    <sequenceFlow id="flow6" sourceRef="isRobotEnabled" targetRef="isAgentsOnline">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${robotEnabled == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="isAgentsOnline" targetRef="isAgentsBusy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${agentsOnline == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="isAgentsOnline" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${agentsOnline == false}]]></conditionExpression>
     </sequenceFlow>
     <serviceTask id="queueService" name="排队等待" flowable:delegateExpression="${threadQueueServiceDelegate}"></serviceTask>
     <sequenceFlow id="flow7" sourceRef="isAgentsBusy" targetRef="queueService">
@@ -106,6 +113,9 @@
       <bpmndi:BPMNShape bpmnElement="isAgentsBusy" id="BPMNShape_isAgentsBusy">
         <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="210.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="isAgentsOnline" id="BPMNShape_isAgentsOnline">
+        <omgdc:Bounds height="40.0" width="40.0" x="250.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="queueService" id="BPMNShape_queueService">
         <omgdc:Bounds height="60.0" width="100.0" x="410.0" y="375.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -175,7 +185,18 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
         <omgdi:waypoint x="219.94288008565312" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="289.95" y="230.0"></omgdi:waypoint>
         <omgdi:waypoint x="320.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="270.0" y="249.95"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="830.0" y="230.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
         <omgdi:waypoint x="340.0" y="249.9443032552827"></omgdi:waypoint>
