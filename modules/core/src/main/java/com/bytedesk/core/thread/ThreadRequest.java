@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 15:58:42
+ * @LastEditTime: 2025-04-03 09:22:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -144,8 +144,8 @@ public class ThreadRequest extends BaseRequest {
     private Boolean mergeByTopic = false;
 
     // 流程实例ID
-    // private String processInstanceId;
+    private String processInstanceId;
     
-    // // 流程定义实体UID
-    // private String processEntityUid;
+    // 流程定义实体UID
+    private String processEntityUid;
 }
