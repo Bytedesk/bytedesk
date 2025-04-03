@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:58:34
+ * @LastEditTime: 2025-04-03 11:36:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-import com.bytedesk.service.thread_summary.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
