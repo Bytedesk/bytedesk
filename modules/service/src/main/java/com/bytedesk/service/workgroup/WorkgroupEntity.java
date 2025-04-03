@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 15:04:09
+ * @LastEditTime: 2025-04-03 10:18:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
@@ -224,6 +226,15 @@ public class WorkgroupEntity extends BaseEntity {
             return false;
         }
         return this.agents.stream().anyMatch(agent -> agent.isConnected());
+    }
+
+    public UserProtobuf toUserProtobuf() {
+        return UserProtobuf.builder()
+            .uid(this.getUid())
+            .nickname(this.getNickname())
+            .avatar(this.getAvatar())
+            .type(UserTypeEnum.WORKGROUP.name())
+            .build();
     }
     
 }
