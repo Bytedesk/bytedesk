@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:57:20
+ * @LastEditTime: 2025-04-03 10:31:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,8 +90,7 @@ public class VisitorThreadService
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         //
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         if (visitorRequest.isWeChat()) {
             extra = visitorRequest.getThreadExtra();
         }
@@ -118,8 +117,7 @@ public class VisitorThreadService
         if (visitorRequest.isWeChat()) {
             thread.setExtra(visitorRequest.getThreadExtra());
         } else {
-            String extra = ServiceConvertUtils
-                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+            String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
         // 保存
@@ -137,8 +135,7 @@ public class VisitorThreadService
         // 访客信息
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         // 考虑到配置可能变化，更新配置
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
