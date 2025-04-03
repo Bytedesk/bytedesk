@@ -13,16 +13,7 @@
  */
 package com.bytedesk.starter.config;
 
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 /**
  * http://127.0.0.1:9003/doc.html#/home
@@ -34,11 +25,11 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class Knife4jConfig {
 
-	@Value("${application.version}")
-    private String version;
+	// @Value("${application.version}")
+    // private String version;
     
-    @Value("${server.port}")
-    private String port;
+    // @Value("${server.port}")
+    // private String port;
 
     /**
      * 根据@Tag 上的排序，写入x-order
@@ -62,23 +53,23 @@ public class Knife4jConfig {
     //     };
     // }
     
-    @Bean
-	@Primary
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-        .components(new Components()
-                    .addSecuritySchemes("bearerAuth", new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .bearerFormat("JWT")
-                                        .in(SecurityScheme.In.HEADER)
-                                        .name("Authorization")
-                                        .scheme("bearer")))
-        .info(new Info()
-              .title("Bytedesk API")
-              .version(version)
-              .description("Team IM && AI Customer Service")
-              .license(new License()
-                       .name("BSL 1.1")
-                       .url("https://github.com/Bytedesk/bytedesk/blob/main/LICENSE")));
-    }
+    // @Bean
+	// @Primary
+    // public OpenAPI customOpenAPI() {
+    //     return new OpenAPI()
+    //     .components(new Components()
+    //                 .addSecuritySchemes("bearerAuth", new SecurityScheme()
+    //                                     .type(SecurityScheme.Type.HTTP)
+    //                                     .bearerFormat("JWT")
+    //                                     .in(SecurityScheme.In.HEADER)
+    //                                     .name("Authorization")
+    //                                     .scheme("bearer")))
+    //     .info(new Info()
+    //           .title("Bytedesk API")
+    //           .version(version)
+    //           .description("Team IM && AI Customer Service")
+    //           .license(new License()
+    //                    .name("BSL 1.1")
+    //                    .url("https://github.com/Bytedesk/bytedesk/blob/main/LICENSE")));
+    // }
 }

@@ -131,8 +131,6 @@ public class QueueService {
     public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, UserProtobuf workgroup, VisitorRequest request, QueueEntity queue) {
         // 
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadEntity.getUid());
-        // Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByQueueTopicAndQueueDayAndThreadUidAndStatus(
-        //     queue.getTopic(), queue.getDay(), threadEntity.getUid(), QueueMemberStatusEnum.WAITING.name());
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
@@ -144,25 +142,18 @@ public class QueueService {
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
-            // .queueUid(queue.getUid())
             .queue(queue)
-            // .threadUid(threadEntity.getUid())
-            // .threadTopic(threadEntity.getTopic())
             .thread(threadEntity)
-            // .visitorUid(request.getUid())
             .visitor(visitor.toJson())
-            // .agentUid(agent.getUid())
             .agent(agent.toJson())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())
-            // .status(QueueMemberStatusEnum.WAITING.name())
             .client(request.getClient())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
         if (workgroup != null) {
-            // member.setWorkgroupUid(workgroup.getUid());
             member.setWorkgroup(workgroup.toJson());
         }
         // 
