@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -57,6 +58,7 @@ public class QueueService {
             .uid(robotEntity.getUid())
             .nickname(robotEntity.getNickname())
             .avatar(robotEntity.getAvatar())
+            .type(UserTypeEnum.ROBOT.name())
             .build();
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
@@ -78,6 +80,7 @@ public class QueueService {
             .uid(agentEntity.getUid())
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
+            .type(UserTypeEnum.AGENT.name())
             .build();
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
@@ -99,6 +102,7 @@ public class QueueService {
             .uid(agentEntity.getUid())
             .nickname(agentEntity.getNickname())
             .avatar(agentEntity.getAvatar())
+            .type(UserTypeEnum.WORKGROUP.name())
             .build();
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
@@ -148,6 +152,11 @@ public class QueueService {
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
+        UserProtobuf visitor = UserProtobuf.builder()
+            .uid(request.getUid())
+            .nickname(request.getNickname())
+            .avatar(request.getAvatar())
+            .build();
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
@@ -156,12 +165,9 @@ public class QueueService {
             .queueTopic(queue.getTopic())
             .queueDay(queue.getDay())
             .threadUid(threadEntity.getUid())
+            .threadTopic(threadEntity.getTopic())
             .visitorUid(request.getUid())
-            // .visitorNickname(request.getNickname())
-            // .visitorAvatar(request.getAvatar())
-            .agentUid(agent.getUid())
-            // .agentNickname(agent.getNickname())
-            // .agentAvatar(agent.getAvatar())
+            .visitor(visitor.toJson())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())
@@ -170,6 +176,14 @@ public class QueueService {
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
+        if (agent.getType().equals(UserTypeEnum.AGENT.name())) {
+            member.setAgentUid(agent.getUid());
+            member.setAgent(agent.toJson());
+        } else if (agent.getType().equals(UserTypeEnum.WORKGROUP.name())) {
+            member.setWorkgroupUid(agent.getUid());
+            member.setWorkgroup(agent.toJson());
+        }
+
         return queueMemberRestService.save(member);
     }
 
