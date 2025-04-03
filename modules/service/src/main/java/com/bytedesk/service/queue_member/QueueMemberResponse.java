@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 11:41:00
+ * @LastEditTime: 2025-04-03 12:27:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 // import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.service.queue.QueueResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,13 +37,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueueMemberResponse extends BaseResponse {
 
-    private String queueUid;  // 关联队列
+    // private String queueUid;  // 关联队列
 
-    private String queueNickname;  // 队列名称
+    // private String queueNickname;  // 队列名称
 
-    private String queueTopic;  // 队列主题，用于查询
+    // private String queueTopic;  // 队列主题，用于查询
 
-    private String queueDay;  // 队列日期，用于查询
+    // private String queueDay;  // 队列日期，用于查询
 
     private String threadUid;  // 关联会话
 
@@ -158,5 +159,7 @@ public class QueueMemberResponse extends BaseResponse {
     
     // 接待工作组信息
     private UserProtobuf workgroup;
+
+    private QueueResponse queue;  // 队列信息
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:00:52
+ * @LastEditTime: 2025-04-03 12:24:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,7 +118,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         }
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
-        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         // 判断客服是否在线且接待状态
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态

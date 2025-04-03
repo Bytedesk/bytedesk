@@ -30,7 +30,7 @@ public class QueueMemberEntityListener {
 
     @PostPersist
     public void onPostPersist(QueueMemberEntity queueMember) {
-        log.info("QueueMemberEntityListener onPostPersist: {}", queueMember.getQueueNickname());
+        log.info("QueueMemberEntityListener onPostPersist: {}", queueMember.getUid());
         QueueMemberEntity clonedEntity = SerializationUtils.clone(queueMember);
         // 
         ApplicationEventPublisher eventPublisher = ApplicationContextHolder.getBean(ApplicationEventPublisher.class);
@@ -39,7 +39,7 @@ public class QueueMemberEntityListener {
 
     @PostUpdate
     public void onPostUpdate(QueueMemberEntity queueMember) {
-        log.info("QueueMemberEntityListener onPostUpdate: {}", queueMember.getQueueNickname());
+        log.info("QueueMemberEntityListener onPostUpdate: {}", queueMember.getUid());
     }
     
 }

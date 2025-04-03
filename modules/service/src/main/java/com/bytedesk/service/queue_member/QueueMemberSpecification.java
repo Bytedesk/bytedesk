@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 09:29:31
+ * @LastEditTime: 2025-04-03 12:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ public class QueueMemberSpecification extends BaseSpecification {
 
             // queueNickname
             if (StringUtils.hasText(request.getQueueNickname())) {
-                predicates.add(criteriaBuilder.like(root.get("queueNickname"), "%" + request.getQueueNickname() + "%"));
+                predicates.add(criteriaBuilder.like(root.get("queue").get("nickname"), "%" + request.getQueueNickname() + "%"));
             }
 
             // 可选条件

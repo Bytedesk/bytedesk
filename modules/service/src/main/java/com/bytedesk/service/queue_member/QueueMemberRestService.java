@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:58:13
+ * @LastEditTime: 2025-04-03 12:31:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,10 +68,15 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         return queueMemberRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue_member", key = "#queueTopic#queueDay#threadUid#status")
-    public Optional<QueueMemberEntity> findByQueueTopicAndQueueDayAndThreadUidAndStatus(String queueTopic, String queueDay, String threadUid, String status) {
-        return queueMemberRepository.findByQueueTopicAndQueueDayAndThreadUidAndStatus(queueTopic, queueDay, threadUid, status);
+    @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
+    public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
+        return queueMemberRepository.findByThreadUid(threadUid);
     }
+
+    // @Cacheable(value = "queue_member", key = "#queueTopic#queueDay#threadUid#status")
+    // public Optional<QueueMemberEntity> findByQueueTopicAndQueueDayAndThreadUidAndStatus(String queueTopic, String queueDay, String threadUid, String status) {
+    //     return queueMemberRepository.findByQueueTopicAndQueueDayAndThreadUidAndStatus(queueTopic, queueDay, threadUid, status);
+    // }
 
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {

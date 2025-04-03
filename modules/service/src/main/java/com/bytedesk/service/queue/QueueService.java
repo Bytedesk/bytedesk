@@ -132,8 +132,9 @@ public class QueueService {
     @Transactional
     public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, UserProtobuf workgroup, VisitorRequest request, QueueEntity queue) {
         // 
-        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByQueueTopicAndQueueDayAndThreadUidAndStatus(
-            queue.getTopic(), queue.getDay(), threadEntity.getUid(), QueueMemberStatusEnum.WAITING.name());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadEntity.getUid());
+        // Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByQueueTopicAndQueueDayAndThreadUidAndStatus(
+        //     queue.getTopic(), queue.getDay(), threadEntity.getUid(), QueueMemberStatusEnum.WAITING.name());
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
@@ -145,10 +146,11 @@ public class QueueService {
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
-            .queueUid(queue.getUid())
-            .queueNickname(queue.getNickname())
-            .queueTopic(queue.getTopic())
-            .queueDay(queue.getDay())
+            // .queueUid(queue.getUid())
+            // .queueNickname(queue.getNickname())
+            // .queueTopic(queue.getTopic())
+            // .queueDay(queue.getDay())
+            .queue(queue)
             .threadUid(threadEntity.getUid())
             .threadTopic(threadEntity.getTopic())
             .visitorUid(request.getUid())
@@ -252,7 +254,7 @@ public class QueueService {
                 queueMemberRepository.save(member);
                 
                 // 更新队列统计
-                QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
+                QueueEntity queue = queueRepository.findByUid(member.getQueue().getUid())
                     .orElseThrow(() -> new RuntimeException("Queue not found"));
                 updateQueueStats(queue);
                 
@@ -294,7 +296,7 @@ public class QueueService {
                     queueMemberRepository.save(member);
                     
                     // 更新队列统计
-                    QueueEntity queue = queueRepository.findByUid(member.getQueueUid())
+                    QueueEntity queue = queueRepository.findByUid(member.getQueue().getUid())
                         .orElseThrow(() -> new RuntimeException("Queue not found"));
                     updateQueueStats(queue);
                     
