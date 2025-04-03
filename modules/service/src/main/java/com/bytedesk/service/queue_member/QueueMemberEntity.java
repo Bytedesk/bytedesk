@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 09:21:03
+ * @LastEditTime: 2025-04-03 09:53:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,7 +71,7 @@ public class QueueMemberEntity extends BaseEntity {
     private int beforeNumber = 0;  // 前面排队人数
 
     @Builder.Default
-    private int waitTime = 0;  // 等待时间(秒)
+    private int waitTime = 0;  // 预计等待时间(秒)，类似医院取号小票上面的等待时间，非真实等待时间
 
     @Builder.Default
     private int queueNumber = 0;  // 排队号码
@@ -159,18 +159,33 @@ public class QueueMemberEntity extends BaseEntity {
     // 处理状态（待处理、已处理、已关闭等）
     @Builder.Default
     private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    
 
     private String client;  // 客户来源渠道
 
-    // 排队用户信息
+    // 便于统计
+    private String visitorUid;  // 访客UID
+
+    // 排队访客信息
     @Builder.Default
-    @Column(name = "queue_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String user = BytedeskConsts.EMPTY_JSON_STRING;
+    @Column(name = "queue_visitor", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 便于统计
+    private String agentUid;  // 客服UID
 
     // 接待客服信息
     @Builder.Default
     @Column(name = "queue_agent", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 便于统计
+    private String workgroupUid;  // 工作组UID
+    
+    // 接待工作组信息
+    @Builder.Default
+    @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 计算等待时间(秒)

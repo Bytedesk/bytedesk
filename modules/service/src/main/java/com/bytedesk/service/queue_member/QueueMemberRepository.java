@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 13:18:01
+ * @LastEditTime: 2025-04-03 09:46:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
     Optional<QueueMemberEntity> findByQueueTopicAndQueueDayAndThreadUidAndStatus(String queueTopic, String queueDay, String threadUid, String status);
 
-    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndSolved(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean solved);
+    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndResolved(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean resolved);
     
     List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndAcceptType(String orgUid, LocalDateTime startTime, LocalDateTime endTime, String acceptType);
     
@@ -103,7 +103,6 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     int cleanupExpiredMembers(
         @Param("queueUid") String queueUid,
         @Param("beforeTime") LocalDateTime beforeTime);
-
 
     // 统计客服的活跃会话数
     @Query("SELECT COUNT(t) FROM QueueMemberEntity t WHERE t.agentUid = :agentUid AND t.status = 'SERVING'")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 17:07:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-02 15:02:56
+ * @LastEditTime: 2025-04-03 09:40:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,13 @@
  */
 package com.bytedesk.service.queue_member;
 
-public class QueueMemberPermissions {
+// public class QueueMemberPermissions {
 
-    public static final String VISITOR_COUNTER_PREFIX = "VISITOR_COUNTER_";
-    // QueueMember permissions
-    public static final String VISITOR_COUNTER_CREATE = "hasAuthority('VISITOR_COUNTER_CREATE')";
-    public static final String VISITOR_COUNTER_READ = "hasAuthority('VISITOR_COUNTER_READ')";
-    public static final String VISITOR_COUNTER_UPDATE = "hasAuthority('VISITOR_COUNTER_UPDATE')";
-    public static final String VISITOR_COUNTER_DELETE = "hasAuthority('VISITOR_COUNTER_DELETE')";
-    public static final String VISITOR_COUNTER_EXPORT = "hasAuthority('VISITOR_COUNTER_EXPORT')";
-}
+//     public static final String VISITOR_COUNTER_PREFIX = "VISITOR_COUNTER_";
+//     // QueueMember permissions
+//     public static final String VISITOR_COUNTER_CREATE = "hasAuthority('VISITOR_COUNTER_CREATE')";
+//     public static final String VISITOR_COUNTER_READ = "hasAuthority('VISITOR_COUNTER_READ')";
+//     public static final String VISITOR_COUNTER_UPDATE = "hasAuthority('VISITOR_COUNTER_UPDATE')";
+//     public static final String VISITOR_COUNTER_DELETE = "hasAuthority('VISITOR_COUNTER_DELETE')";
+//     public static final String VISITOR_COUNTER_EXPORT = "hasAuthority('VISITOR_COUNTER_EXPORT')";
+// }
