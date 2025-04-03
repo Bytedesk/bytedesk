@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 13:56:12
+ * @LastEditTime: 2025-04-03 16:24:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -147,7 +147,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setStarted();
         thread.setUnreadCount(1);
         thread.setContent(agent.getServiceSettings().getWelcomeTip());
-        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         // 增加接待数量，待优化
         agent.increaseThreadCount();
         agentRestService.save(agent);
@@ -189,7 +189,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setQueuing();
         thread.setUnreadCount(0);
         thread.setContent(content);
-        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         threadService.save(thread);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
@@ -209,7 +209,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setOffline();
         thread.setUnreadCount(0);
         thread.setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
-        thread.setQueueNumber(queueMemberEntity.getQueueNumber());
+        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         threadService.save(thread);
         // 
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
