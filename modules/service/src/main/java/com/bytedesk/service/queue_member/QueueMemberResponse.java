@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 09:30:54
+ * @LastEditTime: 2025-04-03 09:49:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,12 +138,25 @@ public class QueueMemberResponse extends BaseResponse {
 
     private String client;  // 客户来源渠道
 
+    // 便于统计
+    private String visitorUid;  // 访客UID
+
     // 排队用户信息
     @Builder.Default
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
+    // 便于统计
+    private String agentUid;  // 客服UID
+
     // 接待客服信息
     @Builder.Default
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 便于统计
+    private String workgroupUid;  // 工作组UID
+    
+    // 接待工作组信息
+    @Builder.Default
+    private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
     
 }

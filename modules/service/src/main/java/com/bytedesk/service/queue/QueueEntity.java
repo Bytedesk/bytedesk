@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:10:49
+ * @LastEditTime: 2025-04-03 09:53:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,7 +83,7 @@ public class QueueEntity extends BaseEntity {
     private int avgWaitTime = 0;  // 平均等待时间(秒)
 
     @Builder.Default
-    private int avgSolveTime = 0;  // 平均解决时间(秒)
+    private int avgResolveTime = 0;  // 平均解决时间(秒)
 
     /**
      * 获取下一个排队号码
