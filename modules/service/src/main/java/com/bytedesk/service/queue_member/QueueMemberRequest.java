@@ -20,7 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+// import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -119,6 +119,9 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Boolean resolved = false;
 
+    @Builder.Default
+    private Integer rateLevel = 0;  // 评分等级
+
     // 重构到相应的表里面
     // 意图类型
     @Builder.Default
@@ -133,8 +136,8 @@ public class QueueMemberRequest extends BaseRequest {
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 处理状态（待处理、已处理、已关闭等）
-    @Builder.Default
-    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    // @Builder.Default
+    // private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     private String client;  // 客户来源渠道
 
