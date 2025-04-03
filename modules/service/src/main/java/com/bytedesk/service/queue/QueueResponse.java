@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 18:19:46
+ * @LastEditTime: 2025-04-03 10:05:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,8 +14,10 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,29 +30,38 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueueResponse extends BaseResponse {
 
+    // 队列名称
     private String nickname;
 
-    private String type;
+    // 队列类型
+    @Builder.Default
+    private String type = ThreadTypeEnum.WORKGROUP.name();  
 
+    // 区别于thread topic，此处的topic是队列的主题，用于访客监听排队人数变化
     private String topic;
 
+    // 队列日期(YYYY-MM-DD)
     private String day;
 
-    private String status;
+    // 队列状态
+    @Builder.Default
+    private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
-    private Integer currentNumber;  // 当前排队号码
+    @Builder.Default
+    private Integer currentNumber = 0;  // 当前排队号码
 
-    private Integer waitingNumber;  // 等待人数
+    @Builder.Default
+    private Integer waitingNumber = 0;  // 等待人数
 
-    private Integer servingNumber;  // 正在服务人数
+    @Builder.Default
+    private Integer servingNumber = 0;  // 正在服务人数
 
-    private Integer servedNumber;  // 已完成人数
+    @Builder.Default
+    private Integer servedNumber = 0;  // 已完成人数
 
-    private Integer avgWaitTime;  // 平均等待时间(秒)
+    @Builder.Default
+    private Integer avgWaitTime = 0;  // 平均等待时间(秒)
 
-    private Integer avgSolveTime;  // 平均解决时间(秒)
-
-    // private LocalDateTime createdAt;
-
-    // private LocalDateTime updatedAt;
+    @Builder.Default
+    private Integer avgResolveTime = 0;  // 平均解决时间(秒)
 }

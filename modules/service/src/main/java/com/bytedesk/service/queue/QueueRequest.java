@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 18:19:19
+ * @LastEditTime: 2025-04-03 10:04:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,19 +33,19 @@ public class QueueRequest extends BaseRequest {
     // 队列名称
     private String nickname;
 
+    // 队列类型
     @Builder.Default
     private String type = ThreadTypeEnum.WORKGROUP.name();  
 
-    // agentUid or workgroupUid
+    // 区别于thread topic，此处的topic是队列的主题，用于访客监听排队人数变化
     private String topic;
 
     // 队列日期(YYYY-MM-DD)
-    private String day;  
+    private String day;
 
     // 队列状态
     @Builder.Default
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
-
 
     @Builder.Default
     private Integer currentNumber = 0;  // 当前排队号码
@@ -63,7 +63,7 @@ public class QueueRequest extends BaseRequest {
     private Integer avgWaitTime = 0;  // 平均等待时间(秒)
 
     @Builder.Default
-    private Integer avgSolveTime = 0;  // 平均解决时间(秒)
+    private Integer avgResolveTime = 0;  // 平均解决时间(秒)
 
     
 }
