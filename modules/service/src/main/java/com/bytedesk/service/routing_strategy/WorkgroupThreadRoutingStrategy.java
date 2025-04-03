@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:43:57
+ * @LastEditTime: 2025-04-03 18:10:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,7 +103,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
-            if (threadOptional.get().isStarted()) {
+            //
+            if (threadOptional.get().isChatting()) {
                 thread = threadOptional.get();
                 // 重新初始化会话，包括重置机器人状态等
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
@@ -116,7 +117,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
             } else if (threadOptional.get().isOffline()) {
                 thread = threadOptional.get();
-            } else if (threadOptional.get().isRoboting()) {
+            } else if (threadOptional.get().isChatting()) {
                 thread = threadOptional.get();
                 if (visitorRequest.getForceAgent()) {
                     // 强制转人工，TODO: 记录转人工日志
@@ -178,7 +179,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
-    
+
         // 未满则接待
         thread.setUserUid(agent.getUid());
         thread.setStarted();
@@ -244,16 +245,17 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, WorkgroupEntity workgroup) {
-        // 
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
+            WorkgroupEntity workgroup) {
+        //
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-        // 
+        //
         ThreadEntity thread = threadOptional.get();
         thread.setOffline();
         thread.setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
         threadService.save(thread);
-        // 
+        //
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
         Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
         if (messageOptional.isPresent()) {
@@ -273,7 +275,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        // 
+        //
         return messageProtobuf;
     }
 
@@ -304,36 +306,36 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
             @Nonnull RobotEntity robot) {
 
-            // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
-            Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
-            Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-            
-            ThreadEntity thread = threadOptional.get();
-            // 排队计数
-            QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
-            log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
+        // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
+        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
 
-            // 更新线程状态
-            thread.setUserUid(robot.getUid());
-            thread.setStatus(ThreadProcessStatusEnum.ROBOTING.name());
-            thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
-            thread.setContent(robot.getServiceSettings().getWelcomeTip());
-            // thread.setRobot(true);
-            thread.setUnreadCount(0);
-            // ThreadEntity savedThread =
-            threadService.save(thread);
+        ThreadEntity thread = threadOptional.get();
+        // 排队计数
+        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+        log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
-            // 增加接待数量
-            robot.increaseThreadCount();
-            robotRestService.save(robot);
+        // 更新线程状态
+        thread.setUserUid(robot.getUid());
+        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
+        thread.setContent(robot.getServiceSettings().getWelcomeTip());
+        // thread.setRobot(true);
+        thread.setUnreadCount(0);
+        // ThreadEntity savedThread =
+        threadService.save(thread);
 
-            // 更新排队状态
-            // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
-            queueMemberEntity.setAcceptTime(LocalDateTime.now());
-            queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-            queueMemberRestService.save(queueMemberEntity);
+        // 增加接待数量
+        robot.increaseThreadCount();
+        robotRestService.save(robot);
 
-            return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+        // 更新排队状态
+        // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
+        queueMemberEntity.setAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberRestService.save(queueMemberEntity);
+
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
 
     }
 

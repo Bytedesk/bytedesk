@@ -147,7 +147,7 @@ public class QueueService {
             .visitor(visitor.toJson())
             .agent(agent.toJson())
             .queueNumber(queue.getNextNumber())
-            .beforeNumber(queue.getWaitingNumber())
+            .beforeNumber(queue.getQueuingCount())
             .enqueueTime(LocalDateTime.now())
             .client(request.getClient())
             .orgUid(threadEntity.getOrgUid())

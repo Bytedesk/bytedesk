@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 15:49:33
+ * @LastEditTime: 2025-04-03 18:11:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,19 +59,8 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getStatus().equals(ThreadProcessStatusEnum.NEW.name());
     }
 
-    public Boolean isStarted() {
-        return getStatus().equals(ThreadProcessStatusEnum.STARTED.name());
-        // return getStatus().equals(ThreadProcessStatusEnum.STARTED.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_PENDING.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_ACCEPTED.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_REJECTED.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_TIMEOUT.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_CANCELED.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_PENDING.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_ACCEPTED.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_REJECTED.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_TIMEOUT.name())
-        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_CANCELED.name());
+    public Boolean isChatting() {
+        return getStatus().equals(ThreadProcessStatusEnum.CHATTING.name());
     }
 
     // is transfer pending
@@ -122,9 +111,9 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
     }
 
-    public Boolean isRoboting() {
-        return getStatus().equals(ThreadProcessStatusEnum.ROBOTING.name());
-    }
+    // public Boolean isRoboting() {
+    //     return getStatus().equals(ThreadProcessStatusEnum.ROBOTING.name());
+    // }
 
     public Boolean isQueuing() {
         return getStatus().equals(ThreadProcessStatusEnum.QUEUING.name());
@@ -175,7 +164,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     public ThreadEntity setStarted() {
-        setStatus(ThreadProcessStatusEnum.STARTED.name());
+        setStatus(ThreadProcessStatusEnum.CHATTING.name());
         return this;
     }
 

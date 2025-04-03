@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:40:15
+ * @LastEditTime: 2025-04-03 18:05:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,16 +78,19 @@ public class QueueEntity extends BaseEntity {
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
     @Builder.Default
-    private int currentNumber = 0;  // 今日请求服务人数，当前排队号码
+    private int newCount = 0;  // 今日请求服务人数，当前排队号码
 
     @Builder.Default
-    private int waitingNumber = 0;  // 等待人数
+    private int queuingCount = 0;  // 排队中人数
 
     @Builder.Default
-    private int servingNumber = 0;  // 正在服务人数
+    private int chattingCount = 0;  // 正在服务人数
 
     @Builder.Default
-    private int servedNumber = 0;  // 已完成人数
+    private int offlineCount = 0;  // 请求时，客服离线或非接待状态的请求人次
+
+    @Builder.Default
+    private int closedCount = 0;  // 对话结束人数
 
     @Builder.Default
     private int avgWaitTime = 0;  // 平均等待时间(秒)
@@ -99,51 +102,51 @@ public class QueueEntity extends BaseEntity {
      * 获取下一个排队号码
      */
     public int getNextNumber() {
-        return ++currentNumber;
+        return ++newCount;
     }
 
     /**
      * 减少等待人数
      */
     public void decreaseWaitingNumber() {
-        this.waitingNumber--;
+        this.queuingCount--;
     }
 
     /**
      * 增加等待人数
      */
     public void increaseWaitingNumber() {
-        this.waitingNumber++;
+        this.queuingCount++;
     }
 
     /**
      * 增加正在服务人数
      */
     public void increaseServingNumber() {
-        this.servingNumber++;
+        this.chattingCount++;
     }
 
     /**
      * 减少正在服务人数
      */
     public void decreaseServingNumber() {
-        this.servingNumber--;
+        this.chattingCount--;
     }
 
     /**
      * 增加已完成人数
      */
     public void increaseServedNumber() {
-        this.servedNumber++;
+        this.closedCount++;
     }
 
     /**
      * 更新队列统计
      */
     public void updateStats(int waiting, int serving, int served, int avgWait) {
-        this.waitingNumber = waiting;
-        this.servingNumber = serving;
-        this.servedNumber = served;
+        this.queuingCount = waiting;
+        this.chattingCount = serving;
+        this.closedCount = served;
         this.avgWaitTime = avgWait;
     }
 
@@ -159,9 +162,9 @@ public class QueueEntity extends BaseEntity {
     }
 
     public void acceptThread() {
-        this.servingNumber++;
-        this.waitingNumber--;
+        this.chattingCount++;
+        this.queuingCount--;
         // TODO: 计算平均等待时间
-        this.avgWaitTime = (this.avgWaitTime * this.servedNumber + this.currentNumber) / (this.servedNumber + 1);
+        this.avgWaitTime = (this.avgWaitTime * this.closedCount + this.newCount) / (this.closedCount + 1);
     }
 }
