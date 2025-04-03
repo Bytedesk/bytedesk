@@ -246,7 +246,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             return convertToResponse(threadOptional.get());
         }
 
-        UserProtobuf userSimple = UserUtils.getSystemChannelUser();
+        UserProtobuf userSimple = UserUtils.getSystemUser();
         //
         ThreadEntity noticeThread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:20:44
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2025-02-08 10:37:40
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-04-03 10:44:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,12 +37,12 @@ public class UserUtils {
     //     return user;
     // }
 
-    public static UserProtobuf getSystemChannelUser() {
+    public static UserProtobuf getSystemUser() {
         UserProtobuf user = UserProtobuf.builder()
+                .uid(BytedeskConsts.DEFAULT_SYSTEM_UID)
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
                 .avatar(AvatarConsts.getDefaultSystemNotificationAvatarUrl())
                 .build();
-        user.setUid(BytedeskConsts.DEFAULT_SYSTEM_UID);
         return user;
     }
 

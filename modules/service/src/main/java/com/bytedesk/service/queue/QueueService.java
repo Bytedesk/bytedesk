@@ -109,9 +109,9 @@ public class QueueService {
                     .orElseGet(() -> {
                         QueueRequest request = QueueRequest.builder()
                             .nickname(queueNickname)
-                            .day(today)
-                            .topic(queueTopic)
                             .type(threadEntity.getType())
+                            .topic(queueTopic)
+                            .day(today)
                             .status(QueueStatusEnum.ACTIVE.name())
                             .orgUid(threadEntity.getOrgUid())
                             .build();
