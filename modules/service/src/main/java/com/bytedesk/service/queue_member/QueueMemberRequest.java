@@ -20,7 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-import com.bytedesk.service.thread_summary.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
