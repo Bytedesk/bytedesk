@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 09:18:19
+ * @LastEditTime: 2025-04-03 09:21:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.service.thread_summary.ThreadSummaryStatusEnum;
@@ -65,25 +66,6 @@ public class QueueMemberEntity extends BaseEntity {
     private String threadUid;  // 关联会话
 
     private String threadTopic;  // 会话主题，用于查询
-
-    @Column(nullable = false)
-    private String visitorUid;  // 访客ID
-
-    private String visitorNickname;  // 访客昵称
-
-    private String visitorAvatar;  // 访客头像
-
-    private String agentUid;  // 服务客服ID
-
-    private String agentNickname;  // 客服昵称
-
-    private String agentAvatar;  // 客服头像
-
-    private String workgroupUid;  // 工作组ID
-
-    private String workgroupName;  // 工作组名称
-
-    private String workgroupAvatar;  // 工作组头像
 
     @Builder.Default
     private int beforeNumber = 0;  // 前面排队人数
@@ -180,6 +162,16 @@ public class QueueMemberEntity extends BaseEntity {
 
     private String client;  // 客户来源渠道
 
+    // 排队用户信息
+    @Builder.Default
+    @Column(name = "queue_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 接待客服信息
+    @Builder.Default
+    @Column(name = "queue_agent", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String agent = BytedeskConsts.EMPTY_JSON_STRING;
+
     /**
      * 计算等待时间(秒)
      */
@@ -194,7 +186,7 @@ public class QueueMemberEntity extends BaseEntity {
      */
     public void updateStatus(String newStatus, String agentUid) {
         this.status = newStatus;
-        this.agentUid = agentUid;
+        // this.agentUid = agentUid;
         
         if (QueueMemberStatusEnum.SERVING.name().equals(newStatus)) {
             this.acceptTime = LocalDateTime.now();
