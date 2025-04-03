@@ -40,7 +40,7 @@ import jakarta.persistence.Convert;
 
 @MappedSuperclass
 @Data
-@SuperBuilder
+@ThreadProcessStatusEnum
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -66,6 +66,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(name = "thread_type", nullable = false)
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
+    // process status
     @Builder.Default
     @Column(name = "thread_status", nullable = false)
     private String status = ThreadStatusEnum.NEW.name();

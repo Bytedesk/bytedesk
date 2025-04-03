@@ -174,7 +174,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
 
         request.setAutoClose(false);
-        request.setStatus(ThreadStatusEnum.CLOSED.name());
+        request.setStatus(ThreadProcessStatusEnum.CLOSED.name());
         ThreadResponse threadResponse = threadService.close(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));

@@ -122,7 +122,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
         thread.setUid(uidUtils.getUid());
-        thread.setStatus(ThreadStatusEnum.STARTED.name());
+        thread.setStatus(ThreadProcessStatusEnum.STARTED.name());
         //
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
@@ -186,7 +186,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
                 .unreadCount(0)
-                .status(ThreadStatusEnum.NEW.name())
+                .status(ThreadProcessStatusEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(JSON.toJSONString(userSimple))
@@ -253,7 +253,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .type(ThreadTypeEnum.CHANNEL.name())
                 .topic(topic)
                 .unreadCount(0)
-                .status(ThreadStatusEnum.NEW.name())
+                .status(ThreadProcessStatusEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(JSON.toJSONString(userSimple))
@@ -449,7 +449,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                 .uid(thread.getUid())
                 .topic(thread.getTopic())
                 .autoClose(true)
-                .status(ThreadStatusEnum.CLOSED.name())
+                .status(ThreadProcessStatusEnum.CLOSED.name())
                 .build();
         return close(threadRequest);
     }
@@ -461,7 +461,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         }
         //
         ThreadEntity thread = threadOptional.get();
-        if (ThreadStatusEnum.CLOSED.name().equals(thread.getStatus())) {
+        if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
             throw new RuntimeException("thread " + thread.getUid() + " is already closed");
         }
         thread.setAutoClose(threadRequest.getAutoClose());
@@ -489,7 +489,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
         ThreadEntity thread = threadOptional.get();
-        thread.setStatus(ThreadStatusEnum.STARTED.name());
+        thread.setStatus(ThreadProcessStatusEnum.STARTED.name());
         thread.setAgent(threadRequest.getAgent());
         //
         ThreadEntity updateThread = save(thread);
@@ -541,7 +541,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     // 找到某个访客当前对应某技能组未关闭会话
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
-        List<String> states = Arrays.asList(new String[] { ThreadStatusEnum.CLOSED.name() });
+        List<String> states = Arrays.asList(new String[] { ThreadProcessStatusEnum.CLOSED.name() });
         return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
@@ -554,7 +554,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });
-        return threadRepository.findByTypesInAndStatusNotAndDeletedFalse(types, ThreadStatusEnum.CLOSED.name());
+        return threadRepository.findByTypesInAndStatusNotAndDeletedFalse(types, ThreadProcessStatusEnum.CLOSED.name());
     }
 
     @Caching(put = {

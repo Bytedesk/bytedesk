@@ -22,7 +22,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
@@ -95,7 +95,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
         // 更新线程状态
-        thread.setStatus(ThreadStatusEnum.ROBOTING.name());
+        thread.setStatus(ThreadProcessStatusEnum.ROBOTING.name());
         thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         thread.setUnreadCount(0);

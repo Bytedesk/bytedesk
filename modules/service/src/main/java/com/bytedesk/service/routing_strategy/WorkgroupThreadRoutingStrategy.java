@@ -29,7 +29,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -317,7 +317,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
             // 更新线程状态
             thread.setUserUid(robot.getUid());
-            thread.setStatus(ThreadStatusEnum.ROBOTING.name());
+            thread.setStatus(ThreadProcessStatusEnum.ROBOTING.name());
             thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
             thread.setContent(robot.getServiceSettings().getWelcomeTip());
             // thread.setRobot(true);
