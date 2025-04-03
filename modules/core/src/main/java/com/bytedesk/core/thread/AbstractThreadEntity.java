@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 09:22:09
+ * @LastEditTime: 2025-04-03 14:42:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ import jakarta.persistence.Convert;
 
 @MappedSuperclass
 @Data
-@ThreadProcessStatusEnum
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -69,7 +69,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     // process status
     @Builder.Default
     @Column(name = "thread_status", nullable = false)
-    private String status = ThreadStatusEnum.NEW.name();
+    private String status = ThreadProcessStatusEnum.NEW.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
     @Builder.Default

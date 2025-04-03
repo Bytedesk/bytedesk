@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 14:38:19
+ * @LastEditTime: 2025-04-03 14:43:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private int queueNumber = 0;  // 排队号码
 
-    // 处理流程 process status
+    // 处理流程 process status，使用thread.status字段代替
     // @Builder.Default
     // private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
