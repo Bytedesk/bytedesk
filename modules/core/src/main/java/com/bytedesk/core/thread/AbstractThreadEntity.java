@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 14:42:30
+ * @LastEditTime: 2025-04-03 15:47:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,17 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_status", nullable = false)
     private String status = ThreadProcessStatusEnum.NEW.name();
+
+    // transfer status
+    @Builder.Default
+    @Column(name = "thread_transfer_status", nullable = false)
+    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
+
+    // 可能同时邀请多个人
+    // invite status
+    // @Builder.Default
+    // @Column(name = "thread_invite_status", nullable = false)
+    // private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
     // 计数器编号，客服咨询首先需要取号，类似银行/医院排队系统
     @Builder.Default

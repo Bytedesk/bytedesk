@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 14:45:15
+ * @LastEditTime: 2025-04-03 15:48:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,63 +60,63 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     public Boolean isStarted() {
-        // return getState().equals(ThreadStateEnum.STARTED.name());
-        return getStatus().equals(ThreadProcessStatusEnum.STARTED.name())
-             || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_PENDING.name())
-             || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_ACCEPTED.name())
-             || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_REJECTED.name())
-             || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_TIMEOUT.name())
-             || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_CANCELED.name())
-             || getStatus().equals(ThreadProcessStatusEnum.INVITE_PENDING.name())
-             || getStatus().equals(ThreadProcessStatusEnum.INVITE_ACCEPTED.name())
-             || getStatus().equals(ThreadProcessStatusEnum.INVITE_REJECTED.name())
-             || getStatus().equals(ThreadProcessStatusEnum.INVITE_TIMEOUT.name())
-             || getStatus().equals(ThreadProcessStatusEnum.INVITE_CANCELED.name());
+        return getStatus().equals(ThreadProcessStatusEnum.STARTED.name());
+        // return getStatus().equals(ThreadProcessStatusEnum.STARTED.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_PENDING.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_ACCEPTED.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_REJECTED.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_TIMEOUT.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.TRANSFER_CANCELED.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_PENDING.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_ACCEPTED.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_REJECTED.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_TIMEOUT.name())
+        //      || getStatus().equals(ThreadProcessStatusEnum.INVITE_CANCELED.name());
     }
 
     // is transfer pending
     public Boolean isTransferPending() {
-        return getStatus().equals(ThreadProcessStatusEnum.TRANSFER_PENDING.name());
+        return getStatus().equals(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
     }
 
     // is transfer accepted
     public Boolean isTransferAccepted() {
-        return getStatus().equals(ThreadProcessStatusEnum.TRANSFER_ACCEPTED.name());
+        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
     }
 
     public Boolean isTransferRejected() {
-        return getStatus().equals(ThreadProcessStatusEnum.TRANSFER_REJECTED.name());
+        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_REJECTED.name());
     }
 
     public Boolean isTransferTimeout() {
-        return getStatus().equals(ThreadProcessStatusEnum.TRANSFER_TIMEOUT.name());
+        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_TIMEOUT.name());
     }
 
     public Boolean isTransferCanceled() {
-        return getStatus().equals(ThreadProcessStatusEnum.TRANSFER_CANCELED.name());
+        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_CANCELED.name());
     }
 
     // is invite pending
     public Boolean isInvitePending() {
-        return getStatus().equals(ThreadProcessStatusEnum.INVITE_PENDING.name());
+        return getStatus().equals(ThreadInviteStatusEnum.INVITE_PENDING.name());
     }
 
     // is invite accepted
-    public Boolean isInviteAccepted() {
-        return getStatus().equals(ThreadProcessStatusEnum.INVITE_ACCEPTED.name());
-    }
+    // public Boolean isInviteAccepted() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_ACCEPTED.name());
+    // }
 
-    public Boolean isInviteRejected() {
-        return getStatus().equals(ThreadProcessStatusEnum.INVITE_REJECTED.name());
-    }
+    // public Boolean isInviteRejected() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_REJECTED.name());
+    // }
 
-    public Boolean isInviteTimeout() {
-        return getStatus().equals(ThreadProcessStatusEnum.INVITE_TIMEOUT.name());
-    }
+    // public Boolean isInviteTimeout() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_TIMEOUT.name());
+    // }
 
-    public Boolean isInviteCanceled() {
-        return getStatus().equals(ThreadProcessStatusEnum.INVITE_CANCELED.name());
-    }
+    // public Boolean isInviteCanceled() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
+    // }
 
     public Boolean isOffline() {
         return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
