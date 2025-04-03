@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:24:11
+ * @LastEditTime: 2025-04-03 13:50:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,9 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 
 // 机器人对话策略器人
 @Slf4j
-@Component("robotCsThreadStrategy")
+@Component("robotThreadStrategy")
 @AllArgsConstructor
-public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
+public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final RobotRestService robotService;
 
@@ -58,12 +58,12 @@ public class RobotCsThreadCreationStrategy implements CsThreadCreationStrategy {
     private final RobotRestService robotRestService;
 
     @Override
-    public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
-        return createRobotCsThread(visitorRequest);
+    public MessageProtobuf createThread(VisitorRequest visitorRequest) {
+        return createRobotThread(visitorRequest);
     }
 
     // 机器人对话，不支持转人工
-    public MessageProtobuf createRobotCsThread(VisitorRequest request) {
+    public MessageProtobuf createRobotThread(VisitorRequest request) {
         String robotUid = request.getSid();
         RobotEntity robot = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
