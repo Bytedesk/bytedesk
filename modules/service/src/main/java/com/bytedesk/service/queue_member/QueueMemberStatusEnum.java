@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-07 15:49:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 14:26:43
+ * @LastEditTime: 2025-04-03 13:56:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,42 +13,42 @@
  */
 package com.bytedesk.service.queue_member;
 
-/**
- * 队列成员状态枚举
- */
-public enum QueueMemberStatusEnum {
+// /**
+//  * 队列成员状态枚举
+//  */
+// public enum QueueMemberStatusEnum {
     
-    WAITING("waiting"),         // 等待中
-    SERVING("serving"),         // 正在服务
-    COMPLETED("completed"),     // 已完成
-    ABANDONED("abandoned"),     // 已放弃
-    TIMEOUT("timeout"),         // 已超时
-    REJECTED("rejected");       // 已拒绝(无可用客服)
+//     WAITING("waiting"),         // 等待中
+//     SERVING("serving"),         // 正在服务
+//     COMPLETED("completed"),     // 已完成
+//     ABANDONED("abandoned"),     // 已放弃
+//     TIMEOUT("timeout"),         // 已超时
+//     REJECTED("rejected");       // 已拒绝(无可用客服)
     
-    private final String value;
+//     private final String value;
     
-    QueueMemberStatusEnum(String value) {
-        this.value = value;
-    }
+//     QueueMemberStatusEnum(String value) {
+//         this.value = value;
+//     }
     
-    public String getValue() {
-        return value;
-    }
+//     public String getValue() {
+//         return value;
+//     }
     
-    /**
-     * 检查是否是结束状态
-     */
-    public boolean isEndStatus() {
-        return this == COMPLETED || this == ABANDONED || 
-               this == TIMEOUT || this == REJECTED;
-    }
+//     /**
+//      * 检查是否是结束状态
+//      */
+//     public boolean isEndStatus() {
+//         return this == COMPLETED || this == ABANDONED || 
+//                this == TIMEOUT || this == REJECTED;
+//     }
     
-    public static QueueMemberStatusEnum fromValue(String value) {
-        for (QueueMemberStatusEnum status : QueueMemberStatusEnum.values()) {
-            if (status.value.equals(value)) {
-                return status;
-            }
-        }
-        throw new IllegalArgumentException("Invalid member status: " + value);
-    }
-} 
+//     public static QueueMemberStatusEnum fromValue(String value) {
+//         for (QueueMemberStatusEnum status : QueueMemberStatusEnum.values()) {
+//             if (status.value.equals(value)) {
+//                 return status;
+//             }
+//         }
+//         throw new IllegalArgumentException("Invalid member status: " + value);
+//     }
+// } 

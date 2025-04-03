@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:27:04
+ * @LastEditTime: 2025-04-03 13:57:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,8 +58,8 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
 
-    @Builder.Default
-    private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
+    // @Builder.Default
+    // private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
