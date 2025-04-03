@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:06:43
+ * @LastEditTime: 2025-04-03 09:09:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,37 +65,6 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_type", nullable = false)
     private String type = ThreadTypeEnum.WORKGROUP.name();
-
-    // 重构到相应的表里面
-    // // 意图类型
-    // @Builder.Default
-    // private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
-
-    // // 情绪类型
-    // @Builder.Default
-    // private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
-
-    // // 质检结果
-    // @Builder.Default
-    // private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
-
-    // 直接在评价表里面根据threadUid查询是否已经评价
-    // // 是否被评价
-    // @Builder.Default
-    // @Column(name = "is_rated")
-    // private boolean rated = false;
-
-    // 直接在小结表里面根据threadUid查询是否已经小结
-    // // 是否已经小结
-    // @Builder.Default
-    // @Column(name = "is_summarized")
-    // private boolean summarized = false;
-
-    // 直接在质检表里面根据threadUid查询是否已经质检
-    // // 是否已经质检
-    // @Builder.Default
-    // @Column(name = "is_quality_checked")
-    // private boolean qualityChecked = false;
 
     @Builder.Default
     @Column(name = "thread_status", nullable = false)

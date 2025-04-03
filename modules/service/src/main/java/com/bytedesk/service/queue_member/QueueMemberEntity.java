@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:23:58
+ * @LastEditTime: 2025-04-03 09:18:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,11 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
+import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
+import com.bytedesk.service.thread_summary.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -59,6 +64,8 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(nullable = false)
     private String threadUid;  // 关联会话
 
+    private String threadTopic;  // 会话主题，用于查询
+
     @Column(nullable = false)
     private String visitorUid;  // 访客ID
 
@@ -75,6 +82,8 @@ public class QueueMemberEntity extends BaseEntity {
     private String workgroupUid;  // 工作组ID
 
     private String workgroupName;  // 工作组名称
+
+    private String workgroupAvatar;  // 工作组头像
 
     @Builder.Default
     private int beforeNumber = 0;  // 前面排队人数
@@ -129,17 +138,47 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private int priority = 0;  // 优先级(0-100)
 
-    // 是否已解决
-    @Builder.Default
-    @Column(name = "is_solved")
-    private boolean solved = false;
-
-    // 是否已评价
+    // 直接在评价表里面根据threadUid查询是否已经评价
+    // 是否被评价
     @Builder.Default
     @Column(name = "is_rated")
     private boolean rated = false;
 
-    private String client;  // 客户端类型
+    // 直接在小结表里面根据threadUid查询是否已经小结
+    // 是否已经小结
+    @Builder.Default
+    @Column(name = "is_summarized")
+    private boolean summarized = false;
+
+    // 直接在质检表里面根据threadUid查询是否已经质检
+    // 是否已经质检
+    @Builder.Default
+    @Column(name = "is_quality_checked")
+    private boolean qualityChecked = false;
+
+    // 是否已解决
+    @Builder.Default
+    @Column(name = "is_resolved")
+    private boolean resolved = false;
+
+    // 重构到相应的表里面
+    // 意图类型
+    @Builder.Default
+    private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
+
+    // 情绪类型
+    @Builder.Default
+    private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
+
+    // 质检结果
+    @Builder.Default
+    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
+
+    // 处理状态（待处理、已处理、已关闭等）
+    @Builder.Default
+    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+
+    private String client;  // 客户来源渠道
 
     /**
      * 计算等待时间(秒)
