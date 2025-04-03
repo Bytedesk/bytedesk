@@ -40,10 +40,6 @@ public class QueueMemberRequest extends BaseRequest {
 
     private String queueNickname;  // 队列名称
 
-    // private String queueTopic;  // 队列主题，用于查询
-
-    // private String queueDay;  // 队列日期，用于查询
-
     private String threadUid;  // 关联会话
 
     private String threadTopic;  // 会话主题，用于查询
@@ -141,7 +137,7 @@ public class QueueMemberRequest extends BaseRequest {
     // 排队用户信息
     @Builder.Default
     private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
-    
+
     // 接待客服信息
     @Builder.Default
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
