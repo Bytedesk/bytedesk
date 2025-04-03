@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 11:36:58
+ * @LastEditTime: 2025-04-03 11:43:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+// import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 
 import jakarta.persistence.Column;
@@ -126,6 +126,9 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_rated")
     private boolean rated = false;
 
+    @Builder.Default
+    private int rateLevel = 0;  // 评分等级
+
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
     @Builder.Default
@@ -138,10 +141,9 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
 
-    // 是否已解决
-    @Builder.Default
-    @Column(name = "is_resolved")
-    private boolean resolved = false;
+    
+
+    
 
     // 重构到相应的表里面
     // 意图类型
@@ -157,10 +159,9 @@ public class QueueMemberEntity extends BaseEntity {
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 处理状态（待处理、已处理、已关闭等）
-    @Builder.Default
-    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    // @Builder.Default
+    // private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
     
-
     private String client;  // 客户来源渠道
 
     // 便于统计

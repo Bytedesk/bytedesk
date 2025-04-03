@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 11:39:10
+ * @LastEditTime: 2025-04-03 11:41:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+// import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -119,8 +119,9 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Boolean resolved = false;
 
+    @Builder.Default
+    private Integer rateLevel = 0;  // 评分等级
     
-
     // 重构到相应的表里面
     // 意图类型
     @Builder.Default
@@ -135,8 +136,8 @@ public class QueueMemberResponse extends BaseResponse {
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 处理状态（待处理、已处理、已关闭等）
-    @Builder.Default
-    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    // @Builder.Default
+    // private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     private String client;  // 客户来源渠道
 
