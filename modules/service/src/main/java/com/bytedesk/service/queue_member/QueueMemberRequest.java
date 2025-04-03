@@ -57,8 +57,8 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
 
-    @Builder.Default
-    private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
+    // @Builder.Default
+    // private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间

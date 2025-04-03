@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:53:45
+ * @LastEditTime: 2025-04-03 14:09:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,12 +23,15 @@ import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.service.queue.QueueEntity;
 // import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -55,10 +58,12 @@ public class QueueMemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(nullable = false)
-    private String threadUid;  // 关联会话
+    // 方便查询
+    // private String threadUid;  // 关联会话，冗余字段
 
-    private String threadTopic;  // 会话主题，用于查询
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "thread_id", referencedColumnName = "id")
+    private ThreadEntity thread;
 
     @Builder.Default
     private int beforeNumber = 0;  // 前面排队人数
@@ -69,8 +74,8 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private int queueNumber = 0;  // 排队号码
 
-    @Builder.Default
-    private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
+    // @Builder.Default
+    // private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
@@ -159,7 +164,7 @@ public class QueueMemberEntity extends BaseEntity {
     private String client;  // 客户来源渠道
 
     // 便于统计
-    private String visitorUid;  // 访客UID
+    // private String visitorUid;  // 访客UID
 
     // 排队访客信息
     @Builder.Default
@@ -167,7 +172,7 @@ public class QueueMemberEntity extends BaseEntity {
     private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 便于统计
-    private String agentUid;  // 客服UID
+    // private String agentUid;  // 客服UID
 
     // 接待客服信息
     @Builder.Default
@@ -175,7 +180,7 @@ public class QueueMemberEntity extends BaseEntity {
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 便于统计
-    private String workgroupUid;  // 工作组UID
+    // private String workgroupUid;  // 工作组UID
     
     // 接待工作组信息
     @Builder.Default
@@ -183,8 +188,8 @@ public class QueueMemberEntity extends BaseEntity {
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 便于统计
-    @NotBlank(message = "queue uid is required")
-    private String queueUid;  // 关联队列UID
+    // @NotBlank(message = "queue uid is required")
+    // private String queueUid;  // 关联队列UID
 
     // 多个queueMember对应一个queue
     @ManyToOne(fetch = FetchType.LAZY)
@@ -202,19 +207,19 @@ public class QueueMemberEntity extends BaseEntity {
     /**
      * 更新状态
      */
-    public void updateStatus(String newStatus, String agentUid) {
-        this.status = newStatus;
-        // this.agentUid = agentUid;
+    // public void updateStatus(String newStatus, String agentUid) {
+    //     // this.status = newStatus;
+    //     // this.agentUid = agentUid;
         
-        if (QueueMemberStatusEnum.SERVING.name().equals(newStatus)) {
-            this.acceptTime = LocalDateTime.now();
-        } else if (QueueMemberStatusEnum.valueOf(newStatus).isEndStatus()) {
-            this.closeTime = LocalDateTime.now();
-        }
-    }
+    //     // if (QueueMemberStatusEnum.SERVING.name().equals(newStatus)) {
+    //     //     this.acceptTime = LocalDateTime.now();
+    //     // } else if (QueueMemberStatusEnum.valueOf(newStatus).isEndStatus()) {
+    //     //     this.closeTime = LocalDateTime.now();
+    //     // }
+    // }
 
     public void acceptThread() {
-        this.status = QueueMemberStatusEnum.SERVING.name();
+        // this.status = QueueMemberStatusEnum.SERVING.name();
         this.acceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
         this.acceptTime = LocalDateTime.now();
         // 计算等待时间
