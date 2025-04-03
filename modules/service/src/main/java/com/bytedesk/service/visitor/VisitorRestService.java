@@ -31,7 +31,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.strategy.ThreadRoutingContext;
+import com.bytedesk.service.routing_strategy.ThreadRoutingContext;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
