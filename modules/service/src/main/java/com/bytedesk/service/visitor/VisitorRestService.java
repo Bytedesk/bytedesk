@@ -31,7 +31,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.strategy.CsThreadCreationContext;
+import com.bytedesk.service.strategy.ThreadRoutingContext;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -48,7 +48,7 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     private final UidUtils uidUtils;
 
-    private final CsThreadCreationContext csThreadCreationContext;
+    private final ThreadRoutingContext csThreadCreationContext;
 
     @Override
     public Page<VisitorResponse> queryByOrg(VisitorRequest request) {

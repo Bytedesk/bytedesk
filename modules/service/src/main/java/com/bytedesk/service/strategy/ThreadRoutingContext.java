@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:07:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 14:45:32
+ * @LastEditTime: 2025-04-03 13:47:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,30 +33,30 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class CsThreadCreationContext {
+public class ThreadRoutingContext {
     
     // 策略模式，将每个策略都封装起来
-    private final Map<ThreadTypeEnum, CsThreadCreationStrategy> strategyMap;
+    private final Map<ThreadTypeEnum, ThreadRoutingStrategy> strategyMap;
 
     @Autowired
-    public CsThreadCreationContext(List<CsThreadCreationStrategy> strategies) {
+    public ThreadRoutingContext(List<ThreadRoutingStrategy> strategies) {
         strategyMap = new EnumMap<>(ThreadTypeEnum.class);
-        for (CsThreadCreationStrategy strategy : strategies) {
+        for (ThreadRoutingStrategy strategy : strategies) {
             // 假设每个策略类都有一个与之对应的Bean名称，可以通过Bean名称和枚举值进行匹配。
             // 在实际应用中，可能需要其他机制来确保策略与枚举的正确匹配。
             log.info("strategy: {}", strategy.getClass());
             String beanName = strategy.getClass().getAnnotation(Component.class).value();
-            ThreadTypeEnum type = ThreadTypeEnum.valueOf(beanName.toUpperCase().replace("CSTHREADSTRATEGY", ""));
+            ThreadTypeEnum type = ThreadTypeEnum.valueOf(beanName.toUpperCase().replace("THREADSTRATEGY", ""));
             strategyMap.put(type, strategy);
         }
     }
 
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         ThreadTypeEnum type = visitorRequest.formatType();
-        CsThreadCreationStrategy strategy = strategyMap.get(type);
+        ThreadRoutingStrategy strategy = strategyMap.get(type);
         if (strategy == null) {
             throw new RuntimeException("Thread type " + type.name() + " not supported");
         }
-        return strategy.createCsThread(visitorRequest);
+        return strategy.createThread(visitorRequest);
     }
 }
