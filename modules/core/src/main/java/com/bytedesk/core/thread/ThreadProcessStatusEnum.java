@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 08:57:26
+ * @LastEditTime: 2025-04-03 14:41:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,8 @@
  */
 package com.bytedesk.core.thread;
 
-public enum ThreadStatusEnum {
+// process status
+public enum ThreadProcessStatusEnum {
     NEW, // 新会话
     ROBOTING, // 访客机器人接待中
     LLMING, // 用户LLM对话中
@@ -39,8 +40,8 @@ public enum ThreadStatusEnum {
     ;
 
     // 根据字符串查找对应的枚举常量
-    public static ThreadStatusEnum fromValue(String value) {
-        for (ThreadStatusEnum type : ThreadStatusEnum.values()) {
+    public static ThreadProcessStatusEnum fromValue(String value) {
+        for (ThreadProcessStatusEnum type : ThreadProcessStatusEnum.values()) {
             if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }

@@ -146,14 +146,14 @@ public class QueueService {
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
-            .queueUid(queue.getUid())
+            // .queueUid(queue.getUid())
             .queue(queue)
             // .threadUid(threadEntity.getUid())
             // .threadTopic(threadEntity.getTopic())
             .thread(threadEntity)
-            .visitorUid(request.getUid())
+            // .visitorUid(request.getUid())
             .visitor(visitor.toJson())
-            .agentUid(agent.getUid())
+            // .agentUid(agent.getUid())
             .agent(agent.toJson())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
@@ -164,7 +164,7 @@ public class QueueService {
             .build();
         // 
         if (workgroup != null) {
-            member.setWorkgroupUid(workgroup.getUid());
+            // member.setWorkgroupUid(workgroup.getUid());
             member.setWorkgroup(workgroup.toJson());
         }
         // 

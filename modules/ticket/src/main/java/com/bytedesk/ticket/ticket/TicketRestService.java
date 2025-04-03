@@ -42,7 +42,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadStatusEnum;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
@@ -292,7 +292,7 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.TICKET.name())
                 .unreadCount(0)
-                .status(ThreadStatusEnum.NEW.name())
+                .status(ThreadProcessStatusEnum.NEW.name())
                 .topic(topic)
                 .hide(true) // 默认隐藏
                 .user(user)
