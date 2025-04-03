@@ -34,7 +34,7 @@ public class MessageUtils {
 
     public static MessageProtobuf createNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
         // 
-        UserProtobuf sender = UserUtils.getSystemChannelUser();
+        UserProtobuf system = UserUtils.getSystemUser();
         // 
         MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
         String extra = JSON.toJSONString(messageExtra);
@@ -47,7 +47,7 @@ public class MessageUtils {
                 .createdAt(LocalDateTime.now())
                 .client(ClientEnum.SYSTEM)
                 .thread(threadProtobuf)
-                .user(sender)
+                .user(system)
                 .extra(extra)
                 .build();
         return message;
@@ -55,7 +55,7 @@ public class MessageUtils {
     
     public static MessageProtobuf createThreadMessage(String messageUid, ThreadEntity thread, MessageTypeEnum type, String content) {
         //
-        UserProtobuf sender = UserUtils.getSystemChannelUser();
+        UserProtobuf sender = UserUtils.getSystemUser();
         // 
         ThreadProtobuf threadProtobuf = thread.toProtobuf();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
