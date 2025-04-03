@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:14:24
+ * @LastEditTime: 2025-04-03 10:07:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,6 +57,9 @@ public class QueueMemberEventListener {
         }
     }
 
+
+
+    
     // @EventListener
     // public void onQueueMemberCreateEvent(QueueMemberCreateEvent event) {
     //     log.info("queue member create event ");
