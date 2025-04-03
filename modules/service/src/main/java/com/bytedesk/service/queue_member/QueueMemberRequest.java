@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:36:30
+ * @LastEditTime: 2025-04-03 16:51:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-// import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,9 +56,6 @@ public class QueueMemberRequest extends BaseRequest {
 
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
-
-    // @Builder.Default
-    // private String status = QueueMemberStatusEnum.WAITING.name();  // 成员状态
 
     @Builder.Default
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
@@ -136,28 +133,19 @@ public class QueueMemberRequest extends BaseRequest {
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 处理状态（待处理、已处理、已关闭等）
-    // @Builder.Default
-    // private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    @Builder.Default
+    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     private String client;  // 客户来源渠道
-
-    // 便于统计
-    private String visitorUid;  // 访客UID
 
     // 排队用户信息
     @Builder.Default
     private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
-
-    // 便于统计
-    private String agentUid;  // 客服UID
-
+    
     // 接待客服信息
     @Builder.Default
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 便于统计
-    private String workgroupUid;  // 工作组UID
-    
     // 接待工作组信息
     @Builder.Default
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
