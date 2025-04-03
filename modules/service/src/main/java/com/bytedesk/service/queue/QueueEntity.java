@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 16:55:51
+ * @LastEditTime: 2025-04-03 17:40:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,7 @@ public class QueueEntity extends BaseEntity {
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
     @Builder.Default
-    private int currentNumber = 0;  // 今日接待人数，当前排队号码
+    private int currentNumber = 0;  // 今日请求服务人数，当前排队号码
 
     @Builder.Default
     private int waitingNumber = 0;  // 等待人数
