@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 11:45:25
+ * @LastEditTime: 2025-04-03 12:00:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -212,7 +212,7 @@ public class AgentCsThreadCreationStrategy implements CsThreadCreationStrategy {
         thread.setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
         thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         threadService.save(thread);
-
+        // 
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
         Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
         if (messageOptional.isPresent()) {
