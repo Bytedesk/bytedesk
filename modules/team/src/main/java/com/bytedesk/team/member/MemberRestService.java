@@ -355,7 +355,7 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
         // 创建反向线程对象
         ThreadEntity reverseThread = ThreadEntity.builder().build();
         reverseThread.setUid(reverseUid);
-        reverseThread.setStatus(ThreadProcessStatusEnum.STARTED.name());
+        reverseThread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         reverseThread.setTopic(reverseTopic);
         reverseThread.setUnreadCount(0);
 

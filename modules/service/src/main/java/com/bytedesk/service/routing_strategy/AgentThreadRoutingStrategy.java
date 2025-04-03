@@ -96,7 +96,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             //
             if (threadOptional.get().isNew()) {
                 thread = threadOptional.get();
-            } else if ( threadOptional.get().isStarted()) {
+            } else if ( threadOptional.get().isChatting()) {
                 thread = threadOptional.get();
                 // 重新初始化会话额外信息，例如客服状态等
                 thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);

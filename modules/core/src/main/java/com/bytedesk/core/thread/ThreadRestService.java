@@ -122,7 +122,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         ThreadEntity thread = modelMapper.map(request, ThreadEntity.class);
         thread.setUid(uidUtils.getUid());
-        thread.setStatus(ThreadProcessStatusEnum.STARTED.name());
+        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         //
         String user = JSON.toJSONString(request.getUser());
         log.info("request {}, user {}", request.toString(), user);
@@ -489,7 +489,7 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
         ThreadEntity thread = threadOptional.get();
-        thread.setStatus(ThreadProcessStatusEnum.STARTED.name());
+        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         thread.setAgent(threadRequest.getAgent());
         //
         ThreadEntity updateThread = save(thread);
