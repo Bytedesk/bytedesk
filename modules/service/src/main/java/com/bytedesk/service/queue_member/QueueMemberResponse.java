@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 11:36:03
+ * @LastEditTime: 2025-04-03 11:39:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,6 +118,8 @@ public class QueueMemberResponse extends BaseResponse {
     // 是否已解决
     @Builder.Default
     private Boolean resolved = false;
+
+    
 
     // 重构到相应的表里面
     // 意图类型
