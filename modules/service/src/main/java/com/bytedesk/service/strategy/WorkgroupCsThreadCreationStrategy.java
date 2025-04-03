@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:20:37
+ * @LastEditTime: 2025-04-03 12:24:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -155,7 +155,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
         }
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
-        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         //
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
@@ -313,7 +313,7 @@ public class WorkgroupCsThreadCreationStrategy implements CsThreadCreationStrate
             ThreadEntity thread = threadOptional.get();
             // 排队计数
             QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
-            log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getQueueNickname());
+            log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
             // 更新线程状态
             thread.setUserUid(robot.getUid());

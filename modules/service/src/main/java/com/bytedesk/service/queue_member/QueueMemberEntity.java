@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 11:43:13
+ * @LastEditTime: 2025-04-03 12:30:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,12 +20,15 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
+import com.bytedesk.service.queue.QueueEntity;
 // import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,16 +54,16 @@ public class QueueMemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(nullable = false)
-    private String queueUid;  // 关联队列
+    // @Column(nullable = false)
+    // private String queueUid;  // 关联队列
 
-    private String queueNickname;  // 队列名称
+    // private String queueNickname;  // 队列名称
 
-    @Column(nullable = false)
-    private String queueTopic;  // 队列主题，用于查询
+    // @Column(nullable = false)
+    // private String queueTopic;  // 队列主题，用于查询
 
-    @Column(nullable = false)
-    private String queueDay;  // 队列日期，用于查询
+    // @Column(nullable = false)
+    // private String queueDay;  // 队列日期，用于查询
 
     @Column(nullable = false)
     private String threadUid;  // 关联会话
@@ -189,6 +192,13 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
+    // 便于统计
+    private String queueUid;  // 关联队列UID
+
+    // 多个queueMember对应一个queue
+    @ManyToOne(fetch = FetchType.LAZY)
+    private QueueEntity queue;
+    
     /**
      * 计算等待时间(秒)
      */
