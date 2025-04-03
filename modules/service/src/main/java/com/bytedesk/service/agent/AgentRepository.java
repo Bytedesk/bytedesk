@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 13:33:37
+ * @LastEditTime: 2025-04-03 17:27:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,5 +112,5 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
     // @Query("UPDATE AgentEntity a SET a.workload = a.workload - 1 WHERE a.uid = :agentUid")
     // void decrementWorkload(@Param("agentUid") String agentUid);
     
-    boolean existsByUid(String uid);
+    Boolean existsByUid(String uid);
 }

@@ -93,11 +93,15 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         return kbaseRepository.findByUid(uid);
     }
 
+    public Boolean existsByUid(@NonNull String uid) {
+        return kbaseRepository.existsByUid(uid);
+    }
+
     @Override
     public KbaseResponse create(KbaseRequest request) {
         // 判断uid是否已经存在
-        if (StringUtils.hasText(request.getUid()) && findByUid(request.getUid()).isPresent()) {
-            return null;
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
         }
         // 
         KbaseEntity entity = KbaseEntity.builder().build();
