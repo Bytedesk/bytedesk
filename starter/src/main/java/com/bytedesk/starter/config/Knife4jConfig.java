@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 12:33:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 13:17:11
+ * @LastEditTime: 2025-04-03 15:18:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Primary;
 
 /**
  * http://127.0.0.1:9003/doc.html#/home
+ * http://127.0.0.1:9003/swagger-ui/index.html
  * 
  * https://doc.xiaominfo.com/docs/quick-start
  * https://github.com/xiaoymin/knife4j?tab=readme-ov-file
@@ -63,23 +64,21 @@ public class Knife4jConfig {
     
     @Bean
 	@Primary
-    public OpenAPI customOpenApi() {
+    public OpenAPI customOpenAPI() {
         return new OpenAPI()
         .components(new Components()
-                    .addSecuritySchemes("openApiSecurityScheme", new SecurityScheme()
+                    .addSecuritySchemes("bearerAuth", new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
                                         .bearerFormat("JWT")
                                         .in(SecurityScheme.In.HEADER)
                                         .name("Authorization")
-                                        .scheme("Bearer")))
-        // set title and version
+                                        .scheme("bearer")))
         .info(new Info()
               .title("Bytedesk API")
               .version(version)
               .description("Team IM && AI Customer Service")
               .license(new License()
-                       .name("Apache 2.0")
-                       .url("https://www.apache.org/licenses/LICENSE-2.0.html")));
+                       .name("BSL 1.1")
+                       .url("https://github.com/Bytedesk/bytedesk/blob/main/LICENSE")));
     }
-
 }
