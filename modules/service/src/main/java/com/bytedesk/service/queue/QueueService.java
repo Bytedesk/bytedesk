@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -54,14 +53,9 @@ public class QueueService {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf agentProtobuf = UserProtobuf.builder()
-            .uid(robotEntity.getUid())
-            .nickname(robotEntity.getNickname())
-            .avatar(robotEntity.getAvatar())
-            .type(UserTypeEnum.ROBOT.name())
-            .build();
+        UserProtobuf agent = robotEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -76,14 +70,9 @@ public class QueueService {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf agentProtobuf = UserProtobuf.builder()
-            .uid(agentEntity.getUid())
-            .nickname(agentEntity.getNickname())
-            .avatar(agentEntity.getAvatar())
-            .type(UserTypeEnum.AGENT.name())
-            .build();
+        UserProtobuf agent = agentEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -98,14 +87,10 @@ public class QueueService {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf agentProtobuf = UserProtobuf.builder()
-            .uid(agentEntity.getUid())
-            .nickname(agentEntity.getNickname())
-            .avatar(agentEntity.getAvatar())
-            .type(UserTypeEnum.WORKGROUP.name())
-            .build();
+        UserProtobuf agent = agentEntity.toUserProtobuf();
+        UserProtobuf workgroup = workgroupEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agentProtobuf, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, workgroup, visitorRequest, queue);
         // 3. 更新队列统计
         updateQueueStats(queue);
         // 4. 返回队列成员
@@ -145,7 +130,7 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest request, QueueEntity queue) {
+    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, UserProtobuf workgroup, VisitorRequest request, QueueEntity queue) {
         // 
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByQueueTopicAndQueueDayAndThreadUidAndStatus(
             queue.getTopic(), queue.getDay(), threadEntity.getUid(), QueueMemberStatusEnum.WAITING.name());
@@ -168,6 +153,8 @@ public class QueueService {
             .threadTopic(threadEntity.getTopic())
             .visitorUid(request.getUid())
             .visitor(visitor.toJson())
+            .agentUid(agent.getUid())
+            .agent(agent.toJson())
             .queueNumber(queue.getNextNumber())
             .beforeNumber(queue.getWaitingNumber())
             .enqueueTime(LocalDateTime.now())
@@ -176,14 +163,11 @@ public class QueueService {
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
-        if (agent.getType().equals(UserTypeEnum.AGENT.name())) {
-            member.setAgentUid(agent.getUid());
-            member.setAgent(agent.toJson());
-        } else if (agent.getType().equals(UserTypeEnum.WORKGROUP.name())) {
-            member.setWorkgroupUid(agent.getUid());
-            member.setWorkgroup(agent.toJson());
+        if (workgroup != null) {
+            member.setWorkgroupUid(workgroup.getUid());
+            member.setWorkgroup(workgroup.toJson());
         }
-
+        // 
         return queueMemberRestService.save(member);
     }
 

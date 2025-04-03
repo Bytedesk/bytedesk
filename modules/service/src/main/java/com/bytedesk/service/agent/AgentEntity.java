@@ -18,6 +18,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
@@ -176,6 +178,15 @@ public class AgentEntity extends BaseEntity {
 
     public void resetThreadCount() {
         this.currentThreadCount = 0;
+    }
+
+    public UserProtobuf toUserProtobuf() {
+        return UserProtobuf.builder()
+            .uid(this.getUid())
+            .nickname(this.getNickname())
+            .avatar(this.getAvatar())
+            .type(UserTypeEnum.AGENT.name())
+            .build();
     }
 
     /**
