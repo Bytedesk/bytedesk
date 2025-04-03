@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:30:27
+ * @LastEditTime: 2025-04-03 12:53:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -53,17 +54,6 @@ import lombok.experimental.SuperBuilder;
 public class QueueMemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    // @Column(nullable = false)
-    // private String queueUid;  // 关联队列
-
-    // private String queueNickname;  // 队列名称
-
-    // @Column(nullable = false)
-    // private String queueTopic;  // 队列主题，用于查询
-
-    // @Column(nullable = false)
-    // private String queueDay;  // 队列日期，用于查询
 
     @Column(nullable = false)
     private String threadUid;  // 关联会话
@@ -193,6 +183,7 @@ public class QueueMemberEntity extends BaseEntity {
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 便于统计
+    @NotBlank(message = "queue uid is required")
     private String queueUid;  // 关联队列UID
 
     // 多个queueMember对应一个queue
