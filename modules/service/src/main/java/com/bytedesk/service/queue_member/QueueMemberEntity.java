@@ -135,16 +135,17 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_summarized")
     private boolean summarized = false;
 
+    // 是否已解决
+    @Builder.Default
+    @Column(name = "is_resolved")
+    private boolean resolved = false;
+
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检
     @Builder.Default
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
-
     
-
-    
-
     // 重构到相应的表里面
     // 意图类型
     @Builder.Default

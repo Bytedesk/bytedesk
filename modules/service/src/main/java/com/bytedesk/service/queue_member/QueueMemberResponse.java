@@ -105,22 +105,22 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Boolean rated = false;
 
+    @Builder.Default
+    private Integer rateLevel = 0;  // 评分等级
+
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
     @Builder.Default
     private Boolean summarized = false;
 
-    // 直接在质检表里面根据threadUid查询是否已经质检
-    // 是否已经质检
-    @Builder.Default
-    private Boolean qualityChecked = false;
-
     // 是否已解决
     @Builder.Default
     private Boolean resolved = false;
 
+    // 直接在质检表里面根据threadUid查询是否已经质检
+    // 是否已经质检
     @Builder.Default
-    private Integer rateLevel = 0;  // 评分等级
+    private Boolean qualityChecked = false;
     
     // 重构到相应的表里面
     // 意图类型
