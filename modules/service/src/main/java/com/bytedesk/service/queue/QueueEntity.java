@@ -78,7 +78,7 @@ public class QueueEntity extends BaseEntity {
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
     @Builder.Default
-    private int currentNumber = 0;  // 当前排队号码
+    private int currentNumber = 0;  // 今日接待人数，当前排队号码
 
     @Builder.Default
     private int waitingNumber = 0;  // 等待人数
