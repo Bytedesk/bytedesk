@@ -252,13 +252,19 @@
 
         <!-- http://127.0.0.1:9003/swagger-ui/index.html -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+        <!-- 添加provided会报错 -->
+        <!-- <scope>provided</scope> -->
         <dependency>
              <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.6</version>
-            <!-- 添加provided会报错 -->
-            <!-- <scope>provided</scope> -->
+            <version>${springdoc.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webflux-api -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-api</artifactId>
+			<version>${springdoc.version}</version>
+		</dependency>
 
         <!-- FIXME: not working? https://docs.spring.io/spring-data/rest/reference/tools.html -->
         <!-- <dependency>

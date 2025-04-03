@@ -35,8 +35,6 @@ public class QueueService {
 
     private final QueueRepository queueRepository;
     
-    // private final QueueMemberRepository queueMemberRepository;
-
     private final QueueMemberRestService queueMemberRestService;
 
     private final AgentService agentService;
