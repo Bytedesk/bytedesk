@@ -48,12 +48,12 @@
         "webUrl": "https://hunyuan.tencent.com/",
         "status": "PRODUCTION"
     },
-    "yiyan": {
-        "nickname": "文心一言",
+    "baidu": {
+        "nickname": "百度千帆",
         "logo": "yiyan.png",
         "apiUrl": "https://yiyan.baidu.com/",
         "webUrl": "https://yiyan.baidu.com/",
-        "status": "DEVELOPMENT"
+        "status": "PRODUCTION"
     },
     "xinghuo": {
         "nickname": "讯飞星火",

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 11:11:59
+ * @LastEditTime: 2025-04-04 12:28:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,15 +57,12 @@ public class ThreadProcessEventListener {
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
         variables.put(TicketConsts.TICKET_VARIABLE_THREAD_UID, thread.getUid());
-        // variables.put(TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID, thread.getDepartmentUid());
         // variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, thread.getReporter().getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, thread.getOrgUid());
         //
         // variables.put(TicketConsts.TICKET_VARIABLE_DESCRIPTION, thread.getDescription());
         // variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, thread.getReporter().getUid());
         // variables.put(TicketConsts.TICKET_VARIABLE_STATUS, thread.getStatus());
-        // variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, thread.getPriority());
-        // variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, thread.getCategoryUid());
         
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()

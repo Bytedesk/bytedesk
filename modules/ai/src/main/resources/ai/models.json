@@ -100,22 +100,10 @@
             "nickname": "Hunyuan T1"
         }
     ],
-    "yiyan": [
+    "baidu": [
         {
-            "name": "ernie-4",
-            "nickname": "ERNIE 4"
-        },
-        {
-            "name": "ernie-4-32k",
-            "nickname": "ERNIE 4 32K"
-        },
-        {
-            "name": "ernie-4-16k",
-            "nickname": "ERNIE 4 16K"
-        },
-        {
-            "name": "ernie-4-8k",
-            "nickname": "ERNIE 4 8K"
+            "name": "ernie-x1-32k-preview",
+            "nickname": "ERNIE X1"
         }
     ],
     "openai": [
