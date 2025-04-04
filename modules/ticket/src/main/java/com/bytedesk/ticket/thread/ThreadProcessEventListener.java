@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 10:32:51
+ * @LastEditTime: 2025-04-04 10:40:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,11 +38,6 @@ public class ThreadProcessEventListener {
         ThreadEntity thread = event.getThread();
         if (thread == null) {
             // log.error("工单线程创建事件, 线程对象为空: {}", event);
-            return;
-        }
-        // 仅支持workgroup类型的会话
-        if (!thread.isWorkgroupType()) {
-            // log.error("工单线程创建事件, 仅支持workgroup类型的会话: {}", event);
             return;
         }
         log.info("开始创建工单流程实例: threadUid={}, orgUid={}", thread.getUid(), thread.getOrgUid());
@@ -112,6 +107,4 @@ public class ThreadProcessEventListener {
         // }
     }
 
-
-    
 }
