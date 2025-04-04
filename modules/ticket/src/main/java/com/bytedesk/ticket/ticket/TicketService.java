@@ -244,7 +244,7 @@ public class TicketService {
 
         // 5. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -314,7 +314,7 @@ public class TicketService {
 
         // 2. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .taskAssignee(assigneeUid)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
@@ -379,7 +379,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -431,7 +431,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -483,7 +483,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -535,7 +535,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -588,7 +588,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -640,7 +640,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -698,7 +698,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -766,7 +766,7 @@ public class TicketService {
 
         // 4. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -840,7 +840,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();
@@ -893,7 +893,7 @@ public class TicketService {
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_TICKET_UID, request.getUid())
                 .processVariableValueEquals(TicketConsts.TICKET_VARIABLE_ORGUID, request.getOrgUid())
                 .singleResult();

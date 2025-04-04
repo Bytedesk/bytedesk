@@ -51,7 +51,7 @@ public class TicketFlowService {
         
         // 启动流程实例
         runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP,
+            TicketConsts.TICKET_PROCESS_KEY,
             ticket.getId().toString(),
             variables
         );
@@ -100,7 +100,7 @@ public class TicketFlowService {
      */
     public List<Task> queryUserTasks(String assignee) {
         return taskService.createTaskQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
             .taskAssignee(assignee)
             .orderByTaskCreateTime()
             .desc()
@@ -123,7 +123,7 @@ public class TicketFlowService {
      */
     public ProcessDefinition getLatestProcessDefinition() {
         return repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
             .latestVersion()
             .singleResult();
     }
@@ -133,7 +133,7 @@ public class TicketFlowService {
      */
     public List<HistoricProcessInstance> queryTicketHistory(String ticketId) {
         return historyService.createHistoricProcessInstanceQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
             .processInstanceBusinessKey(ticketId)
             .orderByProcessInstanceStartTime()
             .desc()
@@ -209,7 +209,7 @@ public class TicketFlowService {
      */
     public List<Task> queryGroupTasks(String groupId) {
         return taskService.createTaskQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
             .taskCandidateGroup(groupId)
             .active()
             .list();
@@ -229,7 +229,7 @@ public class TicketFlowService {
      */
     public List<Task> queryOverdueTasks() {
         return taskService.createTaskQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
             .taskDueBefore(new Date())
             .active()
             .list();
@@ -240,7 +240,7 @@ public class TicketFlowService {
      */
     public List<Task> querySupervisorTasks() {
         return taskService.createTaskQuery()
-            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY_GROUP)
+            .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
             .taskCandidateGroup("supervisors")
             .active()
             .list();

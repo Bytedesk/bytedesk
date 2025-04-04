@@ -79,7 +79,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
         log.info("Started process instance id {}", processInstance.getId());
 
@@ -209,7 +209,7 @@ public class GroupTicketProcessTests {
             variables.put("slaTime", "PT4H");
             
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-                TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+                TicketConsts.TICKET_PROCESS_KEY, variables);
             
             // 完成创建任务
             Task createTask = taskService.createTaskQuery()
@@ -240,7 +240,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT1S"); // 1秒SLA
         
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         
         // 完成创建任务
         Task createTask = taskService.createTaskQuery()
@@ -284,7 +284,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT4H");
         
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         
         // 获取创建工单任务
         Task createTask = taskService.createTaskQuery()
@@ -537,7 +537,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT4H");
         
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         
         // 完成创建任务
         Task createTask = taskService.createTaskQuery()
@@ -564,7 +564,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例 - 会触发 start 事件
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -614,7 +614,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务 - 会触发 create 和 complete 事件
@@ -654,7 +654,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -711,7 +711,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -758,7 +758,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -844,7 +844,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 获取创建工单任务
@@ -925,7 +925,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -973,7 +973,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -1022,7 +1022,7 @@ public class GroupTicketProcessTests {
 
         // 启动流程实例
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, variables);
+            TicketConsts.TICKET_PROCESS_KEY, variables);
         assertNotNull(processInstance);
 
         // 完成创建工单任务
@@ -1072,7 +1072,7 @@ public class GroupTicketProcessTests {
         variables.put("slaTime", "PT4H");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-            TicketConsts.TICKET_PROCESS_KEY_GROUP, 
+            TicketConsts.TICKET_PROCESS_KEY, 
             variables
         );
         assertNotNull(processInstance);
