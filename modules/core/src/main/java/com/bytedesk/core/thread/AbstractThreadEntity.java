@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:49:08
+ * @LastEditTime: 2025-04-04 14:04:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -153,7 +153,6 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     /**
      * 一对一客服对话中，存储客服信息
-     * 技能组客服对话中，存储技能组信息
      * 机器人对话中，存储机器人信息
      * 用户私聊、群聊、同事会话中，无需存储，使用owner字段信息
      * @{UserProtobuf}
@@ -161,6 +160,12 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 技能组客服对话中，存储技能组信息
+    // workgroup
+    @Builder.Default
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 邀请多个客服参与会话，存放多个 UserProtobuf 实体转换成的 JSON
     // 每个字符串元素都是一个 UserProtobuf 实体序列化成的 JSON

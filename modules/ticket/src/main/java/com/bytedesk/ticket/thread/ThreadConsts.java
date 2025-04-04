@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 13:30:46
+ * @LastEditTime: 2025-04-04 14:09:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.consts;
+package com.bytedesk.ticket.thread;
 
 import com.bytedesk.core.constant.I18Consts;
 
@@ -43,5 +43,25 @@ public class ThreadConsts {
 
     public static final String THREAD_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
 
+    // 从流程中提取的变量名
+    public static final String THREAD_VARIABLE_ROBOT_ENABLED = "robotEnabled"; // 是否启用机器人
     
+    public static final String THREAD_VARIABLE_NEED_HUMAN_SERVICE = "needHumanService"; // 是否需要人工服务
+    
+    public static final String THREAD_VARIABLE_AGENTS_ONLINE = "agentsOnline"; // 坐席是否在线
+    
+    public static final String THREAD_VARIABLE_AGENTS_BUSY = "agentsBusy"; // 坐席是否繁忙
+    
+    public static final String THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT = "robotIdleTimeout"; // 机器人接待访客超时时间
+    
+    public static final String THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT = "humanIdleTimeout"; // 人工接待访客超时时间
+
+    // 从流程中提取的状态值
+    public static final String THREAD_STATUS_INVITE = "INVITE"; // 邀请协助状态
+    
+    public static final String THREAD_STATUS_RESOLVED = "RESOLVED"; // 已解决状态
+    
+    public static final String THREAD_STATUS_TRANSFER = "TRANSFER"; // 转接状态
+    
+    public static final String THREAD_STATUS_FINISHED = "FINISHED"; // 结束状态
 }

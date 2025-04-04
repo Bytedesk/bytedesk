@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 13:45:46
+ * @LastEditTime: 2025-04-04 14:03:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
-import com.bytedesk.ticket.consts.ThreadConsts;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,15 +62,40 @@ public class ThreadProcessEventListener {
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
         }
-        // 
+        
+        // 根据不同的会话类型设置相应的流程变量
         if (thread.isAgentType()) {
-            // 一对一
+            // 一对一客服接待，直接指定assignee为特定客服
+            if (thread.getAgentProtobuf() != null) {
+                variables.put(ThreadConsts.THREAD_VARIABLE_ASSIGNEE, thread.getAgentProtobuf().getUid());
+                log.info("一对一客服接待，设置assignee为: {}", thread.getAgentProtobuf().getUid());
+            } else {
+                log.error("一对一客服接待，但客服信息为空");
+            }
+            // 设置为非机器人接待
+            variables.put("robotEnabled", false);
         } else if (thread.isWorkgroupType()) {
-            // 技能组
+            // 技能组接待，设置candidateGroups为技能组ID
+            if (thread.getWorkgroupProtobuf() != null) {
+                variables.put(ThreadConsts.THREAD_VARIABLE_WORKGROUP_UID, thread.getWorkgroupProtobuf().getUid());
+                log.info("技能组接待，设置candidateGroups为: {}", thread.getWorkgroupProtobuf().getUid());
+            } else {
+                log.error("技能组接待，但技能组信息为空");
+            }
+            // 设置为非机器人接待
+            variables.put("robotEnabled", false);
         } else if (thread.isRobotType()) {
-            // 机器人
+            // 机器人接待
+            variables.put("robotEnabled", true);
+            if (thread.getAgentProtobuf() != null) {
+                variables.put(ThreadConsts.THREAD_VARIABLE_AGENT_UID, thread.getAgentProtobuf().getUid());
+                log.info("机器人接待，设置robotUid为: {}", thread.getAgentProtobuf().getUid());
+            }
+            // 设置机器人超时时间（默认5分钟）
+            variables.put("robotIdleTimeout", "PT5M");
         } else {
             // 暂时仅处理上述客服会话类型
+            log.warn("未知的会话类型，不处理");
             return;
         }
         
@@ -106,13 +130,11 @@ public class ThreadProcessEventListener {
         // 5. 设置 SLA 时间
         String slaTime = "PT30M"; // 默认30分钟，后期支持自定义
         runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
-        // assignee设置为agentUid，是任务的执行人
-        if (thread.getAgentProtobuf() != null) {
-            runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_ASSIGNEE,
-                    thread.getAgentProtobuf().getUid());
-        }
         
-        // 6. 更新会话的流程实例ID
+        // 6. 设置人工客服空闲超时时间（默认15分钟）
+        runtimeService.setVariable(processInstance.getId(), "humanIdleTimeout", "PT15M");
+        
+        // 7. 更新会话的流程实例ID
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
         if (threadOptional.isPresent()) {
             ThreadEntity threadEntity = threadOptional.get();

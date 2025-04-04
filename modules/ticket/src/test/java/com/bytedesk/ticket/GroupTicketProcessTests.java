@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.ticket.TicketConsts;
 import com.bytedesk.ticket.ticket.TicketPriorityEnum;
 import com.bytedesk.ticket.ticket.TicketStatusEnum;
 

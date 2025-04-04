@@ -37,8 +37,8 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.ticket.consts.ThreadConsts;
-import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.thread.ThreadConsts;
+import com.bytedesk.ticket.ticket.TicketConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
