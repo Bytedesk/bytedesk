@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:41:40
+ * @LastEditTime: 2025-04-04 14:45:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.routing_strategy;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -26,6 +27,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -69,6 +71,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
     private final QueueMemberRestService queueMemberRestService;
 
     private final MessageRestService messageRestService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -209,32 +213,38 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 
         ThreadEntity thread = threadOptional.get();
         // 客服离线或小休不接待状态，则进入留言
-        thread.setOffline();
-        thread.setUnreadCount(0);
-        thread.setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
-        threadService.save(thread);
+        thread.setOffline()
+            .setUnreadCount(0)
+            .setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            log.error("Failed to save thread {}", thread.getUid());
+            throw new RuntimeException("Failed to save thread " + thread.getUid());
+        }
         // 
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
-        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         if (messageOptional.isPresent()) {
             MessageEntity message = messageOptional.get();
             if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
                 // 距离当前时间不超过30分钟，则直接使用之前的消息
                 // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
-                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
                 return messageProtobuf;
             }
         }
         // 
         // 创建新的留言消息
-        MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(agent, thread);
+        MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(agent, savedThread);
         // 保存留言消息
         messageRestService.save(message);
         // 返回留言消息
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
-        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        // 
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         // 
         return messageProtobuf;
     }
