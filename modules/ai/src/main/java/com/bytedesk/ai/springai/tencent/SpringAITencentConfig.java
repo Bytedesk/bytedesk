@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 11:21:36
+ * @LastEditTime: 2025-04-04 11:21:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.deepseek;
+package com.bytedesk.ai.springai.tencent;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -22,51 +22,55 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
+/**
+ * 腾讯混元大模型配置
+ * https://console.cloud.tencent.com/hunyuan/start#
+ * https://cloud.tencent.com/document/product/1729/111007
+ */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIDeepseekConfig {
+@ConditionalOnProperty(name = "spring.ai.tencent.chat.enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAITencentConfig {
 
-    @Value("${spring.ai.deepseek.base-url:https://api.deepseek.com}")
+    @Value("${spring.ai.tencent.base-url:https://api.hunyuan.cloud.tencent.com}")
     private String baseUrl;
 
-    @Value("${spring.ai.deepseek.api-key:sk-xxx}")
+    @Value("${spring.ai.tencent.api-key:sk-xxx}")
     private String apiKey;
 
-    @Value("${spring.ai.deepseek.chat.options.model:deepseek-chat}")
+    @Value("${spring.ai.tencent.chat.options.model:hunyuan-t1-latest}")
     private String model;
 
-    @Value("${spring.ai.deepseek.chat.options.temperature:0.7}")
+    @Value("${spring.ai.tencent.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("deepseekApi")
-    OpenAiApi deepseekApi() {
+    @Bean("tencentApi")
+    OpenAiApi tencentApi() {
         return OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
     }
 
-    @Bean("deepseekChatOptions")
-    OpenAiChatOptions deepseekChatOptions() {
+    @Bean("tencentChatOptions")
+    OpenAiChatOptions tencentChatOptions() {
         return OpenAiChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
-    @Bean("deepseekChatModel")
-    OpenAiChatModel deepseekChatModel() {
+    @Bean("tencentChatModel")
+    OpenAiChatModel tencentChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(deepseekApi())
-                .defaultOptions(deepseekChatOptions())
+                .openAiApi(tencentApi())
+                .defaultOptions(tencentChatOptions())
                 .build();
     }
 
-    @Bean("deepseekChatClient")
-    ChatClient deepseekChatClient() {
-        return  ChatClient.builder(deepseekChatModel())
-                .defaultOptions(deepseekChatOptions())
+    @Bean("tencentChatClient")
+    ChatClient tencentChatClient() {
+        return  ChatClient.builder(tencentChatModel())
+                .defaultOptions(tencentChatOptions())
                 .build();
     }
 

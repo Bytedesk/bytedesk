@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 15:26:11
+ * @LastEditTime: 2025-04-04 11:29:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -545,14 +545,20 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         //
         RobotRequest robotRequest = RobotRequest.builder()
+                .uid(uid)
+                .name(I18Consts.I18N_ROBOT_NAME)
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
+                .type(RobotTypeEnum.SERVICE.name())
+                .orgUid(orgUid)
+                .isKbEnabled(true)
+                .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID))
                 .build();
-        robotRequest.setUid(uid);
-        robotRequest.setType(RobotTypeEnum.SERVICE.name());
-        robotRequest.setOrgUid(orgUid);
+        // robotRequest.setUid(uid);
+        // robotRequest.setType(RobotTypeEnum.SERVICE.name());
+        // robotRequest.setOrgUid(orgUid);
         //
-        robotRequest.setIsKbEnabled(true);
-        robotRequest.setKbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
+        // robotRequest.setIsKbEnabled(true);
+        // robotRequest.setKbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
         robotRequest.getServiceSettings().setShowFaqs(true);
         robotRequest.getServiceSettings().setShowQuickFaqs(true);
         robotRequest.getServiceSettings().setShowGuessFaqs(true);

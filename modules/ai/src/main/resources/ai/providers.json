@@ -41,18 +41,18 @@
         "webUrl": "https://ai.gitee.com/",
         "status": "PRODUCTION"
     },
+    "tencent": {
+        "nickname": "腾讯混元",
+        "logo": "hunyuan.png",
+        "apiUrl": "https://hunyuan.tencent.com/",
+        "webUrl": "https://hunyuan.tencent.com/",
+        "status": "PRODUCTION"
+    },
     "yiyan": {
         "nickname": "文心一言",
         "logo": "yiyan.png",
         "apiUrl": "https://yiyan.baidu.com/",
         "webUrl": "https://yiyan.baidu.com/",
-        "status": "DEVELOPMENT"
-    },
-    "hunyuan": {
-        "nickname": "腾讯混元",
-        "logo": "hunyuan.png",
-        "apiUrl": "https://hunyuan.tencent.com/",
-        "webUrl": "https://hunyuan.tencent.com/",
         "status": "DEVELOPMENT"
     },
     "xinghuo": {

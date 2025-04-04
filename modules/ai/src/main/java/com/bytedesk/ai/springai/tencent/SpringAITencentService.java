@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:30:55
+ * @LastEditTime: 2025-04-04 11:33:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.deepseek;
+package com.bytedesk.ai.springai.tencent;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,13 +40,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "spring.ai.deepseek.chat.enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIDeepseekService extends BaseSpringAIService {
+@ConditionalOnProperty(name = "spring.ai.tencent.chat.enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAITencentService extends BaseSpringAIService {
 
-    private final Optional<OpenAiChatModel> deepseekChatModel;
+    private final Optional<OpenAiChatModel> tencentChatModel;
 
-    public SpringAIDeepseekService(
-            Optional<OpenAiChatModel> deepseekChatModel,
+    public SpringAITencentService(
+            Optional<OpenAiChatModel> tencentChatModel,
             Optional<SpringAIVectorService> springAIVectorService,
             IMessageSendService messageSendService,
             UidUtils uidUtils,
@@ -55,16 +55,16 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             MessagePersistCache messagePersistCache) {
         super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
                 messagePersistCache);
-        this.deepseekChatModel = deepseekChatModel;
+        this.tencentChatModel = tencentChatModel;
 
     }
 
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        deepseekChatModel.ifPresent(model -> model.stream(prompt).subscribe(
+        tencentChatModel.ifPresent(model -> model.stream(prompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        log.info("Tencent API response metadata: {}", response.getMetadata());
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
@@ -77,7 +77,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                     }
                 },
                 error -> {
-                    log.error("DeepSeek API error: ", error);
+                    log.error("Tencent API error: ", error);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
@@ -93,23 +93,23 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return deepseekChatModel.map(model -> model.call(prompt)).orElse("");
+        return tencentChatModel.map(model -> model.call(prompt)).orElse("");
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return deepseekChatModel.map(model -> model.call(message))
-                    .orElse("DeepSeek service is not available");
+            return tencentChatModel.map(model -> model.call(message))
+                    .orElse("Tencent service is not available");
         } catch (Exception e) {
-            log.error("DeepSeek API sync error: ", e);
+            log.error("Tencent API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
         }
     }
 
     @Override
     protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter) {
-        deepseekChatModel.ifPresentOrElse(
+        tencentChatModel.ifPresentOrElse(
                 model -> {
                     model.stream(prompt).subscribe(
                             response -> {
@@ -119,7 +119,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                                         for (Generation generation : generations) {
                                             AssistantMessage assistantMessage = generation.getOutput();
                                             String textContent = assistantMessage.getText();
-                                            log.info("DeepSeek API response metadata: {}, text {}",
+                                            log.info("Tencent API response metadata: {}, text {}",
                                                     response.getMetadata(), textContent);
                                             //
                                             if (StringUtils.hasValue(textContent)) {
@@ -156,7 +156,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                                 }
                             },
                             error -> {
-                                log.error("DeepSeek API SSE error: ", error);
+                                log.error("Tencent API SSE error: ", error);
                                 //
                                 try {
                                     messageProtobuf.setType(MessageTypeEnum.ERROR);
@@ -175,7 +175,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                                 }
                             },
                             () -> {
-                                log.info("DeepSeek API SSE complete");
+                                log.info("Tencent API SSE complete");
                                 try {
                                     // 发送流结束标记
                                     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
@@ -213,8 +213,8 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                 });
     }
 
-    public Optional<OpenAiChatModel> getDeepSeekChatModel() {
-        return deepseekChatModel;
+    public Optional<OpenAiChatModel> getTencentChatModel() {
+        return tencentChatModel;
     }
 
 }

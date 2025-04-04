@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 14:51:12
+ * @LastEditTime: 2025-04-04 11:31:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ import com.bytedesk.ai.springai.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
 import com.bytedesk.ai.springai.siliconflow.SpringAISiliconFlowService;
+import com.bytedesk.ai.springai.tencent.SpringAITencentService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -56,6 +57,7 @@ public class RobotService {
     private final Optional<SpringAIOllamaService> springAIOllamaService;
     private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
     private final Optional<SpringAIGiteeService> springAIGiteeService;
+    private final Optional<SpringAITencentService> springAITencentService;
 
     private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
@@ -120,6 +122,9 @@ public class RobotService {
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.GITEE)) {
             springAIGiteeService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.TENCENT)) {
+            springAITencentService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else {
             springAIZhipuaiService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
@@ -179,7 +184,10 @@ public class RobotService {
             } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.GITEE)) {
                 springAIGiteeService
                         .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            }  else {
+            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.TENCENT)) {
+                springAITencentService
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+            } else {
                 springAIZhipuaiService
                         .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             }
@@ -209,7 +217,7 @@ public class RobotService {
         }
     }
 
-    // 处理websocket请求消息
+    // websocket消息容易导致消息乱序，暂不采用
     public void processWebsocketMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
@@ -243,8 +251,6 @@ public class RobotService {
         }
         // 实际上是
         RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
-        // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        // && messageProtobuf.getUser().getType().equals(UserTypeEnum.VISITOR.name())
         if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("processRobotThreadWebsocketMessage thread reply");
             RobotEntity robot = robotRestService.findByUid(agent.getUid())
