@@ -34,7 +34,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberRestService;
-import com.bytedesk.ticket.consts.TicketConsts;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;

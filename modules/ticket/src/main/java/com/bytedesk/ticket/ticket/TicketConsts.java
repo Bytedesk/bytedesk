@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.consts;
+package com.bytedesk.ticket.ticket;
 
 import com.bytedesk.core.constant.I18Consts;
 

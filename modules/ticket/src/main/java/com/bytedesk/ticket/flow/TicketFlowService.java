@@ -16,7 +16,7 @@ import org.flowable.engine.task.Comment;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.ticket.comment.TicketCommentService;
-import com.bytedesk.ticket.consts.TicketConsts;
+import com.bytedesk.ticket.ticket.TicketConsts;
 // import com.bytedesk.ticket.ticket.TicketService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
