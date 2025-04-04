@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:31:19
+ * @LastEditTime: 2025-04-04 14:21:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,7 +89,8 @@ public class VisitorThreadService
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         //
-        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         if (visitorRequest.isWeChat()) {
             extra = visitorRequest.getThreadExtra();
@@ -99,7 +100,8 @@ public class VisitorThreadService
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.WORKGROUP.name())
-                .user(visitor)
+                .user(user)
+                .workgroup(workgroupString)
                 .extra(extra)
                 .client(visitorRequest.getClient())
                 .orgUid(workgroup.getOrgUid())

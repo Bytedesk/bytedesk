@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 16:25:05
+ * @LastEditTime: 2025-04-04 14:25:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,13 +61,7 @@ public class ThreadRequest extends BaseRequest {
     // @Builder.Default
     // private Boolean qualityChecked = false;
 
-    private UserProtobuf user;
     
-    private String userNickname;
-
-    private String ownerNickname;
-
-    private String ownerUid;
 
     @Builder.Default
     private Boolean top = false;
@@ -107,9 +101,7 @@ public class ThreadRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
-    // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
-    private String agent;
-
+    
     // 邀请多个客服参与会话
     @Builder.Default
     private List<String> inviteUids = new ArrayList<>();
@@ -142,6 +134,20 @@ public class ThreadRequest extends BaseRequest {
     // 是否合并相同topic的记录
     @Builder.Default
     private Boolean mergeByTopic = false;
+
+    private UserProtobuf user;
+    
+    private String userNickname;
+
+    private String ownerNickname;
+
+    private String ownerUid;
+
+    // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
+    private String agent;
+
+    private String workgroup;
+
 
     // 流程实例ID
     private String processInstanceId;
