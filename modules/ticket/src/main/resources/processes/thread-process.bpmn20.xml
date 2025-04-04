@@ -34,7 +34,7 @@
     <sequenceFlow id="flow7" sourceRef="isAgentsBusy" targetRef="queueService">
       <conditionExpression xsi:type="tFormalExpression">${agentsBusy == true}</conditionExpression>
     </sequenceFlow>
-    <userTask id="humanService" name="人工接待" flowable:candidateGroups="${agentGroupId}" flowable:formFieldValidation="true">
+    <userTask id="humanService" name="人工接待" flowable:candidateGroups="${workgroupUid}" flowable:formFieldValidation="true">
       <documentation>客服人员接待访客，流程外处理流转和协助</documentation>
       <extensionElements>
         <flowable:executionListener event="start" delegateExpression="${threadExecutionListener}" />

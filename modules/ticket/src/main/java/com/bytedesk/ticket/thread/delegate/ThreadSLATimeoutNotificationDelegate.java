@@ -42,7 +42,7 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
         String threadUid = (String) execution.getVariable("threadUid");
         String visitorId = (String) execution.getVariable("visitorId");
         String agentId = (String) execution.getVariable("agentId");
-        // String agentGroupId = (String) execution.getVariable("agentGroupId");
+        // String workgroupUid = (String) execution.getVariable("workgroupUid");
         String slaTime = (String) execution.getVariable("slaTime");
         
         // 记录SLA超时信息

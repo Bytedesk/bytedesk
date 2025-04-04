@@ -95,12 +95,12 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
         // TODO: 实际项目中，这里应该根据业务规则查找合适的坐席
         
         // 获取相关变量
-        String agentGroupId = (String) execution.getVariable("agentGroupId");
+        String workgroupUid = (String) execution.getVariable("workgroupUid");
         String currentAgentId = (String) execution.getVariable("agentId");
         String transferReason = (String) execution.getVariable("transferReason");
         
         log.info("Finding transfer target in group: {}, current agent: {}, reason: {}", 
-            agentGroupId, currentAgentId, transferReason);
+            workgroupUid, currentAgentId, transferReason);
         
         // 模拟找到一个目标坐席
         // 实际项目中，这里应该根据技能匹配、忙闲状态等进行筛选

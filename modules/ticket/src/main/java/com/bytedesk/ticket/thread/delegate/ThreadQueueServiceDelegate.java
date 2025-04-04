@@ -39,7 +39,7 @@ public class ThreadQueueServiceDelegate implements JavaDelegate {
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
         String visitorId = (String) execution.getVariable("visitorId");
-        String agentGroupId = (String) execution.getVariable("agentGroupId");
+        String workgroupUid = (String) execution.getVariable("workgroupUid");
         
         // 记录排队开始时间
         long startTime = System.currentTimeMillis();
@@ -52,7 +52,7 @@ public class ThreadQueueServiceDelegate implements JavaDelegate {
             // 3. 计算估计等待时间
             // 4. 等待分配坐席
             
-            log.info("Visitor {} entered queue for agent group: {}", visitorId, agentGroupId);
+            log.info("Visitor {} entered queue for agent group: {}", visitorId, workgroupUid);
             
             // 模拟排队过程
             int queuePosition = simulateQueuePosition();
