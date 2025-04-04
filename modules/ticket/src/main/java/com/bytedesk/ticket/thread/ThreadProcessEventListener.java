@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:03:03
+ * @LastEditTime: 2025-04-04 14:13:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,7 +73,7 @@ public class ThreadProcessEventListener {
                 log.error("一对一客服接待，但客服信息为空");
             }
             // 设置为非机器人接待
-            variables.put("robotEnabled", false);
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, false);
         } else if (thread.isWorkgroupType()) {
             // 技能组接待，设置candidateGroups为技能组ID
             if (thread.getWorkgroupProtobuf() != null) {
@@ -83,16 +83,16 @@ public class ThreadProcessEventListener {
                 log.error("技能组接待，但技能组信息为空");
             }
             // 设置为非机器人接待
-            variables.put("robotEnabled", false);
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, false);
         } else if (thread.isRobotType()) {
             // 机器人接待
-            variables.put("robotEnabled", true);
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, true);
             if (thread.getAgentProtobuf() != null) {
                 variables.put(ThreadConsts.THREAD_VARIABLE_AGENT_UID, thread.getAgentProtobuf().getUid());
                 log.info("机器人接待，设置robotUid为: {}", thread.getAgentProtobuf().getUid());
             }
             // 设置机器人超时时间（默认5分钟）
-            variables.put("robotIdleTimeout", "PT5M");
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, "PT5M");
         } else {
             // 暂时仅处理上述客服会话类型
             log.warn("未知的会话类型，不处理");
@@ -132,7 +132,7 @@ public class ThreadProcessEventListener {
         runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
         
         // 6. 设置人工客服空闲超时时间（默认15分钟）
-        runtimeService.setVariable(processInstance.getId(), "humanIdleTimeout", "PT15M");
+        runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");
         
         // 7. 更新会话的流程实例ID
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
