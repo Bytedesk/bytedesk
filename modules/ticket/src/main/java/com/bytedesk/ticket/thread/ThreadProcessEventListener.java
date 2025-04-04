@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:47:09
+ * @LastEditTime: 2025-04-04 22:44:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,25 @@ import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author jackning 270580156@qq.com
+ * 
+ * 会话流程创建事件监听器
+ * 
+ * 1. 当会话创建时，创建会话流程实例
+ * 2. 为流程实例设置必要的变量
+ * 3. 启动流程实例
+ * 4. 创建任务
+ * 5. 设置流程实例变量
+ * 6. 设置 SLA 时间
+ * 7. 设置人工客服空闲超时时间
+ * 8. 设置机器人超时时间
+ * 9. 设置任务变量
+ * 
+ * 注意：
+ * 1. 这里仅处理了基本的会话类型，如一对一客服接待、技能组接待、机器人接待等
+ * 
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -114,6 +133,7 @@ public class ThreadProcessEventListener {
         // 3. 创建任务
         Task task = taskService.createTaskQuery()
                 .processInstanceId(processInstance.getId())
+                .taskAssignee(thread.getAgentProtobuf().getUid()) // 指定任务负责人
                 .singleResult();
         if (task != null) {
             // 完成会话创建任务
