@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 08:40:00
+ * @LastEditTime: 2025-04-04 13:42:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
         String userUid = (String) execution.getVariable("userUid");
-        String currentAgentId = (String) execution.getVariable("agentUid");
+        String currentAgentUid = (String) execution.getVariable("agentUid");
         String transferReason = (String) execution.getVariable("transferReason");
         
         // 记录转接开始时间
@@ -55,7 +55,7 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
             // 3. 执行转接操作
             
             log.info("Processing transfer for thread: {}, visitor: {}, from agent: {}", 
-                threadUid, userUid, currentAgentId);
+                threadUid, userUid, currentAgentUid);
             
             // 记录转接原因(如果未提供)
             if (transferReason == null || transferReason.isEmpty()) {
@@ -63,17 +63,17 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
             }
             
             // 查找合适的转接目标
-            String targetAgentId = findTransferTarget(execution);
-            execution.setVariable("transferTargetAgent", targetAgentId);
+            String targetAgentUid = findTransferTarget(execution);
+            execution.setVariable("transferTargetAgent", targetAgentUid);
             
             // 执行转接
-            performTransfer(execution, currentAgentId, targetAgentId);
+            performTransfer(execution, currentAgentUid, targetAgentUid);
             
             log.info("Transfer completed for thread: {}, from agent: {} to agent: {}", 
-                threadUid, currentAgentId, targetAgentId);
+                threadUid, currentAgentUid, targetAgentUid);
             
             // 更新当前坐席ID
-            execution.setVariable("agentUid", targetAgentId);
+            execution.setVariable("agentUid", targetAgentUid);
             execution.setVariable("transferStatus", "COMPLETED");
         } catch (Exception e) {
             log.error("Error in transfer service", e);
@@ -96,36 +96,36 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
         
         // 获取相关变量
         String workgroupUid = (String) execution.getVariable("workgroupUid");
-        String currentAgentId = (String) execution.getVariable("agentUid");
+        String currentAgentUid = (String) execution.getVariable("agentUid");
         String transferReason = (String) execution.getVariable("transferReason");
         
         log.info("Finding transfer target in group: {}, current agent: {}, reason: {}", 
-            workgroupUid, currentAgentId, transferReason);
+            workgroupUid, currentAgentUid, transferReason);
         
         // 模拟找到一个目标坐席
         // 实际项目中，这里应该根据技能匹配、忙闲状态等进行筛选
-        String targetAgentId = "agent" + (int)(Math.random() * 5 + 1);
+        String targetAgentUid = "agent" + (int)(Math.random() * 5 + 1);
         
         // 确保目标坐席不是当前坐席
-        if (targetAgentId.equals(currentAgentId)) {
-            targetAgentId = "agent" + (int)(Math.random() * 5 + 6);
+        if (targetAgentUid.equals(currentAgentUid)) {
+            targetAgentUid = "agent" + (int)(Math.random() * 5 + 6);
         }
         
-        log.info("Selected transfer target: {}", targetAgentId);
-        return targetAgentId;
+        log.info("Selected transfer target: {}", targetAgentUid);
+        return targetAgentUid;
     }
     
     /**
      * 执行转接操作
      */
-    private void performTransfer(DelegateExecution execution, String fromAgentId, String toAgentId) {
+    private void performTransfer(DelegateExecution execution, String fromAgentUid, String toAgentUid) {
         // TODO: 实际项目中，这里应该执行实际的转接操作
         
         String threadUid = (String) execution.getVariable("threadUid");
         String userUid = (String) execution.getVariable("userUid");
         
         log.info("Transferring thread {} with visitor {} from agent {} to agent {}", 
-            threadUid, userUid, fromAgentId, toAgentId);
+            threadUid, userUid, fromAgentUid, toAgentUid);
         
         // 模拟转接过程
         try {
@@ -140,7 +140,7 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
             transferHistory = "";
         }
         
-        String newTransfer = fromAgentId + "->" + toAgentId + " at " + new Date();
+        String newTransfer = fromAgentUid + "->" + toAgentUid + " at " + new Date();
         if (transferHistory.isEmpty()) {
             transferHistory = newTransfer;
         } else {
