@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 18:11:52
+ * @LastEditTime: 2025-04-04 12:29:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -176,6 +176,10 @@ public class ThreadEntity extends AbstractThreadEntity {
     public ThreadEntity setQueuing() {
         setStatus(ThreadProcessStatusEnum.QUEUING.name());
         return this;
+    }
+
+    public UserProtobuf getUser() {
+        return JSON.parseObject(getUser(), UserProtobuf.class);
     }
 
 }

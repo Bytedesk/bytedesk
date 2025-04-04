@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 11:31:57
+ * @LastEditTime: 2025-04-04 11:51:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.provider.LlmProviderConsts;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
+import com.bytedesk.ai.springai.baidu.SpringAIBaiduService;
 import com.bytedesk.ai.springai.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.gitee.SpringAIGiteeService;
@@ -58,6 +59,7 @@ public class RobotService {
     private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
     private final Optional<SpringAIGiteeService> springAIGiteeService;
     private final Optional<SpringAITencentService> springAITencentService;
+    private final Optional<SpringAIBaiduService> springAIBaiduService;
 
     private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
@@ -125,6 +127,9 @@ public class RobotService {
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.TENCENT)) {
             springAITencentService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.BAIDU)) {
+            springAIBaiduService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else {
             springAIZhipuaiService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
@@ -186,6 +191,9 @@ public class RobotService {
                         .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.TENCENT)) {
                 springAITencentService
+                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.BAIDU)) {
+                springAIBaiduService
                         .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
             } else {
                 springAIZhipuaiService
