@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 16:13:25
+ * @LastEditTime: 2025-04-04 12:36:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.ticket.consts.ThreadConsts;
 import com.bytedesk.ticket.consts.TicketConsts;
 
 import lombok.AllArgsConstructor;
@@ -244,7 +245,7 @@ public class TicketProcessRestService
         // 检查是否已经部署
         List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
                 .deploymentTenantId(orgUid)
-                .deploymentName(TicketConsts.THREAD_PROCESS_NAME)
+                .deploymentName(ThreadConsts.THREAD_PROCESS_NAME)
                 .list();
 
         if (!existingDeployments.isEmpty()) {
@@ -255,7 +256,7 @@ public class TicketProcessRestService
         // 读取并部署流程
         try {
             Resource resource = resourceLoader
-                    .getResource("classpath:" + TicketConsts.THREAD_PROCESS_PATH);
+                    .getResource("classpath:" + ThreadConsts.THREAD_PROCESS_PATH);
             String groupThreadBpmn20Xml = "";
 
             try (InputStream inputStream = resource.getInputStream()) {
@@ -263,22 +264,22 @@ public class TicketProcessRestService
             }
 
             // 生成 processUid 并创建流程记录
-            String processUid = Utils.formatUid(orgUid, TicketConsts.THREAD_PROCESS_KEY);
+            String processUid = Utils.formatUid(orgUid, ThreadConsts.THREAD_PROCESS_KEY);
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .uid(processUid)
-                    .name(TicketConsts.THREAD_PROCESS_NAME)
+                    .name(ThreadConsts.THREAD_PROCESS_NAME)
                     .content(groupThreadBpmn20Xml)
                     .type(TicketProcessTypeEnum.THREAD.name())
-                    .key(TicketConsts.THREAD_PROCESS_KEY)
-                    .description(TicketConsts.THREAD_PROCESS_NAME)
+                    .key(ThreadConsts.THREAD_PROCESS_KEY)
+                    .description(ThreadConsts.THREAD_PROCESS_NAME)
                     .orgUid(orgUid)
                     .build();
             create(processRequest);
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
-                    .name(TicketConsts.THREAD_PROCESS_NAME)
-                    .addClasspathResource(TicketConsts.THREAD_PROCESS_PATH)
+                    .name(ThreadConsts.THREAD_PROCESS_NAME)
+                    .addClasspathResource(ThreadConsts.THREAD_PROCESS_PATH)
                     .tenantId(orgUid)
                     .deploy();
 

@@ -142,14 +142,6 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getType().equals(ThreadTypeEnum.UNIFIED.name());
     }
 
-    public ThreadProtobuf toProtobuf() {
-        return ConvertUtils.convertToThreadProtobuf(this);
-    }
-
-    public UserProtobuf getUserProtobuf() {
-        return JSON.parseObject(getUser(), UserProtobuf.class);
-    }
-
     public Boolean isWeChatMp() {
         return getClient().equals(ClientEnum.WECHAT_MP.name());
     }
@@ -178,8 +170,21 @@ public class ThreadEntity extends AbstractThreadEntity {
         return this;
     }
 
-    public UserProtobuf getUser() {
+    public ThreadProtobuf toProtobuf() {
+        return ConvertUtils.convertToThreadProtobuf(this);
+    }
+
+    public UserProtobuf getUserProtobuf() {
         return JSON.parseObject(getUser(), UserProtobuf.class);
     }
+
+    public UserProtobuf getAgentProtobuf() {
+        return JSON.parseObject(getAgent(), UserProtobuf.class);
+    }
+
+    public ThreadExtra getThreadExtra() {
+        return JSON.parseObject(getExtra(), ThreadExtra.class);
+    }
+
 
 }

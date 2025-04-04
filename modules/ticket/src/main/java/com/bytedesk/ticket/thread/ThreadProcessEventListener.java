@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 12:28:29
+ * @LastEditTime: 2025-04-04 12:40:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
+import com.bytedesk.ticket.consts.ThreadConsts;
 import com.bytedesk.ticket.consts.TicketConsts;
 
 import lombok.RequiredArgsConstructor;
@@ -49,42 +50,40 @@ public class ThreadProcessEventListener {
         log.info("ticket - onThreadCreateEvent: {}", event);
         ThreadEntity thread = event.getThread();
         if (thread == null) {
-            log.error("工单线程创建事件, 线程对象为空: {}", event);
+            log.error("会话线程创建事件, 线程对象为空: {}", event);
             return;
         }
-        log.info("开始创建工单流程实例: threadUid={}, orgUid={}", thread.getUid(), thread.getOrgUid());
+        log.info("开始创建会话流程实例: threadUid={}, orgUid={}", thread.getUid(), thread.getOrgUid());
         // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
-        variables.put(TicketConsts.TICKET_VARIABLE_THREAD_UID, thread.getUid());
-        // variables.put(TicketConsts.TICKET_VARIABLE_REPORTER_UID, thread.getReporter().getUid());
-        variables.put(TicketConsts.TICKET_VARIABLE_ORGUID, thread.getOrgUid());
-        //
-        // variables.put(TicketConsts.TICKET_VARIABLE_DESCRIPTION, thread.getDescription());
-        // variables.put(TicketConsts.TICKET_VARIABLE_START_USER_ID, thread.getReporter().getUid());
-        // variables.put(TicketConsts.TICKET_VARIABLE_STATUS, thread.getStatus());
+        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_UID, thread.getUid());
+        variables.put(ThreadConsts.THREAD_VARIABLE_ORGUID, thread.getOrgUid());
+        variables.put(ThreadConsts.THREAD_VARIABLE_STATUS, thread.getStatus());
+        if (thread.getUserProtobuf() != null) {
+            variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
+        }
         
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey(TicketConsts.THREAD_PROCESS_KEY)
+                .processDefinitionKey(ThreadConsts.THREAD_PROCESS_KEY)
                 .tenantId(thread.getOrgUid())
                 .name(thread.getUid()) // 流程实例名称
                 .businessKey(thread.getUid())
                 .variables(variables)
                 .start();
-        log.info("流程实例创建成功: processInstanceId={}, businessKey={}",
+        log.info("会话流程实例创建成功: processInstanceId={}, businessKey={}",
                 processInstance.getId(), processInstance.getBusinessKey());
 
         // 3. 创建任务
         Task task = taskService.createTaskQuery()
                 .processInstanceId(processInstance.getId())
-                // .taskAssignee(thread.getReporter().getUid())
                 .singleResult();
         if (task != null) {
-            // 完成工单创建任务
+            // 完成会话创建任务
             taskService.complete(task.getId());
         } else {
-            log.error("工单创建任务创建失败: task={}", task);
+            log.error("会话创建任务创建失败: task={}", task);
         }
 
         // 4. 设置流程实例变量
@@ -107,7 +106,7 @@ public class ThreadProcessEventListener {
         // runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_ASSIGNEE,
         //         thread.getReporter());
         
-        // 6. 更新工单的流程实例ID
+        // 6. 更新会话的流程实例ID
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
         if (threadOptional.isPresent()) {
             ThreadEntity threadEntity = threadOptional.get();
