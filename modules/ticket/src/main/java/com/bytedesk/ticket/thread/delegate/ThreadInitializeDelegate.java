@@ -152,8 +152,8 @@ public class ThreadInitializeDelegate implements JavaDelegate {
         }
         
         // 设置坐席组ID（如果有）
-        if (execution.getVariable("agentGroupId") == null) {
-            execution.setVariable("agentGroupId", "DEFAULT_GROUP");
+        if (execution.getVariable("workgroupUid") == null) {
+            execution.setVariable("workgroupUid", "DEFAULT_GROUP");
         }
         
         // 设置会话超时时间（秒）

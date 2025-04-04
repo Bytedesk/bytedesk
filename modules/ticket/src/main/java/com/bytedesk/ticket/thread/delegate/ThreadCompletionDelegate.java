@@ -244,7 +244,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         // 服务信息
         archiveData.put("robotUsed", execution.getVariable("robotUsed"));
         archiveData.put("agentId", execution.getVariable("agentId"));
-        archiveData.put("agentGroupId", execution.getVariable("agentGroupId"));
+        archiveData.put("workgroupUid", execution.getVariable("workgroupUid"));
         archiveData.put("transferCount", execution.getVariable("transferCount"));
         archiveData.put("transferHistory", execution.getVariable("transferHistory"));
         

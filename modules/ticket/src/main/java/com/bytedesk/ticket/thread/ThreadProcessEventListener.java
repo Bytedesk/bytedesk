@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 12:40:58
+ * @LastEditTime: 2025-04-04 13:36:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,6 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.ticket.consts.ThreadConsts;
-import com.bytedesk.ticket.consts.TicketConsts;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,21 +89,16 @@ public class ThreadProcessEventListener {
         // 可以在流程执行的任何时候调用, 每次调用都会产生一次变量更新历史记录
         // 适合设置运行时的动态变量或需要更新的变量
         // 每次调用都会有一次数据库操作
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_TIME, new Date());
+        runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
 
         // 5. 设置 SLA 时间
-        // String slaTime = switch (thread.getPriority()) {
-        //     case "CRITICAL" -> "PT30M";
-        //     case "URGENT" -> "PT1H";
-        //     case "HIGH" -> "PT2H";
-        //     case "MEDIUM" -> "PT4H";
-        //     case "LOW" -> "PT8H";
-        //     default -> "P1D";
-        // };
-        // runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_SLA_TIME, slaTime);
-        // 第一步的assignee设置为reporter
-        // runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_ASSIGNEE,
-        //         thread.getReporter());
+        String slaTime = "PT30M"; // 默认30分钟，后期支持自定义
+        runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
+        // assignee设置为agentUid，是任务的执行人
+        if (thread.getAgentProtobuf() != null) {
+            runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_ASSIGNEE,
+                    thread.getAgentProtobuf().getUid());
+        }
         
         // 6. 更新会话的流程实例ID
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
