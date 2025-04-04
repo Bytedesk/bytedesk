@@ -35,15 +35,8 @@
       <conditionExpression xsi:type="tFormalExpression">${agentsBusy == true}</conditionExpression>
     </sequenceFlow>
     <userTask id="humanService" name="人工接待" flowable:candidateGroups="${agentGroupId}" flowable:formFieldValidation="true">
-      <documentation>客服人员接待访客</documentation>
+      <documentation>客服人员接待访客，流程外处理流转和协助</documentation>
       <extensionElements>
-        <flowable:formProperty id="threadUid" name="会话ID" type="string" required="true" />
-        <flowable:formProperty id="status" name="状态" type="enum" required="true">
-          <flowable:value id="ACTIVE" name="接待中" />
-          <flowable:value id="TRANSFER" name="需要转接" />
-          <flowable:value id="INVITE" name="邀请协助" />
-          <flowable:value id="RESOLVED" name="已解决" />
-        </flowable:formProperty>
         <flowable:executionListener event="start" delegateExpression="${threadExecutionListener}" />
         <flowable:executionListener event="end" delegateExpression="${threadExecutionListener}" />
         <flowable:taskListener event="create" delegateExpression="${threadTaskListener}" />
@@ -69,28 +62,23 @@
       <conditionExpression xsi:type="tFormalExpression">${status == 'INVITE'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow14" sourceRef="inviteService" targetRef="humanService" />
-    <userTask id="satisfactionSurvey" name="满意度评价" flowable:assignee="${visitorId}" flowable:formFieldValidation="true">
-      <documentation>访客填写满意度评价</documentation>
+    <serviceTask id="satisfactionService" name="满意度评价" flowable:delegateExpression="${threadSatisfactionServiceDelegate}">
+      <documentation>触发满意度评价事件</documentation>
       <extensionElements>
-        <flowable:formProperty id="threadUid" name="会话ID" type="string" required="true" />
-        <flowable:formProperty id="satisfaction" name="满意度" type="enum" required="true">
-          <flowable:value id="VERY_SATISFIED" name="非常满意" />
-          <flowable:value id="SATISFIED" name="满意" />
-          <flowable:value id="NEUTRAL" name="一般" />
-          <flowable:value id="UNSATISFIED" name="不满意" />
-          <flowable:value id="VERY_UNSATISFIED" name="非常不满意" />
-        </flowable:formProperty>
-        <flowable:formProperty id="resolved" name="问题是否解决" type="boolean" required="true" />
-        <flowable:formProperty id="comment" name="备注" type="string" />
         <flowable:executionListener event="end" delegateExpression="${threadExecutionListener}" />
-        <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler">false</modeler:initiator-can-complete>
       </extensionElements>
-    </userTask>
-    <sequenceFlow id="flow15" sourceRef="humanService" targetRef="satisfactionSurvey">
+    </serviceTask>
+    <sequenceFlow id="flow15" sourceRef="humanService" targetRef="satisfactionService">
       <conditionExpression xsi:type="tFormalExpression">${status == 'RESOLVED'}</conditionExpression>
     </sequenceFlow>
+    
+    <!-- 添加人工坐席手动结束会话流程 -->
+    <sequenceFlow id="flowFinishToEnd" sourceRef="humanService" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression">${status == 'FINISHED'}</conditionExpression>
+    </sequenceFlow>
+    
     <endEvent id="end" name="会话结束" />
-    <sequenceFlow id="flow16" sourceRef="satisfactionSurvey" targetRef="end" />
+    <sequenceFlow id="flow16" sourceRef="satisfactionService" targetRef="end" />
     <sequenceFlow id="flow11" sourceRef="humanService" targetRef="transferService">
       <conditionExpression xsi:type="tFormalExpression">${status == 'TRANSFER'}</conditionExpression>
     </sequenceFlow>
@@ -152,7 +140,7 @@
       <bpmndi:BPMNShape id="BPMNShape_inviteService" bpmnElement="inviteService">
         <omgdc:Bounds x="690" y="400" width="100" height="60" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_satisfactionSurvey" bpmnElement="satisfactionSurvey">
+      <bpmndi:BPMNShape id="BPMNShape_satisfactionService" bpmnElement="satisfactionService">
         <omgdc:Bounds x="680" y="300" width="100" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_end" bpmnElement="end">
