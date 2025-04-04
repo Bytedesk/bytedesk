@@ -22,9 +22,9 @@
 		<spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version>
 		<spring-ai.version>1.0.0-M6</spring-ai.version>
 		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
-		<zhipuai.version>release-V4-2.3.1</zhipuai.version>
+		<!-- <zhipuai.version>release-V4-2.3.1</zhipuai.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
-		<hanlp.version>0.0.15</hanlp.version>
+		<!-- <hanlp.version>0.0.15</hanlp.version> -->
 		<selenium.version>4.30.0</selenium.version>
 	</properties>
 
@@ -188,11 +188,11 @@
 		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
 		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
 		<!-- https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
 			<version>${zhipuai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://central.sonatype.com/artifact/io.github.ollama4j/ollama4j/overview -->
