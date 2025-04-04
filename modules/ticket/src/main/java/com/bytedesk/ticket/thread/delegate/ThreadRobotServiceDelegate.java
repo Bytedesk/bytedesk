@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:34:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 08:34:00
+ * @LastEditTime: 2025-04-04 15:28:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,38 +39,41 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
         String userUid = (String) execution.getVariable("userUid");
+        String workgroupUid = (String) execution.getVariable("workgroupUid");
+        log.info("Processing robot service for thread: {}, visitor: {}, workgroup: {}",
+            threadUid, userUid, workgroupUid);
         
         // 记录机器人接待开始时间
-        long startTime = System.currentTimeMillis();
-        execution.setVariable("robotServiceStartTime", startTime);
+        // long startTime = System.currentTimeMillis();
+        // execution.setVariable("robotServiceStartTime", startTime);
         
-        try {
-            // TODO: 实际项目中，这里需要调用AI服务进行机器人回复
-            // 1. 获取访客最近的消息
-            // 2. 调用AI服务生成回复
-            // 3. 发送机器人回复给访客
+        // try {
+        //     // TODO: 实际项目中，这里需要调用AI服务进行机器人回复
+        //     // 1. 获取访客最近的消息
+        //     // 2. 调用AI服务生成回复
+        //     // 3. 发送机器人回复给访客
             
-            log.info("Robot processing thread: {}, visitor: {}", threadUid, userUid);
+        //     log.info("Robot processing thread: {}, visitor: {}", threadUid, userUid);
             
-            // 模拟处理延时
-            Thread.sleep(500);
+        //     // 模拟处理延时
+        //     Thread.sleep(500);
             
-            // 根据访客回复和上下文，判断是否需要转人工
-            boolean needHumanService = determineIfNeedHumanService(execution);
-            execution.setVariable("needHumanService", needHumanService);
+        //     // 根据访客回复和上下文，判断是否需要转人工
+        //     boolean needHumanService = determineIfNeedHumanService(execution);
+        //     execution.setVariable("needHumanService", needHumanService);
             
-            log.info("Robot service completed, need human service: {}", needHumanService);
-        } catch (Exception e) {
-            log.error("Error in robot service", e);
-            // 异常情况下转人工处理
-            execution.setVariable("needHumanService", true);
-            execution.setVariable("robotServiceError", e.getMessage());
-        } finally {
-            // 记录机器人接待结束时间和总时长
-            long endTime = System.currentTimeMillis();
-            execution.setVariable("robotServiceEndTime", endTime);
-            execution.setVariable("robotServiceDuration", endTime - startTime);
-        }
+        //     log.info("Robot service completed, need human service: {}", needHumanService);
+        // } catch (Exception e) {
+        //     log.error("Error in robot service", e);
+        //     // 异常情况下转人工处理
+        //     execution.setVariable("needHumanService", true);
+        //     execution.setVariable("robotServiceError", e.getMessage());
+        // } finally {
+        //     // 记录机器人接待结束时间和总时长
+        //     long endTime = System.currentTimeMillis();
+        //     execution.setVariable("robotServiceEndTime", endTime);
+        //     execution.setVariable("robotServiceDuration", endTime - startTime);
+        // }
     }
     
     /**
@@ -82,25 +85,25 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
      * 3. 访客情绪异常
      * 4. 问题复杂度超出机器人能力
      */
-    private boolean determineIfNeedHumanService(DelegateExecution execution) {
-        // TODO: 实际项目中，这里需要根据业务规则和AI分析结果来判断
+    // private boolean determineIfNeedHumanService(DelegateExecution execution) {
+    //     // TODO: 实际项目中，这里需要根据业务规则和AI分析结果来判断
         
-        // 获取相关变量
-        Integer unansweredCount = (Integer) execution.getVariable("robotUnansweredCount");
-        if (unansweredCount == null) {
-            unansweredCount = 0;
-        }
+    //     // 获取相关变量
+    //     Integer unansweredCount = (Integer) execution.getVariable("robotUnansweredCount");
+    //     if (unansweredCount == null) {
+    //         unansweredCount = 0;
+    //     }
         
-        // 模拟一些判断逻辑
-        // 1. 随机20%的概率需要转人工
-        // 2. 如果连续3次未解答，则转人工
-        if (Math.random() < 0.2 || unansweredCount >= 3) {
-            return true;
-        }
+    //     // 模拟一些判断逻辑
+    //     // 1. 随机20%的概率需要转人工
+    //     // 2. 如果连续3次未解答，则转人工
+    //     if (Math.random() < 0.2 || unansweredCount >= 3) {
+    //         return true;
+    //     }
         
-        // 更新未解答计数
-        execution.setVariable("robotUnansweredCount", unansweredCount + 1);
+    //     // 更新未解答计数
+    //     execution.setVariable("robotUnansweredCount", unansweredCount + 1);
         
-        return false;
-    }
+    //     return false;
+    // }
 } 
