@@ -38,7 +38,7 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        String userUid = (String) execution.getVariable("userUid");
         
         // 记录机器人接待开始时间
         long startTime = System.currentTimeMillis();
@@ -50,7 +50,7 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             // 2. 调用AI服务生成回复
             // 3. 发送机器人回复给访客
             
-            log.info("Robot processing thread: {}, visitor: {}", threadUid, visitorId);
+            log.info("Robot processing thread: {}, visitor: {}", threadUid, userUid);
             
             // 模拟处理延时
             Thread.sleep(500);

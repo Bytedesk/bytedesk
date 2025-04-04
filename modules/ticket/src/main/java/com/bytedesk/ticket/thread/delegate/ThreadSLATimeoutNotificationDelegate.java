@@ -40,8 +40,8 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
-        String agentId = (String) execution.getVariable("agentId");
+        String userUid = (String) execution.getVariable("userUid");
+        String agentUid = (String) execution.getVariable("agentUid");
         // String workgroupUid = (String) execution.getVariable("workgroupUid");
         String slaTime = (String) execution.getVariable("slaTime");
         
@@ -56,7 +56,7 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
             // 3. 执行升级策略
             
             log.info("SLA timeout for thread: {}, visitor: {}, agent: {}, SLA time: {}", 
-                threadUid, visitorId, agentId, slaTime);
+                threadUid, userUid, agentUid, slaTime);
             
             // 记录超时原因
             execution.setVariable("slaTimeoutReason", "客服响应超时");
@@ -89,10 +89,10 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
      */
     private String[] determineNotificationRecipients(DelegateExecution execution) {
         // TODO: 实际项目中，这里应该根据具体业务规则确定
-        String agentId = (String) execution.getVariable("agentId");
+        String agentUid = (String) execution.getVariable("agentUid");
         String supervisorId = "supervisor1"; // 实际中应该从系统获取
         
-        return new String[] { agentId, supervisorId };
+        return new String[] { agentUid, supervisorId };
     }
     
     /**
@@ -101,11 +101,11 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
     private void sendNotifications(DelegateExecution execution, String[] recipients) {
         // TODO: 实际项目中，这里应该调用消息发送服务
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        String userUid = (String) execution.getVariable("userUid");
         
         for (String recipient : recipients) {
             log.info("Sending SLA timeout notification to {}: Thread {} with visitor {} exceeded SLA time", 
-                recipient, threadUid, visitorId);
+                recipient, threadUid, userUid);
         }
     }
     

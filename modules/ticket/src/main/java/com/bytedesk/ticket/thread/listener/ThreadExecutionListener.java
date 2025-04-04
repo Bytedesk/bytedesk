@@ -67,8 +67,8 @@ public class ThreadExecutionListener implements ExecutionListener {
 
     private void handleThreadStart(DelegateExecution execution) {
         // 会话开始时的业务逻辑
-        String visitorId = (String) execution.getVariable("visitorId");
-        log.info("Thread started by visitor: {}", visitorId);
+        String userUid = (String) execution.getVariable("userUid");
+        log.info("Thread started by visitor: {}", userUid);
         
         // 记录会话开始时间
         execution.setVariable("threadStartTime", System.currentTimeMillis());

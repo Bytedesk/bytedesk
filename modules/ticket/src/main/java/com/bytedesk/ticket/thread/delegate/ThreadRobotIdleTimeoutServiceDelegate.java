@@ -40,7 +40,7 @@ public class ThreadRobotIdleTimeoutServiceDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        String userUid = (String) execution.getVariable("userUid");
         String robotUid = (String) execution.getVariable("robotUid");
         
         // 记录超时开始时间
@@ -54,7 +54,7 @@ public class ThreadRobotIdleTimeoutServiceDelegate implements JavaDelegate {
             execution.setVariable("threadEndReason", "VISITOR_IDLE_TIMEOUT");
             
             log.info("Visitor {} idle timeout in thread: {}, robot: {}", 
-                visitorId, threadUid, robotUid);
+                userUid, threadUid, robotUid);
             
             // 发送超时提醒消息
             sendTimeoutNotification(execution);
@@ -86,11 +86,11 @@ public class ThreadRobotIdleTimeoutServiceDelegate implements JavaDelegate {
         // TODO: 实际项目中，这里应该向访客发送超时提醒消息
         
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        String userUid = (String) execution.getVariable("userUid");
         String robotUid = (String) execution.getVariable("robotUid");
         
         log.info("Sending idle timeout notification to visitor: {} in thread: {} from robot: {}", 
-            visitorId, threadUid, robotUid);
+            userUid, threadUid, robotUid);
         
         // 构建超时提醒消息
         String timeoutMessage = "由于您长时间未发送消息，本次会话已自动结束。如有需要，请重新发起会话。";

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 09:20:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 09:20:00
+ * @LastEditTime: 2025-04-04 13:39:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,8 +40,8 @@ public class ThreadHumanServiceDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
-        String agentId = (String) execution.getVariable("agentId");
+        String userUid = (String) execution.getVariable("userUid");
+        String agentUid = (String) execution.getVariable("agentUid");
         
         // 记录人工服务开始时间
         long startTime = System.currentTimeMillis();
@@ -50,10 +50,10 @@ public class ThreadHumanServiceDelegate implements JavaDelegate {
         
         try {
             log.info("Starting human service for thread: {}, visitor: {}, agent: {}", 
-                threadUid, visitorId, agentId);
+                threadUid, userUid, agentUid);
             
             // 检查坐席是否有效
-            if (agentId == null || agentId.isEmpty()) {
+            if (agentUid == null || agentUid.isEmpty()) {
                 throw new RuntimeException("No agent assigned for human service");
             }
             
@@ -92,11 +92,11 @@ public class ThreadHumanServiceDelegate implements JavaDelegate {
         // TODO: 实际项目中，这里应该实现记录服务开始的逻辑
         
         String threadUid = (String) execution.getVariable("threadUid");
-        String agentId = (String) execution.getVariable("agentId");
+        String agentUid = (String) execution.getVariable("agentUid");
         Date startDate = (Date) execution.getVariable("humanServiceStartDate");
         
         log.info("Recording service start for thread: {}, agent: {}, time: {}", 
-            threadUid, agentId, startDate);
+            threadUid, agentUid, startDate);
         
         // 初始化SLA计时
         initializeSLATimer(execution);
@@ -115,11 +115,11 @@ public class ThreadHumanServiceDelegate implements JavaDelegate {
         // TODO: 实际项目中，这里应该实现记录服务结束的逻辑
         
         String threadUid = (String) execution.getVariable("threadUid");
-        String agentId = (String) execution.getVariable("agentId");
+        String agentUid = (String) execution.getVariable("agentUid");
         Date endDate = (Date) execution.getVariable("humanServiceEndDate");
         
         log.info("Recording service end for thread: {}, agent: {}, time: {}", 
-            threadUid, agentId, endDate);
+            threadUid, agentUid, endDate);
         
         // 计算服务时长
         Date startDate = (Date) execution.getVariable("humanServiceStartDate");
