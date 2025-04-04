@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 18:10:45
+ * @LastEditTime: 2025-04-04 14:22:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,7 +104,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             //
-            if (threadOptional.get().isChatting()) {
+            if (threadOptional.get().isNew()) {
+                thread = threadOptional.get();
+            } else if (threadOptional.get().isChatting()) {
                 thread = threadOptional.get();
                 // 重新初始化会话，包括重置机器人状态等
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
@@ -117,12 +119,13 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
             } else if (threadOptional.get().isOffline()) {
                 thread = threadOptional.get();
-            } else if (threadOptional.get().isChatting()) {
-                thread = threadOptional.get();
-                if (visitorRequest.getForceAgent()) {
-                    // 强制转人工，TODO: 记录转人工日志
-                }
             }
+            // else if (threadOptional.get().isChatting()) {
+            //     thread = threadOptional.get();
+            //     if (visitorRequest.getForceAgent()) {
+            //         // 强制转人工，TODO: 记录转人工日志
+            //     }
+            // }
         }
 
         if (thread == null) {
