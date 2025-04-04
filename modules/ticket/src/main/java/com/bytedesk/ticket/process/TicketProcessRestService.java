@@ -186,7 +186,7 @@ public class TicketProcessRestService
         // 检查是否已经部署
         List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
                 .deploymentTenantId(orgUid)
-                .deploymentName(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                .deploymentName(TicketConsts.TICKET_PROCESS_NAME)
                 .list();
 
         if (!existingDeployments.isEmpty()) {
@@ -197,7 +197,7 @@ public class TicketProcessRestService
         // 读取并部署流程
         try {
             Resource resource = resourceLoader
-                    .getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH_GROUP);
+                    .getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH);
             String groupTicketBpmn20Xml = "";
 
             try (InputStream inputStream = resource.getInputStream()) {
@@ -205,22 +205,22 @@ public class TicketProcessRestService
             }
 
             // 生成 processUid 并创建流程记录
-            String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY_GROUP);
+            String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .uid(processUid)
-                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                    .name(TicketConsts.TICKET_PROCESS_NAME)
                     .content(groupTicketBpmn20Xml)
                     .type(TicketProcessTypeEnum.TICKET.name())
-                    .key(TicketConsts.TICKET_PROCESS_KEY_GROUP)
-                    .description(TicketConsts.TICKET_PROCESS_NAME_GROUP)
+                    .key(TicketConsts.TICKET_PROCESS_KEY)
+                    .description(TicketConsts.TICKET_PROCESS_NAME)
                     .orgUid(orgUid)
                     .build();
             create(processRequest);
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
-                    .name(TicketConsts.TICKET_PROCESS_NAME_GROUP)
-                    .addClasspathResource(TicketConsts.TICKET_PROCESS_PATH_GROUP)
+                    .name(TicketConsts.TICKET_PROCESS_NAME)
+                    .addClasspathResource(TicketConsts.TICKET_PROCESS_PATH)
                     .tenantId(orgUid)
                     .deploy();
 
@@ -244,7 +244,7 @@ public class TicketProcessRestService
         // 检查是否已经部署
         List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
                 .deploymentTenantId(orgUid)
-                .deploymentName(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                .deploymentName(TicketConsts.THREAD_PROCESS_NAME)
                 .list();
 
         if (!existingDeployments.isEmpty()) {
@@ -255,7 +255,7 @@ public class TicketProcessRestService
         // 读取并部署流程
         try {
             Resource resource = resourceLoader
-                    .getResource("classpath:" + TicketConsts.THREAD_PROCESS_PATH_GROUP);
+                    .getResource("classpath:" + TicketConsts.THREAD_PROCESS_PATH);
             String groupThreadBpmn20Xml = "";
 
             try (InputStream inputStream = resource.getInputStream()) {
@@ -263,22 +263,22 @@ public class TicketProcessRestService
             }
 
             // 生成 processUid 并创建流程记录
-            String processUid = Utils.formatUid(orgUid, TicketConsts.THREAD_PROCESS_KEY_GROUP);
+            String processUid = Utils.formatUid(orgUid, TicketConsts.THREAD_PROCESS_KEY);
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .uid(processUid)
-                    .name(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                    .name(TicketConsts.THREAD_PROCESS_NAME)
                     .content(groupThreadBpmn20Xml)
                     .type(TicketProcessTypeEnum.THREAD.name())
-                    .key(TicketConsts.THREAD_PROCESS_KEY_GROUP)
-                    .description(TicketConsts.THREAD_PROCESS_NAME_GROUP)
+                    .key(TicketConsts.THREAD_PROCESS_KEY)
+                    .description(TicketConsts.THREAD_PROCESS_NAME)
                     .orgUid(orgUid)
                     .build();
             create(processRequest);
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
-                    .name(TicketConsts.THREAD_PROCESS_NAME_GROUP)
-                    .addClasspathResource(TicketConsts.THREAD_PROCESS_PATH_GROUP)
+                    .name(TicketConsts.THREAD_PROCESS_NAME)
+                    .addClasspathResource(TicketConsts.THREAD_PROCESS_PATH)
                     .tenantId(orgUid)
                     .deploy();
 

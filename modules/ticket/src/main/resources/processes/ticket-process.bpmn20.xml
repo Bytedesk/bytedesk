@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="BytedeskTicket" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
+  <process id="ticketProcess" name="工单流程" isExecutable="true">
+    <extensionElements>
+      <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
+      <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
+    </extensionElements>
+    <startEvent id="start" name="开始"></startEvent>
+    <userTask id="createTicket" name="创建工单" flowable:assignee="${reporterUid}">
+      <documentation>创建新工单并填写详细信息</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="createTicket"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="createTicket" targetRef="assignToGroup"></sequenceFlow>
+    <userTask id="assignToGroup" name="工单待认领" flowable:candidateGroups="${departmentUid}">
+      <documentation>成员认领工单</documentation>
+      <extensionElements>
+        <flowable:executionListener event="start" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
+        <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
+        <flowable:taskListener event="create" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
+        <flowable:taskListener event="assignment" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
+        <flowable:taskListener event="complete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="customerVerify" name="工单待验证" flowable:assignee="${reporterUid}">
+      <documentation>验证工单是否解决</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="verifyGateway" name="验证结果"></exclusiveGateway>
+    <sequenceFlow id="flow3" sourceRef="assignToGroup" targetRef="customerVerify"></sequenceFlow>
+    <sequenceFlow id="flow_to_gateway" sourceRef="customerVerify" targetRef="verifyGateway"></sequenceFlow>
+    <sequenceFlow id="flow_verify_ok" name="已解决" sourceRef="verifyGateway" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression">${verified == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_verify_fail" name="未解决" sourceRef="verifyGateway" targetRef="assignToGroup">
+      <conditionExpression xsi:type="tFormalExpression">${verified == false}</conditionExpression>
+    </sequenceFlow>
+    <endEvent id="end" name="结束"></endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_groupTicketSimpleProcess">
+    <bpmndi:BPMNPlane bpmnElement="groupTicketSimpleProcess" id="BPMNPlane_groupTicketSimpleProcess">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="130.0" y="315.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="createTicket" id="BPMNShape_createTicket">
+        <omgdc:Bounds height="61.0" width="90.0" x="215.0" y="299.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assignToGroup" id="BPMNShape_assignToGroup">
+        <omgdc:Bounds height="60.0" width="100.0" x="360.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="customerVerify" id="BPMNShape_customerVerify">
+        <omgdc:Bounds height="60.0" width="100.0" x="510.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="verifyGateway" id="BPMNShape_verifyGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="660.0" y="310.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="28.0" width="28.0" x="750.0" y="316.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="45.0" flowable:targetDockerY="30.5">
+        <omgdi:waypoint x="159.94999861835544" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="215.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2" flowable:sourceDockerX="45.0" flowable:sourceDockerY="30.5" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="304.95000000000005" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_verify_fail" id="BPMNEdge_flow_verify_fail" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="680.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="300.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="459.95000000000005" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_verify_ok" id="BPMNEdge_flow_verify_ok" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="699.9381391200869" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_to_gateway" id="BPMNEdge_flow_to_gateway" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="609.9499999998391" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
