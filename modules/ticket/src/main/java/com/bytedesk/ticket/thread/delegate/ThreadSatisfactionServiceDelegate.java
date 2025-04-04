@@ -42,8 +42,8 @@ public class ThreadSatisfactionServiceDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
-        String agentId = (String) execution.getVariable("agentId");
+        String userUid = (String) execution.getVariable("userUid");
+        String agentUid = (String) execution.getVariable("agentUid");
         
         // 记录满意度评价开始时间
         long startTime = System.currentTimeMillis();
@@ -51,12 +51,12 @@ public class ThreadSatisfactionServiceDelegate implements JavaDelegate {
         
         try {
             // 发送满意度调查
-            boolean surveyDelivered = sendSatisfactionSurvey(threadUid, visitorId, agentId);
+            boolean surveyDelivered = sendSatisfactionSurvey(threadUid, userUid, agentUid);
             execution.setVariable("satisfactionSurveyDelivered", surveyDelivered);
             
             if (surveyDelivered) {
                 log.info("Satisfaction survey delivered for thread: {}, visitor: {}, agent: {}", 
-                    threadUid, visitorId, agentId);
+                    threadUid, userUid, agentUid);
                 
                 // 设置超时时间，等待用户评价
                 execution.setVariable("satisfactionWaitTimeout", 3600); // 秒
@@ -84,9 +84,9 @@ public class ThreadSatisfactionServiceDelegate implements JavaDelegate {
     /**
      * 发送满意度调查
      */
-    private boolean sendSatisfactionSurvey(String threadUid, String visitorId, String agentId) {
+    private boolean sendSatisfactionSurvey(String threadUid, String userUid, String agentUid) {
         // TODO: 实际项目中，这里应该实现发送满意度调查的逻辑
-        log.info("Sending satisfaction survey for thread: {}, visitor: {}", threadUid, visitorId);
+        log.info("Sending satisfaction survey for thread: {}, visitor: {}", threadUid, userUid);
         
         // 模拟发送过程
         try {
@@ -199,11 +199,11 @@ public class ThreadSatisfactionServiceDelegate implements JavaDelegate {
         // 例如：通知主管、安排后续跟进等
         
         String threadUid = (String) execution.getVariable("threadUid");
-        String agentId = (String) execution.getVariable("agentId");
+        String agentUid = (String) execution.getVariable("agentUid");
         String comment = (String) feedbackData.get("comment");
         
         log.warn("Unsatisfied feedback for thread: {}, agent: {}, comment: {}", 
-            threadUid, agentId, comment);
+            threadUid, agentUid, comment);
         
         // 设置后续跟进标志
         execution.setVariable("satisfactionNeedsFollowUp", true);

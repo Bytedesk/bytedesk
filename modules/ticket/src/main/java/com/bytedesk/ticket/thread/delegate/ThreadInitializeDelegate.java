@@ -82,11 +82,11 @@ public class ThreadInitializeDelegate implements JavaDelegate {
      */
     private void initializeBasicInfo(DelegateExecution execution) {
         // 获取访客ID（如果已提供）
-        String visitorId = (String) execution.getVariable("visitorId");
-        if (visitorId == null || visitorId.isEmpty()) {
+        String userUid = (String) execution.getVariable("userUid");
+        if (userUid == null || userUid.isEmpty()) {
             // 生成默认访客ID
-            visitorId = "VISITOR-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-            execution.setVariable("visitorId", visitorId);
+            userUid = "VISITOR-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            execution.setVariable("userUid", userUid);
         }
         
         // 记录会话来源
@@ -100,7 +100,7 @@ public class ThreadInitializeDelegate implements JavaDelegate {
         // 记录访客信息
         String visitorName = (String) execution.getVariable("visitorName");
         if (visitorName == null || visitorName.isEmpty()) {
-            visitorName = "访客" + visitorId.substring(visitorId.length() - 4);
+            visitorName = "访客" + userUid.substring(userUid.length() - 4);
             execution.setVariable("visitorName", visitorName);
         }
         
@@ -124,7 +124,7 @@ public class ThreadInitializeDelegate implements JavaDelegate {
         }
         
         log.info("Basic info initialized for thread: {}, visitor: {}, source: {}", 
-            execution.getVariable("threadUid"), visitorId, source);
+            execution.getVariable("threadUid"), userUid, source);
     }
     
     /**

@@ -40,8 +40,8 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
-        String currentAgentId = (String) execution.getVariable("agentId");
+        String userUid = (String) execution.getVariable("userUid");
+        String currentAgentId = (String) execution.getVariable("agentUid");
         String transferReason = (String) execution.getVariable("transferReason");
         
         // 记录转接开始时间
@@ -55,7 +55,7 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
             // 3. 执行转接操作
             
             log.info("Processing transfer for thread: {}, visitor: {}, from agent: {}", 
-                threadUid, visitorId, currentAgentId);
+                threadUid, userUid, currentAgentId);
             
             // 记录转接原因(如果未提供)
             if (transferReason == null || transferReason.isEmpty()) {
@@ -73,7 +73,7 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
                 threadUid, currentAgentId, targetAgentId);
             
             // 更新当前坐席ID
-            execution.setVariable("agentId", targetAgentId);
+            execution.setVariable("agentUid", targetAgentId);
             execution.setVariable("transferStatus", "COMPLETED");
         } catch (Exception e) {
             log.error("Error in transfer service", e);
@@ -96,7 +96,7 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
         
         // 获取相关变量
         String workgroupUid = (String) execution.getVariable("workgroupUid");
-        String currentAgentId = (String) execution.getVariable("agentId");
+        String currentAgentId = (String) execution.getVariable("agentUid");
         String transferReason = (String) execution.getVariable("transferReason");
         
         log.info("Finding transfer target in group: {}, current agent: {}, reason: {}", 
@@ -122,10 +122,10 @@ public class ThreadTransferServiceDelegate implements JavaDelegate {
         // TODO: 实际项目中，这里应该执行实际的转接操作
         
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        String userUid = (String) execution.getVariable("userUid");
         
         log.info("Transferring thread {} with visitor {} from agent {} to agent {}", 
-            threadUid, visitorId, fromAgentId, toAgentId);
+            threadUid, userUid, fromAgentId, toAgentId);
         
         // 模拟转接过程
         try {

@@ -42,7 +42,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         
         // 获取流程变量
         String threadUid = (String) execution.getVariable("threadUid");
-        // String visitorId = (String) execution.getVariable("visitorId");
+        // String userUid = (String) execution.getVariable("userUid");
         
         // 记录会话完成时间
         Date completionTime = new Date();
@@ -143,7 +143,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         // TODO: 实际项目中，这里应该实现生成会话总结的逻辑
         
         String threadUid = (String) execution.getVariable("threadUid");
-        String visitorId = (String) execution.getVariable("visitorId");
+        String userUid = (String) execution.getVariable("userUid");
         String visitorName = (String) execution.getVariable("visitorName");
         Date startTime = (Date) execution.getVariable("threadStartTime");
         Date completionTime = (Date) execution.getVariable("threadCompletionTime");
@@ -153,16 +153,16 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         // 构建总结信息
         StringBuilder summaryBuilder = new StringBuilder();
         summaryBuilder.append("会话ID: ").append(threadUid).append("\n");
-        summaryBuilder.append("访客: ").append(visitorName).append(" (").append(visitorId).append(")\n");
+        summaryBuilder.append("访客: ").append(visitorName).append(" (").append(userUid).append(")\n");
         summaryBuilder.append("开始时间: ").append(startTime).append("\n");
         summaryBuilder.append("结束时间: ").append(completionTime).append("\n");
         summaryBuilder.append("会话时长: ").append(formatDuration(durationSeconds)).append("\n");
         summaryBuilder.append("消息数量: ").append(messageCount).append("\n");
         
         // 添加服务坐席信息
-        String agentId = (String) execution.getVariable("agentId");
-        if (agentId != null && !agentId.isEmpty()) {
-            summaryBuilder.append("服务坐席: ").append(agentId).append("\n");
+        String agentUid = (String) execution.getVariable("agentUid");
+        if (agentUid != null && !agentUid.isEmpty()) {
+            summaryBuilder.append("服务坐席: ").append(agentUid).append("\n");
         }
         
         // 添加转接信息
@@ -234,7 +234,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         
         // 基本信息
         archiveData.put("threadUid", threadUid);
-        archiveData.put("visitorId", execution.getVariable("visitorId"));
+        archiveData.put("userUid", execution.getVariable("userUid"));
         archiveData.put("visitorName", execution.getVariable("visitorName"));
         archiveData.put("source", execution.getVariable("source"));
         archiveData.put("startTime", execution.getVariable("threadStartTime"));
@@ -243,7 +243,7 @@ public class ThreadCompletionDelegate implements JavaDelegate {
         
         // 服务信息
         archiveData.put("robotUsed", execution.getVariable("robotUsed"));
-        archiveData.put("agentId", execution.getVariable("agentId"));
+        archiveData.put("agentUid", execution.getVariable("agentUid"));
         archiveData.put("workgroupUid", execution.getVariable("workgroupUid"));
         archiveData.put("transferCount", execution.getVariable("transferCount"));
         archiveData.put("transferHistory", execution.getVariable("transferHistory"));
