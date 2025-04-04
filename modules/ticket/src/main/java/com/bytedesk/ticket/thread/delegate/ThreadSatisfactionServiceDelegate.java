@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 09:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 09:00:00
+ * @LastEditTime: 2025-04-04 10:24:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.delegate;
+package com.bytedesk.ticket.thread.delegate;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -32,8 +32,8 @@ import java.util.Map;
  * - 处理评价反馈
  */
 @Slf4j
-@Component("threadSatisfactionDelegate")
-public class ThreadSatisfactionDelegate implements JavaDelegate {
+@Component("threadSatisfactionServiceDelegate")
+public class ThreadSatisfactionServiceDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -209,4 +209,4 @@ public class ThreadSatisfactionDelegate implements JavaDelegate {
         execution.setVariable("satisfactionNeedsFollowUp", true);
         execution.setVariable("satisfactionFollowUpReason", "Customer unsatisfied: " + comment);
     }
-} 
+}
