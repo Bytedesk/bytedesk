@@ -31,7 +31,7 @@ public class AuthorityEntityListener {
 
     @PostPersist
     public void onPostPersist(AuthorityEntity authority) {
-        log.info("authority onPostPersist: " + authority);
+        // log.info("authority onPostPersist: " + authority);
         AuthorityEntity cloneAuthority = SerializationUtils.clone(authority);
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -40,7 +40,7 @@ public class AuthorityEntityListener {
 
     @PostUpdate
     public void onPostUpdate(AuthorityEntity authority) {
-        log.info("authority onPostUpdate: " + authority);
+        // log.info("authority onPostUpdate: " + authority);
         AuthorityEntity cloneAuthority = SerializationUtils.clone(authority);
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);

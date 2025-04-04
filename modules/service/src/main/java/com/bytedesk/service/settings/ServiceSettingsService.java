@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:11:11
+ * @LastEditTime: 2025-04-04 15:47:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -276,7 +276,7 @@ public class ServiceSettingsService {
                 Optional<FaqEntity> welcomeFaqOptional = faqService.findByUid(welcomeFaqUid);
                 if (welcomeFaqOptional.isPresent()) {
                     FaqEntity welcomeFaqEntity = welcomeFaqOptional.get();
-                    log.info("welcomeFaqUid added {}", welcomeFaqUid);
+                    // log.info("welcomeFaqUid added {}", welcomeFaqUid);
                     serviceSettings.getWelcomeFaqs().add(welcomeFaqEntity);
                 } else {
                     throw new RuntimeException("welcomeFaq " + welcomeFaqUid + " not found");

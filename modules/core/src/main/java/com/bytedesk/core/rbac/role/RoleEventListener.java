@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 18:15:09
+ * @LastEditTime: 2025-04-04 15:47:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,7 @@ public class RoleEventListener {
     @EventListener
     public void onAuthorityCreateEvent(AuthorityCreateEvent event) {
         AuthorityEntity authorityEntity = event.getAuthority();
-        log.info("role AuthorityCreateEvent: {}", authorityEntity.getUid());
+        // log.info("role AuthorityCreateEvent: {}", authorityEntity.getUid());
         
         // 将权限添加到超级管理员的权限集合
         roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_SUPER_UID, k -> new HashSet<>())
