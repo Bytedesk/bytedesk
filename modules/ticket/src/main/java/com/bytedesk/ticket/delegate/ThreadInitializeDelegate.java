@@ -141,6 +141,11 @@ public class ThreadInitializeDelegate implements JavaDelegate {
             execution.setVariable("robotUid", "DEFAULT_ROBOT");
         }
         
+        // 设置机器人空闲超时时间（访客长时间不回复）
+        if (execution.getVariable("robotIdleTimeout") == null) {
+            execution.setVariable("robotIdleTimeout", "PT5M"); // 5分钟
+        }
+        
         // 设置是否允许转接
         if (execution.getVariable("allowTransfer") == null) {
             execution.setVariable("allowTransfer", true);
@@ -168,4 +173,4 @@ public class ThreadInitializeDelegate implements JavaDelegate {
         
         log.info("Processing strategy initialized for thread: {}", execution.getVariable("threadUid"));
     }
-} 
+}
