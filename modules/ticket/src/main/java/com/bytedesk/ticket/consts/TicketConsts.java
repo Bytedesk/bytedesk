@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 15:00:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 09:38:49
+ * @LastEditTime: 2025-04-04 12:35:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,14 +67,5 @@ public class TicketConsts {
     // 未分配
     public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";
 
-    // thread-process
-    public static final String THREAD_PROCESS_NAME = I18Consts.I18N_PREFIX + "thread.process.name";
     
-    public static final String THREAD_PROCESS_KEY = "threadProcess";
-
-    public static final String THREAD_PROCESS_PATH = "processes/thread-process.bpmn20.xml";
-
-    // variables
-    public static final String TICKET_VARIABLE_THREAD_UID = "threadUid";
-
 }
