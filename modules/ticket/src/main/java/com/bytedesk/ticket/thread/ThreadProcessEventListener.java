@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 13:36:01
+ * @LastEditTime: 2025-04-04 13:45:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,6 +53,7 @@ public class ThreadProcessEventListener {
             return;
         }
         log.info("开始创建会话流程实例: threadUid={}, orgUid={}", thread.getUid(), thread.getOrgUid());
+        
         // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
         // 基本变量
@@ -61,6 +62,17 @@ public class ThreadProcessEventListener {
         variables.put(ThreadConsts.THREAD_VARIABLE_STATUS, thread.getStatus());
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
+        }
+        // 
+        if (thread.isAgentType()) {
+            // 一对一
+        } else if (thread.isWorkgroupType()) {
+            // 技能组
+        } else if (thread.isRobotType()) {
+            // 机器人
+        } else {
+            // 暂时仅处理上述客服会话类型
+            return;
         }
         
         // 2. 启动流程实例
