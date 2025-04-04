@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 22:44:51
+ * @LastEditTime: 2025-04-04 23:06:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -130,37 +130,71 @@ public class ThreadProcessEventListener {
         log.info("会话流程实例创建成功: processInstanceId={}, businessKey={}",
                 processInstance.getId(), processInstance.getBusinessKey());
 
-        // 3. 创建任务
-        Task task = taskService.createTaskQuery()
-                .processInstanceId(processInstance.getId())
-                .taskAssignee(thread.getAgentProtobuf().getUid()) // 指定任务负责人
-                .singleResult();
-        if (task != null) {
-            // 完成会话创建任务
-            taskService.complete(task.getId());
-        } else {
-            log.error("会话创建任务创建失败: task={}", task);
+        // 在后续操作前先检查流程实例是否还存在
+        boolean isProcessInstanceActive = checkProcessInstanceActive(processInstance.getId());
+        
+        // 3. 创建任务 - 只有在流程实例仍然活跃时才创建任务
+        if (isProcessInstanceActive && thread.isAgentType() && thread.getAgentProtobuf() != null) {
+            try {
+                Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstance.getId())
+                    .taskAssignee(thread.getAgentProtobuf().getUid()) // 指定任务负责人
+                    .singleResult();
+                if (task != null) {
+                    // 完成会话创建任务
+                    taskService.complete(task.getId());
+                } else {
+                    log.warn("会话创建任务未找到，可能是因为流程已自动执行到其他节点: threadUid={}", thread.getUid());
+                }
+            } catch (Exception e) {
+                log.error("创建或完成任务时出错: {}", e.getMessage());
+            }
         }
 
-        // 4. 设置流程实例变量
-        // 可以在流程执行的任何时候调用, 每次调用都会产生一次变量更新历史记录
-        // 适合设置运行时的动态变量或需要更新的变量
-        // 每次调用都会有一次数据库操作
-        runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
-
-        // 5. 设置 SLA 时间
-        String slaTime = "PT30M"; // 默认30分钟，后期支持自定义
-        runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
+        // 4. 设置流程实例变量 - 只有在流程实例仍然活跃时才设置变量
+        if (isProcessInstanceActive) {
+            try {
+                // 设置流程实例变量
+                runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
+                
+                // 5. 设置 SLA 时间
+                String slaTime = "PT30M"; // 默认30分钟，后期支持自定义
+                runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
+                
+                // 6. 设置人工客服空闲超时时间（默认15分钟）
+                runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");
+            } catch (Exception e) {
+                log.warn("设置流程变量失败，流程可能已结束: {}", e.getMessage());
+            }
+        } else {
+            log.info("流程实例已不活跃，跳过设置流程变量: processInstanceId={}", processInstance.getId());
+        }
         
-        // 6. 设置人工客服空闲超时时间（默认15分钟）
-        runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");
-        
-        // 7. 更新会话的流程实例ID
+        // 7. 更新会话的流程实例ID - 无论流程是否活跃都需要更新
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
         if (threadOptional.isPresent()) {
             ThreadEntity threadEntity = threadOptional.get();
             threadEntity.setProcessInstanceId(processInstance.getId());
             threadRestService.save(threadEntity);
+        }
+    }
+    
+    /**
+     * 检查流程实例是否仍然活跃
+     * 
+     * @param processInstanceId 流程实例ID
+     * @return 如果流程实例仍然活跃，则返回true；否则返回false
+     */
+    private boolean checkProcessInstanceActive(String processInstanceId) {
+        try {
+            // 尝试查询流程实例
+            ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstanceId)
+                    .singleResult();
+            return instance != null;
+        } catch (Exception e) {
+            log.warn("检查流程实例状态时出错: {}", e.getMessage());
+            return false;
         }
     }
 
