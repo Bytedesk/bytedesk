@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:13:09
+ * @LastEditTime: 2025-04-04 14:47:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.event.ThreadCreateEvent;
+import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +44,8 @@ public class ThreadProcessEventListener {
     private final ThreadRestService threadRestService;
 
     @EventListener
-    public void onThreadCreateEvent(ThreadCreateEvent event) {
-        log.info("ticket - onThreadCreateEvent: {}", event);
+    public void onThreadProcessCreateEvent(ThreadProcessCreateEvent event) {
+        log.info("ticket - ThreadProcessCreateEvent: {}", event);
         ThreadEntity thread = event.getThread();
         if (thread == null) {
             log.error("会话线程创建事件, 线程对象为空: {}", event);
@@ -74,6 +74,7 @@ public class ThreadProcessEventListener {
             }
             // 设置为非机器人接待
             variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, false);
+            variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_ONLINE, !thread.isOffline());
         } else if (thread.isWorkgroupType()) {
             // 技能组接待，设置candidateGroups为技能组ID
             if (thread.getWorkgroupProtobuf() != null) {
