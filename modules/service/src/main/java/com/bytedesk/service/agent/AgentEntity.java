@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:30:54
+ * @LastEditTime: 2025-04-05 15:35:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -122,9 +122,10 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
 
+    // 容易导致不一致，使用实时计算chatting thread数量
     // current thread count
-    @Builder.Default
-    private int currentThreadCount = 0;
+    // @Builder.Default
+    // private int currentThreadCount = 0;
 
     // max concurrent chatting thread count
     @Builder.Default
@@ -163,22 +164,22 @@ public class AgentEntity extends BaseEntity {
         return this.isConnected() && this.isAvailable();
     }
 
-    public Boolean canAcceptMore() {
-        return this.currentThreadCount < this.maxThreadCount;
-    }
+    // public Boolean canAcceptMore() {
+    //     return this.currentThreadCount < this.maxThreadCount;
+    // }
 
-    public void increaseThreadCount() {
-        this.currentThreadCount++;
-    }
-    public void decreaseThreadCount() {
-        if (this.currentThreadCount > 0) {
-            this.currentThreadCount--;
-        }
-    }
+    // public void increaseThreadCount() {
+    //     this.currentThreadCount++;
+    // }
+    // public void decreaseThreadCount() {
+    //     if (this.currentThreadCount > 0) {
+    //         this.currentThreadCount--;
+    //     }
+    // }
 
-    public void resetThreadCount() {
-        this.currentThreadCount = 0;
-    }
+    // public void resetThreadCount() {
+    //     this.currentThreadCount = 0;
+    // }
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
