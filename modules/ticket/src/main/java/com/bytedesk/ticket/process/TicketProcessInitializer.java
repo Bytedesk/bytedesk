@@ -32,8 +32,8 @@ public class TicketProcessInitializer implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         log.info("ticket process - organization created: {}", orgUid);
-        ticketProcessRestService.initTicketGroupProcess(orgUid);
-        ticketProcessRestService.initThreadGroupProcess(orgUid);
+        ticketProcessRestService.initTicketProcess(orgUid);
+        ticketProcessRestService.initThreadProcess(orgUid);
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:41:21
+ * @LastEditTime: 2025-04-05 15:21:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
+import com.bytedesk.core.utils.Utils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -157,11 +158,9 @@ public class ThreadProcessEventListener {
             try {
                 // 设置流程实例变量
                 runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
-                
                 // 5. 设置 SLA 时间
                 String slaTime = "PT30M"; // 默认30分钟，后期支持自定义
                 runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
-                
                 // 6. 设置人工客服空闲超时时间（默认15分钟）
                 runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");
             } catch (Exception e) {
@@ -175,6 +174,8 @@ public class ThreadProcessEventListener {
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
         if (threadOptional.isPresent()) {
             ThreadEntity threadEntity = threadOptional.get();
+            String processUid = Utils.formatUid(threadEntity.getOrgUid(), ThreadConsts.THREAD_PROCESS_KEY);
+            threadEntity.setProcessEntityUid(processUid);
             threadEntity.setProcessInstanceId(processInstance.getId());
             threadRestService.save(threadEntity);
         }
