@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 12:51:28
+ * @LastEditTime: 2025-04-05 13:35:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -149,9 +149,9 @@ public class ThreadEntity extends AbstractThreadEntity {
     /**
      * 检查会话是否曾经处于离线状态
      */
-    public Boolean wasOffline() {
+    public Boolean isOffline() {
         ThreadExtra extra = getThreadExtra();
-        return extra != null && extra.isWasOffline();
+        return extra != null && extra.isOffline();
     }
 
     /**
@@ -165,7 +165,7 @@ public class ThreadEntity extends AbstractThreadEntity {
         if (extra == null) {
             extra = new ThreadExtra();
         }
-        extra.setWasOffline(true);
+        extra.setOffline(true);
         setExtra(JSON.toJSONString(extra));
         
         return this;
