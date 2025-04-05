@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 11:57:57
+ * @LastEditTime: 2025-04-05 12:51:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,12 +107,8 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
     }
 
-    public Boolean isOffline() {
-        return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
-    }
-
-    // public Boolean isRoboting() {
-    //     return getStatus().equals(ThreadProcessStatusEnum.ROBOTING.name());
+    // public Boolean isOffline() {
+    //     return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
     // }
 
     public Boolean isQueuing() {
@@ -162,7 +158,7 @@ public class ThreadEntity extends AbstractThreadEntity {
      * 将当前会话标记为离线状态
      */
     public ThreadEntity setOffline() {
-        setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+        // setStatus(ThreadProcessStatusEnum.OFFLINE.name());
         
         // 更新extra信息，记录曾经处于离线状态
         ThreadExtra extra = getThreadExtra();
