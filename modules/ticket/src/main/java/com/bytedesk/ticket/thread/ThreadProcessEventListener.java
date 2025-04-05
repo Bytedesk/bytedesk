@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 23:06:08
+ * @LastEditTime: 2025-04-05 14:41:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -92,8 +92,9 @@ public class ThreadProcessEventListener {
                 log.error("一对一客服接待，但客服信息为空");
             }
             // 设置为非机器人接待
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, false);
-            variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_ONLINE, !thread.isOffline());
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
+            // 设置客服是否离线
+            variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE, thread.isOffline());
         } else if (thread.isWorkgroupType()) {
             // 技能组接待，设置candidateGroups为技能组ID
             if (thread.getWorkgroupProtobuf() != null) {
@@ -103,10 +104,10 @@ public class ThreadProcessEventListener {
                 log.error("技能组接待，但技能组信息为空");
             }
             // 设置为非机器人接待
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, false);
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
         } else if (thread.isRobotType()) {
             // 机器人接待
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, true);
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
             if (thread.getAgentProtobuf() != null) {
                 variables.put(ThreadConsts.THREAD_VARIABLE_AGENT_UID, thread.getAgentProtobuf().getUid());
                 log.info("机器人接待，设置robotUid为: {}", thread.getAgentProtobuf().getUid());

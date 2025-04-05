@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 13:26:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 10:09:38
+ * @LastEditTime: 2025-04-05 14:53:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,17 +141,17 @@ public class ThreadProcessService {
      */
     private String getGatewayDecisionResult(String gatewayId, Map<String, Object> variableMap) {
         switch (gatewayId) {
-            case "isRobotEnabled":
-                Boolean robotEnabled = (Boolean) variableMap.get("robotEnabled");
+            case ThreadConsts.THREAD_GATEWAY_IS_ROBOT_ENABLED:
+                Boolean robotEnabled = (Boolean) variableMap.get(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED);
                 return robotEnabled != null && robotEnabled ? "结果: 是" : "结果: 否";
-            case "transferToHuman":
-                Boolean needHumanService = (Boolean) variableMap.get("needHumanService");
+            case ThreadConsts.THREAD_GATEWAY_TRANSFER_TO_HUMAN:
+                Boolean needHumanService = (Boolean) variableMap.get(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE);
                 return needHumanService != null && needHumanService ? "结果: 是" : "结果: 否";
-            case "isAgentsOnline":
-                Boolean agentsOnline = (Boolean) variableMap.get("agentsOnline");
-                return agentsOnline != null && agentsOnline ? "结果: 是" : "结果: 否";
-            case "isAgentsBusy":
-                Boolean agentsBusy = (Boolean) variableMap.get("agentsBusy");
+            case ThreadConsts.THREAD_GATEWAY_IS_AGENTS_OFFLINE:
+                Boolean agentsOffline = (Boolean) variableMap.get(ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE);
+                return agentsOffline != null && agentsOffline ? "结果: 是" : "结果: 否";
+            case ThreadConsts.THREAD_GATEWAY_IS_AGENTS_BUSY:
+                Boolean agentsBusy = (Boolean) variableMap.get(ThreadConsts.THREAD_VARIABLE_AGENTS_BUSY);
                 return agentsBusy != null && agentsBusy ? "结果: 是" : "结果: 否";
             default:
                 return null;

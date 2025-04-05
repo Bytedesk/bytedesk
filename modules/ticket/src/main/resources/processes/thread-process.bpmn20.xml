@@ -20,15 +20,15 @@
       <conditionExpression xsi:type="tFormalExpression">${needHumanService == false}</conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="isAgentsBusy" name="坐席繁忙?" />
-    <sequenceFlow id="flow5" sourceRef="transferToHuman" targetRef="isAgentsOnline">
+    <sequenceFlow id="flow5" sourceRef="transferToHuman" targetRef="isAgentsOffline">
       <conditionExpression xsi:type="tFormalExpression">${needHumanService == true}</conditionExpression>
     </sequenceFlow>
-    <exclusiveGateway id="isAgentsOnline" name="坐席在线?" />
-    <sequenceFlow id="flow6" sourceRef="isRobotEnabled" targetRef="isAgentsOnline">
+    <exclusiveGateway id="isAgentsOffline" name="客服离线?" />
+    <sequenceFlow id="flow6" sourceRef="isRobotEnabled" targetRef="isAgentsOffline">
       <conditionExpression xsi:type="tFormalExpression">${robotEnabled == false}</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow17" sourceRef="isAgentsOnline" targetRef="isAgentsBusy">
-      <conditionExpression xsi:type="tFormalExpression">${agentsOnline == true}</conditionExpression>
+    <sequenceFlow id="flow17" sourceRef="isAgentsOffline" targetRef="isAgentsBusy">
+      <conditionExpression xsi:type="tFormalExpression">${agentsOffline == false}</conditionExpression>
     </sequenceFlow>
     <serviceTask id="queueService" name="排队等待" flowable:delegateExpression="${threadQueueServiceDelegate}" />
     <sequenceFlow id="flow7" sourceRef="isAgentsBusy" targetRef="queueService">
@@ -97,8 +97,8 @@
     </boundaryEvent>
     <sequenceFlow id="flowHumanTimeout" sourceRef="humanIdleTimer" targetRef="humanIdleTimeoutService" />
     <serviceTask id="agentsOfflineService" name="坐席离线处理" flowable:delegateExpression="${threadAgentsOfflineServiceDelegate}" />
-    <sequenceFlow id="flow18" sourceRef="isAgentsOnline" targetRef="agentsOfflineService">
-      <conditionExpression xsi:type="tFormalExpression">${agentsOnline == false}</conditionExpression>
+    <sequenceFlow id="flow18" sourceRef="isAgentsOffline" targetRef="agentsOfflineService">
+      <conditionExpression xsi:type="tFormalExpression">${agentsOffline == true}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flowOfflineToEnd" sourceRef="agentsOfflineService" targetRef="end" />
   </process>
@@ -122,7 +122,7 @@
       <bpmndi:BPMNShape id="BPMNShape_isAgentsBusy" bpmnElement="isAgentsBusy" isMarkerVisible="true">
         <omgdc:Bounds x="320" y="310" width="40" height="40" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_isAgentsOnline" bpmnElement="isAgentsOnline" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="BPMNShape_isAgentsOffline" bpmnElement="isAgentsOffline" isMarkerVisible="true">
         <omgdc:Bounds x="250" y="310" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_queueService" bpmnElement="queueService">
