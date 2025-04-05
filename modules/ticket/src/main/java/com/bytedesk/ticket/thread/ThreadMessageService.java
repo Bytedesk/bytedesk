@@ -70,8 +70,23 @@ public class ThreadMessageService {
             
             // 设置流程变量，标记访客请求转人工
             try {
-                runtimeService.setVariable(thread.getProcessInstanceId(), "visitorRequestedTransfer", true);
+                // 使用常量替代直接的字符串值
+                runtimeService.setVariable(thread.getProcessInstanceId(), 
+                    ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, true);
                 log.info("已设置访客请求转人工标记: processInstanceId={}", thread.getProcessInstanceId());
+                
+                /* 
+                 * visitorRequestedTransfer 变量使用说明:
+                 * 
+                 * 1. 此变量在流程中用于标记访客是否主动请求了转人工服务
+                 * 2. 可以在流程的服务任务（如robotService）中检查此变量，从而决定是否进行转人工操作
+                 * 3. 在BPMN流程文件中可以添加条件表达式，例如：${visitorRequestedTransfer == true}
+                 * 4. 建议在ThreadRobotServiceDelegate等相关服务委托类中使用此变量
+                 * 5. 示例：
+                 *    if (execution.getVariable(ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER) == Boolean.TRUE) {
+                 *        execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, true);
+                 *    }
+                 */
             } catch (Exception e) {
                 log.error("设置访客请求转人工标记失败: {}", e.getMessage());
             }
