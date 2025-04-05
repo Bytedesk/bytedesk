@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 17:01:40
+ * @LastEditTime: 2025-04-05 17:16:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,8 +44,8 @@ public class QueueMemberResponse extends BaseResponse {
     // @Builder.Default
     // private Integer beforeNumber = 0;  // 前面排队人数
 
-    // @Builder.Default
-    // private Integer waitTime = 0;  // 等待时间(秒)
+    @Builder.Default
+    private Integer waitTime = 0;  // 等待时间(秒)
 
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
