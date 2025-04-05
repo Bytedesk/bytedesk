@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-05 22:25:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 22:27:24
+ * @LastEditTime: 2025-04-05 22:37:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,15 +90,15 @@ public class ThreadMessageService {
         // 这里需要根据实际的消息类型和用户角色判断逻辑进行调整
         
         // 方法1: 如果MessageEntity有isUserType()方法
-        if (message.isUserType()) {
+        if (message.isFromVisitor()) {
             return true;
         }
         
         // 方法2: 根据消息的发送者uid和会话中的访客uid比较
-        if (thread.getUserProtobuf() != null && 
-            thread.getUserProtobuf().getUid().equals(message.getCreatorUid())) {
-            return true;
-        }
+        // if (thread.getUserProtobuf() != null && 
+        //     thread.getUserProtobuf().getUid().equals(message.getCreatorUid())) {
+        //     return true;
+        // }
         
         return false;
     }
