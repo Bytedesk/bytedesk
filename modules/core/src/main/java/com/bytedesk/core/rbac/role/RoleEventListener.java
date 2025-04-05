@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-07 16:27:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 15:47:49
+ * @LastEditTime: 2025-04-05 14:54:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -88,7 +88,7 @@ public class RoleEventListener {
         // 处理收集的权限
         roleAuthorityMap.forEach((roleUid, authorityUids) -> {
             if (!authorityUids.isEmpty()) {
-                log.info("处理角色权限: {} - 权限数量: {}", roleUid, authorityUids.size());
+                // log.info("处理角色权限: {} - 权限数量: {}", roleUid, authorityUids.size());
                 RoleRequest roleRequest = RoleRequest.builder()
                         .uid(roleUid)
                         .authorityUids(authorityUids)
