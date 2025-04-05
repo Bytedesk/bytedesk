@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 11:49:59
+ * @LastEditTime: 2025-04-05 15:19:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -138,6 +138,8 @@ public class VisitorThreadService
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         // 考虑到配置可能变化，更新配置
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        // 
+        String orgUid = agent.getOrgUid();
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -149,7 +151,7 @@ public class VisitorThreadService
                 .user(visitor)
                 .extra(extra)
                 .client(visitorRequest.getClient())
-                .orgUid(agent.getOrgUid())
+                .orgUid(orgUid)
                 .build();
         // 
         ThreadEntity savedEntity = threadRestService.save(thread);
