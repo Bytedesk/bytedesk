@@ -17,7 +17,11 @@
     <exclusiveGateway id="transferToHuman" name="是否转人工?" />
     <sequenceFlow id="flow3" sourceRef="robotService" targetRef="transferToHuman" />
     <sequenceFlow id="flow4" sourceRef="transferToHuman" targetRef="robotService">
-      <conditionExpression xsi:type="tFormalExpression">${needHumanService == false}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${needHumanService == false &amp;&amp; status != 'FINISHED'}</conditionExpression>
+    </sequenceFlow>
+    <!-- 添加一个从转人工网关到会话结束的直接路径，用于纯机器人会话直接结束的情况 -->
+    <sequenceFlow id="flowRobotFinishToEnd" sourceRef="transferToHuman" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression">${needHumanService == false &amp;&amp; status == 'FINISHED'}</conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="isAgentsBusy" name="坐席繁忙?" />
     <sequenceFlow id="flow5" sourceRef="transferToHuman" targetRef="isAgentsOffline">
@@ -184,6 +188,11 @@
         <omgdi:waypoint x="440" y="200" />
         <omgdi:waypoint x="320" y="200" />
         <omgdi:waypoint x="320" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRobotFinishToEnd" bpmnElement="flowRobotFinishToEnd" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="440" y="250" />
+        <omgdi:waypoint x="844" y="250" />
+        <omgdi:waypoint x="844" y="316" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
         <omgdi:waypoint x="440" y="269.9251246882793" />
