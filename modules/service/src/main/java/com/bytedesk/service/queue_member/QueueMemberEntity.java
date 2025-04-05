@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:55:36
+ * @LastEditTime: 2025-04-05 14:08:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,8 +67,8 @@ public class QueueMemberEntity extends BaseEntity {
     // @Builder.Default
     // private int beforeNumber = 0;  // 前面排队人数
 
-    @Builder.Default
-    private int waitTime = 0;  // 预计等待时间(秒)，类似医院取号小票上面的等待时间，非真实等待时间
+    // @Builder.Default
+    // private int waitTime = 0;  // 预计等待时间(秒)，类似医院取号小票上面的等待时间，非真实等待时间
 
     @Builder.Default
     private int queueNumber = 0;  // 排队号码
@@ -87,9 +87,9 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime acceptTime;  // 开始服务时间
 
     @Builder.Default
-    private boolean firstResponse = false;  // 是否首次响应
+    private boolean firstResponse = false;  // 人工客服是否首次响应
 
-    private LocalDateTime firstResponseTime;  // 首次人工响应时间
+    private LocalDateTime firstResponseTime;  // 首次响应时间
 
     private LocalDateTime lastResponseTime;  // 最后响应时间
 
@@ -194,7 +194,7 @@ public class QueueMemberEntity extends BaseEntity {
         this.acceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
         this.acceptTime = LocalDateTime.now();
         // 计算等待时间
-        this.waitTime = (int) Duration.between(enqueueTime, acceptTime).getSeconds();
+        // this.waitTime = (int) Duration.between(enqueueTime, acceptTime).getSeconds();
     }
 
     /**
