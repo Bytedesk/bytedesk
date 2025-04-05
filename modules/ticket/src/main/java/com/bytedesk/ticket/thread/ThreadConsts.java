@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 22:48:54
+ * @LastEditTime: 2025-04-05 22:57:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -78,4 +78,17 @@ public class ThreadConsts {
     public static final String THREAD_STATUS_TRANSFER = "TRANSFER"; // 转接状态
     
     public static final String THREAD_STATUS_FINISHED = "FINISHED"; // 结束状态
+    
+    // 机器人服务相关常量
+    public static final String THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT = "robotServiceExecutionCount"; // 机器人服务执行计数
+    public static final String THREAD_VARIABLE_ROBOT_SERVICE_START_TIME = "robotServiceStartTime"; // 机器人服务开始时间
+    public static final String THREAD_VARIABLE_ROBOT_SERVICE_END_TIME = "robotServiceEndTime"; // 机器人服务结束时间
+    public static final String THREAD_VARIABLE_ROBOT_SERVICE_DURATION = "robotServiceDuration"; // 机器人服务持续时间
+    public static final String THREAD_VARIABLE_ROBOT_SERVICE_SUMMARY = "robotServiceSummary"; // 机器人服务摘要
+    public static final String THREAD_VARIABLE_ROBOT_SERVICE_ERROR = "robotServiceError"; // 机器人服务错误信息
+    public static final String THREAD_VARIABLE_TRANSFER_REASON = "transferReason"; // 转人工原因
+    public static final String THREAD_VARIABLE_TRANSFER_PRIORITY = "transferPriority"; // 转人工优先级
+    
+    // 机器人服务执行次数上限
+    public static final int THREAD_MAX_ROBOT_EXECUTION_COUNT = 3; // 最大机器人服务执行次数
 }

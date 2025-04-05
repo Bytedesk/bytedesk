@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:34:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 22:53:01
+ * @LastEditTime: 2025-04-05 22:58:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,9 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component("threadRobotServiceDelegate")
 public class ThreadRobotServiceDelegate implements JavaDelegate {
-
-    // 添加执行计数跟踪
-    private static final String EXECUTION_COUNT_KEY = "robotServiceExecutionCount";
     
     @Override
     public void execute(DelegateExecution execution) {
@@ -50,16 +47,16 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             threadUid, userUid, workgroupUid);
         
         // 跟踪执行次数，防止无限循环
-        Integer executionCount = (Integer) execution.getVariable(EXECUTION_COUNT_KEY);
+        Integer executionCount = (Integer) execution.getVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT);
         if (executionCount == null) {
             executionCount = 1;
         } else {
             executionCount++;
         }
-        execution.setVariable(EXECUTION_COUNT_KEY, executionCount);
+        execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT, executionCount);
         
         // 如果执行次数过多，强制设置为需要人工服务，打破循环
-        if (executionCount > 3) {
+        if (executionCount > ThreadConsts.THREAD_MAX_ROBOT_EXECUTION_COUNT) {
             log.warn("检测到机器人服务多次执行，可能存在循环问题，强制设置为需要人工服务。threadUid: {}", threadUid);
             execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, true);
             return;
@@ -67,7 +64,7 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
         
         // 记录机器人接待开始时间
         long startTime = System.currentTimeMillis();
-        execution.setVariable("robotServiceStartTime", startTime);
+        execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_START_TIME, startTime);
         
         try {
             // TODO: 实际项目中，这里需要调用AI服务进行机器人回复
@@ -95,11 +92,11 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
                 // sendSystemMessage(threadUid, "正在为您转接人工客服，请稍候...");
                 
                 // 可以添加一些额外信息，帮助客服了解访客之前的问题
-                execution.setVariable("robotServiceSummary", "访客主动请求转人工服务");
-                execution.setVariable("transferReason", "访客请求");
+                execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_SUMMARY, "访客主动请求转人工服务");
+                execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_REASON, "访客请求");
                 
                 // 设置转人工的优先级，访客主动请求可能需要更高优先级
-                execution.setVariable("transferPriority", 2); // 高优先级
+                execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_PRIORITY, 2); // 高优先级
             }
             
             // 设置是否需要人工服务的流程变量
@@ -118,12 +115,12 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             log.error("Error in robot service for thread: {}", threadUid, e);
             // 异常情况下转人工处理
             execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, true);
-            execution.setVariable("robotServiceError", e.getMessage());
+            execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_ERROR, e.getMessage());
         } finally {
             // 记录机器人接待结束时间和总时长
             long endTime = System.currentTimeMillis();
-            execution.setVariable("robotServiceEndTime", endTime);
-            execution.setVariable("robotServiceDuration", endTime - startTime);
+            execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_END_TIME, endTime);
+            execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_DURATION, endTime - startTime);
         }
     }
 }
