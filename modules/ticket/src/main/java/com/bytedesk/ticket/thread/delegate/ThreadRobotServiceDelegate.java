@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:34:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 22:58:01
+ * @LastEditTime: 2025-04-05 23:34:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 机器人接待服务
+ * 
+ * 纯机器人类型（THREAD_TYPE_ROBOT）不支持转人工
+ * 工作组类型（THREAD_TYPE_WORKGROUP）支持机器人和转人工功能
+ * 一对一客服类型（THREAD_TYPE_AGENT）不应该执行机器人服务
  * 
  * 处理客服会话中的机器人自动应答环节
  * - 接收访客消息
