@@ -50,7 +50,7 @@
     </sequenceFlow>
     <boundaryEvent id="slaTimer" cancelActivity="false" attachedToRef="humanService">
       <timerEventDefinition>
-        <timeDuration>${slaTime}</timeDuration>
+        <timeDuration>${slaTime != null ? slaTime : 'PT30M'}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <serviceTask id="slaNotification" name="SLA超时通知" flowable:delegateExpression="${threadSLATimeoutNotificationDelegate}" />
@@ -70,13 +70,10 @@
     </serviceTask>
     <sequenceFlow id="flow15" sourceRef="humanService" targetRef="satisfactionService">
       <conditionExpression xsi:type="tFormalExpression">${status == 'RESOLVED'}</conditionExpression>
-    </sequenceFlow>
-    
-    <!-- 添加人工坐席手动结束会话流程 -->
+    </sequenceFlow>    
     <sequenceFlow id="flowFinishToEnd" sourceRef="humanService" targetRef="end">
       <conditionExpression xsi:type="tFormalExpression">${status == 'FINISHED'}</conditionExpression>
     </sequenceFlow>
-    
     <endEvent id="end" name="会话结束" />
     <sequenceFlow id="flow16" sourceRef="satisfactionService" targetRef="end" />
     <sequenceFlow id="flow11" sourceRef="humanService" targetRef="transferService">
@@ -85,14 +82,14 @@
     <sequenceFlow id="flowRobotTimeout" sourceRef="robotIdleTimer" targetRef="robotIdleTimeoutService" />
     <boundaryEvent id="robotIdleTimer" attachedToRef="robotService">
       <timerEventDefinition>
-        <timeDuration>${robotIdleTimeout}</timeDuration>
+        <timeDuration>${robotIdleTimeout != null ? robotIdleTimeout : 'PT5M'}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <serviceTask id="humanIdleTimeoutService" name="访客在人工接待中超时未发消息" flowable:delegateExpression="${threadHumanIdleTimeoutServiceDelegate}" />
     <sequenceFlow id="flowHumanTimeoutToEnd" sourceRef="humanIdleTimeoutService" targetRef="end" />
     <boundaryEvent id="humanIdleTimer" attachedToRef="humanService">
       <timerEventDefinition>
-        <timeDuration>${humanIdleTimeout}</timeDuration>
+        <timeDuration>${humanIdleTimeout != null ? humanIdleTimeout : 'PT15M'}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flowHumanTimeout" sourceRef="humanIdleTimer" targetRef="humanIdleTimeoutService" />

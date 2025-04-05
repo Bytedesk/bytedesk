@@ -79,6 +79,16 @@ public class ThreadProcessEventListener {
         variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_UID, thread.getUid());
         variables.put(ThreadConsts.THREAD_VARIABLE_ORGUID, thread.getOrgUid());
         variables.put(ThreadConsts.THREAD_VARIABLE_STATUS, thread.getStatus());
+        variables.put(ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
+        
+        // 设置默认值，避免流程执行时找不到变量
+        // 设置 SLA 时间 - 预先设置默认值
+        variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME, "PT30M");  // 默认30分钟
+        // 设置人工客服空闲超时时间
+        variables.put(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");  // 默认15分钟
+        // 设置机器人空闲超时时间
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, "PT5M");   // 默认5分钟
+        
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
         }
@@ -116,8 +126,6 @@ public class ThreadProcessEventListener {
                 variables.put(ThreadConsts.THREAD_VARIABLE_AGENT_UID, thread.getAgentProtobuf().getUid());
                 log.info("机器人接待，设置robotUid为: {}", thread.getAgentProtobuf().getUid());
             }
-            // 设置机器人超时时间（默认5分钟）
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, "PT5M");
         } else {
             // 暂时仅处理上述客服会话类型
             log.warn("未知的会话类型，不处理");
@@ -156,23 +164,6 @@ public class ThreadProcessEventListener {
             }
         }
 
-        // 4. 设置流程实例变量 - 只有在流程实例仍然活跃时才设置变量
-        if (isProcessInstanceActive) {
-            try {
-                // 设置流程实例变量
-                runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
-                // 5. 设置 SLA 时间
-                String slaTime = "PT30M"; // 默认30分钟，后期支持自定义
-                runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
-                // 6. 设置人工客服空闲超时时间（默认15分钟）
-                runtimeService.setVariable(processInstance.getId(), ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");
-            } catch (Exception e) {
-                log.warn("设置流程变量失败，流程可能已结束: {}", e.getMessage());
-            }
-        } else {
-            log.info("流程实例已不活跃，跳过设置流程变量: processInstanceId={}", processInstance.getId());
-        }
-        
         // 7. 更新会话的流程实例ID - 无论流程是否活跃都需要更新
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(thread.getUid());
         if (threadOptional.isPresent()) {
