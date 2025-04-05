@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:58:15
+ * @LastEditTime: 2025-04-05 14:24:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -247,8 +247,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         //
         ThreadEntity thread = threadOptional.get();
-        thread.setOffline();
-        thread.setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
+        thread.setClose()
+            .setOffline()
+            .setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
         threadService.save(thread);
         //
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
