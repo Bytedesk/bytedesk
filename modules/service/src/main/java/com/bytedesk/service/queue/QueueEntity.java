@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 18:05:39
+ * @LastEditTime: 2025-04-05 11:23:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 队列实体类：
@@ -77,94 +81,109 @@ public class QueueEntity extends BaseEntity {
     @Column(name = "queue_status", nullable = false)
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
+    // 添加与QueueMember的一对多关系
+    @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private int newCount = 0;  // 今日请求服务人数，当前排队号码
+    private List<QueueMemberEntity> queueMembers = new ArrayList<>();
 
-    @Builder.Default
-    private int offlineCount = 0;  // 请求时，客服离线或非接待状态的请求人次
+    /**
+     * 获取当天请求服务总人数（当前分配的排队号码）
+     */
+    public int getNewCount() {
+        return queueMembers.size();
+    }
 
-    @Builder.Default
-    private int queuingCount = 0;  // 排队中人数
+    /**
+     * 获取请求时客服离线的人数
+     */
+    public int getOfflineCount() {
+        return (int) queueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isOffline())
+                .count();
+    }
 
-    @Builder.Default
-    private int chattingCount = 0;  // 正在服务人数   
+    /**
+     * 获取当前排队中的人数
+     */
+    public int getQueuingCount() {
+        return (int) queueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isQueuing())
+                .count();
+    }
 
-    @Builder.Default
-    private int closedCount = 0;  // 对话结束人数
+    /**
+     * 获取当前正在会话的人数
+     */
+    public int getChattingCount() {
+        return (int) queueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isChatting())
+                .count();
+    }
 
-    @Builder.Default
-    private int avgWaitTime = 0;  // 平均等待时间(秒)
+    /**
+     * 获取已结束会话的人数
+     */
+    public int getClosedCount() {
+        return (int) queueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .count();
+    }
 
-    @Builder.Default
-    private int avgResolveTime = 0;  // 平均解决时间(秒)
+    /**
+     * 获取平均等待时间(秒)
+     */
+    public int getAvgWaitTime() {
+        List<QueueMemberEntity> servedMembers = queueMembers.stream()
+                .filter(member -> member.getAcceptTime() != null)
+                .toList();
+        
+        if (servedMembers.isEmpty()) {
+            return 0;
+        }
+        
+        long totalWaitTime = servedMembers.stream()
+                .mapToLong(QueueMemberEntity::getWaitTime)
+                .sum();
+        
+        return (int) (totalWaitTime / servedMembers.size());
+    }
+
+    /**
+     * 获取平均解决时间(秒)
+     */
+    public int getAvgResolveTime() {
+        List<QueueMemberEntity> closedMembers = queueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
+                .toList();
+        
+        if (closedMembers.isEmpty()) {
+            return 0;
+        }
+        
+        long totalResolveTime = closedMembers.stream()
+                .mapToLong(member -> {
+                    return java.time.Duration.between(
+                            member.getAcceptTime(), 
+                            member.getCloseTime())
+                            .getSeconds();
+                })
+                .sum();
+        
+        return (int) (totalResolveTime / closedMembers.size());
+    }
 
     /**
      * 获取下一个排队号码
      */
     public int getNextNumber() {
-        return ++newCount;
-    }
-
-    /**
-     * 减少等待人数
-     */
-    public void decreaseWaitingNumber() {
-        this.queuingCount--;
-    }
-
-    /**
-     * 增加等待人数
-     */
-    public void increaseWaitingNumber() {
-        this.queuingCount++;
-    }
-
-    /**
-     * 增加正在服务人数
-     */
-    public void increaseServingNumber() {
-        this.chattingCount++;
-    }
-
-    /**
-     * 减少正在服务人数
-     */
-    public void decreaseServingNumber() {
-        this.chattingCount--;
-    }
-
-    /**
-     * 增加已完成人数
-     */
-    public void increaseServedNumber() {
-        this.closedCount++;
-    }
-
-    /**
-     * 更新队列统计
-     */
-    public void updateStats(int waiting, int serving, int served, int avgWait) {
-        this.queuingCount = waiting;
-        this.chattingCount = serving;
-        this.closedCount = served;
-        this.avgWaitTime = avgWait;
+        return getNewCount() + 1;
     }
 
     /**
      * 检查是否可以加入队列
-     * TODO: 需要根据队列的最大等待人数来判断
-     * TODO: 增加节假日判断
-     * @return true: 可以加入队列; false: 不可以加入队列
      */
     public boolean canEnqueue() {
         return status.equals(QueueStatusEnum.ACTIVE.name());
-            // && waitingNumber < maxWaiting;
-    }
-
-    public void acceptThread() {
-        this.chattingCount++;
-        this.queuingCount--;
-        // TODO: 计算平均等待时间
-        this.avgWaitTime = (this.avgWaitTime * this.closedCount + this.newCount) / (this.closedCount + 1);
     }
 }

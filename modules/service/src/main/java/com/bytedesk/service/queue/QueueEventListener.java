@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 22:19:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:14:46
+ * @LastEditTime: 2025-04-05 11:19:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,7 +44,7 @@ public class QueueEventListener {
         if (queueOptional.isPresent()) {
             QueueEntity queue = queueOptional.get();
             // 增加已完成人数
-            queue.increaseServedNumber();
+            // queue.increaseServedNumber();
             queueRestService.save(queue);
         } else {
             log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
@@ -62,7 +62,7 @@ public class QueueEventListener {
         if (queueOptional.isPresent()) {
             QueueEntity queue = queueOptional.get();
             // 减少排队人数，增加接入人数
-            queue.acceptThread();
+            // queue.acceptThread();
             queueRestService.save(queue);
         } else {
             log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);

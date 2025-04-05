@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 10:59:26
+ * @LastEditTime: 2025-04-05 11:01:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,10 +101,6 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (savedEntity == null) {
             throw new RuntimeException("Failed to save thread");
         }
-
-        // 增加接待数量
-        // robot.increaseThreadCount();
-        // robotRestService.save(robot);
 
         // 更新排队状态
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
