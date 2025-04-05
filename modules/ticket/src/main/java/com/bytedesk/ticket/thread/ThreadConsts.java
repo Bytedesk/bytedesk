@@ -60,6 +60,12 @@ public class ThreadConsts {
     public static final String THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT = "robotIdleTimeout"; // 机器人接待访客超时时间
     
     public static final String THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT = "humanIdleTimeout"; // 人工接待访客超时时间
+    
+    // 会话类型相关常量
+    public static final String THREAD_VARIABLE_THREAD_TYPE = "threadType"; // 会话类型
+    public static final String THREAD_TYPE_AGENT = "agent";                // 一对一客服类型
+    public static final String THREAD_TYPE_WORKGROUP = "workgroup";        // 工作组类型
+    public static final String THREAD_TYPE_ROBOT = "robot";                // 机器人类型
 
     // 流程网关 ID 常量
     public static final String THREAD_GATEWAY_IS_ROBOT_ENABLED = "isRobotEnabled"; // 机器人接待网关
