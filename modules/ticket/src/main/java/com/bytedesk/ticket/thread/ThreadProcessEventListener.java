@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 22:22:19
+ * @LastEditTime: 2025-04-05 23:31:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -105,6 +105,21 @@ public class ThreadProcessEventListener {
         // 设置客服是否繁忙变量
         variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_BUSY, thread.isQueuing());
         variables.put(ThreadConsts.THREAD_VARIABLE_WORKGROUP_UID, "");
+        // 设置为非机器人接待
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
+        // 设置客服是否离线
+        variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE, thread.isOffline());
+        
+        // 设置会话类型，用于在delegate中判断是否支持转人工等操作
+        if (thread.isAgentType()) {
+            variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_TYPE, ThreadConsts.THREAD_TYPE_AGENT);
+        } else if (thread.isWorkgroupType()) {
+            variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_TYPE, ThreadConsts.THREAD_TYPE_WORKGROUP);
+        } else if (thread.isRobotType()) {
+            variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_TYPE, ThreadConsts.THREAD_TYPE_ROBOT);
+        } else {
+            variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_TYPE, "unknown");
+        }
         
         // 根据不同的会话类型设置相应的流程变量
         if (thread.isAgentType()) {
@@ -116,10 +131,6 @@ public class ThreadProcessEventListener {
             } else {
                 log.error("一对一客服接待，但客服信息为空");
             }
-            // 设置为非机器人接待
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
-            // 设置客服是否离线
-            variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE, thread.isOffline());
         } else if (thread.isWorkgroupType()) {
             // 技能组接待，设置candidateGroups为技能组ID
             if (thread.getWorkgroupProtobuf() != null) {
@@ -128,8 +139,6 @@ public class ThreadProcessEventListener {
             } else {
                 log.error("技能组接待，但技能组信息为空");
             }
-            // 设置为非机器人接待
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
         } else if (thread.isRobotType()) {
             // 机器人接待
             variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, true);  // 确保这里设置为true

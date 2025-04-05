@@ -74,29 +74,45 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             
             log.info("Robot processing thread: {}, visitor: {}", threadUid, userUid);
             
-            // ===== visitorRequestedTransfer 使用实例 BEGIN =====
+            // 获取会话类型
+            String threadType = (String) execution.getVariable(ThreadConsts.THREAD_VARIABLE_THREAD_TYPE);
             
             // 检查是否有访客手动请求转人工的标记
             Boolean visitorRequestedTransfer = (Boolean) execution.getVariable(
                 ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER);
             
-            // 仅当访客明确请求转人工时才设置为需要人工服务
-            boolean needHumanService = (visitorRequestedTransfer != null && visitorRequestedTransfer);
+            // 根据会话类型决定是否支持转人工
+            boolean needHumanService = false;
             
-            // 如果检测到访客请求转人工，则记录日志
-            if (needHumanService) {
-                log.info("检测到访客 {} 请求转人工，正在处理转接流程...", userUid);
+            if (ThreadConsts.THREAD_TYPE_ROBOT.equals(threadType)) {
+                // 纯机器人类型，不支持转人工
+                needHumanService = false;
+                log.info("纯机器人会话类型，不支持转人工: {}", threadUid);
                 
-                // 在这里可以添加转人工前的处理逻辑
-                // 例如：发送提示消息给访客，告知正在转接人工客服
-                // sendSystemMessage(threadUid, "正在为您转接人工客服，请稍候...");
+                // 如果用户请求了转人工，给用户发送提示消息
+                if (visitorRequestedTransfer != null && visitorRequestedTransfer) {
+                    log.info("访客请求转人工，但当前是纯机器人会话，不支持转人工: {}", threadUid);
+                    // TODO: 发送系统消息告知访客此会话不支持转人工
+                    // sendSystemMessage(threadUid, "很抱歉，当前会话不支持转接人工客服");
+                }
                 
-                // 可以添加一些额外信息，帮助客服了解访客之前的问题
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_SUMMARY, "访客主动请求转人工服务");
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_REASON, "访客请求");
+            } else if (ThreadConsts.THREAD_TYPE_WORKGROUP.equals(threadType)) {
+                // 工作组类型，支持转人工
+                needHumanService = (visitorRequestedTransfer != null && visitorRequestedTransfer);
                 
-                // 设置转人工的优先级，访客主动请求可能需要更高优先级
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_PRIORITY, 2); // 高优先级
+                // 如果检测到访客请求转人工，则记录日志
+                if (needHumanService) {
+                    log.info("工作组会话类型，检测到访客 {} 请求转人工，正在处理转接流程...", userUid);
+                    
+                    // 添加转人工相关信息
+                    execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_SUMMARY, "访客主动请求转人工服务");
+                    execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_REASON, "访客请求");
+                    execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_PRIORITY, 2); // 高优先级
+                }
+            } else {
+                // 其他类型（如一对一客服）不应该执行机器人服务
+                log.warn("非机器人支持的会话类型执行了机器人服务: {} 类型: {}", threadUid, threadType);
+                needHumanService = true;
             }
             
             // 设置是否需要人工服务的流程变量
@@ -106,10 +122,9 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             if (needHumanService) {
                 execution.setVariable(ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, false);
             }
-            // ===== visitorRequestedTransfer 使用实例 END =====
             
-            log.info("Robot service completed for thread: {}, visitor requested transfer: {}, need human service: {}", 
-                     threadUid, visitorRequestedTransfer, needHumanService);
+            log.info("Robot service completed for thread: {}, thread type: {}, visitor requested transfer: {}, need human service: {}", 
+                     threadUid, threadType, visitorRequestedTransfer, needHumanService);
             
         } catch (Exception e) {
             log.error("Error in robot service for thread: {}", threadUid, e);
