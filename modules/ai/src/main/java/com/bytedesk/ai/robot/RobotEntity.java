@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:18:23
+ * @LastEditTime: 2025-04-05 10:59:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,8 +81,8 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
 
-    @Builder.Default
-    private int currentThreadCount = 0;
+    // @Builder.Default
+    // private int currentThreadCount = 0;
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
@@ -93,9 +93,6 @@ public class RobotEntity extends BaseEntity {
     @Column(name = "robot_type", nullable = false)
     private String type = RobotTypeEnum.SERVICE.name();
 
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
     @Builder.Default
     private boolean published = false;
 
@@ -104,28 +101,21 @@ public class RobotEntity extends BaseEntity {
 
     private String kbUid; // 对应知识库
 
-    // @Builder.Default
-    // @Column(name = "robot_category")
-    // private String category = RobotCategoryEnum.DEFAULT.name();
-    
     // 机器人分类
     private String categoryUid;
 
-    // only used when created by user, not by org
-    // private String userUid; // 创建用户
+    // public void increaseThreadCount() {
+    //     this.currentThreadCount++;
+    // }
+    // public void decreaseThreadCount() {
+    //     if (this.currentThreadCount > 0) {
+    //         this.currentThreadCount--;
+    //     }
+    // }
 
-    public void increaseThreadCount() {
-        this.currentThreadCount++;
-    }
-    public void decreaseThreadCount() {
-        if (this.currentThreadCount > 0) {
-            this.currentThreadCount--;
-        }
-    }
-
-    public void resetThreadCount() {
-        this.currentThreadCount = 0;
-    }
+    // public void resetThreadCount() {
+    //     this.currentThreadCount = 0;
+    // }
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()

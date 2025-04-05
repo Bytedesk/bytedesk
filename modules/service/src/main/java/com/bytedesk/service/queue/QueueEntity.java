@@ -81,13 +81,13 @@ public class QueueEntity extends BaseEntity {
     private int newCount = 0;  // 今日请求服务人数，当前排队号码
 
     @Builder.Default
+    private int offlineCount = 0;  // 请求时，客服离线或非接待状态的请求人次
+
+    @Builder.Default
     private int queuingCount = 0;  // 排队中人数
 
     @Builder.Default
-    private int chattingCount = 0;  // 正在服务人数
-
-    @Builder.Default
-    private int offlineCount = 0;  // 请求时，客服离线或非接待状态的请求人次
+    private int chattingCount = 0;  // 正在服务人数   
 
     @Builder.Default
     private int closedCount = 0;  // 对话结束人数
