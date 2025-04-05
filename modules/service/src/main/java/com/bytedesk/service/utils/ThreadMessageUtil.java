@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:46:15
+ * @LastEditTime: 2025-04-05 16:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.service.utils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
@@ -30,7 +29,6 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceTrigger;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import java.time.LocalDateTime;
 
@@ -59,13 +57,13 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageProtobuf getThreadRobotWelcomeMessage(RobotEntity robot, ThreadEntity thread) {
+    public static MessageProtobuf getThreadRobotWelcomeMessage(String content, ThreadEntity thread) {
 
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         // ... 方法的实现保持不变 ...
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(robot.getServiceSettings().getWelcomeTip())
+                .content(content)
                 .threadUid(thread.getUid())
                 .topic(thread.getTopic())
                 .type(MessageTypeEnum.WELCOME.name())
@@ -82,14 +80,15 @@ public class ThreadMessageUtil {
     }
 
     // 将此方法设为静态，以便在没有实例化类的情况下调用
-    public static MessageProtobuf getThreadWelcomeMessage(AgentEntity agent, ThreadEntity thread) {
+    public static MessageProtobuf getThreadWelcomeMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(agent.getServiceSettings().getWelcomeTip())
+                // .content(agent.getServiceSettings().getWelcomeTip())
+                .content(content)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
@@ -170,14 +169,14 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageEntity getAgentThreadOfflineMessage(AgentEntity agent, ThreadEntity thread) {
+    public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(agent.getMessageLeaveSettings().getMessageLeaveTip())
+                .content(content)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
@@ -193,7 +192,7 @@ public class ThreadMessageUtil {
         return message;
     }
 
-    public static MessageEntity getThreadOfflineMessage(WorkgroupEntity workgroup, ThreadEntity thread) {
+    public static MessageEntity getThreadOfflineMessage(ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:00:06
+ * @LastEditTime: 2025-04-05 16:21:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,6 @@ import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-// import com.bytedesk.service.routing.RouteService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -63,8 +62,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
     private final VisitorThreadService visitorThreadService;
 
     private final IMessageSendService messageSendService;
-
-    // private final AgentRestService agentRestService;
 
     private final QueueService queueService;
 
@@ -127,7 +124,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
-            // if (agent.canAcceptMore()) {
             if (queueMemberEntity.getQueue().getQueuingCount() < agent.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableAgent(thread, agent, queueMemberEntity);
@@ -150,11 +146,12 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
+        String content = agent.getServiceSettings().getWelcomeTip();
         ThreadEntity thread = threadOptional.get();
         // 未满则接待
         thread.setStarted()
             .setUnreadCount(1)
-            .setContent(agent.getServiceSettings().getWelcomeTip());
+            .setContent(content);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
@@ -165,7 +162,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         // 
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
@@ -216,13 +213,13 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
+        String content = agent.getMessageLeaveSettings().getMessageLeaveTip();
         ThreadEntity thread = threadOptional.get();
         // 客服离线或小休不接待状态，则进入留言
         thread.setClose() // 状态
             .setOffline() // 离线状态
             .setUnreadCount(0)
-            .setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
-        
+            .setContent(content);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
@@ -243,7 +240,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 
         // 创建新的留言消息
-        MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(agent, savedThread);
+        MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(content, savedThread);
         // 保存留言消息
         messageRestService.save(message);
         // 返回留言消息

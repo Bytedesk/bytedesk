@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:37:45
+ * @LastEditTime: 2025-04-05 16:26:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.routing_strategy;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -28,6 +29,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
@@ -67,8 +69,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final IMessageSendService messageSendService;
 
-    // private final AgentRestService agentRestService;
-
     private final QueueService queueService;
 
     private final QueueMemberRestService queueMemberRestService;;
@@ -77,7 +77,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final WorkgroupRoutingService workgroupRoutingService;
 
-    // private final RobotRestService robotRestService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -175,32 +175,30 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
 
+        String content = agent.getServiceSettings().getWelcomeTip();
         // 未满则接待
         thread.setUserUid(agent.getUid());
         thread.setStarted();
         thread.setUnreadCount(1);
-        thread.setContent(agent.getServiceSettings().getWelcomeTip());
-        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        // 增加接待数量，待优化
-        // agent.increaseThreadCount();
-        // agentRestService.save(agent);
-        // 更新排队状态，待优化
-        // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
-        queueMemberEntity.setAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-        queueMemberRestService.save(queueMemberEntity);
-        //
+        thread.setContent(content);
         thread.setOwner(agent.getMember().getUser());
         //
         UserProtobuf agentProtobuf = ServiceConvertUtils.convertToUserProtobuf(agent);
         thread.setAgent(JSON.toJSONString(agentProtobuf));
-        // thread.setRobot(false);
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("Failed to save thread");
+        }
+        // 客服接待
+        queueMemberEntity.setAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberRestService.save(queueMemberEntity);
         //
-        threadService.save(thread);
-        log.info("routeWorkgroup WelcomeMessage: {}", thread.toString());
-        //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        //
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        //
         return messageProtobuf;
     }
 
@@ -230,13 +228,16 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setQueuing();
         thread.setUnreadCount(0);
         thread.setContent(content);
-        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        // thread.setRobot(false);
-        threadService.save(thread);
-        log.info("routeWorkgroup QueueMessage: {}", thread.toString());
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("Failed to save thread");
+        }
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        //
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        //
         return messageProtobuf;
     }
 
@@ -248,29 +249,33 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         ThreadEntity thread = threadOptional.get();
         thread.setClose()
-            .setOffline()
-            .setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
-        threadService.save(thread);
-        //
+                .setOffline()
+                .setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("Failed to save thread");
+        }
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
-        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         if (messageOptional.isPresent()) {
             MessageEntity message = messageOptional.get();
             if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
                 // 距离当前时间不超过30分钟，则直接使用之前的消息
                 // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
-                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
                 messageSendService.sendProtobufMessage(messageProtobuf);
                 return messageProtobuf;
             }
         }
         // 创建新的留言消息
-        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(workgroup, thread);
+        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(savedThread);
         messageRestService.save(message);
         // 返回留言消息
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
-        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        //
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         return messageProtobuf;
     }
@@ -311,19 +316,17 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
+        String content = robot.getServiceSettings().getWelcomeTip();
         // 更新线程状态
         thread.setUserUid(robot.getUid());
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
-        thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        // thread.setRobot(true);
+        thread.setContent(content);
         thread.setUnreadCount(0);
-        // ThreadEntity savedThread =
-        threadService.save(thread);
-
-        // 增加接待数量
-        // robot.increaseThreadCount();
-        // robotRestService.save(robot);
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("Failed to save thread");
+        }
 
         // 更新排队状态
         // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
@@ -331,7 +334,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
 
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
 
     }
 

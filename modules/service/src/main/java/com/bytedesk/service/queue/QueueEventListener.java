@@ -13,16 +13,8 @@
  */
 package com.bytedesk.service.queue;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.event.ThreadAcceptEvent;
-import com.bytedesk.core.thread.event.ThreadCloseEvent;
-import com.bytedesk.core.topic.TopicUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,43 +23,43 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class QueueEventListener {
 
-    private final QueueRestService queueRestService;
+    // private final QueueRestService queueRestService;
 
-    @EventListener
-    public void onThreadCloseEvent(ThreadCloseEvent event) {
-        ThreadEntity thread = event.getThread();
-        // log.info("queue onThreadCloseEvent: {}", thread.getAgent());
-        String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(thread.getTopic());
-        log.info("queue onThreadCloseEvent: {}", queueTopic);
-        String queueDay = thread.getCreatedAt().format(DateTimeFormatter.ISO_DATE);
-        Optional<QueueEntity> queueOptional = queueRestService.findByTopicAndDay(queueTopic, queueDay);
-        if (queueOptional.isPresent()) {
-            QueueEntity queue = queueOptional.get();
-            // 增加已完成人数
-            // queue.increaseServedNumber();
-            queueRestService.save(queue);
-        } else {
-            log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
-        }
-    }
+    // @EventListener
+    // public void onThreadCloseEvent(ThreadCloseEvent event) {
+    //     ThreadEntity thread = event.getThread();
+    //     // log.info("queue onThreadCloseEvent: {}", thread.getAgent());
+    //     String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(thread.getTopic());
+    //     log.info("queue onThreadCloseEvent: {}", queueTopic);
+    //     String queueDay = thread.getCreatedAt().format(DateTimeFormatter.ISO_DATE);
+    //     Optional<QueueEntity> queueOptional = queueRestService.findByTopicAndDay(queueTopic, queueDay);
+    //     if (queueOptional.isPresent()) {
+    //         QueueEntity queue = queueOptional.get();
+    //         // 增加已完成人数
+    //         // queue.increaseServedNumber();
+    //         queueRestService.save(queue);
+    //     } else {
+    //         log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
+    //     }
+    // }
 
-    @EventListener
-    public void onThreadAcceptEvent(ThreadAcceptEvent event) {
-        ThreadEntity thread = event.getThread();
-        log.info("queue onThreadAcceptEvent: {}", thread.getTopic());
-        String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(thread.getTopic());
-        log.info("queue onThreadAcceptEvent: {}", queueTopic);
-        String queueDay = thread.getCreatedAt().format(DateTimeFormatter.ISO_DATE);
-        Optional<QueueEntity> queueOptional = queueRestService.findByTopicAndDay(queueTopic, queueDay);
-        if (queueOptional.isPresent()) {
-            QueueEntity queue = queueOptional.get();
-            // 减少排队人数，增加接入人数
-            // queue.acceptThread();
-            queueRestService.save(queue);
-        } else {
-            log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
-        }
-    }
+    // @EventListener
+    // public void onThreadAcceptEvent(ThreadAcceptEvent event) {
+    //     ThreadEntity thread = event.getThread();
+    //     log.info("queue onThreadAcceptEvent: {}", thread.getTopic());
+    //     String queueTopic = TopicUtils.getQueueTopicFromThreadTopic(thread.getTopic());
+    //     log.info("queue onThreadAcceptEvent: {}", queueTopic);
+    //     String queueDay = thread.getCreatedAt().format(DateTimeFormatter.ISO_DATE);
+    //     Optional<QueueEntity> queueOptional = queueRestService.findByTopicAndDay(queueTopic, queueDay);
+    //     if (queueOptional.isPresent()) {
+    //         QueueEntity queue = queueOptional.get();
+    //         // 减少排队人数，增加接入人数
+    //         // queue.acceptThread();
+    //         queueRestService.save(queue);
+    //     } else {
+    //         log.error("queue onThreadAcceptEvent: queue not found: {}", queueTopic);
+    //     }
+    // }
 
     // @EventListener
     // public void onThreadCreateEvent(ThreadCreateEvent event) {

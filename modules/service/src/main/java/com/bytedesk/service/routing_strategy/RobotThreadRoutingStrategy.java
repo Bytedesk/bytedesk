@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 11:01:11
+ * @LastEditTime: 2025-04-05 16:24:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,11 +16,13 @@ package com.bytedesk.service.routing_strategy;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.queue.QueueService;
@@ -53,7 +55,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final QueueMemberRestService queueMemberRestService;;
 
-    // private final RobotRestService robotRestService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -67,7 +69,6 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
         String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), request.getUid());
-        //
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
@@ -93,12 +94,13 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
+        String content = robot.getServiceSettings().getWelcomeTip();
         // 更新线程状态
-        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-        thread.setContent(robot.getServiceSettings().getWelcomeTip());
-        thread.setUnreadCount(0);
-        ThreadEntity savedEntity = threadService.save(thread);
-        if (savedEntity == null) {
+        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name())
+            .setContent(content)
+            .setUnreadCount(0);
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
 
@@ -106,13 +108,16 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
+        // 
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, savedEntity);
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
     }
 
     private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
         //
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+        String content = robot.getServiceSettings().getWelcomeTip();
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
     }
 
 }
