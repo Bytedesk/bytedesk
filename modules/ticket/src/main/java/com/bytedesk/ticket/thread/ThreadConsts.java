@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 22:57:07
+ * @LastEditTime: 2025-04-05 23:52:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,6 +85,8 @@ public class ThreadConsts {
     
     public static final String THREAD_STATUS_FINISHED = "FINISHED"; // 结束状态
     
+    public static final String THREAD_STATUS_ROBOT_FINISHED = "ROBOT_FINISHED"; // 纯机器人会话结束状态
+
     // 机器人服务相关常量
     public static final String THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT = "robotServiceExecutionCount"; // 机器人服务执行计数
     public static final String THREAD_VARIABLE_ROBOT_SERVICE_START_TIME = "robotServiceStartTime"; // 机器人服务开始时间
