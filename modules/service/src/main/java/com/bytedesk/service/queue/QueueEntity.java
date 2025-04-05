@@ -94,11 +94,13 @@ public class QueueEntity extends BaseEntity {
     }
 
     /**
-     * 获取请求时客服离线的人数
+     * 获取请求时客服离线的人数（包括当前离线和曾经离线但已关闭的）
      */
     public int getOfflineCount() {
         return (int) queueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isOffline())
+                .filter(member -> member.wasOffline() || 
+                       (member.getThread() != null && member.getThread().isOffline()) ||
+                       (member.getThread() != null && member.getThread().wasOffline()))
                 .count();
     }
 

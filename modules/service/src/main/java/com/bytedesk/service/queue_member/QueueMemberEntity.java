@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 16:11:11
+ * @LastEditTime: 2025-04-05 11:39:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -178,6 +178,10 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
+
+    @Builder.Default
+    @Column(name = "was_offline")
+    private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
     
     /**
      * 计算等待时间(秒)
@@ -208,5 +212,19 @@ public class QueueMemberEntity extends BaseEntity {
         this.acceptTime = LocalDateTime.now();
         // 计算等待时间
         this.waitTime = (int) Duration.between(enqueueTime, acceptTime).getSeconds();
+    }
+
+    /**
+     * 标记为离线状态
+     */
+    public void markAsOffline() {
+        this.wasOffline = true;
+    }
+
+    /**
+     * 检查是否曾经是离线状态
+     */
+    public boolean wasOffline() {
+        return this.wasOffline || (thread != null && thread.isOffline());
     }
 }
