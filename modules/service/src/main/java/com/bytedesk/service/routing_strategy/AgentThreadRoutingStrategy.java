@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:36:12
+ * @LastEditTime: 2025-04-05 15:36:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,7 +64,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final IMessageSendService messageSendService;
 
-    private final AgentRestService agentRestService;
+    // private final AgentRestService agentRestService;
 
     private final QueueService queueService;
 
@@ -127,7 +127,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
-            if (agent.canAcceptMore()) {
+            // if (agent.canAcceptMore()) {
+            if (queueMemberEntity.getQueue().getQueuingCount() < agent.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableAgent(thread, agent, queueMemberEntity);
             } else {
@@ -145,31 +146,35 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
         Assert.notNull(agent, "AgentEntity must not be null");
         Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
-
+        // 客服在线 且 接待状态
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        // 
         ThreadEntity thread = threadOptional.get();
-
         // 未满则接待
-        thread.setStarted();
-        thread.setUnreadCount(1);
-        thread.setContent(agent.getServiceSettings().getWelcomeTip());
-        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        
+        thread.setStarted()
+            .setUnreadCount(1)
+            .setContent(agent.getServiceSettings().getWelcomeTip());
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            log.error("Failed to save thread {}", thread.getUid());
+            throw new RuntimeException("Failed to save thread " + thread.getUid());
+        }
+        // 
         // 增加接待数量，待优化
-        agent.increaseThreadCount();
-        agentRestService.save(agent);
+        // agent.increaseThreadCount();
+        // agentRestService.save(agent);
+        // 
         // 更新排队状态，待优化
-        // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
-        // thread.setRobot(false);
-        threadService.save(thread);
-        //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(agent, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        // 
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        // 
         return messageProtobuf;
     }
 
@@ -186,22 +191,26 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (queueMemberEntity.getQueue().getQueuingCount() == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
-            // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(),
-            // queueMemberEntity.getWaitTime());
         } else {
             // 前面有排队人数
             content = " 当前排队人数：" + queueMemberEntity.getQueue().getQueuingCount() + " 大约等待时间："
                     + queueMemberEntity.getQueue().getQueuingCount() * 2 + "  分钟";
         }
         // 进入排队队列
-        thread.setQueuing();
-        thread.setUnreadCount(0);
-        thread.setContent(content);
-        // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
-        threadService.save(thread);
+        thread.setQueuing()
+            .setUnreadCount(0)
+            .setContent(content);
+        ThreadEntity savedThread = threadService.save(thread);
+        if (savedThread == null) {
+            log.error("Failed to save thread {}", thread.getUid());
+            throw new RuntimeException("Failed to save thread " + thread.getUid());
+        }
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        // 
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        // 
         return messageProtobuf;
     }
 
@@ -218,10 +227,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             .setOffline() // 离线状态
             .setUnreadCount(0)
             .setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
-        
-        // 标记QueueMember为离线状态
-        // queueMemberEntity.markAsOffline();
-        // queueMemberRestService.save(queueMemberEntity);
         
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:28:16
+ * @LastEditTime: 2025-04-05 15:40:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,8 +43,6 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
@@ -86,7 +84,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final MqttConnectionService mqttConnectionService;
 
-    private final ThreadRestService threadRestService;
+    // private final ThreadRestService threadRestService;
 
     public Page<AgentResponse> queryByOrg(AgentRequest request) {
         Pageable pageable = request.getPageable();
@@ -259,8 +257,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         agent.setStatus(request.getStatus()); // 更新接待状态
         // 
-        int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadProcessStatusEnum.CLOSED.name());
-        agent.setCurrentThreadCount(currentThreadCount);
+        // int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadProcessStatusEnum.CLOSED.name());
+        // agent.setCurrentThreadCount(currentThreadCount);
         log.info("update agent: {} status", agent.getNickname());
         // 
         AgentEntity updatedAgent = save(agent);
@@ -277,9 +275,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
         if (StringUtils.hasText(request.getUid())) {
             AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-            // int currentThreadCount = threadRestService.countByThreadTopicAndState(agent.getUid(), ThreadStatusEnum.STARTED.name());
-            int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadProcessStatusEnum.CLOSED.name());
-            agent.setCurrentThreadCount(currentThreadCount);
+            // int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadProcessStatusEnum.CLOSED.name());
+            // agent.setCurrentThreadCount(currentThreadCount);
             // 更新Agent的信息
             AgentEntity updatedAgent = save(agent);
             if (updatedAgent == null) {

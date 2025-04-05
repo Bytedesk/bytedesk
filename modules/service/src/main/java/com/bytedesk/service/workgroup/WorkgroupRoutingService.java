@@ -1,12 +1,19 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.List;
+import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.redis.RedisConsts;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.queue.QueueEntity;
+import com.bytedesk.service.queue.QueueRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +30,13 @@ public class WorkgroupRoutingService {
     private final StringRedisTemplate redisTemplate;
 
     private static final String COUNTER_KEY_PREFIX = RedisConsts.BYTEDESK_REDIS_PREFIX + "roundRobinCounter:";
+
+    private final QueueRestService queueRestService;
+
+    // 获取当天日期
+    private String getCurrentDay() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }
 
     /**
      * 根据工作组路由模式选择客服
@@ -67,11 +81,27 @@ public class WorkgroupRoutingService {
      * 选择当前会话数最少的客服
      */
     private AgentEntity selectByLeastActive(List<AgentEntity> agents) {
+        String today = getCurrentDay();
+        
         return agents.stream()
-            .filter(AgentEntity::canAcceptMore)
-            .min((a1, a2) -> Integer.compare(
-                a1.getCurrentThreadCount(),
-                a2.getCurrentThreadCount()))
+            .filter(agent -> {
+                String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agent.getUid());
+                Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
+                return queueEntity.map(queue -> queue.getQueuingCount() < agent.getMaxThreadCount())
+                        .orElse(true); // 如果没有队列信息，默认可以接受更多会话
+            })
+            .min((a1, a2) -> {
+                String queueTopic1 = TopicUtils.getQueueTopicFromAgentUid(a1.getUid());
+                String queueTopic2 = TopicUtils.getQueueTopicFromAgentUid(a2.getUid());
+                
+                Optional<QueueEntity> queueEntity1 = queueRestService.findByTopicAndDay(queueTopic1, today);
+                Optional<QueueEntity> queueEntity2 = queueRestService.findByTopicAndDay(queueTopic2, today);
+                
+                int count1 = queueEntity1.map(QueueEntity::getChattingCount).orElse(0);
+                int count2 = queueEntity2.map(QueueEntity::getChattingCount).orElse(0);
+                
+                return Integer.compare(count1, count2);
+            })
             .orElse(null);
     }
 
@@ -124,8 +154,15 @@ public class WorkgroupRoutingService {
      * 选择平均响应时间最短的客服
      */
     private AgentEntity selectByFastestResponse(List<AgentEntity> agents) {
+        String today = getCurrentDay();
+        
         return agents.stream()
-            .filter(AgentEntity::canAcceptMore)
+            .filter(agent -> {
+                String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agent.getUid());
+                Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
+                return queueEntity.map(queue -> queue.getQueuingCount() < agent.getMaxThreadCount())
+                        .orElse(true); // 如果没有队列信息，默认可以接受更多会话
+            })
             .min((a1, a2) -> Double.compare(
                 getAverageResponseTime(a1),
                 getAverageResponseTime(a2)))
@@ -136,6 +173,7 @@ public class WorkgroupRoutingService {
      * 计算客服权重
      */
     private double calculateWeight(AgentEntity agent) {
+        String today = getCurrentDay();
         double weight = 1.0;
         
         // 1. 评分权重
@@ -147,7 +185,9 @@ public class WorkgroupRoutingService {
         weight *= (1.0 / (avgResponseTime + 1));
         
         // 3. 工作负载权重
-        int currentLoad = agent.getCurrentThreadCount();
+        String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agent.getUid());
+        Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
+        int currentLoad = queueEntity.map(QueueEntity::getChattingCount).orElse(0);
         weight *= (1.0 / (currentLoad + 1));
         
         return weight;

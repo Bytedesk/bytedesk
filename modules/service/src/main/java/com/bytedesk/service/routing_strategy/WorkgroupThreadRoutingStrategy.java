@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:24:53
+ * @LastEditTime: 2025-04-05 15:37:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -68,7 +67,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final IMessageSendService messageSendService;
 
-    private final AgentRestService agentRestService;
+    // private final AgentRestService agentRestService;
 
     private final QueueService queueService;
 
@@ -154,7 +153,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
-            if (agent.canAcceptMore()) {
+            // if (agent.canAcceptMore()) {
+            if (queueMemberEntity.getQueue().getQueuingCount() < agent.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableWorkgroup(thread, agent, queueMemberEntity);
             } else {
@@ -182,8 +182,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setContent(agent.getServiceSettings().getWelcomeTip());
         // thread.setQueueNumber(queueMemberEntity.getQueueNumber());
         // 增加接待数量，待优化
-        agent.increaseThreadCount();
-        agentRestService.save(agent);
+        // agent.increaseThreadCount();
+        // agentRestService.save(agent);
         // 更新排队状态，待优化
         // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
