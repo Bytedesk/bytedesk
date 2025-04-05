@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:22:53
+ * @LastEditTime: 2025-04-05 10:59:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,6 @@ import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
@@ -37,7 +36,6 @@ import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-// import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -80,7 +78,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final WorkgroupRoutingService workgroupRoutingService;
 
-    private final RobotRestService robotRestService;
+    // private final RobotRestService robotRestService;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -329,8 +327,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         threadService.save(thread);
 
         // 增加接待数量
-        robot.increaseThreadCount();
-        robotRestService.save(robot);
+        // robot.increaseThreadCount();
+        // robotRestService.save(robot);
 
         // 更新排队状态
         // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());

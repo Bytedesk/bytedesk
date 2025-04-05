@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 18:08:53
+ * @LastEditTime: 2025-04-05 10:59:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
@@ -54,7 +53,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final QueueMemberRestService queueMemberRestService;;
 
-    private final RobotRestService robotRestService;
+    // private final RobotRestService robotRestService;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -96,29 +95,26 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
 
         // 更新线程状态
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
         thread.setContent(robot.getServiceSettings().getWelcomeTip());
         thread.setUnreadCount(0);
-        threadService.save(thread);
+        ThreadEntity savedEntity = threadService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save thread");
+        }
 
         // 增加接待数量
-        robot.increaseThreadCount();
-        robotRestService.save(robot);
+        // robot.increaseThreadCount();
+        // robotRestService.save(robot);
 
         // 更新排队状态
-        // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
 
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
+        return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, savedEntity);
     }
 
     private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
-        //
-        // UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        // log.info("getRobotContinueMessage user: {}, agent {}", user.toString(),
-        // thread.getAgent());
         //
         return ThreadMessageUtil.getThreadRobotWelcomeMessage(robot, thread);
     }
