@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:21:55
+ * @LastEditTime: 2025-04-05 16:30:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -147,6 +147,9 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         String content = agent.getServiceSettings().getWelcomeTip();
+        if (content == null || content.isEmpty()) {
+            content = "欢迎使用人工客服";
+        }
         ThreadEntity thread = threadOptional.get();
         // 未满则接待
         thread.setStarted()

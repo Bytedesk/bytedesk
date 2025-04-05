@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:26:50
+ * @LastEditTime: 2025-04-05 16:29:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -176,6 +176,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         ThreadEntity thread = threadOptional.get();
 
         String content = agent.getServiceSettings().getWelcomeTip();
+        if (content == null || content.isEmpty()) {
+            content = "您好，请问有什么可以帮助您？";
+        }
         // 未满则接待
         thread.setUserUid(agent.getUid());
         thread.setStarted();
@@ -247,10 +250,14 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         //
+        String content = workgroup.getMessageLeaveSettings().getMessageLeaveTip();
+        if (content == null || content.isEmpty()) {
+            content = "请稍后，客服会尽快回复您";
+        }
         ThreadEntity thread = threadOptional.get();
         thread.setClose()
                 .setOffline()
-                .setContent(workgroup.getMessageLeaveSettings().getMessageLeaveTip());
+                .setContent(content);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -268,7 +275,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             }
         }
         // 创建新的留言消息
-        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(savedThread);
+        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(content, savedThread);
         messageRestService.save(message);
         // 返回留言消息
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
@@ -317,6 +324,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
         String content = robot.getServiceSettings().getWelcomeTip();
+        if (content == null || content.isEmpty()) {
+            content = "您好，请问有什么可以帮助您？";
+        }
         // 更新线程状态
         thread.setUserUid(robot.getUid());
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
