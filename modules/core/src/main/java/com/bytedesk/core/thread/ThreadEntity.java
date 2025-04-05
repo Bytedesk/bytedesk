@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:40:50
+ * @LastEditTime: 2025-04-05 14:40:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ package com.bytedesk.core.thread;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import jakarta.persistence.*;
@@ -107,10 +108,6 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
     }
 
-    // public Boolean isOffline() {
-    //     return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
-    // }
-
     public Boolean isQueuing() {
         return getStatus().equals(ThreadProcessStatusEnum.QUEUING.name());
     }
@@ -197,6 +194,10 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     public UserProtobuf getAgentProtobuf() {
         return JSON.parseObject(getAgent(), UserProtobuf.class);
+    }
+
+    public Boolean isAgentRobot() {
+        return getAgentProtobuf() != null && getAgentProtobuf().getType().equals(UserTypeEnum.ROBOT.name());
     }
 
     public UserProtobuf getWorkgroupProtobuf() {
