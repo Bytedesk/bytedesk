@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 14:40:47
+ * @LastEditTime: 2025-04-05 14:04:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,40 +70,40 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     List<QueueMemberEntity> findByQueueUidOrderByPriorityDesc(@Param("queueUid") String queueUid);
 
     // 修改：使用JSON_EXTRACT从agent字段中提取uid
-    @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.agent LIKE CONCAT('%', :agentUid, '%')")
+    @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.agent LIKE CONCAT('%', :agentUid, '%')")
     List<QueueMemberEntity> findByAgentUid(@Param("agentUid") String agentUid);
     
     // 统计客服的活跃会话数
-    @Query(value = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.agent LIKE CONCAT('%', :agentUid, '%') AND qm.summaryStatus = 'SERVING'")
-    int countServingThreadsByAgent(@Param("agentUid") String agentUid);
+    @Query(value = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.thread.agent LIKE CONCAT('%', :agentUid, '%') AND qm.summaryStatus = 'SERVING'")
+    int countChattingThreadsByAgent(@Param("agentUid") String agentUid);
     
     // 获取客服的活跃会话列表
-    @Query(value = "SELECT qm.uid FROM QueueMemberEntity qm WHERE qm.agent LIKE CONCAT('%', :agentUid, '%') AND qm.summaryStatus = 'SERVING'")
-    List<String> findServingThreadsByAgent(@Param("agentUid") String agentUid);
+    @Query(value = "SELECT qm.uid FROM QueueMemberEntity qm WHERE qm.thread.agent LIKE CONCAT('%', :agentUid, '%') AND qm.summaryStatus = 'SERVING'")
+    List<String> findChattingThreadsByAgent(@Param("agentUid") String agentUid);
     
-    // 获取会话分配的客服 - 需要使用JSON处理
-    @Query(value = "SELECT qm.agent FROM QueueMemberEntity qm WHERE qm.uid = :threadUid")
+    // 获取会话分配的客服
+    @Query(value = "SELECT qm.thread.agent FROM QueueMemberEntity qm WHERE qm.uid = :threadUid")
     String getAssignedAgent(@Param("threadUid") String threadUid);
     
     // 更新会话分配的客服 - 由于是JSON格式，可能需要构建新的JSON
     @Modifying
-    @Query(value = "UPDATE QueueMemberEntity qm SET qm.agent = :agentJson WHERE qm.uid = :threadUid")
+    @Query(value = "UPDATE ThreadEntity t SET t.agent = :agentJson WHERE t.uid = (SELECT qm.thread.uid FROM QueueMemberEntity qm WHERE qm.uid = :threadUid)")
     void updateAssignedAgent(@Param("threadUid") String threadUid, @Param("agentJson") String agentJson);
     
     // 统计客服的总会话数
-    @Query(value = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.agent LIKE CONCAT('%', :agentUid, '%')")
+    @Query(value = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.thread.agent LIKE CONCAT('%', :agentUid, '%')")
     int countTotalThreadsByAgent(@Param("agentUid") String agentUid);
     
     // 统计客服的已解决会话数
-    @Query(value = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.agent LIKE CONCAT('%', :agentUid, '%') AND qm.summaryStatus = 'resolved'")
+    @Query(value = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.thread.agent LIKE CONCAT('%', :agentUid, '%') AND qm.summaryStatus = 'RESOLVED'")
     int countResolvedThreadsByAgent(@Param("agentUid") String agentUid);
 
     // 按访客查询 - 使用字符串匹配
-    @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.visitor LIKE CONCAT('%', :visitorUid, '%')")
+    @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.user LIKE CONCAT('%', :visitorUid, '%')")
     List<QueueMemberEntity> findByVisitorUid(@Param("visitorUid") String visitorUid);
 
     // 修改为使用字符串like查询
-    @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.visitor LIKE CONCAT('%', :visitorUid, '%')")
+    @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.user LIKE CONCAT('%', :visitorUid, '%')")
     List<QueueMemberEntity> findByVisitorContainingUid(@Param("visitorUid") String visitorUid);
 
     // 统计相关查询
