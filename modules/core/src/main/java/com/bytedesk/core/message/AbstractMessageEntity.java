@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 10:45:06
+ * @LastEditTime: 2025-04-05 22:34:58
  * @Description: 消息实体抽象基类，用于统一所有消息类型的字段结构
  */
 package com.bytedesk.core.message;
@@ -11,6 +11,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -65,21 +66,19 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
-    
-    // // 是否是机器人
-    // @Builder.Default
-    // @Column(name = "is_robot", nullable = false)
-    // private boolean robot = false;
+
+
+    public UserProtobuf getUserProtobuf() {
+        return UserProtobuf.parseFromJson(user);
+    }
+
     // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
     public boolean isRobot() {
         // 忽略大小写，判断是否包含"type":"robot"字段
-        return user.toLowerCase().contains("\"type\":\"robot\"");
+        // return user.toLowerCase().contains("\"type\":\"robot\"");
+        
     }
 
-    // // 是否是访客
-    // @Builder.Default
-    // @Column(name = "is_visitor", nullable = false)
-    // private boolean visitor = false;
     // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
     public boolean isVisitor() {
         // 忽略大小写，判断是否包含"type":"visitor"字段
