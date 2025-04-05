@@ -150,8 +150,28 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getClient().equals(ClientEnum.WECHAT_MINI.name());
     }
 
+    /**
+     * 检查会话是否曾经处于离线状态
+     */
+    public Boolean wasOffline() {
+        ThreadExtra extra = getThreadExtra();
+        return extra != null && extra.isWasOffline();
+    }
+
+    /**
+     * 将当前会话标记为离线状态
+     */
     public ThreadEntity setOffline() {
         setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+        
+        // 更新extra信息，记录曾经处于离线状态
+        ThreadExtra extra = getThreadExtra();
+        if (extra == null) {
+            extra = new ThreadExtra();
+        }
+        extra.setWasOffline(true);
+        setExtra(JSON.toJSONString(extra));
+        
         return this;
     }
 

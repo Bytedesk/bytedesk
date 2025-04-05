@@ -16,9 +16,19 @@ package com.bytedesk.core.thread;
 import java.io.Serializable;
 
 import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class ThreadExtra implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    private boolean wasOffline; // 标记此会话是否曾经处于离线状态
 }

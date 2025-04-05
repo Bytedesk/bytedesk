@@ -216,12 +216,17 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setOffline()
             .setUnreadCount(0)
             .setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
+        
+        // 标记QueueMember为离线状态
+        queueMemberEntity.markAsOffline();
+        queueMemberRestService.save(queueMemberEntity);
+        
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
-        // 
+        
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
         Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         if (messageOptional.isPresent()) {
