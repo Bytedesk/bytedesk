@@ -192,14 +192,14 @@ public class ThreadMessageUtil {
         return message;
     }
 
-    public static MessageEntity getThreadOfflineMessage(ThreadEntity thread) {
+    public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(thread.getContent())
+                .content(content)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
