@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 16:20:23
+ * @LastEditTime: 2025-04-05 09:50:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,11 +61,12 @@ public class TicketService {
 
     private final RuntimeService runtimeService;
     private final TaskService taskService;
-    private final TicketRepository ticketRepository;
+    // private final TicketRepository ticketRepository;
     private final HistoryService historyService;
     private final MemberRestService memberRestService;
     private final ThreadRestService threadRestService;
     private final TopicService topicService;
+    private final TicketRestService ticketRestService;
 
     /**
      * 认领工单
@@ -80,7 +81,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
         String assigneeName = request.getAssignee().getNickname();
         // 1. 先查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -193,7 +194,7 @@ public class TicketService {
         }
 
         // 6. 保存工单
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         // 7. 返回工单响应
         return TicketConvertUtils.convertToResponse(ticket);
@@ -213,7 +214,7 @@ public class TicketService {
         String assigneeName = request.getAssignee().getNickname();
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -268,7 +269,7 @@ public class TicketService {
 
             // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.PROCESSING.name());
-            ticketRepository.save(ticket);
+            ticketRestService.save(ticket);
 
             log.info("工单开始处理成功: taskId={}, assigneeUid={}", task.getId(), ticket.getAssigneeString());
 
@@ -293,7 +294,7 @@ public class TicketService {
         String assigneeName = request.getAssignee().getNickname();
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -340,7 +341,7 @@ public class TicketService {
         // 更新工单状态
         ticket.setAssignee(null);
         ticket.setStatus(TicketStatusEnum.UNCLAIMED.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         // 发布工单退回消息事件
         // eventPublisher.publishEvent(TicketMessageEvent.builder()
@@ -365,7 +366,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -398,7 +399,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -416,7 +417,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -450,7 +451,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.HOLDING.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -469,7 +470,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -502,7 +503,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.RESUMED.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -521,7 +522,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -554,7 +555,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PENDING.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -573,7 +574,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -607,7 +608,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PROCESSING.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -626,7 +627,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -660,7 +661,7 @@ public class TicketService {
 
             // 5. 更新工单状态
             ticket.setStatus(TicketStatusEnum.ESCALATED.name());
-            ticketRepository.save(ticket);
+            ticketRestService.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -683,7 +684,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -723,7 +724,7 @@ public class TicketService {
             // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
             ticket.setResolvedTime(LocalDateTime.now());
-            ticketRepository.save(ticket);
+            ticketRestService.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -747,7 +748,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -801,7 +802,7 @@ public class TicketService {
                 // 重置解决时间
                 ticket.setResolvedTime(null);
             }
-            ticketRepository.save(ticket);
+            ticketRestService.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -825,7 +826,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -860,7 +861,7 @@ public class TicketService {
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLOSED.name());
         ticket.setClosedTime(LocalDateTime.now()); // 添加关闭时间记录
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -879,7 +880,7 @@ public class TicketService {
         Assert.notNull(assigneeUid, "处理人uid不能为空");
 
         // 1. 查询工单
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
@@ -910,7 +911,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
-        ticketRepository.save(ticket);
+        ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -923,7 +924,7 @@ public class TicketService {
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
                 // 根据uid查询processInstanceId
-                Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+                Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
                 if (ticketOptional.isPresent()) {
                     request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
                 }
@@ -997,7 +998,7 @@ public class TicketService {
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
                 // 根据uid查询processInstanceId
-                Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+                Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
                 if (ticketOptional.isPresent()) {
                     request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
                 }
@@ -1055,7 +1056,7 @@ public class TicketService {
         // processInstanceId不能为空
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
-                Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+                Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
                 if (ticketOptional.isPresent()) {
                     request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
                 }
@@ -1109,4 +1110,6 @@ public class TicketService {
                 .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
                 .collect(Collectors.toList());
     }
+
+
 }
