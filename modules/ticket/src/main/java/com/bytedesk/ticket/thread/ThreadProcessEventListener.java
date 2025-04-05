@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:21:51
+ * @LastEditTime: 2025-04-05 16:55:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -82,6 +82,9 @@ public class ThreadProcessEventListener {
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
         }
+        // 设置客服是否繁忙变量
+        variables.put(ThreadConsts.THREAD_VARIABLE_AGENTS_BUSY, thread.isQueuing());
+        variables.put(ThreadConsts.THREAD_VARIABLE_WORKGROUP_UID, "");
         
         // 根据不同的会话类型设置相应的流程变量
         if (thread.isAgentType()) {
