@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 12:24:59
+ * @LastEditTime: 2025-04-05 12:59:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -140,6 +140,10 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
+
+    @Builder.Default
+    @Column(name = "was_offline")
+    private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
     
     // 重构到相应的表里面
     // 意图类型
@@ -175,10 +179,6 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
-    @Builder.Default
-    @Column(name = "was_offline")
-    private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
-    
     /**
      * 计算等待时间(秒)
      */
@@ -187,7 +187,6 @@ public class QueueMemberEntity extends BaseEntity {
         LocalDateTime endWaitTime = acceptTime != null ? acceptTime : LocalDateTime.now();
         return Duration.between(enqueueTime, endWaitTime).getSeconds();
     }
-
 
     public void acceptThread() {
         // this.status = QueueMemberStatusEnum.SERVING.name();
@@ -208,6 +207,7 @@ public class QueueMemberEntity extends BaseEntity {
      * 检查是否曾经是离线状态
      */
     public boolean wasOffline() {
-        return this.wasOffline || (thread != null && thread.isOffline());
+        // return this.wasOffline || (thread != null && thread.isOffline());
+        return this.wasOffline || (thread != null && thread.wasOffline());
     }
 }

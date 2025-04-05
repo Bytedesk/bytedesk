@@ -111,7 +111,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().isOffline()) {
+            } else if (threadOptional.get().wasOffline()) {
                 thread = threadOptional.get();
             }
         }

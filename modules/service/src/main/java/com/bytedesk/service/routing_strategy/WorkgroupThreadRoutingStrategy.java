@@ -115,15 +115,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().isOffline()) {
+            } else if (threadOptional.get().wasOffline()) {
                 thread = threadOptional.get();
             }
-            // else if (threadOptional.get().isChatting()) {
-            //     thread = threadOptional.get();
-            //     if (visitorRequest.getForceAgent()) {
-            //         // 强制转人工，TODO: 记录转人工日志
-            //     }
-            // }
         }
 
         if (thread == null) {
