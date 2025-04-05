@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:24:38
+ * @LastEditTime: 2025-04-05 13:52:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,6 +83,8 @@ public class ThreadResponse extends BaseResponse {
     // 备注
     private String note;
 
+    private Boolean offline;
+
     // 标签
     private List<String> tagList;
 
@@ -90,7 +92,6 @@ public class ThreadResponse extends BaseResponse {
 
     private String extra;
 
-    
     // 邀请多个客服参与会话
     private List<UserProtobuf> invites;
 
@@ -111,7 +112,7 @@ public class ThreadResponse extends BaseResponse {
     // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
     private String agent;
 
-    private String workgroup;
+    private UserProtobuf workgroup;
 
     // 流程实例ID
     private String processInstanceId;

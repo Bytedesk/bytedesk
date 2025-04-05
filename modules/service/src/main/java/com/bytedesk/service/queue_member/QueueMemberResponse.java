@@ -16,7 +16,6 @@ package com.bytedesk.service.queue_member;
 import java.time.LocalDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
@@ -130,16 +129,16 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
 
-    private String client;  // 客户来源渠道
+    // private String client;  // 客户来源渠道
 
     // 排队用户信息
-    private UserProtobuf visitor;
+    // private UserProtobuf visitor;
 
     // 接待客服信息
-    private UserProtobuf agent;
+    // private UserProtobuf agent;
     
     // 接待工作组信息
-    private UserProtobuf workgroup;
+    // private UserProtobuf workgroup;
 
     
     

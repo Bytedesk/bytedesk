@@ -97,6 +97,10 @@ public class ThreadRequest extends BaseRequest {
     // 备注
     private String note;
 
+    // offline
+    @Builder.Default
+    private Boolean offline = false;
+
     // 标签
     @Builder.Default
     private List<String> tagList = new ArrayList<>();

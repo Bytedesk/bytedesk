@@ -183,7 +183,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 已满则排队
         // String queueTip = agent.getQueueSettings().getQueueTip();
         String content = "";
-        if (queueMemberEntity.getBeforeNumber() == 0) {
+        if (queueMemberEntity.getQueue.getQueueNumber() == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
             // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(),
