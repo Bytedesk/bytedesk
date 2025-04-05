@@ -113,6 +113,10 @@ public class ConvertUtils {
             UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
             threadResponse.setUser(user);
         }
+        if (thread.getWorkgroup() != null) {
+            UserProtobuf workgroup = JSON.parseObject(thread.getWorkgroup(), UserProtobuf.class);
+            threadResponse.setWorkgroup(workgroup);
+        }
         if (thread.getInvites() != null) {
             // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
             for (String invite : thread.getInvites()) {

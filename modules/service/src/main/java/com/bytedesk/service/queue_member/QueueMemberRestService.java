@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:31:46
+ * @LastEditTime: 2025-04-05 13:47:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,8 +26,9 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
+
 import lombok.AllArgsConstructor;
 
 @Service
@@ -132,9 +133,10 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     @Override
     public QueueMemberResponse convertToResponse(QueueMemberEntity entity) {
         QueueMemberResponse response = modelMapper.map(entity, QueueMemberResponse.class);
-        response.setVisitor(UserProtobuf.parseFromJson(entity.getVisitor()));
-        response.setAgent(UserProtobuf.parseFromJson(entity.getAgent()));
-        response.setWorkgroup(UserProtobuf.parseFromJson(entity.getWorkgroup()));
+        response.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
+        // response.setVisitor(UserProtobuf.parseFromJson(entity.getVisitor()));
+        // response.setAgent(UserProtobuf.parseFromJson(entity.getAgent()));
+        // response.setWorkgroup(UserProtobuf.parseFromJson(entity.getWorkgroup()));
         return response;
     }
 

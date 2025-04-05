@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 12:59:25
+ * @LastEditTime: 2025-04-05 13:55:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.service.queue.QueueEntity;
@@ -65,8 +64,8 @@ public class QueueMemberEntity extends BaseEntity {
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
     private ThreadEntity thread;
 
-    @Builder.Default
-    private int beforeNumber = 0;  // 前面排队人数
+    // @Builder.Default
+    // private int beforeNumber = 0;  // 前面排队人数
 
     @Builder.Default
     private int waitTime = 0;  // 预计等待时间(秒)，类似医院取号小票上面的等待时间，非真实等待时间
@@ -162,28 +161,30 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
     
-    private String client;  // 客户来源渠道
+    // 访客来源渠道
+    // private String client;  // 客户来源渠道
 
     // 排队访客信息
-    @Builder.Default
-    @Column(name = "queue_visitor", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // @Column(name = "queue_visitor", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    // private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 接待客服信息
-    @Builder.Default
-    @Column(name = "queue_agent", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String agent = BytedeskConsts.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // @Column(name = "queue_agent", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    // private String agent = BytedeskConsts.EMPTY_JSON_STRING;
     
     // 接待工作组信息
-    @Builder.Default
-    @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    // private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 计算等待时间(秒)
      */
     public long getWaitTime() {
         if (enqueueTime == null) return 0;
+        if (thread.isOffline()) return 0;
         LocalDateTime endWaitTime = acceptTime != null ? acceptTime : LocalDateTime.now();
         return Duration.between(enqueueTime, endWaitTime).getSeconds();
     }

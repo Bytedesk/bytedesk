@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:04:51
+ * @LastEditTime: 2025-04-05 13:39:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -124,6 +124,11 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     // 备注
     @Column(name = "thread_note")
     private String note;
+
+    // 是否离线
+    @Builder.Default
+    @Column(name = "is_offline")
+    private boolean offline = false;
 
     // 标签
     @Builder.Default

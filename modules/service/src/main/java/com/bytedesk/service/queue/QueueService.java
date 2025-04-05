@@ -134,28 +134,28 @@ public class QueueService {
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
-        UserProtobuf visitor = UserProtobuf.builder()
-            .uid(request.getUid())
-            .nickname(request.getNickname())
-            .avatar(request.getAvatar())
-            .build();
+        // UserProtobuf visitor = UserProtobuf.builder()
+        //     .uid(request.getUid())
+        //     .nickname(request.getNickname())
+        //     .avatar(request.getAvatar())
+        //     .build();
         // 创建队列成员实体并保存到数据库
         QueueMemberEntity member = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
             .queue(queue)
             .thread(threadEntity)
-            .visitor(visitor.toJson())
-            .agent(agent.toJson())
+            // .visitor(visitor.toJson())
+            // .agent(agent.toJson())
             // .queueNumber(queue.getNextNumber())
             // .beforeNumber(queue.getQueuingCount())
             .enqueueTime(LocalDateTime.now())
-            .client(request.getClient())
+            // .client(request.getClient())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
-        if (workgroup != null) {
-            member.setWorkgroup(workgroup.toJson());
-        }
+        // if (workgroup != null) {
+        //     member.setWorkgroup(workgroup.toJson());
+        // }
         // 
         return queueMemberRestService.save(member);
     }
