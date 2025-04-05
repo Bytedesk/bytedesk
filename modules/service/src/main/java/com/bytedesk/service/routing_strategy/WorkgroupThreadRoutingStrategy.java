@@ -115,7 +115,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().wasOffline()) {
+            } else if (threadOptional.get().isOffline()) {
                 thread = threadOptional.get();
             }
         }

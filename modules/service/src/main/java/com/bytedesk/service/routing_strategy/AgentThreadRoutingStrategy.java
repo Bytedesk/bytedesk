@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 12:33:13
+ * @LastEditTime: 2025-04-05 13:36:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -111,7 +111,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().wasOffline()) {
+            } else if (threadOptional.get().isOffline() && !agent.isConnectedAndAvailable()) {
                 thread = threadOptional.get();
             }
         }
@@ -219,8 +219,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             .setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
         
         // 标记QueueMember为离线状态
-        queueMemberEntity.markAsOffline();
-        queueMemberRestService.save(queueMemberEntity);
+        // queueMemberEntity.markAsOffline();
+        // queueMemberRestService.save(queueMemberEntity);
         
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {

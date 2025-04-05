@@ -98,9 +98,10 @@ public class QueueEntity extends BaseEntity {
      */
     public int getOfflineCount() {
         return (int) queueMembers.stream()
-                .filter(member -> member.wasOffline() || 
+                .filter(member -> 
+                    // member.wasOffline() || 
                     //    (member.getThread() != null && member.getThread().isOffline()) ||
-                       (member.getThread() != null && member.getThread().wasOffline()))
+                       (member.getThread() != null && member.getThread().isOffline()))
                 .count();
     }
 

@@ -141,9 +141,9 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
 
-    @Builder.Default
-    @Column(name = "was_offline")
-    private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
+    // @Builder.Default
+    // @Column(name = "was_offline")
+    // private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
     
     // 重构到相应的表里面
     // 意图类型
@@ -199,15 +199,15 @@ public class QueueMemberEntity extends BaseEntity {
     /**
      * 标记为离线状态
      */
-    public void markAsOffline() {
-        this.wasOffline = true;
-    }
+    // public void markAsOffline() {
+    //     this.wasOffline = true;
+    // }
 
     /**
      * 检查是否曾经是离线状态
      */
-    public boolean wasOffline() {
-        // return this.wasOffline || (thread != null && thread.isOffline());
-        return this.wasOffline || (thread != null && thread.wasOffline());
-    }
+    // public boolean wasOffline() {
+    //     // return this.wasOffline || (thread != null && thread.isOffline());
+    //     return this.wasOffline || (thread != null && thread.isOffline());
+    // }
 }
