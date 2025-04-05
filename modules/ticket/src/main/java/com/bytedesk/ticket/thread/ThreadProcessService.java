@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 13:26:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 09:51:37
+ * @LastEditTime: 2025-04-05 10:09:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,12 +16,14 @@ package com.bytedesk.ticket.thread;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.engine.task.Comment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,8 +45,6 @@ public class ThreadProcessService {
     private final TaskService taskService;
     private final HistoryService historyService;
     private final ThreadRestService threadRestService;
-
-    
 
     /**
      * 查询会话的完整活动历史
@@ -74,20 +74,48 @@ public class ThreadProcessService {
         // 获取任务评论
         List<Comment> comments = taskService.getProcessInstanceComments(request.getProcessInstanceId());
 
+        // 获取流程变量
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(request.getProcessInstanceId())
+                .list();
+        
+        // 将变量转换为Map，便于查找
+        Map<String, Object> variableMap = variables.stream()
+                .collect(Collectors.toMap(
+                    v -> v.getVariableName(),
+                    v -> v.getValue(),
+                    (v1, v2) -> v2  // 如果有重复键，保留最后一个值
+                ));
+
         // 合并活动和评论信息
         List<ThreadHistoryActivityResponse> responses = new ArrayList<>();
 
-        // 添加活动历史，只保留关键信息
+        // 添加活动历史，为网关添加决策结果
         responses.addAll(activities.stream()
-                .map(activity -> ThreadHistoryActivityResponse.builder()
-                        .id(activity.getId())
-                        .activityName(activity.getActivityName())
-                        .activityType(activity.getActivityType())
-                        .assignee(activity.getAssignee())
-                        .startTime(activity.getStartTime())
-                        .endTime(activity.getEndTime())
-                        .durationInMillis(activity.getDurationInMillis())
-                        .build())
+                .map(activity -> {
+                    ThreadHistoryActivityResponse response = ThreadHistoryActivityResponse.builder()
+                            .id(activity.getId())
+                            .activityName(activity.getActivityName())
+                            .activityType(activity.getActivityType())
+                            .assignee(activity.getAssignee())
+                            .startTime(activity.getStartTime())
+                            .endTime(activity.getEndTime())
+                            .durationInMillis(activity.getDurationInMillis())
+                            .build();
+                    
+                    // 如果是网关，添加决策结果
+                    if ("exclusiveGateway".equals(activity.getActivityType())) {
+                        // 根据不同网关ID获取对应的变量决策结果
+                        String gatewayId = activity.getActivityId();
+                        String decisionResult = getGatewayDecisionResult(gatewayId, variableMap);
+                        if (decisionResult != null) {
+                            response.setDescription(decisionResult);
+                            response.setActivityName(activity.getActivityName() + " " + decisionResult);
+                        }
+                    }
+                    
+                    return response;
+                })
                 .collect(Collectors.toList()));
 
         // 添加评论历史
@@ -108,5 +136,25 @@ public class ThreadProcessService {
                 .collect(Collectors.toList());
     }
 
-    
+    /**
+     * 根据网关ID和流程变量确定网关决策结果
+     */
+    private String getGatewayDecisionResult(String gatewayId, Map<String, Object> variableMap) {
+        switch (gatewayId) {
+            case "isRobotEnabled":
+                Boolean robotEnabled = (Boolean) variableMap.get("robotEnabled");
+                return robotEnabled != null && robotEnabled ? "结果: 是" : "结果: 否";
+            case "transferToHuman":
+                Boolean needHumanService = (Boolean) variableMap.get("needHumanService");
+                return needHumanService != null && needHumanService ? "结果: 是" : "结果: 否";
+            case "isAgentsOnline":
+                Boolean agentsOnline = (Boolean) variableMap.get("agentsOnline");
+                return agentsOnline != null && agentsOnline ? "结果: 是" : "结果: 否";
+            case "isAgentsBusy":
+                Boolean agentsBusy = (Boolean) variableMap.get("agentsBusy");
+                return agentsBusy != null && agentsBusy ? "结果: 是" : "结果: 否";
+            default:
+                return null;
+        }
+    }
 }
