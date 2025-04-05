@@ -214,7 +214,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 
         ThreadEntity thread = threadOptional.get();
         // 客服离线或小休不接待状态，则进入留言
-        thread.setOffline()
+        thread.setClose() // 状态
+            .setOffline() // 离线状态
             .setUnreadCount(0)
             .setContent(agent.getMessageLeaveSettings().getMessageLeaveTip());
         
