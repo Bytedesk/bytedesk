@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:50:30
+ * @LastEditTime: 2025-04-05 22:48:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,6 +44,9 @@ public class ThreadConsts {
     public static final String THREAD_VARIABLE_SLA_TIME = "slaTime"; // SLA时间
 
     public static final String THREAD_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
+    
+    // 访客请求转人工标记
+    public static final String THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER = "visitorRequestedTransfer"; // 访客是否主动请求转人工
 
     // 从流程中提取的变量名
     public static final String THREAD_VARIABLE_ROBOT_ENABLED = "robotEnabled"; // 是否启用机器人
