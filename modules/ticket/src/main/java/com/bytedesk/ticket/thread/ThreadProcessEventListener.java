@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 17:12:41
+ * @LastEditTime: 2025-04-05 22:22:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,6 +93,12 @@ public class ThreadProcessEventListener {
         variables.put(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);  // 默认不需要转人工
         variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, "CREATED");   // 初始状态
         
+        // 显式初始化机器人相关变量，避免空指针和循环问题
+        variables.put("robotUnansweredCount", 0);
+        variables.put("robotServiceExecutionCount", 0);
+        // 初始化访客请求转人工的标志
+        variables.put("visitorRequestedTransfer", false);
+        
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
         }
@@ -126,7 +132,7 @@ public class ThreadProcessEventListener {
             variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
         } else if (thread.isRobotType()) {
             // 机器人接待
-            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, thread.isAgentRobot());
+            variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_ENABLED, true);  // 确保这里设置为true
             if (thread.getAgentProtobuf() != null) {
                 variables.put(ThreadConsts.THREAD_VARIABLE_AGENT_UID, thread.getAgentProtobuf().getUid());
                 log.info("机器人接待，设置robotUid为: {}", thread.getAgentProtobuf().getUid());
