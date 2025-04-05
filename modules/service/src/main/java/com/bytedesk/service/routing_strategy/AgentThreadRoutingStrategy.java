@@ -148,7 +148,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 
         String content = agent.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
-            content = "欢迎使用人工客服";
+            content = "您好，请问有什么可以帮助您？";
         }
         ThreadEntity thread = threadOptional.get();
         // 未满则接待
@@ -217,6 +217,9 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         String content = agent.getMessageLeaveSettings().getMessageLeaveTip();
+        if (content == null || content.isEmpty()) {
+            content = "您好，请留言，我们会尽快回复您";
+        }
         ThreadEntity thread = threadOptional.get();
         // 客服离线或小休不接待状态，则进入留言
         thread.setClose() // 状态
