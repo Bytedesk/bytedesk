@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:36:42
+ * @LastEditTime: 2025-04-05 16:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -160,11 +160,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             log.error("Failed to save thread {}", thread.getUid());
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
-        // 
-        // 增加接待数量，待优化
-        // agent.increaseThreadCount();
-        // agentRestService.save(agent);
-        // 
         // 更新排队状态，待优化
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
