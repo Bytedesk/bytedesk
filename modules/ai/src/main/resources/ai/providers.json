@@ -53,7 +53,7 @@
         "logo": "yiyan.png",
         "apiUrl": "https://yiyan.baidu.com/",
         "webUrl": "https://yiyan.baidu.com/",
-        "status": "PRODUCTION"
+        "status": "DEVELOPMENT"
     },
     "xinghuo": {
         "nickname": "讯飞星火",
