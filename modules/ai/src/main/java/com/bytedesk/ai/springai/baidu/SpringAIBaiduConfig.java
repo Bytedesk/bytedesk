@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "spring.ai.baidu.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIBaiduConfig {
 
-    @Value("${spring.ai.baidu.base-url:https://qianfan.baidubce.com/v2}")
+    @Value("${spring.ai.baidu.base-url:https://qianfan.baidubce.com}")
     private String baseUrl;
 
     @Value("${spring.ai.baidu.api-key:sk-xxx}")
