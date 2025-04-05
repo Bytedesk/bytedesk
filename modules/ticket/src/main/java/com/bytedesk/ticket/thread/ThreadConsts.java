@@ -30,6 +30,8 @@ public class ThreadConsts {
     public static final String THREAD_VARIABLE_ORGUID = "orgUid";
 
     public static final String THREAD_VARIABLE_STATUS = "status"; // 状态
+    
+    public static final String THREAD_VARIABLE_THREAD_STATUS = "status"; // 线程状态，与STATUS相同，用于流程控制
 
     public static final String THREAD_VARIABLE_USER_UID = "userUid"; // 用户UID
 

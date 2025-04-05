@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:55:53
+ * @LastEditTime: 2025-04-05 17:12:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,6 +89,10 @@ public class ThreadProcessEventListener {
         // 设置机器人空闲超时时间
         variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, "PT5M");   // 默认5分钟
         
+        // 添加控制流程流转的变量
+        variables.put(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);  // 默认不需要转人工
+        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, "CREATED");   // 初始状态
+        
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
         }
@@ -101,6 +105,7 @@ public class ThreadProcessEventListener {
             // 一对一客服接待，直接指定assignee为特定客服
             if (thread.getAgentProtobuf() != null) {
                 variables.put(ThreadConsts.THREAD_VARIABLE_ASSIGNEE, thread.getAgentProtobuf().getUid());
+                variables.put(ThreadConsts.THREAD_VARIABLE_AGENT_UID, thread.getAgentProtobuf().getUid());
                 log.info("一对一客服接待，设置assignee为: {}", thread.getAgentProtobuf().getUid());
             } else {
                 log.error("一对一客服接待，但客服信息为空");
