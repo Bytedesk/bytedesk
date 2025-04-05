@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 10:51:40
+ * @LastEditTime: 2025-04-05 11:49:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -270,7 +270,11 @@ public class VisitorThreadService
             // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {},
             // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
             // diffInMinutes);
-            if (diffInMinutes > autoCloseMinutes) {
+            
+            // 添加空值检查，如果为null则使用默认值30分钟
+            double autoCloseValue = (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
+            
+            if (diffInMinutes > autoCloseValue) {
                 threadRestService.autoClose(thread);
             }
             // }
