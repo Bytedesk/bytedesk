@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 17:16:54
+ * @LastEditTime: 2025-04-06 21:44:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,6 +86,12 @@ public class QueueMemberResponse extends BaseResponse {
 
     @Builder.Default
     private Boolean timeout = false; // 是否超时
+
+    // 机器人对话超时时间
+    private LocalDateTime robotTimeoutAt;
+
+    // 人工对话超时时间
+    private LocalDateTime humanTimeoutAt;
 
     @Builder.Default
     private Integer priority = 0;  // 优先级(0-100)
