@@ -131,7 +131,7 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     )
     @Override
     public TagEntity save(TagEntity entity) {
-        log.info("Attempting to save tag: {}", entity.getName());
+        // log.info("Attempting to save tag: {}", entity.getName());
         return tagRepository.save(entity);
     }
 

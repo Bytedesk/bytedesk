@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 18:16:43
+ * @LastEditTime: 2025-04-06 08:30:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -123,7 +123,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     )
     @Override
     public KbaseInviteEntity save(KbaseInviteEntity entity) {
-        log.info("Attempting to save tag: {}", entity.getName());
+        // log.info("Attempting to save tag: {}", entity.getName());
         return tagRepository.save(entity);
     }
 
