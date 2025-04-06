@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 21:41:05
+ * @LastEditTime: 2025-04-06 21:42:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,6 +104,12 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_timeout")
     private boolean timeout = false; // 是否超时
+
+    // 机器人对话超时时间
+    private LocalDateTime robotTimeoutAt;
+
+    // 人工对话超时时间
+    private LocalDateTime humanTimeoutAt;
 
     @Builder.Default
     private int priority = 0;  // 优先级(0-100)
