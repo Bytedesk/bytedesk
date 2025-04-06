@@ -83,21 +83,21 @@ public class ThreadProcessEventListener {
         
         // 设置默认值，避免流程执行时找不到变量
         // 设置 SLA 时间 - 预先设置默认值
-        variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME, "PT30M");  // 默认30分钟
+        variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME, ThreadConsts.DEFAULT_SLA_TIME);  // 默认30分钟
         // 设置人工客服空闲超时时间
-        variables.put(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, "PT15M");  // 默认15分钟
+        variables.put(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, ThreadConsts.DEFAULT_HUMAN_IDLE_TIMEOUT);  // 默认15分钟
         // 设置机器人空闲超时时间
-        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, "PT5M");   // 默认5分钟
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, ThreadConsts.DEFAULT_ROBOT_IDLE_TIMEOUT);   // 默认5分钟
         
         // 添加控制流程流转的变量
         variables.put(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);  // 默认不需要转人工
-        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, "CREATED");   // 初始状态
+        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_CREATED);   // 初始状态
         
         // 显式初始化机器人相关变量，避免空指针和循环问题
-        variables.put("robotUnansweredCount", 0);
-        variables.put("robotServiceExecutionCount", 0);
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT, 0);
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT, 0);
         // 初始化访客请求转人工的标志
-        variables.put("visitorRequestedTransfer", false);
+        variables.put(ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, false);
         
         if (thread.getUserProtobuf() != null) {
             variables.put(ThreadConsts.THREAD_VARIABLE_USER_UID, thread.getUserProtobuf().getUid());
