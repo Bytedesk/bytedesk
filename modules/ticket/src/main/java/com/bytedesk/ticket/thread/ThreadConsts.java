@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 23:52:26
+ * @LastEditTime: 2025-04-06 09:25:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,4 +99,12 @@ public class ThreadConsts {
     
     // 机器人服务执行次数上限
     public static final int THREAD_MAX_ROBOT_EXECUTION_COUNT = 3; // 最大机器人服务执行次数
+
+    // 活动类型常量
+    public static final String ACTIVITY_TYPE_SEQUENCE_FLOW = "sequenceFlow";
+    public static final String ACTIVITY_TYPE_EXCLUSIVE_GATEWAY = "exclusiveGateway";
+    public static final String ACTIVITY_TYPE_COMMENT = "comment";
+    
+    // 活动ID常量
+    public static final String ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK = "transferToHumanTask";
 }

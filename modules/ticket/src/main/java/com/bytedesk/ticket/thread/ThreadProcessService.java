@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 13:26:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:53:14
+ * @LastEditTime: 2025-04-06 09:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,13 +62,31 @@ public class ThreadProcessService {
             }
         }
 
-        // 获取活动历史，过滤掉 sequenceFlow
+        // 获取活动历史，过滤掉 sequenceFlow 和其他不需要显示的活动
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
                 .orderByHistoricActivityInstanceStartTime().asc()
                 .list()
                 .stream()
-                .filter(activity -> !"sequenceFlow".equals(activity.getActivityType()))
+                .filter(activity -> {
+                    // 过滤掉不需要显示的活动类型
+                    if (ThreadConsts.ACTIVITY_TYPE_SEQUENCE_FLOW.equals(activity.getActivityType())) {
+                        return false;
+                    }
+                    // 过滤掉没有名称的活动
+                    if (activity.getActivityName() == null || activity.getActivityName().trim().isEmpty()) {
+                        return false;
+                    }
+                    // 过滤掉 transferToHumanTask 活动，除非它确实被执行了(有结束时间)
+                    if (ThreadConsts.ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK.equals(activity.getActivityId()) && activity.getEndTime() == null) {
+                        return false;
+                    }
+                    // 过滤掉没有实际执行的活动（开始时间为空）
+                    if (activity.getStartTime() == null) {
+                        return false;
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList());
 
         // 获取任务评论
@@ -104,7 +122,7 @@ public class ThreadProcessService {
                             .build();
                     
                     // 如果是网关，添加决策结果
-                    if ("exclusiveGateway".equals(activity.getActivityType())) {
+                    if (ThreadConsts.ACTIVITY_TYPE_EXCLUSIVE_GATEWAY.equals(activity.getActivityType())) {
                         // 根据不同网关ID获取对应的变量决策结果
                         String gatewayId = activity.getActivityId();
                         String decisionResult = getGatewayDecisionResult(gatewayId, variableMap);
@@ -122,7 +140,7 @@ public class ThreadProcessService {
         responses.addAll(comments.stream()
                 .map(comment -> ThreadHistoryActivityResponse.builder()
                         .id(comment.getId())
-                        .activityType("comment")
+                        .activityType(ThreadConsts.ACTIVITY_TYPE_COMMENT)
                         .activityName(comment.getType())
                         .description(comment.getFullMessage())
                         .startTime(comment.getTime())
