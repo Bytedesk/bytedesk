@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:29:05
+ * @LastEditTime: 2025-04-06 22:55:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -153,7 +153,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         if (agent.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
-            // if (agent.canAcceptMore()) {
             if (queueMemberEntity.getQueue().getQueuingCount() < agent.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableWorkgroup(thread, agent, queueMemberEntity);
@@ -181,13 +180,15 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setStarted();
-        thread.setUnreadCount(1);
-        thread.setContent(content);
-        thread.setOwner(agent.getMember().getUser());
+        thread.setStarted()
+            .setUnreadCount(1)
+            .setContent(content)
+            // .setUserUid(agent.getUid())
+            .setOwner(agent.getMember().getUser());
         //
-        UserProtobuf agentProtobuf = ServiceConvertUtils.convertToUserProtobuf(agent);
-        thread.setAgent(JSON.toJSONString(agentProtobuf));
+        UserProtobuf agentProtobuf = agent.toUserProtobuf(); //ServiceConvertUtils.convertToUserProtobuf(agent);
+        // thread.setAgent(JSON.toJSONString(agentProtobuf));
+        thread.setAgent(agentProtobuf.toJson());
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
