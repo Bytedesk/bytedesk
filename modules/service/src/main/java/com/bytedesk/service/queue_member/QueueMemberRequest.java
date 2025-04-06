@@ -90,6 +90,13 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Boolean timeout = false; // 是否超时
 
+    // 机器人对话超时时间
+    private LocalDateTime robotTimeoutAt;
+
+    // 人工对话超时时间
+    private LocalDateTime humanTimeoutAt;
+
+
     @Builder.Default
     private Integer priority = 0;  // 优先级(0-100)
 
