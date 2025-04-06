@@ -74,6 +74,10 @@
 
 - 浏览器自动化执行
 
+### 视频会议
+
+- 集成jitsi
+
 ### [社交群组](./modules/social/readme.zh.md)
 
 - 类似 Discord
