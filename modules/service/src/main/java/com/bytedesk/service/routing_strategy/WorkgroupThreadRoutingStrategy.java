@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 22:55:44
+ * @LastEditTime: 2025-04-06 22:58:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -181,12 +181,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 未满则接待
         thread.setUserUid(agent.getUid());
         thread.setStarted()
-            .setUnreadCount(1)
-            .setContent(content)
-            // .setUserUid(agent.getUid())
-            .setOwner(agent.getMember().getUser());
+                .setUnreadCount(1)
+                .setContent(content)
+                // .setUserUid(agent.getUid())
+                .setOwner(agent.getMember().getUser());
         //
-        UserProtobuf agentProtobuf = agent.toUserProtobuf(); //ServiceConvertUtils.convertToUserProtobuf(agent);
+        UserProtobuf agentProtobuf = agent.toUserProtobuf(); // ServiceConvertUtils.convertToUserProtobuf(agent);
         // thread.setAgent(JSON.toJSONString(agentProtobuf));
         thread.setAgent(agentProtobuf.toJson());
         ThreadEntity savedThread = threadService.save(thread);
@@ -250,12 +250,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
+        ThreadEntity thread = threadOptional.get();
         //
         String content = workgroup.getMessageLeaveSettings().getMessageLeaveTip();
         if (content == null || content.isEmpty()) {
             content = "请稍后，客服会尽快回复您";
         }
-        ThreadEntity thread = threadOptional.get();
         thread.setClose()
                 .setOffline()
                 .setContent(content);
