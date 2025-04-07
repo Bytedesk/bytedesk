@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 10:02:18
+ * @LastEditTime: 2025-04-07 12:32:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -302,17 +302,18 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_QUEUE_PATTERN, topicArr[2]);
     }
 
-    public static String getQueueTopicFromAgentUid(String agentUid) {
-        return String.format(TOPIC_ORG_QUEUE_PATTERN, agentUid);
+    // agentUid or workgroupUid or robotUid
+    public static String getQueueTopicFromUid(String uid) {
+        return String.format(TOPIC_ORG_QUEUE_PATTERN, uid);
     }
 
-    public static String getQueueTopicFromWorkgroupUid(String workgroupUid) {
-        return String.format(TOPIC_ORG_QUEUE_PATTERN, workgroupUid);
-    }
+    // public static String getQueueTopicFromWorkgroupUid(String workgroupUid) {
+    //     return String.format(TOPIC_ORG_QUEUE_PATTERN, workgroupUid);
+    // }
     
-    public static String getQueueTopicFromRobotUid(String robotUid) {
-        return String.format(TOPIC_ORG_QUEUE_PATTERN, robotUid);
-    }
+    // public static String getQueueTopicFromRobotUid(String robotUid) {
+    //     return String.format(TOPIC_ORG_QUEUE_PATTERN, robotUid);
+    // }
 
     //////////////////////////////////////////////////////////////////////////
     // 工单会话 department ticket thread

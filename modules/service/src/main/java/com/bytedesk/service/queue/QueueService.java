@@ -8,19 +8,14 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
-// import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-// import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
-// import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
@@ -39,16 +34,16 @@ public class QueueService {
     private final UidUtils uidUtils;
 
     @Transactional
-    public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, RobotEntity robotEntity, VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
-        QueueEntity queue = getQueue(threadEntity, robotEntity.getNickname());
+        QueueEntity queue = getQueue(threadEntity, agent.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf agent = robotEntity.toUserProtobuf();
+        // UserProtobuf agent = robotEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue, null);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, queue, null);
         // 3. 更新队列统计
         // updateQueueStats(queue);
         // 4. 返回队列成员
@@ -56,16 +51,16 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
         // 1. 获取或创建队列
-        QueueEntity queue = getQueue(threadEntity, agentEntity.getNickname());
+        QueueEntity queue = getQueue(threadEntity, agent.getNickname());
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
         // 
-        UserProtobuf agent = agentEntity.toUserProtobuf();
+        // UserProtobuf agent = agentEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue, null);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, queue, null);
         // 3. 更新队列统计
         // updateQueueStats(queue);
         // 4. 返回队列成员
@@ -73,7 +68,7 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, AgentEntity agentEntity, WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent, WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
         // 1. 获取或创建工作组队列
         QueueEntity workgroupQueue = getQueue(threadEntity, workgroupEntity.getNickname());
         if (!workgroupQueue.canEnqueue()) {
@@ -81,17 +76,14 @@ public class QueueService {
         }
         
         // 2. 获取或创建客服队列
-        QueueEntity agentQueue = getAgentQueue(agentEntity.getNickname(), agentEntity.getUid(), threadEntity.getOrgUid());
+        QueueEntity agentQueue = getAgentQueue(agent.getNickname(), agent.getUid(), threadEntity.getOrgUid());
         if (!agentQueue.canEnqueue()) {
             throw new QueueFullException("Agent queue is full or not active");
         }
-        
-        UserProtobuf agent = agentEntity.toUserProtobuf();
-        UserProtobuf workgroup = workgroupEntity.toUserProtobuf();
-        
+
         // 3. 创建工作组队列成员
         // 注意: 此处的workgroupQueue和agentQueue没有问题，暂时使用此种命名
-        QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroup, visitorRequest, workgroupQueue, agentQueue);
+        QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroupQueue, agentQueue);
 
         // 保存更新后的队列成员
         workgroupMember = queueMemberRestService.save(workgroupMember);
@@ -139,9 +131,10 @@ public class QueueService {
         }
     }
 
+    // agent or robot
     @Transactional
     private QueueEntity getAgentQueue(String agentNickname, String agentUid, String orgUid) {
-        String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agentUid);
+        String queueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
         while (true) {
@@ -170,7 +163,7 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, UserProtobuf workgroup, VisitorRequest request, QueueEntity queue, QueueEntity workgroupQueue) {
+    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, QueueEntity queue, QueueEntity workgroupQueue) {
         // 
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadEntity.getUid());
         if (memberOptional.isPresent()) {
