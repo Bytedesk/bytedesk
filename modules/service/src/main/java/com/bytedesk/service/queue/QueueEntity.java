@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:06:13
+ * @LastEditTime: 2025-04-07 13:22:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,9 +84,9 @@ public class QueueEntity extends BaseEntity {
 
     // 记录存储一对一、技能组、机器人各自队列中的排队队员
     // 添加与QueueMember的一对多关系
-    @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<QueueMemberEntity> queueMembers = new ArrayList<>();
+//     @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, orphanRemoval = true)
+//     @Builder.Default
+//     private List<QueueMemberEntity> queueMembers = new ArrayList<>();
     
     // 仅用于在工作组情况下，记录存储robot/agent接待来自技能组数量
     // 添加新的一对多关系 - 作为工作组队列
@@ -94,88 +94,117 @@ public class QueueEntity extends BaseEntity {
     @Builder.Default
     private List<QueueMemberEntity> workgroupQueueMembers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "agentQueue", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private List<QueueMemberEntity> agentQueueMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "robotQueue", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private List<QueueMemberEntity> robotQueueMembers = new ArrayList<>();
+
     /**
      * 获取当天请求服务总人数（当前分配的排队号码）
      */
     public int getNewCount() {
-        return queueMembers.size() + workgroupQueueMembers.size();
+        return agentQueueMembers.size() + robotQueueMembers.size() + workgroupQueueMembers.size();
     }
 
     /**
      * 获取请求时客服离线的人数（包括当前离线和曾经离线但已关闭的）
      */
     public int getOfflineCount() {
-        int count1 = (int) queueMembers.stream()
+        int count1 = (int) agentQueueMembers.stream()
                 .filter(member -> 
                        (member.getThread() != null && member.getThread().isOffline()))
                 .count();
         
-        int count2 = (int) workgroupQueueMembers.stream()
+        int count2 = (int) robotQueueMembers.stream()
                 .filter(member -> 
                        (member.getThread() != null && member.getThread().isOffline()))
                 .count();
         
-        return count1 + count2;
+        int count3 = (int) workgroupQueueMembers.stream()
+                .filter(member -> 
+                       (member.getThread() != null && member.getThread().isOffline()))
+                .count();
+        
+        return count1 + count2 + count3;
     }
 
     /**
      * 获取当前排队中的人数
      */
     public int getQueuingCount() {
-        int count1 = (int) queueMembers.stream()
+        int count1 = (int) agentQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isQueuing())
                 .count();
         
-        int count2 = (int) workgroupQueueMembers.stream()
+        int count2 = (int) robotQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isQueuing())
                 .count();
         
-        return count1 + count2;
+        int count3 = (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isQueuing())
+                .count();
+        
+        return count1 + count2 + count3;
     }
 
     /**
      * 获取当前正在会话的人数
      */
     public int getChattingCount() {
-        int count1 = (int) queueMembers.stream()
+        int count1 = (int) agentQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isChatting())
                 .count();
         
-        int count2 = (int) workgroupQueueMembers.stream()
+        int count2 = (int) robotQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isChatting())
                 .count();
         
-        return count1 + count2;
+        int count3 = (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isChatting())
+                .count();
+        
+        return count1 + count2 + count3;
     }
 
     /**
      * 获取已结束会话的人数
      */
     public int getClosedCount() {
-        int count1 = (int) queueMembers.stream()
+        int count1 = (int) agentQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
                 .count();
         
-        int count2 = (int) workgroupQueueMembers.stream()
+        int count2 = (int) robotQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
                 .count();
         
-        return count1 + count2;
+        int count3 = (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .count();
+        
+        return count1 + count2 + count3;
     }
 
     /**
      * 获取平均等待时间(秒)
      */
     public int getAvgWaitTime() {
-        List<QueueMemberEntity> servedMembers1 = queueMembers.stream()
+        List<QueueMemberEntity> servedMembers1 = agentQueueMembers.stream()
                 .filter(member -> member.getAcceptTime() != null)
                 .toList();
         
-        List<QueueMemberEntity> servedMembers2 = workgroupQueueMembers.stream()
+        List<QueueMemberEntity> servedMembers2 = robotQueueMembers.stream()
                 .filter(member -> member.getAcceptTime() != null)
                 .toList();
         
-        int totalCount = servedMembers1.size() + servedMembers2.size();
+        List<QueueMemberEntity> servedMembers3 = workgroupQueueMembers.stream()
+                .filter(member -> member.getAcceptTime() != null)
+                .toList();
+        
+        int totalCount = servedMembers1.size() + servedMembers2.size() + servedMembers3.size();
         
         if (totalCount == 0) {
             return 0;
@@ -189,24 +218,33 @@ public class QueueEntity extends BaseEntity {
                 .mapToLong(QueueMemberEntity::getWaitTime)
                 .sum();
         
-        return (int) ((totalWaitTime1 + totalWaitTime2) / totalCount);
+        long totalWaitTime3 = servedMembers3.stream()
+                .mapToLong(QueueMemberEntity::getWaitTime)
+                .sum();
+        
+        return (int) ((totalWaitTime1 + totalWaitTime2 + totalWaitTime3) / totalCount);
     }
 
     /**
      * 获取平均解决时间(秒)
      */
     public int getAvgResolveTime() {
-        List<QueueMemberEntity> closedMembers1 = queueMembers.stream()
+        List<QueueMemberEntity> closedMembers1 = agentQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
                 .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
                 .toList();
         
-        List<QueueMemberEntity> closedMembers2 = workgroupQueueMembers.stream()
+        List<QueueMemberEntity> closedMembers2 = robotQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
                 .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
                 .toList();
         
-        int totalCount = closedMembers1.size() + closedMembers2.size();
+        List<QueueMemberEntity> closedMembers3 = workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
+                .toList();
+        
+        int totalCount = closedMembers1.size() + closedMembers2.size() + closedMembers3.size();
         
         if (totalCount == 0) {
             return 0;
@@ -230,7 +268,16 @@ public class QueueEntity extends BaseEntity {
                 })
                 .sum();
         
-        return (int) ((totalResolveTime1 + totalResolveTime2) / totalCount);
+        long totalResolveTime3 = closedMembers3.stream()
+                .mapToLong(member -> {
+                    return java.time.Duration.between(
+                            member.getAcceptTime(), 
+                            member.getCloseTime())
+                            .getSeconds();
+                })
+                .sum();
+        
+        return (int) ((totalResolveTime1 + totalResolveTime2 + totalResolveTime3) / totalCount);
     }
 
     /**
