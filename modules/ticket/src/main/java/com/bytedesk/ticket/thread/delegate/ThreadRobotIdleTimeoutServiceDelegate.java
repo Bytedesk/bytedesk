@@ -15,6 +15,7 @@ package com.bytedesk.ticket.thread.delegate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Date;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -53,10 +54,56 @@ public class ThreadRobotIdleTimeoutServiceDelegate implements JavaDelegate {
         log.info("Processing robot idle timeout for thread: {}, visitor: {}", 
             threadUid, userUid);
         
+        // 检查是否真的超时 - 基于最后访客消息时间
+        if (!isReallyTimedOut(execution)) {
+            log.info("访客最近有活动，不执行超时处理: threadUid={}", threadUid);
+            return;
+        }
+        
         // 标记会话为超时状态
         markThreadAsTimeout(threadUid);
         
         // 其他超时处理逻辑
+    }
+    
+    /**
+     * 检查是否真的超时
+     * 
+     * 考虑访客最后活动时间，如果访客在超时时间内有新消息，则不应判定为超时
+     * 
+     * @param execution 流程执行上下文
+     * @return 如果真的超时，返回true；否则返回false
+     */
+    private boolean isReallyTimedOut(DelegateExecution execution) {
+        try {
+            // 获取设置的超时时间
+            Integer idleTimeout = (Integer) execution.getVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT);
+            if (idleTimeout == null) {
+                idleTimeout = ThreadConsts.DEFAULT_ROBOT_IDLE_TIMEOUT;
+            }
+            
+            // 获取访客最后活动时间
+            Date lastActivityTime = (Date) execution.getVariable(ThreadConsts.THREAD_VARIABLE_LAST_VISITOR_MESSAGE_TIME);
+            if (lastActivityTime == null) {
+                // 如果没有记录访客活动时间，默认为超时
+                return true;
+            }
+            
+            // 计算从最后活动到现在的时间
+            long elapsedTime = System.currentTimeMillis() - lastActivityTime.getTime();
+            
+            // 判断是否超时
+            boolean timedOut = elapsedTime >= idleTimeout;
+            log.debug("机器人接待超时检查: threadUid={}, 已经过时间={}ms, 超时阈值={}ms, 是否超时={}", 
+                    execution.getVariable(ThreadConsts.THREAD_VARIABLE_THREAD_UID), 
+                    elapsedTime, idleTimeout, timedOut);
+            
+            return timedOut;
+        } catch (Exception e) {
+            log.error("检查超时状态时出错: {}", e.getMessage(), e);
+            // 默认返回true，确保流程能继续执行
+            return true;
+        }
     }
     
     /**

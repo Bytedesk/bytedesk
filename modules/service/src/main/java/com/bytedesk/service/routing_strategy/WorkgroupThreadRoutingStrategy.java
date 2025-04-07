@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:31:07
+ * @LastEditTime: 2025-04-07 12:52:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -332,7 +331,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 更新线程状态
         thread.setUserUid(robot.getUid());
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-        thread.setAgent(ConvertAiUtils.convertToRobotProtobufString(robot));
+        thread.setAgent(robot.toUserProtobuf().toJson());
         thread.setContent(content);
         thread.setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
@@ -341,7 +340,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 更新排队状态
-        // queueMemberEntity.setStatus(QueueMemberStatusEnum.SERVING.name());
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);

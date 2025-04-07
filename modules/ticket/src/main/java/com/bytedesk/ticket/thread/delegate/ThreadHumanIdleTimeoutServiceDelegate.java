@@ -15,6 +15,7 @@ package com.bytedesk.ticket.thread.delegate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Date;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -55,44 +56,56 @@ public class ThreadHumanIdleTimeoutServiceDelegate implements JavaDelegate {
         log.info("Processing human idle timeout for thread: {}, visitor: {}, agent: {}, workgroup: {}",
             threadUid, userUid, agentUid, workgroupUid); 
         
+        // 检查是否真的超时 - 基于最后访客消息时间
+        if (!isReallyTimedOut(execution)) {
+            log.info("访客最近有活动，不执行超时处理: threadUid={}", threadUid);
+            return;
+        }
+        
         // 标记会话为超时状态
         markThreadAsTimeout(threadUid);
         
         // 其他超时处理逻辑
-        // 记录超时开始时间
-        // long startTime = System.currentTimeMillis();
-        // execution.setVariable("humanIdleTimeoutStartTime", startTime);
-        
-        // try {
-        //     // 记录访客超时未发送消息的事件
-        //     execution.setVariable("humanIdleTimeoutTime", new Date());
-        //     execution.setVariable("humanIdleTimeoutStatus", "TIMEOUT");
-        //     execution.setVariable("threadEndReason", "VISITOR_IDLE_TIMEOUT");
+    }
+    
+    /**
+     * 检查是否真的超时
+     * 
+     * 考虑访客最后活动时间，如果访客在超时时间内有新消息，则不应判定为超时
+     * 
+     * @param execution 流程执行上下文
+     * @return 如果真的超时，返回true；否则返回false
+     */
+    private boolean isReallyTimedOut(DelegateExecution execution) {
+        try {
+            // 获取设置的超时时间
+            Integer idleTimeout = (Integer) execution.getVariable(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT);
+            if (idleTimeout == null) {
+                idleTimeout = ThreadConsts.DEFAULT_HUMAN_IDLE_TIMEOUT;
+            }
             
-        //     log.info("Visitor {} idle timeout in thread: {}, agent: {}", 
-        //         userUid, threadUid, agentUid);
+            // 获取访客最后活动时间
+            Date lastActivityTime = (Date) execution.getVariable(ThreadConsts.THREAD_VARIABLE_LAST_VISITOR_MESSAGE_TIME);
+            if (lastActivityTime == null) {
+                // 如果没有记录访客活动时间，默认为超时
+                return true;
+            }
             
-        //     // 发送超时提醒消息
-        //     sendTimeoutNotification(execution);
+            // 计算从最后活动到现在的时间
+            long elapsedTime = System.currentTimeMillis() - lastActivityTime.getTime();
             
-        //     // 记录会话统计数据
-        //     recordThreadStatistics(execution);
+            // 判断是否超时
+            boolean timedOut = elapsedTime >= idleTimeout;
+            log.debug("人工客服接待超时检查: threadUid={}, 已经过时间={}ms, 超时阈值={}ms, 是否超时={}", 
+                    execution.getVariable(ThreadConsts.THREAD_VARIABLE_THREAD_UID), 
+                    elapsedTime, idleTimeout, timedOut);
             
-        //     // 清理资源
-        //     cleanupResources(execution);
-            
-        //     execution.setVariable("threadStatus", "CLOSED_BY_TIMEOUT");
-        //     log.info("Human idle timeout processing completed for thread: {}", threadUid);
-        // } catch (Exception e) {
-        //     log.error("Error in human idle timeout service", e);
-        //     execution.setVariable("humanIdleTimeoutError", e.getMessage());
-        // } finally {
-        //     // 记录处理结束时间和总时长
-        //     long endTime = System.currentTimeMillis();
-        //     execution.setVariable("humanIdleTimeoutEndTime", endTime);
-        //     execution.setVariable("humanIdleTimeoutDuration", endTime - startTime);
-        //     execution.setVariable("threadEndTime", new Date());
-        // }
+            return timedOut;
+        } catch (Exception e) {
+            log.error("检查超时状态时出错: {}", e.getMessage(), e);
+            // 默认返回true，确保流程能继续执行
+            return true;
+        }
     }
     
     /**
