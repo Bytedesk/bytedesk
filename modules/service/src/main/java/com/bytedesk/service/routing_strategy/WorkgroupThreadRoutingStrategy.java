@@ -192,10 +192,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setChatting()
-            .setUnreadCount(1)
-            .setContent(content)
-            .setOwner(agent.getMember().getUser());
+        thread.setChatting().setContent(content).setUnreadCount(1).setOwner(agent.getMember().getUser());
         //
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
@@ -237,9 +234,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
         // 进入排队队列
         thread.setUserUid(agent.getUid());
-        thread.setQueuing();
-        thread.setUnreadCount(0);
-        thread.setContent(content);
+        thread.setQueuing().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
