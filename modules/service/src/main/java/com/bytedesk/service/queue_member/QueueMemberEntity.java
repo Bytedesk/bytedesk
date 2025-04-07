@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 11:59:51
+ * @LastEditTime: 2025-04-07 13:09:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,6 +85,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     private LocalDateTime acceptTime;  // 开始服务时间
 
+    // 
     @Builder.Default
     private boolean firstResponse = false;  // 人工客服是否首次响应
 

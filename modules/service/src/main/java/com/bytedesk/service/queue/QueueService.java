@@ -41,11 +41,11 @@ public class QueueService {
             throw new QueueFullException("Queue is full or not active");
         }
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agent, queue, null);
+        return getQueueMember(threadEntity, agent, queue, null);
         // 3. 更新队列统计
         // updateQueueStats(queue);
         // 4. 返回队列成员
-        return member;
+        // return member;
     }
 
     @Transactional
@@ -56,11 +56,7 @@ public class QueueService {
             throw new QueueFullException("Queue is full or not active");
         }
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agent, queue, null);
-        // 3. 更新队列统计
-        // updateQueueStats(queue);
-        // 4. 返回队列成员
-        return member;
+        return getQueueMember(threadEntity, agent, queue, null);
     }
 
     @Transactional
@@ -79,20 +75,9 @@ public class QueueService {
 
         // 3. 创建工作组队列成员
         // 注意: 此处的workgroupQueue和agentQueue没有问题，暂时使用此种命名
-        QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroupQueue, agentQueue);
-
-        // 保存更新后的队列成员
-        workgroupMember = queueMemberRestService.save(workgroupMember);
-        
-        // 5. 创建辅助索引 - 确保能够通过客服队列找到该记录
-        queueMemberRestService.createQueueReference(workgroupMember.getUid(), agentQueue.getUid(), threadEntity.getUid());
-        
-        // 6. 更新两个队列的统计信息
-        // updateQueueStats(workgroupQueue);
-        // updateQueueStats(agentQueue);
-        
+        return getQueueMember(threadEntity, agent, workgroupQueue, agentQueue);
         // 7. 返回工作组队列成员
-        return workgroupMember;
+        // return workgroupMember;
     }
 
     @Transactional

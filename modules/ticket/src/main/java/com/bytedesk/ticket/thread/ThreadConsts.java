@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:22:18
+ * @LastEditTime: 2025-04-07 13:04:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,14 @@
 package com.bytedesk.ticket.thread;
 
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 
 public class ThreadConsts {
 
     // thread-process
     public static final String THREAD_PROCESS_NAME = I18Consts.I18N_PREFIX + "thread.process.name";
     
-    public static final String THREAD_PROCESS_KEY = "threadProcess";
+    public static final String THREAD_PROCESS_KEY = "thread-process";
 
     public static final String THREAD_PROCESS_PATH = "processes/thread-process.bpmn20.xml";
 
@@ -31,7 +32,7 @@ public class ThreadConsts {
 
     public static final String THREAD_VARIABLE_STATUS = "status"; // 状态
     
-    public static final String THREAD_VARIABLE_THREAD_STATUS = "status"; // 线程状态，与STATUS相同，用于流程控制
+    public static final String THREAD_VARIABLE_THREAD_STATUS = "threadStatus"; // 线程状态，用于流程控制
 
     public static final String THREAD_VARIABLE_USER_UID = "userUid"; // 用户UID
 
@@ -57,6 +58,10 @@ public class ThreadConsts {
     public static final String THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT = "robotIdleTimeout"; // 机器人接待访客超时时间
     
     public static final String THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT = "humanIdleTimeout"; // 人工接待访客超时时间
+    
+    public static final String THREAD_VARIABLE_LAST_VISITOR_MESSAGE_TIME = "lastVisitorMessageTime"; // 最后访客消息时间
+    
+    public static final String THREAD_VARIABLE_LAST_VISITOR_ACTIVITY_TIME = "lastVisitorActivityTime"; // 最后访客活动时间
     
     // 会话类型相关常量
     public static final String THREAD_VARIABLE_THREAD_TYPE = "threadType"; // 会话类型
@@ -106,12 +111,16 @@ public class ThreadConsts {
     public static final String ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK = "transferToHumanTask";
     
     // 默认超时时间常量
-    public static final String DEFAULT_SLA_TIME = "PT30M";              // 默认SLA时间 - 30分钟
-    public static final String DEFAULT_HUMAN_IDLE_TIMEOUT = "PT15M";    // 默认人工客服空闲超时 - 15分钟
-    public static final String DEFAULT_ROBOT_IDLE_TIMEOUT = "PT5M";     // 默认机器人空闲超时 - 5分钟
+    public static final int DEFAULT_SLA_TIME = 30 * 60 * 1000;           // 默认SLA时间 - 30分钟
+    public static final int DEFAULT_HUMAN_IDLE_TIMEOUT = 15 * 60 * 1000; // 默认人工客服空闲超时 - 15分钟
+    public static final int DEFAULT_ROBOT_IDLE_TIMEOUT = 5 * 60 * 1000;  // 默认机器人空闲超时 - 5分钟
     
-    // 线程状态常量
-    public static final String THREAD_STATUS_CREATED = "CREATED";       // 初始创建状态
+    // 线程状态常量 - 使用 ThreadProcessStatusEnum 中的值
+    public static final String THREAD_STATUS_CREATED = ThreadProcessStatusEnum.NEW.name();       // 新会话状态
+    public static final String THREAD_STATUS_WAITING = ThreadProcessStatusEnum.QUEUING.name();   // 排队中状态
+    public static final String THREAD_STATUS_ONGOING = ThreadProcessStatusEnum.CHATTING.name();  // 对话中状态
+    public static final String THREAD_STATUS_CLOSED = ThreadProcessStatusEnum.CLOSED.name();     // 会话已结束状态
+    public static final String THREAD_STATUS_TRANSFERRED = "TRANSFERRED"; // 转接状态 (枚举中没有，保留原值)
     
     // 机器人相关变量常量
     public static final String THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT = "robotUnansweredCount";  // 机器人未回答计数

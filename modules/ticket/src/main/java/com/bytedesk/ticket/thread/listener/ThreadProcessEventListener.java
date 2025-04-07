@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 23:31:46
+ * @LastEditTime: 2025-04-07 12:56:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.thread;
+package com.bytedesk.ticket.thread.listener;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +29,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.ticket.thread.ThreadConsts;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,11 @@ public class ThreadProcessEventListener {
         variables.put(ThreadConsts.THREAD_VARIABLE_STATUS, thread.getStatus());
         variables.put(ThreadConsts.THREAD_VARIABLE_START_TIME, new Date());
         
+        // 设置初始的访客最后消息时间
+        Date now = new Date();
+        variables.put(ThreadConsts.THREAD_VARIABLE_LAST_VISITOR_MESSAGE_TIME, now);
+        variables.put(ThreadConsts.THREAD_VARIABLE_LAST_VISITOR_ACTIVITY_TIME, now);
+        
         // 设置默认值，避免流程执行时找不到变量
         // 设置 SLA 时间 - 预先设置默认值
         variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME, ThreadConsts.DEFAULT_SLA_TIME);  // 默认30分钟
@@ -91,7 +97,7 @@ public class ThreadProcessEventListener {
         
         // 添加控制流程流转的变量
         variables.put(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);  // 默认不需要转人工
-        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_CREATED);   // 初始状态
+        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_CREATED);   // 使用常量引用初始状态
         
         // 显式初始化机器人相关变量，避免空指针和循环问题
         variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT, 0);
