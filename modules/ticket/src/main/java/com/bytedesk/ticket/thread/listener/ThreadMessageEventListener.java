@@ -61,8 +61,8 @@ public class ThreadMessageEventListener {
             return;
         }
         
-        log.debug("接收到新消息事件: messageUid={}, threadUid={}", 
-                message.getUid(), message.getThreadUid());
+        log.debug("接收到新消息事件: messageUid={}, threadUid={}, content={}",
+                message.getUid(), message.getThreadUid(), message.getContent()); 
         
         // 获取消息对应的会话线程
         ThreadEntity thread = null;
