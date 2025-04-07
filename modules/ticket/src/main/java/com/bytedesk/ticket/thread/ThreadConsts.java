@@ -122,6 +122,10 @@ public class ThreadConsts {
     // 
     public static final String THREAD_STATUS_TRANSFERRED = "TRANSFERRED"; // 转接状态 (枚举中没有，保留原值)
     
+    // 添加缺失的常量
+    public static final String THREAD_STATUS_QUEUING = ThreadProcessStatusEnum.QUEUING.name();   // 排队中状态
+    public static final String THREAD_STATUS_OFFLINE = "OFFLINE"; //ThreadProcessStatusEnum.OFFLINE.name();   // 离线状态
+    
     // 从流程中提取的状态值 - 使用新的 enum 类型
     public static final String THREAD_STATUS_INVITE = ThreadInviteStatusEnum.INVITE_PENDING.name(); // 邀请协助状态
     // 
@@ -133,6 +137,9 @@ public class ThreadConsts {
     // 机器人相关变量常量
     public static final String THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT = "robotUnansweredCount";  // 机器人未回答计数
     public static final String THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER = "visitorRequestedTransfer"; // 访客请求转人工标志
+    
+    // 排队相关变量常量
+    public static final String THREAD_VARIABLE_QUEUE_START_TIME = "queueStartTime";  // 排队开始时间
     
     // 转人工方式相关常量
     public static final String THREAD_VARIABLE_TRANSFER_TYPE = "transferType"; // 转人工方式
