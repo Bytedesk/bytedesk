@@ -147,11 +147,9 @@ public class QueueMemberEntity extends BaseEntity {
     // 如果来自工作组分配，记录工作组队列UID
     private String workgroupQueueUid;
 
-    // @Builder.Default
-    // @Column(name = "was_offline")
-    // private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
-    
-    // 重构到相应的表里面
+    // 客服队列UID (添加这个新字段)
+    private String agentQueueUid;
+
     // 意图类型
     @Builder.Default
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();

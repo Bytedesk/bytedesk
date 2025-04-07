@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:04:42
+ * @LastEditTime: 2025-04-07 10:37:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -130,4 +130,8 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     // 添加新的查询方法，通过线程UID和队列UID查询队列成员
     @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid AND qm.queue.uid = :queueUid")
     Optional<QueueMemberEntity> findByThreadUidAndQueueUid(@Param("threadUid") String threadUid, @Param("queueUid") String queueUid);
+    
+    // 查找指定队列下的所有队列成员
+    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.queue.uid = :queueUid")
+    List<QueueMemberEntity> findByQueueUid(@Param("queueUid") String queueUid);
 }
