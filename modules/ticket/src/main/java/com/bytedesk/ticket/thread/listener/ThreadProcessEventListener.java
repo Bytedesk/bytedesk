@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 17:30:50
+ * @LastEditTime: 2025-04-07 18:01:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -229,6 +229,14 @@ public class ThreadProcessEventListener {
     @EventListener
     public void onThreadTransferToAgentEvent(ThreadTransferToAgentEvent event) {
         // 处理会话转人工事件，例如更新流程变量等
+        ThreadEntity thread = event.getThread();
+        if (thread == null) {
+            log.error("会话转人工事件, 会话对象为空: {}", event);
+            return;
+        }
+        if (thread.getProcessInstanceId() != null) {
+
+        }
     }
 
     @EventListener

@@ -66,14 +66,19 @@ public class ThreadTransferToAgentService {
         // 检查是否包含转人工关键词
         boolean requestTransfer = checkTransferRequest(content);
         if (requestTransfer && thread.getProcessInstanceId() != null) {
-            log.info("检测到访客请求转人工: threadUid={}, content={}", thread.getUid(), content);
+            log.info("检测到访客请求通过关键词转人工: threadUid={}, content={}", thread.getUid(), content);
             
             // 设置流程变量，标记访客请求转人工
             try {
                 // 使用常量替代直接的字符串值
                 runtimeService.setVariable(thread.getProcessInstanceId(), 
                     ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, true);
-                log.info("已设置访客请求转人工标记: processInstanceId={}", thread.getProcessInstanceId());
+                
+                // 设置转人工方式为关键词
+                runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_TRANSFER_TYPE, ThreadConsts.TRANSFER_TYPE_KEYWORD);
+                    
+                log.info("已设置访客通过关键词请求转人工标记: processInstanceId={}", thread.getProcessInstanceId());
                 
                 /* 
                  * visitorRequestedTransfer 变量使用说明:
@@ -93,6 +98,33 @@ public class ThreadTransferToAgentService {
         }
     }
     
+    /**
+     * 处理UI按钮转人工请求
+     * 
+     * @param thread 会话线程
+     */
+    public void processUiTransferRequest(ThreadEntity thread) {
+        if (thread == null || thread.getProcessInstanceId() == null) {
+            log.error("处理UI转人工请求失败：会话或流程实例ID为空");
+            return;
+        }
+        
+        try {
+            // 设置流程变量，标记访客通过UI请求转人工
+            runtimeService.setVariable(thread.getProcessInstanceId(), 
+                ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, true);
+            
+            // 设置转人工方式为UI
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                ThreadConsts.THREAD_VARIABLE_TRANSFER_TYPE, ThreadConsts.TRANSFER_TYPE_UI);
+                
+            log.info("已设置访客通过UI请求转人工标记: threadUid={}, processInstanceId={}", 
+                thread.getUid(), thread.getProcessInstanceId());
+        } catch (Exception e) {
+            log.error("设置访客通过UI请求转人工标记失败: {}", e.getMessage());
+        }
+    }
+
     /**
      * 判断消息是否是访客发送的
      * 
