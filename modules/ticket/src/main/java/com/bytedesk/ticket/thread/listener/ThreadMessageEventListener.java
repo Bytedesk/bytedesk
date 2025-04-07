@@ -13,7 +13,10 @@
  */
 package com.bytedesk.ticket.thread.listener;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 import org.flowable.engine.RuntimeService;
 import org.springframework.context.event.EventListener;
@@ -23,6 +26,8 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.ticket.thread.ThreadConsts;
 import com.bytedesk.ticket.thread.ThreadMessageService;
 
@@ -42,6 +47,7 @@ public class ThreadMessageEventListener {
     private final ThreadMessageService threadMessageService;
     private final ThreadRestService threadRestService;
     private final RuntimeService runtimeService;
+    private final QueueMemberRestService queueMemberRestService;
     
     /**
      * 监听消息创建事件
@@ -74,10 +80,122 @@ public class ThreadMessageEventListener {
             // 如果是访客发送的消息，重置空闲超时计时器
             if (message.isFromVisitor()) {
                 resetIdleTimers(thread);
+                // 更新访客消息统计
+                updateVisitorMessageStats(message, thread);
+            } else if (message.isFromAgent() || message.isFromRobot()) {
+                // 更新客服消息统计
+                updateAgentMessageStats(message, thread);
             }
             
         } catch (Exception e) {
             log.error("处理消息事件时出错: {}", e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 更新访客消息统计
+     * 
+     * @param message 消息对象
+     * @param thread 会话对象
+     */
+    private void updateVisitorMessageStats(MessageEntity message, ThreadEntity thread) {
+        if (thread == null || message == null) {
+            return;
+        }
+        
+        try {
+            // 查找关联的队列成员记录
+            Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+            if (queueMemberOpt.isEmpty()) {
+                log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
+                return;
+            }
+            
+            QueueMemberEntity queueMember = queueMemberOpt.get();
+            LocalDateTime now = LocalDateTime.now();
+            
+            // 更新首次消息时间（如果尚未设置）
+            if (queueMember.getFirstMessageTime() == null) {
+                queueMember.setFirstMessageTime(now);
+            }
+            
+            // 更新最后一次访客消息时间
+            queueMember.setLastMessageTime(now);
+            
+            // 更新访客消息计数
+            queueMember.setVisitorMessageCount(queueMember.getVisitorMessageCount() + 1);
+            
+            // 保存更新
+            queueMemberRestService.save(queueMember);
+            log.debug("已更新队列成员访客消息统计: threadUid={}, visitorMsgCount={}", 
+                    thread.getUid(), queueMember.getVisitorMessageCount());
+        } catch (Exception e) {
+            log.error("更新访客消息统计时出错: {}", e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 更新客服消息统计
+     * 
+     * @param message 消息对象
+     * @param thread 会话对象
+     */
+    private void updateAgentMessageStats(MessageEntity message, ThreadEntity thread) {
+        if (thread == null || message == null) {
+            return;
+        }
+        
+        try {
+            // 查找关联的队列成员记录
+            Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+            if (queueMemberOpt.isEmpty()) {
+                log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
+                return;
+            }
+            
+            QueueMemberEntity queueMember = queueMemberOpt.get();
+            LocalDateTime now = LocalDateTime.now();
+            
+            // 更新客服消息计数
+            queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
+            
+            // 如果是首次响应，记录首次响应时间
+            if (!queueMember.isFirstResponse() && queueMember.getLastMessageTime() != null) {
+                queueMember.setFirstResponse(true);
+                queueMember.setFirstResponseTime(now);
+                
+                // 计算首次响应时间（秒）
+                long responseTimeInSeconds = Duration.between(queueMember.getLastMessageTime(), now).getSeconds();
+                queueMember.setMaxResponseTime((int) responseTimeInSeconds);
+                queueMember.setAvgResponseTime((int) responseTimeInSeconds);
+            } else if (queueMember.getLastMessageTime() != null) {
+                // 非首次响应，更新平均和最大响应时间
+                long responseTimeInSeconds = Duration.between(queueMember.getLastMessageTime(), now).getSeconds();
+                
+                // 更新最大响应时间
+                if (responseTimeInSeconds > queueMember.getMaxResponseTime()) {
+                    queueMember.setMaxResponseTime((int) responseTimeInSeconds);
+                }
+                
+                // 更新平均响应时间 - 使用累计平均计算方法
+                // (currentAvg * (messageCount-1) + newValue) / messageCount
+                int messageCount = queueMember.getAgentMessageCount();
+                if (messageCount > 1) { // 避免除以零
+                    int currentTotal = queueMember.getAvgResponseTime() * (messageCount - 1);
+                    queueMember.setAvgResponseTime((currentTotal + (int) responseTimeInSeconds) / messageCount);
+                }
+            }
+            
+            // 更新最后响应时间
+            queueMember.setLastResponseTime(now);
+            
+            // 保存更新
+            queueMemberRestService.save(queueMember);
+            log.debug("已更新队列成员客服消息统计: threadUid={}, agentMsgCount={}, avgResponseTime={}s, maxResponseTime={}s", 
+                    thread.getUid(), queueMember.getAgentMessageCount(), 
+                    queueMember.getAvgResponseTime(), queueMember.getMaxResponseTime());
+        } catch (Exception e) {
+            log.error("更新客服消息统计时出错: {}", e.getMessage(), e);
         }
     }
     
