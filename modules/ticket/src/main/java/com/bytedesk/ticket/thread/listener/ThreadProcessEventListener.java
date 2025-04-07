@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 22:41:50
+ * @LastEditTime: 2025-04-07 23:37:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -247,6 +247,10 @@ public class ThreadProcessEventListener {
             // 设置流程变量，标记访客通过UI请求转人工
             runtimeService.setVariable(thread.getProcessInstanceId(), 
                     ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, true);
+            
+            // 关键修复：设置需要人工服务变量为true，这样流程才能从transferToHumanTask流转到下一步
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, true);
             
             // 设置转人工方式为UI
             runtimeService.setVariable(thread.getProcessInstanceId(),

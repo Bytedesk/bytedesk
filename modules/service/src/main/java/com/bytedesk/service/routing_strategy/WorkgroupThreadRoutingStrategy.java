@@ -293,7 +293,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     private MessageProtobuf getWorkgroupContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getWorkgroupContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        log.info("getWorkgroupContinueMessage user: {}", user.getNickname());
         // 继续会话
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
         Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
