@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 15:19:21
+ * @LastEditTime: 2025-04-07 17:30:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadAgentQueueEvent;
+import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
+import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.thread.ThreadConsts;
 
@@ -64,19 +67,6 @@ public class ThreadProcessEventListener {
     private final TaskService taskService;
 
     private final ThreadRestService threadRestService;
-    
-    /**
-     * 将毫秒时间转换为Flowable定时器可识别的ISO 8601持续时间格式
-     * 格式为: PT{n}S，其中{n}表示秒数
-     * 
-     * @param milliseconds 毫秒数
-     * @return ISO 8601持续时间格式字符串
-     */
-    private String formatDurationToIso8601(int milliseconds) {
-        // 将毫秒转换成秒
-        long seconds = milliseconds / 1000;
-        return Duration.ofSeconds(seconds).toString();
-    }
 
     @EventListener
     public void onThreadProcessCreateEvent(ThreadProcessCreateEvent event) {
@@ -235,6 +225,23 @@ public class ThreadProcessEventListener {
         }
     }
     
+
+    @EventListener
+    public void onThreadTransferToAgentEvent(ThreadTransferToAgentEvent event) {
+        // 处理会话转人工事件，例如更新流程变量等
+    }
+
+    @EventListener
+    public void onThreadAgentOfflineEvent(ThreadAgentOfflineEvent event) {
+        // 处理客服离线事件，例如更新流程变量等
+    }
+
+    @EventListener
+    public void onThreadAgentQueueEvent(ThreadAgentQueueEvent event) {
+        // 处理客服繁忙事件，例如更新流程变量等
+    }
+
+
     /**
      * 检查流程实例是否仍然活跃
      * 
@@ -253,5 +260,20 @@ public class ThreadProcessEventListener {
             return false;
         }
     }
+
+    /**
+     * 将毫秒时间转换为Flowable定时器可识别的ISO 8601持续时间格式
+     * 格式为: PT{n}S，其中{n}表示秒数
+     * 
+     * @param milliseconds 毫秒数
+     * @return ISO 8601持续时间格式字符串
+     */
+    private String formatDurationToIso8601(int milliseconds) {
+        // 将毫秒转换成秒
+        long seconds = milliseconds / 1000;
+        return Duration.ofSeconds(seconds).toString();
+    }
+
+
 
 }
