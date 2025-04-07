@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 17:07:41
+ * @LastEditTime: 2025-04-07 17:36:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,10 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
+import com.bytedesk.core.thread.event.ThreadAgentQueueEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
+import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueService;
@@ -128,7 +131,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
         } else if (visitorRequest.getForceAgent()) {
             // 只有chatting状态，且接待客服是robot接待时，前端才会显示转人工按钮，
-            // TODO: 强制转人工
+            // 强制转人工
+            applicationEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
         }
         // 
         // 未强制转人工的情况下，判断是否转机器人
@@ -148,7 +152,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 }
             }
         }
-
         
         // 下面人工接待
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
@@ -245,7 +248,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        applicationEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
         //
         return messageProtobuf;
     }
@@ -286,7 +289,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        applicationEventPublisher.publishEvent(new ThreadAgentOfflineEvent(this, savedThread));
         //
         return messageProtobuf;
     }
@@ -347,9 +350,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 更新线程状态
         thread.setUserUid(robot.getUid());
-        thread.setChatting();
-        thread.setContent(content);
-        thread.setUnreadCount(0);
+        thread.setChatting().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
