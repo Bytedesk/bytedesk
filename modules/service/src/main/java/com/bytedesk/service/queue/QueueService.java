@@ -92,10 +92,6 @@ public class QueueService {
         // 3. 创建工作组队列成员
         // 注意: 此处的workgroupQueue和agentQueue没有问题，暂时使用此种命名
         QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroup, visitorRequest, workgroupQueue, agentQueue);
-        
-        // 4. 更新工作组队列成员，添加客服队列关联信息
-        // workgroupMember.setAgentQueueUid(agentQueue.getUid());
-        // workgroupMember.setSourceType(QueueMemberSourceEnum.WORKGROUP.name());
 
         // 保存更新后的队列成员
         workgroupMember = queueMemberRestService.save(workgroupMember);
