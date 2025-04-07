@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 14:48:07
+ * @LastEditTime: 2025-04-07 14:58:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -181,9 +181,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 未满则接待
         thread.setUserUid(agent.getUid());
         thread.setStarted()
-                .setUnreadCount(1)
-                .setContent(content)
-                .setOwner(agent.getMember().getUser());
+            .setUnreadCount(1)
+            .setContent(content)
+            .setOwner(agent.getMember().getUser());
         //
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
@@ -289,6 +289,19 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getWorkgroupContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        // 继续会话
+        // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+                // 距离当前时间不超过30分钟，则直接使用之前的消息
+                // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+                // messageSendService.sendProtobufMessage(messageProtobuf);
+                return messageProtobuf;
+            }
+        }
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
         // 微信公众号等渠道不能重复推送”继续会话“消息
