@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 11:37:07
+ * @LastEditTime: 2025-04-07 11:59:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,6 +59,11 @@ public class QueueMemberEntity extends BaseEntity {
     // 多个queueMember对应一个queue
     @ManyToOne(fetch = FetchType.LAZY)
     private QueueEntity queue;
+    
+    // 作为工作组队列成员关系
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workgroup_queue_id")
+    private QueueEntity workgroupQueue;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
@@ -141,14 +146,14 @@ public class QueueMemberEntity extends BaseEntity {
     private boolean qualityChecked = false;
 
     // 来源类型：直接(DIRECT)、工作组(WORKGROUP)
-    @Builder.Default
-    private String sourceType = QueueMemberSourceEnum.DIRECT.name();
+    // @Builder.Default
+    // private String sourceType = QueueMemberSourceEnum.DIRECT.name();
     
     // 如果来自工作组分配，记录工作组队列UID
-    private String workgroupQueueUid;
+    // private String workgroupQueueUid;
 
     // 客服队列UID (添加这个新字段)
-    private String agentQueueUid;
+    // private String agentQueueUid;
 
     // 意图类型
     @Builder.Default

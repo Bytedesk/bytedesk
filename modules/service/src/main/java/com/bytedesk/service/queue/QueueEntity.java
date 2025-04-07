@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 11:36:42
+ * @LastEditTime: 2025-04-07 12:06:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,7 @@ package com.bytedesk.service.queue;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
-import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
+// import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -82,88 +82,137 @@ public class QueueEntity extends BaseEntity {
     @Column(name = "queue_status", nullable = false)
     private String status = QueueStatusEnum.ACTIVE.name();  // 队列状态
 
+    // 记录存储一对一、技能组、机器人各自队列中的排队队员
     // 添加与QueueMember的一对多关系
     @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<QueueMemberEntity> queueMembers = new ArrayList<>();
+    
+    // 仅用于在工作组情况下，记录存储robot/agent接待来自技能组数量
+    // 添加新的一对多关系 - 作为工作组队列
+    @OneToMany(mappedBy = "workgroupQueue", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private List<QueueMemberEntity> workgroupQueueMembers = new ArrayList<>();
 
     /**
      * 获取当天请求服务总人数（当前分配的排队号码）
      */
     public int getNewCount() {
-        return queueMembers.size();
+        return queueMembers.size() + workgroupQueueMembers.size();
     }
 
     /**
      * 获取请求时客服离线的人数（包括当前离线和曾经离线但已关闭的）
      */
     public int getOfflineCount() {
-        return (int) queueMembers.stream()
+        int count1 = (int) queueMembers.stream()
                 .filter(member -> 
                        (member.getThread() != null && member.getThread().isOffline()))
                 .count();
+        
+        int count2 = (int) workgroupQueueMembers.stream()
+                .filter(member -> 
+                       (member.getThread() != null && member.getThread().isOffline()))
+                .count();
+        
+        return count1 + count2;
     }
 
     /**
      * 获取当前排队中的人数
      */
     public int getQueuingCount() {
-        return (int) queueMembers.stream()
+        int count1 = (int) queueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isQueuing())
                 .count();
+        
+        int count2 = (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isQueuing())
+                .count();
+        
+        return count1 + count2;
     }
 
     /**
      * 获取当前正在会话的人数
      */
     public int getChattingCount() {
-        return (int) queueMembers.stream()
+        int count1 = (int) queueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isChatting())
                 .count();
+        
+        int count2 = (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isChatting())
+                .count();
+        
+        return count1 + count2;
     }
 
     /**
      * 获取已结束会话的人数
      */
     public int getClosedCount() {
-        return (int) queueMembers.stream()
+        int count1 = (int) queueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
                 .count();
+        
+        int count2 = (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .count();
+        
+        return count1 + count2;
     }
 
     /**
      * 获取平均等待时间(秒)
      */
     public int getAvgWaitTime() {
-        List<QueueMemberEntity> servedMembers = queueMembers.stream()
+        List<QueueMemberEntity> servedMembers1 = queueMembers.stream()
                 .filter(member -> member.getAcceptTime() != null)
                 .toList();
         
-        if (servedMembers.isEmpty()) {
+        List<QueueMemberEntity> servedMembers2 = workgroupQueueMembers.stream()
+                .filter(member -> member.getAcceptTime() != null)
+                .toList();
+        
+        int totalCount = servedMembers1.size() + servedMembers2.size();
+        
+        if (totalCount == 0) {
             return 0;
         }
         
-        long totalWaitTime = servedMembers.stream()
+        long totalWaitTime1 = servedMembers1.stream()
                 .mapToLong(QueueMemberEntity::getWaitTime)
                 .sum();
         
-        return (int) (totalWaitTime / servedMembers.size());
+        long totalWaitTime2 = servedMembers2.stream()
+                .mapToLong(QueueMemberEntity::getWaitTime)
+                .sum();
+        
+        return (int) ((totalWaitTime1 + totalWaitTime2) / totalCount);
     }
 
     /**
      * 获取平均解决时间(秒)
      */
     public int getAvgResolveTime() {
-        List<QueueMemberEntity> closedMembers = queueMembers.stream()
+        List<QueueMemberEntity> closedMembers1 = queueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
                 .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
                 .toList();
         
-        if (closedMembers.isEmpty()) {
+        List<QueueMemberEntity> closedMembers2 = workgroupQueueMembers.stream()
+                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
+                .toList();
+        
+        int totalCount = closedMembers1.size() + closedMembers2.size();
+        
+        if (totalCount == 0) {
             return 0;
         }
         
-        long totalResolveTime = closedMembers.stream()
+        long totalResolveTime1 = closedMembers1.stream()
                 .mapToLong(member -> {
                     return java.time.Duration.between(
                             member.getAcceptTime(), 
@@ -172,7 +221,16 @@ public class QueueEntity extends BaseEntity {
                 })
                 .sum();
         
-        return (int) (totalResolveTime / closedMembers.size());
+        long totalResolveTime2 = closedMembers2.stream()
+                .mapToLong(member -> {
+                    return java.time.Duration.between(
+                            member.getAcceptTime(), 
+                            member.getCloseTime())
+                            .getSeconds();
+                })
+                .sum();
+        
+        return (int) ((totalResolveTime1 + totalResolveTime2) / totalCount);
     }
 
     /**
@@ -192,18 +250,30 @@ public class QueueEntity extends BaseEntity {
     /**
      * 获取直接分配的会话数量
      */
-    public int getDirectAssignCount() {
-        return (int) queueMembers.stream()
-                .filter(member -> QueueMemberSourceEnum.DIRECT.name().equals(member.getSourceType()))
-                .count();
-    }
+    // public int getDirectAssignCount() {
+    //     int count1 = (int) queueMembers.stream()
+    //             .filter(member -> QueueMemberSourceEnum.DIRECT.name().equals(member.getSourceType()))
+    //             .count();
+        
+    //     int count2 = (int) workgroupQueueMembers.stream()
+    //             .filter(member -> QueueMemberSourceEnum.DIRECT.name().equals(member.getSourceType()))
+    //             .count();
+        
+    //     return count1 + count2;
+    // }
 
     /**
      * 获取从工作组分配的会话数量
      */
-    public int getWorkgroupAssignCount() {
-        return (int) queueMembers.stream()
-                .filter(member -> QueueMemberSourceEnum.WORKGROUP.name().equals(member.getSourceType()))
-                .count();
-    }
+    // public int getWorkgroupAssignCount() {
+    //     int count1 = (int) queueMembers.stream()
+    //             .filter(member -> QueueMemberSourceEnum.WORKGROUP.name().equals(member.getSourceType()))
+    //             .count();
+        
+    //     int count2 = (int) workgroupQueueMembers.stream()
+    //             .filter(member -> QueueMemberSourceEnum.WORKGROUP.name().equals(member.getSourceType()))
+    //             .count();
+        
+    //     return count1 + count2;
+    // }
 }
