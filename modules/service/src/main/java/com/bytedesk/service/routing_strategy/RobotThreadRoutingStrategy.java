@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 09:16:24
+ * @LastEditTime: 2025-04-07 12:37:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
@@ -91,7 +92,8 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 排队计数
-        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+        UserProtobuf agent = robot.toUserProtobuf();
+        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, agent, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
         String content = robot.getServiceSettings().getWelcomeTip();

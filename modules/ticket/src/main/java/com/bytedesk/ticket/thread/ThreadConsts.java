@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 10:25:12
+ * @LastEditTime: 2025-04-07 12:22:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,9 +106,9 @@ public class ThreadConsts {
     public static final String ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK = "transferToHumanTask";
     
     // 默认超时时间常量
-    public static final String DEFAULT_SLA_TIME = "PT1M";              // 默认SLA时间 - 30分钟
-    public static final String DEFAULT_HUMAN_IDLE_TIMEOUT = "PT1M";    // 默认人工客服空闲超时 - 15分钟
-    public static final String DEFAULT_ROBOT_IDLE_TIMEOUT = "PT1M";     // 默认机器人空闲超时 - 5分钟
+    public static final String DEFAULT_SLA_TIME = "PT30M";              // 默认SLA时间 - 30分钟
+    public static final String DEFAULT_HUMAN_IDLE_TIMEOUT = "PT15M";    // 默认人工客服空闲超时 - 15分钟
+    public static final String DEFAULT_ROBOT_IDLE_TIMEOUT = "PT5M";     // 默认机器人空闲超时 - 5分钟
     
     // 线程状态常量
     public static final String THREAD_STATUS_CREATED = "CREATED";       // 初始创建状态

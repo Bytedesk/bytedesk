@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:30:22
+ * @LastEditTime: 2025-04-07 12:38:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,10 +83,10 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         String topic = TopicUtils.formatOrgAgentThreadTopic(agentUid, visitorRequest.getUid());
         // 是否已经存在会话
         ThreadEntity thread = null;
-        AgentEntity agent = null;
+        AgentEntity agentEntity = null;
         Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
         if (agentOptional.isPresent()) {
-            agent = agentOptional.get();
+            agentEntity = agentOptional.get();
         } else {
             log.info("Agent uid {} not found", agentUid);
             throw new RuntimeException("Agent uid " + agentUid + " not found");
@@ -100,7 +100,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             } else if ( threadOptional.get().isChatting()) {
                 thread = threadOptional.get();
                 // 重新初始化会话额外信息，例如客服状态等
-                thread = visitorThreadService.reInitAgentThreadExtra(thread, agent);
+                thread = visitorThreadService.reInitAgentThreadExtra(thread, agentEntity);
                 // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing thread {}", topic);
                 return getAgentContinueMessage(visitorRequest, thread);
@@ -108,32 +108,33 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().isOffline() && !agent.isConnectedAndAvailable()) {
+            } else if (threadOptional.get().isOffline() && !agentEntity.isConnectedAndAvailable()) {
                 thread = threadOptional.get();
             }
         }
         //
         if (thread == null) {
             // 不存在会话，创建会话
-            thread = visitorThreadService.createAgentThread(visitorRequest, agent, topic);
+            thread = visitorThreadService.createAgentThread(visitorRequest, agentEntity, topic);
         }
         // 排队计数
+        UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         // 判断客服是否在线且接待状态
-        if (agent.isConnectedAndAvailable()) {
+        if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
-            if (queueMemberEntity.getQueue().getQueuingCount() < agent.getMaxThreadCount()) {
+            if (queueMemberEntity.getQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
                 // 未满则接待
-                return handleAvailableAgent(thread, agent, queueMemberEntity);
+                return handleAvailableAgent(thread, agentEntity, queueMemberEntity);
             } else {
                 // 已满则排队
-                return handleQueuedAgent(thread, agent, queueMemberEntity);
+                return handleQueuedAgent(thread, agentEntity, queueMemberEntity);
             }
         } else {
             // 客服离线或小休不接待状态，则进入留言
-            return handleOfflineAgent(thread, agent, queueMemberEntity);
+            return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
         }
     }
 

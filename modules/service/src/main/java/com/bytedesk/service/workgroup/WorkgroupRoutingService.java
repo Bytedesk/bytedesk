@@ -85,14 +85,14 @@ public class WorkgroupRoutingService {
         
         return agents.stream()
             .filter(agent -> {
-                String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agent.getUid());
+                String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
                 Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
                 return queueEntity.map(queue -> queue.getQueuingCount() < agent.getMaxThreadCount())
                         .orElse(true); // 如果没有队列信息，默认可以接受更多会话
             })
             .min((a1, a2) -> {
-                String queueTopic1 = TopicUtils.getQueueTopicFromAgentUid(a1.getUid());
-                String queueTopic2 = TopicUtils.getQueueTopicFromAgentUid(a2.getUid());
+                String queueTopic1 = TopicUtils.getQueueTopicFromUid(a1.getUid());
+                String queueTopic2 = TopicUtils.getQueueTopicFromUid(a2.getUid());
                 
                 Optional<QueueEntity> queueEntity1 = queueRestService.findByTopicAndDay(queueTopic1, today);
                 Optional<QueueEntity> queueEntity2 = queueRestService.findByTopicAndDay(queueTopic2, today);
@@ -158,7 +158,7 @@ public class WorkgroupRoutingService {
         
         return agents.stream()
             .filter(agent -> {
-                String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agent.getUid());
+                String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
                 Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
                 return queueEntity.map(queue -> queue.getQueuingCount() < agent.getMaxThreadCount())
                         .orElse(true); // 如果没有队列信息，默认可以接受更多会话
@@ -185,7 +185,7 @@ public class WorkgroupRoutingService {
         weight *= (1.0 / (avgResponseTime + 1));
         
         // 3. 工作负载权重
-        String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agent.getUid());
+        String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
         Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
         int currentLoad = queueEntity.map(QueueEntity::getChattingCount).orElse(0);
         weight *= (1.0 / (currentLoad + 1));

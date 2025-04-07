@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 11:02:28
+ * @LastEditTime: 2025-04-07 12:31:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -136,7 +136,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 if (robot != null) {
                     thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
                     // 返回机器人欢迎消息
-                    return routeToRobot(visitorRequest, thread, robot);
+                    return routeToRobot(visitorRequest, thread, robot, workgroup);
                 } else {
                     throw new RuntimeException("Workgroup robot not found");
                 }
@@ -144,22 +144,24 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 下面人工接待
-        AgentEntity agent = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
-        if (agent == null) {
+        AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
+        if (agentEntity == null) {
             return getOfflineMessage(visitorRequest, thread, workgroup);
         }
+        // 
+        UserProtobuf agent = agentEntity.toUserProtobuf();
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         //
-        if (agent.isConnectedAndAvailable()) {
+        if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
-            if (queueMemberEntity.getQueue().getQueuingCount() < agent.getMaxThreadCount()) {
+            if (queueMemberEntity.getQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
                 // 未满则接待
-                return handleAvailableWorkgroup(thread, agent, queueMemberEntity);
+                return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);
             } else {
                 // 排队，已满则排队
-                return handleQueuedWorkgroup(thread, agent, queueMemberEntity);
+                return handleQueuedWorkgroup(thread, agentEntity, queueMemberEntity);
             }
         } else {
             // 离线状态永远显示离线提示语，不显示"继续会话"
@@ -309,8 +311,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
 
-    public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
-            @Nonnull RobotEntity robot) {
+    public MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, RobotEntity robot, WorkgroupEntity workgroup) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
         Assert.notNull(robot, "RobotEntity must not be null");
 
@@ -319,8 +320,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         ThreadEntity thread = threadOptional.get();
+        UserProtobuf agent = robot.toUserProtobuf();
         // 排队计数
-        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
         // 机器人接待
         String content = robot.getServiceSettings().getWelcomeTip();
