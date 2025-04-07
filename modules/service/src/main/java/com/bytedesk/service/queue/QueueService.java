@@ -40,8 +40,6 @@ public class QueueService {
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
-        // 
-        // UserProtobuf agent = robotEntity.toUserProtobuf();
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agent, queue, null);
         // 3. 更新队列统计
@@ -57,8 +55,6 @@ public class QueueService {
         if (!queue.canEnqueue()) {
             throw new QueueFullException("Queue is full or not active");
         }
-        // 
-        // UserProtobuf agent = agentEntity.toUserProtobuf();
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agent, queue, null);
         // 3. 更新队列统计
