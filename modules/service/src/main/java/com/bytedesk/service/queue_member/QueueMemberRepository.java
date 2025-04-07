@@ -23,7 +23,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Modifying;
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, Long>, JpaSpecificationExecutor<QueueMemberEntity> {
 
     Optional<QueueMemberEntity> findByUid(String uid);
