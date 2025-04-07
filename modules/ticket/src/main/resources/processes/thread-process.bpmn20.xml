@@ -24,12 +24,12 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow3" sourceRef="robotService" targetRef="transferToHumanTask" />
-    <sequenceFlow id="flow4" sourceRef="transferToHumanTask" targetRef="robotService">
-      <conditionExpression xsi:type="tFormalExpression">${needHumanService == false &amp;&amp; status != 'FINISHED'}</conditionExpression>
-    </sequenceFlow>
     <exclusiveGateway id="isAgentsBusy" name="坐席繁忙?" />
     <sequenceFlow id="flow5" sourceRef="transferToHumanTask" targetRef="isAgentsOffline">
       <conditionExpression xsi:type="tFormalExpression">${needHumanService == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowTransferToEnd" sourceRef="transferToHumanTask" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression">${needHumanService == false}</conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="isAgentsOffline" name="客服离线?" />
     <sequenceFlow id="flow6" sourceRef="isRobotEnabled" targetRef="isAgentsOffline">
@@ -200,10 +200,6 @@
         <omgdi:waypoint x="270" y="30" />
         <omgdi:waypoint x="270" y="180" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-        <omgdi:waypoint x="220" y="210" />
-        <omgdi:waypoint x="178" y="210" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
         <omgdi:waypoint x="240" y="240" />
         <omgdi:waypoint x="240" y="310" />
@@ -286,6 +282,11 @@
         <omgdi:waypoint x="450" y="580" />
         <omgdi:waypoint x="844" y="580" />
         <omgdi:waypoint x="844" y="344" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowTransferToEnd" bpmnElement="flowTransferToEnd" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="320" y="210" />
+        <omgdi:waypoint x="844" y="210" />
+        <omgdi:waypoint x="844" y="316" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

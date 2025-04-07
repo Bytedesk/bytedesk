@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:34:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 17:06:19
+ * @LastEditTime: 2025-04-07 17:21:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,35 +49,6 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
         String workgroupUid = (String) execution.getVariable(ThreadConsts.THREAD_VARIABLE_WORKGROUP_UID);
         log.info("Processing robot service for thread: {}, visitor: {}, workgroup: {}",
             threadUid, userUid, workgroupUid);
-        
-        // 跟踪执行次数，防止无限循环
-        Integer executionCount = (Integer) execution.getVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT);
-        if (executionCount == null) {
-            executionCount = 1;
-        } else {
-            executionCount++;
-        }
-        execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT, executionCount);
-        
-        // 如果执行次数过多，强制设置为需要结束会话，而不是转人工
-        if (executionCount > ThreadConsts.THREAD_MAX_ROBOT_EXECUTION_COUNT) {
-            log.warn("检测到机器人服务多次执行，可能存在循环问题。threadUid: {}", threadUid);
-            
-            // 获取会话类型
-            String threadType = (String) execution.getVariable(ThreadConsts.THREAD_VARIABLE_THREAD_TYPE);
-            
-            // 对于纯机器人类型，不应该转人工，而应该结束会话
-            if (ThreadConsts.THREAD_TYPE_ROBOT.equals(threadType)) {
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_STATUS, ThreadConsts.THREAD_STATUS_CLOSED);
-                log.info("纯机器人会话执行次数过多，设置为结束会话: {}", threadUid);
-            } else {
-                // 其他类型可以考虑转人工
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, true);
-                log.info("非纯机器人会话执行次数过多，设置为需要人工服务: {}", threadUid);
-            }
-            return;
-        }
         
         // 记录机器人接待开始时间
         long startTime = System.currentTimeMillis();
@@ -129,6 +100,9 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
                     execution.setVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_SERVICE_SUMMARY, "访客主动请求转人工服务");
                     execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_REASON, "访客请求");
                     execution.setVariable(ThreadConsts.THREAD_VARIABLE_TRANSFER_PRIORITY, 2); // 高优先级
+                    
+                    // 重置访客请求转人工的标记
+                    execution.setVariable(ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, false);
                 }
             } else {
                 // 其他类型（如一对一客服）不应该执行机器人服务
@@ -138,11 +112,6 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             
             // 设置是否需要人工服务的流程变量
             execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, needHumanService);
-            
-            // 重置访客请求转人工的标记，避免下次循环时仍然转人工
-            if (needHumanService) {
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, false);
-            }
             
             log.info("Robot service completed for thread: {}, thread type: {}, visitor requested transfer: {}, need human service: {}", 
                      threadUid, threadType, visitorRequestedTransfer, needHumanService);
