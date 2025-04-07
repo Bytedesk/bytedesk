@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 16:40:01
+ * @LastEditTime: 2025-04-07 16:52:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,6 +100,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             if (threadOptional.get().isNew()) {
+                // 中间状态，一般情况下，不会进入
                 thread = threadOptional.get();
             } else if (threadOptional.get().isChatting()) {
                 // 如果会话已经存在，并且是聊天状态
@@ -123,11 +124,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 
         if (thread == null) {
-            // 不存在会话，创建会话
+            // 不存在会话，或者所有会话处于closed状态，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-        } else if (visitorRequest.getForceAgent()) {
-            // TODO: 已经存在会话，且强制转人工
-
         }
         // 
         // 未强制转人工的情况下，判断是否转机器人
@@ -148,6 +146,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             }
         }
 
+        // 只有chatting状态，且接待客服是robot接待时，前端才会显示转人工按钮，
         // 下面人工接待
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agentEntity == null) {
@@ -259,9 +258,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (content == null || content.isEmpty()) {
             content = "请稍后，客服会尽快回复您";
         }
-        thread.setClose()
-            .setOffline()
-            .setContent(content);
+        thread.setClose().setOffline().setContent(content);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -274,7 +271,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 距离当前时间不超过30分钟，则直接使用之前的消息
                 // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
                 MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
-                messageSendService.sendProtobufMessage(messageProtobuf);
+                // messageSendService.sendProtobufMessage(messageProtobuf);
                 return messageProtobuf;
             }
         }
