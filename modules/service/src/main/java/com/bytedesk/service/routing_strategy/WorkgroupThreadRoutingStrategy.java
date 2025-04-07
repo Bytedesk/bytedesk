@@ -29,7 +29,6 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueService;
@@ -102,6 +101,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             if (threadOptional.get().isNew()) {
                 thread = threadOptional.get();
             } else if (threadOptional.get().isChatting()) {
+                if
+
                 thread = threadOptional.get();
                 // 重新初始化会话，包括重置机器人状态等
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
@@ -180,7 +181,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setStarted()
+        thread.setChatting()
             .setUnreadCount(1)
             .setContent(content)
             .setOwner(agent.getMember().getUser());
@@ -340,7 +341,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 更新线程状态
         thread.setUserUid(robot.getUid());
-        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        thread.setChatting();
         thread.setAgent(robot.toUserProtobuf().toJson());
         thread.setContent(content);
         thread.setUnreadCount(0);

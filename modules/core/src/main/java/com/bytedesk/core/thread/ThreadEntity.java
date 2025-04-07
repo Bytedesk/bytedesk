@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:40:11
+ * @LastEditTime: 2025-04-07 16:08:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,7 +66,7 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     // is transfer pending
     public Boolean isTransferPending() {
-        return getStatus().equals(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
+        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
     }
 
     // is transfer accepted
@@ -88,7 +88,7 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     // is invite pending
     public Boolean isInvitePending() {
-        return getStatus().equals(ThreadInviteStatusEnum.INVITE_PENDING.name());
+        return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_PENDING.name());
     }
 
     // is invite accepted
@@ -169,7 +169,7 @@ public class ThreadEntity extends AbstractThreadEntity {
         return this;
     }
 
-    public ThreadEntity setStarted() {
+    public ThreadEntity setChatting() {
         setStatus(ThreadProcessStatusEnum.CHATTING.name());
         return this;
     }

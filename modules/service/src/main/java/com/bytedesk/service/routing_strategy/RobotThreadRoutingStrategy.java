@@ -26,7 +26,6 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
@@ -106,7 +105,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
-        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name())
+        thread.setChatting()
             .setContent(content)
             .setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);

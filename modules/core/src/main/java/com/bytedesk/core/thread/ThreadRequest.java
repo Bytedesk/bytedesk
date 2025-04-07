@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:25:10
+ * @LastEditTime: 2025-04-07 15:42:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,31 +37,17 @@ public class ThreadRequest extends BaseRequest {
 
     private String status;
 
-    // // 意图类型
-    // @Builder.Default
-    // private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
+    // transfer status
+    @Builder.Default
+    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
 
-    // // 情绪类型
-    // @Builder.Default
-    // private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
+    // invite status
+    @Builder.Default
+    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    // // 质检结果
-    // @Builder.Default
-    // private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
-
-    // // 是否被评价
-    // @Builder.Default
-    // private Boolean rated = false;
-
-    // // 是否已经小结
-    // @Builder.Default
-    // private Boolean summarized = false;
-
-    // // 是否已经质检
-    // @Builder.Default
-    // private Boolean qualityChecked = false;
-
-    
+    // resolved status
+    @Builder.Default
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     @Builder.Default
     private Boolean top = false;
