@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 15:40:35
+ * @LastEditTime: 2025-04-07 18:00:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,4 +133,9 @@ public class ThreadConsts {
     // 机器人相关变量常量
     public static final String THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT = "robotUnansweredCount";  // 机器人未回答计数
     public static final String THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER = "visitorRequestedTransfer"; // 访客请求转人工标志
+    
+    // 转人工方式相关常量
+    public static final String THREAD_VARIABLE_TRANSFER_TYPE = "transferType"; // 转人工方式
+    public static final String TRANSFER_TYPE_UI = "ui"; // 通过UI按钮转人工
+    public static final String TRANSFER_TYPE_KEYWORD = "keyword"; // 通过关键词转人工
 }
