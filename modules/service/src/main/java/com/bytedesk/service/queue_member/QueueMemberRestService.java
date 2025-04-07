@@ -79,6 +79,12 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     //     return queueMemberRepository.findByQueueTopicAndQueueDayAndThreadUidAndStatus(queueTopic, queueDay, threadUid, status);
     // }
 
+    // 添加新的查询方法
+    public Optional<QueueMemberEntity> findByThreadUidAndQueueUid(String threadUid, String queueUid) {
+        // 实现查询逻辑
+        return queueMemberRepository.findByThreadUidAndQueueUid(threadUid, queueUid);
+    }
+
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {
         QueueMemberEntity counter = modelMapper.map(request, QueueMemberEntity.class);

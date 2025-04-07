@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 14:22:06
+ * @LastEditTime: 2025-04-07 09:53:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.queue;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -186,5 +187,23 @@ public class QueueEntity extends BaseEntity {
      */
     public boolean canEnqueue() {
         return status.equals(QueueStatusEnum.ACTIVE.name());
+    }
+
+    /**
+     * 获取直接分配的会话数量
+     */
+    public int getDirectAssignCount() {
+        return (int) queueMembers.stream()
+                .filter(member -> QueueMemberSourceEnum.DIRECT.name().equals(member.getSourceType()))
+                .count();
+    }
+
+    /**
+     * 获取从工作组分配的会话数量
+     */
+    public int getWorkgroupAssignCount() {
+        return (int) queueMembers.stream()
+                .filter(member -> QueueMemberSourceEnum.WORKGROUP.name().equals(member.getSourceType()))
+                .count();
     }
 }

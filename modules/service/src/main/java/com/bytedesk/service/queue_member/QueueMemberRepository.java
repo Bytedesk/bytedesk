@@ -126,4 +126,8 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     int cleanupExpiredMembers(
         @Param("queueUid") String queueUid,
         @Param("beforeTime") LocalDateTime beforeTime);
+
+    // 添加新的查询方法，通过线程UID和队列UID查询队列成员
+    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid AND qm.queue.uid = :queueUid")
+    Optional<QueueMemberEntity> findByThreadUidAndQueueUid(@Param("threadUid") String threadUid, @Param("queueUid") String queueUid);
 }
