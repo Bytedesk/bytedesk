@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-06 10:15:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:00:27
+ * @LastEditTime: 2025-04-07 17:10:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.ticket.thread.ThreadConsts;
-import com.bytedesk.ticket.thread.ThreadMessageService;
+import com.bytedesk.ticket.thread.ThreadTransferToAgentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ThreadMessageEventListener {
 
-    private final ThreadMessageService threadMessageService;
+    private final ThreadTransferToAgentService threadMessageService;
     private final ThreadRestService threadRestService;
     private final RuntimeService runtimeService;
     private final QueueMemberRestService queueMemberRestService;
@@ -252,4 +252,6 @@ public class ThreadMessageEventListener {
             log.error("重置空闲计时器时出错: {}", e.getMessage(), e);
         }
     }
+
+
 }

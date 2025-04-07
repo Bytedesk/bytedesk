@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 14:49:10
+ * @LastEditTime: 2025-04-07 16:59:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,9 +105,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
-        thread.setChatting()
-            .setContent(content)
-            .setUnreadCount(0);
+        thread.setChatting().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -140,6 +138,18 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
     }
 
     private MessageProtobuf getRobotContinueMessage(RobotEntity robot, @Nonnull ThreadEntity thread) {
+        // 
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+                // 距离当前时间不超过30分钟，则直接使用之前的消息
+                // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+                // messageSendService.sendProtobufMessage(messageProtobuf);
+                return messageProtobuf;
+            }
+        }
         //
         String content = robot.getServiceSettings().getWelcomeTip();
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);

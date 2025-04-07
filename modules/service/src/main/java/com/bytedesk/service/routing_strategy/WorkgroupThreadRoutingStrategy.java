@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 16:52:21
+ * @LastEditTime: 2025-04-07 17:07:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -126,6 +126,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (thread == null) {
             // 不存在会话，或者所有会话处于closed状态，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+        } else if (visitorRequest.getForceAgent()) {
+            // 只有chatting状态，且接待客服是robot接待时，前端才会显示转人工按钮，
+            // TODO: 强制转人工
         }
         // 
         // 未强制转人工的情况下，判断是否转机器人
@@ -146,7 +149,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             }
         }
 
-        // 只有chatting状态，且接待客服是robot接待时，前端才会显示转人工按钮，
+        
         // 下面人工接待
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agentEntity == null) {
