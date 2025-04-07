@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:43:48
+ * @LastEditTime: 2025-04-07 10:02:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -293,6 +293,8 @@ public class TopicUtils {
 
     public static String getQueueTopicFromThreadTopic(String threadTopic) {
         // org/workgroup/{workgroup_uid}/{visitor_uid}
+        // org/agent/{agent_uid}/{visitor_uid}
+        // org/robot/{robot_uid}/{visitor_uid}
         String[] topicArr = threadTopic.split("/");
         if (topicArr.length != 4) {
             throw new RuntimeException("Invalid private topic: " + threadTopic);
@@ -369,5 +371,16 @@ public class TopicUtils {
     public static final String formatTopicInternal(String topic) {
         return topic + TOPIC_INTERNAL_SUFFIX;
     }
+
+    // 添加获取客服队列主题的方法
+    // public static String getAgentQueueTopicFromThreadTopic(String threadTopic) {
+    //     // 实现从会话主题生成客服队列主题的逻辑
+    //     // 例如: thread/org1/visitor1/agent1 -> queue/agent/org1/agent1
+    //     String[] parts = threadTopic.split("/");
+    //     if (parts.length >= 4) {
+    //         return "queue/agent/" + parts[1] + "/" + parts[3];
+    //     }
+    //     return "queue/agent/unknown/unknown";
+    // }
 
 }

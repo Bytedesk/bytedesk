@@ -140,6 +140,13 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
 
+    // 来源类型：直接(DIRECT)、工作组(WORKGROUP)
+    @Builder.Default
+    private String sourceType = QueueMemberSourceEnum.DIRECT.name();
+    
+    // 如果来自工作组分配，记录工作组队列UID
+    private String workgroupQueueUid;
+
     // @Builder.Default
     // @Column(name = "was_offline")
     // private boolean wasOffline = false;  // 标记该会话是否曾处于离线状态
@@ -161,24 +168,6 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
     
-    // 访客来源渠道
-    // private String client;  // 客户来源渠道
-
-    // 排队访客信息
-    // @Builder.Default
-    // @Column(name = "queue_visitor", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // private String visitor = BytedeskConsts.EMPTY_JSON_STRING;
-
-    // 接待客服信息
-    // @Builder.Default
-    // @Column(name = "queue_agent", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // private String agent = BytedeskConsts.EMPTY_JSON_STRING;
-    
-    // 接待工作组信息
-    // @Builder.Default
-    // @Column(name = "queue_workgroup", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
-
     /**
      * 计算等待时间(秒)
      */
