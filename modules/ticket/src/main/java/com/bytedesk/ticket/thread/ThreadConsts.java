@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:04:59
+ * @LastEditTime: 2025-04-07 15:33:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,13 +15,16 @@ package com.bytedesk.ticket.thread;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.ThreadResolvedStatusEnum;
+import com.bytedesk.core.thread.ThreadTransferStatusEnum;
+import com.bytedesk.core.thread.ThreadInviteStatusEnum;
 
 public class ThreadConsts {
 
     // thread-process
     public static final String THREAD_PROCESS_NAME = I18Consts.I18N_PREFIX + "thread.process.name";
     
-    public static final String THREAD_PROCESS_KEY = "thread-process";
+    public static final String THREAD_PROCESS_KEY = "threadProcess";
 
     public static final String THREAD_PROCESS_PATH = "processes/thread-process.bpmn20.xml";
 
@@ -78,16 +81,7 @@ public class ThreadConsts {
     
     public static final String THREAD_GATEWAY_IS_AGENTS_BUSY = "isAgentsBusy"; // 坐席是否繁忙网关
 
-    // 从流程中提取的状态值
-    public static final String THREAD_STATUS_INVITE = "INVITE"; // 邀请协助状态
     
-    public static final String THREAD_STATUS_RESOLVED = "RESOLVED"; // 已解决状态
-    
-    public static final String THREAD_STATUS_TRANSFER = "TRANSFER"; // 转接状态
-    
-    public static final String THREAD_STATUS_FINISHED = "FINISHED"; // 结束状态
-    
-    public static final String THREAD_STATUS_ROBOT_FINISHED = "ROBOT_FINISHED"; // 纯机器人会话结束状态
 
     // 机器人服务相关常量
     public static final String THREAD_VARIABLE_ROBOT_SERVICE_EXECUTION_COUNT = "robotServiceExecutionCount"; // 机器人服务执行计数
@@ -115,12 +109,26 @@ public class ThreadConsts {
     public static final int DEFAULT_HUMAN_IDLE_TIMEOUT = 15 * 60 * 1000; // 默认人工客服空闲超时 - 15分钟
     public static final int DEFAULT_ROBOT_IDLE_TIMEOUT = 5 * 60 * 1000;  // 默认机器人空闲超时 - 5分钟
     
+    // 定时器变量名常量 - 格式化为Flowable可识别的ISO格式
+    public static final String THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT_ISO = "humanIdleTimeoutISO";  // ISO格式的人工客服空闲超时
+    public static final String THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT_ISO = "robotIdleTimeoutISO";  // ISO格式的机器人空闲超时
+    public static final String THREAD_VARIABLE_SLA_TIME_ISO = "slaTimeISO";  // ISO格式的SLA时间
+    
     // 线程状态常量 - 使用 ThreadProcessStatusEnum 中的值
-    public static final String THREAD_STATUS_CREATED = ThreadProcessStatusEnum.NEW.name();       // 新会话状态
+    public static final String THREAD_STATUS_NEW = ThreadProcessStatusEnum.NEW.name();       // 新会话状态
     public static final String THREAD_STATUS_WAITING = ThreadProcessStatusEnum.QUEUING.name();   // 排队中状态
     public static final String THREAD_STATUS_ONGOING = ThreadProcessStatusEnum.CHATTING.name();  // 对话中状态
     public static final String THREAD_STATUS_CLOSED = ThreadProcessStatusEnum.CLOSED.name();     // 会话已结束状态
+    // 
     public static final String THREAD_STATUS_TRANSFERRED = "TRANSFERRED"; // 转接状态 (枚举中没有，保留原值)
+    
+    // 从流程中提取的状态值 - 使用新的 enum 类型
+    public static final String THREAD_STATUS_INVITE = ThreadInviteStatusEnum.INVITE_PENDING.name(); // 邀请协助状态
+    // 
+    public static final String THREAD_STATUS_RESOLVED = ThreadResolvedStatusEnum.RESOLVED.name(); // 已解决状态
+    public static final String THREAD_STATUS_TRANSFER = ThreadTransferStatusEnum.TRANSFER_PENDING.name(); // 转接状态
+    public static final String THREAD_STATUS_FINISHED = ThreadResolvedStatusEnum.FINISHED.name(); // 结束状态
+    public static final String THREAD_STATUS_ROBOT_FINISHED = ThreadResolvedStatusEnum.ROBOT_FINISHED.name(); // 纯机器人会话结束状态
     
     // 机器人相关变量常量
     public static final String THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT = "robotUnansweredCount";  // 机器人未回答计数

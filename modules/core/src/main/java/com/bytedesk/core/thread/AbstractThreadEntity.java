@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:39:13
+ * @LastEditTime: 2025-04-07 15:32:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,6 +81,11 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_invite_status", nullable = false)
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+
+    // resolved status - 包含 RESOLVED, FINISHED, ROBOT_FINISHED
+    @Builder.Default
+    @Column(name = "thread_resolved_status", nullable = false)
+    private String resolvedStatus = ThreadResolvedStatusEnum.NONE.name();
 
     // 
     @Builder.Default

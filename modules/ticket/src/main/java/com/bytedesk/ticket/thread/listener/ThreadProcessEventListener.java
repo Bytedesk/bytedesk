@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:56:13
+ * @LastEditTime: 2025-04-07 15:19:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ticket.thread.listener;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +64,19 @@ public class ThreadProcessEventListener {
     private final TaskService taskService;
 
     private final ThreadRestService threadRestService;
+    
+    /**
+     * 将毫秒时间转换为Flowable定时器可识别的ISO 8601持续时间格式
+     * 格式为: PT{n}S，其中{n}表示秒数
+     * 
+     * @param milliseconds 毫秒数
+     * @return ISO 8601持续时间格式字符串
+     */
+    private String formatDurationToIso8601(int milliseconds) {
+        // 将毫秒转换成秒
+        long seconds = milliseconds / 1000;
+        return Duration.ofSeconds(seconds).toString();
+    }
 
     @EventListener
     public void onThreadProcessCreateEvent(ThreadProcessCreateEvent event) {
@@ -88,16 +102,36 @@ public class ThreadProcessEventListener {
         variables.put(ThreadConsts.THREAD_VARIABLE_LAST_VISITOR_ACTIVITY_TIME, now);
         
         // 设置默认值，避免流程执行时找不到变量
-        // 设置 SLA 时间 - 预先设置默认值
-        variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME, ThreadConsts.DEFAULT_SLA_TIME);  // 默认30分钟
-        // 设置人工客服空闲超时时间
-        variables.put(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, ThreadConsts.DEFAULT_HUMAN_IDLE_TIMEOUT);  // 默认15分钟
-        // 设置机器人空闲超时时间
-        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, ThreadConsts.DEFAULT_ROBOT_IDLE_TIMEOUT);   // 默认5分钟
+        // 设置 SLA 时间 - 预先设置默认值（毫秒值，用于业务逻辑）
+        int slaTime = ThreadConsts.DEFAULT_SLA_TIME;
+        variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME, slaTime);
+        
+        // 设置 SLA 时间（ISO格式，用于定时器）
+        String slaTimeIso = formatDurationToIso8601(slaTime);
+        variables.put(ThreadConsts.THREAD_VARIABLE_SLA_TIME_ISO, slaTimeIso);
+        log.info("SLA超时时间设置为: {}ms ({})", slaTime, slaTimeIso);
+        
+        // 设置人工客服空闲超时时间（毫秒值，用于业务逻辑）
+        int humanIdleTimeout = ThreadConsts.DEFAULT_HUMAN_IDLE_TIMEOUT;
+        variables.put(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT, humanIdleTimeout);
+        
+        // 设置人工客服空闲超时时间（ISO格式，用于定时器）
+        String humanIdleTimeoutIso = formatDurationToIso8601(humanIdleTimeout);
+        variables.put(ThreadConsts.THREAD_VARIABLE_HUMAN_IDLE_TIMEOUT_ISO, humanIdleTimeoutIso);
+        log.info("人工客服空闲超时时间设置为: {}ms ({})", humanIdleTimeout, humanIdleTimeoutIso);
+        
+        // 设置机器人空闲超时时间（毫秒值，用于业务逻辑）
+        int robotIdleTimeout = ThreadConsts.DEFAULT_ROBOT_IDLE_TIMEOUT;
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT, robotIdleTimeout);
+        
+        // 设置机器人空闲超时时间（ISO格式，用于定时器）
+        String robotIdleTimeoutIso = formatDurationToIso8601(robotIdleTimeout);
+        variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT_ISO, robotIdleTimeoutIso);
+        log.info("机器人空闲超时时间设置为: {}ms ({})", robotIdleTimeout, robotIdleTimeoutIso);
         
         // 添加控制流程流转的变量
         variables.put(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);  // 默认不需要转人工
-        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_CREATED);   // 使用常量引用初始状态
+        variables.put(ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_NEW);   // 使用常量引用初始状态
         
         // 显式初始化机器人相关变量，避免空指针和循环问题
         variables.put(ThreadConsts.THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT, 0);
