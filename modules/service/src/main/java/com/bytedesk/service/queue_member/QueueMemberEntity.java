@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:18:41
+ * @LastEditTime: 2025-04-07 15:50:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,11 @@ import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
+import com.bytedesk.core.thread.ThreadInviteStatusEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
-import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadTransferStatusEnum;
+import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 
@@ -175,32 +177,37 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
 
-    // 来源类型：直接(DIRECT)、工作组(WORKGROUP)
-    // @Builder.Default
-    // private String sourceType = QueueMemberSourceEnum.DIRECT.name();
-    
-    // 如果来自工作组分配，记录工作组队列UID
-    // private String workgroupQueueUid;
-
-    // 客服队列UID (添加这个新字段)
-    // private String agentQueueUid;
-
     // 意图类型
     @Builder.Default
+    @Column(name = "thread_intention_type", nullable = false)
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
 
     // 情绪类型
     @Builder.Default
+    @Column(name = "thread_emotion_type", nullable = false)
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
     // 质检结果
     @Builder.Default
+    @Column(name = "thread_quality_check_result", nullable = false)
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
-    // 处理状态（待处理、已处理、已关闭等）
+    // transfer status
     @Builder.Default
-    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
-    
+    @Column(name = "thread_transfer_status", nullable = false)
+    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
+
+    // TODO: 可能同时邀请多个人
+    // invite status
+    @Builder.Default
+    @Column(name = "thread_invite_status", nullable = false)
+    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+
+    // resolved status
+    @Builder.Default
+    @Column(name = "thread_resolved_status", nullable = false)
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
+
     /**
      * 计算等待时间(秒)
      */

@@ -153,7 +153,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         ThreadEntity thread = threadOptional.get();
         // 未满则接待
-        thread.setStarted()
+        thread.setChatting()
             .setUnreadCount(1)
             .setContent(content);
         ThreadEntity savedThread = threadService.save(thread);

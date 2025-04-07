@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 08:34:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 23:52:43
+ * @LastEditTime: 2025-04-07 15:40:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,7 +69,7 @@ public class ThreadRobotServiceDelegate implements JavaDelegate {
             // 对于纯机器人类型，不应该转人工，而应该结束会话
             if (ThreadConsts.THREAD_TYPE_ROBOT.equals(threadType)) {
                 execution.setVariable(ThreadConsts.THREAD_VARIABLE_NEED_HUMAN_SERVICE, false);
-                execution.setVariable(ThreadConsts.THREAD_VARIABLE_STATUS, ThreadConsts.THREAD_STATUS_FINISHED);
+                execution.setVariable(ThreadConsts.THREAD_VARIABLE_STATUS, ThreadConsts.THREAD_STATUS_CLOSED);
                 log.info("纯机器人会话执行次数过多，设置为结束会话: {}", threadUid);
             } else {
                 // 其他类型可以考虑转人工

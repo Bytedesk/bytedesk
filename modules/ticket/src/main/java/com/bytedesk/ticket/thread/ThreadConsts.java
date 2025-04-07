@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 15:33:53
+ * @LastEditTime: 2025-04-07 15:40:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,7 @@ package com.bytedesk.ticket.thread;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
-import com.bytedesk.core.thread.ThreadResolvedStatusEnum;
+// import com.bytedesk.core.thread.ThreadResolvedStatusEnum;
 import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.ThreadInviteStatusEnum;
 
@@ -125,10 +125,10 @@ public class ThreadConsts {
     // 从流程中提取的状态值 - 使用新的 enum 类型
     public static final String THREAD_STATUS_INVITE = ThreadInviteStatusEnum.INVITE_PENDING.name(); // 邀请协助状态
     // 
-    public static final String THREAD_STATUS_RESOLVED = ThreadResolvedStatusEnum.RESOLVED.name(); // 已解决状态
+    // public static final String THREAD_STATUS_RESOLVED = ThreadResolvedStatusEnum.RESOLVED.name(); // 已解决状态
     public static final String THREAD_STATUS_TRANSFER = ThreadTransferStatusEnum.TRANSFER_PENDING.name(); // 转接状态
-    public static final String THREAD_STATUS_FINISHED = ThreadResolvedStatusEnum.FINISHED.name(); // 结束状态
-    public static final String THREAD_STATUS_ROBOT_FINISHED = ThreadResolvedStatusEnum.ROBOT_FINISHED.name(); // 纯机器人会话结束状态
+    // public static final String THREAD_STATUS_FINISHED = ThreadResolvedStatusEnum.FINISHED.name(); // 结束状态
+    // public static final String THREAD_STATUS_ROBOT_FINISHED = ThreadResolvedStatusEnum.ROBOT_FINISHED.name(); // 纯机器人会话结束状态
     
     // 机器人相关变量常量
     public static final String THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT = "robotUnansweredCount";  // 机器人未回答计数

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 15:32:19
+ * @LastEditTime: 2025-04-07 15:58:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,6 +71,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(name = "thread_status", nullable = false)
     private String status = ThreadProcessStatusEnum.NEW.name();
 
+    // TODO: 迁移到 queue member 表?
     // transfer status
     @Builder.Default
     @Column(name = "thread_transfer_status", nullable = false)
@@ -82,10 +83,10 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(name = "thread_invite_status", nullable = false)
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    // resolved status - 包含 RESOLVED, FINISHED, ROBOT_FINISHED
+    // resolved status
     @Builder.Default
     @Column(name = "thread_resolved_status", nullable = false)
-    private String resolvedStatus = ThreadResolvedStatusEnum.NONE.name();
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     // 
     @Builder.Default

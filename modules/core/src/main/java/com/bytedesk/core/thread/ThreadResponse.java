@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:52:07
+ * @LastEditTime: 2025-04-07 15:42:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -42,25 +43,20 @@ public class ThreadResponse extends BaseResponse {
 
     private String type;
 
-    // // 意图类型
-    // private String intentionType;
-
-    // // 情绪类型
-    // private String emotionType;
-
-    // // 质检结果
-    // private String qualityCheckResult;
-
-    // // 是否被评价
-    // private Boolean rated;
-
-    // // 是否已经小结
-    // private Boolean summarized;
-
-    // // 是否已经质检
-    // private Boolean qualityChecked;
-
     private String status;
+
+    // transfer status
+    @Builder.Default
+    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
+
+    // invite status
+    @Builder.Default
+    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+
+    // resolved status
+    @Builder.Default
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
+
 
     private Boolean top;
 

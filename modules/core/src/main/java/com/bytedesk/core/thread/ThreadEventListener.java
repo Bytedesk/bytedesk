@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 09:22:16
+ * @LastEditTime: 2025-04-07 15:52:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -107,11 +107,11 @@ public class ThreadEventListener {
         UserEntity user = thread.getOwner();
         log.info("thread onThreadUpdateEvent: {}", thread.getUid());
         if (thread.isClosed() 
-            || thread.isTransferPending()
-            || thread.isTransferAccepted() 
-            || thread.isTransferRejected() 
-            || thread.isTransferCanceled() 
-            || thread.isTransferTimeout()
+            // || thread.isTransferPending()
+            // || thread.isTransferAccepted() 
+            // || thread.isTransferRejected() 
+            // || thread.isTransferCanceled() 
+            // || thread.isTransferTimeout()
             ) {
             return;
         }
