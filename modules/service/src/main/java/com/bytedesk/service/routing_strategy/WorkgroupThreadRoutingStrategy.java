@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:36:22
+ * @LastEditTime: 2025-04-07 14:05:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -99,7 +99,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
-            //
             if (threadOptional.get().isNew()) {
                 thread = threadOptional.get();
             } else if (threadOptional.get().isChatting()) {

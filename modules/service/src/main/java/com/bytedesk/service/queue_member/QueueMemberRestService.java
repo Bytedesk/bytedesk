@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:44:04
+ * @LastEditTime: 2025-04-07 13:58:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.service.queue_member;
 
 import java.util.Optional;
-import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,8 +26,10 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -143,9 +144,16 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     public QueueMemberResponse convertToResponse(QueueMemberEntity entity) {
         QueueMemberResponse response = modelMapper.map(entity, QueueMemberResponse.class);
         response.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
-        // response.setVisitor(UserProtobuf.parseFromJson(entity.getVisitor()));
-        // response.setAgent(UserProtobuf.parseFromJson(entity.getAgent()));
-        // response.setWorkgroup(UserProtobuf.parseFromJson(entity.getWorkgroup()));
+        if (entity.getThread() != null && entity.getThread().getType() != null) {
+            // 处理不同类型的队列
+            if (entity.getThread().getType().equals(ThreadTypeEnum.AGENT.name())) {
+                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getAgentQueue()));
+            } else if (entity.getThread().getType().equals(ThreadTypeEnum.ROBOT.name())) {
+                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getRobotQueue()));
+            } else if (entity.getThread().getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getWorkgroupQueue()));
+            }
+        }
         return response;
     }
 
@@ -154,8 +162,8 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     }
 
     // 查找指定队列下的所有队列成员
-    public List<QueueMemberEntity> findByQueueUid(String queueUid) {
-        return queueMemberRepository.findByQueueUid(queueUid);
-    }
+    // public List<QueueMemberEntity> findByQueueUid(String queueUid) {
+    //     return queueMemberRepository.findByQueueUid(queueUid);
+    // }
 
 }
