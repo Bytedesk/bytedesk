@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-01 14:08:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 18:01:17
+ * @LastEditTime: 2025-04-07 22:41:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -234,21 +234,108 @@ public class ThreadProcessEventListener {
             log.error("会话转人工事件, 会话对象为空: {}", event);
             return;
         }
-        if (thread.getProcessInstanceId() != null) {
-
+        
+        // 检查线程是否有关联的流程实例ID
+        if (thread.getProcessInstanceId() == null) {
+            log.error("会话转人工事件, 但会话没有关联的流程实例ID: threadUid={}", thread.getUid());
+            return;
+        }
+        
+        log.info("处理会话转人工事件: threadUid={}, processInstanceId={}", thread.getUid(), thread.getProcessInstanceId());
+        
+        try {
+            // 设置流程变量，标记访客通过UI请求转人工
+            runtimeService.setVariable(thread.getProcessInstanceId(), 
+                    ThreadConsts.THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER, true);
+            
+            // 设置转人工方式为UI
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_TRANSFER_TYPE, ThreadConsts.TRANSFER_TYPE_UI);
+            
+            // 转人工时额外设置优先级为高
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_TRANSFER_PRIORITY, 3); // 最高优先级
+            
+            // 设置转人工原因
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_TRANSFER_REASON, "访客从工作组UI请求转人工");
+            
+            log.info("已设置访客通过UI请求转人工标记: threadUid={}, processInstanceId={}", 
+                    thread.getUid(), thread.getProcessInstanceId());
+        } catch (Exception e) {
+            log.error("设置访客通过UI请求转人工标记失败: {}", e.getMessage(), e);
         }
     }
 
     @EventListener
     public void onThreadAgentOfflineEvent(ThreadAgentOfflineEvent event) {
-        // 处理客服离线事件，例如更新流程变量等
+        // 处理客服离线事件，更新流程变量
+        ThreadEntity thread = event.getThread();
+        if (thread == null) {
+            log.error("客服离线事件, 会话对象为空: {}", event);
+            return;
+        }
+        
+        // 检查线程是否有关联的流程实例ID
+        if (thread.getProcessInstanceId() == null) {
+            log.error("客服离线事件, 但会话没有关联的流程实例ID: threadUid={}", thread.getUid());
+            return;
+        }
+        
+        log.info("处理客服离线事件: threadUid={}, processInstanceId={}", thread.getUid(), thread.getProcessInstanceId());
+        
+        try {
+            // 设置客服离线状态变量
+            runtimeService.setVariable(thread.getProcessInstanceId(), 
+                    ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE, true);
+            
+            // 设置线程状态为离线
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_OFFLINE);
+            
+            log.info("已更新客服离线状态变量: threadUid={}, processInstanceId={}", 
+                    thread.getUid(), thread.getProcessInstanceId());
+        } catch (Exception e) {
+            log.error("设置客服离线状态变量失败: {}", e.getMessage(), e);
+        }
     }
 
     @EventListener
     public void onThreadAgentQueueEvent(ThreadAgentQueueEvent event) {
-        // 处理客服繁忙事件，例如更新流程变量等
+        // 处理客服繁忙事件，更新流程变量
+        ThreadEntity thread = event.getThread();
+        if (thread == null) {
+            log.error("客服繁忙事件, 会话对象为空: {}", event);
+            return;
+        }
+        
+        // 检查线程是否有关联的流程实例ID
+        if (thread.getProcessInstanceId() == null) {
+            log.error("客服繁忙事件, 但会话没有关联的流程实例ID: threadUid={}", thread.getUid());
+            return;
+        }
+        
+        log.info("处理客服繁忙事件: threadUid={}, processInstanceId={}", thread.getUid(), thread.getProcessInstanceId());
+        
+        try {
+            // 设置客服繁忙状态变量
+            runtimeService.setVariable(thread.getProcessInstanceId(), 
+                    ThreadConsts.THREAD_VARIABLE_AGENTS_BUSY, true);
+            
+            // 设置线程状态为排队中
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_QUEUING);
+            
+            // 记录进入排队时间，用于计算排队时长
+            runtimeService.setVariable(thread.getProcessInstanceId(),
+                    ThreadConsts.THREAD_VARIABLE_QUEUE_START_TIME, new Date());
+            
+            log.info("已更新客服繁忙状态变量: threadUid={}, processInstanceId={}", 
+                    thread.getUid(), thread.getProcessInstanceId());
+        } catch (Exception e) {
+            log.error("设置客服繁忙状态变量失败: {}", e.getMessage(), e);
+        }
     }
-
 
     /**
      * 检查流程实例是否仍然活跃
