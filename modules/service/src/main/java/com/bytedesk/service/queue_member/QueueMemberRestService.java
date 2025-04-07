@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:47:57
+ * @LastEditTime: 2025-04-07 10:37:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.service.queue_member;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,7 +31,9 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse> {
@@ -42,6 +45,8 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final QueueMemberReferenceRepository queueMemberReferenceRepository;
 
     @Override
     public Page<QueueMemberResponse> queryByOrg(QueueMemberRequest request) {
@@ -148,6 +153,46 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
 
     public QueueMemberExcel convertToExcel(QueueMemberResponse response) {
         return modelMapper.map(response, QueueMemberExcel.class);
+    }
+
+    /**
+     * 创建队列成员引用
+     * 此方法将创建一个辅助索引，允许系统通过队列UID查找特定的队列成员
+     * 
+     * @param memberUid 队列成员UID
+     * @param queueUid 队列UID
+     * @param threadUid 会话线程UID
+     * @return 成功返回true
+     */
+    public boolean createQueueReference(String memberUid, String queueUid, String threadUid) {
+        try {
+            // 检查是否已存在相同的引用
+            Optional<QueueMemberReference> existingRef = queueMemberReferenceRepository
+                .findByQueueUidAndThreadUid(queueUid, threadUid);
+            
+            if (existingRef.isPresent()) {
+                return true; // 已存在，无需创建
+            }
+            
+            // 创建新的引用
+            QueueMemberReference reference = QueueMemberReference.builder()
+                .queueUid(queueUid)
+                .memberUid(memberUid)
+                .threadUid(threadUid)
+                .build();
+            
+            queueMemberReferenceRepository.save(reference);
+            return true;
+        } catch (Exception e) {
+            // 记录错误
+            log.error("Failed to create queue member reference", e);
+            return false;
+        }
+    }
+
+    // 查找指定队列下的所有队列成员
+    public List<QueueMemberEntity> findByQueueUid(String queueUid) {
+        return queueMemberRepository.findByQueueUid(queueUid);
     }
 
 }

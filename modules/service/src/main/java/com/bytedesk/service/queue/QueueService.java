@@ -3,8 +3,6 @@ package com.bytedesk.service.queue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.AgentService;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 // import com.bytedesk.service.queue_member.QueueMemberRepository;
@@ -35,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class QueueService {
 
-    private final QueueRepository queueRepository;
+    // private final QueueRepository queueRepository;
     
     private final QueueMemberRestService queueMemberRestService;
 
-    private final AgentService agentService;
+    // private final AgentService agentService;
 
     public final QueueRestService queueRestService;
 
@@ -57,7 +54,7 @@ public class QueueService {
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue);
         // 3. 更新队列统计
-        updateQueueStats(queue);
+        // updateQueueStats(queue);
         // 4. 返回队列成员
         return member;
     }
@@ -74,7 +71,7 @@ public class QueueService {
         // 2. 创建队列成员
         QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue);
         // 3. 更新队列统计
-        updateQueueStats(queue);
+        // updateQueueStats(queue);
         // 4. 返回队列成员
         return member;
     }
@@ -88,7 +85,7 @@ public class QueueService {
         }
         
         // 2. 获取或创建客服队列
-        QueueEntity agentQueue = getAgentQueue(agentEntity.getUid(), agentEntity.getNickname(), threadEntity.getOrgUid());
+        QueueEntity agentQueue = getAgentQueue(agentEntity.getNickname(), agentEntity.getUid(), threadEntity.getOrgUid());
         if (!agentQueue.canEnqueue()) {
             throw new QueueFullException("Agent queue is full or not active");
         }
@@ -99,17 +96,25 @@ public class QueueService {
         // 3. 创建工作组队列成员
         QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroup, visitorRequest, workgroupQueue);
         
-        // 4. 创建客服队列成员，标记为来自工作组分配
-        // agentMember 用于确保客服队列记录被创建，目前不需要使用返回值
-        // QueueMemberEntity agentMember = 
-        getAgentQueueMember(threadEntity, agent, workgroup, visitorRequest, agentQueue, workgroupQueue.getUid());
-        // log.debug("Created agent queue member: {}", agentMember.getUid());  // 添加日志，避免未使用变量的警告
+        // 4. 更新工作组队列成员，添加客服队列关联信息
+        workgroupMember.setAgentQueueUid(agentQueue.getUid());
+        workgroupMember.setSourceType(QueueMemberSourceEnum.WORKGROUP.name());
         
-        // 5. 更新队列统计
-        updateQueueStats(workgroupQueue);
-        updateQueueStats(agentQueue);
+        // 在workgroupMember.thread.agent中已经存储
+        // 添加代理信息 - 关联客服信息
+        // workgroupMember.setAgentUid(agentEntity.getUid());
         
-        // 6. 返回工作组队列成员（保持现有接口兼容）
+        // 保存更新后的队列成员
+        workgroupMember = queueMemberRestService.save(workgroupMember);
+        
+        // 5. 创建辅助索引 - 确保能够通过客服队列找到该记录
+        queueMemberRestService.createQueueReference(workgroupMember.getUid(), agentQueue.getUid(), threadEntity.getUid());
+        
+        // 6. 更新两个队列的统计信息
+        // updateQueueStats(workgroupQueue);
+        // updateQueueStats(agentQueue);
+        
+        // 7. 返回工作组队列成员
         return workgroupMember;
     }
 
@@ -147,7 +152,6 @@ public class QueueService {
 
     @Transactional
     private QueueEntity getAgentQueue(String agentNickname, String agentUid, String orgUid) {
-        // String threadTopic = threadEntity.getTopic();
         String queueTopic = TopicUtils.getQueueTopicFromAgentUid(agentUid);
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
@@ -196,56 +200,30 @@ public class QueueService {
         return queueMemberRestService.save(member);
     }
 
-    @Transactional
-    public QueueMemberEntity getAgentQueueMember(ThreadEntity threadEntity, UserProtobuf agent, 
-            UserProtobuf workgroup, VisitorRequest request, QueueEntity agentQueue, String workgroupQueueUid) {
+    // private void updateQueueStats(QueueEntity queue) {
+    //     // int waiting = queueMemberRepository.countByQueueUidAndStatus(
+    //     //     queue.getUid(), QueueMemberStatusEnum.WAITING.name());
+    //     // int serving = queueMemberRepository.countByQueueUidAndStatus(
+    //     //     queue.getUid(), QueueMemberStatusEnum.SERVING.name());
+    //     // int finished = queueMemberRepository.countByQueueUidAndEndStatusIsTrue(queue.getUid());
+    //     // int avgWait = calculateAverageWaitTime(queue.getUid());
         
-        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUidAndQueueUid(
-                threadEntity.getUid(), agentQueue.getUid());
-        
-        if (memberOptional.isPresent()) {
-            return memberOptional.get();
-        }
-        
-        // 创建客服队列成员实体并保存到数据库
-        QueueMemberEntity member = QueueMemberEntity.builder()
-            .uid(uidUtils.getUid())
-            .queue(agentQueue)
-            .thread(threadEntity)
-            .queueNumber(agentQueue.getNextNumber())
-            .enqueueTime(LocalDateTime.now())
-            .orgUid(threadEntity.getOrgUid())
-            .workgroupQueueUid(workgroupQueueUid)  // 标记来源工作组队列
-            .sourceType(QueueMemberSourceEnum.WORKGROUP.name())  // 标记来源类型为工作组
-            .build();
-        
-        return queueMemberRestService.save(member);
-    }
-
-    private void updateQueueStats(QueueEntity queue) {
-        // int waiting = queueMemberRepository.countByQueueUidAndStatus(
-        //     queue.getUid(), QueueMemberStatusEnum.WAITING.name());
-        // int serving = queueMemberRepository.countByQueueUidAndStatus(
-        //     queue.getUid(), QueueMemberStatusEnum.SERVING.name());
-        // int finished = queueMemberRepository.countByQueueUidAndEndStatusIsTrue(queue.getUid());
-        // int avgWait = calculateAverageWaitTime(queue.getUid());
-        
-        // queue.updateStats(waiting, serving, finished, avgWait);
-        // queueRepository.save(queue);
-    }
+    //     // queue.updateStats(waiting, serving, finished, avgWait);
+    //     // queueRepository.save(queue);
+    // }
 
     // private int calculateAverageWaitTime(String queueUid) {
     //     Double avgWaitTime = queueMemberRepository.calculateAverageWaitTime(queueUid);
     //     return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     // }
     
-    public List<String> getQueuedThreads(QueueStatusEnum status) {
-        // return queueRepository.findByStatus(status.name())
-        //     .stream()
-        //     .map(QueueEntity::getThreadUid)
-        //     .toList();
-        return new ArrayList<>();
-    }
+    // public List<String> getQueuedThreads(QueueStatusEnum status) {
+    //     // return queueRepository.findByStatus(status.name())
+    //     //     .stream()
+    //     //     .map(QueueEntity::getThreadUid)
+    //     //     .toList();
+    //     return new ArrayList<>();
+    // }
     
     // public int getQueuePosition(String threadTopic) {
     //     QueueMemberEntity member = queueMemberRepository.findByThreadUid(threadTopic)
@@ -254,18 +232,18 @@ public class QueueService {
     //         member.getQueueUid(), member.getPriority());
     // }
     
-    @Transactional
-    public void updateStatus(String threadUid, QueueStatusEnum status) {
-        // QueueEntity queueItem = queueRepository.findByThreadUid(threadUid)
-        //     .orElseThrow(() -> new RuntimeException("Queue item not found"));
-        // queueItem.setStatus(status.name());
-        // // if (status == QueueStatusEnum.COMPLETED || 
-        // //     status == QueueStatusEnum.CANCELLED ||
-        // //     status == QueueStatusEnum.TIMEOUT) {
-        // //     queueItem.setEndTime(LocalDateTime.now());
-        // // }
-        // queueRepository.save(queueItem);
-    }
+    // @Transactional
+    // public void updateStatus(String threadUid, QueueStatusEnum status) {
+    //     // QueueEntity queueItem = queueRepository.findByThreadUid(threadUid)
+    //     //     .orElseThrow(() -> new RuntimeException("Queue item not found"));
+    //     // queueItem.setStatus(status.name());
+    //     // // if (status == QueueStatusEnum.COMPLETED || 
+    //     // //     status == QueueStatusEnum.CANCELLED ||
+    //     // //     status == QueueStatusEnum.TIMEOUT) {
+    //     // //     queueItem.setEndTime(LocalDateTime.now());
+    //     // // }
+    //     // queueRepository.save(queueItem);
+    // }
 
     
     // public int getEstimatedWaitTime(String threadUid) {
@@ -289,104 +267,104 @@ public class QueueService {
     //     return (queuePosition * avgThreadDuration) / onlineAgents.size();
     // }
 
-    @Transactional
-    public void checkQueueTimeout() {
-        // 1. 获取所有等待中的成员
-        // List<QueueMemberEntity> waitingMembers = 
-        //     queueMemberRepository.findByStatus(QueueMemberStatusEnum.WAITING.name());
+    // @Transactional
+    // public void checkQueueTimeout() {
+    //     // 1. 获取所有等待中的成员
+    //     // List<QueueMemberEntity> waitingMembers = 
+    //     //     queueMemberRepository.findByStatus(QueueMemberStatusEnum.WAITING.name());
         
-        // 2. 检查超时
-        // LocalDateTime now = LocalDateTime.now();
-        // for (QueueMemberEntity member : waitingMembers) {
-        //     if (member.getEnqueueTime().plusMinutes(30).isBefore(now)) {
-        //         member.updateStatus(QueueMemberStatusEnum.TIMEOUT.name(), null);
-        //         queueMemberRepository.save(member);
+    //     // 2. 检查超时
+    //     // LocalDateTime now = LocalDateTime.now();
+    //     // for (QueueMemberEntity member : waitingMembers) {
+    //     //     if (member.getEnqueueTime().plusMinutes(30).isBefore(now)) {
+    //     //         member.updateStatus(QueueMemberStatusEnum.TIMEOUT.name(), null);
+    //     //         queueMemberRepository.save(member);
                 
-        //         // 更新队列统计
-        //         QueueEntity queue = queueRepository.findByUid(member.getQueue().getUid())
-        //             .orElseThrow(() -> new RuntimeException("Queue not found"));
-        //         updateQueueStats(queue);
+    //     //         // 更新队列统计
+    //     //         QueueEntity queue = queueRepository.findByUid(member.getQueue().getUid())
+    //     //             .orElseThrow(() -> new RuntimeException("Queue not found"));
+    //     //         updateQueueStats(queue);
                 
-        //         log.info("Thread {} queue timeout", member.getThreadUid());
-        //     }
-        // }
-    }
+    //     //         log.info("Thread {} queue timeout", member.getThreadUid());
+    //     //     }
+    //     // }
+    // }
 
     
-    @Transactional
-    public void processQueue() {
-        try {
-            // 1. 获取等待中的成员(按优先级排序)
-            List<QueueMemberEntity> waitingMembers = new ArrayList<>();
-            // List<QueueMemberEntity> waitingMembers = 
-            //     queueMemberRepository.findByStatusOrderByPriorityDesc(
-            //         QueueMemberStatusEnum.WAITING.name());
-            // if (waitingMembers.isEmpty()) {
-            //     return;
-            // }
+    // @Transactional
+    // public void processQueue() {
+    //     try {
+    //         // 1. 获取等待中的成员(按优先级排序)
+    //         List<QueueMemberEntity> waitingMembers = new ArrayList<>();
+    //         // List<QueueMemberEntity> waitingMembers = 
+    //         //     queueMemberRepository.findByStatusOrderByPriorityDesc(
+    //         //         QueueMemberStatusEnum.WAITING.name());
+    //         // if (waitingMembers.isEmpty()) {
+    //         //     return;
+    //         // }
             
-            // 2. 获取可用客服
-            List<AgentEntity> availableAgents = agentService.getAvailableAgents();
-            if (availableAgents.isEmpty()) {
-                return;
-            }
+    //         // 2. 获取可用客服
+    //         List<AgentEntity> availableAgents = agentService.getAvailableAgents();
+    //         if (availableAgents.isEmpty()) {
+    //             return;
+    //         }
 
-            // 3. 依次处理排队成员
-            for (QueueMemberEntity member : waitingMembers) {
-                // ThreadEntity thread = threadRepository.findByUid(member.getThreadUid())
-                //     .orElseThrow(() -> new RuntimeException("Thread not found"));
+    //         // 3. 依次处理排队成员
+    //         for (QueueMemberEntity member : waitingMembers) {
+    //             // ThreadEntity thread = threadRepository.findByUid(member.getThreadUid())
+    //             //     .orElseThrow(() -> new RuntimeException("Thread not found"));
                     
-                try {
-                    // 分配客服
-                    AgentEntity agent = AgentEntity.builder().build(); // assignmentService.selectAgent(availableAgents, thread);
-                    // assignmentService.assignToAgent(thread, agent);
+    //             try {
+    //                 // 分配客服
+    //                 AgentEntity agent = AgentEntity.builder().build(); // assignmentService.selectAgent(availableAgents, thread);
+    //                 // assignmentService.assignToAgent(thread, agent);
                     
-                    // 更新排队状态
-                    // member.updateStatus(QueueMemberStatusEnum.COMPLETED.name(), agent.getUid());
-                    // queueMemberRepository.save(member);
+    //                 // 更新排队状态
+    //                 // member.updateStatus(QueueMemberStatusEnum.COMPLETED.name(), agent.getUid());
+    //                 // queueMemberRepository.save(member);
                     
-                    // 更新队列统计
-                    QueueEntity queue = queueRepository.findByUid(member.getQueue().getUid())
-                        .orElseThrow(() -> new RuntimeException("Queue not found"));
-                    updateQueueStats(queue);
+    //                 // 更新队列统计
+    //                 QueueEntity queue = queueRepository.findByUid(member.getQueue().getUid())
+    //                     .orElseThrow(() -> new RuntimeException("Queue not found"));
+    //                 updateQueueStats(queue);
                     
-                    // 更新可用客服列表
-                    availableAgents.remove(agent);
-                    if (availableAgents.isEmpty()) {
-                        break;
-                    }
-                } catch (Exception e) {
-                    log.error("Failed to process queue member", e);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to process queue", e);
-        }
-    }
+    //                 // 更新可用客服列表
+    //                 availableAgents.remove(agent);
+    //                 if (availableAgents.isEmpty()) {
+    //                     break;
+    //                 }
+    //             } catch (Exception e) {
+    //                 log.error("Failed to process queue member", e);
+    //             }
+    //         }
+    //     } catch (Exception e) {
+    //         log.error("Failed to process queue", e);
+    //     }
+    // }
 
     
-    public QueueStats getQueueStats() {
-        QueueStats stats = new QueueStats();
+    // public QueueStats getQueueStats() {
+    //     QueueStats stats = new QueueStats();
         
-        // 统计各状态会话数
-        stats.setTotalThreads((int) queueRepository.count());
-        // stats.setWaitingThreads(queueRepository.countByStatus(QueueStatusEnum.WAITING));
-        // stats.setProcessingThreads(queueRepository.countByStatus(QueueStatusEnum.PROCESSING));
+    //     // 统计各状态会话数
+    //     stats.setTotalThreads((int) queueRepository.count());
+    //     // stats.setWaitingThreads(queueRepository.countByStatus(QueueStatusEnum.WAITING));
+    //     // stats.setProcessingThreads(queueRepository.countByStatus(QueueStatusEnum.PROCESSING));
         
-        // 计算平均等待时间
-        // Double avgWaitTime = queueRepository.calculateAverageWaitTime();
-        // stats.setAvgWaitTime(avgWaitTime != null ? avgWaitTime.intValue() : 0);
+    //     // 计算平均等待时间
+    //     // Double avgWaitTime = queueRepository.calculateAverageWaitTime();
+    //     // stats.setAvgWaitTime(avgWaitTime != null ? avgWaitTime.intValue() : 0);
         
-        // 计算最长等待时间
-        // Integer maxWaitTime = queueRepository.calculateMaxWaitTime();
-        // stats.setMaxWaitTime(maxWaitTime != null ? maxWaitTime : 0);
+    //     // 计算最长等待时间
+    //     // Integer maxWaitTime = queueRepository.calculateMaxWaitTime();
+    //     // stats.setMaxWaitTime(maxWaitTime != null ? maxWaitTime : 0);
         
-        // 计算超时率和取消率
-        // long timeoutCount = queueRepository.countByStatus(QueueStatusEnum.TIMEOUT);
-        // long cancelCount = queueRepository.countByStatus(QueueStatusEnum.CANCELLED);
-        // stats.setTimeoutRate(stats.getTotalThreads() > 0 ? (double) timeoutCount / stats.getTotalThreads() : 0);
-        // stats.setCancelRate(stats.getTotalThreads() > 0 ? (double) cancelCount / stats.getTotalThreads() : 0);
+    //     // 计算超时率和取消率
+    //     // long timeoutCount = queueRepository.countByStatus(QueueStatusEnum.TIMEOUT);
+    //     // long cancelCount = queueRepository.countByStatus(QueueStatusEnum.CANCELLED);
+    //     // stats.setTimeoutRate(stats.getTotalThreads() > 0 ? (double) timeoutCount / stats.getTotalThreads() : 0);
+    //     // stats.setCancelRate(stats.getTotalThreads() > 0 ? (double) cancelCount / stats.getTotalThreads() : 0);
         
-        return stats;
-    }
+    //     return stats;
+    // }
 }
