@@ -58,7 +58,7 @@
     </sequenceFlow>
     <boundaryEvent id="slaTimer" cancelActivity="false" attachedToRef="humanService">
       <timerEventDefinition>
-        <timeDuration>${slaTime != null ? slaTime : 'PT30M'}</timeDuration>
+        <timeDuration>${slaTimeISO != null ? slaTimeISO : 'PT30M'}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <serviceTask id="slaNotification" name="SLA超时通知" flowable:delegateExpression="${threadSLATimeoutNotificationDelegate}" />
@@ -90,14 +90,14 @@
     <sequenceFlow id="flowRobotTimeout" sourceRef="robotIdleTimer" targetRef="robotIdleTimeoutService" />
     <boundaryEvent id="robotIdleTimer" attachedToRef="robotService">
       <timerEventDefinition>
-        <timeDuration>${robotIdleTimeout != null ? robotIdleTimeout : 'PT5M'}</timeDuration>
+        <timeDuration>${robotIdleTimeoutISO != null ? robotIdleTimeoutISO : 'PT5M'}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <serviceTask id="humanIdleTimeoutService" name="访客在人工接待中超时未发消息" flowable:delegateExpression="${threadHumanIdleTimeoutServiceDelegate}" />
     <sequenceFlow id="flowHumanTimeoutToEnd" sourceRef="humanIdleTimeoutService" targetRef="end" />
     <boundaryEvent id="humanIdleTimer" attachedToRef="humanService">
       <timerEventDefinition>
-        <timeDuration>${humanIdleTimeout != null ? humanIdleTimeout : 'PT15M'}</timeDuration>
+        <timeDuration>${humanIdleTimeoutISO != null ? humanIdleTimeoutISO : 'PT15M'}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flowHumanTimeout" sourceRef="humanIdleTimer" targetRef="humanIdleTimeoutService" />
