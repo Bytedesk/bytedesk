@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
-public enum QueueMemberSourceEnum {
-    DIRECT,     // 直接分配（一对一会话）
-    WORKGROUP   // 来自工作组分配
-}
+// public enum QueueMemberSourceEnum {
+//     DIRECT,     // 直接分配（一对一会话）
+//     WORKGROUP   // 来自工作组分配
+// }

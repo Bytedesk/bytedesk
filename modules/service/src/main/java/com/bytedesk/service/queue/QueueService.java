@@ -19,7 +19,7 @@ import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 // import com.bytedesk.service.queue_member.QueueMemberRepository;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
+// import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
 // import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -48,7 +48,7 @@ public class QueueService {
         // 
         UserProtobuf agent = robotEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue, null);
         // 3. 更新队列统计
         // updateQueueStats(queue);
         // 4. 返回队列成员
@@ -65,7 +65,7 @@ public class QueueService {
         // 
         UserProtobuf agent = agentEntity.toUserProtobuf();
         // 2. 创建队列成员
-        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue);
+        QueueMemberEntity member = getQueueMember(threadEntity, agent, null, visitorRequest, queue, null);
         // 3. 更新队列统计
         // updateQueueStats(queue);
         // 4. 返回队列成员
@@ -90,16 +90,13 @@ public class QueueService {
         UserProtobuf workgroup = workgroupEntity.toUserProtobuf();
         
         // 3. 创建工作组队列成员
-        QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroup, visitorRequest, workgroupQueue);
+        // 注意: 此处的workgroupQueue和agentQueue没有问题，暂时使用此种命名
+        QueueMemberEntity workgroupMember = getQueueMember(threadEntity, agent, workgroup, visitorRequest, workgroupQueue, agentQueue);
         
         // 4. 更新工作组队列成员，添加客服队列关联信息
-        workgroupMember.setAgentQueueUid(agentQueue.getUid());
-        workgroupMember.setSourceType(QueueMemberSourceEnum.WORKGROUP.name());
-        
-        // 在workgroupMember.thread.agent中已经存储
-        // 添加代理信息 - 关联客服信息
-        // workgroupMember.setAgentUid(agentEntity.getUid());
-        
+        // workgroupMember.setAgentQueueUid(agentQueue.getUid());
+        // workgroupMember.setSourceType(QueueMemberSourceEnum.WORKGROUP.name());
+
         // 保存更新后的队列成员
         workgroupMember = queueMemberRestService.save(workgroupMember);
         
@@ -177,7 +174,7 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, UserProtobuf workgroup, VisitorRequest request, QueueEntity queue) {
+    public QueueMemberEntity getQueueMember(ThreadEntity threadEntity, UserProtobuf agent, UserProtobuf workgroup, VisitorRequest request, QueueEntity queue, QueueEntity workgroupQueue) {
         // 
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadEntity.getUid());
         if (memberOptional.isPresent()) {
@@ -187,6 +184,7 @@ public class QueueService {
         QueueMemberEntity member = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
             .queue(queue)
+            .workgroupQueue(workgroupQueue)
             .thread(threadEntity)
             .queueNumber(queue.getNextNumber())
             .enqueueTime(LocalDateTime.now())
