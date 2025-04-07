@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 11:05:23
+ * @LastEditTime: 2025-04-07 12:12:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -187,13 +187,6 @@ public class I18Consts {
 
 
     // 将上述国际化常量保持常量名称不变，翻译成中文
-    // public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT_ZH = "用户名或密码错误";
-    // public static final String I18N_MOBILE_ALREADY_EXISTS_ZH = "手机号已存在";
-    // public static final String I18N_EMAIL_ALREADY_EXISTS_ZH = "邮箱已存在";
-    // public static final String I18N_MOBILE_NOT_EXISTS_ZH = "手机号不存在";
-    // public static final String I18N_EMAIL_NOT_EXISTS_ZH = "邮箱不存在";
-    // public static final String I18N_MOBILE_FORMAT_ERROR_ZH = "手机号格式错误";      
-    // public static final String I18N_EMAIL_FORMAT_ERROR_ZH = "邮箱格式错误";
-    // public static final String I18N_AUTH_CAPTCHA_SEND_SUCCESS_ZH = "验证码发送成功";
+    
     
 }
