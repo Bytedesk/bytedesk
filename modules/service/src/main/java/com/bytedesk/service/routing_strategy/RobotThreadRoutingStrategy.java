@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:30:09
+ * @LastEditTime: 2025-04-07 09:16:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,7 +96,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
 
         String content = robot.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
-            content = "欢迎使用机器人客服";
+            content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name())
