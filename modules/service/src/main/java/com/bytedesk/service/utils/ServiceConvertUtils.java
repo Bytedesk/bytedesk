@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 14:21:20
+ * @LastEditTime: 2025-04-07 13:58:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.queue.QueueEntity;
+import com.bytedesk.service.queue.QueueResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
@@ -138,6 +140,9 @@ public class ServiceConvertUtils {
         return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
     }
 
+    public static QueueResponse convertToQueueResponse(QueueEntity entity) {
+        return modelMapper.map(entity, QueueResponse.class);
+    }
     
 
 }

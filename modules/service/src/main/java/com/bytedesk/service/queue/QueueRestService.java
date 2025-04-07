@@ -27,6 +27,7 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -149,7 +150,8 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
 
     @Override
     public QueueResponse convertToResponse(QueueEntity entity) {
-        return modelMapper.map(entity, QueueResponse.class);
+        // return modelMapper.map(entity, QueueResponse.class);
+        return ServiceConvertUtils.convertToQueueResponse(entity);
     }
 
     public Optional<QueueEntity> findLatestByQueueTopicAndDay(String queueTopic, String day) {
