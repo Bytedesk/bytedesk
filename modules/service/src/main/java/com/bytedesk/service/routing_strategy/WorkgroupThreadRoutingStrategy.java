@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 14:05:37
+ * @LastEditTime: 2025-04-07 14:48:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -318,7 +318,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 
         ThreadEntity thread = threadOptional.get();
         UserProtobuf agent = robot.toUserProtobuf();
-        // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
         // 机器人接待
@@ -341,9 +340,26 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
+        //
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
-        return ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
+        // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+                // 距离当前时间不超过30分钟，则直接使用之前的消息
+                // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
+                // messageSendService.sendProtobufMessage(messageProtobuf);
+                return messageProtobuf;
+            }
+        }
 
+        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
+        messageRestService.save(message);
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
     }
 
 }
