@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:52:51
+ * @LastEditTime: 2025-04-07 13:36:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -149,13 +149,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 
         UserProtobuf agent = agentEntity.toUserProtobuf();
-        // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         //
         if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
-            if (queueMemberEntity.getQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
+            if (queueMemberEntity.getWorkgroupQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);
             } else {
@@ -216,13 +215,13 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 排队，已满则排队
         // String queueTip = agent.getQueueSettings().getQueueTip();
         String content = "";
-        if (queueMemberEntity.getQueue().getQueuingCount() == 0) {
+        if (queueMemberEntity.getWorkgroupQueue().getQueuingCount() == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
         } else {
             // 前面有排队人数
-            content = " 当前排队人数：" + queueMemberEntity.getQueue().getQueuingCount() + " 大约等待时间："
-                    + queueMemberEntity.getQueue().getQueuingCount() * 2 + "  分钟";
+            content = " 当前排队人数：" + queueMemberEntity.getWorkgroupQueue().getQueuingCount() + " 大约等待时间："
+                    + queueMemberEntity.getWorkgroupQueue().getQueuingCount() * 2 + "  分钟";
         }
 
         // 进入排队队列

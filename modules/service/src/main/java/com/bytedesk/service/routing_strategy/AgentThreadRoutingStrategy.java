@@ -125,7 +125,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
-            if (queueMemberEntity.getQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
+            if (queueMemberEntity.getAgentQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableAgent(thread, agentEntity, queueMemberEntity);
             } else {
@@ -185,13 +185,13 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 已满则排队
         // String queueTip = agent.getQueueSettings().getQueueTip();
         String content = "";
-        if (queueMemberEntity.getQueue().getQueuingCount() == 0) {
+        if (queueMemberEntity.getAgentQueue().getQueuingCount() == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
         } else {
             // 前面有排队人数
-            content = " 当前排队人数：" + queueMemberEntity.getQueue().getQueuingCount() + " 大约等待时间："
-                    + queueMemberEntity.getQueue().getQueuingCount() * 2 + "  分钟";
+            content = " 当前排队人数：" + queueMemberEntity.getAgentQueue().getQueuingCount() + " 大约等待时间："
+                    + queueMemberEntity.getAgentQueue().getQueuingCount() * 2 + "  分钟";
         }
         // 进入排队队列
         thread.setQueuing()

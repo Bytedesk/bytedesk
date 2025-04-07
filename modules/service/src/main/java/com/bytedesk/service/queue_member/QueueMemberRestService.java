@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:49:46
+ * @LastEditTime: 2025-04-07 13:44:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,10 +83,10 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     // }
 
     // 添加新的查询方法
-    public Optional<QueueMemberEntity> findByThreadUidAndQueueUid(String threadUid, String queueUid) {
-        // 实现查询逻辑
-        return queueMemberRepository.findByThreadUidAndQueueUid(threadUid, queueUid);
-    }
+    // public Optional<QueueMemberEntity> findByThreadUidAndQueueUid(String threadUid, String queueUid) {
+    //     // 实现查询逻辑
+    //     return queueMemberRepository.findByThreadUidAndQueueUid(threadUid, queueUid);
+    // }
 
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {

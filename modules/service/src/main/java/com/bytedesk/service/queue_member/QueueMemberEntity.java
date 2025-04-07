@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:09:42
+ * @LastEditTime: 2025-04-07 13:18:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * @author Jackning <270580156@qq.com>
+ * 
+ * 这些统计数据将有助于客服质量监控和绩效评估，也可用于实时监控会话状态。
  */
 @Entity
 @Data
@@ -57,13 +59,21 @@ public class QueueMemberEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     // 多个queueMember对应一个queue
-    @ManyToOne(fetch = FetchType.LAZY)
-    private QueueEntity queue;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private QueueEntity queue;
     
     // 作为工作组队列成员关系
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workgroup_queue_id")
     private QueueEntity workgroupQueue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_queue_id")
+    private QueueEntity agentQueue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "robot_queue_id")
+    private QueueEntity robotQueue;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
@@ -75,9 +85,18 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
 
+    /**
+     * 访客消息统计：
+     * 记录第一条访客消息的时间
+     * 更新最后一条访客消息的时间
+     * 统计访客消息总数
+     */
     private LocalDateTime firstMessageTime;  // 访客首次发送消息时间
 
     private LocalDateTime lastMessageTime;  // 访客最后发送消息时间
+
+    @Builder.Default
+    private int visitorMessageCount = 0;  // 访客消息数量
 
     private LocalDateTime leaveTime;  // 离开时间
 
@@ -85,7 +104,15 @@ public class QueueMemberEntity extends BaseEntity {
 
     private LocalDateTime acceptTime;  // 开始服务时间
 
-    // 
+    /**
+     * 客服消息统计：
+     * 标记客服是否首次响应
+     * 记录首次响应时间
+     * 更新最后响应时间
+     * 计算平均响应时间（累计平均算法）
+     * 追踪最长响应时间
+     * 统计客服消息总数
+     */
     @Builder.Default
     private boolean firstResponse = false;  // 人工客服是否首次响应
 
@@ -95,6 +122,11 @@ public class QueueMemberEntity extends BaseEntity {
 
     private LocalDateTime closeTime;  // 结束时间
 
+    /**
+     * 响应时间计算：
+     * 基于访客最后消息时间和客服响应时间计算响应时长
+     * 动态更新平均响应时间和最大响应时间
+     */
     @Builder.Default
     private int avgResponseTime = 0;  // 平均响应时间(秒)
     
@@ -103,9 +135,6 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Builder.Default
     private int agentMessageCount = 0;  // 客服消息数量
-
-    @Builder.Default
-    private int visitorMessageCount = 0;  // 访客消息数量
 
     @Builder.Default
     @Column(name = "is_timeout")
