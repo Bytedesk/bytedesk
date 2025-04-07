@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 22:58:38
+ * @LastEditTime: 2025-04-07 09:27:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -183,11 +183,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setStarted()
                 .setUnreadCount(1)
                 .setContent(content)
-                // .setUserUid(agent.getUid())
                 .setOwner(agent.getMember().getUser());
         //
-        UserProtobuf agentProtobuf = agent.toUserProtobuf(); // ServiceConvertUtils.convertToUserProtobuf(agent);
-        // thread.setAgent(JSON.toJSONString(agentProtobuf));
+        UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
@@ -314,16 +312,18 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     public MessageProtobuf routeToRobot(VisitorRequest request, @Nonnull ThreadEntity threadFromRequest,
             @Nonnull RobotEntity robot) {
+        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+        Assert.notNull(robot, "RobotEntity must not be null");
 
         // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-
+        // 
         ThreadEntity thread = threadOptional.get();
         // 排队计数
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robot, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
-
+        // 机器人接待
         String content = robot.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";

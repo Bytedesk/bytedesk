@@ -45,9 +45,6 @@ public class ThreadConsts {
 
     public static final String THREAD_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
     
-    // 访客请求转人工标记
-    public static final String THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER = "visitorRequestedTransfer"; // 访客是否主动请求转人工
-
     // 从流程中提取的变量名
     public static final String THREAD_VARIABLE_ROBOT_ENABLED = "robotEnabled"; // 是否启用机器人
     
@@ -109,14 +106,14 @@ public class ThreadConsts {
     public static final String ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK = "transferToHumanTask";
     
     // 默认超时时间常量
-    public static final String DEFAULT_SLA_TIME = "PT30M";              // 默认SLA时间 - 30分钟
-    public static final String DEFAULT_HUMAN_IDLE_TIMEOUT = "PT15M";    // 默认人工客服空闲超时 - 15分钟
-    public static final String DEFAULT_ROBOT_IDLE_TIMEOUT = "PT5M";     // 默认机器人空闲超时 - 5分钟
+    public static final String DEFAULT_SLA_TIME = "PT1M";              // 默认SLA时间 - 30分钟
+    public static final String DEFAULT_HUMAN_IDLE_TIMEOUT = "PT1M";    // 默认人工客服空闲超时 - 15分钟
+    public static final String DEFAULT_ROBOT_IDLE_TIMEOUT = "PT1M";     // 默认机器人空闲超时 - 5分钟
     
     // 线程状态常量
     public static final String THREAD_STATUS_CREATED = "CREATED";       // 初始创建状态
     
     // 机器人相关变量常量
     public static final String THREAD_VARIABLE_ROBOT_UNANSWERED_COUNT = "robotUnansweredCount";  // 机器人未回答计数
-    // public static final String THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER = "visitorRequestedTransfer"; // 访客请求转人工标志
+    public static final String THREAD_VARIABLE_VISITOR_REQUESTED_TRANSFER = "visitorRequestedTransfer"; // 访客请求转人工标志
 }
