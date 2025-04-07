@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 09:27:32
+ * @LastEditTime: 2025-04-07 11:02:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -114,7 +114,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().isOffline()) {
+            } else if (threadOptional.get().isOffline() && workgroup.getAvailableAgents().isEmpty()) {
+                // 离线状态，客服离线
                 thread = threadOptional.get();
             }
         }
@@ -217,8 +218,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (queueMemberEntity.getQueue().getQueuingCount() == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
-            // String content = String.format(queueTip, queueMemberEntity.getQueueNumber(),
-            // queueMemberEntity.getWaitTime());
         } else {
             // 前面有排队人数
             content = " 当前排队人数：" + queueMemberEntity.getQueue().getQueuingCount() + " 大约等待时间："
@@ -255,8 +254,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "请稍后，客服会尽快回复您";
         }
         thread.setClose()
-                .setOffline()
-                .setContent(content);
+            .setOffline()
+            .setContent(content);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");

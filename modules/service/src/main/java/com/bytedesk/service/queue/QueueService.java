@@ -31,12 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class QueueService {
-
-    // private final QueueRepository queueRepository;
     
     private final QueueMemberRestService queueMemberRestService;
-
-    // private final AgentService agentService;
 
     public final QueueRestService queueRestService;
 
