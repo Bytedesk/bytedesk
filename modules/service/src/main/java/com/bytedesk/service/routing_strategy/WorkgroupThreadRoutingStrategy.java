@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 14:58:43
+ * @LastEditTime: 2025-04-07 16:40:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,19 +96,22 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         } else {
             throw new RuntimeException("Workgroup uid " + workgroupUid + " not found");
         }
+        // 
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             if (threadOptional.get().isNew()) {
                 thread = threadOptional.get();
             } else if (threadOptional.get().isChatting()) {
-                if
-
+                // 如果会话已经存在，并且是聊天状态
                 thread = threadOptional.get();
-                // 重新初始化会话，包括重置机器人状态等
-                thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
-                // 返回继续会话消息
-                log.info("Already have a processing thread {}", topic);
-                return getWorkgroupContinueMessage(visitorRequest, thread);
+                // 非强制转人工，继续会话，无论是否机器人
+                if (!visitorRequest.getForceAgent()) {
+                    // 重新初始化会话，包括重置机器人状态等
+                    thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+                    // 返回继续会话消息
+                    log.info("Already have a processing thread {}", topic);
+                    return getWorkgroupContinueMessage(visitorRequest, thread);
+                }
             } else if (threadOptional.get().isQueuing()) {
                 thread = threadOptional.get();
                 // 返回排队中的会话
@@ -118,12 +121,15 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
             }
         }
-
+        // 
         if (thread == null) {
             // 不存在会话，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-        }
+        } else if (visitorRequest.getForceAgent()) {
+            // TODO: 已经存在会话，且强制转人工
 
+        }
+        // 
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             Boolean isOffline = !workgroup.isConnected();
@@ -342,7 +348,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 更新线程状态
         thread.setUserUid(robot.getUid());
         thread.setChatting();
-        thread.setAgent(robot.toUserProtobuf().toJson());
         thread.setContent(content);
         thread.setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);

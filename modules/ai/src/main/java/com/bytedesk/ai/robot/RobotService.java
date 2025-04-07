@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 11:51:29
+ * @LastEditTime: 2025-04-07 16:17:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.Optional;
 // import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -32,7 +31,6 @@ import com.bytedesk.ai.springai.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
 import com.bytedesk.ai.springai.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.tencent.SpringAITencentService;
-import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
@@ -42,8 +40,6 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
-import com.bytedesk.core.uid.UidUtils;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,10 +57,10 @@ public class RobotService {
     private final Optional<SpringAITencentService> springAITencentService;
     private final Optional<SpringAIBaiduService> springAIBaiduService;
 
-    private final UidUtils uidUtils;
+    // private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
-    private final IMessageSendService messageSendService;
-    private final RobotRestService robotRestService;
+    // private final IMessageSendService messageSendService;
+    // private final RobotRestService robotRestService;
     private final MessageService messageService;
 
     // 处理内部成员SSE请求消息
@@ -226,65 +222,65 @@ public class RobotService {
     }
 
     // websocket消息容易导致消息乱序，暂不采用
-    public void processWebsocketMessage(String messageJson) {
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-        MessageTypeEnum messageType = messageProtobuf.getType();
-        if (messageType.equals(MessageTypeEnum.STREAM)) {
-            return;
-        }
-        String query = messageProtobuf.getContent();
-        log.info("robot processWebsocketMessage {}", query);
-        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
-        if (threadProtobuf == null) {
-            throw new RuntimeException("thread is null");
-        }
-        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
-        if (!messageType.equals(MessageTypeEnum.TEXT)) {
-            return;
-        }
-        String threadTopic = threadProtobuf.getTopic();
-        if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
-            log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
-            processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
-        }
-    }
+    // public void processWebsocketMessage(String messageJson) {
+    //     MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+    //     MessageTypeEnum messageType = messageProtobuf.getType();
+    //     if (messageType.equals(MessageTypeEnum.STREAM)) {
+    //         return;
+    //     }
+    //     String query = messageProtobuf.getContent();
+    //     log.info("robot processWebsocketMessage {}", query);
+    //     ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
+    //     if (threadProtobuf == null) {
+    //         throw new RuntimeException("thread is null");
+    //     }
+    //     // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
+    //     if (!messageType.equals(MessageTypeEnum.TEXT)) {
+    //         return;
+    //     }
+    //     String threadTopic = threadProtobuf.getTopic();
+    //     if (threadProtobuf.getType().equals(ThreadTypeEnum.LLM)) {
+    //         log.info("robot threadTopic {}, thread.type {}", threadTopic, threadProtobuf.getType());
+    //         processRobotThreadWebsocketMessage(query, threadTopic, threadProtobuf, messageProtobuf);
+    //     }
+    // }
 
-    private void processRobotThreadWebsocketMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf,
-            MessageProtobuf messageProtobuf) {
-        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
-                .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
-                        " not found"));
-        if (!StringUtils.hasText(thread.getAgent())) {
-            return;
-        }
-        // 实际上是
-        RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
-        if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
-            log.info("processRobotThreadWebsocketMessage thread reply");
-            RobotEntity robot = robotRestService.findByUid(agent.getUid())
-                    .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
-            RobotProtobuf robotProtobuf = RobotProtobuf.convertFromRobotEntity(robot);
-            // 机器人回复访客消息
-            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robotProtobuf,
-                    messageProtobuf);
-            //
-            MessageProtobuf clonedMessage = SerializationUtils.clone(message);
-            clonedMessage.setUid(uidUtils.getUid());
-            clonedMessage.setType(MessageTypeEnum.PROCESSING);
-            messageSendService.sendProtobufMessage(clonedMessage);
-            //
-            if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.OLLAMA)) {
-                springAIOllamaService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DEEPSEEK)) {
-                springAIDeepseekService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DASHSCOPE)) {
-                springAIDashscopeService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
-                springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-            } else {
-                springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
-            }
-        }
-    }
+    // private void processRobotThreadWebsocketMessage(String query, String threadTopic, ThreadProtobuf threadProtobuf,
+    //         MessageProtobuf messageProtobuf) {
+    //     ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
+    //             .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
+    //                     " not found"));
+    //     if (!StringUtils.hasText(thread.getAgent())) {
+    //         return;
+    //     }
+    //     // 实际上是
+    //     RobotProtobuf agent = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
+    //     if (agent.getType().equals(UserTypeEnum.ROBOT.name())) {
+    //         log.info("processRobotThreadWebsocketMessage thread reply");
+    //         RobotEntity robot = robotRestService.findByUid(agent.getUid())
+    //                 .orElseThrow(() -> new RuntimeException("robot " + agent.getUid() + " not found"));
+    //         RobotProtobuf robotProtobuf = RobotProtobuf.convertFromRobotEntity(robot);
+    //         // 机器人回复访客消息
+    //         MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robotProtobuf,
+    //                 messageProtobuf);
+    //         //
+    //         MessageProtobuf clonedMessage = SerializationUtils.clone(message);
+    //         clonedMessage.setUid(uidUtils.getUid());
+    //         clonedMessage.setType(MessageTypeEnum.PROCESSING);
+    //         messageSendService.sendProtobufMessage(clonedMessage);
+    //         //
+    //         if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.OLLAMA)) {
+    //             springAIOllamaService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DEEPSEEK)) {
+    //             springAIDeepseekService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DASHSCOPE)) {
+    //             springAIDashscopeService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
+    //             springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //         } else {
+    //             springAIZhipuaiService.ifPresent(service -> service.sendWebsocketMessage(query, robot, message));
+    //         }
+    //     }
+    // }
 
 }
