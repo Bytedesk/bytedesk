@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
@@ -191,7 +192,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @ActionAnnotation(title = "user", action = "logout", description = "logout")
+    @ActionAnnotation(title = "user", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
 
