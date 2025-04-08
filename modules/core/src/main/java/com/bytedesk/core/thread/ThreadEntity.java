@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:21:16
+ * @LastEditTime: 2025-04-08 18:22:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,19 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -51,6 +57,13 @@ import lombok.experimental.SuperBuilder;
 public class ThreadEntity extends AbstractThreadEntity {
 
     private static final long serialVersionUID = 1L;
+
+    // 一对多关系，一个thread可以对应多个message
+    // cascade = CascadeType.ALL, orphanRemoval = true, 
+    @Builder.Default
+    @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
+    private List<MessageEntity> messages = new ArrayList<>();
+
     //
     public Boolean isClosed() {
         return getStatus().equals(ThreadProcessStatusEnum.CLOSED.name());
@@ -206,9 +219,10 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     // 判断是否机器人转人工
+    // 如果robot和agent都不是BytedeskConsts.EMPTY_JSON_STRING，说明是机器人转人工
     public Boolean isRobotToAgent() {
-        // 
-        return false;
+        return !getRobot().equals(BytedeskConsts.EMPTY_JSON_STRING)
+                && !getAgent().equals(BytedeskConsts.EMPTY_JSON_STRING);
     }
 
 
