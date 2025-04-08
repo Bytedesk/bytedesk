@@ -143,6 +143,7 @@ public class ThreadConsts {
     
     // 转人工方式相关常量
     public static final String THREAD_VARIABLE_TRANSFER_TYPE = "transferType"; // 转人工方式
-    public static final String TRANSFER_TYPE_UI = "ui"; // 通过UI按钮转人工
-    public static final String TRANSFER_TYPE_KEYWORD = "keyword"; // 通过关键词转人工
+    public static final String TRANSFER_TYPE_UI = "UI"; // 通过UI按钮转人工
+    public static final String TRANSFER_TYPE_KEYWORD = "KEYWORD"; // 通过关键词转人工
+    public static final String TRANSFER_TYPE_TIMEOUT = "TIMEOUT"; // 通过超时转人工
 }

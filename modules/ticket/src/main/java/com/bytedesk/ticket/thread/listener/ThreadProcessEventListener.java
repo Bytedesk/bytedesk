@@ -288,19 +288,46 @@ public class ThreadProcessEventListener {
         
         log.info("处理客服离线事件: threadUid={}, processInstanceId={}", thread.getUid(), thread.getProcessInstanceId());
         
-        try {
-            // 设置客服离线状态变量
-            runtimeService.setVariable(thread.getProcessInstanceId(), 
-                    ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE, true);
-            
-            // 设置线程状态为离线
-            runtimeService.setVariable(thread.getProcessInstanceId(),
-                    ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_OFFLINE);
-            
-            log.info("已更新客服离线状态变量: threadUid={}, processInstanceId={}", 
-                    thread.getUid(), thread.getProcessInstanceId());
-        } catch (Exception e) {
-            log.error("设置客服离线状态变量失败: {}", e.getMessage(), e);
+        // 添加重试机制
+        int maxRetries = 3;
+        int retryCount = 0;
+        boolean success = false;
+        
+        while (!success && retryCount < maxRetries) {
+            try {
+                // 设置客服离线状态变量
+                runtimeService.setVariable(thread.getProcessInstanceId(), 
+                        ThreadConsts.THREAD_VARIABLE_AGENTS_OFFLINE, true);
+                
+                // 设置线程状态为离线
+                runtimeService.setVariable(thread.getProcessInstanceId(),
+                        ThreadConsts.THREAD_VARIABLE_THREAD_STATUS, ThreadConsts.THREAD_STATUS_OFFLINE);
+                
+                log.info("已更新客服离线状态变量: threadUid={}, processInstanceId={}", 
+                        thread.getUid(), thread.getProcessInstanceId());
+                
+                success = true;
+            } catch (org.flowable.common.engine.api.FlowableOptimisticLockingException e) {
+                // 并发修改异常，需要重试
+                retryCount++;
+                log.warn("设置客服离线状态变量发生并发修改异常，尝试重试 #{}: {}", retryCount, e.getMessage());
+                
+                try {
+                    // 短暂延时后重试
+                    Thread.sleep(200 * retryCount);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    log.error("重试时线程被中断", ie);
+                    break;
+                }
+            } catch (Exception e) {
+                log.error("设置客服离线状态变量失败: {}", e.getMessage(), e);
+                break;
+            }
+        }
+        
+        if (!success) {
+            log.error("多次尝试后仍无法更新客服离线状态变量: threadUid={}", thread.getUid());
         }
     }
 
