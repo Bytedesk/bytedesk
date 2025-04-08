@@ -58,22 +58,23 @@ public class TopicEventListener {
         // request.getTopics().add(event.getTopic());
         topicCacheService.pushRequest(request);
     }
-
-    // @EventListener
-    // public void onTopicUpdateEvent(TopicUpdateEvent event) {
-    //     log.info("topic onTopicUpdateEvent: {}", event);
-    //     // topicService.update(event.getTopic(), event.getUserUid());
-    // }
     
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
         // 定时刷新缓存中的topic事件到数据库中
-        List<String> list = topicCacheService.getList();
-        if (list != null) {
-            list.forEach(item -> {
+        List<String> topicRequestList = topicCacheService.getTopicRequestList();
+        if (topicRequestList != null) {
+            topicRequestList.forEach(item -> {
                 // log.info("topic onQuartzFiveSecondEvent {}", item);
                 TopicRequest topicRequest = JSON.parseObject(item, TopicRequest.class);
                 topicService.create(topicRequest);
+            });
+        }
+        List<String> clientIdList = topicCacheService.getClientIdList();
+        if (clientIdList!= null) {
+            clientIdList.forEach(item -> {
+                // log.info("topic onQuartzFiveSecondEvent {}", item);
+                // mqttConnectionService.removeClientId(item);
             });
         }
     }

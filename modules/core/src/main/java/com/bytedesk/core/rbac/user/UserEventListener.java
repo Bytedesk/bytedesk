@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 10:21:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:21:45
+ * @LastEditTime: 2025-04-08 22:35:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.user.event.UserCreateEvent;
 import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
 import com.bytedesk.core.topic.TopicCacheService;
@@ -39,24 +38,21 @@ public class UserEventListener {
         UserEntity user = event.getUser();
         log.info("topic onUserCreateEvent: {}", user.getUid());
         // 默认订阅用户主题
-        // topicService.create(TopicUtils.getUserTopic(user.getUid()), user.getUid());
-        //
         TopicRequest topicRequest = TopicRequest.builder()
                 .topic(TopicUtils.getUserTopic(user.getUid()))
-                // .userUid(user.getUid())
+                .userUid(user.getUid())
                 .build();
-        topicRequest.setUserUid(user.getUid());
-        topicCacheService.push(JSON.toJSONString(topicRequest));
+        // topicRequest.setUserUid(user.getUid());
+        topicCacheService.pushRequest(topicRequest);
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {
             // topicService.create(TopicUtils.getOrgTopic(user.getOrgUid()), user.getUid());
-            //
             TopicRequest topicRequestOrg = TopicRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
-                    // .userUid(user.getUid())
+                    .userUid(user.getUid())
                     .build();
-            topicRequestOrg.setUserUid(user.getUid());
-            topicCacheService.push(JSON.toJSONString(topicRequestOrg));
+            // topicRequestOrg.setUserUid(user.getUid());
+            topicCacheService.pushRequest(topicRequestOrg);
         }
     }
 
@@ -67,13 +63,12 @@ public class UserEventListener {
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {
             // topicService.create(TopicUtils.getOrgTopic(user.getOrgUid()), user.getUid());
-            //
             TopicRequest topicRequestOrg = TopicRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
                     .userUid(user.getUid())
                     .build();
             // topicRequestOrg.setUserUid(user.getUid());
-            topicCacheService.push(JSON.toJSONString(topicRequestOrg));
+            topicCacheService.pushRequest(topicRequestOrg);
         }
     }
 
