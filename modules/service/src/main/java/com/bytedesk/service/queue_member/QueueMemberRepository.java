@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 10:09:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:47:40
+ * @LastEditTime: 2025-04-08 11:52:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
     List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndResolved(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean resolved);
     
-    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndAcceptType(String orgUid, LocalDateTime startTime, LocalDateTime endTime, String acceptType);
+    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndAgentAcceptType(String orgUid, LocalDateTime startTime, LocalDateTime endTime, String acceptType);
     // 修改查询方法，使用 JPQL 通过关联的 Thread 实体的 uid 字段查询
     @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid")
     Optional<QueueMemberEntity> findByThreadUid(@Param("threadUid") String threadUid);
