@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:31:19
+ * @LastEditTime: 2025-04-08 18:59:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,17 +64,37 @@ public class ThreadEntity extends AbstractThreadEntity {
     @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
     private List<MessageEntity> messages = new ArrayList<>();
 
-    //
-    public Boolean isClosed() {
-        return getStatus().equals(ThreadProcessStatusEnum.CLOSED.name());
-    }
-
     public Boolean isNew() {
         return getStatus().equals(ThreadProcessStatusEnum.NEW.name());
     }
 
+    // ROBOTING
+    public Boolean isRoboting() {
+        return getStatus().equals(ThreadProcessStatusEnum.ROBOTING.name());
+    }
+
+    // LLMING
+    public Boolean isLlmIng() {
+        return getStatus().equals(ThreadProcessStatusEnum.LLMING.name());
+    }
+
+    // queuing
+    public Boolean isQueuing() {
+        return getStatus().equals(ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    // is offline
+    public Boolean isOffline() {
+        return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
+    }
+
     public Boolean isChatting() {
         return getStatus().equals(ThreadProcessStatusEnum.CHATTING.name());
+    }
+
+    //
+    public Boolean isClosed() {
+        return getStatus().equals(ThreadProcessStatusEnum.CLOSED.name());
     }
 
     // is transfer pending
@@ -121,10 +141,6 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
     }
 
-    public Boolean isQueuing() {
-        return getStatus().equals(ThreadProcessStatusEnum.QUEUING.name());
-    }
-
     public Boolean isCustomerService() {
         return getType().equals(ThreadTypeEnum.AGENT.name())
                 || getType().equals(ThreadTypeEnum.WORKGROUP.name())
@@ -168,14 +184,14 @@ public class ThreadEntity extends AbstractThreadEntity {
      * 将当前会话标记为离线状态
      */
     public ThreadEntity setOffline() {
-        // setStatus(ThreadProcessStatusEnum.OFFLINE.name());
-        setOffline(true);
+        setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+        // setOffline(true);
         return this;
     }
 
     public ThreadEntity setOnline() {
-        // setStatus(ThreadProcessStatusEnum.OFFLINE.name());
-        setOffline(false);
+        setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+        // setOffline(false);
         return this;
     }
 
@@ -208,6 +224,10 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     public Boolean isAgentRobot() {
         return getAgentProtobuf() != null && getAgentProtobuf().getType().equals(UserTypeEnum.ROBOT.name());
+    }
+
+    public UserProtobuf getRobotProtobuf() {
+        return JSON.parseObject(getRobot(), UserProtobuf.class);
     }
 
     public UserProtobuf getWorkgroupProtobuf() {

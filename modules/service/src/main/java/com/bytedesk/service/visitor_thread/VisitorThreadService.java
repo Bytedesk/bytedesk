@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:54:51
+ * @LastEditTime: 2025-04-08 18:46:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -189,7 +189,8 @@ public class VisitorThreadService
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.ROBOT.name())
-                .agent(robotString)
+                // .agent(robotString) // 人工客服
+                .robot(robotString) // 机器人
                 .userUid(robot.getUid()) // 机器人uid
                 .user(visitor)
                 .client(visitorRequest.getClient())
@@ -209,7 +210,8 @@ public class VisitorThreadService
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
-        thread.setAgent(robotString);
+        // thread.setAgent(robotString); // 人工客服
+        thread.setRobot(robotString); // 机器人
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {
