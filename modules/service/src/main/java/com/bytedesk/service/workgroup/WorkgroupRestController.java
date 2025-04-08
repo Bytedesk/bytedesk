@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:57:53
+ * @LastEditTime: 2025-04-08 17:13:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,8 +55,10 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     // @PreAuthorize("hasAuthority('WORKGROUP_READ')")
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        WorkgroupResponse workgroup = workgroupService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_CREATE')")

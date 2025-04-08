@@ -75,6 +75,15 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         return queryByOrg(request);
     }
 
+    public WorkgroupResponse queryByUid(WorkgroupRequest request) {
+        Optional<WorkgroupEntity> workgroupOptional = findByUid(request.getUid());
+        if (!workgroupOptional.isPresent()) {
+            throw new RuntimeException(request.getUid() + " is not found.");
+        }
+        WorkgroupEntity workgroup = workgroupOptional.get();
+        return convertToResponse(workgroup);
+    }
+
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
         // 判断uid是否已经存储，如果已经存在，则不创建新的workgroup
