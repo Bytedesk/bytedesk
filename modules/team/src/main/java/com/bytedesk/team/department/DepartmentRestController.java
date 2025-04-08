@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 09:57:23
+ * @LastEditTime: 2025-04-08 15:58:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,7 +64,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize("hasAuthority('MEMBER_CREATE')")
-    @ActionAnnotation(title = "department", action = "新建", description = "create department")
+    @ActionAnnotation(title = "部门", action = "新建", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest departmentRequest) {
 
         DepartmentResponse department = departmentService.create(departmentRequest);
@@ -73,7 +73,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
-    @ActionAnnotation(title = "department", action = "更新", description = "update department")
+    @ActionAnnotation(title = "部门", action = "更新", description = "update department")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest departmentRequest) {
 
         DepartmentResponse department = departmentService.update(departmentRequest);
@@ -82,7 +82,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize("hasAuthority('MEMBER_DELETE')")
-    @ActionAnnotation(title = "department", action = "删除", description = "delete department")
+    @ActionAnnotation(title = "部门", action = "删除", description = "delete department")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest departmentRequest) {
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:05:58
+ * @LastEditTime: 2025-04-08 15:58:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,7 +65,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "group", action = "新建", description = "create group")
+    @ActionAnnotation(title = "群组", action = "新建", description = "create group")
     @Override
     public ResponseEntity<?> create(@RequestBody GroupRequest request) {
         
@@ -74,7 +74,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "group", action = "更新", description = "update group")
+    @ActionAnnotation(title = "群组", action = "更新", description = "update group")
     @Override
     public ResponseEntity<?> update(@RequestBody GroupRequest request) {
 
@@ -83,7 +83,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "group", action = "invite", description = "invite group")
+    @ActionAnnotation(title = "群组", action = "invite", description = "invite group")
     @PostMapping("/invite")
     public ResponseEntity<?> invite(@RequestBody GroupRequest request) {
         // TODO: 待完善
@@ -91,7 +91,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
     
-    @ActionAnnotation(title = "group", action = "join", description = "join group")
+    @ActionAnnotation(title = "群组", action = "join", description = "join group")
     @PostMapping("/join")
     public ResponseEntity<?> join(@RequestBody GroupRequest request) {
         // TODO: 待完善
@@ -99,7 +99,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "kick", description = "kick group")
+    @ActionAnnotation(title = "群组", action = "kick", description = "kick group")
     @PostMapping("/kick")
     public ResponseEntity<?> kick(@RequestBody GroupRequest request) {
         // TODO: 待完善, 将用户踢出/移出群组
@@ -107,7 +107,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "leave", description = "leave group")
+    @ActionAnnotation(title = "群组", action = "leave", description = "leave group")
     @PostMapping("/leave")
     public ResponseEntity<?> leave(@RequestBody GroupRequest request) {
         // TODO: 待完善
@@ -115,7 +115,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "dismiss", description = "dismiss group")
+    @ActionAnnotation(title = "群组", action = "dismiss", description = "dismiss group")
     @PostMapping("/dismiss")
     public ResponseEntity<?> dismiss(@RequestBody GroupRequest request) {
 
@@ -124,7 +124,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "删除", description = "delete group")
+    @ActionAnnotation(title = "群组", action = "删除", description = "delete group")
     @Override
     public ResponseEntity<?> delete(@RequestBody GroupRequest request) {
         
@@ -133,7 +133,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "导出", description = "export group")
+    @ActionAnnotation(title = "群组", action = "导出", description = "export group")
     @Override
     public Object export(GroupRequest request, HttpServletResponse response) {
         // query data to export

@@ -79,7 +79,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_READ')")
-    @ActionAnnotation(title = "agent", action = "detail", description = "query agent profile")
+    @ActionAnnotation(title = "客服", action = "查询", description = "query agent profile")
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(AgentRequest request) {
 
@@ -89,7 +89,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_READ')")
-    // @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
+    // @ActionAnnotation(title = "客服", action = "syncCurrentThreadCount", description = "sync agent current thread count")
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
 
@@ -101,7 +101,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     @PreAuthorize("hasAuthority('AGENT_CREATE')")
-    @ActionAnnotation(title = "agent", action = "新建", description = "create agent")
+    @ActionAnnotation(title = "客服", action = "新建", description = "create agent")
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
@@ -114,7 +114,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     @PreAuthorize("hasAuthority('AGENT_UPDATE')")
-    @ActionAnnotation(title = "agent", action = "更新", description = "update agent")
+    @ActionAnnotation(title = "客服", action = "更新", description = "update agent")
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
@@ -125,7 +125,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
 
     // updateAvatar
     // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改头像，不需要权限限制
-    @ActionAnnotation(title = "agent", action = "updateAvatar", description = "update agent avatar")
+    @ActionAnnotation(title = "客服", action = "updateAvatar", description = "update agent avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody AgentRequest request) {
 
@@ -135,7 +135,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改在线状态，不需要权限限制
-    @ActionAnnotation(title = "agent", action = "updateStatus", description = "update agent status")
+    @ActionAnnotation(title = "客服", action = "updateStatus", description = "update agent status")
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody AgentRequest request) {
 
@@ -145,7 +145,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改自动回复，不需要权限限制
-    @ActionAnnotation(title = "agent", action = "updateAutoReply", description = "update agent autoreply")
+    @ActionAnnotation(title = "客服", action = "updateAutoReply", description = "update agent autoreply")
     @PostMapping("/update/autoreply")
     public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {
 
@@ -155,7 +155,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
     
     @PreAuthorize("hasAuthority('AGENT_DELETE')")
-    @ActionAnnotation(title = "agent", action = "删除", description = "delete agent")
+    @ActionAnnotation(title = "客服", action = "删除", description = "delete agent")
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
 
@@ -174,8 +174,8 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @BlackIpFilter(title = "black", action = "sendAgentSseMessage")
     @BlackUserFilter(title = "black", action = "sendAgentSseMessage")
-    @TabooJsonFilter(title = "taboo", action = "sendAgentSseMessage")
-    @ActionAnnotation(title = "agent", action = "sendAgentSseMessage", description = "sendAgentSseMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendAgentSseMessage")
+    @ActionAnnotation(title = "客服", action = "sendAgentSseMessage", description = "sendAgentSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendAgentSseMessage(@RequestParam(value = "message") String message) {
 

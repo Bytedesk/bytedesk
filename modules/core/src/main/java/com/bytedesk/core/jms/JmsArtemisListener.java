@@ -52,7 +52,7 @@ public class JmsArtemisListener {
 	// }
 
 	// topic pub sub
-	// @TabooJsonFilter(title = "taboo", action = "JmsArtemisListener")
+	// @TabooJsonFilter(title = "敏感词", action = "JmsArtemisListener")
 	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
 	public void receiveTopicMessage(String json) {
 		// log.info("jms receiveTopicMessage string {}", json);

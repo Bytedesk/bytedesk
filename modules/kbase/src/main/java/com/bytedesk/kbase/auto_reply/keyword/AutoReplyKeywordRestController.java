@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 12:59:32
+ * @LastEditTime: 2025-04-08 15:55:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "keyword", action = "新建", description = "create keyword")
+    @ActionAnnotation(title = "关键词", action = "新建", description = "create keyword")
     @Override
     public ResponseEntity<?> create(@RequestBody AutoReplyKeywordRequest request) {
         
@@ -66,7 +66,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "keyword", action = "更新", description = "update keyword")
+    @ActionAnnotation(title = "关键词", action = "更新", description = "update keyword")
     @Override
     public ResponseEntity<?> update(@RequestBody AutoReplyKeywordRequest request) {
         
@@ -75,7 +75,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "keyword", action = "删除", description = "delete keyword")
+    @ActionAnnotation(title = "关键词", action = "删除", description = "delete keyword")
     @Override
     public ResponseEntity<?> delete(@RequestBody AutoReplyKeywordRequest request) {
 
@@ -86,7 +86,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "keyword", action = "导出", description = "export keyword")
+    @ActionAnnotation(title = "关键词", action = "导出", description = "export keyword")
     @GetMapping("/export")
     public Object export(AutoReplyKeywordRequest request, HttpServletResponse response) {
         // query data to export

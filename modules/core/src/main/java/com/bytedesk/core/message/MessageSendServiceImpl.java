@@ -31,7 +31,7 @@ public class MessageSendServiceImpl implements IMessageSendService {
 
     @BlackIpFilter(title = "black", action = "sendJsonMessage")
     @BlackUserFilter(title = "black", action = "sendJsonMessage")
-    @TabooJsonFilter(title = "taboo", action = "sendJsonMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendJsonMessage")
     @Override
     public void sendJsonMessage(String json) {
         // log.debug("sendJsonMessage: {}", json);
@@ -40,7 +40,7 @@ public class MessageSendServiceImpl implements IMessageSendService {
 
     @BlackIpFilter(title = "black", action = "sendProtobufMessage")
     @BlackUserFilter(title = "black", action = "sendProtobufMessage")
-    @TabooProtobufFilter(title = "taboo", action = "sendProtobufMessage")
+    @TabooProtobufFilter(title = "敏感词", action = "sendProtobufMessage")
     @Override
     public void sendProtobufMessage(MessageProtobuf messageProtobuf) {
         String json = JSON.toJSONString(messageProtobuf);

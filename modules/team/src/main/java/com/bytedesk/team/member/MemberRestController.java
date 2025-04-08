@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 10:45:45
+ * @LastEditTime: 2025-04-08 15:58:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,7 +87,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_CREATE')")
-    @ActionAnnotation(title = "member", action = "新建", description = "create member")
+    @ActionAnnotation(title = "成员", action = "新建", description = "create member")
     @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest request) {
 
@@ -97,7 +97,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
-    @ActionAnnotation(title = "member", action = "更新", description = "update member")
+    @ActionAnnotation(title = "成员", action = "更新", description = "update member")
     @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest request) {
 
@@ -107,7 +107,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_DELETE')")
-    @ActionAnnotation(title = "member", action = "删除", description = "delete member")
+    @ActionAnnotation(title = "成员", action = "删除", description = "delete member")
     @Override
     public ResponseEntity<?> delete(@RequestBody MemberRequest request) {
 
@@ -117,7 +117,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_EXPORT')")
-    @ActionAnnotation(title = "member", action = "导出", description = "export member")
+    @ActionAnnotation(title = "成员", action = "导出", description = "export member")
     @GetMapping("/export")
     public Object export(MemberRequest request, HttpServletResponse response) {
         // query data to export

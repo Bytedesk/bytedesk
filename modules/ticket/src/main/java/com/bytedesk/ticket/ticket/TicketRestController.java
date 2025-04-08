@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 16:03:57
+ * @LastEditTime: 2025-04-08 16:00:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,6 +97,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     @PreAuthorize("hasAuthority('TICKET_CREATE')")
+    @ActionAnnotation(title = "工单", action = "新建", description = "create ticket")
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
 
@@ -106,6 +107,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     @PreAuthorize("hasAuthority('TICKET_UPDATE')")
+    @ActionAnnotation(title = "工单", action = "更新", description = "update ticket")
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
 
@@ -115,6 +117,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     }
 
     @PreAuthorize("hasAuthority('TICKET_DELETE')")
+    @ActionAnnotation(title = "工单", action = "删除", description = "delete ticket")
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
 
@@ -138,7 +141,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @PreAuthorize("hasAuthority('TICKET_EXPORT')")
-    @ActionAnnotation(title = "ticket", action = "导出", description = "export ticket")
+    @ActionAnnotation(title = "工单", action = "导出", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
         // query data to export

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:28:46
+ * @LastEditTime: 2025-04-08 15:55:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,7 +67,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(faq));
     }
 
-    @ActionAnnotation(title = "faq", action = "新建", description = "create faq")
+    @ActionAnnotation(title = "常见问题", action = "新建", description = "create faq")
     @Override
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
@@ -77,7 +77,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
-    @ActionAnnotation(title = "faq", action = "更新", description = "update faq")
+    @ActionAnnotation(title = "常见问题", action = "更新", description = "update faq")
     @Override
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
@@ -87,7 +87,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
-    @ActionAnnotation(title = "faq", action = "删除", description = "delete faq")
+    @ActionAnnotation(title = "常见问题", action = "删除", description = "delete faq")
     @Override
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
@@ -99,7 +99,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "faq", action = "导出", description = "export faq")
+    @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")
     @GetMapping("/export")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     public Object export(FaqRequest request, HttpServletResponse response) {
