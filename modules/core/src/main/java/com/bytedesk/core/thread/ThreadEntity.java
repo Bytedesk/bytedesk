@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:59:26
+ * @LastEditTime: 2025-04-08 20:18:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import jakarta.persistence.*;
@@ -183,15 +182,37 @@ public class ThreadEntity extends AbstractThreadEntity {
     /**
      * 将当前会话标记为离线状态
      */
-    public ThreadEntity setOffline() {
-        setStatus(ThreadProcessStatusEnum.OFFLINE.name());
-        // setOffline(true);
+    // public ThreadEntity setOffline() {
+    //     setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+    //     // setOffline(true);
+    //     return this;
+    // }
+
+    // public ThreadEntity setOnline() {
+    //     setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+    //     // setOffline(false);
+    //     return this;
+    // }
+
+    // ---------------------------
+
+    public ThreadEntity setRoboting() {
+        setStatus(ThreadProcessStatusEnum.ROBOTING.name());
         return this;
     }
 
-    public ThreadEntity setOnline() {
+    public ThreadEntity setLlmIng() {
+        setStatus(ThreadProcessStatusEnum.LLMING.name());
+        return this;
+    }
+
+    public ThreadEntity setOffline() {
         setStatus(ThreadProcessStatusEnum.OFFLINE.name());
-        // setOffline(false);
+        return this;
+    }
+
+    public ThreadEntity setQueuing() {
+        setStatus(ThreadProcessStatusEnum.QUEUING.name());
         return this;
     }
 
@@ -205,10 +226,7 @@ public class ThreadEntity extends AbstractThreadEntity {
         return this;
     }
 
-    public ThreadEntity setQueuing() {
-        setStatus(ThreadProcessStatusEnum.QUEUING.name());
-        return this;
-    }
+    //--------------------------
 
     public ThreadProtobuf toProtobuf() {
         return ConvertUtils.convertToThreadProtobuf(this);
@@ -222,9 +240,9 @@ public class ThreadEntity extends AbstractThreadEntity {
         return JSON.parseObject(getAgent(), UserProtobuf.class);
     }
 
-    public Boolean isAgentRobot() {
-        return getAgentProtobuf() != null && getAgentProtobuf().getType().equals(UserTypeEnum.ROBOT.name());
-    }
+    // public Boolean isAgentRobot() {
+    //     return getAgentProtobuf() != null && getAgentProtobuf().getType().equals(UserTypeEnum.ROBOT.name());
+    // }
 
     public UserProtobuf getRobotProtobuf() {
         return JSON.parseObject(getRobot(), UserProtobuf.class);
