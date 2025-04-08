@@ -147,6 +147,9 @@ public class ThreadMessageEventListener {
         if (thread == null || message == null) {
             return;
         }
+        if (message.isFromSystem()) {
+            return;
+        }
         
         try {
             // 查找关联的队列成员记录
