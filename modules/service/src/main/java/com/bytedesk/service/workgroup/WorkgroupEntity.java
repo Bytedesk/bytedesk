@@ -129,7 +129,6 @@ public class WorkgroupEntity extends BaseEntity {
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
-
     /**
      * 获取可用客服
      * @return 可用客服列表
