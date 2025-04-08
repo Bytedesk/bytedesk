@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 12:18:52
+ * @LastEditTime: 2025-04-08 12:23:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
@@ -131,12 +130,12 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
                 entity.setUid(uidUtils.getUid());
             }
             // 如何将string类型startDate和endDate转换为LocalDateTime类型？
-            if (StringUtils.hasText(request.getStartDate())) {
-                entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
-            }
-            if (StringUtils.hasText(request.getEndDate())) {
-                entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
-            }
+            // if (StringUtils.hasText(request.getStartDate())) {
+            //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
+            // }
+            // if (StringUtils.hasText(request.getEndDate())) {
+            //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
+            // }
             // entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
             // 根据request.relatedFaqUids查找关联的FAQ
             List<FaqEntity> relatedFaqs = new ArrayList<>();
@@ -189,14 +188,14 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
             entity.setType(request.getType());
             entity.setEnabled(request.getEnabled());
             // 如何将string类型startDate和endDate转换为LocalDateTime类型？
-            if (StringUtils.hasText(request.getStartDate())) {
-                entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
-            }
-            if (StringUtils.hasText(request.getEndDate())) {
-                entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
-            }
-            // entity.setStartDate(request.getStartDate());
-            // entity.setEndDate(request.getEndDate());
+            // if (StringUtils.hasText(request.getStartDate())) {
+            //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
+            // }
+            // if (StringUtils.hasText(request.getEndDate())) {
+            //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
+            // }
+            entity.setStartDate(request.getStartDate());
+            entity.setEndDate(request.getEndDate());
             //
             entity.setCategoryUid(request.getCategoryUid());
             entity.setKbUid(request.getKbUid());
