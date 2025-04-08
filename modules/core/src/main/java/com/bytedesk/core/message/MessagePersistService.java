@@ -90,8 +90,8 @@ public class MessagePersistService {
             log.info("thread not found, uid: {}", threadUid);
             return;
         }
-        message.setThreadUid(threadUid);
-        message.setTopic(threadTopic);
+        // message.setThreadUid(threadUid);
+        // message.setTopic(threadTopic);
         message.setUser(messageProtobuf.getUser().toJson());
         message.setUserUid(messageProtobuf.getUser().getUid());
         // 

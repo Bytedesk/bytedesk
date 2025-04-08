@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 14:53:47
+ * @LastEditTime: 2025-04-08 18:39:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,8 @@ import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.topic.TopicUtils;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 
 public class MessageSpecification extends BaseSpecification {
@@ -31,24 +33,27 @@ public class MessageSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            // 
+            
+            // 获取thread关联，用于访问thread的属性
+            Join<Object, Object> threadJoin = root.join("thread", JoinType.LEFT);
+            
             if (StringUtils.hasText(request.getComponentType())) {
                 // 
                 if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
-                    // topic like '%group%' or topic like '%member%'
+                    // thread.topic like '%group%' or thread.topic like '%member%'
                     predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("topic"), "%group%"),
-                        criteriaBuilder.like(root.get("topic"), "%member%")
+                        criteriaBuilder.like(threadJoin.get("topic"), "%group%"),
+                        criteriaBuilder.like(threadJoin.get("topic"), "%member%")
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
-                    // topic like '%agent%' or topic like '%workgroup%'
+                    // thread.topic like '%agent%' or thread.topic like '%workgroup%'
                     predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("topic"), "%agent%"),
-                        criteriaBuilder.like(root.get("topic"), "%workgroup%")
+                        criteriaBuilder.like(threadJoin.get("topic"), "%agent%"),
+                        criteriaBuilder.like(threadJoin.get("topic"), "%workgroup%")
                     ));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
-                    // topic like '%robot%'
-                    predicates.add(criteriaBuilder.like(root.get("topic"), "%robot%"));
+                    // thread.topic like '%robot%'
+                    predicates.add(criteriaBuilder.like(threadJoin.get("topic"), "%robot%"));
                 } else if (TypeConsts.COMPONENT_TYPE_VISITOR.equals(request.getComponentType())) {
                     // 访客端查询消息：过滤掉一些消息类型，比如：TRANSFER, TRANSFER_ACCEPT, TRANSFER_REJECT
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.TRANSFER.name()));
@@ -72,18 +77,18 @@ public class MessageSpecification extends BaseSpecification {
             // 
             String topic = request.getTopic();
             if (StringUtils.hasText(topic)) {
-                Predicate topicPredicate = criteriaBuilder.equal(root.get("topic"), topic);
+                Predicate topicPredicate = criteriaBuilder.equal(threadJoin.get("topic"), topic);
                 if (TopicUtils.isOrgMemberTopic(topic)) {
                     String reverseTopic = TopicUtils.getOrgMemberTopicReverse(topic);
-                    Predicate reverseTopicPredicate = criteriaBuilder.equal(root.get("topic"), reverseTopic);
+                    Predicate reverseTopicPredicate = criteriaBuilder.equal(threadJoin.get("topic"), reverseTopic);
                     predicates.add(criteriaBuilder.or(topicPredicate, reverseTopicPredicate));
                 } else {
                     predicates.add(topicPredicate);
                 }
             }
-            // threadUid
+            // threadUid 替换为 thread.uid
             if (StringUtils.hasText(request.getThreadUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("threadUid"), request.getThreadUid()));
+                predicates.add(criteriaBuilder.equal(threadJoin.get("uid"), request.getThreadUid()));
             }
             // user.nickname
             if (StringUtils.hasText(request.getNickname())) {
