@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:21:56
+ * @LastEditTime: 2025-04-08 18:27:11
  * @Description: 消息实体抽象基类，用于统一所有消息类型的字段结构
  */
 package com.bytedesk.core.message;
@@ -52,10 +52,13 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Builder.Default
     private String client = ClientEnum.WEB.name();
 
+    // 使用thread代替topic和threadUid, 待去掉
+    @Deprecated
     /** message belongs to */
     @Column(name = "thread_topic")
     private String topic;
 
+    @Deprecated
     @Column(name = "thread_uid")
     private String threadUid;
 
