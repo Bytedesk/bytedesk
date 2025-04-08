@@ -72,11 +72,8 @@ public class TicketEntity extends BaseEntity {
     // 关联category，工单分类
     private String categoryUid;
 
-    // 使用UserProtobuf json格式化
-    // 一个工单一个工作组，一个工作组可以有多个工单
-    // @Builder.Default
-    // @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
+    private String workgroupUid; // 工作组
+
     private String departmentUid; // 部门
 
     // 统一使用member entity

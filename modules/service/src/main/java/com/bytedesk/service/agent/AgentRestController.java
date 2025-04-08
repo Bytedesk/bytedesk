@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 20:53:15
+ * @LastEditTime: 2025-04-08 14:48:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,7 +89,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_READ')")
-    @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
+    // @ActionAnnotation(title = "agent", action = "syncCurrentThreadCount", description = "sync agent current thread count")
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
 
