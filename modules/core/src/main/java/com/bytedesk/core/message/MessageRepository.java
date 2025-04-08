@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 13:16:05
+ * @LastEditTime: 2025-04-08 11:13:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,9 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
 
     // 根据threadUid查询最新一条消息
     Optional<MessageEntity> findFirstByThreadUidOrderByCreatedAtDesc(String threadUid);
+
+    // threadUid + type + user contains uid
+    Optional<MessageEntity> findFirstByThreadUidAndTypeAndUserContainsOrderByCreatedAtDesc(String threadUid, String type, String userUid);
 
     boolean existsByUid(String uid);
 }
