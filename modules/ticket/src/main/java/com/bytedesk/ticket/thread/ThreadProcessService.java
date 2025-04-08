@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 13:26:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 09:26:14
+ * @LastEditTime: 2025-04-08 09:40:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,18 +73,28 @@ public class ThreadProcessService {
                     if (ThreadConsts.ACTIVITY_TYPE_SEQUENCE_FLOW.equals(activity.getActivityType())) {
                         return false;
                     }
+                    
+                    // 特定活动始终显示，不过滤
+                    if ("agentsOfflineService".equals(activity.getActivityId()) || 
+                        "end".equals(activity.getActivityId())) {
+                        return true;
+                    }
+                    
                     // 过滤掉没有名称的活动
                     if (activity.getActivityName() == null || activity.getActivityName().trim().isEmpty()) {
                         return false;
                     }
+                    
                     // 过滤掉 transferToHumanTask 活动，除非它确实被执行了(有结束时间)
                     if (ThreadConsts.ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK.equals(activity.getActivityId()) && activity.getEndTime() == null) {
                         return false;
                     }
+                    
                     // 过滤掉没有实际执行的活动（开始时间为空）
                     if (activity.getStartTime() == null) {
                         return false;
                     }
+                    
                     return true;
                 })
                 .collect(Collectors.toList());
