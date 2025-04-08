@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:37:46
+ * @LastEditTime: 2025-04-08 15:54:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,7 +48,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 
 	private final UploadRestService uploadService;
 	
-	@ActionAnnotation(title = "upload", action = "uploadFile", description = "upload File")
+	@ActionAnnotation(title = "上传", action = "新建", description = "upload File")
 	@PostMapping("/file")
 	public ResponseEntity<?> uploadFile(
 			@RequestParam("file") MultipartFile file,
@@ -70,7 +70,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}
 
-	// @ActionAnnotation(title = "upload", action = "process", description = "process upload")
+	// @ActionAnnotation(title = "上传", action = "process", description = "process upload")
 	// @PostMapping("/process")
 	// public ResponseEntity<?> process(@RequestBody UploadRequest request) {
 
@@ -113,7 +113,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 		throw new UnsupportedOperationException("Unimplemented method 'update'");
 	}
 
-	@ActionAnnotation(title = "upload", action = "delete", description = "delete upload")
+	@ActionAnnotation(title = "上传", action = "删除", description = "delete upload")
 	@Override
 	public ResponseEntity<?> delete(UploadRequest request) {
 		// 更新数据库

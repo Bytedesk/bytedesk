@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:18:01
+ * @LastEditTime: 2025-04-08 15:53:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,7 +68,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(organizationService.convertToResponse(org.get())));
     }
 
-    @ActionAnnotation(title = "organization", action = "create", description = "organization create")
+    @ActionAnnotation(title = "组织", action = "新建", description = "organization create")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
         //
@@ -80,7 +80,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(org));
     }
 
-    @ActionAnnotation(title = "organization", action = "update", description = "organization update")
+    @ActionAnnotation(title = "组织", action = "更新", description = "organization update")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
         //

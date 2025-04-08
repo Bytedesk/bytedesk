@@ -61,7 +61,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
 
 
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
-    @ActionAnnotation(title = "quick_reply", action = "create", description = "create quick_reply")
+    @ActionAnnotation(title = "quick_reply", action = "新建", description = "create quick_reply")
     @Override
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
         
@@ -71,7 +71,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
-    @ActionAnnotation(title = "quick_reply", action = "update", description = "update quick_reply")
+    @ActionAnnotation(title = "quick_reply", action = "更新", description = "update quick_reply")
     @Override
     public ResponseEntity<?> update(@RequestBody QuickReplyRequest request) {
         
@@ -81,7 +81,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
-    @ActionAnnotation(title = "quick_reply", action = "delete", description = "delete quick_reply")
+    @ActionAnnotation(title = "quick_reply", action = "删除", description = "delete quick_reply")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
 
@@ -93,7 +93,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
-    @ActionAnnotation(title = "quickReply", action = "export", description = "export quickReply")
+    @ActionAnnotation(title = "quickReply", action = "导出", description = "export quickReply")
     @Override
     public Object export(QuickReplyRequest request, HttpServletResponse response) {
         // query data to export

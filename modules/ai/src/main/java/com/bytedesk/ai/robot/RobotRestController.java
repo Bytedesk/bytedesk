@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 15:48:51
+ * @LastEditTime: 2025-04-08 15:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,7 +67,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
     
     @PreAuthorize("hasAuthority('ROBOT_CREATE')")
-    @ActionAnnotation(title = "robot", action = "create", description = "create robot")
+    @ActionAnnotation(title = "机器人", action = "新建", description = "create robot")
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
 
@@ -78,7 +78,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     
     // 员工/客服创建智能体会话
     @PreAuthorize("hasAuthority('ROBOT_CREATE')")
-    @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
+    @ActionAnnotation(title = "机器人", action = "新建", description = "create robot thread")
     @PostMapping("/create/llm/thread")
     public ResponseEntity<?> createLlmThread(@RequestBody ThreadRequest request) {
         //
@@ -89,7 +89,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     // 创建客服助手会话
     // @PreAuthorize("hasAuthority('ROBOT_CREATE')")
-    // @ActionAnnotation(title = "robot", action = "create", description = "create robot thread")
+    // @ActionAnnotation(title = "机器人", action = "新建", description = "create robot thread")
     // @PostMapping("/create/assistant/thread")
     // public ResponseEntity<?> createAssistantThread(@RequestBody ThreadRequest request) {
     //     //
@@ -100,7 +100,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     // 创建智能体模板
     @PreAuthorize("hasAuthority('ROBOT_CREATE')")
-    @ActionAnnotation(title = "robot", action = "create", description = "create prompt robot")
+    // @ActionAnnotation(title = "机器人", action = "新建", description = "create prompt robot")
     @PostMapping("/create/prompt")
     public ResponseEntity<?> createPromptRobot(@RequestBody RobotRequest request) {
         //
@@ -110,7 +110,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
-    @ActionAnnotation(title = "robot", action = "update", description = "update robot")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot")
     @Override
     public ResponseEntity<?> update(@RequestBody RobotRequest request) {
 
@@ -121,7 +121,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
     // update avatar
     @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
-    @ActionAnnotation(title = "robot", action = "update", description = "update robot avatar")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody RobotRequest request) {
 
@@ -131,7 +131,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
-    @ActionAnnotation(title = "robot", action = "update", description = "update robot thread")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot thread")
     @PostMapping("/update/thread")
     public ResponseEntity<?> updateThread(@RequestBody ThreadRequest request) {
         //
@@ -141,7 +141,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
-    @ActionAnnotation(title = "robot", action = "update", description = "update prompt robot")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update prompt robot")
     @PostMapping("/update/prompt")
     public ResponseEntity<?> updatePromptRobot(@RequestBody RobotRequest request) {
 
@@ -151,7 +151,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     }
 
     @PreAuthorize("hasAuthority('ROBOT_DELETE')")
-    @ActionAnnotation(title = "robot", action = "delete", description = "delete robot")
+    @ActionAnnotation(title = "机器人", action = "删除", description = "delete robot")
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
         

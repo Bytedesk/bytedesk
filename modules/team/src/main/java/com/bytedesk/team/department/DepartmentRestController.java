@@ -64,7 +64,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize("hasAuthority('MEMBER_CREATE')")
-    @ActionAnnotation(title = "department", action = "create", description = "create department")
+    @ActionAnnotation(title = "department", action = "新建", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest departmentRequest) {
 
         DepartmentResponse department = departmentService.create(departmentRequest);
@@ -73,7 +73,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
-    @ActionAnnotation(title = "department", action = "update", description = "update department")
+    @ActionAnnotation(title = "department", action = "更新", description = "update department")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest departmentRequest) {
 
         DepartmentResponse department = departmentService.update(departmentRequest);
@@ -82,7 +82,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize("hasAuthority('MEMBER_DELETE')")
-    @ActionAnnotation(title = "department", action = "delete", description = "delete department")
+    @ActionAnnotation(title = "department", action = "删除", description = "delete department")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest departmentRequest) {
 

@@ -57,7 +57,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "keyword", action = "create", description = "create keyword")
+    @ActionAnnotation(title = "keyword", action = "新建", description = "create keyword")
     @Override
     public ResponseEntity<?> create(@RequestBody AutoReplyKeywordRequest request) {
         
@@ -66,7 +66,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "keyword", action = "update", description = "update keyword")
+    @ActionAnnotation(title = "keyword", action = "更新", description = "update keyword")
     @Override
     public ResponseEntity<?> update(@RequestBody AutoReplyKeywordRequest request) {
         
@@ -75,7 +75,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "keyword", action = "delete", description = "delete keyword")
+    @ActionAnnotation(title = "keyword", action = "删除", description = "delete keyword")
     @Override
     public ResponseEntity<?> delete(@RequestBody AutoReplyKeywordRequest request) {
 
@@ -86,7 +86,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "keyword", action = "export", description = "export keyword")
+    @ActionAnnotation(title = "keyword", action = "导出", description = "export keyword")
     @GetMapping("/export")
     public Object export(AutoReplyKeywordRequest request, HttpServletResponse response) {
         // query data to export

@@ -146,7 +146,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "message", action = "export", description = "export message")
+    @ActionAnnotation(title = "消息", action = "导出", description = "export message")
     @GetMapping("/export")
     public Object export(MessageRequest request, HttpServletResponse response) {
         // query data to export

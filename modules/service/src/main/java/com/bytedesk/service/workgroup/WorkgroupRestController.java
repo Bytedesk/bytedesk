@@ -60,7 +60,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_CREATE')")
-    @ActionAnnotation(title = "workgroup", action = "create", description = "create workgroup")
+    @ActionAnnotation(title = "workgroup", action = "新建", description = "create workgroup")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupService.create(request);
@@ -69,7 +69,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "workgroup", action = "update", description = "update workgroup")
+    @ActionAnnotation(title = "workgroup", action = "更新", description = "update workgroup")
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupService.update(request);
@@ -100,7 +100,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_DELETE')")
-    @ActionAnnotation(title = "workgroup", action = "delete", description = "delete workgroup")
+    @ActionAnnotation(title = "workgroup", action = "删除", description = "delete workgroup")
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest request) {
 
         workgroupService.deleteByUid(request.getUid());

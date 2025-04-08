@@ -87,7 +87,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_CREATE')")
-    @ActionAnnotation(title = "member", action = "create", description = "create member")
+    @ActionAnnotation(title = "member", action = "新建", description = "create member")
     @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest request) {
 
@@ -97,7 +97,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
-    @ActionAnnotation(title = "member", action = "update", description = "update member")
+    @ActionAnnotation(title = "member", action = "更新", description = "update member")
     @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest request) {
 
@@ -107,7 +107,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_DELETE')")
-    @ActionAnnotation(title = "member", action = "delete", description = "delete member")
+    @ActionAnnotation(title = "member", action = "删除", description = "delete member")
     @Override
     public ResponseEntity<?> delete(@RequestBody MemberRequest request) {
 
@@ -117,7 +117,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     }
 
     @PreAuthorize("hasAuthority('MEMBER_EXPORT')")
-    @ActionAnnotation(title = "member", action = "export", description = "export member")
+    @ActionAnnotation(title = "member", action = "导出", description = "export member")
     @GetMapping("/export")
     public Object export(MemberRequest request, HttpServletResponse response) {
         // query data to export

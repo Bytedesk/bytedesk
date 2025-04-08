@@ -67,7 +67,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(faq));
     }
 
-    @ActionAnnotation(title = "faq", action = "create", description = "create faq")
+    @ActionAnnotation(title = "faq", action = "新建", description = "create faq")
     @Override
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
@@ -77,7 +77,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
-    @ActionAnnotation(title = "faq", action = "update", description = "update faq")
+    @ActionAnnotation(title = "faq", action = "更新", description = "update faq")
     @Override
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
@@ -87,7 +87,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
-    @ActionAnnotation(title = "faq", action = "delete", description = "delete faq")
+    @ActionAnnotation(title = "faq", action = "删除", description = "delete faq")
     @Override
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
@@ -99,7 +99,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "faq", action = "export", description = "export faq")
+    @ActionAnnotation(title = "faq", action = "导出", description = "export faq")
     @GetMapping("/export")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     public Object export(FaqRequest request, HttpServletResponse response) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:40:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:34:44
+ * @LastEditTime: 2025-04-08 15:52:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.EasyExcel;
-import com.bytedesk.core.annotation.ActionAnnotation;
+// import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
@@ -71,7 +71,7 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "action", action = "export", description = "export action")
+    // @ActionAnnotation(title = "action", action = "导出", description = "export action")
     @GetMapping("/export")
     public Object export(ActionRequest request, HttpServletResponse response) {
         // query data to export

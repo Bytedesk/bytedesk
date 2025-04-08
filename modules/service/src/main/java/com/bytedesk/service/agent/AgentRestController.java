@@ -101,7 +101,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     @PreAuthorize("hasAuthority('AGENT_CREATE')")
-    @ActionAnnotation(title = "agent", action = "create", description = "create agent")
+    @ActionAnnotation(title = "agent", action = "新建", description = "create agent")
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
@@ -114,7 +114,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     @PreAuthorize("hasAuthority('AGENT_UPDATE')")
-    @ActionAnnotation(title = "agent", action = "update", description = "update agent")
+    @ActionAnnotation(title = "agent", action = "更新", description = "update agent")
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
@@ -155,7 +155,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
     
     @PreAuthorize("hasAuthority('AGENT_DELETE')")
-    @ActionAnnotation(title = "agent", action = "delete", description = "delete agent")
+    @ActionAnnotation(title = "agent", action = "删除", description = "delete agent")
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
 
