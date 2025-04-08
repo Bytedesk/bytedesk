@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,11 +33,16 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
 
     Optional<MessageEntity> findByUid(String uid);
 
-    // 根据threadUid查询最新一条消息
-    Optional<MessageEntity> findFirstByThreadUidOrderByCreatedAtDesc(String threadUid);
+    // 根据thread.uid查询最新一条消息
+    @Query("SELECT m FROM MessageEntity m JOIN m.thread t WHERE t.uid = :threadUid ORDER BY m.createdAt DESC")
+    Optional<MessageEntity> findFirstByThreadUidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
 
-    // threadUid + type + user contains uid
-    Optional<MessageEntity> findFirstByThreadUidAndTypeAndUserContainsOrderByCreatedAtDesc(String threadUid, String type, String userUid);
+    // thread.uid + type + user contains uid
+    @Query("SELECT m FROM MessageEntity m JOIN m.thread t WHERE t.uid = :threadUid AND m.type = :type AND m.user LIKE %:userUid% ORDER BY m.createdAt DESC")
+    Optional<MessageEntity> findFirstByThreadUidAndTypeAndUserContainsOrderByCreatedAtDesc(
+            @Param("threadUid") String threadUid, 
+            @Param("type") String type, 
+            @Param("userUid") String userUid);
 
     boolean existsByUid(String uid);
 }
