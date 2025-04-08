@@ -159,8 +159,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
         // 更新排队状态，待优化
-        queueMemberEntity.setAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);

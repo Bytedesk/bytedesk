@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-06 10:15:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 17:11:45
+ * @LastEditTime: 2025-04-08 11:42:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -118,12 +118,12 @@ public class ThreadMessageEventListener {
             LocalDateTime now = LocalDateTime.now();
             
             // 更新首次消息时间（如果尚未设置）
-            if (queueMember.getFirstMessageTime() == null) {
-                queueMember.setFirstMessageTime(now);
+            if (queueMember.getVisitorFirstMessageTime() == null) {
+                queueMember.setVisitorFirstMessageTime(now);
             }
             
             // 更新最后一次访客消息时间
-            queueMember.setLastMessageTime(now);
+            queueMember.setVisitorLastMessageTime(now);
             
             // 更新访客消息计数
             queueMember.setVisitorMessageCount(queueMember.getVisitorMessageCount() + 1);
@@ -166,40 +166,40 @@ public class ThreadMessageEventListener {
             queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
             
             // 如果是首次响应，记录首次响应时间
-            if (!queueMember.isFirstResponse() && queueMember.getLastMessageTime() != null) {
-                queueMember.setFirstResponse(true);
-                queueMember.setFirstResponseTime(now);
+            if (!queueMember.isAgentFirstResponse() && queueMember.getVisitorLastMessageTime() != null) {
+                queueMember.setAgentFirstResponse(true);
+                queueMember.setAgentFirstResponseTime(now);
                 
                 // 计算首次响应时间（秒）
-                long responseTimeInSeconds = Duration.between(queueMember.getLastMessageTime(), now).getSeconds();
-                queueMember.setMaxResponseTime((int) responseTimeInSeconds);
-                queueMember.setAvgResponseTime((int) responseTimeInSeconds);
-            } else if (queueMember.getLastMessageTime() != null) {
+                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageTime(), now).getSeconds();
+                queueMember.setAgentMaxResponseTime((int) responseTimeInSeconds);
+                queueMember.setAgentAvgResponseTime((int) responseTimeInSeconds);
+            } else if (queueMember.getVisitorLastMessageTime() != null) {
                 // 非首次响应，更新平均和最大响应时间
-                long responseTimeInSeconds = Duration.between(queueMember.getLastMessageTime(), now).getSeconds();
+                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageTime(), now).getSeconds();
                 
                 // 更新最大响应时间
-                if (responseTimeInSeconds > queueMember.getMaxResponseTime()) {
-                    queueMember.setMaxResponseTime((int) responseTimeInSeconds);
+                if (responseTimeInSeconds > queueMember.getAgentMaxResponseTime()) {
+                    queueMember.setAgentMaxResponseTime((int) responseTimeInSeconds);
                 }
                 
                 // 更新平均响应时间 - 使用累计平均计算方法
                 // (currentAvg * (messageCount-1) + newValue) / messageCount
                 int messageCount = queueMember.getAgentMessageCount();
                 if (messageCount > 1) { // 避免除以零
-                    int currentTotal = queueMember.getAvgResponseTime() * (messageCount - 1);
-                    queueMember.setAvgResponseTime((currentTotal + (int) responseTimeInSeconds) / messageCount);
+                    int currentTotal = queueMember.getAgentAvgResponseTime() * (messageCount - 1);
+                    queueMember.setAgentAvgResponseTime((currentTotal + (int) responseTimeInSeconds) / messageCount);
                 }
             }
             
             // 更新最后响应时间
-            queueMember.setLastResponseTime(now);
+            queueMember.setAgentLastResponseTime(now);
             
             // 保存更新
             queueMemberRestService.save(queueMember);
             log.debug("已更新队列成员客服消息统计: threadUid={}, agentMsgCount={}, avgResponseTime={}s, maxResponseTime={}s", 
                     thread.getUid(), queueMember.getAgentMessageCount(), 
-                    queueMember.getAvgResponseTime(), queueMember.getMaxResponseTime());
+                    queueMember.getAgentAvgResponseTime(), queueMember.getAgentMaxResponseTime());
         } catch (Exception e) {
             log.error("更新客服消息统计时出错: {}", e.getMessage(), e);
         }

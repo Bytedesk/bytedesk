@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 16:59:30
+ * @LastEditTime: 2025-04-08 11:39:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,8 +112,8 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 更新排队状态
-        queueMemberEntity.setAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         // 
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));

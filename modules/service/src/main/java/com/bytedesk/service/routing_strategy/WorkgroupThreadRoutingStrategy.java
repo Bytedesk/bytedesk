@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:13:57
+ * @LastEditTime: 2025-04-08 11:21:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -197,7 +197,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setChatting().setContent(content).setUnreadCount(1).setOwner(agent.getMember().getUser());
+        thread.setOnline().setChatting().setContent(content).setUnreadCount(1).setOwner(agent.getMember().getUser());
         //
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
@@ -206,8 +206,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread");
         }
         // 客服接待
-        queueMemberEntity.setAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, savedThread);
@@ -239,7 +239,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
         // 进入排队队列
         thread.setUserUid(agent.getUid());
-        thread.setQueuing().setContent(content).setUnreadCount(0);
+        thread.setOnline().setQueuing().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -333,8 +333,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 更新排队状态
-        queueMemberEntity.setAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
+        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         //
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));

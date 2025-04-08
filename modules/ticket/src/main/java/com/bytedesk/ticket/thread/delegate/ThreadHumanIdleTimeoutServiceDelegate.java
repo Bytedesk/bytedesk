@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 14:20:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 21:52:50
+ * @LastEditTime: 2025-04-08 11:40:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -120,8 +120,8 @@ public class ThreadHumanIdleTimeoutServiceDelegate implements JavaDelegate {
                 QueueMemberEntity queueMember = optionalQueueMember.get();
                 
                 // 设置人工客服超时时间和超时标志
-                queueMember.setHumanTimeoutAt(LocalDateTime.now());
-                queueMember.setTimeout(true);
+                queueMember.setAgentTimeoutAt(LocalDateTime.now());
+                queueMember.setAgentTimeout(true);
                 
                 // 保存更新
                 queueMemberRestService.save(queueMember);
