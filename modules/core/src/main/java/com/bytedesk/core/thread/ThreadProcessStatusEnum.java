@@ -22,8 +22,8 @@ public enum ThreadProcessStatusEnum {
     NEW, // 新会话
     ROBOTING, // 机器人接待中，外部会话
     LLMING, // 大模型对话中，内部会话
+    OFFLINE, // 客服离线
     QUEUING, // 排队中
-    OFFLINE, // 离线
     CHATTING, // 对话中
     CLOSED, // 会话已结束
     ;

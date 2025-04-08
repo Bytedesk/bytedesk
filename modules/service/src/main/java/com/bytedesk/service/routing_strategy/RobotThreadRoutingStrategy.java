@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:39:03
+ * @LastEditTime: 2025-04-08 20:16:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,7 +80,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
             // 
             if (threadOptional.get().isNew()) {
                 thread = threadOptional.get();
-            } else if (threadOptional.get().isChatting()) {
+            } else if (threadOptional.get().isRoboting()) {
                 thread = threadOptional.get();
                 // 
                 thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
@@ -105,7 +105,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
-        thread.setChatting().setContent(content).setUnreadCount(0);
+        thread.setRoboting().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");

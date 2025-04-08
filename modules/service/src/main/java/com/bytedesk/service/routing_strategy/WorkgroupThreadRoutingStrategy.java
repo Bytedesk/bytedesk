@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:21:53
+ * @LastEditTime: 2025-04-08 20:18:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,7 +110,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 如果会话已经存在，并且是聊天状态
                 thread = threadOptional.get();
                 // 非强制转人工，继续会话，无论是否机器人
-                if (!visitorRequest.getForceAgent() && !thread.isAgentRobot()) {
+                if (!visitorRequest.getForceAgent() && !thread.isRoboting()) {
                     // 人工类型，继续会话
                     // 重新初始化会话，包括重置机器人状态等
                     thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
@@ -197,7 +197,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setOnline().setChatting().setContent(content).setUnreadCount(1).setOwner(agent.getMember().getUser());
+        thread.setChatting().setContent(content).setUnreadCount(1).setOwner(agent.getMember().getUser());
         //
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
@@ -239,7 +239,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
         // 进入排队队列
         thread.setUserUid(agent.getUid());
-        thread.setOnline().setQueuing().setContent(content).setUnreadCount(0);
+        thread.setQueuing().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -264,7 +264,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (content == null || content.isEmpty()) {
             content = "请稍后，客服会尽快回复您";
         }
-        thread.setClose().setOffline().setContent(content);
+        thread.setOffline().setContent(content);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");

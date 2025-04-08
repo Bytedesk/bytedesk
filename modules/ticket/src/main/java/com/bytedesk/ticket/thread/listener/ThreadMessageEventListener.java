@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-06 10:15:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:42:16
+ * @LastEditTime: 2025-04-08 20:18:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -234,7 +234,7 @@ public class ThreadMessageEventListener {
             Date now = new Date();
             
             // 更新流程变量，重置空闲计时器
-            if (thread.isRobotType() || thread.isAgentRobot()) {
+            if (thread.isRobotType() || thread.isRoboting()) {
                 // 重置机器人空闲计时器
                 runtimeService.setVariable(thread.getProcessInstanceId(), 
                         ThreadConsts.THREAD_VARIABLE_LAST_VISITOR_MESSAGE_TIME, now);
