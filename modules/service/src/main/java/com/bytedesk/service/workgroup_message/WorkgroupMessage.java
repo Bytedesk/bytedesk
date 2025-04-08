@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 11:32:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 21:37:02
+ * @LastEditTime: 2025-04-08 16:14:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,25 +15,17 @@ package com.bytedesk.service.workgroup_message;
 
 import com.bytedesk.core.message.AbstractMessageEntity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
-
 /**
  * 分表存储技能组客服消息
  * 同步message中客服消息，包括uid。用于查询技能组消息，减少message表压力
  */
-@Entity
-@Data
-@SuperBuilder
-@NoArgsConstructor // 添加无参构造函数
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-@Table(name = "bytedesk_service_workgroup_message")
+// @Entity
+// @Data
+// @SuperBuilder
+// @NoArgsConstructor // 添加无参构造函数
+// @Accessors(chain = true)
+// @EqualsAndHashCode(callSuper = true)
+// @Table(name = "bytedesk_service_workgroup_message")
 public class WorkgroupMessage extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
