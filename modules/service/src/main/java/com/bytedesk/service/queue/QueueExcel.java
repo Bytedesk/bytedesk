@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:58:58
+ * @LastEditTime: 2025-04-08 23:20:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,46 +43,24 @@ public class QueueExcel {
     @ColumnWidth(15)
     private String status;
 
-    @ExcelProperty(index = 5, value = "当前号码")
+    @ExcelProperty(index = 5, value = "请求服务人次")
     @ColumnWidth(10)
-    private Integer currentNumber;
+    private Integer newCount;
 
-    @ExcelProperty(index = 6, value = "等待人数")
+    @ExcelProperty(index = 6, value = "离线留言人次")
     @ColumnWidth(10)
-    private Integer waitingNumber;
+    private Integer offlineCount;
 
-    @ExcelProperty(index = 7, value = "服务中人数")
+    @ExcelProperty(index = 7, value = "当前等待中人次")
     @ColumnWidth(10)
-    private Integer servingNumber;
+    private Integer queuingCount;
 
-    @ExcelProperty(index = 8, value = "已完成人数")
+    @ExcelProperty(index = 8, value = "服务中人次")
     @ColumnWidth(10)
-    private Integer servedNumber;
+    private Integer chattingCount;
 
-    @ExcelProperty(index = 9, value = "平均等待时间(秒)")
-    @ColumnWidth(15)
-    private Integer avgWaitTime;
+    @ExcelProperty(index = 9, value = "服务结束人次")
+    @ColumnWidth(10)
+    private Integer closedCount;
 
-    @ExcelProperty(index = 10, value = "平均解决时间(秒)")
-    @ColumnWidth(15)
-    private Integer avgSolveTime;
-
-    /**
-     * 从QueueEntity创建QueueExcel
-     */
-    // public static QueueExcel from(QueueEntity queue) {
-    //     QueueExcel excel = new QueueExcel();
-    //     excel.setNickname(queue.getNickname());
-    //     excel.setType(queue.getType());
-    //     excel.setTopic(queue.getTopic());
-    //     excel.setDay(queue.getDay());
-    //     excel.setStatus(queue.getStatus());
-    //     excel.setCurrentNumber(queue.getCurrentNumber());
-    //     excel.setWaitingNumber(queue.getWaitingNumber());
-    //     excel.setServingNumber(queue.getServingNumber());
-    //     excel.setServedNumber(queue.getServedNumber());
-    //     excel.setAvgWaitTime(queue.getAvgWaitTime());
-    //     excel.setAvgSolveTime(queue.getAvgSolveTime());
-    //     return excel;
-    // }
 }
