@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:57:07
+ * @LastEditTime: 2025-04-08 08:52:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,12 +58,8 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
             throw new RuntimeException("User not found");
         }
         // set user uid
-
-        Pageable pageable = request.getPageable();
-        Specification<QueueEntity> specification = QueueSpecification.search(request);
-        Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
-
-        return page.map(this::convertToResponse);
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")
@@ -109,7 +105,6 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
             QueueEntity entity = queueOptional.get();
             // modelMapper.map(request, entity);
             entity.setUid(request.getUid());
-            // entity.setThreadTopics(request.getThreadTopics());
             //
             return convertToResponse(save(entity));
         }
