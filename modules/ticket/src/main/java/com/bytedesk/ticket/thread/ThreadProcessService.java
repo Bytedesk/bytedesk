@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 13:26:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 09:40:34
+ * @LastEditTime: 2025-04-08 09:44:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,8 +75,8 @@ public class ThreadProcessService {
                     }
                     
                     // 特定活动始终显示，不过滤
-                    if ("agentsOfflineService".equals(activity.getActivityId()) || 
-                        "end".equals(activity.getActivityId())) {
+                    if (ThreadConsts.ACTIVITY_ID_AGENTS_OFFLINE_SERVICE.equals(activity.getActivityId()) || 
+                        ThreadConsts.ACTIVITY_ID_END.equals(activity.getActivityId())) {
                         return true;
                     }
                     
