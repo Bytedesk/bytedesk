@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 10:46:22
+ * @LastEditTime: 2025-04-08 18:48:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,8 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(thread.getAgent())
+                // .user(thread.getAgent())
+                .user(thread.getRobot())
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
                 .createdAt(LocalDateTime.now())
