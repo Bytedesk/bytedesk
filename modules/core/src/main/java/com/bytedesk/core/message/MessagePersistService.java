@@ -25,6 +25,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.notice.NoticeRestService;
 import com.bytedesk.core.notice.extra.NoticeExtraInvite;
 import com.bytedesk.core.notice.extra.NoticeExtraTransfer;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -38,6 +40,8 @@ public class MessagePersistService {
     private final MessageRestService messageRestService;
 
     private final NoticeRestService noticeRestService;
+
+    private final ThreadRestService threadRestService;
 
     private final ModelMapper modelMapper;
 
@@ -77,6 +81,14 @@ public class MessagePersistService {
         MessageEntity message = modelMapper.map(messageProtobuf, MessageEntity.class);
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
+        }
+        Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
+        if (threadOpt.isPresent()) {
+            ThreadEntity thread = threadOpt.get();
+            message.setThread(thread);
+        } else {
+            log.info("thread not found, uid: {}", threadUid);
+            return;
         }
         message.setThreadUid(threadUid);
         message.setTopic(threadTopic);
