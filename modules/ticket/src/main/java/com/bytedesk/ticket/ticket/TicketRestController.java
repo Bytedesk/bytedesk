@@ -138,7 +138,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @PreAuthorize("hasAuthority('TICKET_EXPORT')")
-    @ActionAnnotation(title = "ticket", action = "export", description = "export ticket")
+    @ActionAnnotation(title = "ticket", action = "导出", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
         // query data to export

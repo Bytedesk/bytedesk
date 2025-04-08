@@ -65,7 +65,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "group", action = "create", description = "create group")
+    @ActionAnnotation(title = "group", action = "新建", description = "create group")
     @Override
     public ResponseEntity<?> create(@RequestBody GroupRequest request) {
         
@@ -74,7 +74,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "group", action = "update", description = "update group")
+    @ActionAnnotation(title = "group", action = "更新", description = "update group")
     @Override
     public ResponseEntity<?> update(@RequestBody GroupRequest request) {
 
@@ -124,7 +124,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "delete", description = "delete group")
+    @ActionAnnotation(title = "group", action = "删除", description = "delete group")
     @Override
     public ResponseEntity<?> delete(@RequestBody GroupRequest request) {
         
@@ -133,7 +133,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "group", action = "export", description = "export group")
+    @ActionAnnotation(title = "group", action = "导出", description = "export group")
     @Override
     public Object export(GroupRequest request, HttpServletResponse response) {
         // query data to export

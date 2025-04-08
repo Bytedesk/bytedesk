@@ -54,7 +54,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "taboo_message", action = "create", description = "create taboo_message")
+    @ActionAnnotation(title = "taboo_message", action = "新建", description = "create taboo_message")
     @Override
     public ResponseEntity<?> create(TabooMessageRequest request) {
         
@@ -63,7 +63,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
         return ResponseEntity.ok(JsonResult.success(taboo_message));
     }
 
-    @ActionAnnotation(title = "taboo_message", action = "update", description = "update taboo_message")
+    @ActionAnnotation(title = "taboo_message", action = "更新", description = "update taboo_message")
     @Override
     public ResponseEntity<?> update(TabooMessageRequest request) {
         
@@ -72,7 +72,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
         return ResponseEntity.ok(JsonResult.success(taboo_message));
     }
 
-    @ActionAnnotation(title = "taboo_message", action = "delete", description = "delete taboo_message")
+    @ActionAnnotation(title = "taboo_message", action = "删除", description = "delete taboo_message")
     @Override
     public ResponseEntity<?> delete(TabooMessageRequest request) {
         
@@ -83,7 +83,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
     
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "taboo_message", action = "export", description = "export taboo_message")
+    @ActionAnnotation(title = "taboo_message", action = "导出", description = "export taboo_message")
     @Override
     public Object export(TabooMessageRequest request, HttpServletResponse response) {
         // query data to export

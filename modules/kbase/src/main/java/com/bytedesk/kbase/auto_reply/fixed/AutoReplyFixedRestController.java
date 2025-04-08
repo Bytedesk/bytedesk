@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:39:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 12:59:17
+ * @LastEditTime: 2025-04-08 15:54:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,7 +84,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "autoReply", action = "export", description = "export autoReply")
+    @ActionAnnotation(title = "自动回复", action = "导出", description = "export autoReply")
     @GetMapping("/export")
     public Object export(AutoReplyFixedRequest request, HttpServletResponse response) {
         // query data to export

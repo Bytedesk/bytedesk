@@ -67,7 +67,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
     }
 
     @PreAuthorize("hasRole('SUPER')")
-    @ActionAnnotation(title = "user", action = "create", description = "create user info")
+    @ActionAnnotation(title = "user", action = "新建", description = "create user info")
     @Override
     public ResponseEntity<?> create(UserRequest request) {
         
@@ -77,7 +77,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
     }
 
     @PreAuthorize("hasRole('SUPER')")
-    @ActionAnnotation(title = "user", action = "update", description = "update user info")
+    @ActionAnnotation(title = "user", action = "更新", description = "update user info")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
 
@@ -87,7 +87,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
     }
 
     @PreAuthorize("hasRole('SUPER')")
-    @ActionAnnotation(title = "user", action = "delete", description = "delete user info")
+    @ActionAnnotation(title = "user", action = "删除", description = "delete user info")
     @Override
     public ResponseEntity<?> delete(UserRequest request) {
         

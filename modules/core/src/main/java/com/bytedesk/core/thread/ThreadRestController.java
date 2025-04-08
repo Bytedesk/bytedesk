@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 15:58:54
+ * @LastEditTime: 2025-04-08 15:54:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,7 +97,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.error("not found"));
     }
 
-    @ActionAnnotation(title = "thread", action = "create", description = "create thread")
+    @ActionAnnotation(title = "会话", action = "新建", description = "create thread")
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
@@ -106,7 +106,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(thread));
     }
 
-    @ActionAnnotation(title = "thread", action = "update", description = "update thread")
+    @ActionAnnotation(title = "会话", action = "更新", description = "update thread")
     @Override
     public ResponseEntity<?> update(@RequestBody ThreadRequest request) {
 
@@ -169,7 +169,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    @ActionAnnotation(title = "thread", action = "close", description = "close thread")
+    @ActionAnnotation(title = "会话", action = "close", description = "close thread")
     @PostMapping("/close")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
 
@@ -188,7 +188,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success("delete thread success"));
     }
 
-    @ActionAnnotation(title = "thread", action = "accept", description = "accept thread")
+    @ActionAnnotation(title = "会话", action = "accept", description = "accept thread")
     @PostMapping("/accept")
     public ResponseEntity<?> acceptByAgent (@RequestBody ThreadRequest request) {
         
@@ -199,7 +199,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "thread", action = "export", description = "export thread")
+    @ActionAnnotation(title = "会话", action = "导出", description = "export thread")
     @GetMapping("/export")
     public Object export(ThreadRequest request, HttpServletResponse response) {
         // query data to export
