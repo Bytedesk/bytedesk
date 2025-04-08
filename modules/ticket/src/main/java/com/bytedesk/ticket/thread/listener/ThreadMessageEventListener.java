@@ -60,6 +60,9 @@ public class ThreadMessageEventListener {
         if (message == null) {
             return;
         }
+        if (message.isFromSystem()) {
+            return;
+        }
         
         log.debug("接收到新消息事件: messageUid={}, threadUid={}, content={}",
                 message.getUid(), message.getThreadUid(), message.getContent()); 

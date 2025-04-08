@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 14:18:32
+ * @LastEditTime: 2025-04-08 10:22:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
@@ -83,7 +82,7 @@ public class ThreadMessageUtil {
     // 将此方法设为静态，以便在没有实例化类的情况下调用
     public static MessageProtobuf getThreadWelcomeMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        UserProtobuf system = UserUtils.getSystemUser();
+        UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
@@ -107,7 +106,7 @@ public class ThreadMessageUtil {
 
     public static MessageProtobuf getAgentThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        UserProtobuf system = UserUtils.getSystemUser();
+        UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
@@ -172,7 +171,7 @@ public class ThreadMessageUtil {
 
     public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        UserProtobuf system = UserUtils.getSystemUser();
+        UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
@@ -195,7 +194,7 @@ public class ThreadMessageUtil {
 
     public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
-        UserProtobuf system = UserUtils.getSystemUser();
+        UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()

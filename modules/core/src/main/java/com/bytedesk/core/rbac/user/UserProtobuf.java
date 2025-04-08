@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:07:40
+ * @LastEditTime: 2025-04-08 10:22:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,10 @@ package com.bytedesk.core.rbac.user;
 import java.io.Serializable;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,5 +56,25 @@ public class UserProtobuf implements Serializable {
 
     public String toJson() {
         return JSON.toJSONString(this);
+    }
+
+    public static UserProtobuf getSystemUser() {
+        return UserProtobuf.builder()
+                .uid(BytedeskConsts.DEFAULT_SYSTEM_UID)
+                .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
+                .avatar(AvatarConsts.getDefaultSystemNotificationAvatarUrl())
+                .type(UserTypeEnum.SYSTEM.name())
+                .build();
+    }
+
+    public static UserProtobuf getFileAssistantUser() {
+        return UserProtobuf.builder()
+                .uid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID)
+                .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
+                .avatar(AvatarConsts.getDefaultFileAssistantAvatarUrl())
+                .type(UserTypeEnum.SYSTEM.name())
+                .build();
+        // user.setUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
+        // return user;
     }
 }
