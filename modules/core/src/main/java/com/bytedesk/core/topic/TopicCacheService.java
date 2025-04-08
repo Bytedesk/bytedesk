@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:12:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-22 17:31:12
+ * @LastEditTime: 2025-04-08 22:40:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -30,15 +29,17 @@ import jakarta.annotation.PostConstruct;
 public class TopicCacheService {
 
     // 假设我们使用"myList"作为缓存中的键
-    String defaultCacheKey = "topicList";
+    private String topicRequestCacheKey = "topicRequestList";
 
-    // 创建一个缓存实例，设置过期时间为5天
-    private Cache<String, List<String>> topicCache;
+    private String clientIdCacheKey = "clientIdList";
+
+    // 创建一个缓存实例，设置过期时间为1天
+    private Cache<String, List<String>> topicRequestCache;
 
     @PostConstruct
     public void init() {
         // 初始化caffeineCache，设置缓存的最大大小、过期时间等参数
-        topicCache = Caffeine.newBuilder()
+        topicRequestCache = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.DAYS)
             .build(new CacheLoader<String, List<String>>() {
                 @Override
@@ -49,33 +50,37 @@ public class TopicCacheService {
             });
     }
 
-    // 模拟 push 操作：向列表中添加元素
-    public void push(String messageJSON) {
-        push(defaultCacheKey, messageJSON);
-    }
-
     public void pushRequest(TopicRequest request) {
-        push(JSON.toJSONString(request));
+        // push(JSON.toJSONString(request));
+        push(topicRequestCacheKey, request.toJson());
+    }
+
+    public void pushClientId(String clientId) {
+        push(clientIdCacheKey, clientId);
     }
 
     // 模拟 push 操作：向列表中添加元素
-    public void push(String listKey, String messageJSON) {
-        List<String> cachedList = topicCache.getIfPresent(listKey);
+    private void push(String listKey, String requestJson) {
+        List<String> cachedList = topicRequestCache.getIfPresent(listKey);
         if (cachedList == null) {
             // 如果缓存中没有找到对应的键，则使用load方法初始化
             cachedList = new ArrayList<>();
         }
-        cachedList.add(messageJSON);
-        topicCache.put(listKey, cachedList);
+        cachedList.add(requestJson);
+        topicRequestCache.put(listKey, cachedList);
     }
 
     // 模拟 pop 操作：从列表中移除元素
-    public List<String> getList() {
-        return getList(defaultCacheKey);
+    public List<String> getTopicRequestList() {
+        return getList(topicRequestCacheKey);
     }
 
-    public List<String> getList(String listKey) {
-        List<String> cachedList = topicCache.getIfPresent(listKey);
+    public List<String> getClientIdList() {
+        return getList(clientIdCacheKey);
+    }
+
+    private List<String> getList(String listKey) {
+        List<String> cachedList = topicRequestCache.getIfPresent(listKey);
         if (cachedList != null && !cachedList.isEmpty()) {
             // 只需要返回一次即可
             remove(listKey);
@@ -85,15 +90,15 @@ public class TopicCacheService {
     }
 
     public void remove() {
-        remove(defaultCacheKey);
+        remove(topicRequestCacheKey);
     }
 
-    public void remove(String listKey) {
-        topicCache.invalidate(listKey);
+    private void remove(String listKey) {
+        topicRequestCache.invalidate(listKey);
     }
 
     public void clear() {
-        topicCache.invalidateAll();
+        topicRequestCache.invalidateAll();
     }
 
 }

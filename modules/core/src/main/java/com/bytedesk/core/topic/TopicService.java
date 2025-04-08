@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 17:12:47
+ * @LastEditTime: 2025-04-08 22:42:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -170,9 +170,12 @@ public class TopicService {
         }
     }
 
-    // 删除clientId
     @Transactional
-    private void doRemoveClientId(String clientId) {
+    public void removeClientId(String clientId) {
+        // TODO: 防止客户端频繁闪断重连的情况，延迟执行，防止频繁删除
+        // concurrentMap.put(clientId, clientId);
+        // doRemoveClientId(clientId);
+
         // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
@@ -185,12 +188,21 @@ public class TopicService {
         }
     }
 
-    @Async
-    public void removeClientId(String clientId) {
-        // TODO: 防止客户端频繁闪断重连的情况，延迟执行，防止频繁删除
-        // concurrentMap.put(clientId, clientId);
-        doRemoveClientId(clientId);
-    }
+
+    // 删除clientId
+    // @Transactional
+    // private void doRemoveClientId(String clientId) {  
+    //     // 用户clientId格式: userUid/client/deviceUid
+    //     Optional<TopicEntity> topicOptional = findByClientId(clientId);
+    //     if (topicOptional.isPresent()) {
+    //         TopicEntity topic = topicOptional.get();
+    //         if (topic.getClientIds().contains(clientId)) {
+    //             log.info("removeClientId: {}", clientId);
+    //             topic.getClientIds().remove(clientId);
+    //             save(topic);
+    //         }
+    //     }
+    // }
 
     // 5分钟没有重连成功的话，就删除掉
     // @Scheduled(fixedDelay = 5 * 60 * 1000)
