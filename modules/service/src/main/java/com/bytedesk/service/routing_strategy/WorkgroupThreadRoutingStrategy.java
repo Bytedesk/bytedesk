@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 10:44:57
+ * @LastEditTime: 2025-04-08 11:13:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
@@ -322,6 +323,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";
         }
+        
         // 更新线程状态
         thread.setUserUid(robot.getUid());
         thread.setChatting().setContent(content).setUnreadCount(0);
@@ -338,7 +340,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
-        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
+        Optional<MessageEntity> messageOptional = messageRestService.findByThreadUidAndTypeAndUserContains(savedThread.getUid(), MessageTypeEnum.WELCOME.name(), robot.getUid());
         if (messageOptional.isPresent()) {
             MessageEntity message = messageOptional.get();
             if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
