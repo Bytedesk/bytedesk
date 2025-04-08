@@ -205,5 +205,11 @@ public class ThreadEntity extends AbstractThreadEntity {
         return JSON.parseObject(getExtra(), ThreadExtra.class);
     }
 
+    // 判断是否机器人转人工
+    public Boolean isRobotToAgent() {
+        // 
+        return false;
+    }
+
 
 }
