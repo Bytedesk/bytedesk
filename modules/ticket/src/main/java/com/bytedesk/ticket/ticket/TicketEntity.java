@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 12:11:55
+ * @LastEditTime: 2025-04-08 14:09:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,13 +53,6 @@ public class TicketEntity extends BaseEntity {
     // 非结构化内容
     private String description;     // 工单描述(选填)
 
-    // 结构化内容
-    // @Builder.Default
-    // json字段格式，搜索时，对数据库有依赖，不方便迁移
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
-    // private String form = BytedeskConsts.EMPTY_JSON_STRING;
-
     @Builder.Default
     private String status = TicketStatusEnum.NEW.name();          // 状态(新建/处理中/已解决/已关闭)
     
@@ -70,9 +63,6 @@ public class TicketEntity extends BaseEntity {
     private String type = TicketTypeEnum.AGENT.name();        // 类型(agent/group)
 
     // 对应在线客服会话: 跟threadUid合并
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private ThreadEntity serviceThread;
-    // private String serviceThreadTopic;
     @Column(name = "thread_topic")
     private String topic;
 
@@ -81,12 +71,6 @@ public class TicketEntity extends BaseEntity {
 
     // 关联category，工单分类
     private String categoryUid;
-
-    // user, 使用UserProtobuf json格式化
-    // 关联service thread ThreadEntity的user字段，访客信息
-    // @Builder.Default
-    // @Column(name = "ticket_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 使用UserProtobuf json格式化
     // 一个工单一个工作组，一个工作组可以有多个工单
@@ -150,15 +134,6 @@ public class TicketEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity owner;
 
-
-    // 获取工单的访客
-    // public UserProtobuf getUser() {
-    //     return JSON.parseObject(user, UserProtobuf.class);
-    // }
-    // public String getUserString() {
-    //     return user;
-    // }
-
     // 获取工单的处理人
     public UserProtobuf getAssignee() {
         return JSON.parseObject(assignee, UserProtobuf.class);
@@ -174,13 +149,5 @@ public class TicketEntity extends BaseEntity {
     public String getReporterString() {
         return reporter;
     }
-
-    // 获取工单的部门
-    // public UserProtobuf getDepartment() {
-    //     return JSON.parseObject(department, UserProtobuf.class);
-    // }
-    // public String getDepartmentString() {
-    //     return department;
-    // }
 
 } 
