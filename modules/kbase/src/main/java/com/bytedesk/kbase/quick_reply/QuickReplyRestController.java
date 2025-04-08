@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 13:41:53
+ * @LastEditTime: 2025-04-08 15:56:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
 
 
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
-    @ActionAnnotation(title = "quick_reply", action = "新建", description = "create quick_reply")
+    @ActionAnnotation(title = "快捷回复", action = "新建", description = "create quick_reply")
     @Override
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
         
@@ -71,7 +71,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
-    @ActionAnnotation(title = "quick_reply", action = "更新", description = "update quick_reply")
+    @ActionAnnotation(title = "快捷回复", action = "更新", description = "update quick_reply")
     @Override
     public ResponseEntity<?> update(@RequestBody QuickReplyRequest request) {
         
@@ -81,7 +81,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
-    @ActionAnnotation(title = "quick_reply", action = "删除", description = "delete quick_reply")
+    @ActionAnnotation(title = "快捷回复", action = "删除", description = "delete quick_reply")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
 

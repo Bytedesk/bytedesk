@@ -149,7 +149,7 @@ public class VisitorRestControllerAnonymous {
     // 访客发送http消息
     @BlackIpFilter(title = "black", action = "sendRestMessage")
     @BlackUserFilter(title = "black", action = "sendRestMessage")
-    @TabooJsonFilter(title = "taboo", action = "sendRestMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
@@ -163,7 +163,7 @@ public class VisitorRestControllerAnonymous {
 
     @BlackIpFilter(title = "black", action = "sendSseVisitorMessage")
     @BlackUserFilter(title = "black", action = "sendSseVisitorMessage")
-    @TabooJsonFilter(title = "taboo", action = "sendSseVisitorMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendSseVisitorMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
@@ -192,7 +192,7 @@ public class VisitorRestControllerAnonymous {
         return emitter;
     }
 
-    @TabooJsonFilter(title = "taboo", action = "sendSseMemberMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {

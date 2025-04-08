@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 09:52:25
+ * @LastEditTime: 2025-04-08 15:57:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_CREATE')")
-    @ActionAnnotation(title = "workgroup", action = "新建", description = "create workgroup")
+    @ActionAnnotation(title = "工作组", action = "新建", description = "create workgroup")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupService.create(request);
@@ -69,7 +69,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "workgroup", action = "更新", description = "update workgroup")
+    @ActionAnnotation(title = "工作组", action = "更新", description = "update workgroup")
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupService.update(request);
@@ -79,7 +79,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
 
     // updateAvatar
     @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "workgroup", action = "updateAvatar", description = "update workgroup avatar")
+    @ActionAnnotation(title = "工作组", action = "updateAvatar", description = "update workgroup avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody WorkgroupRequest request) {
 
@@ -90,7 +90,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
 
     // updateStatus
     @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "workgroup", action = "updateStatus", description = "update workgroup status")
+    @ActionAnnotation(title = "工作组", action = "updateStatus", description = "update workgroup status")
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody WorkgroupRequest request) {
 
@@ -100,7 +100,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     }
 
     @PreAuthorize("hasAuthority('WORKGROUP_DELETE')")
-    @ActionAnnotation(title = "workgroup", action = "删除", description = "delete workgroup")
+    @ActionAnnotation(title = "工作组", action = "删除", description = "delete workgroup")
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest request) {
 
         workgroupService.deleteByUid(request.getUid());
