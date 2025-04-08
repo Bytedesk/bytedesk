@@ -30,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MqttEventListener {
 
-    // private final TopicService topicService;
+    private final TopicService topicService;
+
     private final TopicCacheService topicCacheService;
 
     private final MqttConnectionService mqttConnectionService;
@@ -42,7 +43,8 @@ public class MqttEventListener {
         final String uid = clientId.split("/")[0];
         log.info("topic onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         //
-        topicService.addClientId(clientId);
+        // topicService.addClientId(clientId);
+        topicCacheService.pushClientId(clientId);
     }
 
     @EventListener
@@ -52,7 +54,8 @@ public class MqttEventListener {
         final String uid = clientId.split("/")[0];
         log.info("topic onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         //
-        topicService.removeClientId(clientId);
+        // topicService.removeClientId(clientId);
+        topicCacheService.removeClientId(clientId);
     }
 
     @EventListener
