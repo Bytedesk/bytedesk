@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:12:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 22:40:25
+ * @LastEditTime: 2025-04-08 22:45:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,15 +59,28 @@ public class TopicCacheService {
         push(clientIdCacheKey, clientId);
     }
 
+    public void removeClientId(String clientId) {
+        remove(clientIdCacheKey, clientId);
+    }
+
     // 模拟 push 操作：向列表中添加元素
-    private void push(String listKey, String requestJson) {
+    private void push(String listKey, String cacheValue) {
         List<String> cachedList = topicRequestCache.getIfPresent(listKey);
         if (cachedList == null) {
             // 如果缓存中没有找到对应的键，则使用load方法初始化
             cachedList = new ArrayList<>();
         }
-        cachedList.add(requestJson);
+        cachedList.add(cacheValue);
         topicRequestCache.put(listKey, cachedList);
+    }
+
+    // remove 操作：从列表中移除元素
+    private void remove(String listKey, String cacheValue) {
+        List<String> cachedList = topicRequestCache.getIfPresent(listKey);
+        if (cachedList != null) {
+            cachedList.remove(cacheValue);
+            topicRequestCache.put(listKey, cachedList);
+        }
     }
 
     // 模拟 pop 操作：从列表中移除元素

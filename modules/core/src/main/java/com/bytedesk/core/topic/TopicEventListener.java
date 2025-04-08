@@ -74,7 +74,7 @@ public class TopicEventListener {
         if (clientIdList!= null) {
             clientIdList.forEach(item -> {
                 // log.info("topic onQuartzFiveSecondEvent {}", item);
-                // mqttConnectionService.removeClientId(item);
+                topicService.addClientId(item);
             });
         }
     }
