@@ -119,7 +119,7 @@ public class ThreadRobotIdleTimeoutServiceDelegate implements JavaDelegate {
                 
                 // 设置机器人超时时间和超时标志
                 queueMember.setRobotTimeoutAt(LocalDateTime.now());
-                queueMember.setTimeout(true);
+                queueMember.setRobotTimeout(true);
                 
                 // 保存更新
                 queueMemberRestService.save(queueMember);

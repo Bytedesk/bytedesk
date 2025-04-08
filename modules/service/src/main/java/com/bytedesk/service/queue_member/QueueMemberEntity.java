@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 15:50:32
+ * @LastEditTime: 2025-04-08 11:46:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,27 +84,26 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private int queueNumber = 0;  // 排队号码
 
-    @Builder.Default
-    private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
-
     /**
      * 访客消息统计：
      * 记录第一条访客消息的时间
      * 更新最后一条访客消息的时间
      * 统计访客消息总数
      */
-    private LocalDateTime firstMessageTime;  // 访客首次发送消息时间
+    @Builder.Default
+    private LocalDateTime visitorEnqueueTime = LocalDateTime.now();  // 加入时间
 
-    private LocalDateTime lastMessageTime;  // 访客最后发送消息时间
+    private LocalDateTime visitorFirstMessageTime;  // 访客首次发送消息时间
+
+    private LocalDateTime visitorLastMessageTime;  // 访客最后发送消息时间
 
     @Builder.Default
     private int visitorMessageCount = 0;  // 访客消息数量
 
-    private LocalDateTime leaveTime;  // 离开时间
+    private LocalDateTime visitorLeaveTime;  // 离开时间
 
-    private String acceptType ;  // 接入方式：自动、手动，不设置默认
-
-    private LocalDateTime acceptTime;  // 开始服务时间
+    @Builder.Default
+    private int visitorPriority = 0;  // 优先级(0-100)
 
     /**
      * 客服消息统计：
@@ -115,14 +114,18 @@ public class QueueMemberEntity extends BaseEntity {
      * 追踪最长响应时间
      * 统计客服消息总数
      */
+    private String agentAcceptType ;  // 接入方式：自动、手动，不设置默认
+
+    private LocalDateTime agentAcceptTime;  // 开始服务时间
+
     @Builder.Default
-    private boolean firstResponse = false;  // 人工客服是否首次响应
+    private boolean agentFirstResponse = false;  // 人工客服是否首次响应
 
-    private LocalDateTime firstResponseTime;  // 首次响应时间
+    private LocalDateTime agentFirstResponseTime;  // 首次响应时间
 
-    private LocalDateTime lastResponseTime;  // 最后响应时间
+    private LocalDateTime agentLastResponseTime;  // 最后响应时间
 
-    private LocalDateTime closeTime;  // 结束时间
+    private LocalDateTime agentCloseTime;  // 结束时间
 
     /**
      * 响应时间计算：
@@ -130,26 +133,52 @@ public class QueueMemberEntity extends BaseEntity {
      * 动态更新平均响应时间和最大响应时间
      */
     @Builder.Default
-    private int avgResponseTime = 0;  // 平均响应时间(秒)
+    private int agentAvgResponseTime = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private int maxResponseTime = 0;  // 最长响应时间(秒)
+    private int agentMaxResponseTime = 0;  // 最长响应时间(秒)
 
     @Builder.Default
     private int agentMessageCount = 0;  // 客服消息数量
 
+    private LocalDateTime agentTimeoutAt; // 人工对话超时时间
+
     @Builder.Default
-    @Column(name = "is_timeout")
-    private boolean timeout = false; // 是否超时
+    @Column(name = "is_agent_timeout")
+    private boolean agentTimeout = false; // 是否超时
+
+    /**
+     * robot 
+     * 响应时间计算：
+     */
+    @Builder.Default
+    private boolean robotFirstResponse = false;  // 人工客服是否首次响应
+
+    private LocalDateTime robotFirstResponseTime;  // 首次响应时间
+
+    private LocalDateTime robotLastResponseTime;  // 最后响应时间
+
+    private LocalDateTime robotCloseTime;  // 结束时间
+
+    @Builder.Default
+    private int robotAvgResponseTime = 0;  // 平均响应时间(秒)
+    
+    @Builder.Default
+    private int robotMaxResponseTime = 0;  // 最长响应时间(秒)
+
+    @Builder.Default
+    private int robotMessageCount = 0;  // 客服消息数量
 
     // 机器人对话超时时间
     private LocalDateTime robotTimeoutAt;
 
-    // 人工对话超时时间
-    private LocalDateTime humanTimeoutAt;
-
     @Builder.Default
-    private int priority = 0;  // 优先级(0-100)
+    @Column(name = "is_robot_timeout")
+    private boolean robotTimeout = false; // 是否超时
+    
+    /**
+     * 
+     */
 
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
@@ -212,18 +241,18 @@ public class QueueMemberEntity extends BaseEntity {
      * 计算等待时间(秒)
      */
     public long getWaitTime() {
-        if (enqueueTime == null) return 0;
+        if (visitorEnqueueTime == null) return 0;
         if (thread.isOffline()) return 0;
-        LocalDateTime endWaitTime = acceptTime != null ? acceptTime : LocalDateTime.now();
-        return Duration.between(enqueueTime, endWaitTime).getSeconds();
+        LocalDateTime endWaitTime = agentAcceptTime != null ? agentAcceptTime : LocalDateTime.now();
+        return Duration.between(visitorEnqueueTime, endWaitTime).getSeconds();
     }
 
     public void acceptThread() {
         // this.status = QueueMemberStatusEnum.SERVING.name();
-        this.acceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
-        this.acceptTime = LocalDateTime.now();
+        this.agentAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
+        this.agentAcceptTime = LocalDateTime.now();
         // 计算等待时间
-        // this.waitTime = (int) Duration.between(enqueueTime, acceptTime).getSeconds();
+        // this.waitTime = (int) Duration.between(enqueueTime, agentAcceptTime).getSeconds();
     }
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:45:39
+ * @LastEditTime: 2025-04-08 11:38:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -193,15 +193,15 @@ public class QueueEntity extends BaseEntity {
      */
     public int getAvgWaitTime() {
         List<QueueMemberEntity> servedMembers1 = agentQueueMembers.stream()
-                .filter(member -> member.getAcceptTime() != null)
+                .filter(member -> member.getAgentAcceptTime() != null)
                 .toList();
         
         List<QueueMemberEntity> servedMembers2 = robotQueueMembers.stream()
-                .filter(member -> member.getAcceptTime() != null)
+                .filter(member -> member.getAgentAcceptTime() != null)
                 .toList();
         
         List<QueueMemberEntity> servedMembers3 = workgroupQueueMembers.stream()
-                .filter(member -> member.getAcceptTime() != null)
+                .filter(member -> member.getAgentAcceptTime() != null)
                 .toList();
         
         int totalCount = servedMembers1.size() + servedMembers2.size() + servedMembers3.size();
@@ -231,17 +231,17 @@ public class QueueEntity extends BaseEntity {
     public int getAvgResolveTime() {
         List<QueueMemberEntity> closedMembers1 = agentQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
-                .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
+                .filter(member -> member.getAgentAcceptTime() != null && member.getAgentCloseTime() != null)
                 .toList();
         
         List<QueueMemberEntity> closedMembers2 = robotQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
-                .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
+                .filter(member -> member.getAgentAcceptTime() != null && member.getAgentCloseTime() != null)
                 .toList();
         
         List<QueueMemberEntity> closedMembers3 = workgroupQueueMembers.stream()
                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
-                .filter(member -> member.getAcceptTime() != null && member.getCloseTime() != null)
+                .filter(member -> member.getAgentAcceptTime() != null && member.getAgentCloseTime() != null)
                 .toList();
         
         int totalCount = closedMembers1.size() + closedMembers2.size() + closedMembers3.size();
@@ -253,8 +253,8 @@ public class QueueEntity extends BaseEntity {
         long totalResolveTime1 = closedMembers1.stream()
                 .mapToLong(member -> {
                     return java.time.Duration.between(
-                            member.getAcceptTime(), 
-                            member.getCloseTime())
+                            member.getAgentAcceptTime(), 
+                            member.getAgentCloseTime())
                             .getSeconds();
                 })
                 .sum();
@@ -262,8 +262,8 @@ public class QueueEntity extends BaseEntity {
         long totalResolveTime2 = closedMembers2.stream()
                 .mapToLong(member -> {
                     return java.time.Duration.between(
-                            member.getAcceptTime(), 
-                            member.getCloseTime())
+                            member.getAgentAcceptTime(), 
+                            member.getAgentCloseTime())
                             .getSeconds();
                 })
                 .sum();
@@ -271,8 +271,8 @@ public class QueueEntity extends BaseEntity {
         long totalResolveTime3 = closedMembers3.stream()
                 .mapToLong(member -> {
                     return java.time.Duration.between(
-                            member.getAcceptTime(), 
-                            member.getCloseTime())
+                            member.getAgentAcceptTime(), 
+                            member.getAgentCloseTime())
                             .getSeconds();
                 })
                 .sum();
