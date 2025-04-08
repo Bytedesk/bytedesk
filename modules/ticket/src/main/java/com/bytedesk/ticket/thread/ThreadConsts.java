@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 12:34:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 18:00:48
+ * @LastEditTime: 2025-04-08 10:30:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -103,6 +103,11 @@ public class ThreadConsts {
     
     // 活动ID常量
     public static final String ACTIVITY_ID_TRANSFER_TO_HUMAN_TASK = "transferToHumanTask";
+    public static final String ACTIVITY_ID_AGENTS_OFFLINE_SERVICE = "agentsOfflineService";
+    public static final String ACTIVITY_ID_END = "end"; // BPMN流程中的结束节点ID
+    public static final String ACTIVITY_ID_ROBOT_SERVICE = "robotService";
+    public static final String ACTIVITY_ID_HUMAN_SERVICE = "humanService";
+    public static final String ACTIVITY_ID_QUEUE_SERVICE = "queueService";
     
     // 默认超时时间常量
     public static final int DEFAULT_SLA_TIME = 30 * 60 * 1000;           // 默认SLA时间 - 30分钟
