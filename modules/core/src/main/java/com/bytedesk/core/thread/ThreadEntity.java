@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:22:20
+ * @LastEditTime: 2025-04-08 18:31:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -223,6 +223,65 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Boolean isRobotToAgent() {
         return !getRobot().equals(BytedeskConsts.EMPTY_JSON_STRING)
                 && !getAgent().equals(BytedeskConsts.EMPTY_JSON_STRING);
+    }
+
+    // 获取全部消息数量
+    public Integer getAllMessageCount() {
+        return messages.size();
+    }
+
+    // 获取访客消息数量
+    public Integer getVisitorMessageCount() {
+        // 遍历消息列表，统计访客消息数量
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (message.isFromVisitor()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 获取客服消息数量
+    public Integer getAgentMessageCount() {
+        // 遍历消息列表，统计客服消息数量
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (message.isFromAgent()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 获取系统消息数量
+    public Integer getSystemMessageCount() {
+        // 遍历消息列表，统计系统消息数量
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (message.isFromSystem()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 获取机器人消息数量
+    public Integer getRobotMessageCount() {
+        // 遍历消息列表，统计机器人消息数量
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (message.isFromRobot()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 是否有效会话
+    // 至少包含一条用户消息 + 一条客服消息
+    public Boolean isValid() {
+        return getVisitorMessageCount() > 0 && getAgentMessageCount() > 0;
     }
 
 
