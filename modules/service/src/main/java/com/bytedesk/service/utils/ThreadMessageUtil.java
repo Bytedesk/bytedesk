@@ -48,8 +48,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         
@@ -63,8 +64,9 @@ public class ThreadMessageUtil {
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
@@ -96,8 +98,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         
@@ -119,8 +122,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         
@@ -140,8 +144,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         
@@ -161,8 +166,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         
@@ -184,8 +190,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         
@@ -207,8 +214,9 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .threadUid(thread.getUid())
-                .topic(thread.getTopic())
+                // .threadUid(thread.getUid())
+                // .topic(thread.getTopic())
+                .thread(thread)
                 .extra(extra.toJson())
                 .build();
         

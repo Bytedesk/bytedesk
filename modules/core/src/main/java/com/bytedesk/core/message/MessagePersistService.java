@@ -51,7 +51,7 @@ public class MessagePersistService {
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
-        String threadTopic = messageProtobuf.getThread().getTopic();
+        // String threadTopic = messageProtobuf.getThread().getTopic();
         // log.info("orgUid: {}", orgUid);
 
         // 返回true表示该消息是系统通知，不应该保存到数据库
