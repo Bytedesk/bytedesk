@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 21:44:12
+ * @LastEditTime: 2025-04-08 11:51:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,60 +41,102 @@ public class QueueMemberResponse extends BaseResponse {
 
     private ThreadResponse thread;  // 会话信息
 
-    // @Builder.Default
-    // private Integer beforeNumber = 0;  // 前面排队人数
-
-    @Builder.Default
-    private Integer waitTime = 0;  // 等待时间(秒)
-
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
 
+    /**
+     * 访客消息统计：
+     * 记录第一条访客消息的时间
+     * 更新最后一条访客消息的时间
+     * 统计访客消息总数
+     */
     @Builder.Default
-    private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
+    private LocalDateTime visitorEnqueueTime = LocalDateTime.now();  // 加入时间
 
-    private LocalDateTime firstMessageTime;  // 访客首次发送消息时间
+    private LocalDateTime visitorFirstMessageTime;  // 访客首次发送消息时间
 
-    private LocalDateTime lastMessageTime;  // 访客最后发送消息时间
-
-    private LocalDateTime leaveTime;  // 离开时间
-
-    private String acceptType ;  // 接入方式：自动、手动，不设置默认
-
-    private LocalDateTime acceptTime;  // 开始服务时间
-
-    @Builder.Default
-    private Boolean firstResponse = false;  // 是否首次响应
-
-    private LocalDateTime firstResponseTime;  // 首次人工响应时间
-
-    private LocalDateTime lastResponseTime;  // 最后响应时间
-
-    private LocalDateTime closeTime;  // 结束时间
-
-    @Builder.Default
-    private Integer avgResponseTime = 0;  // 平均响应时间(秒)
-    
-    @Builder.Default
-    private Integer maxResponseTime = 0;  // 最长响应时间(秒)
-
-    @Builder.Default
-    private Integer agentMessageCount = 0;  // 客服消息数量
+    private LocalDateTime visitorLastMessageTime;  // 访客最后发送消息时间
 
     @Builder.Default
     private Integer visitorMessageCount = 0;  // 访客消息数量
 
+    private LocalDateTime visitorLeaveTime;  // 离开时间
+
     @Builder.Default
-    private Boolean timeout = false; // 是否超时
+    private Integer visitorPriority = 0;  // 优先级(0-100)
+
+    /**
+     * 客服消息统计：
+     * 标记客服是否首次响应
+     * 记录首次响应时间
+     * 更新最后响应时间
+     * 计算平均响应时间（累计平均算法）
+     * 追踪最长响应时间
+     * 统计客服消息总数
+     */
+    private String agentAcceptType ;  // 接入方式：自动、手动，不设置默认
+
+    private LocalDateTime agentAcceptTime;  // 开始服务时间
+
+    @Builder.Default
+    private Boolean agentFirstResponse = false;  // 人工客服是否首次响应
+
+    private LocalDateTime agentFirstResponseTime;  // 首次响应时间
+
+    private LocalDateTime agentLastResponseTime;  // 最后响应时间
+
+    private LocalDateTime agentCloseTime;  // 结束时间
+
+    /**
+     * 响应时间计算：
+     * 基于访客最后消息时间和客服响应时间计算响应时长
+     * 动态更新平均响应时间和最大响应时间
+     */
+    @Builder.Default
+    private Integer agentAvgResponseTime = 0;  // 平均响应时间(秒)
+    
+    @Builder.Default
+    private Integer agentMaxResponseTime = 0;  // 最长响应时间(秒)
+
+    @Builder.Default
+    private Integer agentMessageCount = 0;  // 客服消息数量
+
+    private LocalDateTime agentTimeoutAt; // 人工对话超时时间
+
+    @Builder.Default
+    private Boolean agentTimeout = false; // 是否超时
+
+    /**
+     * robot 
+     * 响应时间计算：
+     */
+    @Builder.Default
+    private Boolean robotFirstResponse = false;  // 人工客服是否首次响应
+
+    private LocalDateTime robotFirstResponseTime;  // 首次响应时间
+
+    private LocalDateTime robotLastResponseTime;  // 最后响应时间
+
+    private LocalDateTime robotCloseTime;  // 结束时间
+
+    @Builder.Default
+    private Integer robotAvgResponseTime = 0;  // 平均响应时间(秒)
+    
+    @Builder.Default
+    private Integer robotMaxResponseTime = 0;  // 最长响应时间(秒)
+
+    @Builder.Default
+    private Integer robotMessageCount = 0;  // 客服消息数量
 
     // 机器人对话超时时间
     private LocalDateTime robotTimeoutAt;
 
-    // 人工对话超时时间
-    private LocalDateTime humanTimeoutAt;
-
     @Builder.Default
-    private Integer priority = 0;  // 优先级(0-100)
+    private Boolean robotTimeout = false; // 是否超时
+    
+    /**
+     * 
+     */
 
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
