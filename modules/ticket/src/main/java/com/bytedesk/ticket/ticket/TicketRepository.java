@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 17:35:52
+ * @LastEditTime: 2025-04-08 14:51:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,9 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     Optional<TicketEntity> findByProcessInstanceId(String processInstanceId);
 
-    // List<TicketEntity> findByWorkgroupContainingAndCreatedAtBetween(
-    //     String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
+    List<TicketEntity> findByWorkgroupUidContainingAndCreatedAtBetween(
+        String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
+        
     List<TicketEntity> findByDepartmentUidAndCreatedAtBetween(
             String departmentUid, LocalDateTime startTime, LocalDateTime endTime);
 
