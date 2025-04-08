@@ -65,15 +65,15 @@ public class ThreadMessageEventListener {
         }
         
         log.debug("接收到新消息事件: messageUid={}, threadUid={}, content={}",
-                message.getUid(), message.getThreadUid(), message.getContent()); 
+                message.getUid(), message.getThread().getUid(), message.getContent()); 
         
         // 获取消息对应的会话线程
         ThreadEntity thread = null;
         try {
-            thread = threadRestService.findByUid(message.getThreadUid()).orElse(null);
+            thread = threadRestService.findByUid(message.getThread().getUid()).orElse(null);
             if (thread == null) {
                 log.warn("消息对应的会话不存在: messageUid={}, threadUid={}", 
-                        message.getUid(), message.getThreadUid());
+                        message.getUid(), message.getThread().getUid());
                 return;
             }
             
