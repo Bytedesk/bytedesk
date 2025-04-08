@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-03 12:24:48
+ * @LastEditTime: 2025-04-08 15:39:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ public class AuthController {
 
     private AuthenticationManager authenticationManager;
 
-    @ActionAnnotation(title = "auth", action = "register", description = "register")
+    // @ActionAnnotation(title = "auth", action = "register", description = "register")
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
@@ -90,7 +90,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    @ActionAnnotation(title = "auth", action = "sendMobileCode", description = "Send mobile code")
+    // @ActionAnnotation(title = "auth", action = "sendMobileCode", description = "Send mobile code")
     @PostMapping("/send/mobile")
     public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getClient(),
@@ -109,7 +109,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
+    // @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
@@ -142,7 +142,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    @ActionAnnotation(title = "auth", action = "sendEmailCode", description = "Send email code")
+    // @ActionAnnotation(title = "auth", action = "sendEmailCode", description = "Send email code")
     @PostMapping("/send/email")
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
