@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 13:04:38
+ * @LastEditTime: 2025-04-08 13:14:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,5 +46,35 @@ public class FaqExcel {
     @ExcelProperty(index = 5, value = "点击次数")
     @ColumnWidth(20)
     private int clickCount;
+
+    // upCount
+    @ExcelProperty(index = 6, value = "点赞次数")
+    @ColumnWidth(20)
+    private int upCount;
+
+    // downCount
+    @ExcelProperty(index = 7, value = "点踩次数")
+    @ColumnWidth(20)
+    private int downCount;
+
+    // enabled
+    @ExcelProperty(index = 8, value = "是否启用")   
+    @ColumnWidth(20)
+    private String enabled;
+
+    // startDate
+    @ExcelProperty(index = 9, value = "有效开始日期")
+    @ColumnWidth(20)
+    private String startDate;
+
+    // endDate
+    @ExcelProperty(index = 10, value = "有效结束日期")
+    @ColumnWidth(20)
+    private String endDate;
+
+    // answerList
+    @ExcelProperty(index = 11, value = "扩展问答")
+    @ColumnWidth(20)
+    private String answerList;
 
 }

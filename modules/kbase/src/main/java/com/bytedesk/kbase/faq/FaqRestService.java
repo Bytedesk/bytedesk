@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 13:03:30
+ * @LastEditTime: 2025-04-08 13:08:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -341,11 +341,21 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
 
     public FaqExcel convertToExcel(FaqEntity faq) {
         FaqExcel excel = modelMapper.map(faq, FaqExcel.class);
-        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(faq.getCategoryUid());
-        if (categoryOptional.isPresent()) {
-            excel.setCategory(categoryOptional.get().getName());
+        if (StringUtils.hasText(faq.getCategoryUid())) {
+            Optional<CategoryEntity> categoryOptional = categoryService.findByUid(faq.getCategoryUid());
+            if (categoryOptional.isPresent()) {
+                excel.setCategory(categoryOptional.get().getName());
+            } else {
+                excel.setCategory("未分类");
+            }
         } else {
             excel.setCategory("未分类");
+        }
+        excel.setAnswerList(JSON.toJSONString(faq.getAnswerList()));
+        if (faq.isEnabled()) {
+            excel.setEnabled("是");
+        } else {
+            excel.setEnabled("否");
         }
 
         return excel;
