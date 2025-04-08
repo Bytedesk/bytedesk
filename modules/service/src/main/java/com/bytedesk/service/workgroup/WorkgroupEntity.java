@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 10:18:47
+ * @LastEditTime: 2025-04-08 17:03:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -234,6 +234,47 @@ public class WorkgroupEntity extends BaseEntity {
             .avatar(this.getAvatar())
             .type(UserTypeEnum.WORKGROUP.name())
             .build();
+    }
+
+    // 监控客服组登录坐席、开启自动领取坐席数、空闲坐席数、领取会话数、已处理会话数、流失会话数、留言数。
+    // agent connected count
+    public long getConnectedAgentCount() {
+        if (this.agents == null || this.agents.isEmpty()) {
+            return 0;
+        }
+        return this.agents.stream().filter(agent -> agent.isConnected()).count();
+    }
+
+    // agent available count
+    public long getAvailableAgentCount() {
+        if (this.agents == null || this.agents.isEmpty()) {
+            return 0;
+        }
+        return this.agents.stream().filter(agent -> agent.isAvailable()).count();
+    }
+
+    // agent offline count
+    public long getOfflineAgentCount() {
+        if (this.agents == null || this.agents.isEmpty()) {
+            return 0;
+        }
+        return this.agents.stream().filter(agent -> agent.isOffline()).count();
+    }
+
+    // agent busy count
+    public long getBusyAgentCount() {
+        if (this.agents == null || this.agents.isEmpty()) {
+            return 0;
+        }
+        return this.agents.stream().filter(agent -> agent.isBusy()).count();
+    }
+    
+    // agent away count
+    public long getAwayAgentCount() {
+        if (this.agents == null || this.agents.isEmpty()) {
+            return 0;
+        }
+        return this.agents.stream().filter(agent -> agent.isAway()).count();
     }
     
 }
