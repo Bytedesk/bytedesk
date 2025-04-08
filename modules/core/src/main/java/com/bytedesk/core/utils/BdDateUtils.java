@@ -208,12 +208,12 @@ public class BdDateUtils {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
     
-    public static LocalDateTime parseLocalDateTime(String time) {
-        return LocalDateTime.parse(time, BdDateUtils.getDateTimeFormatter());
+    public static LocalDateTime parseLocalDateTime(String dateTime) {
+        return LocalDateTime.parse(dateTime, BdDateUtils.getDateTimeFormatter());
     }
 
-    public static LocalDateTime parseLocalDateTime(String time, DateTimeFormatter formatter) {
-        return LocalDateTime.parse(time, formatter);
+    public static LocalDateTime parseLocalDateTime(String dateTime, DateTimeFormatter formatter) {
+        return LocalDateTime.parse(dateTime, formatter);
     }
 
     public static String getCurrentLocalDateTime() {
