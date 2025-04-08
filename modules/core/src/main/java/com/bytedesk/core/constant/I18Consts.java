@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 17:38:09
+ * @LastEditTime: 2025-04-08 23:27:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -213,11 +213,11 @@ public class I18Consts {
     public static final String I18N_THREAD_CONTENT_AUDIO = "语音"; // 语音
     public static final String I18N_THREAD_CONTENT_VIDEO = "视频"; // 视频
     // 提示信息
-    public static final String I18N_WELCOME_TIP = "欢迎提示"; // 欢迎提示
+    public static final String I18N_WELCOME_TIP = "您好，请问有什么可以帮助您？"; // 欢迎提示
     public static final String I18N_TOP_TIP = "置顶提示"; // 置顶提示
-    public static final String I18N_LEAVEMSG_TIP = "留言提示"; // 留言提示
+    public static final String I18N_LEAVEMSG_TIP = "您好，请留言，我们会尽快回复您"; // 留言提示
     public static final String I18N_REENTER_TIP = "重新进入提示"; // 重新进入提示
-    public static final String I18N_QUEUE_TIP = "排队提示"; // 排队提示
+    public static final String I18N_QUEUE_TIP = "您好，客服繁忙，请稍后"; // 排队提示
     public static final String I18N_QUEUE_MESSAGE_TEMPLATE = "您前面还有{0}人排队"; // 您前面还有{0}人排队
     public static final String I18N_AUTO_CLOSE_TIP = "会话已自动关闭"; // 会话已自动关闭
     public static final String I18N_AGENT_CLOSE_TIP = "客服已关闭会话"; // 客服已关闭会话
