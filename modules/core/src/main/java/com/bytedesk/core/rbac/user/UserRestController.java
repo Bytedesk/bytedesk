@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 12:57:44
+ * @LastEditTime: 2025-04-08 16:06:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -192,7 +192,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @ActionAnnotation(title = "user", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
+    @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
 

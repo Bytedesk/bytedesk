@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:39:18
+ * @LastEditTime: 2025-04-08 16:05:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password")
+    @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password")
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
@@ -159,7 +159,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code")
+    @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code")
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login email {}", authRequest.toString());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:41:21
+ * @LastEditTime: 2025-04-08 16:05:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,11 +63,11 @@ public class BytedeskConsts {
     public static final String DEFAULT_ROLE_USER_UID = "df_role_user_uid";
     public static final String DEFAULT_ROLE_VISITOR_UID = "df_role_visitor_uid";
     // 
-    public static final String ACTION_LOGIN_USERNAME = "loginWithUsernamePassword";
-    public static final String ACTION_LOGIN_MOBILE = "loginWithMobileCode";
-    public static final String ACTION_LOGIN_EMAIL = "loginWithEmailCode";
-    public static final String ACTION_LOGIN_SCAN = "loginWithScanCode";
-    public static final String ACTION_LOGOUT = "logout";
+    public static final String ACTION_LOGIN_USERNAME = "密码登录";
+    public static final String ACTION_LOGIN_MOBILE = "手机号登录";
+    public static final String ACTION_LOGIN_EMAIL = "邮箱登录";
+    public static final String ACTION_LOGIN_SCAN = "扫码登录";
+    public static final String ACTION_LOGOUT = "退出登录";
     // 
     public static final int COLUMN_EXTRA_LENGTH = 2048;
     // 
