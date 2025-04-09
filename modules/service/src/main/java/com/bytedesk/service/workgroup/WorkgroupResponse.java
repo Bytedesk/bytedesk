@@ -19,6 +19,7 @@ import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
+import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
@@ -68,6 +69,8 @@ public class WorkgroupResponse extends BaseResponse {
 
     // 
     private List<UserProtobuf> agents;
+
+    private AgentResponse messageLeaveAgent;
 
     // agent connected count
     private Long connectedAgentCount;

@@ -127,6 +127,10 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 throw new RuntimeException(agentUid + " is not found.");
             }
         }
+        // 如果未设置messageLeaveAgentUid，则使用第一个agent作为messageLeaveAgentUid
+        if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
+            
+        }
         //
         WorkgroupEntity updatedWorkgroup = save(workgroup);
         if (updatedWorkgroup == null) {
