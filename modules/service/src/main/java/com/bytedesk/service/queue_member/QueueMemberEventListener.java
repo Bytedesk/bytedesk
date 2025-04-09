@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:15:27
+ * @LastEditTime: 2025-04-09 14:15:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,11 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
+import com.bytedesk.service.thread_invite.ThreadInviteEntity;
+import com.bytedesk.service.thread_invite.event.ThreadInviteCreateEvent;
+import com.bytedesk.service.thread_summary.ThreadSummaryEntity;
+import com.bytedesk.service.thread_summary.event.ThreadSummaryCreateEvent;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +56,32 @@ public class QueueMemberEventListener {
             // messageSendService.sendProtobufMessage(messageProtobuf);
         } else {
             log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());
+        }
+    }
+
+    @EventListener
+    public void onThreadSummaryCreateEvent(ThreadSummaryCreateEvent event) {
+        ThreadSummaryEntity threadSummary = event.getThreadSummary();
+        log.info("queue member onThreadSummaryCreateEvent: {}", threadSummary.getUid());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadSummary.getThreadUid());
+        if (memberOptional.isPresent()) {
+            QueueMemberEntity member = memberOptional.get();
+            // 更新小结状态
+            member.setSummarized(true);
+            queueMemberRestService.save(member);
+        }
+    }
+
+    @EventListener
+    public void onThreadInviteCreateEvent(ThreadInviteCreateEvent event) {
+        ThreadInviteEntity thread = event.getThreadInvite();
+        log.info("queue member onThreadInviteCreateEvent: {}", thread.getUid());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+        if (memberOptional.isPresent()) {
+            // QueueMemberEntity member = memberOptional.get();
+            // 更新邀请状态
+            // member.setInvited(true);
+            // queueMemberRestService.save(member);
         }
     }
 
@@ -305,4 +336,7 @@ public class QueueMemberEventListener {
         }
     }
 
+
+
+    
 }

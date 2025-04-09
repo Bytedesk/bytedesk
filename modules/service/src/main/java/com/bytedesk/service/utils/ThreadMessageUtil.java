@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:03:52
+ * @LastEditTime: 2025-04-09 13:51:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,8 +80,7 @@ public class ThreadMessageUtil {
 
     // 将此方法设为静态，以便在没有实例化类的情况下调用
     public static MessageProtobuf getThreadWelcomeMessage(String content, ThreadEntity thread) {
-        // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
-        // UserProtobuf system = UserProtobuf.getSystemUser();
+        //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
         MessageEntity message = MessageEntity.builder()
@@ -90,13 +89,10 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                // .user(system.toJson())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                // .threadUid(thread.getUid())
-                // .topic(thread.getTopic())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();

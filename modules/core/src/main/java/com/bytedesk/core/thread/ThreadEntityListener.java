@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-09-20 10:27:24
+ * @LastEditTime: 2025-04-09 14:13:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,9 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ThreadEntityListener {
 
-    // @Transient
-    // private transient Thread oldThread;
-    
+
     @PostPersist
     public void postPersist(ThreadEntity thread) {
         log.info("thread postPersist {}", thread.getUid());
@@ -42,12 +40,6 @@ public class ThreadEntityListener {
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadCreateEvent(clonedThread);
     }
-    
-    // @PreUpdate
-    // public void preUpdate(Thread thread) {
-    //     log.info("preUpdate {}", thread.getUid());
-    //     this.oldThread = SerializationUtils.clone(thread);
-    // }
 
     @PostUpdate
     public void postUpdate(ThreadEntity thread) {
