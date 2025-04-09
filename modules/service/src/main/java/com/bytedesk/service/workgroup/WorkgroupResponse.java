@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:18:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 17:05:51
+ * @LastEditTime: 2025-04-09 11:09:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
-import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue.settings.QueueSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
@@ -70,7 +69,7 @@ public class WorkgroupResponse extends BaseResponse {
     // 
     private List<UserProtobuf> agents;
 
-    private AgentResponse messageLeaveAgent;
+    private UserProtobuf messageLeaveAgent;
 
     // agent connected count
     private Long connectedAgentCount;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 10:48:28
+ * @LastEditTime: 2025-04-09 11:06:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,17 +115,17 @@ public class QueueEntity extends BaseEntity {
     public int getOfflineCount() {
         int count1 = (int) agentQueueMembers.stream()
                 .filter(member -> 
-                       (member.getThread() != null && member.getThread().isOffline()))
+                       (member.getThread() != null && member.isAgentOffline()))
                 .count();
         
         int count2 = (int) robotQueueMembers.stream()
                 .filter(member -> 
-                       (member.getThread() != null && member.getThread().isOffline()))
+                       (member.getThread() != null && member.isAgentOffline()))
                 .count();
         
         int count3 = (int) workgroupQueueMembers.stream()
                 .filter(member -> 
-                       (member.getThread() != null && member.getThread().isOffline()))
+                       (member.getThread() != null && member.isAgentOffline()))
                 .count();
         
         return count1 + count2 + count3;

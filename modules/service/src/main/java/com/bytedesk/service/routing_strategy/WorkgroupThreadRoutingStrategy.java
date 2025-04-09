@@ -167,7 +167,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 下面人工接待
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agentEntity == null) {
-            return getOfflineMessage(visitorRequest, thread, workgroup);
+            agentEntity = workgroup.getMessageLeaveAgent();
         }
         // 
         UserProtobuf agent = agentEntity.toUserProtobuf();

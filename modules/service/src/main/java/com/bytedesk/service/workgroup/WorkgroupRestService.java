@@ -129,7 +129,12 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         // 如果未设置messageLeaveAgentUid，则使用第一个agent作为messageLeaveAgentUid
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
-            
+            Optional<AgentEntity> agentOptional = agentService.findByUid(request.getMessageLeaveAgentUid());
+            if (agentOptional.isPresent()) {
+                workgroup.setMessageLeaveAgent(agentOptional.get());
+            }
+        } else {
+            workgroup.setMessageLeaveAgent(workgroup.getAgents().get(0));
         }
         //
         WorkgroupEntity updatedWorkgroup = save(workgroup);
@@ -183,6 +188,15 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             } else {
                 throw new RuntimeException(agentUid + " is not found.");
             }
+        }
+        // 如果未设置messageLeaveAgentUid，则使用第一个agent作为messageLeaveAgentUid
+        if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
+            Optional<AgentEntity> agentOptional = agentService.findByUid(request.getMessageLeaveAgentUid());
+            if (agentOptional.isPresent()) {
+                workgroup.setMessageLeaveAgent(agentOptional.get());
+            }
+        } else {
+            workgroup.setMessageLeaveAgent(workgroup.getAgents().get(0));
         }
         //
         WorkgroupEntity updatedWorkgroup = save(workgroup);

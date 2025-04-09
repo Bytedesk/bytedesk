@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 10:22:22
+ * @LastEditTime: 2025-04-09 11:19:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,11 @@ import java.time.LocalDateTime;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
+import com.bytedesk.core.thread.ThreadInviteStatusEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.service.queue.QueueResponse;
 
 import lombok.AllArgsConstructor;
@@ -37,7 +39,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueueMemberResponse extends BaseResponse {
 
-    private QueueResponse queue;  // 队列信息
+    // 作为工作组队列成员关系
+    private QueueResponse queue;
 
     private ThreadResponse thread;  // 会话信息
 
@@ -109,6 +112,10 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Boolean agentTimeout = false; // 是否超时
 
+    // 人工是否离线
+    @Builder.Default
+    private Boolean agentOffline = false;
+
     /**
      * robot 
      * 响应时间计算：
@@ -136,10 +143,7 @@ public class QueueMemberResponse extends BaseResponse {
 
     @Builder.Default
     private Boolean robotTimeout = false; // 是否超时
-    
-    /**
-     * 
-     */
+
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
     @Builder.Default
@@ -148,9 +152,9 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Integer rateLevel = 0;  // 评分等级
 
-    /// 是否留言
+    // 是否留言
     @Builder.Default
-    private boolean leaveMsg = false;
+    private Boolean leaveMsg = false;
 
     private LocalDateTime leaveMsgAt;  // 留言时间
 
@@ -163,12 +167,19 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Boolean resolved = false;
 
+    // resolved status
+    @Builder.Default
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
+
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检
     @Builder.Default
     private Boolean qualityChecked = false;
-    
-    // 重构到相应的表里面
+
+    // 质检结果
+    @Builder.Default
+    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
+
     // 意图类型
     @Builder.Default
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
@@ -177,12 +188,21 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
-    // 质检结果
+    // 机器人转人工
     @Builder.Default
-    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
+    private String robotToAgentStatus = ThreadTransferStatusEnum.NONE.name();
 
-    // 处理状态（待处理、已处理、已关闭等）
+    // 人工转人工
+    // transfer status
     @Builder.Default
-    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
+
+    // TODO: 可能同时邀请多个人
+    // invite status
+    @Builder.Default
+    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+
+    // 机器人转人工
+    private Boolean robotToAgent;
     
 }
