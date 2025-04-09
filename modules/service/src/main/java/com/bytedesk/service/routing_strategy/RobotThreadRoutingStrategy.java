@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 20:16:43
+ * @LastEditTime: 2025-04-09 16:23:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,8 +95,8 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 排队计数
-        UserProtobuf agent = robot.toUserProtobuf();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, agent, request);
+        UserProtobuf robotProtobuf = robot.toUserProtobuf();
+        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robotProtobuf, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
         String content = robot.getServiceSettings().getWelcomeTip();
@@ -104,18 +104,16 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
-        thread.setRoboting().setContent(content).setUnreadCount(0);
+        thread.setRoboting().setRobot(robotProtobuf.toJson()).setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
-
         // 更新排队状态
         queueMemberEntity.robotAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         // 
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
         Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         if (messageOptional.isPresent()) {

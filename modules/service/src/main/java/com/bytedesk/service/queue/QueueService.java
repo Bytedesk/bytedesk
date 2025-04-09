@@ -104,7 +104,7 @@ public class QueueService {
         }
         
         // 2. 获取或创建客服队列
-        QueueEntity agentQueue = getAgentQueue(agent, threadEntity.getOrgUid());
+        QueueEntity agentQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
         if (!agentQueue.canEnqueue()) {
             throw new QueueFullException("Agent queue is full or not active");
         }
@@ -184,7 +184,7 @@ public class QueueService {
 
     // agent or robot
     @Transactional
-    private QueueEntity getAgentQueue(UserProtobuf user, String orgUid) {
+    private QueueEntity getAgentOrRobotQueue(UserProtobuf user, String orgUid) {
         Assert.notNull(user, "User cannot be null");
         String queueTopic = TopicUtils.getQueueTopicFromUid(user.getUid());
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
