@@ -28,7 +28,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.queue.QueueService;
-import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -112,8 +111,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 更新排队状态
-        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.robotAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         // 
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));

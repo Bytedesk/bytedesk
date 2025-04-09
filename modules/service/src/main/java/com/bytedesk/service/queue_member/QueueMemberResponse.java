@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:19:14
+ * @LastEditTime: 2025-04-09 12:09:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -120,6 +120,10 @@ public class QueueMemberResponse extends BaseResponse {
      * robot 
      * 响应时间计算：
      */
+    private String robotAcceptType ;  // 接入方式：自动、手动，不设置默认
+
+    private LocalDateTime robotAcceptTime;  // 开始服务时间
+    
     @Builder.Default
     private Boolean robotFirstResponse = false;  // 人工客服是否首次响应
 
@@ -190,7 +194,8 @@ public class QueueMemberResponse extends BaseResponse {
 
     // 机器人转人工
     @Builder.Default
-    private String robotToAgentStatus = ThreadTransferStatusEnum.NONE.name();
+    // private String robotToAgentStatus = ThreadTransferStatusEnum.NONE.name();
+    private Boolean robotToAgent = false;
 
     // 人工转人工
     // transfer status
@@ -203,6 +208,6 @@ public class QueueMemberResponse extends BaseResponse {
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
     // 机器人转人工
-    private Boolean robotToAgent;
+    // private Boolean robotToAgent;
     
 }

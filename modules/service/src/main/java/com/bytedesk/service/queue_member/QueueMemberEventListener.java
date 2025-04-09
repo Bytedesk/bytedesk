@@ -40,7 +40,7 @@ public class QueueMemberEventListener {
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
         if (memberOptional.isPresent()) {
             QueueMemberEntity member = memberOptional.get();
-            member.acceptThread();
+            member.manualAcceptThread();
             queueMemberRestService.save(member);
             // TODO: 找出队列中所有等待中的访客，发送更新排队数量消息，通知访客前端
             // MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(thread.getAgent(), thread);
