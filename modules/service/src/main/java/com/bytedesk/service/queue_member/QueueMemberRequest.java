@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:57:27
+ * @LastEditTime: 2025-04-09 14:53:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,8 +110,12 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Boolean rated = false;
 
+    // 评分时间
+    private LocalDateTime rateAt;  // 评分时间
+
+    // 是否已解决
     @Builder.Default
-    private Integer rateLevel = 0;  // 评分等级
+    private Boolean resolved = false;
 
     /// 是否留言
     @Builder.Default
@@ -124,9 +128,7 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Boolean summarized = false;
 
-    // 是否已解决
-    @Builder.Default
-    private Boolean resolved = false;
+    
 
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检
