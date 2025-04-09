@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:46:45
+ * @LastEditTime: 2025-04-09 11:41:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -134,7 +135,8 @@ public class VisitorThreadService
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         // 考虑到客服信息发生变化，更新客服信息
-        String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
+        // String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
+        UserProtobuf agentProtobuf = agent.toUserProtobuf();
         // 访客信息
         String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
         // 考虑到配置可能变化，更新配置
@@ -146,7 +148,7 @@ public class VisitorThreadService
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.AGENT.name())
-                .agent(agentString)
+                .agent(agentProtobuf.toJson())
                 .userUid(agent.getUid()) // 客服uid
                 .owner(agent.getMember().getUser())
                 .user(visitor)
