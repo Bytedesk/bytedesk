@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 12:26:14
+ * @LastEditTime: 2025-04-09 16:07:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,34 +33,50 @@ public class QueueMemberSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
 
-            // if (request.getStartTime() != null && request.getEndTime() != null) {
-            //     predicates.add(criteriaBuilder.between(root.get("createdAt"), request.getStartTime(), request.getEndTime()));
-            // }
-
-            // queueNickname
+            // queueNickname - 搜索所有三种队列类型，不考虑线程类型
             if (StringUtils.hasText(request.getQueueNickname())) {
-                predicates.add(criteriaBuilder.like(root.get("queue").get("nickname"), "%" + request.getQueueNickname() + "%"));
+                List<Predicate> queuePredicates = new ArrayList<>();
+                
+                // 只有当agentQueue不为空时才添加条件
+                Predicate agentQueueNotNull = criteriaBuilder.isNotNull(root.get("agentQueue"));
+                Predicate agentQueueMatch = criteriaBuilder.like(root.get("agentQueue").get("nickname"), 
+                                                               "%" + request.getQueueNickname() + "%");
+                queuePredicates.add(criteriaBuilder.and(agentQueueNotNull, agentQueueMatch));
+                
+                // 只有当robotQueue不为空时才添加条件
+                Predicate robotQueueNotNull = criteriaBuilder.isNotNull(root.get("robotQueue"));
+                Predicate robotQueueMatch = criteriaBuilder.like(root.get("robotQueue").get("nickname"), 
+                                                               "%" + request.getQueueNickname() + "%");
+                queuePredicates.add(criteriaBuilder.and(robotQueueNotNull, robotQueueMatch));
+                
+                // 只有当workgroupQueue不为空时才添加条件
+                Predicate workgroupQueueNotNull = criteriaBuilder.isNotNull(root.get("workgroupQueue"));
+                Predicate workgroupQueueMatch = criteriaBuilder.like(root.get("workgroupQueue").get("nickname"), 
+                                                                   "%" + request.getQueueNickname() + "%");
+                queuePredicates.add(criteriaBuilder.and(workgroupQueueNotNull, workgroupQueueMatch));
+                
+                // 将三种队列条件用OR连接
+                predicates.add(criteriaBuilder.or(queuePredicates.toArray(new Predicate[0])));
             }
 
-            // 可选条件
-            // if (StringUtils.hasText(request.getWorkgroupUid())) {
-            //     predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), request.getWorkgroupUid()));
-            // }
-            // if (StringUtils.hasText(request.getAgentUid())) {
-            //     predicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
-            // }
-
             // 根据visitorNickname查询
-            // if (StringUtils.hasText(request.getVisitorNickname())) {
-            //     predicates.add(criteriaBuilder.like(root.get("visitorNickname"), "%" + request.getVisitorNickname() + "%"));
-            // }
+            if (StringUtils.hasText(request.getVisitorNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("thread").get("user"), "%" + request.getVisitorNickname() + "%"));
+            }
+
             // 根据agentNickname查询
-            // if (StringUtils.hasText(request.getAgentNickname())) {
-            //     predicates.add(criteriaBuilder.like(root.get("agentNickname"), "%" + request.getAgentNickname() + "%"));
-            // }
+            if (StringUtils.hasText(request.getAgentNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("thread").get("agent"), "%" + request.getAgentNickname() + "%"));
+            }
+
+            // robotNickname
+            if (StringUtils.hasText(request.getRobotNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("thread").get("robot"), "%" + request.getRobotNickname() + "%"));
+            }
+            
             // 根据client查询
             if (StringUtils.hasText(request.getClient())) {
-                predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));
+                predicates.add(criteriaBuilder.like(root.get("thread").get("client"), "%" + request.getClient() + "%"));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
