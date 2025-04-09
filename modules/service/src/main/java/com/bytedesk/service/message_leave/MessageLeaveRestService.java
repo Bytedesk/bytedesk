@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 09:18:27
+ * @LastEditTime: 2025-04-09 09:28:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,10 +22,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,40 +38,39 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity, MessageLeaveRequest, MessageLeaveResponse> {
 
-    private final MessageLeaveRepository MessageLeaveRepository;
+    private final MessageLeaveRepository messageLeaveRepository;
 
     private final UidUtils uidUtils;
 
     private final ModelMapper modelMapper;
 
+    private final AuthService authService;
+
+    private final CategoryRestService categoryService;
+
     @Override
     public Page<MessageLeaveResponse> queryByOrg(MessageLeaveRequest request) {
-
         Pageable pageable = request.getPageable();
-
         Specification<MessageLeaveEntity> spec = MessageLeaveSpecification.search(request);
-
-        Page<MessageLeaveEntity> page = MessageLeaveRepository.findAll(spec, pageable);
-
+        Page<MessageLeaveEntity> page = messageLeaveRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<MessageLeaveResponse> queryByUser(MessageLeaveRequest request) {
-
-        Pageable pageable = request.getPageable();
-
-        Specification<MessageLeaveEntity> spec = MessageLeaveSpecification.search(request);
-
-        Page<MessageLeaveEntity> page = MessageLeaveRepository.findAll(spec, pageable);
-
-        return page.map(this::convertToResponse);
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
-    @Cacheable(value = "messageLeave", key = "#uid")
+    @Cacheable(value = "messageLeave", key = "#uid", unless = "#result == null")
     @Override
     public Optional<MessageLeaveEntity> findByUid(String uid) {
-        return MessageLeaveRepository.findByUid(uid);
+        return messageLeaveRepository.findByUid(uid);
     }
 
     @Override
@@ -107,7 +110,7 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
     @Override
     public MessageLeaveEntity save(MessageLeaveEntity entity) {
         try {
-            return MessageLeaveRepository.save(entity);
+            return messageLeaveRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
         }
@@ -139,6 +142,27 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
     @Override
     public MessageLeaveResponse convertToResponse(MessageLeaveEntity entity) {
         return modelMapper.map(entity, MessageLeaveResponse.class);
+    }
+
+    public Page<MessageLeaveEntity> queryByOrgExcel(MessageLeaveRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<MessageLeaveEntity> spec = MessageLeaveSpecification.search(request);
+        return messageLeaveRepository.findAll(spec, pageable);
+    }
+
+    public MessageLeaveExcel convertToExcel(MessageLeaveEntity entity) {
+        MessageLeaveExcel excel = modelMapper.map(entity, MessageLeaveExcel.class);
+        if (StringUtils.hasText(entity.getCategoryUid())) {
+            Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
+            if (categoryOptional.isPresent()) {
+                excel.setCategory(categoryOptional.get().getName());
+            } else {
+                excel.setCategory("未分类");
+            }
+        } else {
+            excel.setCategory("未分类");
+        }
+        return excel;
     }
 
 }
