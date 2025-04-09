@@ -323,26 +323,26 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
 
-    public MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, RobotEntity robot, WorkgroupEntity workgroup) {
+    public MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, RobotEntity robotEntity, WorkgroupEntity workgroup) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
-        Assert.notNull(robot, "RobotEntity must not be null");
+        Assert.notNull(robotEntity, "RobotEntity must not be null");
 
         // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         ThreadEntity thread = threadOptional.get();
-        UserProtobuf agent = robot.toUserProtobuf();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+        UserProtobuf robotProtobuf = robotEntity.toUserProtobuf();
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, robotProtobuf, workgroup, visitorRequest);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
         // 机器人接待
-        String content = robot.getServiceSettings().getWelcomeTip();
+        String content = robotEntity.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
-        thread.setUserUid(robot.getUid());
-        thread.setRoboting().setContent(content).setUnreadCount(0);
+        thread.setUserUid(robotEntity.getUid());
+        thread.setRoboting().setRobot(robotProtobuf.toJson()).setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -354,7 +354,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
-        Optional<MessageEntity> messageOptional = messageRestService.findByThreadUidAndTypeAndUserContains(savedThread.getUid(), MessageTypeEnum.WELCOME.name(), robot.getUid());
+        Optional<MessageEntity> messageOptional = messageRestService.findByThreadUidAndTypeAndUserContains(savedThread.getUid(), MessageTypeEnum.WELCOME.name(), robotEntity.getUid());
         if (messageOptional.isPresent()) {
             MessageEntity message = messageOptional.get();
             if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
