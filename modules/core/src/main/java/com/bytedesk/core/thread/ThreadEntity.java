@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 20:18:28
+ * @LastEditTime: 2025-04-09 08:34:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import jakarta.persistence.*;
@@ -257,10 +257,11 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     // 判断是否机器人转人工
-    // 如果robot和agent都不是BytedeskConsts.EMPTY_JSON_STRING，说明是机器人转人工
+    // 如果robot.type == UserTypeEnum.ROBOT.name() && agent.type == UserTypeEnum.AGENT.name()
     public Boolean isRobotToAgent() {
-        return !getRobot().equals(BytedeskConsts.EMPTY_JSON_STRING)
-                && !getAgent().equals(BytedeskConsts.EMPTY_JSON_STRING);
+        return getRobotProtobuf() != null && getAgentProtobuf() != null
+                && getRobotProtobuf().getType().equals(UserTypeEnum.ROBOT.name())
+                && getAgentProtobuf().getType().equals(UserTypeEnum.AGENT.name());
     }
 
     // 获取全部消息数量

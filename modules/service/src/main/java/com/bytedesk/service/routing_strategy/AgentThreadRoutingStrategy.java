@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 20:20:33
+ * @LastEditTime: 2025-04-09 08:50:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,8 +108,11 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getAgentQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().isOffline() && !agentEntity.isConnectedAndAvailable()) {
-                thread = threadOptional.get();
+            } else if (threadOptional.get().isOffline()) {
+                // 返回留言状态的会话
+                if (!agentEntity.isConnectedAndAvailable()) {
+                    thread = threadOptional.get();
+                }
             }
         }
         //
@@ -134,7 +137,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             }
         } else {
             // 客服离线或小休不接待状态，则进入留言
-            return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
+            return handleOfflineAgent(thread, agentEntity);
         }
     }
 
@@ -205,8 +208,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent,
-            QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
         // 
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
