@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 14:15:57
+ * @LastEditTime: 2025-04-09 14:18:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,8 +27,12 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.service.thread_invite.ThreadInviteEntity;
 import com.bytedesk.service.thread_invite.event.ThreadInviteCreateEvent;
+import com.bytedesk.service.thread_rating.ThreadRatingEntity;
+import com.bytedesk.service.thread_rating.event.ThreadRatingCreateEvent;
 import com.bytedesk.service.thread_summary.ThreadSummaryEntity;
 import com.bytedesk.service.thread_summary.event.ThreadSummaryCreateEvent;
+import com.bytedesk.service.thread_transfer.ThreadTransferEntity;
+import com.bytedesk.service.thread_transfer.event.ThreadTransferCreateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +64,19 @@ public class QueueMemberEventListener {
     }
 
     @EventListener
+    public void onThreadRatingCreateEvent(ThreadRatingCreateEvent event) {
+        ThreadRatingEntity threadRating = event.getThreadRating();
+        log.info("queue member onThreadRatingCreateEvent: {}", threadRating.getUid());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadRating.getThreadUid());
+        if (memberOptional.isPresent()) {
+            // QueueMemberEntity member = memberOptional.get();
+            // 更新评分状态
+            // member.setRated(true);
+            // queueMemberRestService.save(member);
+        }
+    }
+
+    @EventListener
     public void onThreadSummaryCreateEvent(ThreadSummaryCreateEvent event) {
         ThreadSummaryEntity threadSummary = event.getThreadSummary();
         log.info("queue member onThreadSummaryCreateEvent: {}", threadSummary.getUid());
@@ -70,6 +87,19 @@ public class QueueMemberEventListener {
             member.setSummarized(true);
             queueMemberRestService.save(member);
         }
+    }
+
+    @EventListener
+    public void onThreadTransferCreateEvent(ThreadTransferCreateEvent event) {
+        ThreadTransferEntity threadTransfer = event.getThreadTransfer();
+        log.info("queue member onThreadTransferCreateEvent: {}", threadTransfer.getUid());
+        // Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadTransfer.getThreadUid());
+        // if (memberOptional.isPresent()) {
+        //     // QueueMemberEntity member = memberOptional.get();
+        //     // 更新转接状态
+        //     // member.setTransferred(true);
+        //     // queueMemberRestService.save(member);
+        // }
     }
 
     @EventListener
