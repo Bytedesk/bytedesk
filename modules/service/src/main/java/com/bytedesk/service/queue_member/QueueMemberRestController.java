@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:40:37
+ * @LastEditTime: 2025-04-09 12:40:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,6 +51,13 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
+
+    @Override
+    public ResponseEntity<?> queryByUid(QueueMemberRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+    
 
     @Override
     public ResponseEntity<?> create(QueueMemberRequest request) {
@@ -109,10 +116,5 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
          return "";
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(QueueMemberRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
     
 }

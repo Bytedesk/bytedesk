@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:48:30
+ * @LastEditTime: 2025-04-09 13:03:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,17 +60,14 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadRobotWelcomeMessage(String content, ThreadEntity thread) {
 
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        // ... 方法的实现保持不变 ...
+        // 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
-                // .threadUid(thread.getUid())
-                // .topic(thread.getTopic())
                 .thread(thread)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .client(ClientEnum.SYSTEM.name())
-                // .user(thread.getAgent())
                 .user(thread.getRobot())
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
@@ -79,7 +76,6 @@ public class ThreadMessageUtil {
                 .build();
         //
         return message;
-        // return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     // 将此方法设为静态，以便在没有实例化类的情况下调用

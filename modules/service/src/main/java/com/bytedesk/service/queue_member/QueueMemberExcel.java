@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 09:59:10
+ * @LastEditTime: 2025-04-09 12:47:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -119,35 +119,103 @@ public class QueueMemberExcel {
     @ColumnWidth(15)
     private String client;
 
-    /**
-     * 从QueueMemberEntity创建QueueMemberExcel
-     */
-    // public static QueueMemberExcel from(QueueMemberEntity member) {
-    //     QueueMemberExcel excel = new QueueMemberExcel();
-    //     excel.setQueueNickname(member.getQueueNickname());
-    //     excel.setVisitorNickname(member.getVisitorNickname());
-    //     excel.setAgentNickname(member.getAgentNickname());
-    //     excel.setWorkgroupName(member.getWorkgroupName());
-    //     excel.setQueueNumber(member.getQueueNumber());
-    //     excel.setBeforeNumber(member.getBeforeNumber());
-    //     excel.setWaitTime(member.getWaitTime());
-    //     excel.setStatus(member.getStatus());
-    //     excel.setEnqueueTime(member.getEnqueueTime() != null ? member.getEnqueueTime().toString() : null);
-    //     excel.setAcceptType(member.getAcceptType());
-    //     excel.setAcceptTime(member.getAcceptTime() != null ? member.getAcceptTime().toString() : null);
-    //     excel.setFirstResponseTime(member.getFirstResponseTime() != null ? member.getFirstResponseTime().toString() : null);
-    //     excel.setAvgResponseTime(member.getAvgResponseTime());
-    //     excel.setMaxResponseTime(member.getMaxResponseTime());
-    //     excel.setAgentMessageCount(member.getAgentMessageCount());
-    //     excel.setVisitorMessageCount(member.getVisitorMessageCount());
-    //     excel.setTimeout(member.isTimeout());
-    //     excel.setLastResponseTime(member.getLastResponseTime() != null ? member.getLastResponseTime().toString() : null);
-    //     excel.setLeaveTime(member.getLeaveTime() != null ? member.getLeaveTime().toString() : null);
-    //     excel.setCloseTime(member.getCloseTime() != null ? member.getCloseTime().toString() : null);
-    //     excel.setPriority(member.getPriority());
-    //     excel.setSolved(member.isSolved());
-    //     excel.setRated(member.isRated());
-    //     excel.setClient(member.getClient());
-    //     return excel;
-    // }
+    @ExcelProperty(index = 24, value = "评分等级")
+    @ColumnWidth(10)
+    private Integer rateLevel;
+
+    @ExcelProperty(index = 25, value = "是否留言")
+    @ColumnWidth(10)
+    private Boolean leaveMsg;
+
+    @ExcelProperty(index = 26, value = "留言时间")
+    @ColumnWidth(20)
+    private String leaveMsgTime;
+
+    @ExcelProperty(index = 27, value = "是否已小结")
+    @ColumnWidth(10)
+    private Boolean summarized;
+
+    @ExcelProperty(index = 28, value = "解决状态")
+    @ColumnWidth(15)
+    private String resolvedStatus;
+
+    @ExcelProperty(index = 29, value = "是否已质检")
+    @ColumnWidth(10)
+    private Boolean qualityChecked;
+
+    @ExcelProperty(index = 30, value = "质检结果")
+    @ColumnWidth(15)
+    private String qualityCheckResult;
+
+    @ExcelProperty(index = 31, value = "意图类型")
+    @ColumnWidth(15)
+    private String intentionType;
+
+    @ExcelProperty(index = 32, value = "情绪类型")
+    @ColumnWidth(15)
+    private String emotionType;
+
+    @ExcelProperty(index = 33, value = "机器人转人工")
+    @ColumnWidth(15)
+    private Boolean robotToAgent;
+
+    @ExcelProperty(index = 34, value = "转接状态")
+    @ColumnWidth(15)
+    private String transferStatus;
+
+    @ExcelProperty(index = 35, value = "邀请状态")
+    @ColumnWidth(15)
+    private String inviteStatus;
+
+    @ExcelProperty(index = 36, value = "系统消息数")
+    @ColumnWidth(10)
+    private Integer systemMessageCount;
+
+    @ExcelProperty(index = 37, value = "机器人消息数")
+    @ColumnWidth(10)
+    private Integer robotMessageCount;
+
+    @ExcelProperty(index = 38, value = "机器人平均响应时间(秒)")
+    @ColumnWidth(15)
+    private Integer robotAvgResponseTime;
+
+    @ExcelProperty(index = 39, value = "机器人最长响应时间(秒)")
+    @ColumnWidth(15)
+    private Integer robotMaxResponseTime;
+
+    @ExcelProperty(index = 40, value = "机器人接单方式")
+    @ColumnWidth(15)
+    private String robotAcceptType;
+
+    @ExcelProperty(index = 41, value = "机器人服务开始时间")
+    @ColumnWidth(20)
+    private String robotAcceptTime;
+
+    @ExcelProperty(index = 42, value = "机器人首次响应时间")
+    @ColumnWidth(20)
+    private String robotFirstResponseTime;
+
+    @ExcelProperty(index = 43, value = "机器人最后响应时间")
+    @ColumnWidth(20)
+    private String robotLastResponseTime;
+
+    @ExcelProperty(index = 44, value = "机器人结束时间")
+    @ColumnWidth(20)
+    private String robotCloseTime;
+
+    @ExcelProperty(index = 45, value = "机器人是否超时")
+    @ColumnWidth(10)
+    private Boolean robotTimeout;
+
+    @ExcelProperty(index = 46, value = "客服是否离线")
+    @ColumnWidth(10)
+    private Boolean agentOffline;
+
+    @ExcelProperty(index = 47, value = "访客首次消息时间")
+    @ColumnWidth(20)
+    private String visitorFirstMessageTime;
+
+    @ExcelProperty(index = 48, value = "访客最后消息时间")
+    @ColumnWidth(20)
+    private String visitorLastMessageTime;
 }
