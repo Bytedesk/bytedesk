@@ -219,8 +219,8 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         excel.setRated(response.getRated());
         // excel.setRateLevel(response.getRateLevel());
         excel.setResolved(response.getResolved());
-        excel.setQualityChecked(response.getQualityChecked());
-        excel.setQualityCheckResult(response.getQualityCheckResult());
+        // excel.setQualityChecked(response.getQualityChecked());
+        // excel.setQualityCheckResult(response.getQualityCheckResult());
         
         // 留言与小结
         excel.setLeaveMsg(response.getLeaveMsg());
@@ -228,10 +228,10 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         excel.setSummarized(response.getSummarized());
         
         // 交互状态
-        excel.setTransferStatus(response.getTransferStatus());
-        excel.setInviteStatus(response.getInviteStatus());
-        excel.setIntentionType(response.getIntentionType());
-        excel.setEmotionType(response.getEmotionType());
+        // excel.setTransferStatus(response.getTransferStatus());
+        // excel.setInviteStatus(response.getInviteStatus());
+        // excel.setIntentionType(response.getIntentionType());
+        // excel.setEmotionType(response.getEmotionType());
         
         return excel;
     }
