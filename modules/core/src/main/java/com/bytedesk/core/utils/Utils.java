@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 10:22:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 12:56:38
+ * @LastEditTime: 2025-04-09 09:54:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,12 @@
  */
 package com.bytedesk.core.utils;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 public class Utils {
 
@@ -90,6 +93,20 @@ public class Utils {
         int max = 999998;
         int code = new Random().nextInt(max) % (max - min + 1) + min;
         return String.valueOf(code);
+    }
+
+    public static String convertListToString(List<String> list) {
+        if (list == null) {
+            return "";
+        }
+        Iterator<String> iterator = list.iterator();  
+        while(iterator.hasNext()){  
+            String str = iterator.next();  
+            if(!StringUtils.hasText(str)){  
+                iterator.remove();
+            }  
+        }
+        return String.join(",", list);
     }
 
 }
