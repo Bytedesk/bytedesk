@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 09:13:10
+ * @LastEditTime: 2025-04-09 10:22:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -148,9 +148,11 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Integer rateLevel = 0;  // 评分等级
 
-    // 是否留言
+    /// 是否留言
     @Builder.Default
-    private Boolean messageLeave = false;
+    private boolean leaveMsg = false;
+
+    private LocalDateTime leaveMsgAt;  // 留言时间
 
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
