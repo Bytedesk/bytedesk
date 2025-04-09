@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-24 10:35:50
+ * @LastEditTime: 2025-04-09 08:55:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,7 @@ public class MessageLeaveRequest extends BaseRequest {
     private String threadTopic;
 
     @Builder.Default
-    private String status = MessageLeaveStatusEnum.UNREAD.name();
+    private String status = MessageLeaveStatusEnum.PENDING.name();
 
     private String user;
 }

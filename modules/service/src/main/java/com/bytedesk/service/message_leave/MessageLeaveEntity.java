@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 10:53:33
+ * @LastEditTime: 2025-04-09 09:00:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.thread.ThreadEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -59,13 +60,68 @@ public class MessageLeaveEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
 
-    private String threadTopic;
+    // 关联的会话
+    // private String threadTopic;
+    private ThreadEntity thread;
 
     @Builder.Default
-    private String status = MessageLeaveStatusEnum.UNREAD.name();
+    private String status = MessageLeaveStatusEnum.PENDING.name();
+
+    
+    
+    // 留言分类（如：咨询、投诉、建议、其他）
+    private String categoryUid;// = "咨询";
+    
+    // 留言优先级（如：低、中、高、紧急）
+    @Builder.Default
+    private String priority = "中";
+    
+    // 处理人ID
+    private String handlerId;
+    
+    // 处理人姓名
+    private String handlerName;
+    
+    // 处理时间
+    private Long handleTime;
+    
+    // 处理备注
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String handleRemark;
+    
+    // 关联工单ID（如果生成了工单）
+    private String ticketId;
+    
+    // 关联会话ID（如果转为了会话）
+    private String conversationId;
+    
+    // 客户来源渠道（如：网站、APP、小程序等）
+    private String source;
+    
+    // 设备信息（浏览器、APP版本等）
+    private String deviceInfo;
+    
+    // 客户IP地址
+    private String ipAddress;
+    
+    // 地理位置信息
+    private String location;
+    
+    // 满意度评价（处理后可以让用户评价）
+    private Integer satisfaction;
+    
+    // 标签，用于分类和检索
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tags = new ArrayList<>();
 
     @Builder.Default
     @Column(name = "leavemsg_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    // @JdbcTypeCode(SqlTypes.JSON)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 处理人
+    @Builder.Default
+    @Column(name = "handler_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String handler = BytedeskConsts.EMPTY_JSON_STRING;
 }
