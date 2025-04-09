@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:00:11
+ * @LastEditTime: 2025-04-09 11:01:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -101,6 +101,15 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
 
+    // 是否统一入口
+    // @Builder.Default
+    // private boolean isUnifiedEntry = false;
+
+    // 路由技能组，仅用于统一入口技能组
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // private List<WorkgroupEntity> routingWorkgroups = new ArrayList<>();
+    
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
@@ -110,6 +119,12 @@ public class WorkgroupEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private AgentEntity messageLeaveAgent;
 
+    // 监控管理员agents
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // private List<AgentEntity> monitorAgents = new ArrayList<>();
+
+    /** 存储下一个待分配的客服等信息 */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
@@ -126,8 +141,84 @@ public class WorkgroupEntity extends BaseEntity {
      * 检查是否超载
      */
     public boolean isOverloaded() {
+        // 1. 检查总会话数是否超限
+        // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
+        //     return true;
+        // }
+
+        // 2. 检查等待队列是否超限 
+        // if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
+        //     return true;
+        // }
+
+        // 3. 检查客服平均负载是否超限
+        // if (getOnlineAgentCount() > 0) {
+        //     double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
+        //     if (avgLoad >= getMaxThreadPerAgent()) {
+        //         return true;
+        //     }
+        // }
+
+        // 4. 检查负载率是否超过告警阈值
+        // double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
+        // if (loadRate >= getAlertThreshold()) {
+        //     return true;
+        // }
+
         return false;
     }
+
+    // TODO: 根据算法选择一个agent
+    // TODO: 增加agent-currentThreadCount数量
+    // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
+    // public AgentEntity nextAgent() {
+
+        // TODO: 所有客服都离线或小休不接待状态，则进入留言
+
+        // TODO:  所有客服都达到最大接待人数，则进入排队
+
+        // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
+
+        // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
+
+    //     if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
+    //         // return assignAgentByRobin();
+
+    //     } else if (routingMode.equals(WorkgroupRoutingModeEnum.LEAST_ACTIVE.name())) {
+
+    //     }
+
+    //     return getAgents().iterator().next();
+    // }
+
+    /**
+     * 路由队列，用于分配客服
+     */
+    // @Transient
+    // @Builder.Default
+    // private Queue<AgentEntity> agentQueue = new LinkedList<>();
+
+    /**
+     * 轮询分配算法实现访客到客服的分配
+     * @return 分配到的客服
+     */
+    // public AgentEntity assignAgentByRobin() {
+    //     if (agentQueue.isEmpty()) {
+    //         Iterator<AgentEntity> iterator = agents.iterator();
+    //         while (iterator.hasNext()) {
+    //             AgentEntity agent = iterator.next();
+    //             if (agent.isConnected() && agent.isAvailable()) {
+    //                 agentQueue.add(agent);
+    //             }
+    //         }
+    //     }
+    //     // 从队列头部获取一个客服
+    //     AgentEntity assignedAgent = agentQueue.poll();
+    //     // 为了保证轮询的连续性，将该客服重新加入队列尾部
+    //     agentQueue.offer(assignedAgent);
+    //     // 返回分配到的客服
+    //     return assignedAgent;
+    // }
 
     public boolean isConnected() {
         if (this.agents == null || this.agents.isEmpty()) {
