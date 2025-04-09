@@ -162,6 +162,7 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
     public MessageLeaveExcel convertToExcel(MessageLeaveEntity entity) {
         MessageLeaveExcel excel = modelMapper.map(entity, MessageLeaveExcel.class);
         excel.setImages(Utils.convertListToString(entity.getImages()));
+        excel.setStatus(MessageLeaveStatusEnum.fromString(entity.getStatus()).getDescription());
         // if (StringUtils.hasText(entity.getCategoryUid())) {
         //     Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
         //     if (categoryOptional.isPresent()) {

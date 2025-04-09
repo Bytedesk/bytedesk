@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:38:28
+ * @LastEditTime: 2025-04-09 10:23:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,7 +105,7 @@ public class QueueEntity extends BaseEntity {
     /**
      * 获取当天请求服务总人数（当前分配的排队号码）
      */
-    public int getNewCount() {
+    public int getTotalCount() {
         return agentQueueMembers.size() + robotQueueMembers.size() + workgroupQueueMembers.size();
     }
 
@@ -128,6 +128,23 @@ public class QueueEntity extends BaseEntity {
                        (member.getThread() != null && member.getThread().isOffline()))
                 .count();
         
+        return count1 + count2 + count3;
+    }
+
+   // leaveMsgCount
+    public int getLeaveMsgCount() {
+        int count1 = (int) agentQueueMembers.stream()
+                .filter(member -> (member.isLeaveMsg()))
+                .count();
+        
+        int count2 = (int) robotQueueMembers.stream()
+                .filter(member -> (member.isLeaveMsg()))
+                .count();
+        
+        int count3 = (int) workgroupQueueMembers.stream()
+                .filter(member -> (member.isLeaveMsg()))
+                .count();
+
         return count1 + count2 + count3;
     }
 
@@ -284,7 +301,7 @@ public class QueueEntity extends BaseEntity {
      * 获取下一个排队号码
      */
     public int getNextNumber() {
-        return getNewCount() + 1;
+        return getTotalCount() + 1;
     }
 
     /**
