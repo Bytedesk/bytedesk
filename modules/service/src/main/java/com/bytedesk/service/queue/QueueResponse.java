@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 10:48:54
+ * @LastEditTime: 2025-04-09 14:23:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class QueueResponse extends BaseResponse {
     private Integer totalCount = 0;  // 今日请求服务人数，当前排队号码
 
     @Builder.Default
-    private Integer offlineCount = 0;  // 请求时，客服离线或非接待状态的请求人次
+    private Integer offlineCount = 0;  // 客服离线人次
 
     @Builder.Default
     private Integer leaveMsgCount = 0;  // 留言数
