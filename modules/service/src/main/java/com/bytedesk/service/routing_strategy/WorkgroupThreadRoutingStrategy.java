@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 20:18:45
+ * @LastEditTime: 2025-04-09 08:51:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,25 +106,36 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             if (threadOptional.get().isNew()) {
                 // 中间状态，一般情况下，不会进入
                 thread = threadOptional.get();
+            } else if (threadOptional.get().isRoboting()) {
+                // 
+                if (!visitorRequest.getForceAgent()) {
+                    // 如果会话已经存在，并且是机器人接待状态
+                    thread = threadOptional.get();
+                    // 
+                    RobotEntity robot = workgroup.getRobotSettings().getRobot();
+                    thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
+                    // 返回未关闭，或 非留言状态的会话
+                    log.info("Already have a processing robot thread {}", topic);
+                    return getRobotContinueMessage(robot, thread);
+                }
             } else if (threadOptional.get().isChatting()) {
                 // 如果会话已经存在，并且是聊天状态
                 thread = threadOptional.get();
-                // 非强制转人工，继续会话，无论是否机器人
-                if (!visitorRequest.getForceAgent() && !thread.isRoboting()) {
-                    // 人工类型，继续会话
-                    // 重新初始化会话，包括重置机器人状态等
-                    thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
-                    // 返回继续会话消息
-                    log.info("Already have a processing thread {}", topic);
-                    return getWorkgroupContinueMessage(visitorRequest, thread);
-                }
+                // 人工类型，继续会话
+                // 重新初始化会话，包括重置机器人状态等
+                thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
+                // 返回继续会话消息
+                log.info("Already have a processing thread {}", topic);
+                return getWorkgroupContinueMessage(visitorRequest, thread);
             } else if (threadOptional.get().isQueuing()) {
                 thread = threadOptional.get();
                 // 返回排队中的会话
                 return getWorkgroupQueuingMessage(visitorRequest, thread);
-            } else if (threadOptional.get().isOffline() && workgroup.getAvailableAgents().isEmpty()) {
+            } else if (threadOptional.get().isOffline()) {
                 // 离线状态，客服离线
-                thread = threadOptional.get();
+                if (workgroup.getAvailableAgents().isEmpty()) {
+                    thread = threadOptional.get();
+                }
             }
         }
         // 
@@ -326,7 +337,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         
         // 更新线程状态
         thread.setUserUid(robot.getUid());
-        thread.setChatting().setContent(content).setUnreadCount(0);
+        thread.setRoboting().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -356,6 +367,26 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         messageRestService.save(message);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
+    }
+
+    private MessageProtobuf getRobotContinueMessage(RobotEntity robot, ThreadEntity thread) {
+        // 
+        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+                // 距离当前时间不超过30分钟，则直接使用之前的消息
+                // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+                // messageSendService.sendProtobufMessage(messageProtobuf);
+                return messageProtobuf;
+            }
+        }
+        //
+        String content = robot.getServiceSettings().getWelcomeTip();
+        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
 }
