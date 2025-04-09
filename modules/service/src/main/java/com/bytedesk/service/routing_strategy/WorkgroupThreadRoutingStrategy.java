@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 08:51:06
+ * @LastEditTime: 2025-04-09 10:55:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,7 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
 import com.bytedesk.core.thread.event.ThreadAgentQueueEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
@@ -107,10 +108,10 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 中间状态，一般情况下，不会进入
                 thread = threadOptional.get();
             } else if (threadOptional.get().isRoboting()) {
+                // 如果会话已经存在，并且是机器人接待状态，同一条会话设置转接机器人
+                thread = threadOptional.get();
                 // 
                 if (!visitorRequest.getForceAgent()) {
-                    // 如果会话已经存在，并且是机器人接待状态
-                    thread = threadOptional.get();
                     // 
                     RobotEntity robot = workgroup.getRobotSettings().getRobot();
                     thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
@@ -142,12 +143,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (thread == null) {
             // 不存在会话，或者所有会话处于closed状态，创建会话
             thread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-        } else if (visitorRequest.getForceAgent()) {
-            // 只有chatting状态，且接待客服是robot接待时，前端才会显示转人工按钮，
-            // 强制转人工
-            applicationEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
         }
-        // 
         // 未强制转人工的情况下，判断是否转机器人
         if (!visitorRequest.getForceAgent()) {
             log.info("Not force transfer to agent");
@@ -168,7 +164,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         } else {
             log.info("Force transfer to agent");
         }
-        
         // 下面人工接待
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
         if (agentEntity == null) {
@@ -178,6 +173,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
+        if (visitorRequest.getForceAgent()) {
+            // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
+            applicationEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
+            queueMemberEntity.setTransferStatus(ThreadTransferStatusEnum.PENDING.name());
+            queueMemberRestService.save(queueMemberEntity);
+        }
         //
         if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
@@ -191,12 +192,11 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         } else {
             // 离线状态永远显示离线提示语，不显示"继续会话"
             // 客服离线 或 非接待状态
-            return getOfflineMessage(visitorRequest, thread, workgroup);
+            return getOfflineMessage(visitorRequest, thread, workgroup, queueMemberEntity);
         }
     }
 
-    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent,
-            QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
         // 未满则接待
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
@@ -229,8 +229,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent,
-            QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
 
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
@@ -264,8 +263,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
-            WorkgroupEntity workgroup) {
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
         //
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
@@ -280,6 +278,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
+        // 
+        queueMemberEntity.setAgentOffline(true);
+        queueMemberRestService.save(queueMemberEntity);
         // 创建新的留言消息
         MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(content, savedThread);
         messageRestService.save(message);

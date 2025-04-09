@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 10:30:31
+ * @LastEditTime: 2025-04-09 10:51:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -147,6 +147,11 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_agent_timeout")
     private boolean agentTimeout = false; // 是否超时
 
+    // 人工是否离线
+    @Builder.Default
+    @Column(name = "is_agent_offline")
+    private boolean agentOffline = false;
+
     /**
      * robot 
      * 响应时间计算：
@@ -203,11 +208,21 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_resolved")
     private boolean resolved = false;
 
+    // resolved status
+    @Builder.Default
+    @Column(name = "thread_resolved_status", nullable = false)
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
+
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检
     @Builder.Default
     @Column(name = "is_quality_checked")
     private boolean qualityChecked = false;
+
+    // 质检结果
+    @Builder.Default
+    @Column(name = "thread_quality_check_result", nullable = false)
+    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 意图类型
     @Builder.Default
@@ -218,11 +233,6 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_emotion_type", nullable = false)
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
-
-    // 质检结果
-    @Builder.Default
-    @Column(name = "thread_quality_check_result", nullable = false)
-    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 机器人转人工
     @Builder.Default
@@ -241,11 +251,6 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "thread_invite_status", nullable = false)
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    // resolved status
-    @Builder.Default
-    @Column(name = "thread_resolved_status", nullable = false)
-    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
-
     /**
      * 计算等待时间(秒)
      */
@@ -262,6 +267,11 @@ public class QueueMemberEntity extends BaseEntity {
         this.agentAcceptTime = LocalDateTime.now();
         // 计算等待时间
         // this.waitTime = (int) Duration.between(enqueueTime, agentAcceptTime).getSeconds();
+    }
+
+    // is robotToAgent
+    public boolean isRobotToAgent() {
+        return ThreadTransferStatusEnum.NONE.name().equals(robotToAgentStatus);
     }
 
     /**
