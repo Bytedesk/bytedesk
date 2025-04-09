@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:30:22
+ * @LastEditTime: 2025-04-09 12:49:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -109,6 +109,11 @@ public class ConvertUtils {
         //     UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         //     threadResponse.setAgent(agent);
         // }
+        // agent
+        if (thread.getAgent() != null) {
+            UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+            threadResponse.setAgentProtobuf(agent);
+        }
         if (thread.getUser() != null) {
             UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
             threadResponse.setUser(user);

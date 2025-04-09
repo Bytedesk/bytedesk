@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:37:36
+ * @LastEditTime: 2025-04-09 13:09:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -188,6 +188,10 @@ public class QueueMemberEntity extends BaseEntity {
 
     //-------------------------------
 
+    private LocalDateTime systemFirstResponseTime;  // 系统首次响应时间
+
+    private LocalDateTime systemLastResponseTime;  // 系统最后响应时间
+
     @Builder.Default
     private int systemMessageCount = 0;  // 系统消息数量
 
@@ -249,6 +253,9 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "thread_robot_to_agent", nullable = false)
     private boolean robotToAgent = false;
 
+    // 机器人转人工时间
+    private LocalDateTime robotToAgentTime;  // 机器人转人工时间
+
     // 人工转人工
     // transfer status
     @Builder.Default
@@ -290,6 +297,12 @@ public class QueueMemberEntity extends BaseEntity {
         this.robotAcceptTime = LocalDateTime.now();
     }
 
+    public void transferRobotToAgent() {
+        this.robotToAgent = true;
+        this.robotToAgentTime = LocalDateTime.now();
+    }
+
+    // 
     // public boolean isRobotToAgent() {
     //     return !ThreadTransferStatusEnum.NONE.name().equals(robotToAgentStatus);
     // }

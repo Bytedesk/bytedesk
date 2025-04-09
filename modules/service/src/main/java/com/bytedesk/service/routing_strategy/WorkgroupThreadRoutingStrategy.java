@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:06:06
+ * @LastEditTime: 2025-04-09 13:00:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -171,11 +171,11 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 
         UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
-        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
+        // log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         if (visitorRequest.getForceAgent()) {
             // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
             applicationEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            queueMemberEntity.setRobotToAgent(true);
+            queueMemberEntity.transferRobotToAgent();
             queueMemberRestService.save(queueMemberEntity);
         }
         //

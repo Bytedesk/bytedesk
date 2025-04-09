@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 13:58:38
+ * @LastEditTime: 2025-04-09 12:50:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -158,12 +159,91 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     }
 
     public QueueMemberExcel convertToExcel(QueueMemberResponse response) {
-        return modelMapper.map(response, QueueMemberExcel.class);
+        QueueMemberExcel excel = new QueueMemberExcel();
+        
+        // 基本信息
+        if (response.getQueue() != null) {
+            excel.setQueueNickname(response.getQueue().getNickname());
+        }
+        
+        // 访客信息
+        if (response.getThread() != null) {
+            excel.setVisitorNickname(response.getThread().getUser().getNickname());
+            excel.setAgentNickname(response.getThread().getAgentProtobuf().getNickname());
+            excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
+            excel.setClient(response.getThread().getClient());
+        }
+        
+        // 排队信息
+        excel.setQueueNumber(response.getQueueNumber());
+        excel.setBeforeNumber(0); // 需要计算或者从别处获取
+        excel.setWaitTime(response.getWaitTime());
+        excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
+        excel.setPriority(response.getVisitorPriority());
+        
+        // 时间处理
+        excel.setEnqueueTime(formatLocalDateTime(response.getVisitorEnqueueTime()));
+        excel.setVisitorFirstMessageTime(formatLocalDateTime(response.getVisitorFirstMessageTime()));
+        excel.setVisitorLastMessageTime(formatLocalDateTime(response.getVisitorLastMessageTime()));
+        excel.setLeaveTime(formatLocalDateTime(response.getVisitorLeaveTime()));
+        
+        // 人工客服相关
+        excel.setAcceptType(response.getAgentAcceptType());
+        excel.setAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
+        excel.setFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
+        excel.setLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
+        excel.setCloseTime(formatLocalDateTime(response.getAgentCloseTime()));
+        excel.setAvgResponseTime(response.getAgentAvgResponseTime());
+        excel.setMaxResponseTime(response.getAgentMaxResponseTime());
+        excel.setAgentMessageCount(response.getAgentMessageCount());
+        excel.setTimeout(response.getAgentTimeout());
+        excel.setAgentOffline(response.getAgentOffline());
+        
+        // 机器人相关
+        excel.setRobotAcceptType(response.getRobotAcceptType());
+        excel.setRobotAcceptTime(formatLocalDateTime(response.getRobotAcceptTime()));
+        excel.setRobotFirstResponseTime(formatLocalDateTime(response.getRobotFirstResponseTime()));
+        excel.setRobotLastResponseTime(formatLocalDateTime(response.getRobotLastResponseTime()));
+        excel.setRobotCloseTime(formatLocalDateTime(response.getRobotCloseTime()));
+        excel.setRobotAvgResponseTime(response.getRobotAvgResponseTime());
+        excel.setRobotMaxResponseTime(response.getRobotMaxResponseTime());
+        excel.setRobotMessageCount(response.getRobotMessageCount());
+        excel.setRobotTimeout(response.getRobotTimeout());
+        excel.setRobotToAgent(response.getRobotToAgent());
+        
+        // 消息统计
+        excel.setVisitorMessageCount(response.getVisitorMessageCount());
+        excel.setSystemMessageCount(response.getSystemMessageCount());
+        
+        // 评价与服务质量
+        excel.setRated(response.getRated());
+        excel.setRateLevel(response.getRateLevel());
+        excel.setSolved(response.getResolved());
+        excel.setResolvedStatus(response.getResolvedStatus());
+        excel.setQualityChecked(response.getQualityChecked());
+        excel.setQualityCheckResult(response.getQualityCheckResult());
+        
+        // 留言与小结
+        excel.setLeaveMsg(response.getLeaveMsg());
+        excel.setLeaveMsgTime(formatLocalDateTime(response.getLeaveMsgAt()));
+        excel.setSummarized(response.getSummarized());
+        
+        // 交互状态
+        excel.setTransferStatus(response.getTransferStatus());
+        excel.setInviteStatus(response.getInviteStatus());
+        excel.setIntentionType(response.getIntentionType());
+        excel.setEmotionType(response.getEmotionType());
+        
+        return excel;
     }
-
-    // 查找指定队列下的所有队列成员
-    // public List<QueueMemberEntity> findByQueueUid(String queueUid) {
-    //     return queueMemberRepository.findByQueueUid(queueUid);
-    // }
-
+    
+    /**
+     * 将LocalDateTime转换为易于阅读的字符串格式
+     */
+    private String formatLocalDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        return dateTime.toString().replace("T", " ").split("\\.")[0];
+    }
 }
