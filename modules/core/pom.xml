@@ -114,6 +114,15 @@
 			<version>${protobuf.version}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<!-- https://wizardforcel.gitbooks.io/guava-tutorial/content/1.html -->
+		<!-- https://github.com/google/guava/wiki -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.3.1-jre</version>
+		</dependency>
+
 		<!--
 		https://mvnrepository.com/artifact/com.googlecode.protobuf-java-format/protobuf-java-format -->
 		<dependency>

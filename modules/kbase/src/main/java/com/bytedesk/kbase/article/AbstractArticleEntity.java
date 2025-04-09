@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 10:53:01
+ * @LastEditTime: 2025-04-09 21:36:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -60,25 +61,32 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
     @Column(name = "is_top")
+    @Builder.Default
     private boolean top = false;
 
     @Column(name = "is_published")
+    @Builder.Default
     private boolean published = false;
 
     @Column(name = "is_markdown")
+    @Builder.Default
     private boolean markdown = false;
 
+    @Builder.Default
     private int readCount = 0;
 
+    @Builder.Default
     private int likeCount = 0;
 
     // 状态 - 具体枚举值由子类定义
     private String status;
 
     // 编辑者
+    @Builder.Default
     private String editor = BytedeskConsts.EMPTY_STRING;
 
     // 有效开始日期
@@ -89,6 +97,7 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     // 是否需要审核
     @Column(name = "need_audit")
+    @Builder.Default
     private boolean needAudit = false;
 
     // 审核状态 - 具体枚举值由子类定义
@@ -97,14 +106,17 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     // 审核意见
     @Column(name = "audit_opinion")
+    @Builder.Default
     private String auditOpinion = BytedeskConsts.EMPTY_STRING;
 
     // 审核人
     @Column(name = "audit_user")
+    @Builder.Default
     private String auditUser = BytedeskConsts.EMPTY_STRING;
 
     // 是否需要密码访问
     @Column(name = "is_password_protected")
+    @Builder.Default
     private boolean isPasswordProtected = false;
 
     private String password;
@@ -114,10 +126,11 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     private String kbUid; // 对应知识库
 
     @Column(name = "create_user", length = 1024)
+    @Builder.Default
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 多个附件，暂时不启用，直接将链接放在contentMarkdown/contentHtml中即可
     // @OneToMany
     // @JoinColumn(name = "article_uid", referencedColumnName = "uuid")
     // private List<UploadEntity> attachments = new ArrayList<>();
-} 
+}
