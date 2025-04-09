@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 14:57:37
+ * @LastEditTime: 2025-04-09 15:44:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -179,41 +179,40 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         // excel.setBeforeNumber(0); // 需要计算或者从别处获取
         excel.setWaitTime(response.getWaitTime());
         excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
-        excel.setPriority(response.getVisitorPriority());
         
         // 时间处理
         excel.setEnqueueTime(formatLocalDateTime(response.getVisitorEnqueueTime()));
         excel.setVisitorFirstMessageTime(formatLocalDateTime(response.getVisitorFirstMessageTime()));
         excel.setVisitorLastMessageTime(formatLocalDateTime(response.getVisitorLastMessageTime()));
-        excel.setLeaveTime(formatLocalDateTime(response.getVisitorLeaveTime()));
+        // excel.setLeaveTime(formatLocalDateTime(response.getVisitorLeaveTime()));
         
         // 人工客服相关
-        excel.setAcceptType(response.getAgentAcceptType());
-        excel.setAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
-        excel.setFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
-        excel.setLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
-        excel.setCloseTime(formatLocalDateTime(response.getAgentCloseTime()));
-        excel.setAvgResponseTime(response.getAgentAvgResponseTime());
-        excel.setMaxResponseTime(response.getAgentMaxResponseTime());
+        excel.setAgentAcceptType(response.getAgentAcceptType());
+        excel.setAgentAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
+        excel.setAgentFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
+        excel.setAgentLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
+        // excel.setCloseTime(formatLocalDateTime(response.getAgentCloseTime()));
+        // excel.setAvgResponseTime(response.getAgentAvgResponseTime());
+        // excel.setMaxResponseTime(response.getAgentMaxResponseTime());
         excel.setAgentMessageCount(response.getAgentMessageCount());
-        excel.setTimeout(response.getAgentTimeout());
-        excel.setAgentOffline(response.getAgentOffline());
+        // excel.setTimeout(response.getAgentTimeout());
+        // excel.setAgentOffline(response.getAgentOffline());
         
         // 机器人相关
         excel.setRobotAcceptType(response.getRobotAcceptType());
         excel.setRobotAcceptTime(formatLocalDateTime(response.getRobotAcceptTime()));
         excel.setRobotFirstResponseTime(formatLocalDateTime(response.getRobotFirstResponseTime()));
         excel.setRobotLastResponseTime(formatLocalDateTime(response.getRobotLastResponseTime()));
-        excel.setRobotCloseTime(formatLocalDateTime(response.getRobotCloseTime()));
-        excel.setRobotAvgResponseTime(response.getRobotAvgResponseTime());
-        excel.setRobotMaxResponseTime(response.getRobotMaxResponseTime());
-        excel.setRobotMessageCount(response.getRobotMessageCount());
-        excel.setRobotTimeout(response.getRobotTimeout());
+        // excel.setRobotCloseTime(formatLocalDateTime(response.getRobotCloseTime()));
+        // excel.setRobotAvgResponseTime(response.getRobotAvgResponseTime());
+        // excel.setRobotMaxResponseTime(response.getRobotMaxResponseTime());
+        // excel.setRobotMessageCount(response.getRobotMessageCount());
+        // excel.setRobotTimeout(response.getRobotTimeout());
         excel.setRobotToAgent(response.getRobotToAgent());
         
         // 消息统计
         excel.setVisitorMessageCount(response.getVisitorMessageCount());
-        excel.setSystemMessageCount(response.getSystemMessageCount());
+        // excel.setSystemMessageCount(response.getSystemMessageCount());
         
         // 评价与服务质量
         excel.setRated(response.getRated());
@@ -224,7 +223,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         
         // 留言与小结
         excel.setLeaveMsg(response.getLeaveMsg());
-        excel.setLeaveMsgTime(formatLocalDateTime(response.getLeaveMsgAt()));
+        excel.setLeaveMsgAt(formatLocalDateTime(response.getLeaveMsgAt()));
         excel.setSummarized(response.getSummarized());
         
         // 交互状态
