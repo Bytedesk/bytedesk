@@ -25,8 +25,6 @@ import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqExcel;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -49,14 +47,18 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @Override
     public ResponseEntity<?> queryByUser(MessageLeaveRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        Page<MessageLeaveResponse> page = messageLeaveService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUid(MessageLeaveRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        MessageLeaveResponse response = messageLeaveService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
@@ -98,10 +100,10 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
 
             // 转换数据
-            List<FaqExcel> excelList = messageLeavePage.getContent().stream().map(faqResponse -> messageLeaveService.convertToExcel(faqResponse)).toList();
+            List<MessageLeaveExcel> excelList = messageLeavePage.getContent().stream().map(messageLeave -> messageLeaveService.convertToExcel(messageLeave)).toList();
 
             // write to excel
-            EasyExcel.write(response.getOutputStream(), FaqExcel.class)
+            EasyExcel.write(response.getOutputStream(), MessageLeaveExcel.class)
                     .autoCloseStream(Boolean.FALSE)
                     .sheet("Faq")
                     .doWrite(excelList);

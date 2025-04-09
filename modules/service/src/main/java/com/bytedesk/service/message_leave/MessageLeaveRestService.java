@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 09:28:00
+ * @LastEditTime: 2025-04-09 09:42:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,6 +65,16 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
         request.setUserUid(user.getUid());
         // 
         return queryByOrg(request);
+    }
+
+    @Override
+    public MessageLeaveResponse queryByUid(MessageLeaveRequest request) {
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            return convertToResponse(messageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
     }
 
     @Cacheable(value = "messageLeave", key = "#uid", unless = "#result == null")
