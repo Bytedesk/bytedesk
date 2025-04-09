@@ -307,8 +307,10 @@ public class PageRouteController {
 
 	/**
 	 * http://127.0.0.1:9003/download
+	 * http://127.0.0.1:9003/privacy
+	 * http://127.0.0.1:9003/protocol
 	 */
-	@GetMapping({ "/{page:download|contact|about}", "/{page:download|contact|about}.html" })
+	@GetMapping({ "/{page:download|contact|about|privacy|protocol}", "/{page:download|contact|about|privacy|protocol}.html" })
 	public String handlePageRoutes(@PathVariable String page) {
 		return page;
 	}
