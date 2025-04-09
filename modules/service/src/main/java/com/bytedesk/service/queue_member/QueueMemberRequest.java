@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 14:53:34
+ * @LastEditTime: 2025-04-09 15:49:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,13 @@ public class QueueMemberRequest extends BaseRequest {
 
     private String queueUid;  // 关联队列
 
-    private String queueNickname;  // 队列名称
+    private String queueNickname;  // 队列昵称
+
+    private String visitorNickname; // 访客昵称
+
+    private String robotNickname; //  机器人昵称
+
+    private String agentNickname; // 客服昵称
 
     private String threadUid;  // 关联会话
 
