@@ -180,13 +180,13 @@ public class QueueMemberExcel {
     @ColumnWidth(15)
     private Boolean resolved;
 
-    @ExcelProperty(index = 40, value = "是否已质检")
-    @ColumnWidth(15)
-    private Boolean qualityChecked;
+    // @ExcelProperty(index = 40, value = "是否已质检")
+    // @ColumnWidth(15)
+    // private Boolean qualityChecked;
 
-    @ExcelProperty(index = 41, value = "质检结果")
-    @ColumnWidth(15)
-    private String qualityCheckResult;
+    // @ExcelProperty(index = 41, value = "质检结果")
+    // @ColumnWidth(15)
+    // private String qualityCheckResult;
 
     // 留言与小结
     @ExcelProperty(index = 42, value = "是否留言")
@@ -202,19 +202,19 @@ public class QueueMemberExcel {
     private Boolean summarized;
 
     // 交互状态
-    @ExcelProperty(index = 45, value = "转接状态")
-    @ColumnWidth(15)
-    private String transferStatus;
+    // @ExcelProperty(index = 45, value = "转接状态")
+    // @ColumnWidth(15)
+    // private String transferStatus;
 
-    @ExcelProperty(index = 46, value = "邀请状态")
-    @ColumnWidth(15)
-    private String inviteStatus;
+    // @ExcelProperty(index = 46, value = "邀请状态")
+    // @ColumnWidth(15)
+    // private String inviteStatus;
 
-    @ExcelProperty(index = 47, value = "意图类型")
-    @ColumnWidth(15)
-    private String intentionType;
+    // @ExcelProperty(index = 47, value = "意图类型")
+    // @ColumnWidth(15)
+    // private String intentionType;
 
-    @ExcelProperty(index = 48, value = "情绪类型")
-    @ColumnWidth(15)
-    private String emotionType;
+    // @ExcelProperty(index = 48, value = "情绪类型")
+    // @ColumnWidth(15)
+    // private String emotionType;
 }

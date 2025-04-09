@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:26:34
+ * @LastEditTime: 2025-04-09 15:31:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,7 +112,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 if (!visitorRequest.getForceAgent()) {
                     // 
                     RobotEntity robot = workgroup.getRobotSettings().getRobot();
-                    thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
+                    // thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
+                    // 重新初始化会话，包括重置机器人状态等
+                    thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                     // 返回未关闭，或 非留言状态的会话
                     log.info("Already have a processing robot thread {}", topic);
                     return getRobotContinueMessage(robot, thread);
@@ -152,7 +154,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 转机器人
                 RobotEntity robot = workgroup.getRobotSettings().getRobot();
                 if (robot != null) {
-                    thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
+                    // thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
+                    // 重新初始化会话，包括重置机器人状态等
+                    thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                     // 返回机器人欢迎消息
                     return routeToRobot(visitorRequest, thread, robot, workgroup);
                 } else {
