@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:45:56
+ * @LastEditTime: 2025-04-09 12:06:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,6 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
 import com.bytedesk.core.thread.event.ThreadAgentQueueEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
@@ -37,7 +36,6 @@ import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueService;
-import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -177,7 +175,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (visitorRequest.getForceAgent()) {
             // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
             applicationEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            queueMemberEntity.setTransferStatus(ThreadTransferStatusEnum.PENDING.name());
+            queueMemberEntity.setRobotToAgent(true);
             queueMemberRestService.save(queueMemberEntity);
         }
         //
@@ -218,8 +216,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread");
         }
         // 客服接待
-        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.agentAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, savedThread);
@@ -337,7 +334,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";
         }
-        
         // 更新线程状态
         thread.setUserUid(robot.getUid());
         thread.setRoboting().setContent(content).setUnreadCount(0);
@@ -345,10 +341,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
-
         // 更新排队状态
-        queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
-        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberEntity.robotAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         //
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
