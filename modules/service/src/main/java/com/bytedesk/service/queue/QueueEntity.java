@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:06:57
+ * @LastEditTime: 2025-04-10 07:55:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -102,6 +102,15 @@ public class QueueEntity extends BaseEntity {
     @Builder.Default
     private List<QueueMemberEntity> robotQueueMembers = new ArrayList<>();
 
+    // 将queueMembers中的thread, 按照thread.created按照24小时分组，统计每个分组的数量？
+    public List<Integer> getQueueMembersCountByHour() {
+        List<Integer> queueMembersCountByHour = new ArrayList<>();
+        // 1. 获取当前日期的开始时间和结束时间
+        // 2. 遍历当前日期的每个小时，统计每个小时的排队人数
+        // 3. 将统计结果存储到queueMembersCountByHour中
+        return queueMembersCountByHour;
+    }
+        
     /**
      * 获取当天请求服务总人数（当前分配的排队号码）
      */
