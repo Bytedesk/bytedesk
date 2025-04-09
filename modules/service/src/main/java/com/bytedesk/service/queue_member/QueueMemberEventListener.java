@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:11:16
+ * @LastEditTime: 2025-04-09 13:15:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,7 +73,6 @@ public class QueueMemberEventListener {
                 return;
             }
             
-            // 如果是访客发送的消息，重置空闲超时计时器
             if (message.isFromVisitor()) {
                 // 更新访客消息统计
                 updateVisitorMessageStats(message, thread);
