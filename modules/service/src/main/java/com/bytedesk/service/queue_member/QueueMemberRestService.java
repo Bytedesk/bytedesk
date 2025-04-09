@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:50:23
+ * @LastEditTime: 2025-04-09 14:57:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -176,7 +176,7 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         
         // 排队信息
         excel.setQueueNumber(response.getQueueNumber());
-        excel.setBeforeNumber(0); // 需要计算或者从别处获取
+        // excel.setBeforeNumber(0); // 需要计算或者从别处获取
         excel.setWaitTime(response.getWaitTime());
         excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
         excel.setPriority(response.getVisitorPriority());
@@ -217,9 +217,8 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         
         // 评价与服务质量
         excel.setRated(response.getRated());
-        excel.setRateLevel(response.getRateLevel());
-        excel.setSolved(response.getResolved());
-        excel.setResolvedStatus(response.getResolvedStatus());
+        // excel.setRateLevel(response.getRateLevel());
+        excel.setResolved(response.getResolved());
         excel.setQualityChecked(response.getQualityChecked());
         excel.setQualityCheckResult(response.getQualityCheckResult());
         

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 14:18:15
+ * @LastEditTime: 2025-04-09 14:52:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,17 +63,14 @@ public class QueueMemberEventListener {
         }
     }
 
+    // 在 ThreadRatingEventListener 中处理
     @EventListener
     public void onThreadRatingCreateEvent(ThreadRatingCreateEvent event) {
         ThreadRatingEntity threadRating = event.getThreadRating();
         log.info("queue member onThreadRatingCreateEvent: {}", threadRating.getUid());
-        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadRating.getThreadUid());
-        if (memberOptional.isPresent()) {
-            // QueueMemberEntity member = memberOptional.get();
-            // 更新评分状态
-            // member.setRated(true);
-            // queueMemberRestService.save(member);
-        }
+        // Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadRating.getThreadUid());
+        // if (memberOptional.isPresent()) {
+        // }
     }
 
     @EventListener

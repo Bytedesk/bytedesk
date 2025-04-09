@@ -200,8 +200,13 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_rated")
     private boolean rated = false;
 
+    // 评分时间
+    private LocalDateTime rateAt;  // 评分时间
+
+    // 是否已解决
     @Builder.Default
-    private int rateLevel = 0;  // 评分等级
+    @Column(name = "is_resolved")
+    private boolean resolved = false;
 
     // 是否留言
     @Builder.Default
@@ -215,12 +220,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_summarized")
     private boolean summarized = false;
-
-    // 是否已解决
-    @Builder.Default
-    @Column(name = "is_resolved")
-    private boolean resolved = false;
-
+    
     // resolved status
     @Builder.Default
     @Column(name = "thread_resolved_status", nullable = false)
