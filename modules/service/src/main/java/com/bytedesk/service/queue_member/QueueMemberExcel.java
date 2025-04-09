@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 15:16:44
+ * @LastEditTime: 2025-04-09 15:45:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,10 +42,6 @@ public class QueueMemberExcel {
     @ExcelProperty(index = 4, value = "排队号码")
     @ColumnWidth(10)
     private Integer queueNumber;
-    
-    @ExcelProperty(index = 5, value = "前面人数")
-    @ColumnWidth(10)
-    private Integer beforeNumber;
 
     @ExcelProperty(index = 6, value = "等待时长(秒)")
     @ColumnWidth(15)
@@ -54,10 +50,6 @@ public class QueueMemberExcel {
     @ExcelProperty(index = 7, value = "状态")
     @ColumnWidth(15)
     private String status;
-
-    @ExcelProperty(index = 8, value = "优先级")
-    @ColumnWidth(10)
-    private Integer priority;
 
     @ExcelProperty(index = 9, value = "客户端")
     @ColumnWidth(15)
@@ -76,50 +68,50 @@ public class QueueMemberExcel {
     @ColumnWidth(20)
     private String visitorLastMessageTime;
 
-    @ExcelProperty(index = 13, value = "离开时间")
-    @ColumnWidth(20)
-    private String leaveTime;
+    // @ExcelProperty(index = 13, value = "离开时间")
+    // @ColumnWidth(20)
+    // private String leaveTime;
 
     // 人工客服相关
     @ExcelProperty(index = 14, value = "接入方式")
     @ColumnWidth(15)
-    private String acceptType;
+    private String agentAcceptType;
 
     @ExcelProperty(index = 15, value = "接入时间")
     @ColumnWidth(20)
-    private String acceptTime;
+    private String agentAcceptTime;
 
     @ExcelProperty(index = 16, value = "首次响应时间")
     @ColumnWidth(20)
-    private String firstResponseTime;
+    private String agentFirstResponseTime;
 
     @ExcelProperty(index = 17, value = "最后响应时间")
     @ColumnWidth(20)
-    private String lastResponseTime;
+    private String agentLastResponseTime;
 
-    @ExcelProperty(index = 18, value = "会话结束时间")
-    @ColumnWidth(20)
-    private String closeTime;
+    // @ExcelProperty(index = 18, value = "会话结束时间")
+    // @ColumnWidth(20)
+    // private String closeTime;
 
-    @ExcelProperty(index = 19, value = "平均响应时长(秒)")
-    @ColumnWidth(15)
-    private Integer avgResponseTime;
+    // @ExcelProperty(index = 19, value = "平均响应时长(秒)")
+    // @ColumnWidth(15)
+    // private Integer avgResponseTime;
 
-    @ExcelProperty(index = 20, value = "最长响应时长(秒)")
-    @ColumnWidth(15)
-    private Integer maxResponseTime;
+    // @ExcelProperty(index = 20, value = "最长响应时长(秒)")
+    // @ColumnWidth(15)
+    // private Integer maxResponseTime;
 
     @ExcelProperty(index = 21, value = "客服消息数")
     @ColumnWidth(15)
     private Integer agentMessageCount;
 
-    @ExcelProperty(index = 22, value = "是否超时")
-    @ColumnWidth(10)
-    private Boolean timeout;
+    // @ExcelProperty(index = 22, value = "是否超时")
+    // @ColumnWidth(10)
+    // private Boolean timeout;
 
-    @ExcelProperty(index = 23, value = "客服是否离线")
-    @ColumnWidth(15)
-    private Boolean agentOffline;
+    // @ExcelProperty(index = 23, value = "客服是否离线")
+    // @ColumnWidth(15)
+    // private Boolean agentOffline;
 
     // 机器人相关
     @ExcelProperty(index = 24, value = "机器人接入方式")
@@ -138,25 +130,25 @@ public class QueueMemberExcel {
     @ColumnWidth(20)
     private String robotLastResponseTime;
 
-    @ExcelProperty(index = 28, value = "机器人结束时间")
-    @ColumnWidth(20)
-    private String robotCloseTime;
+    // @ExcelProperty(index = 28, value = "机器人结束时间")
+    // @ColumnWidth(20)
+    // private String robotCloseTime;
 
-    @ExcelProperty(index = 29, value = "机器人平均响应时长(秒)")
-    @ColumnWidth(15)
-    private Integer robotAvgResponseTime;
+    // @ExcelProperty(index = 29, value = "机器人平均响应时长(秒)")
+    // @ColumnWidth(15)
+    // private Integer robotAvgResponseTime;
 
-    @ExcelProperty(index = 30, value = "机器人最长响应时长(秒)")
-    @ColumnWidth(15)
-    private Integer robotMaxResponseTime;
+    // @ExcelProperty(index = 30, value = "机器人最长响应时长(秒)")
+    // @ColumnWidth(15)
+    // private Integer robotMaxResponseTime;
 
-    @ExcelProperty(index = 31, value = "机器人消息数")
-    @ColumnWidth(15)
-    private Integer robotMessageCount;
+    // @ExcelProperty(index = 31, value = "机器人消息数")
+    // @ColumnWidth(15)
+    // private Integer robotMessageCount;
 
-    @ExcelProperty(index = 32, value = "机器人是否超时")
-    @ColumnWidth(15)
-    private Boolean robotTimeout;
+    // @ExcelProperty(index = 32, value = "机器人是否超时")
+    // @ColumnWidth(15)
+    // private Boolean robotTimeout;
 
     @ExcelProperty(index = 33, value = "机器人转人工")
     @ColumnWidth(15)
@@ -167,9 +159,9 @@ public class QueueMemberExcel {
     @ColumnWidth(15)
     private Integer visitorMessageCount;
 
-    @ExcelProperty(index = 35, value = "系统消息数")
-    @ColumnWidth(15)
-    private Integer systemMessageCount;
+    // @ExcelProperty(index = 35, value = "系统消息数")
+    // @ColumnWidth(15)
+    // private Integer systemMessageCount;
 
     // 评价与服务质量
     @ExcelProperty(index = 36, value = "是否已评价")
@@ -195,7 +187,7 @@ public class QueueMemberExcel {
 
     @ExcelProperty(index = 43, value = "留言时间")
     @ColumnWidth(20)
-    private String leaveMsgTime;
+    private String leaveMsgAt;
 
     @ExcelProperty(index = 44, value = "是否已小结")
     @ColumnWidth(15)
