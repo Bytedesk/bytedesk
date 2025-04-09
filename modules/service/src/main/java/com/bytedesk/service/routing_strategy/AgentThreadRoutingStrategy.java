@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 08:50:12
+ * @LastEditTime: 2025-04-09 10:54:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -137,7 +137,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             }
         } else {
             // 客服离线或小休不接待状态，则进入留言
-            return handleOfflineAgent(thread, agentEntity);
+            return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
         }
     }
 
@@ -208,7 +208,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent) {
+    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
         // 
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
@@ -240,9 +240,10 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             }
         }
         // 
+        queueMemberEntity.setAgentOffline(true);
+        queueMemberRestService.save(queueMemberEntity);
         // 创建新的留言消息
         MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(content, savedThread);
-        // 保存留言消息
         messageRestService.save(message);
         // 返回留言消息
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
