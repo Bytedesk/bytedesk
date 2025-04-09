@@ -36,6 +36,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import lombok.ToString;
 import jakarta.persistence.Convert;
 
 @MappedSuperclass
@@ -45,6 +46,7 @@ import jakarta.persistence.Convert;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public abstract class AbstractThreadEntity extends BaseEntity {
     
     private static final long serialVersionUID = 1L;

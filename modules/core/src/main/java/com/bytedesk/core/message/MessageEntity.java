@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:35:17
+ * @LastEditTime: 2025-04-09 17:27:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,5 +73,20 @@ public class MessageEntity extends AbstractMessageEntity {
         // 忽略大小写，判断是否包含"type":"agent"字段
         // return user.toLowerCase().contains("\"type\":\"agent\"");
         return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.AGENT.name());
+    }
+    
+    /**
+     * 重写toString方法避免循环引用
+     */
+    @Override
+    public String toString() {
+        return "MessageEntity{" +
+                "id=" + getId() +
+                ", uid='" + getUid() + '\'' +
+                ", type='" + getType() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", createdAt=" + getCreatedAt() +
+                ", userUid='" + getUserUid() + '\'' +
+                '}';
     }
 }
