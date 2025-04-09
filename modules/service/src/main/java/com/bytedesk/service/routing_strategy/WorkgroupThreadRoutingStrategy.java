@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 10:55:03
+ * @LastEditTime: 2025-04-09 11:45:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -193,7 +193,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         } else {
             // 离线状态永远显示离线提示语，不显示"继续会话"
             // 客服离线 或 非接待状态
-            return getOfflineMessage(visitorRequest, thread, workgroup, queueMemberEntity);
+            return getOfflineMessage(visitorRequest, thread, agentEntity, workgroup, queueMemberEntity);
         }
     }
 
@@ -264,7 +264,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agent, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
         //
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
@@ -275,6 +275,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "请稍后，客服会尽快回复您";
         }
         thread.setOffline().setContent(content);
+        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        thread.setAgent(agentProtobuf.toJson());
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -295,7 +297,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    // Q-原样返回会话
     private MessageProtobuf getWorkgroupContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
