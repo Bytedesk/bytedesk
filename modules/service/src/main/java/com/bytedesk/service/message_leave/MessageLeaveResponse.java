@@ -63,7 +63,7 @@ public class MessageLeaveResponse extends BaseResponse {
     private String threadUid;
     // 关联的会话
     // private String threadTopic;
-    // private ThreadEntity thread;
+    // private ThreadResponse thread;
 
     // 客户来源渠道（如：网站、APP、小程序等）
     private String client;

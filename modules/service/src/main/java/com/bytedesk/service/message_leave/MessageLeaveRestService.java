@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 08:55:51
+ * @LastEditTime: 2025-04-09 09:18:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,6 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
         messageLeave.setUid(uidUtils.getUid());
         messageLeave.setStatus(MessageLeaveStatusEnum.PENDING.name());
         //
-
         // 保存留言
         MessageLeaveEntity savedMessageLeave = save(messageLeave);
         if (savedMessageLeave == null) {
