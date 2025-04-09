@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 15:44:20
+ * @LastEditTime: 2025-04-09 16:15:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -195,8 +195,8 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         // excel.setAvgResponseTime(response.getAgentAvgResponseTime());
         // excel.setMaxResponseTime(response.getAgentMaxResponseTime());
         excel.setAgentMessageCount(response.getAgentMessageCount());
-        // excel.setTimeout(response.getAgentTimeout());
-        // excel.setAgentOffline(response.getAgentOffline());
+        // excel.setTimeout(booleanToString(response.getAgentTimeout()));
+        // excel.setAgentOffline(booleanToString(response.getAgentOffline()));
         
         // 机器人相关
         excel.setRobotAcceptType(response.getRobotAcceptType());
@@ -207,24 +207,24 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         // excel.setRobotAvgResponseTime(response.getRobotAvgResponseTime());
         // excel.setRobotMaxResponseTime(response.getRobotMaxResponseTime());
         // excel.setRobotMessageCount(response.getRobotMessageCount());
-        // excel.setRobotTimeout(response.getRobotTimeout());
-        excel.setRobotToAgent(response.getRobotToAgent());
+        // excel.setRobotTimeout(booleanToString(response.getRobotTimeout()));
+        excel.setRobotToAgent(booleanToString(response.getRobotToAgent()));
         
         // 消息统计
         excel.setVisitorMessageCount(response.getVisitorMessageCount());
         // excel.setSystemMessageCount(response.getSystemMessageCount());
         
         // 评价与服务质量
-        excel.setRated(response.getRated());
+        excel.setRated(booleanToString(response.getRated()));
         // excel.setRateLevel(response.getRateLevel());
-        excel.setResolved(response.getResolved());
-        // excel.setQualityChecked(response.getQualityChecked());
+        excel.setResolved(booleanToString(response.getResolved()));
+        // excel.setQualityChecked(booleanToString(response.getQualityChecked()));
         // excel.setQualityCheckResult(response.getQualityCheckResult());
         
         // 留言与小结
-        excel.setLeaveMsg(response.getLeaveMsg());
+        excel.setLeaveMsg(booleanToString(response.getLeaveMsg()));
         excel.setLeaveMsgAt(formatLocalDateTime(response.getLeaveMsgAt()));
-        excel.setSummarized(response.getSummarized());
+        excel.setSummarized(booleanToString(response.getSummarized()));
         
         // 交互状态
         // excel.setTransferStatus(response.getTransferStatus());
@@ -243,5 +243,15 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
             return null;
         }
         return dateTime.toString().replace("T", " ").split("\\.")[0];
+    }
+    
+    /**
+     * 将Boolean转换为"是"或"否"
+     */
+    private String booleanToString(Boolean value) {
+        if (value == null) {
+            return null;
+        }
+        return value ? "是" : "否";
     }
 }
