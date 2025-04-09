@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 09:42:18
+ * @LastEditTime: 2025-04-09 09:56:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,14 +22,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.category.CategoryEntity;
-import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +45,7 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
 
     private final AuthService authService;
 
-    private final CategoryRestService categoryService;
+    // private final CategoryRestService categoryService;
 
     @Override
     public Page<MessageLeaveResponse> queryByOrg(MessageLeaveRequest request) {
@@ -162,15 +161,22 @@ public class MessageLeaveRestService extends BaseRestService<MessageLeaveEntity,
 
     public MessageLeaveExcel convertToExcel(MessageLeaveEntity entity) {
         MessageLeaveExcel excel = modelMapper.map(entity, MessageLeaveExcel.class);
-        if (StringUtils.hasText(entity.getCategoryUid())) {
-            Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
-            if (categoryOptional.isPresent()) {
-                excel.setCategory(categoryOptional.get().getName());
-            } else {
-                excel.setCategory("未分类");
-            }
+        excel.setImages(Utils.convertListToString(entity.getImages()));
+        // if (StringUtils.hasText(entity.getCategoryUid())) {
+        //     Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
+        //     if (categoryOptional.isPresent()) {
+        //         excel.setCategory(categoryOptional.get().getName());
+        //     } else {
+        //         excel.setCategory("未分类");
+        //     }
+        // } else {
+        //     excel.setCategory("未分类");
+        // }
+        UserProtobuf user = UserProtobuf.parseFromJson(entity.getUser());
+        if (user != null) {
+            excel.setUser(user.getNickname());
         } else {
-            excel.setCategory("未分类");
+            excel.setUser("未知");
         }
         return excel;
     }
