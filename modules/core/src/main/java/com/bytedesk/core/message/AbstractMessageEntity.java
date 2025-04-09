@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:40:35
+ * @LastEditTime: 2025-04-09 17:29:07
  * @Description: 消息实体抽象基类，用于统一所有消息类型的字段结构
  */
 package com.bytedesk.core.message;
@@ -21,6 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import lombok.ToString;
 
 @MappedSuperclass
 @Data
@@ -29,6 +30,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public abstract class AbstractMessageEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -68,6 +70,4 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
-
-    
 }

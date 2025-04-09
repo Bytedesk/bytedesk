@@ -323,5 +323,19 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getVisitorMessageCount() > 0 && getAgentMessageCount() > 0;
     }
 
+    /**
+     * 重写toString方法避免循环引用
+     */
+    @Override
+    public String toString() {
+        return "ThreadEntity{" +
+                "id=" + getId() +
+                ", uid='" + getUid() + '\'' +
+                ", topic='" + getTopic() + '\'' +
+                ", type='" + getType() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", createdAt=" + getCreatedAt() +
+                '}';
+    }
 
 }
