@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:03:35
+ * @LastEditTime: 2025-04-09 12:37:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -185,6 +185,12 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_robot_timeout")
     private boolean robotTimeout = false; // 是否超时
 
+
+    //-------------------------------
+
+    @Builder.Default
+    private int systemMessageCount = 0;  // 系统消息数量
+
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
     @Builder.Default
@@ -261,6 +267,10 @@ public class QueueMemberEntity extends BaseEntity {
     public long getWaitTime() {
         if (visitorEnqueueTime == null) return 0;
         if (thread.isOffline()) return 0;
+        // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
+        if (robotAcceptTime != null) {
+            return Duration.between(visitorEnqueueTime, robotAcceptTime).getSeconds();
+        }
         LocalDateTime endWaitTime = agentAcceptTime != null ? agentAcceptTime : LocalDateTime.now();
         return Duration.between(visitorEnqueueTime, endWaitTime).getSeconds();
     }
@@ -271,12 +281,12 @@ public class QueueMemberEntity extends BaseEntity {
     }
 
     public void agentAutoAcceptThread() {
-        this.agentAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
+        this.agentAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
         this.agentAcceptTime = LocalDateTime.now();
     }
 
     public void robotAutoAcceptThread() {
-        this.robotAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
+        this.robotAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
         this.robotAcceptTime = LocalDateTime.now();
     }
 

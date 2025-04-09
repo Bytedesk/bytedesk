@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:09:00
+ * @LastEditTime: 2025-04-09 12:39:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -148,6 +148,11 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Boolean robotTimeout = false; // 是否超时
 
+    // -----------------
+
+    @Builder.Default
+    private Integer systemMessageCount = 0;  // 系统消息数量
+
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
     @Builder.Default
@@ -194,7 +199,6 @@ public class QueueMemberResponse extends BaseResponse {
 
     // 机器人转人工
     @Builder.Default
-    // private String robotToAgentStatus = ThreadTransferStatusEnum.NONE.name();
     private Boolean robotToAgent = false;
 
     // 人工转人工
@@ -207,7 +211,5 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    // 机器人转人工
-    // private Boolean robotToAgent;
     
 }
