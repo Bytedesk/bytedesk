@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:23:06
+ * @LastEditTime: 2025-04-10 16:00:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -218,6 +218,22 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             entity.setRelatedFaqs(relatedFaqs);
 
             return convertToResponse(save(entity));
+        } else {
+            throw new RuntimeException("faq not found");
+        }
+    }
+
+    // update enable
+    public FaqResponse enable(FaqRequest request) {
+        Optional<FaqEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            FaqEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            FaqEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update FAQ");
+            }
+            return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("faq not found");
         }

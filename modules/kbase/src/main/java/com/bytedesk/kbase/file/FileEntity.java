@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:55:44
+ * @LastEditTime: 2025-04-10 16:07:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,13 +70,12 @@ public class FileEntity extends BaseEntity {
     private LocalDateTime endDate;
 
     @Builder.Default
+    @Column(name = "is_enabled")
+    private boolean enabled = true;
+
+
+    @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
 
     private String categoryUid; // 所属分类
 
@@ -84,8 +83,6 @@ public class FileEntity extends BaseEntity {
 
     // 对应 uploadEntity 的 uid
     private String uploadUid;
-
-    // private String userUid;
 
     // vector store id
     @Builder.Default

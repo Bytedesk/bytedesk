@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:55:56
+ * @LastEditTime: 2025-04-10 16:10:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,17 +38,7 @@ public class FileRequest extends BaseRequest {
 
     private String fileName;
 
-    // baseRequest 的 content
-    // private String content;
-
     private String fileUrl;
-
-    // 大模型
-    // private String loader;
-
-    // private String splitter;
-
-    // private int docsCount;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
@@ -57,14 +47,10 @@ public class FileRequest extends BaseRequest {
 
     private LocalDateTime endDate;
 
+    private Boolean enabled;
+
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
 
     // 所属分类
     private String categoryUid;
@@ -75,6 +61,4 @@ public class FileRequest extends BaseRequest {
     // 对应 uploadEntity 的 uid
     private String uploadUid;
 
-    // 上传用户
-    // private String userUid;
 }

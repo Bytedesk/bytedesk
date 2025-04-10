@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -91,6 +92,16 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         faqRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
+    }
+
+    // enable/disable faq
+    @ActionAnnotation(title = "常见问题", action = "启用", description = "enable faq")
+    @PostMapping("/enable")
+    public ResponseEntity<?> enable(@RequestBody FaqRequest request) {
+
+        FaqResponse faqResponse = faqRestService.enable(request);
+
+        return ResponseEntity.ok(JsonResult.success(faqResponse));
     }
 
     @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")

@@ -50,6 +50,8 @@ public class SplitResponse extends BaseResponse {
     // 有效结束日期
     private LocalDateTime endDate;
 
+    private Boolean enabled;
+
     // 合并fileEntity/textEntity/qaEntity/websiteEntity 的 uid
     private String typeUid;
 
@@ -59,7 +61,4 @@ public class SplitResponse extends BaseResponse {
     // kbaseEntity 的 uid
     private String kbUid;
 
-    // private LocalDateTime createdAt;
-
-    // private LocalDateTime updatedAt;
 }
