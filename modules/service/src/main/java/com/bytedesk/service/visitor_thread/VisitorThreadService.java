@@ -115,8 +115,7 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
         //
         if (visitorRequest.isWeChat()) {
             thread.setExtra(visitorRequest.getThreadExtra());

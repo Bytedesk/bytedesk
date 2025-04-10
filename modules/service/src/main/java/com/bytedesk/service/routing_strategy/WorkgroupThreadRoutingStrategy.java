@@ -21,6 +21,7 @@ import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -340,7 +341,10 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 更新线程状态
         thread.setUserUid(robotEntity.getUid());
-        thread.setRoboting().setRobot(robotProtobuf.toJson()).setContent(content).setUnreadCount(0);
+        thread.setRoboting().setContent(content).setUnreadCount(0);
+        // 
+        String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        thread.setRobot(robotString);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");

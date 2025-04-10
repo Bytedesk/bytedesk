@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 10:49:13
+ * @LastEditTime: 2025-04-10 10:56:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,10 +57,7 @@ public class RobotService {
     private final Optional<SpringAITencentService> springAITencentService;
     private final Optional<SpringAIBaiduService> springAIBaiduService;
 
-    // private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
-    // private final IMessageSendService messageSendService;
-    // private final RobotRestService robotRestService;
     private final MessageService messageService;
 
     // 处理内部成员SSE请求消息
@@ -72,9 +69,7 @@ public class RobotService {
         messageJson = messageService.processMessageJson(messageJson);
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
-        // if (messageType.equals(MessageTypeEnum.STREAM)) {
-        // return;
-        // }
+        // 
         String query = messageProtobuf.getContent();
         log.info("robot processSseMessage {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 10:54:01
+ * @LastEditTime: 2025-04-10 10:55:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -227,18 +227,19 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
         
+        // 如果拉取的是访客的消息，会影响前端
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
-        Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
-        if (messageOptional.isPresent()) {
-            MessageEntity message = messageOptional.get();
-            if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
-                // 距离当前时间不超过30分钟，则直接使用之前的消息
-                // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
-                MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
-                messageSendService.sendProtobufMessage(messageProtobuf);
-                return messageProtobuf;
-            }
-        }
+        // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
+        // if (messageOptional.isPresent()) {
+        //     MessageEntity message = messageOptional.get();
+        //     if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+        //         // 距离当前时间不超过30分钟，则直接使用之前的消息
+        //         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+        //         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
+        //         messageSendService.sendProtobufMessage(messageProtobuf);
+        //         return messageProtobuf;
+        //     }
+        // }
         // 
         queueMemberEntity.setAgentOffline(true);
         queueMemberRestService.save(queueMemberEntity);
