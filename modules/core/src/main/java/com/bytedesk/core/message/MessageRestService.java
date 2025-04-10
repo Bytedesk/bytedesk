@@ -75,12 +75,12 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
 
     @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public Optional<MessageEntity> findLatestByThreadUid(String threadUid) {
-        return messageRepository.findFirstByThreadUidOrderByCreatedAtDesc(threadUid);
+        return messageRepository.findFirstByThread_UidOrderByCreatedAtDesc(threadUid);
     }
 
     @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")
     public Optional<MessageEntity> findByThreadUidAndTypeAndUserContains(String threadUid, String type, String userUid) {
-        return messageRepository.findFirstByThreadUidAndTypeAndUserContainsOrderByCreatedAtDesc(threadUid, type, userUid);
+        return messageRepository.findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(threadUid, type, userUid);
     }
 
     // rate message extra helpful

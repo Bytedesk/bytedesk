@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:13:14
+ * @LastEditTime: 2025-04-10 10:32:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -34,12 +33,10 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
     Optional<MessageEntity> findByUid(String uid);
 
     // 根据thread.uid查询最新一条消息
-    @Query("SELECT m FROM MessageEntity m JOIN m.thread t WHERE t.uid = :threadUid ORDER BY m.createdAt DESC")
-    Optional<MessageEntity> findFirstByThreadUidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
+    Optional<MessageEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
 
     // thread.uid + type + user contains uid
-    @Query("SELECT m FROM MessageEntity m JOIN m.thread t WHERE t.uid = :threadUid AND m.type = :type AND m.user LIKE %:userUid% ORDER BY m.createdAt DESC")
-    Optional<MessageEntity> findFirstByThreadUidAndTypeAndUserContainsOrderByCreatedAtDesc(
+    Optional<MessageEntity> findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(
             @Param("threadUid") String threadUid, 
             @Param("type") String type, 
             @Param("userUid") String userUid);
