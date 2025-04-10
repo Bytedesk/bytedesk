@@ -141,7 +141,7 @@ public class TextRestService extends BaseRestService<TextEntity, TextRequest, Te
         return modelMapper.map(entity, TextResponse.class);
     }
 
-    public Page<TextEntity> queryByOrgExcel(TextRequest request) {
+    public Page<TextEntity> queryByOrgEntity(TextRequest request) {
         Pageable pageable = request.getPageable();
         Specification<TextEntity> spec = TextSpecification.search(request);
         return textRepository.findAll(spec, pageable);

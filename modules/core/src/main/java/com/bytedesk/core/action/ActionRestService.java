@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 17:54:52
+ * @LastEditTime: 2025-04-10 12:04:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,14 +17,12 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -34,7 +32,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ActionRestService extends BaseRestService<ActionEntity, ActionRequest, ActionResponse> {
+public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, ActionRequest, ActionResponse, ActionExcel> {
 
     private final ActionRepository actionRepository;
 
@@ -43,6 +41,33 @@ public class ActionRestService extends BaseRestService<ActionEntity, ActionReque
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    @Override
+    public Page<ActionEntity> queryByOrgEntity(ActionRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<ActionEntity> spec = ActionSpecification.search(request);
+        return actionRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<ActionResponse> queryByOrg(ActionRequest request) {
+        Page<ActionEntity> page = queryByOrgEntity(request);
+        return page.map(action -> convertToResponse(action));
+    }
+
+    @Override
+    public Page<ActionResponse> queryByUser(ActionRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<ActionEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    
 
     public ActionResponse create(ActionRequest actionRequest) {
 
@@ -64,6 +89,13 @@ public class ActionRestService extends BaseRestService<ActionEntity, ActionReque
         return convertToResponse(savedAction);
     }
 
+    @Override
+    public ActionResponse update(ActionRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+
     public ActionEntity save(ActionEntity action) {
         try {
             return actionRepository.save(action);
@@ -80,35 +112,9 @@ public class ActionRestService extends BaseRestService<ActionEntity, ActionReque
         return modelMapper.map(action, ActionResponse.class);
     }
 
-    @Override
-    public Page<ActionResponse> queryByOrg(ActionRequest request) {
+    
 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
-        //
-        Specification<ActionEntity> spec = ActionSpecification.search(request);
-        Page<ActionEntity> page = actionRepository.findAll(spec, pageable);
-
-        return page.map(action -> convertToResponse(action));
-    }
-
-    @Override
-    public Page<ActionResponse> queryByUser(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public Optional<ActionEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
-    }
-
-    @Override
-    public ActionResponse update(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
+    
     @Override
     public void deleteByUid(String uid) {
         // TODO Auto-generated method stub
@@ -127,19 +133,32 @@ public class ActionRestService extends BaseRestService<ActionEntity, ActionReque
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
-    public ActionExcel convertToExcel(ActionResponse action) {
-        ActionExcel actionExcel = modelMapper.map(action, ActionExcel.class);
-        if (action.getUser() != null) {
-            actionExcel.setUser(action.getUser().getNickname());
-        }
-        actionExcel.setCreatedAt(action.getCreatedAt());
-        return actionExcel;
-    }
+
+    // public ActionExcel convertToExcel(ActionResponse action) {
+    //     ActionExcel actionExcel = modelMapper.map(action, ActionExcel.class);
+    //     if (action.getUser() != null) {
+    //         actionExcel.setUser(action.getUser().getNickname());
+    //     }
+    //     actionExcel.setCreatedAt(action.getCreatedAt());
+    //     return actionExcel;
+    // }
 
     @Override
     public ActionResponse queryByUid(ActionRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    
+
+    @Override
+    public ActionExcel convertToExcel(ActionEntity entity) {
+        ActionExcel actionExcel = modelMapper.map(entity, ActionExcel.class);
+        if (entity.getUser() != null) {
+            actionExcel.setUser(entity.getUser().getNickname());
+        }
+        // actionExcel.setCreatedAt(entity.getCreatedAt());
+        return actionExcel;
     }
 
 }

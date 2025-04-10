@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 23:07:37
+ * @LastEditTime: 2025-04-10 12:26:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
@@ -49,7 +49,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse> {
+public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse, QuickReplyExcel> {
 
     private final QuickReplyRepository quickReplyRepository;
 
@@ -64,10 +64,15 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
     private final AuthService authService;
 
     @Override
-    public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {
+    public Page<QuickReplyEntity> queryByOrgEntity(QuickReplyRequest request) {
         Pageable pageable = request.getPageable();
         Specification<QuickReplyEntity> spec = QuickReplySpecification.search(request);
-        Page<QuickReplyEntity> page = quickReplyRepository.findAll(spec, pageable);
+        return quickReplyRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {
+        Page<QuickReplyEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
     
@@ -188,12 +193,7 @@ public class QuickReplyRestService extends BaseRestService<QuickReplyEntity, Qui
         return modelMapper.map(entity, QuickReplyResponse.class);
     }
 
-    public Page<QuickReplyEntity> queryByOrgExcel(QuickReplyRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<QuickReplyEntity> spec = QuickReplySpecification.search(request);
-        return quickReplyRepository.findAll(spec, pageable);
-    }
-
+    @Override
     public QuickReplyExcel convertToExcel(QuickReplyEntity quickReply) {
         // categoryUid
         Optional<CategoryEntity> categoryOptional = categoryService.findByUid(quickReply.getCategoryUid());

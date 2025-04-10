@@ -153,7 +153,7 @@ public class TabooMessageRestService extends BaseRestService<TabooMessageEntity,
         return modelMapper.map(entity, TabooMessageResponse.class);
     }
 
-    public Page<TabooMessageEntity> queryByOrgExcel(TabooMessageRequest request) {
+    public Page<TabooMessageEntity> queryByOrgEntity(TabooMessageRequest request) {
         Pageable pageable = request.getPageable();
         Specification<TabooMessageEntity> specification = TabooMessageSpecification.search(request);
         return taboo_messageRepository.findAll(specification, pageable);

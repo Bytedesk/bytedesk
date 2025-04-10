@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 11:54:00
+ * @LastEditTime: 2025-04-10 12:06:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserRestService extends BaseRestService<UserEntity, UserRequest, UserResponse> {
+public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRequest, UserResponse, UserExcel> {
 
     private final UserRepository userRepository;
     
@@ -40,10 +40,15 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
     private final UserService userService;
 
     @Override
-    public Page<UserResponse> queryByOrg(UserRequest request) {
+    public Page<UserEntity> queryByOrgEntity(UserRequest request) {
         Pageable pageable = request.getPageable();
         Specification<UserEntity> specification = UserSpecification.search(request);
-        Page<UserEntity> page = userRepository.findAll(specification, pageable);
+        return userRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<UserResponse> queryByOrg(UserRequest request) {
+        Page<UserEntity> page = queryByOrgEntity(request);
         return page.map(ConvertUtils::convertToUserResponse);
     }
 
@@ -152,7 +157,20 @@ public class UserRestService extends BaseRestService<UserEntity, UserRequest, Us
     //     return entities.stream().map(this::convertToExcel).collect(Collectors.toList());
     // }
 
-    public UserExcel convertToExcel(UserResponse entity) {
+    // public UserExcel convertToExcel(UserResponse entity) {
+    //     UserExcel excel = new UserExcel();
+    //     excel.setNickname(entity.getNickname());
+    //     excel.setEmail(entity.getEmail());
+    //     excel.setMobile(entity.getMobile());
+    //     excel.setDescription(entity.getDescription());
+    //     // excel.setAvatar(entity.getAvatar());
+    //     // excel.setPlatform(entity.getPlatform());
+    //     // excel.setOrgUid(entity.getOrgUid());
+    //     return excel;
+    // }
+
+    @Override
+    public UserExcel convertToExcel(UserEntity entity) {
         UserExcel excel = new UserExcel();
         excel.setNickname(entity.getNickname());
         excel.setEmail(entity.getEmail());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 13:08:56
+ * @LastEditTime: 2025-04-10 12:23:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqResponse> {
+public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqRequest, FaqResponse, FaqExcel> {
 
     private final FaqRepository faqRepository;
 
@@ -64,10 +64,15 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
     private final AuthService authService;
 
     @Override
-    public Page<FaqResponse> queryByOrg(FaqRequest request) {
+    public Page<FaqEntity> queryByOrgEntity(FaqRequest request) {
         Pageable pageable = request.getPageable();
         Specification<FaqEntity> spec = FaqSpecification.search(request);
-        Page<FaqEntity> page = faqRepository.findAll(spec, pageable);
+        return faqRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<FaqResponse> queryByOrg(FaqRequest request) {
+        Page<FaqEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -333,12 +338,8 @@ public class FaqRestService extends BaseRestService<FaqEntity, FaqRequest, FaqRe
         return response;
     }
 
-    public Page<FaqEntity> queryByOrgExcel(FaqRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<FaqEntity> spec = FaqSpecification.search(request);
-        return faqRepository.findAll(spec, pageable);
-    }
-
+    
+    @Override
     public FaqExcel convertToExcel(FaqEntity faq) {
         FaqExcel excel = modelMapper.map(faq, FaqExcel.class);
         if (StringUtils.hasText(faq.getCategoryUid())) {

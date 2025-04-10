@@ -85,7 +85,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
     @Override
     public Object export(TextRequest request, HttpServletResponse response) {
         // query data to export
-        Page<TextEntity> textPage = textService.queryByOrgExcel(request);
+        Page<TextEntity> textPage = textService.queryByOrgEntity(request);
         // 
         try {
             //

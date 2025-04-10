@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 19:29:35
+ * @LastEditTime: 2025-04-10 12:20:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywordEntity, AutoReplyKeywordRequest, AutoReplyKeywordResponse> {
+public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoReplyKeywordEntity, AutoReplyKeywordRequest, AutoReplyKeywordResponse, AutoReplyKeywordExcel> {
 
     private final AutoReplyKeywordRepository keywordRepository;
 
@@ -55,10 +55,15 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
     private final AuthService authService;
 
     @Override
-    public Page<AutoReplyKeywordResponse> queryByOrg(AutoReplyKeywordRequest request) {
+    public Page<AutoReplyKeywordEntity> queryByOrgEntity(AutoReplyKeywordRequest request) {
         Pageable pageable = request.getPageable();
         Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
-        Page<AutoReplyKeywordEntity> page = keywordRepository.findAll(spec, pageable);
+        return keywordRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<AutoReplyKeywordResponse> queryByOrg(AutoReplyKeywordRequest request) {
+        Page<AutoReplyKeywordEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -187,12 +192,7 @@ public class AutoReplyKeywordRestService extends BaseRestService<AutoReplyKeywor
         return keywordResponse;
     }
 
-    public Page<AutoReplyKeywordEntity> queryByOrgExcel(AutoReplyKeywordRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
-        return keywordRepository.findAll(spec, pageable);
-    }
-
+    @Override
     public AutoReplyKeywordExcel convertToExcel(AutoReplyKeywordEntity entity) {
         // categoryUid
         Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());

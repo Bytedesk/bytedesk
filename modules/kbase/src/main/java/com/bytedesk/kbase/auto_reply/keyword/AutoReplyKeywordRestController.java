@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:55:29
+ * @LastEditTime: 2025-04-10 12:20:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.kbase.auto_reply.keyword;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,11 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-// import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,13 +33,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AutoReplyKeywordRestController extends BaseRestController<AutoReplyKeywordRequest> {
 
-    private final AutoReplyKeywordRestService keywordService;
+    private final AutoReplyKeywordRestService keywordRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(AutoReplyKeywordRequest request) {
         
-        Page<AutoReplyKeywordResponse> page = keywordService.queryByOrg(request);
+        Page<AutoReplyKeywordResponse> page = keywordRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -52,7 +47,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
     @Override
     public ResponseEntity<?> queryByUser(AutoReplyKeywordRequest request) {
         
-        Page<AutoReplyKeywordResponse> page = keywordService.queryByUser(request);
+        Page<AutoReplyKeywordResponse> page = keywordRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -61,7 +56,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
     @Override
     public ResponseEntity<?> create(@RequestBody AutoReplyKeywordRequest request) {
         
-        AutoReplyKeywordResponse response = keywordService.create(request);
+        AutoReplyKeywordResponse response = keywordRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -70,7 +65,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
     @Override
     public ResponseEntity<?> update(@RequestBody AutoReplyKeywordRequest request) {
         
-        AutoReplyKeywordResponse response = keywordService.update(request);
+        AutoReplyKeywordResponse response = keywordRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -79,46 +74,22 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
     @Override
     public ResponseEntity<?> delete(@RequestBody AutoReplyKeywordRequest request) {
 
-        keywordService.delete(request);
+        keywordRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
 
-    // https://github.com/alibaba/easyexcel
-    // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "关键词", action = "导出", description = "export keyword")
     @GetMapping("/export")
     public Object export(AutoReplyKeywordRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<AutoReplyKeywordEntity> keywordPage = keywordService.queryByOrgExcel(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "auto_reply-keyword-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<AutoReplyKeywordExcel> excelList = keywordPage.getContent().stream().map(keywordResponse -> keywordService.convertToExcel(keywordResponse)).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), AutoReplyKeywordExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("AutoReplyKeyword")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            keywordRestService,
+            AutoReplyKeywordExcel.class,
+            "关键词",
+            "auto_reply-keyword"
+        );
     }
 
     @Override

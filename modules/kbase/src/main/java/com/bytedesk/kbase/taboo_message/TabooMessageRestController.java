@@ -87,7 +87,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
     @Override
     public Object export(TabooMessageRequest request, HttpServletResponse response) {
         // query data to export
-        Page<TabooMessageEntity> taboo_messagePage = taboo_messageService.queryByOrgExcel(request);
+        Page<TabooMessageEntity> taboo_messagePage = taboo_messageService.queryByOrgEntity(request);
         // 
         try {
             //

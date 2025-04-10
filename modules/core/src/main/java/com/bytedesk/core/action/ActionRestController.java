@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:40:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:52:39
+ * @LastEditTime: 2025-04-10 12:00:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,18 +13,13 @@
  */
 package com.bytedesk.core.action;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
-// import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,12 +30,12 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/action")
 public class ActionRestController extends BaseRestController<ActionRequest> {
     
-    private final ActionRestService actionService;
+    private final ActionRestService actionRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(ActionRequest request) {
 
-        Page<ActionResponse> page = actionService.queryByOrg(request);
+        Page<ActionResponse> page = actionRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -77,10 +72,10 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
         return exportTemplate(
             request,
             response,
-            actionService,
+            actionRestService,
             ActionExcel.class,
-            "action",
-            "team-action"
+            "日志",
+            "actions"
         );
     }
 

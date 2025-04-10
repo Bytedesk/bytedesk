@@ -127,7 +127,7 @@ public class WebsiteRestService extends BaseRestService<WebsiteEntity, WebsiteRe
         return modelMapper.map(entity, WebsiteResponse.class);
     }
 
-    public Page<WebsiteEntity> queryByOrgExcel(WebsiteRequest request) {
+    public Page<WebsiteEntity> queryByOrgEntity(WebsiteRequest request) {
         Pageable pageable = request.getPageable();
         Specification<WebsiteEntity> spec = WebsiteSpecification.search(request);
         return websiteRepository.findAll(spec, pageable);
