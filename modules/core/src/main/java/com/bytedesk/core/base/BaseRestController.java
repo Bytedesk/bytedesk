@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:16:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 11:55:24
+ * @LastEditTime: 2025-04-10 11:57:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,9 +108,9 @@ public abstract class BaseRestController<T> {
             Page<?> dataPage = null;
             List<?> excelList = null;
             
-            // 反射获取queryByOrgExcel方法
+            // 反射获取queryByOrgEntity方法
             try {
-                java.lang.reflect.Method queryMethod = service.getClass().getMethod("queryByOrgExcel", request.getClass());
+                java.lang.reflect.Method queryMethod = service.getClass().getMethod("queryByOrgEntity", request.getClass());
                 dataPage = (Page<?>) queryMethod.invoke(service, request);
                 
                 // 反射获取convertToExcel方法
