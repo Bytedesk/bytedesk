@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 19:23:32
+ * @LastEditTime: 2025-04-10 12:09:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEntity, AutoReplyFixedRequest, AutoReplyFixedResponse> {
+public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoReplyFixedEntity, AutoReplyFixedRequest, AutoReplyFixedResponse, AutoReplyFixedExcel> {
 
     private final AutoReplyFixedRepository autoReplyRepository;
 
@@ -51,10 +51,15 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
     private final AuthService authService;
 
     @Override
-    public Page<AutoReplyFixedResponse> queryByOrg(AutoReplyFixedRequest request) {
+    public Page<AutoReplyFixedEntity> queryByOrgEntity(AutoReplyFixedRequest request) {
         Pageable pageable = request.getPageable();
         Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
-        Page<AutoReplyFixedEntity> page = autoReplyRepository.findAll(specification, pageable);
+        return autoReplyRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<AutoReplyFixedResponse> queryByOrg(AutoReplyFixedRequest request) {
+        Page<AutoReplyFixedEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -155,12 +160,7 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
         return modelMapper.map(entity, AutoReplyFixedResponse.class);
     }
 
-    public Page<AutoReplyFixedEntity> queryByOrgExcel(AutoReplyFixedRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
-        return autoReplyRepository.findAll(specification, pageable);
-    }
-
+    @Override
     public AutoReplyFixedExcel convertToExcel(AutoReplyFixedEntity autoReply) {
         // categoryUid
         Optional<CategoryEntity> categoryOptional = categoryService.findByUid(autoReply.getCategoryUid());
@@ -204,5 +204,6 @@ public class AutoReplyFixedRestService extends BaseRestService<AutoReplyFixedEnt
 
         return autoReply;
     }
+
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:31:50
+ * @LastEditTime: 2025-04-10 12:08:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRequest, ArticleResponse> {
+public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, ArticleRequest, ArticleResponse, ArticleExcel> {
 
     private final ArticleRepository articleRepository;
 
@@ -47,10 +47,15 @@ public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRe
     private final AuthService authService;
 
     @Override
-    public Page<ArticleResponse> queryByOrg(ArticleRequest request) {
+    public Page<ArticleEntity> queryByOrgEntity(ArticleRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ArticleEntity> spec = ArticleSpecification.search(request);
-        Page<ArticleEntity> page = articleRepository.findAll(spec, pageable);
+        return articleRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<ArticleResponse> queryByOrg(ArticleRequest request) {
+        Page<ArticleEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -170,14 +175,11 @@ public class ArticleRestService extends BaseRestService<ArticleEntity, ArticleRe
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    public Page<ArticleEntity> queryByOrgExcel(ArticleRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ArticleEntity> spec = ArticleSpecification.search(request);
-        return articleRepository.findAll(spec, pageable);
-    }
-
+    @Override
     public ArticleExcel convertToExcel(ArticleEntity article) {
         return modelMapper.map(article, ArticleExcel.class);
     }
+
+    
 
 }

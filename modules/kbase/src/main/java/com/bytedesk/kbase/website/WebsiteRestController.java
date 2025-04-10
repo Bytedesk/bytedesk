@@ -81,7 +81,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
     @Override
     public Object export(WebsiteRequest request, HttpServletResponse response) {
         // query data to export
-        Page<WebsiteEntity> websitePage = websiteService.queryByOrgExcel(request);
+        Page<WebsiteEntity> websitePage = websiteService.queryByOrgEntity(request);
         // 
         try {
             //

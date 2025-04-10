@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 14:20:56
+ * @LastEditTime: 2025-04-10 12:26:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,17 +13,13 @@
  */
 package com.bytedesk.kbase.split;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,13 +30,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SplitRestController extends BaseRestController<SplitRequest> {
 
-    private final SplitRestService splitService;
+    private final SplitRestService splitRestService;
 
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(SplitRequest request) {
         
-        Page<SplitResponse> splits = splitService.queryByOrg(request);
+        Page<SplitResponse> splits = splitRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(splits));
     }
@@ -49,7 +45,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
     @Override
     public ResponseEntity<?> queryByUser(SplitRequest request) {
         
-        Page<SplitResponse> splits = splitService.queryByUser(request);
+        Page<SplitResponse> splits = splitRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(splits));
     }
@@ -65,7 +61,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
     @Override
     public ResponseEntity<?> create(SplitRequest request) {
         
-        SplitResponse split = splitService.create(request);
+        SplitResponse split = splitRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(split));
     }
@@ -74,7 +70,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
     @Override
     public ResponseEntity<?> update(SplitRequest request) {
         
-        SplitResponse split = splitService.update(request);
+        SplitResponse split = splitRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(split));
     }
@@ -83,7 +79,7 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
     @Override
     public ResponseEntity<?> delete(SplitRequest request) {
         
-        splitService.delete(request);
+        splitRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -91,37 +87,13 @@ public class SplitRestController extends BaseRestController<SplitRequest> {
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(SplitRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<SplitEntity> splitPage = splitService.queryByOrgExcel(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "kbase-split-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<SplitExcel> excelList = splitPage.getContent().stream().map(splitResponse -> splitService.convertToExcel(splitResponse)).toList();
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), SplitExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("split")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            splitRestService,
+            SplitExcel.class,
+            "分词",
+            "split"
+        );
     }
-
-    
-    
 }

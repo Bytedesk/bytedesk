@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:23:56
+ * @LastEditTime: 2025-04-10 12:26:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest, SplitResponse> {
+public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, SplitRequest, SplitResponse, SplitExcel> {
 
     private final SplitRepository splitRepository;
 
@@ -45,10 +45,15 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
     private final AuthService authService;
 
     @Override
-    public Page<SplitResponse> queryByOrg(SplitRequest request) {
+    public Page<SplitEntity> queryByOrgEntity(SplitRequest request) {
         Pageable pageable = request.getPageable();
         Specification<SplitEntity> spec = SplitSpecification.search(request);
-        Page<SplitEntity> page = splitRepository.findAll(spec, pageable);
+        return splitRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<SplitResponse> queryByOrg(SplitRequest request) {
+        Page<SplitEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -158,12 +163,7 @@ public class SplitRestService extends BaseRestService<SplitEntity, SplitRequest,
         return modelMapper.map(entity, SplitResponse.class);
     }
 
-    public Page<SplitEntity> queryByOrgExcel(SplitRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<SplitEntity> spec = SplitSpecification.search(request);
-        return splitRepository.findAll(spec, pageable);
-    }
-    
+    @Override
     public SplitExcel convertToExcel(SplitEntity split) {
         return modelMapper.map(split, SplitExcel.class);
     }

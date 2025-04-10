@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:55:49
+ * @LastEditTime: 2025-04-10 12:21:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -36,13 +32,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FaqRestController extends BaseRestController<FaqRequest> {
 
-    private final FaqRestService faqService;
+    private final FaqRestService faqRestService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
 
-        Page<FaqResponse> page = faqService.queryByOrg(request);
+        Page<FaqResponse> page = faqRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -51,7 +47,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @Override
     public ResponseEntity<?> queryByUser(FaqRequest request) {
         
-        Page<FaqResponse> page = faqService.queryByUser(request);
+        Page<FaqResponse> page = faqRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -60,7 +56,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @Override
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         
-        FaqResponse faq = faqService.queryByUid(request);
+        FaqResponse faq = faqRestService.queryByUid(request);
         if (faq == null) {
             return ResponseEntity.ok(JsonResult.error("faq not found"));
         }
@@ -72,7 +68,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
 
-        FaqResponse Faq = faqService.create(request);
+        FaqResponse Faq = faqRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
@@ -82,7 +78,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
 
-        FaqResponse Faq = faqService.update(request);
+        FaqResponse Faq = faqRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
@@ -92,51 +88,23 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
 
-        faqService.delete(request);
+        faqRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    // https://github.com/alibaba/easyexcel
-    // https://easyexcel.opensource.alibaba.com/docs/current/
     @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")
     @GetMapping("/export")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     public Object export(FaqRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<FaqEntity> faqPage = faqService.queryByOrgExcel(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            // String fileName = "Faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            String fileName = "faq-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<FaqExcel> excelList = faqPage.getContent().stream().map(faqResponse -> faqService.convertToExcel(faqResponse)).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), FaqExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("Faq")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            // 
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            faqRestService,
+            FaqExcel.class,
+            "常见问题",
+            "faq"
+        );
     }
-
-    
-
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:24:11
+ * @LastEditTime: 2025-04-10 12:24:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,14 +23,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class FileRestService extends BaseRestService<FileEntity, FileRequest, FileResponse> {
+public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRequest, FileResponse, FileExcel> {
 
     private final FileRepository fileRepository;
 
@@ -39,10 +39,15 @@ public class FileRestService extends BaseRestService<FileEntity, FileRequest, Fi
     private final UidUtils uidUtils;
 
     @Override
-    public Page<FileResponse> queryByOrg(FileRequest request) {
+    public Page<FileEntity> queryByOrgEntity(FileRequest request) {
         Pageable pageable = request.getPageable();
         Specification<FileEntity> spec = FileSpecification.search(request);
-        Page<FileEntity> page = fileRepository.findAll(spec, pageable);
+        return fileRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<FileResponse> queryByOrg(FileRequest request) {
+        Page<FileEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -126,13 +131,9 @@ public class FileRestService extends BaseRestService<FileEntity, FileRequest, Fi
     public FileResponse convertToResponse(FileEntity entity) {
         return modelMapper.map(entity, FileResponse.class);
     }
+    
 
-    public Page<FileEntity> queryByOrgExcel(FileRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<FileEntity> spec = FileSpecification.search(request);
-        return fileRepository.findAll(spec, pageable);
-    }
-
+    @Override
     public FileExcel convertToExcel(FileEntity file) {
         return modelMapper.map(file, FileExcel.class);
     }
