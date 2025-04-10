@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 15:49:00
+ * @LastEditTime: 2025-04-10 14:58:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,14 +85,16 @@ public class TopicEventListener {
         // log.info("topic QuartzOneMinEvent {}", clientIds);
         // current connected clientIds
         if (clientIds != null) {
-            // todo: clear topic clientIds not in clientIds
-
-            // add clientIds to topic
+            // 不再直接处理每个clientId，而是将它们添加到缓存中，由五秒定时器统一处理
             for (String clientId : clientIds) {
                 // 用户clientId格式: userUid/client/deviceUid
                 // log.info("topic onQuartzOneMinEvent connected clientId: {}", clientId);
-                topicService.addClientId(clientId);
+                // 将clientId添加到缓存中，而不是直接调用topicService.addClientId
+                topicCacheService.pushClientId(clientId);
             }
+            
+            // TODO: 可以在这里添加清理逻辑，删除不在当前连接列表中的clientId
+            // 这样可以确保只有活跃连接被保留在topic中
         }
     }
 
