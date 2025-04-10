@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 08:46:03
+ * @LastEditTime: 2025-04-10 17:14:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -219,8 +219,8 @@ public class I18Consts {
     public static final String I18N_REENTER_TIP = "继续会话"; // 重新进入提示
     public static final String I18N_QUEUE_TIP = "您好，客服繁忙，请稍后"; // 排队提示
     public static final String I18N_QUEUE_MESSAGE_TEMPLATE = "您前面还有{0}人排队"; // 您前面还有{0}人排队
-    public static final String I18N_AUTO_CLOSE_TIP = "会话已自动关闭"; // 会话已自动关闭
-    public static final String I18N_AGENT_CLOSE_TIP = "客服已关闭会话"; // 客服已关闭会话
+    public static final String I18N_AUTO_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 会话已自动关闭
+    public static final String I18N_AGENT_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 客服已关闭会话
     public static final String I18N_AGENT_TRANSFER_TIP = "客服已将会话转接"; // 客服已将会话转接
     // 评价提示
     public static final String I18N_INVITE_RATE_TIP = "邀请评价提示"; // 邀请评价提示
