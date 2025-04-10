@@ -45,6 +45,10 @@ public class ThreadProtobuf implements Serializable {
 
     private String extra;
 
+    public static ThreadProtobuf fromJson(String json) {
+        return JSON.parseObject(json, ThreadProtobuf.class);
+    }
+
     public String toJson() {
         return JSON.toJSONString(this);
     }

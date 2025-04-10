@@ -49,7 +49,7 @@ public class FileEventListener {
                 .kbUid(upload.getKbUid())
                 .build();
             fileRequest.setOrgUid(upload.getOrgUid());
-            UserProtobuf userProtobuf = UserProtobuf.parseFromJson(upload.getUser());
+            UserProtobuf userProtobuf = UserProtobuf.fromJson(upload.getUser());
             fileRequest.setUserUid(userProtobuf.getUid());
             // 读取文件内容，写入到content字段，迁移到 ai 模块 SpringAIEventListener中读取
             fileRestService.create(fileRequest);

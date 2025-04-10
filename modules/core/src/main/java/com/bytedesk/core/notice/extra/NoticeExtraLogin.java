@@ -43,7 +43,7 @@ public class NoticeExtraLogin extends BaseExtra {
 
     private String loginTime;
 
-    public static NoticeExtraLogin parseFromJson(String json) {
+    public static NoticeExtraLogin fromJson(String json) {
         return JSON.parseObject(json, NoticeExtraLogin.class);
     }
 

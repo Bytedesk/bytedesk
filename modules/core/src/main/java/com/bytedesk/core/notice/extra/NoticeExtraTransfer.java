@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-16 10:29:30
+ * @LastEditTime: 2025-04-10 18:01:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,7 +55,7 @@ public class NoticeExtraTransfer extends BaseExtra {
     @Builder.Default
     private Long expireTime = 120L;
 
-    public static NoticeExtraTransfer parseFromJson(String json) {
+    public static NoticeExtraTransfer fromJson(String json) {
         return JSON.parseObject(json, NoticeExtraTransfer.class);
     }
 
