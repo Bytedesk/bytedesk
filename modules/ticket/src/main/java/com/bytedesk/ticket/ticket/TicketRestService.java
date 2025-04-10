@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 09:05:24
+ * @LastEditTime: 2025-04-10 11:56:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -66,7 +67,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TicketRestService extends BaseRestService<TicketEntity, TicketRequest, TicketResponse> {
+public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, TicketRequest, TicketResponse, TicketExcel> {
 
     private final TaskService taskService;
 
@@ -437,6 +438,18 @@ public class TicketRestService extends BaseRestService<TicketEntity, TicketReque
                     .build();
             categoryService.create(categoryRequest);
         }
+    }
+
+    @Override
+    public Page<TicketEntity> queryByOrgEntity(TicketRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrgEntity'");
+    }
+
+    @Override
+    public TicketExcel convertToExcel(TicketEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToExcel'");
     }
 
 }
