@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 17:57:08
+ * @LastEditTime: 2025-04-10 12:37:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -35,9 +35,9 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TabooMessageRestService extends BaseRestService<TabooMessageEntity, TabooMessageRequest, TabooMessageResponse> {
+public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessageEntity, TabooMessageRequest, TabooMessageResponse, TabooMessageExcel> {
 
-    private final TabooMessageRepository taboo_messageRepository;
+    private final TabooMessageRepository tabooMessageRepository;
 
     private final ModelMapper modelMapper;
 
@@ -48,10 +48,15 @@ public class TabooMessageRestService extends BaseRestService<TabooMessageEntity,
     private final AuthService authService;
 
     @Override
-    public Page<TabooMessageResponse> queryByOrg(TabooMessageRequest request) {
+    public Page<TabooMessageEntity> queryByOrgEntity(TabooMessageRequest request) {
         Pageable pageable = request.getPageable();
         Specification<TabooMessageEntity> specification = TabooMessageSpecification.search(request);
-        Page<TabooMessageEntity> page = taboo_messageRepository.findAll(specification, pageable);
+        return tabooMessageRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<TabooMessageResponse> queryByOrg(TabooMessageRequest request) {
+        Page<TabooMessageEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -69,7 +74,7 @@ public class TabooMessageRestService extends BaseRestService<TabooMessageEntity,
     @Cacheable(value = "taboo_message", key="#uid", unless = "#result == null")
     @Override
     public Optional<TabooMessageEntity> findByUid(String uid) {
-        return taboo_messageRepository.findByUid(uid);
+        return tabooMessageRepository.findByUid(uid);
     }
 
     @Override
@@ -116,7 +121,7 @@ public class TabooMessageRestService extends BaseRestService<TabooMessageEntity,
     @Override
     public TabooMessageEntity save(TabooMessageEntity entity) {
         try {
-            return taboo_messageRepository.save(entity);
+            return tabooMessageRepository.save(entity);
         } catch (Exception e) {
             // TODO: handle exception
         }
@@ -124,7 +129,7 @@ public class TabooMessageRestService extends BaseRestService<TabooMessageEntity,
     }
 
     public void save(List<TabooMessageEntity> entities) {
-        taboo_messageRepository.saveAll(entities);
+        tabooMessageRepository.saveAll(entities);
     }
 
     @Override
@@ -153,12 +158,9 @@ public class TabooMessageRestService extends BaseRestService<TabooMessageEntity,
         return modelMapper.map(entity, TabooMessageResponse.class);
     }
 
-    public Page<TabooMessageEntity> queryByOrgEntity(TabooMessageRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TabooMessageEntity> specification = TabooMessageSpecification.search(request);
-        return taboo_messageRepository.findAll(specification, pageable);
-    }
+    
 
+    @Override
     public TabooMessageExcel convertToExcel(TabooMessageEntity response) {
         // categoryUid
         Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(response.getCategoryUid());
