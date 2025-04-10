@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 14:23:27
+ * @LastEditTime: 2025-04-10 08:02:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.service.queue;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -73,4 +76,7 @@ public class QueueResponse extends BaseResponse {
 
     @Builder.Default
     private Integer avgResolveTime = 0;  // 平均解决时间(秒)
+
+    @Builder.Default
+    private List<Integer> threadsCountByHour = new ArrayList<>();  // 每小时接待人数
 }
