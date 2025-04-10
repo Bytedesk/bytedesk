@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 16:11:36
+ * @LastEditTime: 2025-04-10 16:31:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,8 +54,6 @@ public class TextRequest extends BaseRequest {
 
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
-
-    
 
     private String categoryUid; // 所属分类
 

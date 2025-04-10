@@ -168,6 +168,22 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         quickReplyRepository.saveAll(entities);
     }
 
+    // 启用/禁用快捷回复
+    public QuickReplyResponse enable(QuickReplyRequest request) {
+        Optional<QuickReplyEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            QuickReplyEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            QuickReplyEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update QuickReply");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("quick_reply not found");
+        }
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<QuickReplyEntity> optional = findByUid(uid);

@@ -164,6 +164,22 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
         keywordRepository.saveAll(keywords);
     }
 
+    // 启用/禁用关键词自动回复
+    public AutoReplyKeywordResponse enable(AutoReplyKeywordRequest request) {
+        Optional<AutoReplyKeywordEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            AutoReplyKeywordEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            AutoReplyKeywordEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update AutoReplyKeyword");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("auto_reply_keyword not found");
+        }
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<AutoReplyKeywordEntity> keywordOptional = findByUid(uid);
