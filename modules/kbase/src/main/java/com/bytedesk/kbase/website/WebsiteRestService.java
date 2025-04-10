@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:23:28
+ * @LastEditTime: 2025-04-10 12:38:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,14 +23,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class WebsiteRestService extends BaseRestService<WebsiteEntity, WebsiteRequest, WebsiteResponse> {
+public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, WebsiteRequest, WebsiteResponse, WebsiteExcel> {
 
     private final WebsiteRepository websiteRepository;
 
@@ -39,10 +39,15 @@ public class WebsiteRestService extends BaseRestService<WebsiteEntity, WebsiteRe
     private final UidUtils uidUtils;
 
     @Override
-    public Page<WebsiteResponse> queryByOrg(WebsiteRequest request) {
+    public Page<WebsiteEntity> queryByOrgEntity(WebsiteRequest request) {
         Pageable pageable = request.getPageable();
         Specification<WebsiteEntity> spec = WebsiteSpecification.search(request);
-        Page<WebsiteEntity> page = websiteRepository.findAll(spec, pageable);
+        return websiteRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<WebsiteResponse> queryByOrg(WebsiteRequest request) {
+        Page<WebsiteEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -127,12 +132,9 @@ public class WebsiteRestService extends BaseRestService<WebsiteEntity, WebsiteRe
         return modelMapper.map(entity, WebsiteResponse.class);
     }
 
-    public Page<WebsiteEntity> queryByOrgEntity(WebsiteRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<WebsiteEntity> spec = WebsiteSpecification.search(request);
-        return websiteRepository.findAll(spec, pageable);
-    }
+    
 
+    @Override
     public WebsiteExcel convertToExcel(WebsiteEntity website) {
         return modelMapper.map(website, WebsiteExcel.class);
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:58:33
+ * @LastEditTime: 2025-04-10 12:35:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.team.group;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -136,35 +132,14 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @ActionAnnotation(title = "群组", action = "导出", description = "export group")
     @Override
     public Object export(GroupRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<GroupEntity> groupPage = groupRestService.queryForExport(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "team-group-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<GroupExcel> excelList = groupPage.getContent().stream().map(groupResponse -> groupRestService.convertToExcel(groupResponse)).toList();
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), GroupExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("group")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            groupRestService,
+            GroupExcel.class,
+            "群组",
+            "group"
+        );
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-26 10:45:35
+ * @LastEditTime: 2025-04-10 12:35:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
@@ -56,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MemberRestService extends BaseRestService<MemberEntity, MemberRequest, MemberResponse> {
+public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, MemberRequest, MemberResponse, MemberExcel> {
 
     private final UserService userService;
 
@@ -71,10 +71,15 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
     private final ThreadRestService threadService;
 
     @Override
-    public Page<MemberResponse> queryByOrg(MemberRequest request) {
+    public Page<MemberEntity> queryByOrgEntity(MemberRequest request) {
         Pageable pageable = request.getPageable();
         Specification<MemberEntity> spec = MemberSpecification.search(request);
-        Page<MemberEntity> memberPage = memberRepository.findAll(spec, pageable);
+        return memberRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<MemberResponse> queryByOrg(MemberRequest request) {
+        Page<MemberEntity> memberPage = queryByOrgEntity(request);
         return memberPage.map(this::convertToResponse);
     }
 
@@ -403,6 +408,13 @@ public class MemberRestService extends BaseRestService<MemberEntity, MemberReque
     @Override
     public MemberResponse convertToResponse(MemberEntity entity) {
         return modelMapper.map(entity, MemberResponse.class);
+    }
+
+    
+
+    @Override
+    public MemberExcel convertToExcel(MemberEntity entity) {
+        return modelMapper.map(entity, MemberExcel.class);
     }
 
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 00:00:20
+ * @LastEditTime: 2025-04-10 12:35:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 // @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest, GroupResponse> {
+public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, GroupRequest, GroupResponse, GroupExcel> {
 
     private final GroupRepository groupRepository;
 
@@ -46,6 +46,13 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
     private final UidUtils uidUtils;
 
     private final MemberRestService memberService;
+
+    @Override
+    public Page<GroupEntity> queryByOrgEntity(GroupRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<GroupEntity> specification = GroupSpecification.search(request);
+        return groupRepository.findAll(specification, pageable);
+    }
 
     @Override
     public Page<GroupResponse> queryByOrg(GroupRequest request) {
@@ -189,6 +196,7 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
     /**
      * 将群组实体转换为Excel导出对象
      */
+    @Override
     public GroupExcel convertToExcel(GroupEntity group) {
         GroupExcel excel = new GroupExcel();
         
@@ -213,5 +221,7 @@ public class GroupRestService extends BaseRestService<GroupEntity, GroupRequest,
         
         return excel;
     }
+
+    
 
 }
