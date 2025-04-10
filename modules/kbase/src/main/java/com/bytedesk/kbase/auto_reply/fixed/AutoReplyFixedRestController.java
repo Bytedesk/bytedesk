@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:39:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:08:38
+ * @LastEditTime: 2025-04-10 16:45:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,6 +74,15 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         autoReplyService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+    
+    @ActionAnnotation(title = "自动回复", action = "启用", description = "enable autoReply")
+    @PostMapping("/enable")
+    public ResponseEntity<?> enable(@RequestBody AutoReplyFixedRequest request) {
+        
+        AutoReplyFixedResponse response = autoReplyService.enable(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
     
     // https://github.com/alibaba/easyexcel

@@ -135,6 +135,22 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
         autoReplyRepository.saveAll(entities);
     }
 
+    // 启用/禁用固定自动回复
+    public AutoReplyFixedResponse enable(AutoReplyFixedRequest request) {
+        Optional<AutoReplyFixedEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            AutoReplyFixedEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            AutoReplyFixedEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update AutoReplyFixed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("auto_reply_fixed not found");
+        }
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<AutoReplyFixedEntity> autoReplyOptional = findByUid(uid);
