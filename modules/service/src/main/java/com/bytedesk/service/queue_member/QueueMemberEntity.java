@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:19:47
+ * @LastEditTime: 2025-04-10 18:06:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -256,7 +256,6 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime robotToAgentTime;  // 机器人转人工时间
 
     // 人工转人工
-    // transfer status
     @Builder.Default
     @Column(name = "thread_transfer_status", nullable = false)
     private String transferStatus = ThreadTransferStatusEnum.NONE.name();
