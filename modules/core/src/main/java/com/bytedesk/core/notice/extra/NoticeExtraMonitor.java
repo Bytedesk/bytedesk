@@ -55,7 +55,7 @@ public class NoticeExtraMonitor extends BaseExtra {
     @Builder.Default
     private Long expireTime = 120L;
 
-    public static NoticeExtraInvite parseFromJson(String json) {
+    public static NoticeExtraInvite fromJson(String json) {
         return JSON.parseObject(json, NoticeExtraInvite.class);
     }
 

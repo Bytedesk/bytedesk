@@ -62,7 +62,7 @@ public class MessageProtobuf implements Serializable {
 
 	private String extra;
 
-	public static MessageProtobuf parseFromJson(String user) {
+	public static MessageProtobuf fromJson(String user) {
         return JSON.parseObject(user, MessageProtobuf.class);
     }
 

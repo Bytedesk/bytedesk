@@ -44,7 +44,7 @@ public class MessageEntity extends AbstractMessageEntity {
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
     public UserProtobuf getUserProtobuf() {
-        return UserProtobuf.parseFromJson(getUser());
+        return UserProtobuf.fromJson(getUser());
     }
 
     // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
