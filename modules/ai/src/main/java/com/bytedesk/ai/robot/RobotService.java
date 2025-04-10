@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 16:17:56
+ * @LastEditTime: 2025-04-10 10:49:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,10 +93,10 @@ public class RobotService {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
-        if (!StringUtils.hasText(thread.getAgent())) {
+        if (!StringUtils.hasText(thread.getRobot())) {
             return;
         }
-        RobotProtobuf robot = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
+        RobotProtobuf robot = JSON.parseObject(thread.getRobot(), RobotProtobuf.class);
         log.info("processSseMemberMessage thread reply");
         //
         MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
@@ -158,9 +158,9 @@ public class RobotService {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
                         " not found"));
-        Assert.notNull(thread.getAgent(), "thread agent is null, threadTopic:" + threadTopic);
+        Assert.notNull(thread.getRobot(), "thread agent is null, threadTopic:" + threadTopic);
         // 
-        RobotProtobuf robot = JSON.parseObject(thread.getAgent(), RobotProtobuf.class);
+        RobotProtobuf robot = JSON.parseObject(thread.getRobot(), RobotProtobuf.class);
         if (robot.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("processSseVisitorMessage thread reply");
             // 机器人回复访客消息
