@@ -53,7 +53,7 @@ public class NoticeExtraTransfer extends BaseExtra {
 
     // 超时时间：单位秒，默认120秒
     @Builder.Default
-    private Long expireTime = 120L;
+    private Long expireLength = 120L;
 
     public static NoticeExtraTransfer fromJson(String json) {
         return JSON.parseObject(json, NoticeExtraTransfer.class);

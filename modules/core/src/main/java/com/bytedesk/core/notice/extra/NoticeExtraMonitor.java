@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 09:35:01
+ * @LastEditTime: 2025-04-10 18:55:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,7 @@ public class NoticeExtraMonitor extends BaseExtra {
 
     // 超时时间：单位秒，默认120秒
     @Builder.Default
-    private Long expireTime = 120L;
+    private Long expireLength = 120L;
 
     public static NoticeExtraInvite fromJson(String json) {
         return JSON.parseObject(json, NoticeExtraInvite.class);

@@ -88,7 +88,7 @@ public class FormEntity extends BaseEntity {
     
     // 表单过期时间
     @Column(name = "expire_time")
-    private LocalDateTime expireTime;
+    private LocalDateTime expireLength;
     
     // 表单布局类型：单列、双列、响应式等
     @Builder.Default
