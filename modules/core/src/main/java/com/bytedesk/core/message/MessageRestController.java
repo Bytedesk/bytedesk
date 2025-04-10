@@ -13,10 +13,8 @@
  */
 package com.bytedesk.core.message;
 
-import java.util.List;
 import java.util.Map;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +23,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.message_unread.MessageUnreadService;
-// import com.bytedesk.core.socket.MqService;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,8 +46,6 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     private final IMessageSendService messageSendService;
 
     private final MessageUnreadService messageUnreadService;
-
-    private final ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<?> queryByOrg(MessageRequest request) {
@@ -149,38 +142,14 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @ActionAnnotation(title = "消息", action = "导出", description = "export message")
     @GetMapping("/export")
     public Object export(MessageRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<MessageResponse> messagePage = messageRestService.queryByOrg(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "Message-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<MessageExcel> excelList = messagePage.getContent().stream().map(messageResponse -> {
-                return modelMapper.map(messageResponse, MessageExcel.class);
-            }).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), MessageExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("Message")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            messageRestService,
+            MessageExcel.class,
+            "Message",
+            "Message"
+        );
     }
 
     

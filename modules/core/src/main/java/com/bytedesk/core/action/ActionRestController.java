@@ -74,35 +74,14 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
     // @ActionAnnotation(title = "action", action = "导出", description = "export action")
     @GetMapping("/export")
     public Object export(ActionRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<ActionResponse> actionPage = actionService.queryByOrg(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "team-action-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<ActionExcel> excelList = actionPage.getContent().stream().map(actionResponse -> actionService.convertToExcel(actionResponse)).toList();
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), ActionExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("action")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            actionService,
+            ActionExcel.class,
+            "action",
+            "team-action"
+        );
     }
 
     @Override

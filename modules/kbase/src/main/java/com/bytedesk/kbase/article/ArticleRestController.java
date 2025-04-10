@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 07:32:04
+ * @LastEditTime: 2025-04-10 11:52:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,37 +105,13 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(ArticleRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<ArticleEntity> articlePage = articleRestService.queryByOrgExcel(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "Article-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<ArticleExcel> excelList = articlePage.getContent().stream().map(articleResponse -> articleRestService.convertToExcel(articleResponse)).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), ArticleExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("Article")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            // 
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            articleRestService,
+            ArticleExcel.class,
+            "文章",
+            "Article"
+        );
     }
-
-    
 }

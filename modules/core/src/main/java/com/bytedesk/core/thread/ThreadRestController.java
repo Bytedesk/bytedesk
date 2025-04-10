@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:54:06
+ * @LastEditTime: 2025-04-10 11:46:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,8 @@
  */
 package com.bytedesk.core.thread;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,13 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-// import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,8 +39,6 @@ import lombok.AllArgsConstructor;
 public class ThreadRestController extends BaseRestController<ThreadRequest> {
 
     private final ThreadRestService threadService;
-
-    private final ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<?> queryByOrg(ThreadRequest request) {
@@ -202,47 +192,14 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @ActionAnnotation(title = "会话", action = "导出", description = "export thread")
     @GetMapping("/export")
     public Object export(ThreadRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "Thread-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<ThreadExcel> excelList = threadPage.getContent().stream().map(threadResponse -> {
-                return modelMapper.map(threadResponse, ThreadExcel.class);
-            }).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), ThreadExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("Thread")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("status", "failure");
-            jsonObject.put("message", "download failed " + e.getMessage());
-            try {
-                response.getWriter().println(JSON.toJSONString(jsonObject));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            threadService,
+            ThreadExcel.class,
+            "Thread",
+            "Thread"
+        );
     }
-
-
     
 }

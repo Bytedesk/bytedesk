@@ -13,16 +13,12 @@
  */
 package com.bytedesk.service.queue;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.excel.EasyExcel;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -80,35 +76,14 @@ public class QueueRestController extends BaseRestController <QueueRequest> {
 
     @Override
     public Object export(QueueRequest request, HttpServletResponse response) {
-         // query data to export
-         Page<QueueResponse> queuePage = queueService.queryByOrg(request);
-         // 
-         try {
-             //
-             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-             response.setCharacterEncoding("utf-8");
-             // download filename
-             String fileName = "monitor-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
- 
-             // 转换数据
-             List<QueueExcel> excelList = queuePage.getContent().stream().map(queueResponse -> queueService.convertToExcel(queueResponse)).toList();
-             // write to excel
-             EasyExcel.write(response.getOutputStream(), QueueExcel.class)
-                     .autoCloseStream(Boolean.FALSE)
-                     .sheet("queue")
-                     .doWrite(excelList);
- 
-         } catch (Exception e) {
-             // reset response
-             response.reset();
-             response.setContentType("application/json");
-             response.setCharacterEncoding("utf-8");
-             //
-             return JsonResult.error(e.getMessage());
-         }
- 
-         return "";
+        return exportTemplate(
+            request,
+            response,
+            queueService,
+            QueueExcel.class,
+            "monitor",
+            "queue"
+        );
     }
 
     

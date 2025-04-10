@@ -87,44 +87,14 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @ActionAnnotation(title = "自动回复", action = "导出", description = "export autoReply")
     @GetMapping("/export")
     public Object export(AutoReplyFixedRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<AutoReplyFixedEntity> autoReplyPage = autoReplyService.queryByOrgExcel(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            // String fileName = "kbase-auto_reply-fixed-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            String fileName = "auto_reply-fixed-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<AutoReplyFixedExcel> excelList = autoReplyPage.getContent().stream().map(autoReplyResponse -> autoReplyService.convertToExcel(autoReplyResponse)).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), AutoReplyFixedExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("AutoReplyFixed")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("status", "failure");
-            jsonObject.put("message", "download failed " + e.getMessage());
-            try {
-                response.getWriter().println(JSON.toJSONString(jsonObject));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            autoReplyService,
+            AutoReplyFixedExcel.class,
+            "AutoReplyFixed",
+            "auto_reply-fixed"
+        );
     }
 
     @Override
