@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
@@ -68,10 +69,10 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
     // 机器人对话，不支持转人工
     public MessageProtobuf createRobotThread(VisitorRequest request) {
         String robotUid = request.getSid();
-        RobotEntity robot = robotService.findByUid(robotUid)
+        RobotEntity robotEntity = robotService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
-        String topic = TopicUtils.formatOrgRobotThreadTopic(robot.getUid(), request.getUid());
+        String topic = TopicUtils.formatOrgRobotThreadTopic(robotEntity.getUid(), request.getUid());
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
@@ -81,29 +82,33 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
             } else if (threadOptional.get().isRoboting()) {
                 thread = threadOptional.get();
                 // 
-                thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
+                thread = visitorThreadService.reInitRobotThreadExtra(thread, robotEntity); // 方便测试
                 // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing robot thread {}", topic);
-                return getRobotContinueMessage(robot, thread);
+                return getRobotContinueMessage(robotEntity, thread);
             }
         }
 
         // 如果会话不存在，或者会话已经关闭，则创建新的会话
         if (thread == null) {
-            thread = visitorThreadService.createRobotThread(request, robot, topic);
+            thread = visitorThreadService.createRobotThread(request, robotEntity, topic);
         }
 
         // 排队计数
-        UserProtobuf robotProtobuf = robot.toUserProtobuf();
+        UserProtobuf robotProtobuf = robotEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robotProtobuf, request);
         log.info("routeRobot Enqueued to queue {}", queueMemberEntity.getUid());
 
-        String content = robot.getServiceSettings().getWelcomeTip();
+        String content = robotEntity.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";
         }
         // 更新线程状态
-        thread.setRoboting().setRobot(robotProtobuf.toJson()).setContent(content).setUnreadCount(0);
+        thread.setRoboting().setContent(content).setUnreadCount(0);
+        // 
+        String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        thread.setRobot(robotString);
+        // 
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
