@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 16:00:01
+ * @LastEditTime: 2025-04-10 11:55:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,8 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentRequest;
@@ -50,8 +44,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     private final TicketRestService ticketRestService;
 
     private final TicketService ticketService;
-
-    private final ModelMapper modelMapper;
 
     // @PreAuthorize("hasAuthority('TICKET_READ')") // 查询放开权限
     @Override
@@ -144,45 +136,14 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @ActionAnnotation(title = "工单", action = "导出", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<TicketResponse> ticketPage = ticketRestService.queryByOrg(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "Ticket-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<TicketExcel> excelList = ticketPage.getContent().stream().map(ticketResponse -> {
-                return modelMapper.map(ticketResponse, TicketExcel.class);
-            }).toList();
-
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), TicketExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("Ticket")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("status", "failure");
-            jsonObject.put("message", "download failed " + e.getMessage());
-            try {
-                response.getWriter().println(JSON.toJSONString(jsonObject));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            ticketRestService,
+            TicketExcel.class,
+            "Ticket",
+            "Ticket"
+        );
     }
 
     /**
@@ -440,4 +401,4 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
     
 
-} 
+}

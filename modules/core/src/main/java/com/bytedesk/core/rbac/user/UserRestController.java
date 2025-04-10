@@ -99,35 +99,14 @@ public class UserRestController extends BaseRestController<UserRequest> {
     @PreAuthorize("hasRole('SUPER')")
     @Override
     public Object export(UserRequest request, HttpServletResponse response) {
-        // query data to export
-        Page<UserResponse> userPage = userRestService.queryByOrg(request);
-        // 
-        try {
-            //
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            // download filename
-            String fileName = "user-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 转换数据
-            List<UserExcel> excelList = userPage.getContent().stream().map(userResponse -> userRestService.convertToExcel(userResponse)).toList();
-            // write to excel
-            EasyExcel.write(response.getOutputStream(), UserExcel.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("member")
-                    .doWrite(excelList);
-
-        } catch (Exception e) {
-            // reset response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            //
-            return JsonResult.error(e.getMessage());
-        }
-
-        return "";
+        return exportTemplate(
+            request,
+            response,
+            userRestService,
+            UserExcel.class,
+            "用户",
+            "user"
+        );
     }
 
 
