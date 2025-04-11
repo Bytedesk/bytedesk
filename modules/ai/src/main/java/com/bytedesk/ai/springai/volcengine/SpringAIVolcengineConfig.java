@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 10:17:40
+ * @LastEditTime: 2025-04-11 10:17:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.baidu;
+package com.bytedesk.ai.springai.volcengine;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -22,55 +22,51 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * 百度智能云配置
- * https://console.bce.baidu.com/iam/#/iam/apikey/list
- * https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Fm2vrveyu
- */
-@Configuration
-@ConditionalOnProperty(name = "spring.ai.baidu.chat.enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIBaiduConfig {
 
-    @Value("${spring.ai.baidu.base-url:https://qianfan.baidubce.com/v2}")
+@Configuration
+@ConditionalOnProperty(name = "spring.ai.volcengine.chat.enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIVolcengineConfig {
+
+    @Value("${spring.ai.volcengine.base-url:https://ark.cn-beijing.volces.com/api/v3}")
     private String baseUrl;
 
-    @Value("${spring.ai.baidu.api-key:sk-xxx}")
+    @Value("${spring.ai.volcengine.api-key:sk-xxx}")
     private String apiKey;
 
-    @Value("${spring.ai.baidu.chat.options.model:ernie-x1-32k-preview}")
+    @Value("${spring.ai.volcengine.chat.options.model:volcengine-chat}")
     private String model;
 
-    @Value("${spring.ai.baidu.chat.options.temperature:0.7}")
+    @Value("${spring.ai.volcengine.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("baiduApi")
-    OpenAiApi baiduApi() {
+    @Bean("volcengineApi")
+    OpenAiApi volcengineApi() {
         return OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
     }
 
-    @Bean("baiduChatOptions")
-    OpenAiChatOptions baiduChatOptions() {
+    @Bean("volcengineChatOptions")
+    OpenAiChatOptions volcengineChatOptions() {
         return OpenAiChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
-    @Bean("baiduChatModel")
-    OpenAiChatModel baiduChatModel() {
+    @Bean("volcengineChatModel")
+    OpenAiChatModel volcengineChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(baiduApi())
-                .defaultOptions(baiduChatOptions())
+                .openAiApi(volcengineApi())
+                .defaultOptions(volcengineChatOptions())
                 .build();
     }
 
-    @Bean("baiduChatClient")
-    ChatClient baiduChatClient() {
-        return  ChatClient.builder(baiduChatModel())
-                .defaultOptions(baiduChatOptions())
+    @Bean("volcengineChatClient")
+    ChatClient volcengineChatClient() {
+        return  ChatClient.builder(volcengineChatModel())
+                .defaultOptions(volcengineChatOptions())
                 .build();
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 10:56:24
+ * @LastEditTime: 2025-04-11 10:12:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,11 +31,11 @@ import com.bytedesk.ai.springai.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
 import com.bytedesk.ai.springai.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.tencent.SpringAITencentService;
+import com.bytedesk.ai.springai.volcengine.SpringAIVolcengineService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -56,6 +56,7 @@ public class RobotService {
     private final Optional<SpringAIGiteeService> springAIGiteeService;
     private final Optional<SpringAITencentService> springAITencentService;
     private final Optional<SpringAIBaiduService> springAIBaiduService;
+    private final Optional<SpringAIVolcengineService> springAIVolcengineService;
 
     private final ThreadRestService threadRestService;
     private final MessageService messageService;
@@ -121,6 +122,9 @@ public class RobotService {
         } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.BAIDU)) {
             springAIBaiduService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.VOLCENGINE)) {
+            springAIVolcengineService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         } else {
             springAIZhipuaiService
                     .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
@@ -156,41 +160,44 @@ public class RobotService {
         Assert.notNull(thread.getRobot(), "thread agent is null, threadTopic:" + threadTopic);
         // 
         RobotProtobuf robot = JSON.parseObject(thread.getRobot(), RobotProtobuf.class);
-        if (robot.getType().equals(UserTypeEnum.ROBOT.name())) {
+        // if (robot.getType().equals(UserTypeEnum.ROBOT.name())) {
             log.info("processSseVisitorMessage thread reply");
-            // 机器人回复访客消息
-            MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
-                    messageProtobuf);
-            //
-            if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.OLLAMA)) {
-                springAIOllamaService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DEEPSEEK)) {
-                springAIDeepseekService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DASHSCOPE)) {
-                springAIDashscopeService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
-                springAIZhipuaiService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.SILICONFLOW)) {
-                springAISiliconFlowService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.GITEE)) {
-                springAIGiteeService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.TENCENT)) {
-                springAITencentService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.BAIDU)) {
-                springAIBaiduService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            } else {
-                springAIZhipuaiService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
-            }
+        // 机器人回复访客消息
+        MessageProtobuf message = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+                messageProtobuf);
+        //
+        if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.OLLAMA)) {
+            springAIOllamaService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DEEPSEEK)) {
+            springAIDeepseekService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.DASHSCOPE)) {
+            springAIDashscopeService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.ZHIPU)) {
+            springAIZhipuaiService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.SILICONFLOW)) {
+            springAISiliconFlowService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.GITEE)) {
+            springAIGiteeService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.TENCENT)) {
+            springAITencentService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.BAIDU)) {
+            springAIBaiduService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else if (robot.getLlm().getProvider().equalsIgnoreCase(LlmProviderConsts.VOLCENGINE)) {
+            springAIVolcengineService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
+        } else {
+            springAIZhipuaiService
+                    .ifPresent(service -> service.sendSseMessage(query, robot, message, emitter));
         }
+        // }
     }
 
     // 处理访客端同步请求消息，用于微信公众号等平台

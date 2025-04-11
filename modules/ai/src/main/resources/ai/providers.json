@@ -53,7 +53,14 @@
         "logo": "yiyan.png",
         "apiUrl": "https://yiyan.baidu.com/",
         "webUrl": "https://yiyan.baidu.com/",
-        "status": "DEVELOPMENT"
+        "status": "PRODUCTION"
+    },
+    "volcengine": {
+        "nickname": "火山引擎",
+        "logo": "doubao.png",
+        "apiUrl": "https://ark.cn-beijing.volces.com/api/v3/",
+        "webUrl": "https://console.volcengine.com/ark/",
+        "status": "PRODUCTION"
     },
     "xinghuo": {
         "nickname": "讯飞星火",
@@ -76,13 +83,6 @@
         "webUrl": "https://www.baichuan-ai.com/",
         "status": "DEVELOPMENT"
     },
-    "doubao": {
-        "nickname": "豆包",
-        "logo": "doubao.png",
-        "apiUrl": "https://ark.cn-beijing.volces.com/api/v3/",
-        "webUrl": "https://console.volcengine.com/ark/",
-        "status": "DEVELOPMENT"
-    },
     "minimax": {
         "nickname": "Minimax",
         "logo": "minimax.png",
@@ -90,7 +90,6 @@
         "webUrl": "https://platform.minimaxi.com/",
         "status": "DEVELOPMENT"
     },
-    
     "yi": {
         "nickname": "Yi",
         "logo": "yi.png",
