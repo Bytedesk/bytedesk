@@ -78,7 +78,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
     public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
         // Assert.hasText(messageJson, "Message must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
-
         // sendSseTypingMessage(messageProtobuf, emitter);
         //
         String prompt = "";

@@ -106,6 +106,12 @@
             "nickname": "ERNIE X1"
         }
     ],
+    "volcengine": [
+        {
+            "name": "doubao-1-5-pro-32k-250115",
+            "nickname": "Doubao-1-5-pro-32k"
+        }
+    ],
     "openai": [
         {
             "name": "gpt-4o",
@@ -206,7 +212,6 @@
             "nickname": "Baichuan3 Turbo 128k"
         }
     ],
-   
     "stepfun": [
         {
             "name": "step-1-8k",
@@ -217,7 +222,7 @@
             "nickname": "Step 1 Flash"
         }
     ],
-    "doubao": [],
+    
     "minimax": [
         {
             "name": "abab6.5s-chat",
