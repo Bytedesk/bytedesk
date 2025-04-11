@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:20:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:34:55
+ * @LastEditTime: 2025-04-11 18:42:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,13 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest> 
 
         return ResponseEntity.ok(JsonResult.success());
     }
+
+    // import 
+    // @PostMapping("/import")
+    // public ResponseEntity<?> importModel(@RequestBody LlmModelRequest request) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'importData'");
+    // }
 
     @Override
     public Object export(LlmModelRequest request, HttpServletResponse response) {
