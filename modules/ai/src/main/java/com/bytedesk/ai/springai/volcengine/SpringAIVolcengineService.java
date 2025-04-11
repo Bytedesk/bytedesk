@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:30:55
+ * @LastEditTime: 2025-04-11 10:55:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,7 +64,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         volcengineChatModel.ifPresent(model -> model.stream(prompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("DeepSeek API response metadata: {}", response.getMetadata());
+                        log.info("Volcengine API response metadata: {}", response.getMetadata());
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
@@ -77,7 +77,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                     }
                 },
                 error -> {
-                    log.error("DeepSeek API error: ", error);
+                    log.error("Volcengine API error: ", error);
                     messageProtobuf.setType(MessageTypeEnum.ERROR);
                     messageProtobuf.setContent("服务暂时不可用，请稍后重试");
                     messageSendService.sendProtobufMessage(messageProtobuf);
@@ -100,9 +100,9 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
     protected String processPromptSync(String message) {
         try {
             return volcengineChatModel.map(model -> model.call(message))
-                    .orElse("DeepSeek service is not available");
+                    .orElse("Volcengine service is not available");
         } catch (Exception e) {
-            log.error("DeepSeek API sync error: ", e);
+            log.error("Volcengine API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
         }
     }
@@ -119,7 +119,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                                         for (Generation generation : generations) {
                                             AssistantMessage assistantMessage = generation.getOutput();
                                             String textContent = assistantMessage.getText();
-                                            log.info("DeepSeek API response metadata: {}, text {}",
+                                            log.info("Volcengine API response metadata: {}, text {}",
                                                     response.getMetadata(), textContent);
                                             //
                                             if (StringUtils.hasValue(textContent)) {
@@ -156,7 +156,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                                 }
                             },
                             error -> {
-                                log.error("DeepSeek API SSE error: ", error);
+                                log.error("Volcengine API SSE error: ", error);
                                 //
                                 try {
                                     messageProtobuf.setType(MessageTypeEnum.ERROR);
@@ -175,7 +175,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                                 }
                             },
                             () -> {
-                                log.info("DeepSeek API SSE complete");
+                                log.info("Volcengine API SSE complete");
                                 try {
                                     // 发送流结束标记
                                     messageProtobuf.setType(MessageTypeEnum.STREAM_END);
@@ -213,7 +213,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                 });
     }
 
-    public Optional<OpenAiChatModel> getDeepSeekChatModel() {
+    public Optional<OpenAiChatModel> getVolcengineChatModel() {
         return volcengineChatModel;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:05:47
+ * @LastEditTime: 2025-04-11 11:38:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,13 +97,18 @@ public class AssistantService extends BaseRestService<AssistantEntity, Assistant
     @Override
     public AssistantEntity save(AssistantEntity entity) {
         try {
-            return assistantRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
         } catch (Exception e) {
             // TODO: handle exception
         }
         return null;
+    }
+
+    @Override
+    protected AssistantEntity doSave(AssistantEntity entity) {
+        return assistantRepository.save(entity);
     }
 
     @Override
@@ -123,7 +128,7 @@ public class AssistantService extends BaseRestService<AssistantEntity, Assistant
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public AssistantEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             AssistantEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");

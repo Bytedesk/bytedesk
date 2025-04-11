@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:10:18
+ * @LastEditTime: 2025-04-11 11:42:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -154,7 +154,7 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ArticleArchiveEntity entity) {
+    public ArticleArchiveEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ArticleArchiveEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }

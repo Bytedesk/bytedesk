@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 17:06:13
+ * @LastEditTime: 2025-04-11 11:19:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -185,19 +185,24 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     @Override
     public CategoryEntity save(CategoryEntity entity) {
         try {
-            // 保存父级
-            if (entity.getParent() != null) {
-                CategoryEntity parent = entity.getParent();
-                if (parent.getId() == null) {
-                    CategoryEntity newParent = categoryRepository.save(parent);
-                    entity.setParent(newParent);
-                }
-            }
-            return categoryRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
         }
         return null;
+    }
+
+    @Override
+    protected CategoryEntity doSave(CategoryEntity entity) {
+        // 保存父级
+        if (entity.getParent() != null) {
+            CategoryEntity parent = entity.getParent();
+            if (parent.getId() == null) {
+                CategoryEntity newParent = categoryRepository.save(parent);
+                entity.setParent(newParent);
+            }
+        }
+        return categoryRepository.save(entity);
     }
 
     @Override
@@ -215,7 +220,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CategoryEntity entity) {
+    public CategoryEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CategoryEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }

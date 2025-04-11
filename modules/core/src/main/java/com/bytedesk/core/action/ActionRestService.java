@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:04:47
+ * @LastEditTime: 2025-04-11 11:20:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -98,11 +98,16 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
 
     public ActionEntity save(ActionEntity action) {
         try {
-            return actionRepository.save(action);
+            return doSave(action);
         } catch (Exception e) {
             // TODO: handle exception
         }
         return null;
+    }
+    
+    @Override
+    protected ActionEntity doSave(ActionEntity entity) {
+        return actionRepository.save(entity);
     }
 
     public ActionResponse convertToResponse(ActionEntity action) {
@@ -128,7 +133,7 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ActionEntity entity) {
+    public ActionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ActionEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }

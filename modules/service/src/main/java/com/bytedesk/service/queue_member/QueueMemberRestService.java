@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 16:15:02
+ * @LastEditTime: 2025-04-11 11:49:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,11 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse> {
 
     private final QueueMemberRepository queueMemberRepository;
-
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
-
     private final AuthService authService;
 
     @Override
@@ -79,22 +76,76 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         return queueMemberRepository.findByThreadUid(threadUid);
     }
 
-    // @Cacheable(value = "queue_member", key = "#queueTopic#queueDay#threadUid#status")
-    // public Optional<QueueMemberEntity> findByQueueTopicAndQueueDayAndThreadUidAndStatus(String queueTopic, String queueDay, String threadUid, String status) {
-    //     return queueMemberRepository.findByQueueTopicAndQueueDayAndThreadUidAndStatus(queueTopic, queueDay, threadUid, status);
-    // }
+    @Override
+    public QueueMemberEntity save(QueueMemberEntity entity) {
+        // 调用基类的方法，不再需要自己实现重试逻辑
+        return super.save(entity);
+    }
+    
+    @Override
+    protected QueueMemberEntity doSave(QueueMemberEntity entity) {
+        return queueMemberRepository.save(entity);
+    }
 
-    // 添加新的查询方法
-    // public Optional<QueueMemberEntity> findByThreadUidAndQueueUid(String threadUid, String queueUid) {
-    //     // 实现查询逻辑
-    //     return queueMemberRepository.findByThreadUidAndQueueUid(threadUid, queueUid);
-    // }
+    @Override
+    public QueueMemberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            QueueMemberEntity entity) {
+        log.error("处理乐观锁异常: {}", e.getMessage());
+        
+        try {
+            // 获取最新的实体
+            Optional<QueueMemberEntity> latestEntityOpt = queueMemberRepository.findByUid(entity.getUid());
+            if (latestEntityOpt.isPresent()) {
+                QueueMemberEntity latestEntity = latestEntityOpt.get();
+                
+                // 根据业务需求合并变更
+                // 保留当前实体中的重要计数值
+                if (entity.getVisitorMessageCount() > latestEntity.getVisitorMessageCount()) {
+                    latestEntity.setVisitorMessageCount(entity.getVisitorMessageCount());
+                }
+                
+                if (entity.getAgentMessageCount() > latestEntity.getAgentMessageCount()) {
+                    latestEntity.setAgentMessageCount(entity.getAgentMessageCount());
+                }
+                
+                if (entity.getRobotMessageCount() > latestEntity.getRobotMessageCount()) {
+                    latestEntity.setRobotMessageCount(entity.getRobotMessageCount());
+                }
+                
+                if (entity.getSystemMessageCount() > latestEntity.getSystemMessageCount()) {
+                    latestEntity.setSystemMessageCount(entity.getSystemMessageCount());
+                }
+                
+                // 保持最新的时间戳
+                if (entity.getVisitorLastMessageTime() != null && 
+                    (latestEntity.getVisitorLastMessageTime() == null || 
+                     entity.getVisitorLastMessageTime().isAfter(latestEntity.getVisitorLastMessageTime()))) {
+                    latestEntity.setVisitorLastMessageTime(entity.getVisitorLastMessageTime());
+                }
+                
+                if (entity.getAgentLastResponseTime() != null && 
+                    (latestEntity.getAgentLastResponseTime() == null || 
+                     entity.getAgentLastResponseTime().isAfter(latestEntity.getAgentLastResponseTime()))) {
+                    latestEntity.setAgentLastResponseTime(entity.getAgentLastResponseTime());
+                }
+                
+                // 保存合并后的实体
+                return queueMemberRepository.save(latestEntity);
+            } else {
+                log.error("无法找到UID为{}的QueueMember实体", entity.getUid());
+            }
+        } catch (Exception ex) {
+            log.error("在处理乐观锁异常时发生错误: {}", ex.getMessage(), ex);
+        }
+
+        return null;
+    }
 
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {
         QueueMemberEntity counter = modelMapper.map(request, QueueMemberEntity.class);
         counter.setUid(uidUtils.getUid());
-        //
+        
         QueueMemberEntity savedQueueMember = save(counter);
         if (savedQueueMember == null) {
             throw new RuntimeException("save counter failed");
@@ -106,16 +157,6 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     public QueueMemberResponse update(QueueMemberRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public QueueMemberEntity save(QueueMemberEntity entity) {
-        try {
-            return queueMemberRepository.save(entity);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override
@@ -132,13 +173,6 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
 
     public void deleteAll() {
         queueMemberRepository.deleteAll();
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            QueueMemberEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

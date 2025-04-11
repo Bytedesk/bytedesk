@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 22:19:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:32:40
+ * @LastEditTime: 2025-04-11 12:17:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,12 +100,16 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     @Override
     public ClipboardEntity save(ClipboardEntity entity) {
         try {
-            return clipboardRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
         }
         return null;
+    }
+
+    @Override
+    protected ClipboardEntity doSave(ClipboardEntity entity) {
+        return clipboardRepository.save(entity);
     }
 
     @Override
@@ -123,7 +127,7 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ClipboardEntity entity) {
+    public ClipboardEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ClipboardEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
