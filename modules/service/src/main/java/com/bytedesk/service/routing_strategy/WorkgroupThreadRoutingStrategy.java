@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 10:55:09
+ * @LastEditTime: 2025-04-11 09:11:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -204,7 +204,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
-
+        // 
         String content = agent.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";
