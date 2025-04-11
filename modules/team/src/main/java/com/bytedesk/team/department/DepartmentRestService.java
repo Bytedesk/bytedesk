@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 18:16:56
+ * @LastEditTime: 2025-04-11 13:27:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -175,7 +175,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public DepartmentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             DepartmentEntity entity) {
         // 乐观锁处理实现
         try {
