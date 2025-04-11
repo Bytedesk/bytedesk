@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 08:52:31
+ * @LastEditTime: 2025-04-11 12:10:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,11 +115,16 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
     @Override
     public QueueEntity save(QueueEntity entity) {
         try {
-            return queueRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
         }
         return null;
+    }
+
+    @Override
+    protected QueueEntity doSave(QueueEntity entity) {
+        return queueRepository.save(entity);
     }
 
     @Override
@@ -138,9 +143,20 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QueueEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    public QueueEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QueueEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<QueueEntity> latest = queueRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                QueueEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return queueRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

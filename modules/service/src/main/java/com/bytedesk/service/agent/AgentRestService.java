@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:40:32
+ * @LastEditTime: 2025-04-11 11:21:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -392,9 +392,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
     private final Queue<AgentEntity> retryQueue = new LinkedList<>();
 
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentEntity agent) {
+    public AgentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentEntity agent) {
         retryQueue.add(agent);
         processRetryQueue();
+        return agent;
     }
 
     private void processRetryQueue() {

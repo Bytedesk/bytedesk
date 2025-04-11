@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 07:20:03
+ * @LastEditTime: 2025-04-11 11:15:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,6 @@ public class QueueMemberEventListener {
             log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());
         }
     }
-
 
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
@@ -127,7 +126,7 @@ public class QueueMemberEventListener {
             // 更新访客消息计数
             queueMember.setVisitorMessageCount(queueMember.getVisitorMessageCount() + 1);
             
-            // 保存更新
+            // 保存更新 - 支持重试机制
             queueMemberRestService.save(queueMember);
             log.debug("已更新队列成员访客消息统计: threadUid={}, visitorMsgCount={}", 
                     thread.getUid(), queueMember.getVisitorMessageCount());

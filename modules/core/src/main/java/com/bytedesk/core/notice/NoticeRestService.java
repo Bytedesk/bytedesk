@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 10:31:29
+ * @LastEditTime: 2025-04-11 11:17:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -160,7 +160,7 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public NoticeEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             NoticeEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");

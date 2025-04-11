@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 21:39:55
+ * @LastEditTime: 2025-04-11 11:18:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,10 +161,16 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
     @Override
     public IpBlacklistEntity save(IpBlacklistEntity entity) {
         try {
-            return ipBlacklistRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException("Save ip blacklist failed");
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
         }
+        return null;
+    }
+
+    @Override
+    protected IpBlacklistEntity doSave(IpBlacklistEntity entity) {
+        return ipBlacklistRepository.save(entity);
     }
 
     @Override
@@ -181,7 +187,7 @@ public class IpBlacklistRestService extends BaseRestService<IpBlacklistEntity, I
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public IpBlacklistEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             IpBlacklistEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");

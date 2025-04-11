@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:31:38
+ * @LastEditTime: 2025-04-11 11:40:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -129,10 +129,29 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     @Override
     public LlmModelEntity save(LlmModelEntity entity) {
         try {
-            return repository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected LlmModelEntity doSave(LlmModelEntity entity) {
+        return repository.save(entity);
+    }
+
+    @Override
+    public LlmModelEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, LlmModelEntity entity) {
+        try {
+            Optional<LlmModelEntity> latest = repository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                LlmModelEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 根据业务需求合并实体
+                return repository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -154,12 +173,6 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     @Override
     public void delete(LlmModelRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, LlmModelEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 13:37:47
+ * @LastEditTime: 2025-04-11 11:18:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -128,7 +128,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, IpAccessEntity entity) {
+    public IpAccessEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, IpAccessEntity entity) {
         log.warn("Optimistic locking failure for IP: {} with endpoint: {}", entity.getIp(), entity.getEndpoint());
         // 尝试刷新实体状态
         if (entity.getId() != null) {
@@ -144,8 +144,12 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 if (fresh.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
                     ipBlacklistService.addToBlacklistSystem(fresh.getIp());
                 }
+
+                return fresh;
             }
         }
+        // 如果无法刷新实体，则返回原始实体
+        return entity;
     }
 
     @Override
@@ -180,8 +184,17 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     @Override
     public IpAccessEntity save(IpAccessEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
+        }
+        return null;
+    }
+
+    @Override
+    protected IpAccessEntity doSave(IpAccessEntity entity) {
+        return ipAccessRepository.save(entity);
     }
 
     @Override

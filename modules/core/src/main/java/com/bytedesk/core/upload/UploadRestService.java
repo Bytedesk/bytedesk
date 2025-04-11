@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:39:27
+ * @LastEditTime: 2025-04-11 11:21:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -297,7 +297,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
 	@Override
-	public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UploadEntity entity) {
+	public UploadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UploadEntity entity) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
 	}

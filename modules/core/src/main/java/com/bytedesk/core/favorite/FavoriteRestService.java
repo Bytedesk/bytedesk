@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 16:04:23
+ * @LastEditTime: 2025-04-11 11:20:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,10 +106,16 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
     @Override
     public FavoriteEntity save(FavoriteEntity entity) {
         try {
-            return favoriteRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
         }
+        return null;
+    }
+
+    @Override
+    protected FavoriteEntity doSave(FavoriteEntity entity) {
+        return favoriteRepository.save(entity);
     }
 
     @Override
@@ -131,7 +137,7 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FavoriteEntity entity) {
+    public FavoriteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FavoriteEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }

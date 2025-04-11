@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:34:56
+ * @LastEditTime: 2025-04-11 10:58:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,7 +69,7 @@ public class SpringAIDeepseekController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return springAIDeepseekService.getDeepSeekChatModel()
+        return springAIDeepseekService.getDeepseekChatModel()
             .map(model -> model.stream(prompt))
             .orElse(Flux.empty());
     }
@@ -114,12 +114,12 @@ public class SpringAIDeepseekController {
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        if (!springAIDeepseekService.getDeepSeekChatModel().isPresent()) {
+        if (!springAIDeepseekService.getDeepseekChatModel().isPresent()) {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
 
         try {
-            ChatResponse response = springAIDeepseekService.getDeepSeekChatModel().get().call(
+            ChatResponse response = springAIDeepseekService.getDeepseekChatModel().get().call(
                 new Prompt(
                     message,
                     OpenAiChatOptions.builder()

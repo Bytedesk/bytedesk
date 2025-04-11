@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 10:49:57
+ * @LastEditTime: 2025-04-11 12:11:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.OptimisticLockingHandler;
+// import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -96,7 +96,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final LlmProviderRestService llmProviderRestService;
 
-    private final OptimisticLockingHandler optimisticLockingHandler;
+    // private final OptimisticLockingHandler optimisticLockingHandler;
 
     @PostConstruct
     public void setupModelMapper() {
@@ -499,16 +499,36 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     @Override
     public RobotEntity save(RobotEntity entity) {
         try {
-            // return robotRepository.save(entity);
-            return optimisticLockingHandler.executeWithRetry(
-                    () -> robotRepository.save(entity),
-                    "robot",
-                    entity.getUid(),
-                    entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.error("Failed to save robot after retries", e);
-            return null;
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    @Override
+    protected RobotEntity doSave(RobotEntity entity) {
+        try {
+            return robotRepository.save(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw e; // 重新抛出异常以触发重试机制
+        }
+    }
+
+    @Override
+    public RobotEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, RobotEntity entity) {
+        try {
+            Optional<RobotEntity> latest = robotRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                RobotEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 根据业务需求进行数据合并
+                return robotRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -754,12 +774,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         } else {
             log.info("initDemoBytedesk already initialized");
         }
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, RobotEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

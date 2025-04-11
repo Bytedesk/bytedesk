@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:13:18
+ * @LastEditTime: 2025-04-11 12:20:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,13 +138,19 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     @Caching(put = {
             @CachePut(value = "message", key = "#message.uid"),
     })
+    @Override
     public MessageEntity save(@NonNull MessageEntity message) {
         try {
-            return messageRepository.save(message);
+            return doSave(message);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, message);
         }
         return null;
+    }
+
+    @Override
+    protected MessageEntity doSave(MessageEntity entity) {
+        return messageRepository.save(entity);
     }
 
     @Caching(evict = {
@@ -176,7 +182,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public MessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             MessageEntity message) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");

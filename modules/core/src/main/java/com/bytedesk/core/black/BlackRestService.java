@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:04:39
+ * @LastEditTime: 2025-04-11 11:19:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -122,11 +122,16 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     @Override
     public BlackEntity save(BlackEntity entity) {
         try {
-            return repository.save(entity);
+            return doSave(entity);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected BlackEntity doSave(BlackEntity entity) {
+        return repository.save(entity);
     }
 
     @Override
@@ -145,7 +150,7 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, BlackEntity entity) {
+    public BlackEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, BlackEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
