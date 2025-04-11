@@ -45,10 +45,8 @@ public class SpringAIBaiduConfig {
 
     @Bean("baiduApi")
     OpenAiApi baiduApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
+        // 使用BaiduApi工厂方法创建API实例，自动配置正确的路径
+        return BaiduApi.create(baseUrl, apiKey);
     }
 
     @Bean("baiduChatOptions")
