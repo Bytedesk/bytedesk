@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:40:29
+ * @LastEditTime: 2025-04-11 17:33:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -98,7 +98,10 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     public LlmProviderResponse create(LlmProviderRequest request) {
         // 
         if (existsByNameAndLevelAndOrgUid(request.getName(), request.getLevel(), request.getOrgUid())) {
-            throw new RuntimeException("Provider already exists");
+            Optional<LlmProviderEntity> optional = repository.findByNameAndLevelAndOrgUidAndDeletedFalse(request.getName(), request.getLevel(), request.getOrgUid());
+            if (optional.isPresent()) {
+                return convertToResponse(optional.get());
+            }
         }
 
         LlmProviderEntity entity = modelMapper.map(request, LlmProviderEntity.class);
@@ -120,9 +123,9 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
                 .apiUrl(providerJson.getApiUrl())
                 .webUrl(providerJson.getWebUrl())
                 .status(providerJson.getStatus())
+                .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
+                .level(level)
                 .build();
-        request.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        request.setLevel(level);
 
         return create(request);
     }
