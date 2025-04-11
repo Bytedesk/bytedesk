@@ -184,7 +184,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupEntity entity) {
+    public GroupEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupEntity entity) {
         // 乐观锁处理实现
         try {
             Optional<GroupEntity> latest = groupRepository.findByUid(entity.getUid());

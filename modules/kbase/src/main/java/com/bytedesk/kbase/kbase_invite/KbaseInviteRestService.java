@@ -123,7 +123,15 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     )
     @Override
     public KbaseInviteEntity save(KbaseInviteEntity entity) {
-        // log.info("Attempting to save tag: {}", entity.getName());
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected KbaseInviteEntity doSave(KbaseInviteEntity entity) {
         return tagRepository.save(entity);
     }
 
@@ -135,6 +143,23 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
         log.error("Failed to save tag after 3 attempts: {}", entity.getName(), e);
         // 可以在这里添加告警通知
         throw new RuntimeException("Failed to save tag after retries: " + e.getMessage());
+    }
+
+    @Override
+    public KbaseInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, KbaseInviteEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<KbaseInviteEntity> latest = tagRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                KbaseInviteEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return tagRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -153,12 +178,6 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     @Override
     public void delete(KbaseInviteRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, KbaseInviteEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

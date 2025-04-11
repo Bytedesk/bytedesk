@@ -166,7 +166,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupInviteEntity entity) {
+    public GroupInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupInviteEntity entity) {
         // 乐观锁处理实现
         try {
             Optional<GroupInviteEntity> latest = group_inviteRepository.findByUid(entity.getUid());
