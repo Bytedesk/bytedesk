@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-06 15:06:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-06 15:14:51
+ * @LastEditTime: 2025-04-11 13:39:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,21 +75,41 @@ public class TicketAttachmentRestService extends BaseRestService<TicketAttachmen
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public TicketAttachmentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             TicketAttachmentEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            // 实现乐观锁冲突处理
+            Optional<TicketAttachmentEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TicketAttachmentEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return doSave(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
-
-    
 
     @Override
     public TicketAttachmentEntity save(TicketAttachmentEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        } catch (Exception e) {
+            // 记录错误日志
+            throw new RuntimeException("保存附件失败: " + e.getMessage());
+        }
     }
 
-    
+    @Override
+    protected TicketAttachmentEntity doSave(TicketAttachmentEntity entity) {
+        // 实现具体的保存逻辑
+        // TODO: 实现具体的保存逻辑
+        throw new UnsupportedOperationException("Unimplemented method 'doSave'");
+    }
 
     @Override
     public TicketAttachmentResponse convertToResponse(TicketAttachmentEntity entity) {

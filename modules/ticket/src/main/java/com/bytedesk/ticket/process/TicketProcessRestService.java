@@ -148,11 +148,35 @@ public class TicketProcessRestService
     @Override
     public TicketProcessEntity save(TicketProcessEntity entity) {
         try {
-            return processRepository.save(entity);
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         } catch (Exception e) {
             log.error("Save process failed: {}", e.getMessage());
             throw new RuntimeException("Save process failed: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected TicketProcessEntity doSave(TicketProcessEntity entity) {
+        return processRepository.save(entity);
+    }
+
+    @Override
+    public TicketProcessEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TicketProcessEntity entity) {
+        try {
+            Optional<TicketProcessEntity> latest = processRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TicketProcessEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return processRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("处理乐观锁冲突失败: {}", ex.getMessage());
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -169,13 +193,6 @@ public class TicketProcessRestService
     @Override
     public void delete(TicketProcessRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            TicketProcessEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
@@ -299,6 +316,4 @@ public class TicketProcessRestService
         }
     }
 
-    
-    
 }

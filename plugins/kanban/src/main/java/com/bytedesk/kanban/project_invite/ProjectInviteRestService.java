@@ -22,9 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -114,27 +111,36 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
      * 保存标签，失败时自动重试
      * maxAttempts: 最大重试次数（包括第一次尝试）
      * backoff: 重试延迟，multiplier是延迟倍数
-     * recover: 当重试次数用完后的回调方法
      */
-    @Retryable(
-        value = { Exception.class },
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
     @Override
     public ProjectInviteEntity save(ProjectInviteEntity entity) {
-        log.info("Attempting to save project_invite: {}", entity.getName());
+        try {
+            log.info("Attempting to save project_invite: {}", entity.getName());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected ProjectInviteEntity doSave(ProjectInviteEntity entity) {
         return project_inviteRepository.save(entity);
     }
 
-    /**
-     * 重试失败后的回调方法
-     */
-    @Recover
-    public ProjectInviteEntity recover(Exception e, ProjectInviteEntity entity) {
-        log.error("Failed to save project_invite after 3 attempts: {}", entity.getName(), e);
-        // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save project_invite after retries: " + e.getMessage());
+    @Override
+    public ProjectInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ProjectInviteEntity entity) {
+        try {
+            Optional<ProjectInviteEntity> latest = project_inviteRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                ProjectInviteEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                modelMapper.map(entity, latestEntity);
+                return project_inviteRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -153,12 +159,6 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
     @Override
     public void delete(ProjectInviteRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ProjectInviteEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
