@@ -77,8 +77,32 @@ public class CustomerRestService extends BaseRestService<CustomerEntity, Custome
 
     @Override
     public CustomerEntity save(CustomerEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+    
+    @Override
+    protected CustomerEntity doSave(CustomerEntity entity) {
+        return customerRepository.save(entity);
+    }
+
+    @Override
+    public CustomerEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CustomerEntity entity) {
+        try {
+            Optional<CustomerEntity> latest = customerRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                CustomerEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return customerRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -91,12 +115,6 @@ public class CustomerRestService extends BaseRestService<CustomerEntity, Custome
     public void delete(CustomerRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CustomerEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

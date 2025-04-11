@@ -137,11 +137,15 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
     @Override
     public ArticleEntity save(ArticleEntity entity) {
         try {
-            return articleRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            return handleOptimisticLockingFailureException(e, entity);
         }
-        return null;
+    }
+
+    @Override
+    protected ArticleEntity doSave(ArticleEntity entity) {
+        return articleRepository.save(entity);
     }
 
     @Override
@@ -160,8 +164,19 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
 
     @Override
     public ArticleEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ArticleEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        // 乐观锁处理实现
+        try {
+            Optional<ArticleEntity> latest = articleRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                ArticleEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return articleRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

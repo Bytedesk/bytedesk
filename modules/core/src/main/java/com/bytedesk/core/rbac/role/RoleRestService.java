@@ -208,14 +208,6 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         }
 
         @Override
-        public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-                        RoleEntity entity) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException(
-                                "Unimplemented method 'handleOptimisticLockingFailureException'");
-        }
-
-        @Override
         public RoleResponse convertToResponse(RoleEntity entity) {
                 return ConvertUtils.convertToRoleResponse(entity);
         }
@@ -235,13 +227,31 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         })
         public RoleEntity save(RoleEntity role) {
                 try {
-                        return roleRepository.save(role);
-                } catch (Exception e) {
-                        log.error("save role failed: {}", e.getMessage());
+                        return doSave(role);
+                } catch (ObjectOptimisticLockingFailureException e) {
+                        return handleOptimisticLockingFailureException(e, role);
+                }
+        }
+
+        @Override
+        protected RoleEntity doSave(RoleEntity entity) {
+                return roleRepository.save(entity);
+        }
+
+        @Override
+        public RoleEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+                        RoleEntity entity) {
+                try {
+                        Optional<RoleEntity> latest = roleRepository.findByUid(entity.getUid());
+                        if (latest.isPresent()) {
+                                RoleEntity latestEntity = latest.get();
+                                // 合并需要保留的数据
+                                return roleRepository.save(latestEntity);
+                        }
+                } catch (Exception ex) {
+                        throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
                 }
                 return null;
         }
-
-
 
 }

@@ -111,10 +111,14 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     @Override
     public TextEntity save(TextEntity entity) {
         try {
-            return textRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException("Save text failed: " + e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    protected TextEntity doSave(TextEntity entity) {
+        return textRepository.save(entity);
     }
 
     @Override
@@ -136,9 +140,18 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TextEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    public TextEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TextEntity entity) {
+        try {
+            Optional<TextEntity> latest = textRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TextEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return textRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

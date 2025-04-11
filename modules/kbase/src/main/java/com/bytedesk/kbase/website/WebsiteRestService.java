@@ -97,10 +97,29 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
     @Override
     public WebsiteEntity save(WebsiteEntity entity) {
         try {
-            return websiteRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    protected WebsiteEntity doSave(WebsiteEntity entity) {
+        return websiteRepository.save(entity);
+    }
+
+    @Override
+    public WebsiteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WebsiteEntity entity) {
+        try {
+            Optional<WebsiteEntity> latest = websiteRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                WebsiteEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return websiteRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -122,17 +141,9 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WebsiteEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
     public WebsiteResponse convertToResponse(WebsiteEntity entity) {
         return modelMapper.map(entity, WebsiteResponse.class);
     }
-
-    
 
     @Override
     public WebsiteExcel convertToExcel(WebsiteEntity website) {

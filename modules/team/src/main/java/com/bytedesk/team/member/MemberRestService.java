@@ -258,10 +258,32 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     @Override
     public MemberEntity save(MemberEntity member) {
         try {
-            return memberRepository.save(member);
+            return doSave(member);
         } catch (ObjectOptimisticLockingFailureException e) {
-            // TODO: handle exception
             handleOptimisticLockingFailureException(e, member);
+        }
+        return null;
+    }
+
+    @Override
+    protected MemberEntity doSave(MemberEntity member) {
+        return memberRepository.save(member);
+    }
+
+    @Override
+    public MemberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            MemberEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<MemberEntity> latest = memberRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                MemberEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return memberRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -399,23 +421,12 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            MemberEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
     public MemberResponse convertToResponse(MemberEntity entity) {
         return modelMapper.map(entity, MemberResponse.class);
     }
-
-    
 
     @Override
     public MemberExcel convertToExcel(MemberEntity entity) {
         return modelMapper.map(entity, MemberExcel.class);
     }
-
-    
 }

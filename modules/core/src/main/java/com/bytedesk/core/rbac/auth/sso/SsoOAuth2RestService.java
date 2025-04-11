@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:50:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 13:18:05
+ * @LastEditTime: 2025-04-11 12:27:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,8 +56,22 @@ public class SsoOAuth2RestService extends BaseRestService<SsoOAuth2Entity, SsoOA
 
     @Override
     public SsoOAuth2Entity save(SsoOAuth2Entity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected SsoOAuth2Entity doSave(SsoOAuth2Entity entity) {
+        throw new UnsupportedOperationException("实现保存逻辑");
+    }
+
+    @Override
+    public SsoOAuth2Entity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SsoOAuth2Entity entity) {
+        // 乐观锁处理逻辑
+        throw new UnsupportedOperationException("实现乐观锁处理逻辑");
     }
 
     @Override
@@ -70,12 +84,6 @@ public class SsoOAuth2RestService extends BaseRestService<SsoOAuth2Entity, SsoOA
     public void delete(SsoOAuth2Request entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SsoOAuth2Entity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

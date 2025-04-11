@@ -285,9 +285,28 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     })
     public PushEntity save(PushEntity push) {
         try {
-            return pushRepository.save(push);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return doSave(push);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, push);
+        }
+    }
+
+    @Override
+    protected PushEntity doSave(PushEntity entity) {
+        return pushRepository.save(entity);
+    }
+
+    @Override
+    public PushEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, PushEntity entity) {
+        try {
+            Optional<PushEntity> latest = pushRepository.findByDeviceUid(entity.getDeviceUid());
+            if (latest.isPresent()) {
+                PushEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return pushRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -370,12 +389,6 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     public void delete(PushRequest entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public PushEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, PushEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

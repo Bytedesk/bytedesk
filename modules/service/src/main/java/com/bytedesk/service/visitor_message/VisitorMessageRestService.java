@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-20 13:21:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 14:15:40
+ * @LastEditTime: 2025-04-11 13:04:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,8 +79,16 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
 
     @Override
     public MessageEntity save(MessageEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+    
+    @Override
+    protected MessageEntity doSave(MessageEntity entity) {
+        return messageRepository.save(entity);
     }
 
     @Override
@@ -96,10 +104,21 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public MessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             MessageEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                MessageEntity latestEntity = latest.get();
+                // 消息实体通常不应该修改
+                // 这里仅保留状态相关字段的更新
+                latestEntity.setStatus(entity.getStatus());
+                return messageRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

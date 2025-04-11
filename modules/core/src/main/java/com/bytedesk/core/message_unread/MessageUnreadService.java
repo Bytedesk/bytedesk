@@ -110,8 +110,28 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
 
     @Override
     public MessageUnreadEntity save(MessageUnreadEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected MessageUnreadEntity doSave(MessageUnreadEntity entity) {
+        return messageUnreadRepository.save(entity);
+    }
+
+    @Override
+    public MessageUnreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            MessageUnreadEntity entity) {
+        try {
+            // 由于 MessageUnread 没有 uid 直接查询，可能需要其他字段组合查询
+            // 这里简化处理，直接尝试重新保存
+            return messageUnreadRepository.save(entity);
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
     }
 
     @Override
@@ -124,13 +144,6 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
     public void delete(MessageUnreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public MessageUnreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            MessageUnreadEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

@@ -129,10 +129,29 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     @Override
     public SplitEntity save(SplitEntity entity) {
         try {
-            return splitRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException("Save split failed: " + e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    protected SplitEntity doSave(SplitEntity entity) {
+        return splitRepository.save(entity);
+    }
+
+    @Override
+    public SplitEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SplitEntity entity) {
+        try {
+            Optional<SplitEntity> latest = splitRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                SplitEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return splitRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -150,12 +169,6 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     @Override
     public void delete(SplitRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SplitEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

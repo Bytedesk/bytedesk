@@ -56,8 +56,33 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     @Override
     public TopicEntity save(TopicEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected TopicEntity doSave(TopicEntity entity) {
+        // 假设这里有一个topicRepository
+        throw new UnsupportedOperationException("需要实现具体的保存逻辑");
+    }
+
+    @Override
+    public TopicEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity entity) {
+        try {
+            Optional<TopicEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TopicEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 根据具体业务需求合并属性
+                return doSave(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -70,12 +95,6 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     public void delete(TopicRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public TopicEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

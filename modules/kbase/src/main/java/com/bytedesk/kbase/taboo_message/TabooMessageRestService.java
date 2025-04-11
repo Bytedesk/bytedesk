@@ -121,9 +121,27 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
     @Override
     public TabooMessageEntity save(TabooMessageEntity entity) {
         try {
-            return tabooMessageRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    protected TabooMessageEntity doSave(TabooMessageEntity entity) {
+        return tabooMessageRepository.save(entity);
+    }
+
+    @Override
+    public TabooMessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TabooMessageEntity entity) {
+        try {
+            Optional<TabooMessageEntity> latest = tabooMessageRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TabooMessageEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return tabooMessageRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -148,17 +166,9 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TabooMessageEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
     public TabooMessageResponse convertToResponse(TabooMessageEntity entity) {
         return modelMapper.map(entity, TabooMessageResponse.class);
     }
-
-    
 
     @Override
     public TabooMessageExcel convertToExcel(TabooMessageEntity response) {

@@ -290,12 +290,15 @@ public class VisitorThreadService
     @Override
     public VisitorThreadEntity save(VisitorThreadEntity entity) {
         try {
-            return visitorThreadRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
-        return null;
+    }
+
+    @Override
+    protected VisitorThreadEntity doSave(VisitorThreadEntity entity) {
+        return visitorThreadRepository.save(entity);
     }
 
     @Override
@@ -311,10 +314,21 @@ public class VisitorThreadService
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public VisitorThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             VisitorThreadEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            Optional<VisitorThreadEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                VisitorThreadEntity latestEntity = latest.get();
+                // 合并关键信息
+                latestEntity.setStatus(entity.getStatus());
+                return visitorThreadRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突", ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

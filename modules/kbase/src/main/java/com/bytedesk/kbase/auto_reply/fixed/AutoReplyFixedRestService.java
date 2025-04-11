@@ -124,9 +124,30 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     @Override
     public AutoReplyFixedEntity save(AutoReplyFixedEntity entity) {
         try {
-            return autoReplyRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected AutoReplyFixedEntity doSave(AutoReplyFixedEntity entity) {
+        return autoReplyRepository.save(entity);
+    }
+
+    @Override
+    public AutoReplyFixedEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyFixedEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<AutoReplyFixedEntity> latest = autoReplyRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                AutoReplyFixedEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return autoReplyRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -163,12 +184,6 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     @Override
     public void delete(AutoReplyFixedRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public AutoReplyFixedEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyFixedEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

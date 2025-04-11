@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:20:49
+ * @LastEditTime: 2025-04-11 12:34:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -559,15 +558,40 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         return threadRepository.findByTypesInAndStatusNotAndDeletedFalse(types, ThreadProcessStatusEnum.CLOSED.name());
     }
 
-    @Caching(put = {
-            @CachePut(value = "thread", key = "#thread.uid"),
-            @CachePut(value = "thread", key = "#thread.topic")
-    })
+    @Override
     public ThreadEntity save(@NonNull ThreadEntity thread) {
         try {
-            return threadRepository.save(thread);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return doSave(thread);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, thread);
+        }
+    }
+
+    @Override
+    protected ThreadEntity doSave(ThreadEntity entity) {
+        return threadRepository.save(entity);
+    }
+
+    @Override
+    public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ThreadEntity entity) {
+        try {
+            Optional<ThreadEntity> latest = threadRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                ThreadEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 保留最新的会话状态
+                latestEntity.setStatus(entity.getStatus());
+                // 保留未读数量，取较大值
+                latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
+                // 保留最新内容
+                if (entity.getContent() != null) {
+                    latestEntity.setContent(entity.getContent());
+                }
+                return threadRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -609,13 +633,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     public Page<ThreadResponse> queryByUser(ThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            ThreadEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

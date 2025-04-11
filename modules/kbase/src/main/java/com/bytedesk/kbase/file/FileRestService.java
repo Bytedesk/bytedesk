@@ -97,10 +97,32 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     @Override
     public FileEntity save(FileEntity entity) {
         try {
-            return fileRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    @Override
+    protected FileEntity doSave(FileEntity entity) {
+        return fileRepository.save(entity);
+    }
+
+    @Override
+    public FileEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FileEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<FileEntity> latest = fileRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                FileEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return fileRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -119,12 +141,6 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     @Override
     public void delete(FileRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FileEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

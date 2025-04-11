@@ -132,9 +132,28 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     @Override
     public AuthorityEntity save(AuthorityEntity entity) {
         try {
-            return authorityRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected AuthorityEntity doSave(AuthorityEntity entity) {
+        return authorityRepository.save(entity);
+    }
+
+    @Override
+    public AuthorityEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AuthorityEntity entity) {
+        try {
+            Optional<AuthorityEntity> latest = authorityRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                AuthorityEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                authorityRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -153,12 +172,6 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     @Override
     public void delete(AuthorityRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AuthorityEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

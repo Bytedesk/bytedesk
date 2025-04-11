@@ -56,8 +56,16 @@ public class EmailTemplateService extends BaseRestService<EmailTemplateEntity, E
 
     @Override
     public EmailTemplateEntity save(EmailTemplateEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected EmailTemplateEntity doSave(EmailTemplateEntity entity) {
+        throw new UnsupportedOperationException("实现保存逻辑");
     }
 
     @Override
@@ -75,8 +83,7 @@ public class EmailTemplateService extends BaseRestService<EmailTemplateEntity, E
     @Override
     public EmailTemplateEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             EmailTemplateEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        throw new UnsupportedOperationException("实现乐观锁处理逻辑");
     }
 
     @Override
