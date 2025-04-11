@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 17:34:13
+ * @LastEditTime: 2025-04-11 18:42:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -43,10 +41,11 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     private final UidUtils uidUtils;
 
+    // private final AuthService authService;
+
     @Override
     public Page<LlmModelResponse> queryByOrg(LlmModelRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<LlmModelEntity> specification = LlmModelSpecification.search(request);
         Page<LlmModelEntity> page = repository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
