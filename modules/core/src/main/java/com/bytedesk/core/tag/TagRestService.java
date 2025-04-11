@@ -131,8 +131,35 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     )
     @Override
     public TagEntity save(TagEntity entity) {
-        // log.info("Attempting to save tag: {}", entity.getName());
+        try {
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected TagEntity doSave(TagEntity entity) {
         return tagRepository.save(entity);
+    }
+
+    @Override
+    public TagEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TagEntity entity) {
+        try {
+            Optional<TagEntity> latest = tagRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TagEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                latestEntity.setName(entity.getName());
+                latestEntity.setOrder(entity.getOrder());
+                latestEntity.setDeleted(entity.isDeleted());
+                return tagRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     /**
@@ -161,12 +188,6 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     @Override
     public void delete(TagRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public TagEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TagEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

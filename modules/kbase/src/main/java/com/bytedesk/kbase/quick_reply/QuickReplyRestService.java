@@ -157,9 +157,27 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
     @Override
     public QuickReplyEntity save(QuickReplyEntity entity) {
         try {
-            return quickReplyRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    protected QuickReplyEntity doSave(QuickReplyEntity entity) {
+        return quickReplyRepository.save(entity);
+    }
+
+    @Override
+    public QuickReplyEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QuickReplyEntity entity) {
+        try {
+            Optional<QuickReplyEntity> latest = quickReplyRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                QuickReplyEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return quickReplyRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -196,12 +214,6 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
     @Override
     public void delete(QuickReplyRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QuickReplyEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

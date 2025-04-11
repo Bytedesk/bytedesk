@@ -112,9 +112,30 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     @Override
     public UrlEntity save(UrlEntity entity) {
         try {
-            return urlRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected UrlEntity doSave(UrlEntity entity) {
+        return urlRepository.save(entity);
+    }
+
+    @Override
+    public UrlEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UrlEntity entity) {
+        try {
+            Optional<UrlEntity> latest = urlRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                UrlEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                latestEntity.setUrl(entity.getUrl());
+                latestEntity.setShortUrl(entity.getShortUrl());
+                return urlRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -135,12 +156,6 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     @Override
     public void delete(UrlRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public UrlEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UrlEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

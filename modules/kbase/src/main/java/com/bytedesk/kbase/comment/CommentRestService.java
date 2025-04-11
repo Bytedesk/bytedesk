@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-09 22:24:18
+ * @LastEditTime: 2025-04-11 12:41:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -107,10 +107,15 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     @Override
     public CommentEntity save(CommentEntity entity) {
         try {
-            return commentRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    @Override
+    protected CommentEntity doSave(CommentEntity entity) {
+        return commentRepository.save(entity);
     }
 
     @Override
@@ -132,9 +137,20 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CommentEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    public CommentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CommentEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<CommentEntity> latest = commentRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                CommentEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return commentRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

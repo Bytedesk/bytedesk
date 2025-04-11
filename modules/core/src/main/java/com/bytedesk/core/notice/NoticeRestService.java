@@ -134,14 +134,34 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
         return null;
     }
 
-
     @Override
     public NoticeEntity save(NoticeEntity entity) {
         try {
-            return noticeRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    @Override
+    protected NoticeEntity doSave(NoticeEntity entity) {
+        return noticeRepository.save(entity);
+    }
+
+    @Override
+    public NoticeEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            NoticeEntity entity) {
+        try {
+            Optional<NoticeEntity> latest = noticeRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                NoticeEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return noticeRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -157,13 +177,6 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
     @Override
     public void delete(NoticeRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public NoticeEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            NoticeEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

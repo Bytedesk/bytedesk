@@ -95,10 +95,31 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     @Override
     public FormEntity save(FormEntity entity) {
         try {
-            return formRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    @Override
+    protected FormEntity doSave(FormEntity entity) {
+        return formRepository.save(entity);
+    }
+
+    @Override
+    public FormEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FormEntity entity) {
+        try {
+            Optional<FormEntity> latest = formRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                FormEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return formRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -117,12 +138,6 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     @Override
     public void delete(FormRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FormEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

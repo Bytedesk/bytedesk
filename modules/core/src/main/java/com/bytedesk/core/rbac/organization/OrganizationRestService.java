@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 12:41:09
+ * @LastEditTime: 2025-04-11 12:27:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,10 +161,21 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     })
     public OrganizationEntity save(OrganizationEntity organization) {
         try {
-                    return organizationRepository.save(organization);
+            return doSave(organization);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, organization);
+            return handleOptimisticLockingFailureException(e, organization);
         }
+    }
+
+    @Override
+    protected OrganizationEntity doSave(OrganizationEntity entity) {
+        return organizationRepository.save(entity);
+    }
+
+    @Override
+    public OrganizationEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            OrganizationEntity organization) {
+        log.info("handleOptimisticLockingFailureException: " + e.getMessage());
         return null;
     }
 
@@ -178,11 +189,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public void delete(OrganizationRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            OrganizationEntity organization) {
-        log.info("handleOptimisticLockingFailureException: " + e.getMessage());
     }
 
     public OrganizationResponse convertToResponse(OrganizationEntity organization) {

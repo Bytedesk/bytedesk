@@ -122,9 +122,31 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
     @Override
     public MessageLeaveEntity save(MessageLeaveEntity entity) {
         try {
-            return messageLeaveRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+    
+    @Override
+    protected MessageLeaveEntity doSave(MessageLeaveEntity entity) {
+        return messageLeaveRepository.save(entity);
+    }
+
+    @Override
+    public MessageLeaveEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            MessageLeaveEntity entity) {
+        try {
+            Optional<MessageLeaveEntity> latest = messageLeaveRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                MessageLeaveEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return messageLeaveRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -142,13 +164,6 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
     @Override
     public void delete(MessageLeaveRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            MessageLeaveEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

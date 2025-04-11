@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:06:35
+ * @LastEditTime: 2025-04-11 12:24:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -109,9 +109,28 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
     @Override
     public UserEntity save(UserEntity entity) {
         try {
-            return userRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected UserEntity doSave(UserEntity entity) {
+        return userRepository.save(entity);
+    }
+
+    @Override
+    public UserEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UserEntity entity) {
+        try {
+            Optional<UserEntity> latest = userRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                UserEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return userRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -132,12 +151,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UserEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
-    }
-
-    @Override
     public UserResponse convertToResponse(UserEntity entity) {
         return ConvertUtils.convertToUserResponse(entity);
     }
@@ -152,22 +165,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         Specification<UserEntity> specification = UserSpecification.search(request);
         return userRepository.findAll(specification);
     }
-
-    // public List<UserExcel> convertToExcel(List<UserEntity> entities) {
-    //     return entities.stream().map(this::convertToExcel).collect(Collectors.toList());
-    // }
-
-    // public UserExcel convertToExcel(UserResponse entity) {
-    //     UserExcel excel = new UserExcel();
-    //     excel.setNickname(entity.getNickname());
-    //     excel.setEmail(entity.getEmail());
-    //     excel.setMobile(entity.getMobile());
-    //     excel.setDescription(entity.getDescription());
-    //     // excel.setAvatar(entity.getAvatar());
-    //     // excel.setPlatform(entity.getPlatform());
-    //     // excel.setOrgUid(entity.getOrgUid());
-    //     return excel;
-    // }
 
     @Override
     public UserExcel convertToExcel(UserEntity entity) {

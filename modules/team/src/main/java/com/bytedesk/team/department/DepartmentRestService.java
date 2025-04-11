@@ -133,13 +133,19 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         }
     }
 
-    public DepartmentEntity save(DepartmentEntity department) {
+    @Override
+    public DepartmentEntity save(DepartmentEntity entity) {
         try {
-            return departmentRepository.save(department);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
         }
         return null;
+    }
+
+    @Override
+    protected DepartmentEntity doSave(DepartmentEntity entity) {
+        return departmentRepository.save(entity);
     }
 
     @Override
@@ -171,8 +177,19 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             DepartmentEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        // 乐观锁处理实现
+        try {
+            Optional<DepartmentEntity> latest = departmentRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                DepartmentEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return departmentRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     public DepartmentResponse convertToResponse(DepartmentEntity department) {

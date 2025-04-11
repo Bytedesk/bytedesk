@@ -274,16 +274,32 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     @Override
     public FaqEntity save(FaqEntity entity) {
         try {
-            return faqRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.warn("Optimistic locking failure for FAQ: {}", entity.getUid());
-            // 重试逻辑
-            Optional<FaqEntity> existingFaq = findByUid(entity.getUid());
-            if (existingFaq.isPresent()) {
-                return existingFaq.get();
-            }
-            throw e;
+            return handleOptimisticLockingFailureException(e, entity);
         }
+    }
+
+    @Override
+    protected FaqEntity doSave(FaqEntity entity) {
+        return faqRepository.save(entity);
+    }
+
+    @Override
+    public FaqEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<FaqEntity> latest = faqRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                FaqEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return faqRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     public void save(List<FaqEntity> entities) {
@@ -302,11 +318,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     @Override
     public void delete(FaqRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
-
     }
 
     @Override

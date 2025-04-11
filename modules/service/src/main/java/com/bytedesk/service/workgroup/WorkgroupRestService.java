@@ -241,12 +241,15 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     @Override
     public WorkgroupEntity save(WorkgroupEntity workgroup) {
         try {
-            return workgroupRepository.save(workgroup);
-        } catch (Exception e) {
-            log.error("save workgroup failed", e);
-            handleOptimisticLockingFailureException(null, workgroup);
+            return doSave(workgroup);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, workgroup);
         }
-        return null;
+    }
+    
+    @Override
+    protected WorkgroupEntity doSave(WorkgroupEntity entity) {
+        return workgroupRepository.save(entity);
     }
 
     public void deleteByUid(String uid) {
@@ -263,10 +266,30 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public WorkgroupEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             WorkgroupEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            Optional<WorkgroupEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                WorkgroupEntity latestEntity = latest.get();
+                // 合并需要保留的数据，保留基本信息
+                latestEntity.setNickname(entity.getNickname());
+                latestEntity.setAvatar(entity.getAvatar());
+                latestEntity.setDescription(entity.getDescription());
+                latestEntity.setStatus(entity.getStatus());
+                // 配置信息
+                latestEntity.setMessageLeaveSettings(entity.getMessageLeaveSettings());
+                latestEntity.setRobotSettings(entity.getRobotSettings());
+                latestEntity.setServiceSettings(entity.getServiceSettings());
+                latestEntity.setQueueSettings(entity.getQueueSettings());
+                latestEntity.setInviteSettings(entity.getInviteSettings());
+                return workgroupRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突", ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

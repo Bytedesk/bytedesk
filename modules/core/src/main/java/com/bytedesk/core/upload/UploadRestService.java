@@ -87,9 +87,32 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	public UploadEntity save(UploadEntity upload) {
 		try {
-			return uploadRepository.save(upload);
-		} catch (Exception e) {
-			e.printStackTrace();
+			return doSave(upload);
+		} catch (ObjectOptimisticLockingFailureException e) {
+			return handleOptimisticLockingFailureException(e, upload);
+		}
+	}
+
+	@Override
+	protected UploadEntity doSave(UploadEntity entity) {
+		return uploadRepository.save(entity);
+	}
+
+	@Override
+	public UploadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UploadEntity entity) {
+		try {
+			Optional<UploadEntity> latest = uploadRepository.findByUid(entity.getUid());
+			if (latest.isPresent()) {
+				UploadEntity latestEntity = latest.get();
+				// 合并需要保留的数据
+				latestEntity.setStatus(entity.getStatus());
+				latestEntity.setFileName(entity.getFileName());
+				latestEntity.setFileUrl(entity.getFileUrl());
+				return uploadRepository.save(latestEntity);
+			}
+		} catch (Exception ex) {
+			log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+			throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
 		}
 		return null;
 	}
@@ -294,12 +317,6 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	@Override
 	public void delete(UploadRequest entity) {
 		deleteByUid(entity.getUid());
-	}
-
-	@Override
-	public UploadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, UploadEntity entity) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
 	}
 
 	@Override

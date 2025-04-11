@@ -184,12 +184,15 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
     @Override
     public VisitorEntity save(VisitorEntity visitor) {
         try {
-            return visitorRepository.save(visitor);
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+            return doSave(visitor);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, visitor);
         }
-        return null;
+    }
+
+    @Override
+    protected VisitorEntity doSave(VisitorEntity entity) {
+        return visitorRepository.save(entity);
     }
 
     @Override
@@ -208,10 +211,31 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public VisitorEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             VisitorEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            Optional<VisitorEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                VisitorEntity latestEntity = latest.get();
+                // 合并访客信息
+                latestEntity.setNickname(entity.getNickname());
+                latestEntity.setAvatar(entity.getAvatar());
+                latestEntity.setMobile(entity.getMobile());
+                latestEntity.setEmail(entity.getEmail());
+                latestEntity.setIp(entity.getIp());
+                latestEntity.setIpLocation(entity.getIpLocation());
+                latestEntity.setVipLevel(entity.getVipLevel());
+                latestEntity.setTagList(entity.getTagList());
+                latestEntity.setNote(entity.getNote());
+                latestEntity.setExtra(entity.getExtra());
+                latestEntity.setDeviceInfo(entity.getDeviceInfo());
+                return visitorRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突", ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

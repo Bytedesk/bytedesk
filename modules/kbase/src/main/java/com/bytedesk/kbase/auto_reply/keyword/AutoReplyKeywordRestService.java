@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:42:43
+ * @LastEditTime: 2025-04-11 12:37:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -153,9 +153,30 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     @Override
     public AutoReplyKeywordEntity save(AutoReplyKeywordEntity entity) {
         try {
-            return keywordRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected AutoReplyKeywordEntity doSave(AutoReplyKeywordEntity entity) {
+        return keywordRepository.save(entity);
+    }
+
+    @Override
+    public AutoReplyKeywordEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyKeywordEntity entity) {
+        // 乐观锁处理实现
+        try {
+            Optional<AutoReplyKeywordEntity> latest = keywordRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                AutoReplyKeywordEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return keywordRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }
@@ -192,12 +213,6 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     @Override
     public void delete(AutoReplyKeywordRequest entity) {
         deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public AutoReplyKeywordEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyKeywordEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

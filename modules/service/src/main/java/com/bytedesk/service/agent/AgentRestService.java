@@ -363,14 +363,18 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             @CachePut(value = "agent", key = "#agent.mobile", unless = "#agent.mobile == null"),
             @CachePut(value = "agent", key = "#agent.email", unless = "#agent.email == null"),
     })
+    @Override
     public AgentEntity save(AgentEntity agent) {
         try {
-            return agentRepository.save(agent);
+            return doSave(agent);
         } catch (ObjectOptimisticLockingFailureException e) {
-            // 乐观锁冲突处理逻辑
-            handleOptimisticLockingFailureException(e, agent);
+            return handleOptimisticLockingFailureException(e, agent);
         }
-        return null;
+    }
+    
+    @Override
+    protected AgentEntity doSave(AgentEntity entity) {
+        return agentRepository.save(entity);
     }
 
     @CacheEvict(value = "agent", key = "#uid")

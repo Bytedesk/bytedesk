@@ -154,11 +154,16 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
     @Override
     public GroupEntity save(GroupEntity entity) {
         try {
-            return groupRepository.save(entity);
-        } catch (Exception e) {
-            // TODO: handle exception
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            handleOptimisticLockingFailureException(e, entity);
         }
         return null;
+    }
+
+    @Override
+    protected GroupEntity doSave(GroupEntity entity) {
+        return groupRepository.save(entity);
     }
 
     @Override
@@ -180,8 +185,19 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     @Override
     public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        // 乐观锁处理实现
+        try {
+            Optional<GroupEntity> latest = groupRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                GroupEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return groupRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override

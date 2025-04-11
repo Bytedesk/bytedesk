@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 07:38:16
+ * @LastEditTime: 2025-04-11 12:26:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,7 +84,32 @@ public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzReque
     }
 
     public QuartzEntity save(QuartzEntity quartzEntity) {
-        return quartzRepository.save(quartzEntity);
+        try {
+            return doSave(quartzEntity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, quartzEntity);
+        }
+    }
+
+    @Override
+    protected QuartzEntity doSave(QuartzEntity entity) {
+        return quartzRepository.save(entity);
+    }
+
+    @Override
+    public QuartzEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            QuartzEntity entity) {
+        try {
+            Optional<QuartzEntity> latest = quartzRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                QuartzEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return quartzRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -138,13 +163,6 @@ public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzReque
     @Override
     public QuartzResponse convertToResponse(QuartzEntity entity) {
         return modelMapper.map(entity, QuartzResponse.class);
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            QuartzEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     public void startJob(QuartzRequest quartzRequest) {

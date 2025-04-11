@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:14:59
+ * @LastEditTime: 2025-04-11 12:46:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -166,11 +166,15 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     @Override
     public KbaseEntity save(KbaseEntity entity) {
         try {
-            return kbaseRepository.save(entity);
+            return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            return handleOptimisticLockingFailureException(e, entity);
         }
-        return null;
+    }
+
+    @Override
+    protected KbaseEntity doSave(KbaseEntity entity) {
+        return kbaseRepository.save(entity);
     }
 
     @Override
@@ -188,10 +192,21 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+    public KbaseEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             KbaseEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        // 乐观锁处理实现
+        try {
+            Optional<KbaseEntity> latest = kbaseRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                KbaseEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return kbaseRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
