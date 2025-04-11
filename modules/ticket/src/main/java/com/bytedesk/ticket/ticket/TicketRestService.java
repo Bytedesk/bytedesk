@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 11:57:35
+ * @LastEditTime: 2025-04-11 13:43:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -386,15 +386,38 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     @Override
     public TicketEntity save(TicketEntity entity) {
         try {
-            TicketEntity ticket = ticketRepository.save(entity);
-            //
-            if (ticket == null) {
-                throw new RuntimeException("save ticket failed");
-            }
-            return ticket;
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
         } catch (Exception e) {
             throw new RuntimeException("save ticket exception: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected TicketEntity doSave(TicketEntity entity) {
+        return ticketRepository.save(entity);
+    }
+
+    @Override
+    public TicketEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TicketEntity entity) {
+        try {
+            Optional<TicketEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TicketEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                latestEntity.setTitle(entity.getTitle());
+                latestEntity.setDescription(entity.getDescription());
+                latestEntity.setPriority(entity.getPriority());
+                latestEntity.setStatus(entity.getStatus());
+                // 其他需要合并的字段
+                return ticketRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -411,13 +434,6 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
         TicketEntity ticket = ticketOptional.get();
         ticket.setDeleted(true);
         save(ticket);
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            TicketEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override

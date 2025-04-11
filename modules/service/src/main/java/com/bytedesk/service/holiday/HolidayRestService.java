@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 09:22:08
+ * @LastEditTime: 2025-04-11 13:46:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,9 +23,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -118,31 +115,10 @@ public class HolidayRestService extends BaseRestService<HolidayEntity, HolidayRe
         }
     }
 
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     * recover: 当重试次数用完后的回调方法
-     */
-    @Retryable(
-        value = { Exception.class },
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
     @Override
-    public HolidayEntity save(HolidayEntity entity) {
-        log.info("Attempting to save holiday: {}", entity.getName());
+    protected HolidayEntity doSave(HolidayEntity entity) {
+        log.info("Saving holiday: {}", entity.getName());
         return holidayRepository.save(entity);
-    }
-
-    /**
-     * 重试失败后的回调方法
-     */
-    @Recover
-    public HolidayEntity recover(Exception e, HolidayEntity entity) {
-        log.error("Failed to save holiday after 3 attempts: {}", entity.getName(), e);
-        // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save holiday after retries: " + e.getMessage());
     }
 
     @Override
@@ -164,9 +140,21 @@ public class HolidayRestService extends BaseRestService<HolidayEntity, HolidayRe
     }
 
     @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, HolidayEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+    public HolidayEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, HolidayEntity entity) {
+        try {
+            Optional<HolidayEntity> latest = holidayRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                HolidayEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                latestEntity.setName(entity.getName());
+                latestEntity.setDescription(entity.getDescription());
+                // 其他需要合并的字段
+                return holidayRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -179,6 +167,4 @@ public class HolidayRestService extends BaseRestService<HolidayEntity, HolidayRe
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
-    
-    
 }

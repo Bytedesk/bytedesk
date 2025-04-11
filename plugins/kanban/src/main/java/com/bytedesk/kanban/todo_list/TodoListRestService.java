@@ -22,9 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -126,25 +123,35 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
      * backoff: 重试延迟，multiplier是延迟倍数
      * recover: 当重试次数用完后的回调方法
      */
-    @Retryable(
-        value = { Exception.class },
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
     @Override
     public TodoListEntity save(TodoListEntity entity) {
-        log.info("Attempting to save todo: {}", entity.getName());
+        try {
+            log.info("Attempting to save todo: {}", entity.getName());
+            return doSave(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, entity);
+        }
+    }
+
+    @Override
+    protected TodoListEntity doSave(TodoListEntity entity) {
         return todoRepository.save(entity);
     }
 
-    /**
-     * 重试失败后的回调方法
-     */
-    @Recover
-    public TodoListEntity recover(Exception e, TodoListEntity entity) {
-        log.error("Failed to save todo after 3 attempts: {}", entity.getName(), e);
-        // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save todo after retries: " + e.getMessage());
+    @Override
+    public TodoListEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TodoListEntity entity) {
+        try {
+            Optional<TodoListEntity> latest = todoRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                TodoListEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                modelMapper.map(entity, latestEntity);
+                return todoRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -163,12 +170,6 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
     @Override
     public void delete(TodoListRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    @Override
-    public void handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TodoListEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
