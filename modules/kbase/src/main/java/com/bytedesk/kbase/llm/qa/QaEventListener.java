@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:47:12
+ * @LastEditTime: 2025-04-12 13:53:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class QaEventListener {
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                     EasyExcel.read(filePath, QaExcel.class, new QaExcelListener(qaRestService,
-                            UploadTypeEnum.LLM.name(),
+                            UploadTypeEnum.LLM_QA.name(),
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();
                 }

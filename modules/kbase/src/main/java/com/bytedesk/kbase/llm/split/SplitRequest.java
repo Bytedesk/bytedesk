@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 16:11:15
+ * @LastEditTime: 2025-04-12 14:21:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
@@ -34,11 +35,6 @@ import lombok.experimental.Accessors;
 public class SplitRequest extends BaseRequest {
 
     private String name;
-
-    // private String content;
-
-    // @Builder.Default
-    // private String type = SplitTypeEnum.CUSTOMER.name();
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();

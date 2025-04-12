@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.llm.qa;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -75,7 +76,9 @@ public class QaResponse extends BaseResponse {
 
     private String fileUid; // 对应文件
 
-    private String docUid; // 对应文档
+    // private String docUid; // 对应文档
+    @Builder.Default
+    private List<String> docIdList = new ArrayList<>();
 
     /**
      * 简化版FAQ响应，用于相关问题展示，避免循环依赖

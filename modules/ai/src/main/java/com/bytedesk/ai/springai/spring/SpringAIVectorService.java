@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:45:58
+ * @LastEditTime: 2025-04-12 14:21:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.HashMap;
 
 import com.bytedesk.ai.utils.reader.WebDocumentReader;
@@ -286,15 +285,12 @@ public class SpringAIVectorService {
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(name)
+					.content(doc.getText())
+					.type(SplitTypeEnum.TEXT.name())
 					.docId(doc.getId())
-					// .typeUid(textEntity.getUid())
-					// .categoryUid(textEntity.getCategoryUid())
 					.kbUid(kbUid)
-					// .userUid(textEntity.getUserUid())
+					.orgUid(orgUid)
 					.build();
-			splitRequest.setType(SplitTypeEnum.TEXT.name());
-			splitRequest.setContent(doc.getText());
-			splitRequest.setOrgUid(orgUid);
 			splitRestService.create(splitRequest);
 		});
 		// log.info("Parsing document, this will take a while.");
@@ -329,16 +325,15 @@ public class SpringAIVectorService {
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(textEntity.getName())
+					.content(doc.getText())
+					.type(SplitTypeEnum.TEXT.name())
 					.docId(doc.getId())
 					.typeUid(textEntity.getUid())
 					.categoryUid(textEntity.getCategoryUid())
 					.kbUid(textEntity.getKbUid())
-					// .userUid(textEntity.getUserUid())
+					.userUid(textEntity.getUserUid())
+					.orgUid(textEntity.getOrgUid())
 					.build();
-			splitRequest.setUserUid(textEntity.getUserUid());
-			splitRequest.setType(SplitTypeEnum.TEXT.name());
-			splitRequest.setContent(doc.getText());
-			splitRequest.setOrgUid(textEntity.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
 		textEntity.setDocIdList(docIdList);
@@ -379,15 +374,18 @@ public class SpringAIVectorService {
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(qaEntity.getQuestion())
+					.content(doc.getText())
+					.type(SplitTypeEnum.QA.name())
 					.docId(doc.getId())
 					.typeUid(qaEntity.getUid())
 					.categoryUid(qaEntity.getCategoryUid())
 					.kbUid(qaEntity.getKbUid())
-					// .userUid(fqaEntity.getUserUid())
+					.userUid(qaEntity.getUserUid())
+					
 					.build();
-			splitRequest.setUserUid(qaEntity.getUserUid());
-			splitRequest.setType(SplitTypeEnum.QA.name());
-			splitRequest.setContent(doc.getText());
+			// splitRequest.setUserUid(qaEntity.getUserUid());
+			// splitRequest.setType(SplitTypeEnum.QA.name());
+			// splitRequest.setContent(doc.getText());
 			splitRequest.setOrgUid(qaEntity.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
@@ -670,54 +668,45 @@ public class SpringAIVectorService {
 
 	/**
 	 * 批量更新向量存储中的文档内容
-	 * List<Document> documents = List.of(
-     * new Document("doc1", "内容1", null),
-     * new Document("doc2", "内容2", null)
-     * );
-	 * 
 	 * @param documents 要更新的文档列表
 	 */
-	public void updateDocs(List<Document> documents) {
-		Assert.notEmpty(documents, "Documents list must not be empty");
-		log.info("Updating {} documents", documents.size());
-		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
-			try {
-				List<String> docIds = documents.stream()
-					.map(Document::getId)
-					.collect(Collectors.toList());
-				
-				// 先删除旧的文档
-				redisVectorStore.delete(docIds);
-				// 添加新的文档
-				redisVectorStore.add(documents);
-				
-				log.info("Successfully updated {} documents", documents.size());
-			} catch (Exception e) {
-				log.error("Failed to update documents", e);
-				throw new RuntimeException("Failed to update documents", e);
-			}
-		});
-		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
-				try {
-					List<String> docIds = documents.stream()
-						.map(Document::getId)
-						.collect(Collectors.toList());
-
-					// 先删除旧的文档
-					redisVectorStore.delete(docIds);
-					// 添加新的文档
-					redisVectorStore.add(documents);
-					
-					log.info("Successfully updated {} documents", documents.size());
-				} catch (Exception e) {
-					log.error("Failed to update documents", e);
-					throw new RuntimeException("Failed to update documents", e);
-				}
-			});
-		}
-	}
+	// public void updateDocs(List<Document> documents) {
+	// 	Assert.notEmpty(documents, "Documents list must not be empty");
+	// 	log.info("Updating {} documents", documents.size());
+	// 	bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
+	// 		try {
+	// 			List<String> docIds = documents.stream()
+	// 				.map(Document::getId)
+	// 				.collect(Collectors.toList());				
+	// 			// 先删除旧的文档
+	// 			redisVectorStore.delete(docIds);
+	// 			// 添加新的文档
+	// 			redisVectorStore.add(documents);			
+	// 			log.info("Successfully updated {} documents", documents.size());
+	// 		} catch (Exception e) {
+	// 			log.error("Failed to update documents", e);
+	// 			throw new RuntimeException("Failed to update documents", e);
+	// 		}
+	// 	});
+	// 	// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+	// 	if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+	// 		bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
+	// 			try {
+	// 				List<String> docIds = documents.stream()
+	// 					.map(Document::getId)
+	// 					.collect(Collectors.toList());
+	// 				// 先删除旧的文档
+	// 				redisVectorStore.delete(docIds);
+	// 				// 添加新的文档
+	// 				redisVectorStore.add(documents);				
+	// 				log.info("Successfully updated {} documents", documents.size());
+	// 			} catch (Exception e) {
+	// 				log.error("Failed to update documents", e);
+	// 				throw new RuntimeException("Failed to update documents", e);
+	// 			}
+	// 		});
+	// 	}
+	// }
 
 	// 删除一个docId
 	public void deleteDoc(String docId) {

@@ -81,15 +81,12 @@ public class WebsiteEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
-
     private String categoryUid; // 所属分类
 
     private String kbUid; // 所属知识库
 
     // 对应 uploadEntity 的 uid
     private String uploadUid;
-
-    // private String userUid;
 
     // vector store id
     @Builder.Default
