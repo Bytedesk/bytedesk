@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:10:59
+ * @LastEditTime: 2025-04-12 14:57:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -107,10 +107,6 @@ public class QaEntity extends BaseEntity {
     // 点踩次数
     @Builder.Default
     private int downCount = 0;
-
-    // 当用户点踩的时候，是否显示转人工按钮
-    // @Builder.Default
-    // private boolean downShowTransferToAgentButton = true;
 
     // 是否启用，状态：启用/禁用
     @Builder.Default
