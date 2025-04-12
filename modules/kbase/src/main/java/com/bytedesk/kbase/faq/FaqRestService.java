@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 16:00:47
+ * @LastEditTime: 2025-04-11 21:25:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -365,7 +365,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         return response;
     }
 
-    
     @Override
     public FaqExcel convertToExcel(FaqEntity faq) {
         FaqExcel excel = modelMapper.map(faq, FaqExcel.class);
@@ -395,11 +394,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         faq.setUid(uidUtils.getUid());
         faq.setQuestion(excel.getQuestion());
         faq.setAnswer(excel.getAnswer());
-        //
-        // faq.setType(MessageTypeEnum.TEXT);
         faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         //
-        // faq.setCategoryUid(categoryUid);
         Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             faq.setCategoryUid(categoryOptional.get().getUid());
@@ -407,13 +403,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             // create category
             CategoryRequest categoryRequest = CategoryRequest.builder()
                     .name(excel.getCategory())
-                    // .type(CategoryTypeEnum.FAQ.name())
                     .type(uploadType)
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
-            // categoryRequest.setType(CategoryTypeEnum.FAQ.name());
-            // categoryRequest.setOrgUid(orgUid);
             //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
             faq.setCategoryUid(categoryResponse.getUid());
