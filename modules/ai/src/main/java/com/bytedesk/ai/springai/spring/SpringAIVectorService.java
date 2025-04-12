@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 15:25:22
+ * @LastEditTime: 2025-04-12 22:56:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -607,11 +607,8 @@ public class SpringAIVectorService {
 
 		log.info("searchText kbUid {}, query: {}", kbUid, query);
 		
-		// 构建过滤表达式，只搜索启用状态为true且在有效期内的内容
+		// 构建过滤表达式，只搜索启用状态为true的内容和特定知识库
 		FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
-		
-		// 获取当前时间，用于日期过滤
-		String currentTime = java.time.LocalDateTime.now().toString();
 		
 		// 首先创建知识库过滤条件
 		FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
@@ -621,21 +618,12 @@ public class SpringAIVectorService {
 		FilterExpressionBuilder.Op enabledNullOp = expressionBuilder.eq("enabled", null);
 		FilterExpressionBuilder.Op enabledOp = expressionBuilder.or(enabledTrueOp, enabledNullOp);
 		
-		// 创建开始日期过滤：开始日期<=当前时间 或 无此字段
-		FilterExpressionBuilder.Op startDateValidOp = expressionBuilder.lte("startDate", currentTime);
-		FilterExpressionBuilder.Op startDateNullOp = expressionBuilder.eq("startDate", null);
-		FilterExpressionBuilder.Op startDateOp = expressionBuilder.or(startDateValidOp, startDateNullOp);
+		// 注意：Redis向量存储不支持LTE和GTE操作符用于标签值
+		// 我们只使用知识库ID和启用状态作为过滤条件
+		// 日期过滤将在内存中进行后处理
 		
-		// 创建结束日期过滤：结束日期>=当前时间 或 无此字段
-		FilterExpressionBuilder.Op endDateValidOp = expressionBuilder.gte("endDate", currentTime);
-		FilterExpressionBuilder.Op endDateNullOp = expressionBuilder.eq("endDate", null);
-		FilterExpressionBuilder.Op endDateOp = expressionBuilder.or(endDateValidOp, endDateNullOp);
-		
-		// 构建最终的过滤表达式，组合所有条件
-		FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
-			expressionBuilder.and(kbUidOp, enabledOp),  // 知识库匹配且启用
-			expressionBuilder.and(startDateOp, endDateOp)  // 且在有效期内
-		);
+		// 构建最终的过滤表达式
+		FilterExpressionBuilder.Op finalOp = expressionBuilder.and(kbUidOp, enabledOp);
 		
 		// 通过build()方法获取最终的Expression对象
 		Expression finalExpression = finalOp.build();
@@ -656,8 +644,46 @@ public class SpringAIVectorService {
 							.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest))
 							.orElse(List.of());
 				});
+		
+		// 获取当前时间，用于内存中过滤日期
+		LocalDateTime currentTime = LocalDateTime.now();
+		
+		// 在内存中过滤日期范围
+		List<Document> dateFilteredDocuments = similarDocuments.stream()
+				.filter(doc -> {
+					// 检查startDate
+					Object startDateObj = doc.getMetadata().get("startDate");
+					if (startDateObj != null) {
+						try {
+							String startDateStr = String.valueOf(startDateObj);
+							LocalDateTime startDate = LocalDateTime.parse(startDateStr);
+							if (startDate.isAfter(currentTime)) {
+								return false; // 如果开始日期在当前时间之后，则过滤掉
+							}
+						} catch (Exception e) {
+							log.warn("无法解析startDate: {}", startDateObj);
+						}
+					}
+					
+					// 检查endDate
+					Object endDateObj = doc.getMetadata().get("endDate");
+					if (endDateObj != null) {
+						try {
+							String endDateStr = String.valueOf(endDateObj);
+							LocalDateTime endDate = LocalDateTime.parse(endDateStr);
+							if (endDate.isBefore(currentTime)) {
+								return false; // 如果结束日期在当前时间之前，则过滤掉
+							}
+						} catch (Exception e) {
+							log.warn("无法解析endDate: {}", endDateObj);
+						}
+					}
+					
+					return true; // 通过日期验证
+				})
+				.toList();
 				
-		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
+		List<String> contentList = dateFilteredDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		return contentList;
 	}
