@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 15:43:48
+ * @LastEditTime: 2025-04-12 16:59:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -126,6 +126,10 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             QaEntity entity = modelMapper.map(request, QaEntity.class);
             if (!StringUtils.hasText(request.getUid())) {
                 entity.setUid(uidUtils.getUid());
+            }
+            UserEntity user = authService.getUser();
+            if (user != null) {
+                entity.setUserUid(user.getUid());
             }
             // 如何将string类型startDate和endDate转换为LocalDateTime类型？
             // if (StringUtils.hasText(request.getStartDate())) {
@@ -280,19 +284,36 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
 
     @Override
     public QaEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QaEntity entity) {
-        // 乐观锁处理实现
         try {
+            log.warn("处理乐观锁冲突: {}", entity.getUid());
             Optional<QaEntity> latest = qaRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 QaEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                // 这里可以根据业务需求合并实体
+                // 保持原有实体的部分属性
+                latestEntity.setQuestion(entity.getQuestion());
+                latestEntity.setAnswer(entity.getAnswer());
+                latestEntity.setAnswerList(entity.getAnswerList());
+                latestEntity.setType(entity.getType());
+                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setCategoryUid(entity.getCategoryUid());
+                latestEntity.setKbUid(entity.getKbUid());
+                
+                // 处理相关问答时特别小心
+                if (entity.getRelatedQas() != null && !entity.getRelatedQas().isEmpty()) {
+                    latestEntity.setRelatedQas(entity.getRelatedQas());
+                }
+                
+                // 文档ID列表和状态
+                latestEntity.setDocIdList(entity.getDocIdList());
+                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setTagList(entity.getTagList());
+                
                 return qaRepository.save(latestEntity);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
         }
-        return null;
+        throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
     public void save(List<QaEntity> entities) {
@@ -381,7 +402,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         return excel;
     }
 
-    public QaEntity convertExcelToQa(QaExcel excel, String uploadType, String kbUid, String orgUid) {
+    public QaEntity convertExcelToQa(QaExcel excel, String uploadType, String fileUid, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Qa.class); // String categoryUid,
         QaEntity qa = QaEntity.builder().build();
         qa.setUid(uidUtils.getUid());
@@ -403,6 +424,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
             qa.setCategoryUid(categoryResponse.getUid());
         }
+        qa.setFileUid(fileUid);
         qa.setKbUid(kbUid);
         qa.setOrgUid(orgUid);
         //

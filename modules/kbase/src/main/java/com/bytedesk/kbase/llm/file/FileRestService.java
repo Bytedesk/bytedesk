@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:24:01
+ * @LastEditTime: 2025-04-12 16:50:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,19 +110,35 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
 
     @Override
     public FileEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FileEntity entity) {
-        // 乐观锁处理实现
         try {
             Optional<FileEntity> latest = fileRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 FileEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-                // 这里可以根据业务需求合并实体
+                latestEntity.setFileName(entity.getFileName());
+                latestEntity.setContent(entity.getContent());
+                latestEntity.setTagList(entity.getTagList());
+                latestEntity.setFileUrl(entity.getFileUrl());
+                latestEntity.setContent(entity.getContent());
+                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setStartDate(entity.getStartDate());
+                latestEntity.setEndDate(entity.getEndDate());
+                latestEntity.setCategoryUid(entity.getCategoryUid());
+                latestEntity.setOrgUid(entity.getOrgUid());
+                latestEntity.setUserUid(entity.getUserUid());
+                latestEntity.setKbUid(entity.getKbUid());
+                latestEntity.setUploadUid(entity.getUploadUid());
+                
+                // 文档ID列表和状态
+                latestEntity.setDocIdList(entity.getDocIdList());
+                latestEntity.setStatus(entity.getStatus());
+                
                 return fileRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
-        return null;
+        throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
     @Override
