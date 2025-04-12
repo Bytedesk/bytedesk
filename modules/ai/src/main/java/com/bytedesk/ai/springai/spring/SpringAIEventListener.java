@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:42:27
+ * @LastEditTime: 2025-04-12 14:12:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -71,9 +71,9 @@ public class SpringAIEventListener {
         FileEntity file = event.getFile();
         log.info("SpringAIEventListener onFileUpdateEvent: {}", file.getFileName());
         // 后台删除文件记录
-        if (!file.isDeleted()) {
-            // TODO: 更新文件对应的document
-        }
+        // if (!file.isDeleted()) {
+        //     // TODO: 更新文件对应的document
+        // }
     }
 
     @EventListener
@@ -100,18 +100,14 @@ public class SpringAIEventListener {
     public void onTextUpdateEvent(TextUpdateEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getName());
-        // FIXME: Text->split->Text 循环更新
         if (!text.isDeleted()) {
-            // TODO: 更新text对应的document
+            // 更新text对应的document
+            springAiVectorService.ifPresent(service -> {
+                // service.updateDoc(text.getDocId(), text.getContent(), text.getKbUid());
+                service.deleteDocs(text.getDocIdList());
+                service.readText(text);
+            });
         }
-        // 首先删除text对应的document，以及redis中缓存的document
-        // springAiVectorService.ifPresent(service -> {
-        //     service.deleteDoc(text.getDocIdList());
-        // });
-        // // 然后重新生成document
-        // springAiVectorService.ifPresent(service -> {
-        //     service.readText(text);
-        // });
     }
 
     @EventListener
@@ -141,8 +137,10 @@ public class SpringAIEventListener {
         if (!qa.isDeleted()) {
             // 更新qa对应的document
             springAiVectorService.ifPresent(service -> {
-                String content = qa.getQuestion() + "\n" + qa.getAnswer();
-                service.updateDoc(qa.getDocId(), content, qa.getKbUid());
+                // String content = qa.getQuestion() + "\n" + qa.getAnswer();
+                // service.updateDoc(qa.getDocId(), content, qa.getKbUid());
+                service.deleteDocs(qa.getDocIdList());
+                service.readQa(qa);
             });
         }
     }
@@ -174,19 +172,9 @@ public class SpringAIEventListener {
         if (!faq.isDeleted()) {
             // 更新faq对应的document
             springAiVectorService.ifPresent(service -> {
-                String content = faq.getQuestion() + "\n" + faq.getAnswer();
-                service.updateDoc(faq.getDocId(), content, faq.getKbUid());
+                service.deleteDocs(faq.getDocIdList());
+                service.readFaq(faq);
             });
-
-            // 更新faq对应的document
-            // 首先删除text对应的document，以及redis中缓存的document
-            // springAiVectorService.ifPresent(service -> {
-            //     service.deleteDoc(faq.getDocIdList());
-            // });
-            // 然后重新生成document
-            // springAiVectorService.ifPresent(service -> {
-            //     service.readFaq(faq);
-            // });
         }
         
     }
@@ -217,16 +205,7 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.getName());
         if (!website.isDeleted()) {
             // TODO: 更新website对应的document
-
         }
-        // 首先删除text对应的document，以及redis中缓存的document
-        // springAiVectorService.ifPresent(service -> {
-        //     service.deleteDoc(website.getDocIdList());
-        // });
-        // // 然后重新生成document
-        // springAiVectorService.ifPresent(service -> {
-        //     service.readWebsite(website);
-        // });
     }
 
     @EventListener

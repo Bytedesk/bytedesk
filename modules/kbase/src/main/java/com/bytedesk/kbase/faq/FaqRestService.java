@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 21:25:29
+ * @LastEditTime: 2025-04-12 14:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -343,7 +343,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 .categoryUid(entity.getCategoryUid())
                 .kbUid(entity.getKbUid())
                 .fileUid(entity.getFileUid())
-                .docUid(entity.getDocId())
+                // .docUid(entity.getDocId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -417,7 +417,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         return faq;
     }
 
-    public void saveFaqPairs(String qaPairs, String kbUid, String orgUid, String docId) {
+    public void saveFaqPairs(String qaPairs, String kbUid, String orgUid) {
         if (!StringUtils.hasText(qaPairs)) {
             return;
         }
@@ -462,7 +462,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .type(MessageTypeEnum.TEXT.name())
                             // .tags(tags)
                             .kbUid(kbUid)
-                            .docId(docId)
+                            // .docId(docId)
                             .build();
 
                     faq.setUid(uidUtils.getUid());

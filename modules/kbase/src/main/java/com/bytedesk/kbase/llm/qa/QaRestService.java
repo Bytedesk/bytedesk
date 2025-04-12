@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:48:51
+ * @LastEditTime: 2025-04-12 14:11:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
@@ -339,7 +338,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                 .categoryUid(entity.getCategoryUid())
                 .kbUid(entity.getKbUid())
                 .fileUid(entity.getFileUid())
-                .docUid(entity.getDocId())
+                // .docUid(entity.getDocId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -410,63 +409,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         qa.setOrgUid(orgUid);
         //
         return qa;
-    }
-
-    public void saveQaPairs(String qaPairs, String kbUid, String orgUid, String docId) {
-        if (!StringUtils.hasText(qaPairs)) {
-            return;
-        }
-
-        try {
-            // Clean up the JSON string
-            String cleanJson = qaPairs;
-            int jsonStart = qaPairs.indexOf("```json");
-            if (jsonStart != -1) {
-                // Find the start of the actual JSON after ```json
-                int contentStart = qaPairs.indexOf("{", jsonStart);
-                int contentEnd = qaPairs.lastIndexOf("}");
-                if (contentStart != -1 && contentEnd != -1) {
-                    cleanJson = qaPairs.substring(contentStart, contentEnd + 1);
-                }
-            } else {
-                // If no ```json marker, try to find JSON directly
-                int contentStart = qaPairs.indexOf("{");
-                int contentEnd = qaPairs.lastIndexOf("}");
-                if (contentStart != -1 && contentEnd != -1) {
-                    cleanJson = qaPairs.substring(contentStart, contentEnd + 1);
-                }
-            }
-
-            // Parse JSON array of QA pairs
-            JSONObject jsonObject = JSON.parseObject(cleanJson);
-            List<JSONObject> qaList = jsonObject.getList("qaPairs", JSONObject.class);
-            if (qaList == null || qaList.isEmpty()) {
-                log.warn("No QA pairs found in response");
-                return;
-            }
-
-            for (JSONObject qa : qaList) {
-                String question = qa.getString("question");
-                String answer = qa.getString("answer");
-                // String tags = qa.getString("tags");
-
-                if (StringUtils.hasText(question) && StringUtils.hasText(answer)) {
-                    QaEntity qaEntity = QaEntity.builder()
-                            .question(question)
-                            .answer(answer)
-                            .type(MessageTypeEnum.TEXT.name())
-                            .kbUid(kbUid)
-                            .docId(docId)
-                            .build();
-                            qaEntity.setUid(uidUtils.getUid());
-                            qaEntity.setOrgUid(orgUid);
-                    save(qaEntity);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error parsing and saving QA pairs: {} \nContent: {}", e.getMessage(), qaPairs);
-            throw new RuntimeException("Failed to save QA pairs", e);
-        }
     }
 
 
