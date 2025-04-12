@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:47:39
+ * @LastEditTime: 2025-04-12 15:48:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,7 +64,7 @@ public class QaRestController extends BaseRestController<QaRequest> {
         return ResponseEntity.ok(JsonResult.success(qa));
     }
 
-    @ActionAnnotation(title = "常见问题", action = "新建", description = "create qa")
+    @ActionAnnotation(title = "问答对", action = "新建", description = "create qa")
     @Override
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     public ResponseEntity<?> create(@RequestBody QaRequest request) {
@@ -74,7 +74,7 @@ public class QaRestController extends BaseRestController<QaRequest> {
         return ResponseEntity.ok(JsonResult.success(Qa));
     }
 
-    @ActionAnnotation(title = "常见问题", action = "更新", description = "update qa")
+    @ActionAnnotation(title = "问答对", action = "更新", description = "update qa")
     @Override
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     public ResponseEntity<?> update(@RequestBody QaRequest request) {
@@ -84,18 +84,18 @@ public class QaRestController extends BaseRestController<QaRequest> {
         return ResponseEntity.ok(JsonResult.success(Qa));
     }
 
-    @ActionAnnotation(title = "常见问题", action = "删除", description = "delete qa")
+    @ActionAnnotation(title = "问答对", action = "删除", description = "delete qa")
     @Override
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     public ResponseEntity<?> delete(@RequestBody QaRequest request) {
 
         qaRestService.delete(request);
 
-        return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     // enable/disable qa
-    @ActionAnnotation(title = "常见问题", action = "启用", description = "enable qa")
+    @ActionAnnotation(title = "问答对", action = "启用", description = "enable qa")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody QaRequest request) {
 
@@ -104,7 +104,7 @@ public class QaRestController extends BaseRestController<QaRequest> {
         return ResponseEntity.ok(JsonResult.success(qaResponse));
     }
 
-    @ActionAnnotation(title = "常见问题", action = "导出", description = "export qa")
+    @ActionAnnotation(title = "问答对", action = "导出", description = "export qa")
     @GetMapping("/export")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     public Object export(QaRequest request, HttpServletResponse response) {
@@ -113,7 +113,7 @@ public class QaRestController extends BaseRestController<QaRequest> {
             response,
             qaRestService,
             QaExcel.class,
-            "常见问题",
+            "问答对",
             "qa"
         );
     }

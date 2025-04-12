@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:40:51
+ * @LastEditTime: 2025-04-12 15:39:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,6 @@ public class SplitEntityListener {
     @PostPersist
     public void onPostPersist(SplitEntity split) {
         log.info("SplitEntityListener onPostPersist: {}", split.getName());
-        // 
         SplitEntity clonedSplit = SerializationUtils.clone(split);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -43,13 +42,14 @@ public class SplitEntityListener {
     @PostUpdate
     public void onPostUpdate(SplitEntity split) {
         log.info("SplitEntityListener onPostUpdate: {}", split.getName());
-        // 
         SplitEntity clonedSplit = SerializationUtils.clone(split);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         if (split.isDeleted()) {
+            log.info("SplitEntityListener onPostUpdate: Split is deleted");
             publisher.publishEvent(new SplitDeleteEvent(clonedSplit));
         }else {
+            log.info("SplitEntityListener onPostUpdate: Split is update");
             publisher.publishEvent(new SplitUpdateEvent(clonedSplit));
         }   
     }

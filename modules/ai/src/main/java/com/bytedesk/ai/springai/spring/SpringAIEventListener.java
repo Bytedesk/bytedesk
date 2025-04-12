@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:52:43
+ * @LastEditTime: 2025-04-12 15:42:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,9 +32,6 @@ import com.bytedesk.kbase.llm.qa.QaEntity;
 import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
 import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
 import com.bytedesk.kbase.llm.qa.event.QaUpdateEvent;
-import com.bytedesk.kbase.llm.split.SplitEntity;
-import com.bytedesk.kbase.llm.split.event.SplitDeleteEvent;
-import com.bytedesk.kbase.llm.split.event.SplitUpdateEvent;
 import com.bytedesk.kbase.llm.text.TextEntity;
 import com.bytedesk.kbase.llm.text.event.TextCreateEvent;
 import com.bytedesk.kbase.llm.text.event.TextDeleteEvent;
@@ -201,27 +198,27 @@ public class SpringAIEventListener {
         });
     }
 
-    @EventListener
-    public void onSplitUpdateEvent(SplitUpdateEvent event) {
-        SplitEntity split = event.getSplit();
-        log.info("SpringAIEventListener onSplitUpdateEvent: {}", split.getName());
-        if (!split.isDeleted()) {
-            // 更新向量库
-            springAiVectorService.ifPresent(service -> {
-                service.updateDoc(split.getDocId(), split.getContent(), split.getKbUid());
-            });
-        }
-    }
+    // @EventListener
+    // public void onSplitUpdateEvent(SplitUpdateEvent event) {
+    //     SplitEntity split = event.getSplit();
+    //     log.info("SpringAIEventListener onSplitUpdateEvent: {}", split.getName());
+    //     if (!split.isDeleted()) {
+    //         // 更新向量库
+    //         springAiVectorService.ifPresent(service -> {
+    //             service.updateDoc(split.getDocId(), split.getContent(), split.getKbUid());
+    //         });
+    //     }
+    // }
 
-    @EventListener
-    public void onSplitDeleteEvent(SplitDeleteEvent event) {
-        SplitEntity split = event.getSplit();
-        log.info("SpringAIEventListener onSplitDeleteEvent: {}", split.getName());
-        // 删除向量库
-        springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(split.getDocId());
-        });
-    }
+    // @EventListener
+    // public void onSplitDeleteEvent(SplitDeleteEvent event) {
+    //     SplitEntity split = event.getSplit();
+    //     log.info("SpringAIEventListener onSplitDeleteEvent: {}", split.getName());
+    //     // 删除向量库
+    //     springAiVectorService.ifPresent(service -> {
+    //         service.deleteDoc(split.getDocId());
+    //     });
+    // }
 
     // @EventListener
     // public void onVectorSplitEvent(VectorSplitEvent event) {
