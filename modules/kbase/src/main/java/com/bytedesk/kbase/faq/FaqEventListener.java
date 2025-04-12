@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:26:42
+ * @LastEditTime: 2025-04-12 13:05:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.faq;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +22,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.event.MessageUpdateEvent;
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
@@ -42,13 +39,13 @@ public class FaqEventListener {
 
     private final UploadRestService uploadRestService;
 
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        // String orgUid = organization.getUid();
-        log.info("faq - organization created: {}", organization.getName());
-    }
+    // @Order(3)
+    // @EventListener
+    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
+    //     // String orgUid = organization.getUid();
+    //     log.info("faq - organization created: {}", organization.getName());
+    // }
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
@@ -86,24 +83,6 @@ public class FaqEventListener {
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                     EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
                             UploadTypeEnum.FAQ.name(),
-                            upload.getKbUid(),
-                            upload.getOrgUid())).sheet().doRead();
-                }
-            } catch (Exception e) {
-                log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
-            }
-        } else if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
-            // llm qa 问答对导入
-            try {
-                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
-                if (resource.exists()) {
-                    String filePath = resource.getFile().getAbsolutePath();
-                    log.info("UploadEventListener loadAsResource: {}", filePath);
-                    // 导入自动回复
-                    // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
-                    // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                    EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
-                            UploadTypeEnum.LLM.name(),
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();
                 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:43:37
+ * @LastEditTime: 2025-04-12 12:53:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,8 +52,8 @@ public class QaInitializer implements SmartInitializingSingleton {
     //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
     //     String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
     //     // 
-    //     // qaService.importQas(orgUid, kbUid);
-    //     // qaService.initRelationQas(orgUid, kbUid);
+        // qaService.importQas(orgUid, kbUid);
+        // qaService.initRelationQas(orgUid, kbUid);
     // }
     
 
