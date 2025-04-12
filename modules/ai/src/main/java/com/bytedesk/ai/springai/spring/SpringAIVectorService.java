@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:10:26
+ * @LastEditTime: 2025-04-12 13:45:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,9 +41,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 
-import com.bytedesk.ai.springai.spring.event.VectorSplitEvent;
 import com.bytedesk.ai.utils.reader.WebDocumentReader;
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;
@@ -88,8 +86,6 @@ public class SpringAIVectorService {
 	private final QaRestService qaRestService;
 
 	private final UploadRestService uploadRestService;
-
-	private final BytedeskEventPublisher bytedeskEventPublisher;
 
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
@@ -580,8 +576,8 @@ public class SpringAIVectorService {
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		}
-
-		bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
+		// 通知生成问答对
+		// bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
@@ -653,6 +649,23 @@ public class SpringAIVectorService {
 				throw new RuntimeException("Failed to update document", e);
 			}
 		});
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
+				try {
+					// 创建新的Document对象
+					Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
+					// 更新向量存储
+					redisVectorStore.delete(List.of(docId));  // 先删除旧的
+					redisVectorStore.add(List.of(document));  // 再添加新的
+
+					log.info("Successfully updated document: {}", docId);
+				} catch (Exception e) {
+					log.error("Failed to update document: {}", docId, e);
+					throw new RuntimeException("Failed to update document", e);
+				}
+			});
+		}
 	}
 
 	/**
@@ -684,15 +697,35 @@ public class SpringAIVectorService {
 				throw new RuntimeException("Failed to update documents", e);
 			}
 		});
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
+				try {
+					List<String> docIds = documents.stream()
+						.map(Document::getId)
+						.collect(Collectors.toList());
+
+					// 先删除旧的文档
+					redisVectorStore.delete(docIds);
+					// 添加新的文档
+					redisVectorStore.add(documents);
+					
+					log.info("Successfully updated {} documents", documents.size());
+				} catch (Exception e) {
+					log.error("Failed to update documents", e);
+					throw new RuntimeException("Failed to update documents", e);
+				}
+			});
+		}
 	}
 
 	// 删除一个docId
 	public void deleteDoc(String docId) {
 		Assert.hasText(docId, "Document ID must not be empty");
-		deleteDoc(List.of(docId));
+		deleteDocs(List.of(docId));
 	}
 
-	public void deleteDoc(List<String> docIdList) {
+	public void deleteDocs(List<String> docIdList) {
 		Assert.notEmpty(docIdList, "Document ID list must not be empty");
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai

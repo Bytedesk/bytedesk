@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:34:09
+ * @LastEditTime: 2025-04-12 13:42:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.springai.spring.event.VectorSplitEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
@@ -83,7 +82,7 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onFileDeleteEvent: {}", file.getFileName());
         // 删除文件对应的document
         springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(file.getDocIdList());
+            service.deleteDocs(file.getDocIdList());
         });
     }
 
@@ -121,7 +120,7 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onTextDeleteEvent: {}", text.getName());
         // 删除text对应的document，以及redis中缓存的document
         springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(text.getDocIdList());
+            service.deleteDocs(text.getDocIdList());
         });
     }
 
@@ -140,11 +139,11 @@ public class SpringAIEventListener {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getQuestion());
         if (!qa.isDeleted()) {
-            // TODO: 更新qa对应的document
+            // 更新qa对应的document
             springAiVectorService.ifPresent(service -> {
-                service.updateDoc(qa.getDocId(), qa.getAnswer(), qa.getKbUid());
+                String content = qa.getQuestion() + "\n" + qa.getAnswer();
+                service.updateDoc(qa.getDocId(), content, qa.getKbUid());
             });
-            // 
         }
     }
 
@@ -154,7 +153,7 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onQaDeleteEvent: {}", qa.getQuestion());
         // 删除qa对应的document，以及redis中缓存的document
         springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(qa.getDocIdList());
+            service.deleteDocs(qa.getDocIdList());
         });
     }
 
@@ -174,6 +173,12 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onFaqUpdateEvent: {}", faq.getQuestion());
         if (!faq.isDeleted()) {
             // 更新faq对应的document
+            springAiVectorService.ifPresent(service -> {
+                String content = faq.getQuestion() + "\n" + faq.getAnswer();
+                service.updateDoc(faq.getDocId(), content, faq.getKbUid());
+            });
+
+            // 更新faq对应的document
             // 首先删除text对应的document，以及redis中缓存的document
             // springAiVectorService.ifPresent(service -> {
             //     service.deleteDoc(faq.getDocIdList());
@@ -192,7 +197,7 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onFaqDeleteEvent: {}", faq.getQuestion());
         // 删除faq对应的document，以及redis中缓存的document
         springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(faq.getDocIdList());
+            service.deleteDocs(faq.getDocIdList());
         });
     }
 
@@ -230,7 +235,7 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onWebsiteDeleteEvent: {}", website.getName());
         // 删除text对应的document，以及redis中缓存的document
         springAiVectorService.ifPresent(service -> {
-            service.deleteDoc(website.getDocIdList());
+            service.deleteDocs(website.getDocIdList());
         });
     }
 
@@ -262,27 +267,27 @@ public class SpringAIEventListener {
         });
     }
 
-    @EventListener
-    public void onVectorSplitEvent(VectorSplitEvent event) {
-        log.info("SpringAIEventListener onVectorSplitEvent: {}", event.getKbUid());
+    // @EventListener
+    // public void onVectorSplitEvent(VectorSplitEvent event) {
+        // log.info("SpringAIEventListener onVectorSplitEvent: {}", event.getKbUid());
         // List<Document> docList = event.getDocuments();
         // String kbUid = event.getKbUid();
         // String orgUid = event.getOrgUid();
         // // 生成问答对
 		// for (Document document : docList) {
-        //     // 调用模型生成问答对
-        //     // springAIZhipuaiChatService.ifPresent(service -> {
-        //     //     String qaPairs = service.generateFaqPairsAsync(document.getText());
-        //     //     // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
-        //     //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
-        //     // });
-        //     // ollamaChatService.ifPresent(service -> {
-        //     //     String qaPairs = service.generateFaqPairsAsync(document.getText());
-        //     //     log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
-        //     //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
-        //     // });
+            // 调用模型生成问答对
+            // springAIZhipuaiChatService.ifPresent(service -> {
+            //     String qaPairs = service.generateFaqPairsAsync(document.getText());
+            //     // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
+            //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
+            // });
+            // ollamaChatService.ifPresent(service -> {
+            //     String qaPairs = service.generateFaqPairsAsync(document.getText());
+            //     log.info("generateFaqPairsAsync qaPairs {}", qaPairs);
+            //     faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, document.getId());
+            // });
         // }
-    }
+    // }
 
     @EventListener
     public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {

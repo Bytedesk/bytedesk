@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 12:51:29
+ * @LastEditTime: 2025-04-12 13:48:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -403,7 +403,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
-            //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
             qa.setCategoryUid(categoryResponse.getUid());
         }
@@ -470,101 +469,5 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         }
     }
 
-    /**
-     * 导入FAQ数据
-     * 从JSON文件加载数据并存储到数据库
-     * 
-     * @return 导入的FAQ数量
-     */
-    // @Transactional
-    // public void importQas(String orgUid, String kbUid) {
-    //     if (qaRepository.count() > 0) {
-    //         return;
-    //     }
-
-    //     try {
-    //         // 加载JSON文件中的FAQ数据
-    //         QaConfiguration config = qaJsonLoader.loadQas();
-
-    //         // 遍历并保存每个FAQ
-    //         for (Qa qa : config.getQas()) {
-    //             String uid = Utils.formatUid(orgUid, qa.getUid());
-    //             // 检查FAQ是否已存在
-    //             if (!qaRepository.existsByUid(uid)) {
-    //                 QaRequest request = QaRequest.builder()
-    //                         .uid(uid)
-    //                         .question(qa.getQuestion())
-    //                         .answer(qa.getAnswer())
-    //                         .type(MessageTypeEnum.TEXT.name())
-    //                         .kbUid(kbUid)
-    //                         .orgUid(orgUid)
-    //                         .build();
-    //                 // 保存FAQ到数据库
-    //                 create(request);
-    //             } else {
-    //                 // log.info("FAQ already exists: {}", qa.getUid());
-    //             }
-    //         }
-    //         // log.info("Successfully imported {} FAQs", count);
-    //         // return count;
-    //     } catch (Exception e) {
-    //         log.error("Failed to import FAQs", e);
-    //         throw new RuntimeException("Failed to import FAQs", e);
-    //     }
-    // }
-
-    // @Transactional
-    // public void initRelationQas(String orgUid, String kbUid) {
-    //     try {
-    //         // 加载JSON文件中的FAQ数据
-    //         QaConfiguration config = qaJsonLoader.loadQas();
-            
-    //         // 创建5个示例多答案数据
-    //         List<QaAnswer> answerList = new ArrayList<>();
-    //         for (int i = 1; i <= 5; i++) {
-    //             QaAnswer answer = new QaAnswer();
-    //             answer.setVipLevel("" + i);
-    //             answer.setAnswer("VIP " + i + " 专属回答：这是针对不同会员等级的答案示例");
-    //             answerList.add(answer);
-    //         }
-            
-    //         // 准备5个相关问题的UID列表
-    //         List<String> relatedQaUids = new ArrayList<>();
-    //         for (int i = 5; i < 10; i++) {
-    //             String relatedUid = Utils.formatUid(orgUid, "qa_00" + i);
-    //             relatedQaUids.add(relatedUid);
-    //         }
-
-    //         int count = 0;
-    //         // 遍历并保存每个FAQ
-    //         for (Qa qa : config.getQas()) {
-    //             String uid = Utils.formatUid(orgUid, qa.getUid());
-    //             // 构建FAQ请求
-    //             QaRequest request = QaRequest.builder()
-    //                     .uid(uid)
-    //                     .question(qa.getQuestion())
-    //                     .answer(qa.getAnswer())
-    //                     .type(MessageTypeEnum.TEXT.name())
-    //                     .kbUid(kbUid)
-    //                     .orgUid(orgUid)
-    //                     .build();
-                
-    //             // 为部分FAQ添加多答案和相关问题
-    //             if (count < 5) {
-    //                 request.setAnswerList(answerList);
-    //                 request.setRelatedQaUids(relatedQaUids);
-    //             }
-                
-    //             // 更新FAQ到数据库
-    //             update(request);
-    //             count++;
-    //         }
-            
-    //         log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
-    //     } catch (Exception e) {
-    //         log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);
-    //         throw new RuntimeException("Failed to initialize FAQ relations", e);
-    //     }
-    // }
 
 }

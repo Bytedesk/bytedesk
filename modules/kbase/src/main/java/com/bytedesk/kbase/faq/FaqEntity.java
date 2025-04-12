@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 15:58:53
+ * @LastEditTime: 2025-04-12 13:43:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -136,8 +136,6 @@ public class FaqEntity extends BaseEntity {
     private String docId; // 对应文档
 
     private String fileUid; // 对应文件
-
-    // private String userUid;
     
     /**
      * 排序权重
