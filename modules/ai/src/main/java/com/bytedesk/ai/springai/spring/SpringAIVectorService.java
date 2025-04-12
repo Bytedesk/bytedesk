@@ -50,6 +50,8 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.FileRestService;
+import com.bytedesk.kbase.llm.qa.QaEntity;
+import com.bytedesk.kbase.llm.qa.QaRestService;
 import com.bytedesk.kbase.llm.split.SplitRequest;
 import com.bytedesk.kbase.llm.split.SplitRestService;
 import com.bytedesk.kbase.llm.split.SplitStatusEnum;
@@ -82,6 +84,8 @@ public class SpringAIVectorService {
 	private final WebsiteRestService websiteRestService;
 
 	private final FaqRestService faqRestService;
+
+	private final QaRestService qaRestService;
 
 	private final UploadRestService uploadRestService;
 
@@ -344,6 +348,56 @@ public class SpringAIVectorService {
 		textEntity.setDocIdList(docIdList);
 		textEntity.setStatus(SplitStatusEnum.SUCCESS.name());
 		textRestService.save(textEntity);
+		// log.info("Parsing document, this will take a while.");
+		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		}
+
+		return docList;
+	}
+
+	// 
+	public List<Document> readQa(QaEntity qaEntity) {
+		log.info("Converting string content to documents");
+		Assert.notNull(qaEntity, "QaEntity must not be null");
+		Assert.hasText(qaEntity.getQuestion(), "Question must not be empty");
+		Assert.hasText(qaEntity.getAnswer(), "Answer must not be empty");
+		//
+		String content = qaEntity.getQuestion() + "\n" + qaEntity.getAnswer();
+		// 创建Document对象
+		Document document = new Document(content);
+		// 使用TokenTextSplitter分割文本
+		var tokenTextSplitter = new TokenTextSplitter();
+		List<Document> docList = tokenTextSplitter.split(List.of(document));
+		List<String> docIdList = new ArrayList<>();
+		Iterator<Document> iterator = docList.iterator();
+		while (iterator.hasNext()) {
+			Document doc = iterator.next();
+			log.info("faq doc id: {}", doc.getId());
+			docIdList.add(doc.getId());
+			// 添加元数据: 文件file_uid, 知识库kb_uid
+			// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbUid());
+			// 将doc写入到splitEntity
+			SplitRequest splitRequest = SplitRequest.builder()
+					.name(qaEntity.getQuestion())
+					.docId(doc.getId())
+					.typeUid(qaEntity.getUid())
+					.categoryUid(qaEntity.getCategoryUid())
+					.kbUid(qaEntity.getKbUid())
+					// .userUid(fqaEntity.getUserUid())
+					.build();
+			splitRequest.setUserUid(qaEntity.getUserUid());
+			splitRequest.setType(SplitTypeEnum.QA.name());
+			splitRequest.setContent(doc.getText());
+			splitRequest.setOrgUid(qaEntity.getOrgUid());
+			splitRestService.create(splitRequest);
+		}
+		qaEntity.setDocIdList(docIdList);
+		qaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
+		qaRestService.save(qaEntity);
 		// log.info("Parsing document, this will take a while.");
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai

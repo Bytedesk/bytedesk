@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 17:33:18
+ * @LastEditTime: 2025-04-12 13:37:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import org.springframework.util.SerializationUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.llm.text.event.TextCreateEvent;
+import com.bytedesk.kbase.llm.text.event.TextDeleteEvent;
 import com.bytedesk.kbase.llm.text.event.TextUpdateEvent;
 
 import jakarta.persistence.PostPersist;
@@ -46,7 +47,11 @@ public class TextEntityListener {
         TextEntity clonedText = SerializationUtils.clone(text);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new TextUpdateEvent(clonedText));
+        if (text.isDeleted()) {
+            publisher.publishEvent(new TextDeleteEvent(clonedText));
+        } else {
+            publisher.publishEvent(new TextUpdateEvent(clonedText));
+        }
     }
     
 }

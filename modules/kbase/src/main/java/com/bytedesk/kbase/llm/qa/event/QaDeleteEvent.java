@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:03:12
+ * @LastEditTime: 2025-04-12 13:22:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,14 +22,15 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class QaUpdateEvent extends ApplicationEvent {
+public class QaDeleteEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
     private QaEntity qa;
 
-    public QaUpdateEvent(QaEntity qa) {
+    public QaDeleteEvent(QaEntity qa) {
         super(qa);
         this.qa = qa;
     }
+
 }
