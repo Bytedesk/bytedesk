@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:53:40
+ * @LastEditTime: 2025-04-12 14:56:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -443,7 +443,6 @@ public class SpringAIVectorService {
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		}
-
 		return docList;
 	}
 
@@ -566,19 +565,6 @@ public class SpringAIVectorService {
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
-	public List<String> searchText(String query) {
-		Assert.hasText(query, "Search query must not be empty");
-
-		SearchRequest searchRequest = SearchRequest.builder()
-				.query(query)
-				.topK(2)
-				.build();
-		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore
-				.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
-		return similarDocuments.stream().map(Document::getText).toList();
-	}
-
-	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	public List<String> searchText(String query, String kbUid) {
 		Assert.hasText(query, "Search query must not be empty");
 		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
@@ -592,8 +578,17 @@ public class SpringAIVectorService {
 				.query(query)
 				.filterExpression(expression)
 				.build();
+				
+		// 首先尝试使用bytedeskOllamaRedisVectorStore
 		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore
-				.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
+				.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest))
+				.orElseGet(() -> {
+					// 如果bytedeskOllamaRedisVectorStore不存在，则尝试使用bytedeskZhipuaiRedisVectorStore
+					return bytedeskZhipuaiRedisVectorStore
+							.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest))
+							.orElse(List.of());
+				});
+				
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		return contentList;
