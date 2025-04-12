@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 16:10:47
+ * @LastEditTime: 2025-04-12 15:24:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,11 +43,18 @@ public class FileRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
     
-    private LocalDateTime startDate;
+    // 是否启用，状态：启用/禁用
+    @Builder.Default
+    private boolean enabled = true;
 
-    private LocalDateTime endDate;
+    // 有效开始日期
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
 
-    private Boolean enabled;
+    // 有效结束日期
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();

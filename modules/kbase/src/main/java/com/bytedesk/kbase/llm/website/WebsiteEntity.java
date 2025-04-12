@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:38:06
+ * @LastEditTime: 2025-04-12 15:23:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,15 +71,19 @@ public class WebsiteEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
-    // 有效开始日期
-    private LocalDateTime startDate;
-
-    // 有效结束日期
-    private LocalDateTime endDate;
-
+    // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
+
+    // 有效开始日期
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
+
+    // 有效结束日期
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     private String categoryUid; // 所属分类
 

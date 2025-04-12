@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:56:08
+ * @LastEditTime: 2025-04-12 15:25:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
+import java.time.LocalDateTime;
 
 import com.bytedesk.ai.utils.reader.WebDocumentReader;
 import com.bytedesk.core.upload.UploadRestService;
@@ -271,7 +272,7 @@ public class SpringAIVectorService {
 	}
 
 	// string content 转换成 List<Document> documents
-	public List<Document> readText(String name, String content, String kbUid, String orgUid) {
+	public List<Document> readTextDemo(String name, String content, String kbUid, String orgUid) {
 		log.info("Converting string content to documents");
 		Assert.hasText(content, "Content must not be empty");
 		// 创建Document对象
@@ -282,7 +283,11 @@ public class SpringAIVectorService {
 		// 添加元数据: 文件file_uid, 知识库kb_uid
 		docList.forEach(doc -> {
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
-			// doc.getMetadata().put(KbaseConst.KBASE_ORG_UID, orgUid);
+			// 添加元数据: 启用状态和有效期，对于简单文本，默认启用且无有效期限制
+			doc.getMetadata().put("enabled", "true");
+			doc.getMetadata().put("startDate", LocalDateTime.now().toString());
+			doc.getMetadata().put("endDate", LocalDateTime.now().plusYears(100).toString());
+			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(name)
@@ -291,6 +296,9 @@ public class SpringAIVectorService {
 					.docId(doc.getId())
 					.kbUid(kbUid)
 					.orgUid(orgUid)
+					.enabled(true) // 默认启用
+					.startDate(LocalDateTime.now()) // 默认从现在开始
+					.endDate(LocalDateTime.now().plusYears(100)) // 默认有效期100年
 					.build();
 			splitRestService.create(splitRequest);
 		});
@@ -320,9 +328,12 @@ public class SpringAIVectorService {
 			Document doc = iterator.next();
 			log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
-			// 添加元数据: 文件file_uid, 知识库kb_uid
-			// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbUid());
+			doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
+			doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(textEntity.getName())
@@ -334,6 +345,9 @@ public class SpringAIVectorService {
 					.kbUid(textEntity.getKbUid())
 					.userUid(textEntity.getUserUid())
 					.orgUid(textEntity.getOrgUid())
+					.enabled(textEntity.isEnabled())
+					.startDate(textEntity.getStartDate())
+					.endDate(textEntity.getEndDate())
 					.build();
 			splitRestService.create(splitRequest);
 		}
@@ -354,8 +368,6 @@ public class SpringAIVectorService {
 	public List<Document> readQa(QaEntity qaEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(qaEntity, "QaEntity must not be null");
-		// Assert.hasText(qaEntity.getQuestion(), "Question must not be empty");
-		// Assert.hasText(qaEntity.getAnswer(), "Answer must not be empty");
 		//
 		String content = qaEntity.getQuestion() + "\n" + qaEntity.getAnswer();
 		// 创建Document对象
@@ -369,9 +381,12 @@ public class SpringAIVectorService {
 			Document doc = iterator.next();
 			log.info("faq doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
-			// 添加元数据: 文件file_uid, 知识库kb_uid
-			// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbUid());
+			doc.getMetadata().put("enabled", String.valueOf(qaEntity.isEnabled()));
+			doc.getMetadata().put("startDate", qaEntity.getStartDate() != null ? qaEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			doc.getMetadata().put("endDate", qaEntity.getEndDate() != null ? qaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(qaEntity.getQuestion())
@@ -383,6 +398,9 @@ public class SpringAIVectorService {
 					.kbUid(qaEntity.getKbUid())
 					.userUid(qaEntity.getUserUid())
 					.orgUid(qaEntity.getOrgUid())
+					.enabled(qaEntity.isEnabled())
+					.startDate(qaEntity.getStartDate() != null ? qaEntity.getStartDate() : LocalDateTime.now())
+					.endDate(qaEntity.getEndDate() != null ? qaEntity.getEndDate() : LocalDateTime.now().plusYears(100))
 					.build();
 			splitRestService.create(splitRequest);
 		}
@@ -402,8 +420,6 @@ public class SpringAIVectorService {
 	public List<Document> readFaq(FaqEntity fqaEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(fqaEntity, "FaqEntity must not be null");
-		// Assert.hasText(fqaEntity.getQuestion(), "Question must not be empty");
-		// Assert.hasText(fqaEntity.getAnswer(), "Answer must not be empty");
 		//
 		String content = fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
 		// 创建Document对象
@@ -417,9 +433,12 @@ public class SpringAIVectorService {
 			Document doc = iterator.next();
 			log.info("faq doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
-			// 添加元数据: 文件file_uid, 知识库kb_uid
-			// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, fqaEntity.getKbUid());
+			doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
+			doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(fqaEntity.getQuestion())
@@ -431,6 +450,9 @@ public class SpringAIVectorService {
 					.kbUid(fqaEntity.getKbUid())
 					.userUid(fqaEntity.getUserUid())
 					.orgUid(fqaEntity.getOrgUid())
+					.enabled(fqaEntity.isEnabled())
+					.startDate(fqaEntity.getStartDate() != null ? fqaEntity.getStartDate() : LocalDateTime.now())
+					.endDate(fqaEntity.getEndDate() != null ? fqaEntity.getEndDate() : LocalDateTime.now().plusYears(100))
 					.build();
 			splitRestService.create(splitRequest);
 		}
@@ -474,9 +496,12 @@ public class SpringAIVectorService {
 				Document doc = iterator.next();
 				log.info("doc id: {}", doc.getId());
 				docIdList.add(doc.getId());
-				// 添加元数据: 文件file_uid, 知识库kb_uid
-				// doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+				// 添加元数据: 知识库kb_uid、启用状态、有效期
 				doc.getMetadata().put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbUid());
+				doc.getMetadata().put("enabled", String.valueOf(websiteEntity.isEnabled()));
+				doc.getMetadata().put("startDate", websiteEntity.getStartDate() != null ? websiteEntity.getStartDate().toString() : LocalDateTime.now().toString());
+				doc.getMetadata().put("endDate", websiteEntity.getEndDate() != null ? websiteEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+				
 				// 将doc写入到splitEntity
 				SplitRequest splitRequest = SplitRequest.builder()
 						.name(websiteEntity.getName())
@@ -488,6 +513,9 @@ public class SpringAIVectorService {
 						.kbUid(websiteEntity.getKbUid())
 						.userUid(websiteEntity.getUserUid())
 						.orgUid(websiteEntity.getOrgUid())
+						.enabled(websiteEntity.isEnabled())
+						.startDate(websiteEntity.getStartDate())
+						.endDate(websiteEntity.getEndDate())
 						.build();
 				splitRestService.create(splitRequest);
 			}
@@ -531,6 +559,11 @@ public class SpringAIVectorService {
 			docIdList.add(doc.getId());
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
+			// 添加元数据: 启用状态和有效期，使用FileEntity中的字段
+			doc.getMetadata().put("enabled", String.valueOf(file.isEnabled()));
+			doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
+			doc.getMetadata().put("endDate", file.getEndDate() != null ? file.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			
 			// 
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(file.getFileName())
@@ -542,6 +575,9 @@ public class SpringAIVectorService {
 					.kbUid(file.getKbUid())
 					.userUid(file.getUserUid())
 					.orgUid(file.getOrgUid())
+					.enabled(file.isEnabled()) // 使用文件的启用状态，默认为true
+					.startDate(file.getStartDate() != null ? file.getStartDate() : LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
+					.endDate(file.getEndDate() != null ? file.getEndDate() : LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
 					.build();
 			splitRestService.create(splitRequest);
 		}
@@ -570,13 +606,45 @@ public class SpringAIVectorService {
 		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
 
 		log.info("searchText kbUid {}, query: {}", kbUid, query);
+		
+		// 构建过滤表达式，只搜索启用状态为true且在有效期内的内容
 		FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
-		Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
-		log.info("expression: {}", expression.toString());
+		
+		// 获取当前时间，用于日期过滤
+		String currentTime = java.time.LocalDateTime.now().toString();
+		
+		// 首先创建知识库过滤条件
+		FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
+		
+		// 创建启用状态过滤：启用 或 无此字段
+		FilterExpressionBuilder.Op enabledTrueOp = expressionBuilder.eq("enabled", "true");
+		FilterExpressionBuilder.Op enabledNullOp = expressionBuilder.eq("enabled", null);
+		FilterExpressionBuilder.Op enabledOp = expressionBuilder.or(enabledTrueOp, enabledNullOp);
+		
+		// 创建开始日期过滤：开始日期<=当前时间 或 无此字段
+		FilterExpressionBuilder.Op startDateValidOp = expressionBuilder.lte("startDate", currentTime);
+		FilterExpressionBuilder.Op startDateNullOp = expressionBuilder.eq("startDate", null);
+		FilterExpressionBuilder.Op startDateOp = expressionBuilder.or(startDateValidOp, startDateNullOp);
+		
+		// 创建结束日期过滤：结束日期>=当前时间 或 无此字段
+		FilterExpressionBuilder.Op endDateValidOp = expressionBuilder.gte("endDate", currentTime);
+		FilterExpressionBuilder.Op endDateNullOp = expressionBuilder.eq("endDate", null);
+		FilterExpressionBuilder.Op endDateOp = expressionBuilder.or(endDateValidOp, endDateNullOp);
+		
+		// 构建最终的过滤表达式，组合所有条件
+		FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+			expressionBuilder.and(kbUidOp, enabledOp),  // 知识库匹配且启用
+			expressionBuilder.and(startDateOp, endDateOp)  // 且在有效期内
+		);
+		
+		// 通过build()方法获取最终的Expression对象
+		Expression finalExpression = finalOp.build();
+		
+		log.info("expression: {}", finalExpression.toString());
 
 		SearchRequest searchRequest = SearchRequest.builder()
 				.query(query)
-				.filterExpression(expression)
+				.filterExpression(finalExpression)
 				.build();
 				
 		// 首先尝试使用bytedeskOllamaRedisVectorStore
