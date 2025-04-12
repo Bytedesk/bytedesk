@@ -6,6 +6,7 @@ import org.springframework.util.SerializationUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
+import com.bytedesk.kbase.llm.file.event.FileDeleteEvent;
 import com.bytedesk.kbase.llm.file.event.FileUpdateEvent;
 
 import jakarta.persistence.PostPersist;
@@ -33,6 +34,10 @@ public class FileEntityListener {
         FileEntity clonedFile = SerializationUtils.clone(file);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new FileUpdateEvent(clonedFile));
+        if (file.isDeleted()) {
+            publisher.publishEvent(new FileDeleteEvent(clonedFile));
+        } else {
+            publisher.publishEvent(new FileUpdateEvent(clonedFile));
+        }
     }
 }

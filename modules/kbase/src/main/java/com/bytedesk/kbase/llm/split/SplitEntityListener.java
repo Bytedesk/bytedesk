@@ -19,6 +19,7 @@ import org.springframework.util.SerializationUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.llm.split.event.SplitCreateEvent;
+import com.bytedesk.kbase.llm.split.event.SplitDeleteEvent;
 import com.bytedesk.kbase.llm.split.event.SplitUpdateEvent;
 
 import jakarta.persistence.PostPersist;
@@ -46,6 +47,10 @@ public class SplitEntityListener {
         SplitEntity clonedSplit = SerializationUtils.clone(split);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new SplitUpdateEvent(clonedSplit));
+        if (split.isDeleted()) {
+            publisher.publishEvent(new SplitDeleteEvent(clonedSplit));
+        }else {
+            publisher.publishEvent(new SplitUpdateEvent(clonedSplit));
+        }   
     }
 }
