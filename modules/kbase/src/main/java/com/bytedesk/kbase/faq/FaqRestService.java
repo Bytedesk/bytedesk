@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 16:04:23
+ * @LastEditTime: 2025-04-12 16:19:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -308,7 +308,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 latestEntity.setAnswer(entity.getAnswer());
                 latestEntity.setAnswerList(entity.getAnswerList());
                 latestEntity.setType(entity.getType());
-                latestEntity.setStatus(entity.getStatus());
                 latestEntity.setEnabled(entity.isEnabled());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
                 latestEntity.setKbUid(entity.getKbUid());
@@ -323,6 +322,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 if (entity.getRelatedFaqs() != null && !entity.getRelatedFaqs().isEmpty()) {
                     latestEntity.setRelatedFaqs(entity.getRelatedFaqs());
                 }
+
+                // docIdList
+                latestEntity.setDocIdList(entity.getDocIdList());
+                latestEntity.setStatus(entity.getStatus());
                 
                 return faqRepository.save(latestEntity);
             }
@@ -592,33 +595,9 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     request.setAnswerList(answerList);
                     request.setRelatedFaqUids(relatedFaqUids);
                 }
-                
-                try {
-                    // 尝试更新FAQ，使用重试机制
-                    int retryCount = 0;
-                    int maxRetries = 3;
-                    boolean success = false;
-                    
-                    while (!success && retryCount < maxRetries) {
-                        try {
-                            // 尝试更新FAQ到数据库
-                            update(request);
-                            success = true;
-                            count++;
-                        } catch (ObjectOptimisticLockingFailureException e) {
-                            retryCount++;
-                            if (retryCount >= maxRetries) {
-                                log.error("最大重试次数已达到，无法更新FAQ: {}", uid);
-                                throw e;
-                            }
-                            log.warn("乐观锁冲突，正在重试更新FAQ: {}，重试次数: {}", uid, retryCount);
-                            // 短暂延迟后重试
-                            Thread.sleep(100 * retryCount);
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("更新FAQ失败: {}, 原因: {}", uid, e.getMessage());
-                }
+
+                update(request);
+                count++;
             }
             
             log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
