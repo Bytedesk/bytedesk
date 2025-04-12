@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:05:39
+ * @LastEditTime: 2025-04-12 14:38:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,19 +55,6 @@ public class FileEventListener {
             fileRestService.create(fileRequest);
         }
     }
-
-    // @EventListener
-    // public void onUploadUpdateEvent(UploadUpdateEvent event) {
-    //     UploadEntity upload = event.getUpload();
-    //     log.info("UploadEventListener update: {}", upload.getFileName());
-    //     // 后台删除文件记录
-    //     if (upload.isDeleted()) {
-    //         // 通知python ai模块处理
-    //         // redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
-    //         // 删除redis中缓存的document
-    //         // springAIVectorService.deleteDoc(upload.getDocIdList());
-    //     }
-    // }
 
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:26:39
+ * @LastEditTime: 2025-04-12 14:35:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm.split;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -78,6 +79,7 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     public SplitResponse create(SplitRequest request) {
         // log.info("SplitRestService create: {}", request);
         SplitEntity entity = SplitEntity.builder()
+            .uid(uidUtils.getUid())
             .name(request.getName())
             .content(request.getContent())
             .type(request.getType())
@@ -88,12 +90,13 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             .categoryUid(request.getCategoryUid())
             .kbUid(request.getKbUid())
             .userUid(request.getUserUid())
+            .orgUid(request.getOrgUid())
             .build();
         // Error mapping a854a402-04c9-4018-84ee-f0313ad00f48 to java.lang.Long
         // Caused by: java.lang.NumberFormatException: For input string: "a854a402-04c9-4018-84ee-f0313ad00f48"
         // SplitEntity entity = modelMapper.map(request, SplitEntity.class);
-        entity.setUid(uidUtils.getUid());
-        entity.setOrgUid(request.getOrgUid());
+        // entity.setUid(uidUtils.getUid());
+        // entity.setOrgUid(request.getOrgUid());
         // log.info("SplitRestService create: {}", entity);
         // 
         SplitEntity savedEntity = save(entity);
@@ -152,6 +155,19 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
+    }
+
+    public void deleteByDocList(List<String> docIdList) {
+        // 遍历 docIdList
+        for (String docId : docIdList) {
+            // 查找 docId 对应的所有 split
+            Optional<SplitEntity> splitList = splitRepository.findByDocId(docId);
+            // 删除
+            splitList.ifPresent(split -> {
+                split.setDeleted(true);
+                save(split);
+            });
+        }
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:28:45
+ * @LastEditTime: 2025-04-12 14:37:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -662,49 +662,6 @@ public class SpringAIVectorService {
 		}
 	}
 
-	/**
-	 * 批量更新向量存储中的文档内容
-	 * 
-	 * @param documents 要更新的文档列表
-	 */
-	// public void updateDocs(List<Document> documents) {
-	// Assert.notEmpty(documents, "Documents list must not be empty");
-	// log.info("Updating {} documents", documents.size());
-	// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
-	// try {
-	// List<String> docIds = documents.stream()
-	// .map(Document::getId)
-	// .collect(Collectors.toList());
-	// // 先删除旧的文档
-	// redisVectorStore.delete(docIds);
-	// // 添加新的文档
-	// redisVectorStore.add(documents);
-	// log.info("Successfully updated {} documents", documents.size());
-	// } catch (Exception e) {
-	// log.error("Failed to update documents", e);
-	// throw new RuntimeException("Failed to update documents", e);
-	// }
-	// });
-	// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-	// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-	// bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
-	// try {
-	// List<String> docIds = documents.stream()
-	// .map(Document::getId)
-	// .collect(Collectors.toList());
-	// // 先删除旧的文档
-	// redisVectorStore.delete(docIds);
-	// // 添加新的文档
-	// redisVectorStore.add(documents);
-	// log.info("Successfully updated {} documents", documents.size());
-	// } catch (Exception e) {
-	// log.error("Failed to update documents", e);
-	// throw new RuntimeException("Failed to update documents", e);
-	// }
-	// });
-	// }
-	// }
-
 	// 删除一个docId
 	public void deleteDoc(String docId) {
 		Assert.hasText(docId, "Document ID must not be empty");
@@ -713,9 +670,8 @@ public class SpringAIVectorService {
 
 	public void deleteDocs(List<String> docIdList) {
 		Assert.notEmpty(docIdList, "Document ID list must not be empty");
-		// TODO： 删除splitEntity
-		
-
+		// 删除splitEntity
+		splitRestService.deleteByDocList(docIdList);
 		// 删除向量存储中的文档
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
