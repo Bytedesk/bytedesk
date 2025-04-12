@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 16:21:02
+ * @LastEditTime: 2025-04-12 13:14:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ai.springai.spring;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
@@ -28,6 +27,9 @@ import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
 import com.bytedesk.kbase.llm.file.event.FileUpdateEvent;
+import com.bytedesk.kbase.llm.qa.QaEntity;
+import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
+import com.bytedesk.kbase.llm.qa.event.QaUpdateEvent;
 import com.bytedesk.kbase.llm.split.SplitEntity;
 import com.bytedesk.kbase.llm.split.event.SplitCreateEvent;
 import com.bytedesk.kbase.llm.split.event.SplitUpdateEvent;
@@ -48,14 +50,8 @@ public class SpringAIEventListener {
     
     private final Optional<SpringAIVectorService> springAiVectorService;
 
-    // private final Optional<SpringAIZhipuaiService> springAIZhipuaiChatService;
-
-    // private final Optional<OllamaChatService> ollamaChatService;
-
-    // private final FaqRestService faqRestService;
-
     @EventListener
-    public void onFileCreateEvent(FileCreateEvent event) throws IOException {
+    public void onFileCreateEvent(FileCreateEvent event) {
         FileEntity file = event.getFile();
         log.info("SpringAIEventListener onFileCreateEvent: {}", file.getFileName());
         // etl分块处理
@@ -100,6 +96,26 @@ public class SpringAIEventListener {
         // springAiVectorService.ifPresent(service -> {
         //     service.readText(text);
         // });
+    }
+
+    @EventListener
+    public void onQaCreateEvent(QaCreateEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getQuestion());
+        // 生成document
+        // springAiVectorService.ifPresent(service -> {
+        //     service.readQnA(qa);
+        // });
+    }
+
+    @EventListener
+    public void onQaUpdateEvent(QaUpdateEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getQuestion());
+        // 首先删除text对应的document，以及redis中缓存的document
+        // springAiVectorService.deleteDoc(qa.getDocIdList());
+        // 然后重新生成document
+        // springAiVectorService.readQnA(qa);
     }
 
     @EventListener

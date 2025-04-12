@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 17:00:24
+ * @LastEditTime: 2025-04-12 13:07:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,15 +40,5 @@ public class RobotEventListener {
         String robotUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
         robotRestService.initDefaultRobot(orgUid, robotUid);
     }
-
-    // @EventListener
-    // public void onFaqCreateEvent(FaqCreateEvent event) {
-    //     // robotFaqProcessor.addFaqToQueue(event.getFaq());
-    // }
-
-    // @EventListener
-    // public void onMessageJsonEvent(MessageJsonEvent event) {
-    //     // robotService.processWebsocketMessage(event.getJson());
-    // }
 
 }
