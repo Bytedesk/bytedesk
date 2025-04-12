@@ -755,7 +755,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             // 写入到redis vector 中
             for (FileContent file : files) {
                 springAIVectorService.ifPresent(service -> {
-                    service.readText(file.getFilename(), file.getContent(), kbUid, orgUid);
+                    service.readTextDemo(file.getFilename(), file.getContent(), kbUid, orgUid);
                 });
                 // 只在前两次调用zhipuaiChatService
                 if (count[0] < MAX_CALLS) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:35:47
+ * @LastEditTime: 2025-04-12 15:28:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,9 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             .platform(request.getPlatform())
             .docId(request.getDocId())
             .typeUid(request.getTypeUid())
+            .enabled(request.isEnabled())
+            .startDate(request.getStartDate())
+            .endDate(request.getEndDate())
             .categoryUid(request.getCategoryUid())
             .kbUid(request.getKbUid())
             .userUid(request.getUserUid())
@@ -115,6 +118,13 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             // modelMapper.map(request, entity);
             entity.setName(request.getName());
             entity.setContent(request.getContent());
+            entity.setEnabled(request.isEnabled());
+            entity.setStartDate(request.getStartDate());
+            entity.setEndDate(request.getEndDate());
+            // entity.setCategoryUid(request.getCategoryUid());
+            // entity.setKbUid(request.getKbUid());
+            // entity.setUserUid(request.getUserUid());
+            // entity.setOrgUid(request.getOrgUid());
             // entity.setType(request.getType());
             // entity.setDocId(request.getDocId());
             //
