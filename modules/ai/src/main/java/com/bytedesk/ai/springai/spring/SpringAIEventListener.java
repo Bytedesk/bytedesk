@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:30:31
+ * @LastEditTime: 2025-04-12 14:37:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,6 @@ import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
 import com.bytedesk.kbase.llm.file.event.FileDeleteEvent;
-import com.bytedesk.kbase.llm.file.event.FileUpdateEvent;
 import com.bytedesk.kbase.llm.qa.QaEntity;
 import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
 import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
@@ -66,16 +65,6 @@ public class SpringAIEventListener {
     }
 
     @EventListener
-    public void onFileUpdateEvent(FileUpdateEvent event) {
-        FileEntity file = event.getFile();
-        log.info("SpringAIEventListener onFileUpdateEvent: {}", file.getFileName());
-        // 后台删除文件记录
-        // if (!file.isDeleted()) {
-        //     // TODO: 更新文件对应的document
-        // }
-    }
-
-    @EventListener
     public void onFileDeleteEvent(FileDeleteEvent event) {
         FileEntity file = event.getFile();
         log.info("SpringAIEventListener onFileDeleteEvent: {}", file.getFileName());
@@ -102,7 +91,6 @@ public class SpringAIEventListener {
         if (!text.isDeleted()) {
             // 更新text对应的document
             springAiVectorService.ifPresent(service -> {
-                // service.updateDoc(text.getDocId(), text.getContent(), text.getKbUid());
                 service.deleteDocs(text.getDocIdList());
                 service.readText(text);
             });
@@ -136,8 +124,6 @@ public class SpringAIEventListener {
         if (!qa.isDeleted()) {
             // 更新qa对应的document
             springAiVectorService.ifPresent(service -> {
-                // String content = qa.getQuestion() + "\n" + qa.getAnswer();
-                // service.updateDoc(qa.getDocId(), content, qa.getKbUid());
                 service.deleteDocs(qa.getDocIdList());
                 service.readQa(qa);
             });

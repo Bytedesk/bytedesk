@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:50:35
+ * @LastEditTime: 2025-04-12 14:35:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,7 +68,6 @@ public class SplitEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
-
 
     // 对应 拆分 document 的 id
     private String docId;
