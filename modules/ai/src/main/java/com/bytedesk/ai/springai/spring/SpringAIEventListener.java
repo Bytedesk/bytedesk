@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:12:27
+ * @LastEditTime: 2025-04-12 14:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,6 @@ import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
 import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
 import com.bytedesk.kbase.llm.qa.event.QaUpdateEvent;
 import com.bytedesk.kbase.llm.split.SplitEntity;
-import com.bytedesk.kbase.llm.split.event.SplitCreateEvent;
 import com.bytedesk.kbase.llm.split.event.SplitDeleteEvent;
 import com.bytedesk.kbase.llm.split.event.SplitUpdateEvent;
 import com.bytedesk.kbase.llm.text.TextEntity;
@@ -176,7 +175,6 @@ public class SpringAIEventListener {
                 service.readFaq(faq);
             });
         }
-        
     }
 
     @EventListener
@@ -218,11 +216,11 @@ public class SpringAIEventListener {
         });
     }
 
-    @EventListener
-    public void onSplitCreateEvent(SplitCreateEvent event) {
-        SplitEntity split = event.getSplit();
-        log.info("SpringAIEventListener onSplitCreateEvent: {}", split.getName());
-    }
+    // @EventListener
+    // public void onSplitCreateEvent(SplitCreateEvent event) {
+    //     SplitEntity split = event.getSplit();
+    //     log.info("SpringAIEventListener onSplitCreateEvent: {}", split.getName());
+    // }
 
     @EventListener
     public void onSplitUpdateEvent(SplitUpdateEvent event) {

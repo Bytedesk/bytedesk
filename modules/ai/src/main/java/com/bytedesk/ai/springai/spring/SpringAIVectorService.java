@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:21:57
+ * @LastEditTime: 2025-04-12 14:28:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -205,7 +205,8 @@ public class SpringAIVectorService {
 		Assert.isTrue(fileName.endsWith(".md"), String.format("File must end with .md, got %s", fileName));
 
 		Resource resource = uploadRestService.loadAsResource(fileName);
-		MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource, MarkdownDocumentReaderConfig.builder().build());
+		MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource,
+				MarkdownDocumentReaderConfig.builder().build());
 		List<Document> documents = markdownReader.read();
 		// 提取文本内容
 		StringBuilder contentBuilder = new StringBuilder();
@@ -349,7 +350,7 @@ public class SpringAIVectorService {
 		return docList;
 	}
 
-	// 
+	//
 	public List<Document> readQa(QaEntity qaEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(qaEntity, "QaEntity must not be null");
@@ -381,12 +382,8 @@ public class SpringAIVectorService {
 					.categoryUid(qaEntity.getCategoryUid())
 					.kbUid(qaEntity.getKbUid())
 					.userUid(qaEntity.getUserUid())
-					
+					.orgUid(qaEntity.getOrgUid())
 					.build();
-			// splitRequest.setUserUid(qaEntity.getUserUid());
-			// splitRequest.setType(SplitTypeEnum.QA.name());
-			// splitRequest.setContent(doc.getText());
-			splitRequest.setOrgUid(qaEntity.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
 		qaEntity.setDocIdList(docIdList);
@@ -427,16 +424,15 @@ public class SpringAIVectorService {
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(fqaEntity.getQuestion())
+					.content(doc.getText())
+					.type(SplitTypeEnum.FAQ.name())
 					.docId(doc.getId())
 					.typeUid(fqaEntity.getUid())
 					.categoryUid(fqaEntity.getCategoryUid())
 					.kbUid(fqaEntity.getKbUid())
-					// .userUid(fqaEntity.getUserUid())
+					.userUid(fqaEntity.getUserUid())
+					.orgUid(fqaEntity.getOrgUid())
 					.build();
-			splitRequest.setUserUid(fqaEntity.getUserUid());
-			splitRequest.setType(SplitTypeEnum.QA.name());
-			splitRequest.setContent(doc.getText());
-			splitRequest.setOrgUid(fqaEntity.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
 		fqaEntity.setDocIdList(docIdList);
@@ -457,8 +453,8 @@ public class SpringAIVectorService {
 		log.info("Loading document from website: {}", websiteEntity.getUrl());
 		Assert.notNull(websiteEntity, "WebsiteEntity must not be null");
 		Assert.hasText(websiteEntity.getUrl(), "URL must not be empty");
-		Assert.isTrue(websiteEntity.getUrl().startsWith("http"), 
-			String.format("URL must start with http, got %s", websiteEntity.getUrl()));
+		Assert.isTrue(websiteEntity.getUrl().startsWith("http"),
+				String.format("URL must start with http, got %s", websiteEntity.getUrl()));
 		//
 		try {
 			// 构建URI
@@ -486,16 +482,15 @@ public class SpringAIVectorService {
 				// 将doc写入到splitEntity
 				SplitRequest splitRequest = SplitRequest.builder()
 						.name(websiteEntity.getName())
+						.content(doc.getText())
+						.type(SplitTypeEnum.WEBSITE.name())
 						.docId(doc.getId())
 						.typeUid(websiteEntity.getUid())
 						.categoryUid(websiteEntity.getCategoryUid())
 						.kbUid(websiteEntity.getKbUid())
-						// .userUid(websiteEntity.getUserUid())
+						.userUid(websiteEntity.getUserUid())
+						.orgUid(websiteEntity.getOrgUid())
 						.build();
-					splitRequest.setUserUid(websiteEntity.getUserUid());
-				splitRequest.setType(SplitTypeEnum.WEBSITE.name());
-				splitRequest.setContent(doc.getText());
-				splitRequest.setOrgUid(websiteEntity.getOrgUid());
 				splitRestService.create(splitRequest);
 			}
 			// 如果需要存储到向量数据库
@@ -510,9 +505,9 @@ public class SpringAIVectorService {
 			// log.info("Parsing document, this will take a while.");
 			bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 			// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		}
+			if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+				bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+			}
 
 			return docList;
 
@@ -543,7 +538,7 @@ public class SpringAIVectorService {
 			docIdList.add(doc.getId());
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
-			
+
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(file.getFileName())
 					.docId(doc.getId())
@@ -552,7 +547,7 @@ public class SpringAIVectorService {
 					.kbUid(file.getKbUid())
 					// .userUid(file.getUserUid())
 					.build();
-					splitRequest.setUserUid(file.getUserUid());
+			splitRequest.setUserUid(file.getUserUid());
 			splitRequest.setType(SplitTypeEnum.FILE.name());
 			splitRequest.setContent(doc.getText());
 			splitRequest.setOrgUid(file.getOrgUid());
@@ -561,7 +556,7 @@ public class SpringAIVectorService {
 		file.setDocIdList(docIdList);
 		file.setStatus(SplitStatusEnum.SUCCESS.name());
 		fileRestService.save(file);
-		
+
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
 			try {
 				redisVectorStore.write(docList);
@@ -575,14 +570,15 @@ public class SpringAIVectorService {
 			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		}
 		// 通知生成问答对
-		// bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(), file.getOrgUid(), docList));
+		// bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(),
+		// file.getOrgUid(), docList));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
 	public List<String> searchText(String query) {
 		Assert.hasText(query, "Search query must not be empty");
-		
+
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			log.warn("Vector store is not available");
 			return List.of();
@@ -592,8 +588,8 @@ public class SpringAIVectorService {
 				.query(query)
 				.topK(2)
 				.build();
-		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore.map(redisVectorStore -> 
-			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
+		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore
+				.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
 		return similarDocuments.stream().map(Document::getText).toList();
 	}
 
@@ -615,8 +611,8 @@ public class SpringAIVectorService {
 				.query(query)
 				.filterExpression(expression)
 				.build();
-		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore.map(redisVectorStore -> 
-			redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
+		List<Document> similarDocuments = bytedeskOllamaRedisVectorStore
+				.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest)).orElse(List.of());
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
 		return contentList;
@@ -625,7 +621,7 @@ public class SpringAIVectorService {
 	/**
 	 * 更新向量存储中的文档内容
 	 * 
-	 * @param docId 文档ID
+	 * @param docId   文档ID
 	 * @param content 新的文档内容
 	 */
 	public void updateDoc(String docId, String content, String kbUid) {
@@ -638,9 +634,9 @@ public class SpringAIVectorService {
 				// 创建新的Document对象
 				Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
 				// 更新向量存储
-				redisVectorStore.delete(List.of(docId));  // 先删除旧的
-				redisVectorStore.add(List.of(document));  // 再添加新的
-				
+				redisVectorStore.delete(List.of(docId)); // 先删除旧的
+				redisVectorStore.add(List.of(document)); // 再添加新的
+
 				log.info("Successfully updated document: {}", docId);
 			} catch (Exception e) {
 				log.error("Failed to update document: {}", docId, e);
@@ -654,8 +650,8 @@ public class SpringAIVectorService {
 					// 创建新的Document对象
 					Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
 					// 更新向量存储
-					redisVectorStore.delete(List.of(docId));  // 先删除旧的
-					redisVectorStore.add(List.of(document));  // 再添加新的
+					redisVectorStore.delete(List.of(docId)); // 先删除旧的
+					redisVectorStore.add(List.of(document)); // 再添加新的
 
 					log.info("Successfully updated document: {}", docId);
 				} catch (Exception e) {
@@ -668,44 +664,45 @@ public class SpringAIVectorService {
 
 	/**
 	 * 批量更新向量存储中的文档内容
+	 * 
 	 * @param documents 要更新的文档列表
 	 */
 	// public void updateDocs(List<Document> documents) {
-	// 	Assert.notEmpty(documents, "Documents list must not be empty");
-	// 	log.info("Updating {} documents", documents.size());
-	// 	bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
-	// 		try {
-	// 			List<String> docIds = documents.stream()
-	// 				.map(Document::getId)
-	// 				.collect(Collectors.toList());				
-	// 			// 先删除旧的文档
-	// 			redisVectorStore.delete(docIds);
-	// 			// 添加新的文档
-	// 			redisVectorStore.add(documents);			
-	// 			log.info("Successfully updated {} documents", documents.size());
-	// 		} catch (Exception e) {
-	// 			log.error("Failed to update documents", e);
-	// 			throw new RuntimeException("Failed to update documents", e);
-	// 		}
-	// 	});
-	// 	// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-	// 	if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-	// 		bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
-	// 			try {
-	// 				List<String> docIds = documents.stream()
-	// 					.map(Document::getId)
-	// 					.collect(Collectors.toList());
-	// 				// 先删除旧的文档
-	// 				redisVectorStore.delete(docIds);
-	// 				// 添加新的文档
-	// 				redisVectorStore.add(documents);				
-	// 				log.info("Successfully updated {} documents", documents.size());
-	// 			} catch (Exception e) {
-	// 				log.error("Failed to update documents", e);
-	// 				throw new RuntimeException("Failed to update documents", e);
-	// 			}
-	// 		});
-	// 	}
+	// Assert.notEmpty(documents, "Documents list must not be empty");
+	// log.info("Updating {} documents", documents.size());
+	// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
+	// try {
+	// List<String> docIds = documents.stream()
+	// .map(Document::getId)
+	// .collect(Collectors.toList());
+	// // 先删除旧的文档
+	// redisVectorStore.delete(docIds);
+	// // 添加新的文档
+	// redisVectorStore.add(documents);
+	// log.info("Successfully updated {} documents", documents.size());
+	// } catch (Exception e) {
+	// log.error("Failed to update documents", e);
+	// throw new RuntimeException("Failed to update documents", e);
+	// }
+	// });
+	// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+	// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+	// bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
+	// try {
+	// List<String> docIds = documents.stream()
+	// .map(Document::getId)
+	// .collect(Collectors.toList());
+	// // 先删除旧的文档
+	// redisVectorStore.delete(docIds);
+	// // 添加新的文档
+	// redisVectorStore.add(documents);
+	// log.info("Successfully updated {} documents", documents.size());
+	// } catch (Exception e) {
+	// log.error("Failed to update documents", e);
+	// throw new RuntimeException("Failed to update documents", e);
+	// }
+	// });
+	// }
 	// }
 
 	// 删除一个docId
@@ -716,6 +713,10 @@ public class SpringAIVectorService {
 
 	public void deleteDocs(List<String> docIdList) {
 		Assert.notEmpty(docIdList, "Document ID list must not be empty");
+		// TODO： 删除splitEntity
+		
+
+		// 删除向量存储中的文档
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
