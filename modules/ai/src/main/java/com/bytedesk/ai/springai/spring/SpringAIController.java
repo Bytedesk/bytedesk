@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-12 12:15:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 17:44:06
+ * @LastEditTime: 2025-04-13 00:15:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -68,6 +68,8 @@ public class SpringAIController {
 
         @Qualifier("ollamaChatModel")
         private final Optional<OllamaChatModel> ollamaChatModel;
+
+        private final SpringAIVectorService springAIVectorService;
 
         // 流式生成
         // @GetMapping(value = "/generateStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -391,5 +393,16 @@ public class SpringAIController {
                 return ResponseEntity.ok(JsonResult.success(queryAugmenter));
         }
 
-        
+        // 测试向量搜索
+        // http://127.0.0.1:9003/spring/ai/search?query=什么时间考试？&kbUid=xxx
+        @GetMapping("/search")
+        ResponseEntity<JsonResult<?>> search(
+                @RequestParam(value = "query", defaultValue = "什么时间考试？") String query,
+                @RequestParam(value = "kbUid", required = true) String kbUid) {
+            
+            log.info("搜索向量数据，query: {}, kbUid: {}", query, kbUid);
+            List<String> results = springAIVectorService.searchText(query, kbUid);
+            
+            return ResponseEntity.ok(JsonResult.success(results));
+        }
 }
