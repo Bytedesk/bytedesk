@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 14:32:22
+ * @LastEditTime: 2025-04-12 18:15:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,9 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        // TODO: 集中执行必要的初始化
+
+
         // 在应用的主类或配置类中
         // TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         // TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));

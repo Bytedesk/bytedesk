@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:43:37
+ * @LastEditTime: 2025-04-12 18:13:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,26 +14,35 @@
 package com.bytedesk.kbase.faq;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.Utils;
 
-import lombok.AllArgsConstructor;
-
 @Component
-@AllArgsConstructor
 public class FaqInitializer implements SmartInitializingSingleton {
 
-    private final FaqRestService faqService;
-
-    // private final AuthorityRestService authorityService;
+    @Autowired
+    private FaqRestService faqService;
+    
+    // @Autowired
+    // private ThreadPoolTaskScheduler taskScheduler;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         initFaq();
+        // 使用异步方式延迟初始化FAQ，不阻塞项目启动
+        // scheduleFaqInitialization();
     }
+
+    // private void scheduleFaqInitialization() {
+    //     taskScheduler.schedule(() -> {
+    //         initFaq();
+    //     }, java.time.Instant.now().plusSeconds(60));
+    // }
 
     private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
@@ -58,6 +67,4 @@ public class FaqInitializer implements SmartInitializingSingleton {
         faqService.importFaqs(orgUid, kbUid);
         faqService.initRelationFaqs(orgUid, kbUid);
     }
-    
-
 }
