@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.llm.qa;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,17 +33,17 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FaqRequest extends BaseRequest {
+public class QaRequest extends BaseRequest {
 
     private String question;
 
     private String answer;
 
     @Builder.Default
-    private List<FaqAnswer> answerList = new ArrayList<>();
+    private List<QaAnswer> answerList = new ArrayList<>();
 
     @Builder.Default
-    private List<String> relatedFaqUids = new ArrayList<>();
+    private List<String> relatedQaUids = new ArrayList<>();
 
     // 是否是llm问答
     @Builder.Default

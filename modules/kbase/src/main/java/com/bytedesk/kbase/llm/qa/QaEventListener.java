@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:26:42
+ * @LastEditTime: 2025-03-29 14:23:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.llm.qa;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -36,9 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class FaqEventListener {
+public class QaEventListener {
 
-    private final FaqRestService faqRestService;
+    private final QaRestService qaRestService;
 
     private final UploadRestService uploadRestService;
 
@@ -47,7 +47,7 @@ public class FaqEventListener {
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         // String orgUid = organization.getUid();
-        log.info("faq - organization created: {}", organization.getName());
+        log.info("qa - organization created: {}", organization.getName());
     }
 
     @EventListener
@@ -56,15 +56,15 @@ public class FaqEventListener {
         //
         if (message.getStatus().equals(MessageStatusEnum.RATE_UP.name())
                 || message.getStatus().equals(MessageStatusEnum.RATE_DOWN.name())) {
-            log.info("message faq update event: {}", message);
+            log.info("message qa update event: {}", message);
             //
-            FaqMessageExtra extra = JSON.parseObject(message.getExtra(), FaqMessageExtra.class);
-            log.info("faq rate extra faqUid {}, rate {}", extra.getFaqUid(), extra.getRate());
+            QaMessageExtra extra = JSON.parseObject(message.getExtra(), QaMessageExtra.class);
+            log.info("qa rate extra qaUid {}, rate {}", extra.getQaUid(), extra.getRate());
             //
             if (message.getStatus().equals(MessageStatusEnum.RATE_UP.name())) {
-                faqRestService.rateUp(extra.getFaqUid());
+                qaRestService.rateUp(extra.getQaUid());
             } else if (message.getStatus().equals(MessageStatusEnum.RATE_DOWN.name())) {
-                faqRestService.rateDown(extra.getFaqUid());
+                qaRestService.rateDown(extra.getQaUid());
             }
         }
     }
@@ -72,7 +72,7 @@ public class FaqEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
-        log.info("FaqEventListener UploadEventListener create: {}", upload.toString());
+        log.info("QaEventListener UploadEventListener create: {}", upload.toString());
 
         if (upload.getType().equalsIgnoreCase(UploadTypeEnum.FAQ.name())) {
             // 常见问题导入
@@ -84,13 +84,13 @@ public class FaqEventListener {
                     // 导入自动回复
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                    EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
+                    EasyExcel.read(filePath, QaExcel.class, new QaExcelListener(qaRestService,
                             UploadTypeEnum.FAQ.name(),
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();
                 }
             } catch (Exception e) {
-                log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
+                log.error("QaEventListener UploadEventListener create error: {}", e.getMessage());
             }
         } else if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
             // llm qa 问答对导入
@@ -102,13 +102,13 @@ public class FaqEventListener {
                     // 导入自动回复
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                    EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
+                    EasyExcel.read(filePath, QaExcel.class, new QaExcelListener(qaRestService,
                             UploadTypeEnum.LLM.name(),
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();
                 }
             } catch (Exception e) {
-                log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
+                log.error("QaEventListener UploadEventListener create error: {}", e.getMessage());
             }
         }
     }
