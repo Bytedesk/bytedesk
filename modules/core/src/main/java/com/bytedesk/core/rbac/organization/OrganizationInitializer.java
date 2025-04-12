@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 21:19:00
+ * @LastEditTime: 2025-04-12 22:36:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 // import com.bytedesk.core.rbac.authority.AuthorityInitializer;
-// import com.bytedesk.core.rbac.role.RoleInitializer;
+import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserEntity;
-// import com.bytedesk.core.rbac.user.UserInitializer;
+import com.bytedesk.core.rbac.user.UserInitializer;
 import com.bytedesk.core.rbac.user.UserService;
 
 // import jakarta.annotation.PostConstruct;
@@ -35,9 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class OrganizationInitializer implements SmartInitializingSingleton {
 
-    // private final RoleInitializer roleInitializer;
+    private final RoleInitializer roleInitializer;
 
-    // private final UserInitializer userInitializer;
+    private final UserInitializer userInitializer;
 
     private final OrganizationRepository organizationRepository;
 
@@ -50,10 +50,10 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // 
-        // roleInitializer.init();
-        // userInitializer.init();
-        // // 
-        // init();
+        roleInitializer.init();
+        userInitializer.init();
+        // 
+        init();
     }
 
     // @PostConstruct
