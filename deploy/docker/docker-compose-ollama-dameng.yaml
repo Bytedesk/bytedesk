@@ -62,70 +62,116 @@ services:
       SPRING_DATA_REDIS_DATABASE: 0
       # bytedesk config
       BYTEDESK_DEBUG: true
+      # COMMUNITY, // 社区版-免费, 功能受限，人数不限
+      # ENTERPRISE, // 企业版-200人，付费，功能不限
+      # ULTIMATE // 旗舰版-不限人数，付费，功能不限
       BYTEDESK_EDITION: enterprise
       BYTEDESK_VERSION: 0.7.2
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: false
+      # default null use default name
       BYTEDESK_CUSTOM_NAME: 
+      # default null use default logo
       BYTEDESK_CUSTOM_LOGO: 
+      # default null use: Chat As A Service
       BYTEDESK_CUSTOM_DESCRIPTION: 
+      # show right corner chat
       BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: true
+      # privacy policy url
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL:
+      # terms of service url
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL:
+      # enable login username
       BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: true
+      # enable login mobile
       BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: true
+      # enable login email
       BYTEDESK_CUSTOM_LOGIN_EMAIL_ENABLE: false
+      # enable login scan
       BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: true
+      # show doc url
       BYTEDESK_CUSTOM_DOC_URL_SHOW: true
+      # doc url
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
       # Admin config
+      # admin email
       BYTEDESK_ADMIN_EMAIL: admin@email.com
+      # admin password
       BYTEDESK_ADMIN_PASSWORD: admin
+      # create/import member default password
       BYTEDESK_ADMIN_PASSWORD_DEFAULT: 123456
+      # admin nickname
       BYTEDESK_ADMIN_NICKNAME: SuperAdmin
+      # admin mobile
       BYTEDESK_ADMIN_MOBILE: 13345678000
+      # white list mobile
       BYTEDESK_ADMIN_MOBILE_WHITELIST: 18888888000,18888888001,18888888002,18888888003,18888888004,18888888005
+      # white list email
       BYTEDESK_ADMIN_EMAIL_WHITELIST: 100@email.com,101@email.com,102@email.com,103@email.com,104@email.com,105@email.com
+      # validate code for white list mobile and email, otherwise random 6 digits
       BYTEDESK_ADMIN_VALIDATE_CODE: 123456
+      # force validate mobile
       BYTEDESK_ADMIN_FORCE_VALIDATE_MOBILE: true
+      # force validate email
       BYTEDESK_ADMIN_FORCE_VALIDATE_EMAIL: true
       # Organization config
+      # organization name
       BYTEDESK_ORGANIZATION_NAME: MyCompany
+      # organization code
       BYTEDESK_ORGANIZATION_CODE: bytedesk
       # Features config
+      # enable java ai
       BYTEDESK_FEATURES_JAVA_AI: false
+      # enable python ai
       BYTEDESK_FEATURES_PYTHON_AI: true
+      # send email by javamail, valid value: javamail/aliyun
       BYTEDESK_FEATURES_EMAIL_TYPE: javamail
       BYTEDESK_FEATURES_ENABLE_REGISTRATION: false
+      # avatar base url
       BYTEDESK_FEATURES_AVATAR_BASE_URL: 
       # CORS config
       # BYTEDESK_CORS_ALLOWED_ORIGINS: *
       # JWT config
       BYTEDESK_JWT_SECRET_KEY: 1dfaf8d004207b628a9a6b859c429f49a9a7ead9fd8161c1e60847aeef06dbd2
+      # 30 days, milliseconds
       BYTEDESK_JWT_EXPIRATION: 2592000000
+      # 60 days, milliseconds
       BYTEDESK_JWT_REFRESH_TOKEN_EXPIRATION: 5184000000
       # Cache config
+      # 0: no cache, 1: caffeine cache, 2: caffeine + redis cache
       BYTEDESK_CACHE_LEVEL: 0
+      # cache prefix
       BYTEDESK_CACHE_PREFIX: bytedeskim
+      # redis stream key
       BYTEDESK_CACHE_REDIS_STREAM_KEY: bytedeskim:stream
       # Upload config
       BYTEDESK_UPLOAD_TYPE: local
+      # upload dir
       BYTEDESK_UPLOAD_DIR: /app/uploads
       # 上传文件的访问地址，请修改为服务器实际的地址
       BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
       # Knowledge base config
+      # theme: default/eduport/social/kbdoc
       BYTEDESK_KBASE_THEME: default
+      # html path
       BYTEDESK_KBASE_HTML_PATH: helpcenter
       # 知识库的访问地址，请修改为服务器实际的地址
       BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
       # Socket config
+      # socket host
       BYTEDESK_SOCKET_HOST: 0.0.0.0
+      # websocket port
       BYTEDESK_SOCKET_WEBSOCKET_PORT: 9885
+      # leak detector level
       BYTEDESK_SOCKET_LEAK_DETECTOR_LEVEL: SIMPLE
+      # parent event loop group thread count
       BYTEDESK_SOCKET_PARENT_EVENT_LOOP_GROUP_THREAD_COUNT: 1
+      # child event loop group thread count
       BYTEDESK_SOCKET_CHILD_EVENT_LOOP_GROUP_THREAD_COUNT: 8
+      # max payload size
       BYTEDESK_SOCKET_MAX_PAYLOAD_SIZE: 10240
       # Cluster config
+      # enable cluster
       BYTEDESK_CLUSTER_ENABLED: false
       # Push config
       # BYTEDESK_PUSH_APNS_BUNDLE_ID: com.kefux.im
@@ -165,7 +211,7 @@ services:
       SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
       SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
       SPRING_AI_DEEPSEEK_CHAT_ENABLED: false
-      # SPRING_AI_OPENAI_CHAT_MODEL: deepseek-chat
+      # deepseek-reasoner or deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL: deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_TEMPERATURE: 0.7
       SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: false
@@ -243,6 +289,30 @@ services:
       #  http://服务器ip:9003/doc.html
       KNIFE4J_ENABLED: true
       KNIFE4J_SETTING_LANGUAGE: zh_cn
+      # tencent
+      # https://console.cloud.tencent.com/hunyuan/start#
+      # https://cloud.tencent.com/document/product/1729/111007
+      SPRING_AI_TENCENT_BASE_URL: https://api.hunyuan.cloud.tencent.com
+      SPRING_AI_TENCENT_API_KEY: 'sk-xxx'
+      SPRING_AI_TENCENT_CHAT_ENABLED: false
+      SPRING_AI_TENCENT_CHAT_OPTIONS_MODEL: hunyuan-t1-latest
+      SPRING_AI_TENCENT_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # baidu
+      # https://console.bce.baidu.com/iam/#/iam/apikey/list
+      # https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Fm2vrveyu
+      SPRING_AI_BAIDU_BASE_URL: https://qianfan.baidubce.com/v2
+      SPRING_AI_BAIDU_API_KEY: 'bce-v3/xxx'
+      SPRING_AI_BAIDU_CHAT_ENABLED: false
+      SPRING_AI_BAIDU_CHAT_OPTIONS_MODEL: ernie-x1-32k-preview
+      SPRING_AI_BAIDU_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # volcengine 火山引擎
+      # api key: https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey?apikey=%7B%7D
+      # https://www.volcengine.com/docs/82379/1330626
+      SPRING_AI_VOLCENGINE_BASE_URL: https://ark.cn-beijing.volces.com/api/v3
+      SPRING_AI_VOLCENGINE_API_KEY: 'sk-xxx'
+      SPRING_AI_VOLCENGINE_CHAT_ENABLED: false
+      SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
+      SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
     ports:
       - 9003:9003
       - 9885:9885

@@ -209,6 +209,35 @@ services:
       SPRING_AI_GITEE_CHAT_ENABLED: false
       SPRING_AI_GITEE_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
       SPRING_AI_GITEE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # tencent
+      # https://console.cloud.tencent.com/hunyuan/start#
+      # https://cloud.tencent.com/document/product/1729/111007
+      SPRING_AI_TENCENT_BASE_URL: https://api.hunyuan.cloud.tencent.com
+      SPRING_AI_TENCENT_API_KEY: 'sk-xxx'
+      SPRING_AI_TENCENT_CHAT_ENABLED: false
+      SPRING_AI_TENCENT_CHAT_OPTIONS_MODEL: hunyuan-t1-latest
+      SPRING_AI_TENCENT_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # baidu
+      # https://console.bce.baidu.com/iam/#/iam/apikey/list
+      # https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Fm2vrveyu
+      SPRING_AI_BAIDU_BASE_URL: https://qianfan.baidubce.com/v2
+      # model builder（可用）
+      SPRING_AI_BAIDU_API_KEY: 'bce-v3/xxx'
+      SPRING_AI_BAIDU_CHAT_ENABLED: false
+      SPRING_AI_BAIDU_CHAT_OPTIONS_MODEL: ernie-x1-32k-preview
+      SPRING_AI_BAIDU_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # volcengine 火山引擎
+      # api key: https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey?apikey=%7B%7D
+      # https://www.volcengine.com/docs/82379/1330626
+      SPRING_AI_VOLCENGINE_BASE_URL: https://ark.cn-beijing.volces.com/api/v3
+      SPRING_AI_VOLCENGINE_API_KEY: 'sk-xxx'
+      SPRING_AI_VOLCENGINE_CHAT_ENABLED: false
+      SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
+      SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
       # moonshot
       SPRING_AI_MOONSHOT_CHAT_ENABLED: false
       SPRING_AI_MINIMAX_CHAT_ENABLED: false
