@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:37:01
+ * @LastEditTime: 2025-04-12 14:52:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,6 @@ import com.bytedesk.kbase.llm.text.event.TextUpdateEvent;
 import com.bytedesk.kbase.llm.website.WebsiteEntity;
 import com.bytedesk.kbase.llm.website.event.WebsiteCreateEvent;
 import com.bytedesk.kbase.llm.website.event.WebsiteDeleteEvent;
-import com.bytedesk.kbase.llm.website.event.WebsiteUpdateEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -183,14 +182,14 @@ public class SpringAIEventListener {
         });
     }
 
-    @EventListener
-    public void onWebsiteUpdateEvent(WebsiteUpdateEvent event) {
-        WebsiteEntity website = event.getWebsite();
-        log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.getName());
-        if (!website.isDeleted()) {
-            // TODO: 更新website对应的document
-        }
-    }
+    // @EventListener
+    // public void onWebsiteUpdateEvent(WebsiteUpdateEvent event) {
+    //     WebsiteEntity website = event.getWebsite();
+    //     log.info("SpringAIEventListener onWebsiteUpdateEvent: {}", website.getName());
+    //     if (!website.isDeleted()) {
+    //         // TODO: 更新website对应的document
+    //     }
+    // }
 
     @EventListener
     public void onWebsiteDeleteEvent(WebsiteDeleteEvent event) {

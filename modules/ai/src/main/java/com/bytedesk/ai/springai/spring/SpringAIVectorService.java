@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:37:41
+ * @LastEditTime: 2025-04-12 14:50:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -354,8 +354,8 @@ public class SpringAIVectorService {
 	public List<Document> readQa(QaEntity qaEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(qaEntity, "QaEntity must not be null");
-		Assert.hasText(qaEntity.getQuestion(), "Question must not be empty");
-		Assert.hasText(qaEntity.getAnswer(), "Answer must not be empty");
+		// Assert.hasText(qaEntity.getQuestion(), "Question must not be empty");
+		// Assert.hasText(qaEntity.getAnswer(), "Answer must not be empty");
 		//
 		String content = qaEntity.getQuestion() + "\n" + qaEntity.getAnswer();
 		// 创建Document对象
@@ -403,8 +403,8 @@ public class SpringAIVectorService {
 	public List<Document> readFaq(FaqEntity fqaEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(fqaEntity, "FaqEntity must not be null");
-		Assert.hasText(fqaEntity.getQuestion(), "Question must not be empty");
-		Assert.hasText(fqaEntity.getAnswer(), "Answer must not be empty");
+		// Assert.hasText(fqaEntity.getQuestion(), "Question must not be empty");
+		// Assert.hasText(fqaEntity.getAnswer(), "Answer must not be empty");
 		//
 		String content = fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
 		// 创建Document对象
@@ -523,12 +523,7 @@ public class SpringAIVectorService {
 		Assert.notNull(file, "FileEntity must not be null");
 		Assert.notNull(file.getUid(), "File UID must not be null");
 		Assert.notNull(file.getKbUid(), "Knowledge base UID must not be null");
-
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			log.warn("Vector store is not available, skipping document storage for file: {}", file.getFileName());
-			return;
-		}
-
+		// 
 		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
 		List<String> docIdList = new ArrayList<>();
 		Iterator<Document> iterator = docList.iterator();
@@ -538,25 +533,24 @@ public class SpringAIVectorService {
 			docIdList.add(doc.getId());
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
-
+			// 
 			SplitRequest splitRequest = SplitRequest.builder()
 					.name(file.getFileName())
+					.content(doc.getText())
+					.type(SplitTypeEnum.FILE.name())
 					.docId(doc.getId())
 					.typeUid(file.getUid())
 					.categoryUid(file.getCategoryUid())
 					.kbUid(file.getKbUid())
-					// .userUid(file.getUserUid())
+					.userUid(file.getUserUid())
+					.orgUid(file.getOrgUid())
 					.build();
-			splitRequest.setUserUid(file.getUserUid());
-			splitRequest.setType(SplitTypeEnum.FILE.name());
-			splitRequest.setContent(doc.getText());
-			splitRequest.setOrgUid(file.getOrgUid());
 			splitRestService.create(splitRequest);
 		}
 		file.setDocIdList(docIdList);
 		file.setStatus(SplitStatusEnum.SUCCESS.name());
 		fileRestService.save(file);
-
+		// 
 		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
 			try {
 				redisVectorStore.write(docList);
@@ -569,9 +563,6 @@ public class SpringAIVectorService {
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		}
-		// 通知生成问答对
-		// bytedeskEventPublisher.publishEvent(new VectorSplitEvent(file.getKbUid(),
-		// file.getOrgUid(), docList));
 	}
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
