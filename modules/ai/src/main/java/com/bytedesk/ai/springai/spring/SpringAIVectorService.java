@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 14:50:44
+ * @LastEditTime: 2025-04-12 14:53:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -395,7 +395,6 @@ public class SpringAIVectorService {
 		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
 			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		}
-
 		return docList;
 	}
 
@@ -570,11 +569,6 @@ public class SpringAIVectorService {
 	public List<String> searchText(String query) {
 		Assert.hasText(query, "Search query must not be empty");
 
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			log.warn("Vector store is not available");
-			return List.of();
-		}
-
 		SearchRequest searchRequest = SearchRequest.builder()
 				.query(query)
 				.topK(2)
@@ -588,10 +582,6 @@ public class SpringAIVectorService {
 	public List<String> searchText(String query, String kbUid) {
 		Assert.hasText(query, "Search query must not be empty");
 		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			log.warn("Vector store is not available for kbUid: {}", kbUid);
-			return List.of();
-		}
 
 		log.info("searchText kbUid {}, query: {}", kbUid, query);
 		FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();

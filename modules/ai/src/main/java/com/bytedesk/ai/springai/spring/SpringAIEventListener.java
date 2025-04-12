@@ -201,12 +201,6 @@ public class SpringAIEventListener {
         });
     }
 
-    // @EventListener
-    // public void onSplitCreateEvent(SplitCreateEvent event) {
-    //     SplitEntity split = event.getSplit();
-    //     log.info("SpringAIEventListener onSplitCreateEvent: {}", split.getName());
-    // }
-
     @EventListener
     public void onSplitUpdateEvent(SplitUpdateEvent event) {
         SplitEntity split = event.getSplit();
