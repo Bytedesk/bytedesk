@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:05:20
+ * @LastEditTime: 2025-04-12 17:00:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,6 +83,7 @@ public class FaqEventListener {
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                     EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
                             UploadTypeEnum.FAQ.name(),
+                            upload.getUid(),
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();
                 }

@@ -146,12 +146,21 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             if (latest.isPresent()) {
                 TextEntity latestEntity = latest.get();
                 // 合并需要保留的数据
+                latestEntity.setName(entity.getName());
+                latestEntity.setContent(entity.getContent());
+                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setType(entity.getType());
+                
+                // 文档ID列表和状态
+                latestEntity.setDocIdList(entity.getDocIdList());
+                latestEntity.setStatus(entity.getStatus());
+                
                 return textRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
-        return null;
+        throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
     @Override

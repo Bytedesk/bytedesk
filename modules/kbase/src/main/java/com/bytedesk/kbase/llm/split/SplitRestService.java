@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 15:28:23
+ * @LastEditTime: 2025-04-12 16:55:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,15 +92,15 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             .endDate(request.getEndDate())
             .categoryUid(request.getCategoryUid())
             .kbUid(request.getKbUid())
-            .userUid(request.getUserUid())
             .orgUid(request.getOrgUid())
             .build();
-        // Error mapping a854a402-04c9-4018-84ee-f0313ad00f48 to java.lang.Long
-        // Caused by: java.lang.NumberFormatException: For input string: "a854a402-04c9-4018-84ee-f0313ad00f48"
-        // SplitEntity entity = modelMapper.map(request, SplitEntity.class);
-        // entity.setUid(uidUtils.getUid());
-        // entity.setOrgUid(request.getOrgUid());
-        // log.info("SplitRestService create: {}", entity);
+            // 
+            UserEntity user = authService.getUser();
+            if (user != null) {
+                entity.setUserUid(user.getUid());
+            } else {
+                entity.setUserUid(request.getUserUid());
+            }
         // 
         SplitEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -155,16 +155,31 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     @Override
     public SplitEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SplitEntity entity) {
         try {
+            log.warn("处理乐观锁冲突: {}", entity.getUid());
             Optional<SplitEntity> latest = splitRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 SplitEntity latestEntity = latest.get();
                 // 合并需要保留的数据
+                latestEntity.setName(entity.getName());
+                latestEntity.setContent(entity.getContent());
+                latestEntity.setType(entity.getType());
+                latestEntity.setTypeUid(entity.getTypeUid());
+                latestEntity.setLevel(entity.getLevel());
+                latestEntity.setPlatform(entity.getPlatform());
+                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setStartDate(entity.getStartDate());
+                latestEntity.setEndDate(entity.getEndDate());
+                
+                // 文档ID列表和状态
+                // latestEntity.setStatus(entity.getStatus());
+                latestEntity.setDocId(entity.getDocId());
+                
                 return splitRepository.save(latestEntity);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
         }
-        return null;
+        throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
     public void deleteByDocList(List<String> docIdList) {
