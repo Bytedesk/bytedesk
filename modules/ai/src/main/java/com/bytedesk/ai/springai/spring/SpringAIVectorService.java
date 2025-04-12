@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 23:34:08
+ * @LastEditTime: 2025-04-13 00:11:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -326,13 +326,13 @@ public class SpringAIVectorService {
 		Iterator<Document> iterator = docList.iterator();
 		while (iterator.hasNext()) {
 			Document doc = iterator.next();
-			log.info("doc id: {}", doc.getId());
+			// log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbUid());
-			doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
-			doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			// doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
+			// doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			// doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
@@ -383,9 +383,9 @@ public class SpringAIVectorService {
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbUid());
-			doc.getMetadata().put("enabled", String.valueOf(qaEntity.isEnabled()));
-			doc.getMetadata().put("startDate", qaEntity.getStartDate() != null ? qaEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			doc.getMetadata().put("endDate", qaEntity.getEndDate() != null ? qaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			// doc.getMetadata().put("enabled", String.valueOf(qaEntity.isEnabled()));
+			// doc.getMetadata().put("startDate", qaEntity.getStartDate() != null ? qaEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			// doc.getMetadata().put("endDate", qaEntity.getEndDate() != null ? qaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
@@ -435,9 +435,9 @@ public class SpringAIVectorService {
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, fqaEntity.getKbUid());
-			doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
-			doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			// doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
+			// doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			// doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
@@ -560,9 +560,9 @@ public class SpringAIVectorService {
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbUid());
 			// 添加元数据: 启用状态和有效期，使用FileEntity中的字段
-			doc.getMetadata().put("enabled", String.valueOf(file.isEnabled()));
-			doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
-			doc.getMetadata().put("endDate", file.getEndDate() != null ? file.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			// doc.getMetadata().put("enabled", String.valueOf(file.isEnabled()));
+			// doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
+			// doc.getMetadata().put("endDate", file.getEndDate() != null ? file.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 
 			SplitRequest splitRequest = SplitRequest.builder()
