@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:55:08
+ * @LastEditTime: 2025-04-12 14:26:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.llm.split.SplitStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -51,9 +52,10 @@ public class TextEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // @Builder.Default
-    // @Column(name = "text_type")
-    // private String type = MessageTypeEnum.TEXT.name();
+    // 文本类型，TODO: 后期支持OCR提取图片文字、音频转录、视频文字提取等
+    @Builder.Default
+    @Column(name = "text_type")
+    private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
     private String status = SplitStatusEnum.NEW.name();
