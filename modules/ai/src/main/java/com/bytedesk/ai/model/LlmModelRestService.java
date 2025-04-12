@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 18:42:22
+ * @LastEditTime: 2025-04-12 10:29:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,8 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -41,7 +43,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     private final UidUtils uidUtils;
 
-    // private final AuthService authService;
+    private final AuthService authService;
 
     @Override
     public Page<LlmModelResponse> queryByOrg(LlmModelRequest request) {
@@ -53,8 +55,12 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     public Page<LlmModelResponse> queryByUser(LlmModelRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Override
@@ -88,12 +94,18 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
             }
         }
 
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
         LlmModelEntity entity = modelMapper.map(request, LlmModelEntity.class);
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
         } else {
             entity.setUid(uidUtils.getUid());
         }
+        entity.setUserUid(user.getUid());
         //
         LlmModelEntity savedModel = save(entity);
         if (savedModel == null) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-06 10:15:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:03:03
+ * @LastEditTime: 2025-04-12 10:33:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.ticket.thread.ThreadConsts;
-import com.bytedesk.ticket.thread.ThreadTransferToAgentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ThreadMessageEventListener {
 
-    private final ThreadTransferToAgentService threadTransferToAgentService;
+    // private final ThreadTransferToAgentService threadTransferToAgentService;
     private final ThreadRestService threadRestService;
     private final RuntimeService runtimeService;
     
@@ -70,8 +69,9 @@ public class ThreadMessageEventListener {
                 return;
             }
             
+            // 暂时先在前端拦截，转人工
             // 处理访客消息，检查转人工请求
-            threadTransferToAgentService.processVisitorMessage(message, thread);
+            // threadTransferToAgentService.processVisitorMessage(message, thread);
 
             // 如果是访客发送的消息，重置空闲超时计时器
             if (message.isFromVisitor()) {
