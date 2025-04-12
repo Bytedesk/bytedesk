@@ -16,23 +16,20 @@ package com.bytedesk.kbase.llm.qa;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class QaInitializer implements SmartInitializingSingleton {
 
-    private final QaRestService qaService;
+    // private final QaRestService qaService;
 
     // private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        initQa();
+        // initQa();
     }
 
     private void initAuthority() {
@@ -51,13 +48,13 @@ public class QaInitializer implements SmartInitializingSingleton {
         // }
     }
 
-    private void initQa() {
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
-        // 
-        qaService.importQas(orgUid, kbUid);
-        qaService.initRelationQas(orgUid, kbUid);
-    }
+    // private void initQa() {
+    //     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    //     String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
+    //     // 
+    //     // qaService.importQas(orgUid, kbUid);
+    //     // qaService.initRelationQas(orgUid, kbUid);
+    // }
     
 
 }
