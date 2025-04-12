@@ -33,7 +33,7 @@ public class FaqInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        initFaq();
+        // init();
         // 使用异步方式延迟初始化FAQ，不阻塞项目启动
         // scheduleFaqInitialization();
     }
@@ -60,7 +60,7 @@ public class FaqInitializer implements SmartInitializingSingleton {
         // }
     }
 
-    private void initFaq() {
+    public void init() {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
         // 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 17:00:42
+ * @LastEditTime: 2025-04-12 21:24:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,11 +35,11 @@ public class RobotInitializer implements SmartInitializingSingleton {
     
     @Override
     public void afterSingletonsInstantiated() {
-        initRobot();
+        // init();
         initPermissions();
     }
     
-    private void initRobot() {
+    public void init() {
         // 导入平台智能体
         robotService.initRobotJson();
         // 

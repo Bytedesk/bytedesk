@@ -25,8 +25,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.service.agent.AgentInitializer;
-import com.bytedesk.team.member.MemberInitializer;
+// import com.bytedesk.service.agent.AgentInitializer;
+// import com.bytedesk.team.member.MemberInitializer;
 
 import lombok.AllArgsConstructor;
 
@@ -35,19 +35,19 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class WorkgroupInitializer implements SmartInitializingSingleton {
 
-    private final MemberInitializer memberInitializer;
-    private final AgentInitializer agentInitializer;
+    // private final MemberInitializer memberInitializer;
+    // private final AgentInitializer agentInitializer;
     private final WorkgroupRestService workgroupService;
     private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {
         // 确保 MemberInitializer 先执行完成
-        memberInitializer.init();
+        // memberInitializer.init();
         // 确保 AgentInitializer 先执行完成
-        agentInitializer.init();
+        // agentInitializer.init();
         // 
-        init();
+        // init();
         // 
         initPermissions();
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 21:14:36
+ * @LastEditTime: 2025-04-12 21:24:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,9 +21,16 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.ai.provider.LlmProviderInitializer;
+import com.bytedesk.ai.robot.RobotInitializer;
+import com.bytedesk.core.rbac.organization.OrganizationInitializer;
 import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserInitializer;
 import com.bytedesk.core.utils.NetworkUtils;
+import com.bytedesk.kbase.faq.FaqInitializer;
+import com.bytedesk.service.agent.AgentInitializer;
+import com.bytedesk.service.workgroup.WorkgroupInitializer;
+import com.bytedesk.team.member.MemberInitializer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +48,25 @@ public class InitDataRunner implements ApplicationRunner {
     private UserInitializer userInitializer;
 
     @Autowired
-    
+    private OrganizationInitializer organizationInitializer;
+
+    @Autowired
+    private MemberInitializer memberInitializer;
+
+    @Autowired
+    private AgentInitializer agentInitializer;
+
+    @Autowired
+    private WorkgroupInitializer workgroupInitializer;
+
+    @Autowired
+    private FaqInitializer faqInitializer;
+
+    @Autowired
+    private RobotInitializer robotInitializer;
+
+    @Autowired
+    private LlmProviderInitializer llmProviderInitializer;
 
     @Value("${application.version}")
     private String version;
@@ -51,7 +76,24 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // TODO: 集中执行必要的初始化
+        // 集中执行必要的初始化，方便管理和控制初始化顺序，避免分散执行因依赖关系导致初始化失败
+        roleInitializer.init();
+
+        userInitializer.init();
+
+        organizationInitializer.init();
+
+        memberInitializer.init();
+
+        agentInitializer.init();
+
+        workgroupInitializer.init();
+
+        faqInitializer.init();
+
+        robotInitializer.init();
+
+        llmProviderInitializer.init();
 
 
         // 在应用的主类或配置类中
