@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 14:11:44
+ * @LastEditTime: 2025-04-12 21:11:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,8 +80,6 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
             if (savedOrganization != null) {
                 user.setCurrentOrganization(savedOrganization);
                 user = userService.addRoleSuper(user);
-                // user = userService.addAdminRole(user);
-                // user = userService.addMemberRole(user);
             } else {
                 throw new RuntimeException("Organization: Default Organization Save Failed");
             }

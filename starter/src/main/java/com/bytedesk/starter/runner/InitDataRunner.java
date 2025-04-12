@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 18:15:17
+ * @LastEditTime: 2025-04-12 21:14:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,11 +15,14 @@ package com.bytedesk.starter.runner;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.rbac.role.RoleInitializer;
+import com.bytedesk.core.rbac.user.UserInitializer;
 import com.bytedesk.core.utils.NetworkUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class InitDataRunner implements ApplicationRunner {
+
+    @Autowired
+    private RoleInitializer roleInitializer;
+
+    @Autowired
+    private UserInitializer userInitializer;
+
+    @Autowired
+    
 
     @Value("${application.version}")
     private String version;
