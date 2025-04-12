@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 15:58:53
+ * @LastEditTime: 2025-04-12 11:37:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.llm.qa;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,18 +39,18 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * faq: Frequently Asked Questions
+ * qa: Frequently Asked Questions
  */
 @Entity
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true, exclude = { "relatedFaqs" })
+@EqualsAndHashCode(callSuper = true, exclude = { "relatedQas" })
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({FaqEntityListener.class})
-@Table(name = "bytedesk_kbase_faq")
-public class FaqEntity extends BaseEntity {
+@EntityListeners({QaEntityListener.class})
+@Table(name = "bytedesk_kbase_llm_qa")
+public class QaEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,14 +64,14 @@ public class FaqEntity extends BaseEntity {
     
     // 支持一问多答，根据不同VIP等级对应不同答案
     @Builder.Default
-    @Convert(converter = FaqAnswerListConverter.class)
+    @Convert(converter = QaAnswerListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<FaqAnswer> answerList = new ArrayList<>();
+    private List<QaAnswer> answerList = new ArrayList<>();
 
     // 支持设置关联问题
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<FaqEntity> relatedFaqs = new ArrayList<>();
+    private List<QaEntity> relatedQas = new ArrayList<>();
 
     // 是否是llm问答
     @Builder.Default
@@ -79,7 +79,7 @@ public class FaqEntity extends BaseEntity {
     private boolean isLlmQa = false;
 
     @Builder.Default
-    @Column(name = "faq_type", nullable = false)
+    @Column(name = "qa_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
@@ -132,7 +132,7 @@ public class FaqEntity extends BaseEntity {
     // 对应知识库
     private String kbUid;
 
-    // used for auto-generate faq
+    // used for auto-generate qa
     private String docId; // 对应文档
 
     private String fileUid; // 对应文件
@@ -193,7 +193,7 @@ public class FaqEntity extends BaseEntity {
     public String getAnswerForVipLevel(String vipLevel) {
         if (answerList != null && !answerList.isEmpty()) {
             // 先查找是否有完全匹配的VIP等级答案
-            for (FaqAnswer vipAnswer : answerList) {
+            for (QaAnswer vipAnswer : answerList) {
                 if (vipAnswer.getVipLevel().equalsIgnoreCase(vipLevel)) {
                     return vipAnswer.getAnswer();
                 }
@@ -202,8 +202,8 @@ public class FaqEntity extends BaseEntity {
             // 如果没有完全匹配的，返回默认答案answer
             return answer;
 
-            // FaqAnswer highestMatch = null;
-            // for (FaqAnswer vipAnswer : answerList) {
+            // QaAnswer highestMatch = null;
+            // for (QaAnswer vipAnswer : answerList) {
             //     if (vipAnswer.getVipLevel() < vipLevel && 
             //         (highestMatch == null || vipAnswer.getVipLevel() > highestMatch.getVipLevel())) {
             //         highestMatch = vipAnswer;
