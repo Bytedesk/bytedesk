@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 09:11:01
+ * @LastEditTime: 2025-04-12 23:47:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,13 +110,19 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 
                 if (!visitorRequest.getForceAgent()) {
                     // 
-                    RobotEntity robot = workgroup.getRobotSettings().getRobot();
+                    RobotEntity robotEntity = workgroup.getRobotSettings().getRobot();
                     // thread = visitorThreadService.reInitRobotThreadExtra(thread, robot); // 方便测试
                     // 重新初始化会话，包括重置机器人状态等
                     thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                     // 返回未关闭，或 非留言状态的会话
+                    String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+                    thread.setRobot(robotString);
+                    ThreadEntity savedThread = threadService.save(thread);
+                    if (savedThread == null) {
+                        throw new RuntimeException("Failed to save thread");
+                    }
                     log.info("Already have a processing robot thread {}", topic);
-                    return getRobotContinueMessage(robot, thread);
+                    return getRobotContinueMessage(robotEntity, savedThread);
                 }
             } else if (threadOptional.get().isChatting()) {
                 // 如果会话已经存在，并且是聊天状态
@@ -375,7 +381,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
     }
 
-    private MessageProtobuf getRobotContinueMessage(RobotEntity robot, ThreadEntity thread) {
+    private MessageProtobuf getRobotContinueMessage(RobotEntity robotEntity, ThreadEntity thread) {
         // 如果拉取的是访客的消息，会影响前端
         // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
         // if (messageOptional.isPresent()) {
@@ -389,9 +395,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //     }
         // }
         //
-        String content = robot.getServiceSettings().getWelcomeTip();
+        String content = robotEntity.getServiceSettings().getWelcomeTip();
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
-
+        // 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
