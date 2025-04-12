@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 15:31:04
+ * @LastEditTime: 2025-04-12 16:04:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -180,46 +180,55 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     @Override
     @Transactional
     public FaqResponse update(FaqRequest request) {
-
-        Optional<FaqEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            FaqEntity entity = optional.get();
-            // modelMapper.map(request, entity);
-            entity.setQuestion(request.getQuestion());
-            entity.setAnswer(request.getAnswer());
-            entity.setAnswerList(request.getAnswerList());
-            entity.setStatus(request.getStatus());
-            entity.setTagList(request.getTagList());
-            entity.setType(request.getType());
-            entity.setEnabled(request.getEnabled());
-            // 如何将string类型startDate和endDate转换为LocalDateTime类型？
-            // if (StringUtils.hasText(request.getStartDate())) {
-            //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
-            // }
-            // if (StringUtils.hasText(request.getEndDate())) {
-            //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
-            // }
-            entity.setStartDate(request.getStartDate());
-            entity.setEndDate(request.getEndDate());
-            //
-            entity.setCategoryUid(request.getCategoryUid());
-            entity.setKbUid(request.getKbUid());
-            //
-            // 根据request.relatedFaqUids查找关联的FAQ
-            List<FaqEntity> relatedFaqs = new ArrayList<>();
-            for (String relatedFaqUid : request.getRelatedFaqUids()) {
-                Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
-                if (relatedFaq.isPresent()) {
-                    relatedFaqs.add(relatedFaq.get());
-                } else {
-                    throw new RuntimeException("relatedFaqUid not found");
+        try {
+            Optional<FaqEntity> optional = findByUid(request.getUid());
+            if (optional.isPresent()) {
+                FaqEntity entity = optional.get();
+                // 设置属性
+                entity.setQuestion(request.getQuestion());
+                entity.setAnswer(request.getAnswer());
+                entity.setAnswerList(request.getAnswerList());
+                entity.setStatus(request.getStatus());
+                entity.setTagList(request.getTagList());
+                entity.setType(request.getType());
+                entity.setEnabled(request.getEnabled());
+                entity.setStartDate(request.getStartDate());
+                entity.setEndDate(request.getEndDate());
+                entity.setCategoryUid(request.getCategoryUid());
+                entity.setKbUid(request.getKbUid());
+                
+                // 处理相关FAQ
+                if (request.getRelatedFaqUids() != null && !request.getRelatedFaqUids().isEmpty()) {
+                    List<FaqEntity> relatedFaqs = new ArrayList<>();
+                    for (String relatedFaqUid : request.getRelatedFaqUids()) {
+                        try {
+                            Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
+                            if (relatedFaq.isPresent()) {
+                                relatedFaqs.add(relatedFaq.get());
+                            }
+                        } catch (Exception e) {
+                            log.warn("无法加载相关的FAQ: {}, 原因: {}", relatedFaqUid, e.getMessage());
+                            // 继续处理其他相关FAQ，不要中断
+                        }
+                    }
+                    entity.setRelatedFaqs(relatedFaqs);
                 }
-            }
-            entity.setRelatedFaqs(relatedFaqs);
 
-            return convertToResponse(save(entity));
-        } else {
-            throw new RuntimeException("faq not found");
+                try {
+                    return convertToResponse(save(entity));
+                } catch (ObjectOptimisticLockingFailureException e) {
+                    // 乐观锁异常，交给调用者处理重试
+                    throw e;
+                }
+            } else {
+                throw new RuntimeException("faq not found");
+            }
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // 原样传递乐观锁异常，以便上层方法处理重试
+            throw e;
+        } catch (Exception e) {
+            log.error("更新FAQ失败: {}, 原因: {}", request.getUid(), e.getMessage());
+            throw new RuntimeException("更新FAQ失败", e);
         }
     }
 
@@ -276,6 +285,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("发生乐观锁冲突，尝试处理: {}", entity.getUid());
             return handleOptimisticLockingFailureException(e, entity);
         }
     }
@@ -287,19 +297,39 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     @Override
     public FaqEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqEntity entity) {
-        // 乐观锁处理实现
         try {
+            log.warn("处理乐观锁冲突: {}", entity.getUid());
+            // 重新获取最新版本的实体
             Optional<FaqEntity> latest = faqRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 FaqEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                // 这里可以根据业务需求合并实体
+                // 保持原有实体的部分属性
+                latestEntity.setQuestion(entity.getQuestion());
+                latestEntity.setAnswer(entity.getAnswer());
+                latestEntity.setAnswerList(entity.getAnswerList());
+                latestEntity.setType(entity.getType());
+                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setCategoryUid(entity.getCategoryUid());
+                latestEntity.setKbUid(entity.getKbUid());
+                
+                // 避免覆盖计数器类字段
+                // latestEntity.setViewCount(entity.getViewCount());
+                // latestEntity.setClickCount(entity.getClickCount());
+                // latestEntity.setUpCount(entity.getUpCount());
+                // latestEntity.setDownCount(entity.getDownCount());
+                
+                // 处理相关FAQ时特别小心
+                if (entity.getRelatedFaqs() != null && !entity.getRelatedFaqs().isEmpty()) {
+                    latestEntity.setRelatedFaqs(entity.getRelatedFaqs());
+                }
+                
                 return faqRepository.save(latestEntity);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
         }
-        return null;
+        throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
     public void save(List<FaqEntity> entities) {
@@ -563,9 +593,32 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     request.setRelatedFaqUids(relatedFaqUids);
                 }
                 
-                // 更新FAQ到数据库
-                update(request);
-                count++;
+                try {
+                    // 尝试更新FAQ，使用重试机制
+                    int retryCount = 0;
+                    int maxRetries = 3;
+                    boolean success = false;
+                    
+                    while (!success && retryCount < maxRetries) {
+                        try {
+                            // 尝试更新FAQ到数据库
+                            update(request);
+                            success = true;
+                            count++;
+                        } catch (ObjectOptimisticLockingFailureException e) {
+                            retryCount++;
+                            if (retryCount >= maxRetries) {
+                                log.error("最大重试次数已达到，无法更新FAQ: {}", uid);
+                                throw e;
+                            }
+                            log.warn("乐观锁冲突，正在重试更新FAQ: {}，重试次数: {}", uid, retryCount);
+                            // 短暂延迟后重试
+                            Thread.sleep(100 * retryCount);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("更新FAQ失败: {}, 原因: {}", uid, e.getMessage());
+                }
             }
             
             log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
