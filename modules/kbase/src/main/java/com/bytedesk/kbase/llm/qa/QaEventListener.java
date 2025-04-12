@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:05:07
+ * @LastEditTime: 2025-04-12 13:47:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,14 +34,6 @@ public class QaEventListener {
     private final QaRestService qaRestService;
 
     private final UploadRestService uploadRestService;
-
-    // @Order(3)
-    // @EventListener
-    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
-    //     // String orgUid = organization.getUid();
-    //     log.info("qa - organization created: {}", organization.getName());
-    // }
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
