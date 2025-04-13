@@ -46,7 +46,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         Pageable pageable = request.getPageable();
         Specification<MessageEntity> specs = MessageSpecification.search(request);
         Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-        return messagePage.map(ConvertUtils::convertToMessageResponse);
+        return messagePage.map(this::convertToResponse);
     }
 
     @Override

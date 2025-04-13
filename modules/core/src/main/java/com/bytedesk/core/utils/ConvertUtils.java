@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:49:52
+ * @LastEditTime: 2025-04-13 22:34:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.service.message_unread.MessageUnreadEntity;
 
 public class ConvertUtils {
 
@@ -185,18 +184,7 @@ public class ConvertUtils {
         return messageResponse;
     }
 
-    public static MessageResponse convertToMessageResponse(MessageUnreadEntity message) {
-
-        MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
-
-        UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
-        if (user.getExtra() == null) {
-            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
-        }
-        messageResponse.setUser(user);
-
-        return messageResponse;
-    }
+    
 
     public static AuthorityResponse convertToAuthorityResponse(AuthorityEntity authorityEntity) {
         return modelMapper.map(authorityEntity, AuthorityResponse.class);

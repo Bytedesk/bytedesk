@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:17:51
+ * @LastEditTime: 2025-04-13 22:37:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -43,7 +43,7 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
     public List<MessageResponse> getMessages(String userUid) {
         List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
         delete(userUid);
-        return messageUnreadList.stream().map(ConvertUtils::convertToMessageResponse).toList();
+        return messageUnreadList.stream().map(ServiceConvertUtils::convertToMessageResponse).toList();
     }
 
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
@@ -148,8 +148,7 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
 
     @Override
     public MessageUnreadResponse convertToResponse(MessageUnreadEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return modelMapper.map(entity, MessageUnreadResponse.class);
     }
 
 }
