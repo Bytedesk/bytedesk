@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 16:18:32
+ * @LastEditTime: 2025-04-13 18:15:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.ai.robot;
 import java.io.Serializable;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 
 import lombok.AllArgsConstructor;
@@ -51,8 +52,12 @@ public class RobotProtobuf implements Serializable {
 
     private RobotLlm llm;
 
-    public static RobotProtobuf parseFrom(String user) {
+    public static RobotProtobuf fromJson(String user) {
         return JSON.parseObject(user, RobotProtobuf.class);
+    }
+
+    public String toJson() {
+        return JSON.toJSONString(this);
     }
 
     public static RobotProtobuf convertFromRobotEntity(RobotEntity robotEntity) {
@@ -67,7 +72,13 @@ public class RobotProtobuf implements Serializable {
                 .build();
     }
 
-    public String toJson() {
-        return JSON.toJSONString(this);
+    public UserProtobuf toUserProtobuf() {
+        return UserProtobuf.builder()
+                .uid(this.uid)
+                .nickname(this.nickname)
+                .avatar(this.avatar)
+                .type(UserTypeEnum.ROBOT.name())
+                .build();
     }
+
 }
