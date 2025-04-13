@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 18:18:25
+ * @LastEditTime: 2025-04-13 19:23:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@ package com.bytedesk.core.enums;
 
 public enum ClientEnum {
     SYSTEM,
-    AUTO_REPLY, // auto reply
+    // AUTO_REPLY, // auto reply
     // ROBOT, // robot reply
     // 
     WEB,
