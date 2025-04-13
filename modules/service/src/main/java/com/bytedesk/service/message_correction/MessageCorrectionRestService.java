@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:26:17
+ * @LastEditTime: 2025-04-13 21:14:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,9 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -125,12 +123,6 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
      * backoff: 重试延迟，multiplier是延迟倍数
      * recover: 当重试次数用完后的回调方法
      */
-    @Retryable(
-        value = { Exception.class },
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
-    @Override
     public MessageCorrectionEntity save(MessageCorrectionEntity entity) {
         try {
             return doSave(entity);
@@ -141,7 +133,7 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
 
     @Override
     protected MessageCorrectionEntity doSave(MessageCorrectionEntity entity) {
-        log.info("Attempting to save message_correction: {}", entity.getName());
+        // log.info("Attempting to save message_correction: {}", entity.getName());
         return message_correctionRepository.save(entity);
     }
 
@@ -167,7 +159,7 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
      */
     @Recover
     public MessageCorrectionEntity recover(Exception e, MessageCorrectionEntity entity) {
-        log.error("Failed to save message_correction after 3 attempts: {}", entity.getName(), e);
+        // log.error("Failed to save message_correction after 3 attempts: {}", entity.getName(), e);
         // 可以在这里添加告警通知
         throw new RuntimeException("Failed to save message_correction after retries: " + e.getMessage());
     }
