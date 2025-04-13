@@ -83,19 +83,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
             if (contentList.isEmpty()) {
+                // TODO: 记录未找到相关答案的问题到数据库
+
                 // TODO: 直接返回未找到相关问题答案
-                // messageProtobuf.setType(MessageTypeEnum.ERROR);
+                // messageProtobuf.setType(MessageTypeEnum.TEXT);
                 // messageProtobuf.setContent("未查找到相关问题答案");
                 // messageSendService.sendProtobufMessage(messageProtobuf);
             }
             String context = String.join("\n", contentList);
-            // TODO: 历史聊天记录
+            // TODO: 根据配置，拉取历史聊天记录
             // String history = "";
             prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
         } else {
             prompt = robot.getLlm().getPrompt();
         }
         // TODO: 判断是否开启大模型
+        // TODO: 返回消息中携带消息搜索结果(来源依据)
         //
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
