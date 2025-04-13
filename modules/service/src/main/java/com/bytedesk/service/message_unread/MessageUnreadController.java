@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:38:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:36:28
+ * @LastEditTime: 2025-04-13 21:25:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.message_unread;
+package com.bytedesk.service.message_unread;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/message_unread")
+@RequestMapping("/api/v1/message/unread")
 @AllArgsConstructor
 public class MessageUnreadController extends BaseRestController<MessageUnreadRequest> {
 

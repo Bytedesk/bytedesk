@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 12:02:29
+ * @LastEditTime: 2025-04-13 21:24:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,9 +40,9 @@ import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message_unread.MessageUnreadService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.message_unread.MessageUnreadService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
@@ -137,10 +137,11 @@ public class VisitorRestControllerAnonymous {
     }
 
     // 访客拉取未读消息
+    // TODO: 拉取visitor_message表，非消息主表
     @VisitorAnnotation(title = "visitor", action = "getMessageUnread", description = "get unread messages")
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
-        // TODO: 拉取visitor_message表，非消息主表
+        
         List<MessageResponse> messages = messageUnreadService.getMessages(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));

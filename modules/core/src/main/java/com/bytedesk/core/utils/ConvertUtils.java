@@ -27,7 +27,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message_unread.MessageUnreadEntity;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
 import com.bytedesk.core.rbac.role.RoleEntity;
@@ -39,6 +38,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.service.message_unread.MessageUnreadEntity;
 
 public class ConvertUtils {
 
