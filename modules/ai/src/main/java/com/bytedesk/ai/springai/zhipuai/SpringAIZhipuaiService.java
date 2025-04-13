@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 14:33:09
+ * @LastEditTime: 2025-04-13 17:38:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,9 +55,10 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             IMessageSendService messageSendService,
             UidUtils uidUtils,
             RobotRestService robotRestService,
-            ThreadRestService threadRestService, 
+            ThreadRestService threadRestService,
             MessagePersistCache messagePersistCache) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService, messagePersistCache);
+        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
+                messagePersistCache);
         this.bytedeskZhipuaiChatModel = bytedeskZhipuaiChatModel;
     }
 
@@ -113,14 +114,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(Prompt prompt, 
-            MessageProtobuf messageProtobuf, SseEmitter emitter) {
-
-        // 检查权限
-        // if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-        //     log.warn("User not authenticated for SSE stream");
-        //     return;
-        // }
+    public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter) {
 
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
@@ -132,7 +126,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                // log.info("Zhipuai API response metadata: {}, text {}", response.getMetadata(), textContent);
+                                // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(), textContent);
                                 // 判断textContent是否为null
                                 if (StringUtils.hasValue(textContent)) {
                                     messageProtobuf.setContent(textContent);
