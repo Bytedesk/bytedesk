@@ -22,16 +22,16 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 
 @Service
-public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessage, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
+public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessageEntity, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
 
     @Override
-    public Page<RobotMessage> queryByOrgEntity(RobotMessageRequest request) {
+    public Page<RobotMessageEntity> queryByOrgEntity(RobotMessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrgEntity'");
     }
 
     @Override
-    public RobotMessageExcel convertToExcel(RobotMessage entity) {
+    public RobotMessageExcel convertToExcel(RobotMessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToExcel'");
     }
@@ -49,7 +49,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     }
 
     @Override
-    public Optional<RobotMessage> findByUid(String uid) {
+    public Optional<RobotMessageEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -67,7 +67,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     }
 
     @Override
-    protected RobotMessage doSave(RobotMessage entity) {
+    protected RobotMessageEntity doSave(RobotMessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'doSave'");
     }
@@ -85,14 +85,14 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     }
 
     @Override
-    public RobotMessage handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            RobotMessage entity) {
+    public RobotMessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            RobotMessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public RobotMessageResponse convertToResponse(RobotMessage entity) {
+    public RobotMessageResponse convertToResponse(RobotMessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }

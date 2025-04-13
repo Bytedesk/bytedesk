@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 17:02:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:06:20
+ * @LastEditTime: 2025-04-14 07:22:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +41,20 @@ public class BlackService {
     
     // 检查黑名单
     public boolean isBlackList(MessageProtobuf messageProtobuf) {
-        String uid = messageProtobuf.getUser().getUid();
-        MessageExtra extraObject = JSON.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+        // String uid = messageProtobuf.getUser().getUid();
+        String userUid = messageProtobuf.getUser().getUid();
+        if (userUid == null) {
+            return false;
+        }
+        MessageExtra extraObject = MessageExtra.fromJson(messageProtobuf.getExtra());
+         //JSON.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
         if (extraObject != null) {
             String orgUid = extraObject.getOrgUid();
-            Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(uid, orgUid);
+            if (orgUid == null) {
+                return false;
+            }
+            // Check if the user is in the blacklist
+            Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(userUid, orgUid);
             if (blackOpt.isPresent()) {
                 BlackEntity black = blackOpt.get();
                 if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
