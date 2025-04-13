@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:34:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:36:47
+ * @LastEditTime: 2025-04-13 23:32:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/taboo_message")
+@RequestMapping("/api/v1/taboo/message")
 @AllArgsConstructor
 public class TabooMessageRestController extends BaseRestController<TabooMessageRequest> {
 

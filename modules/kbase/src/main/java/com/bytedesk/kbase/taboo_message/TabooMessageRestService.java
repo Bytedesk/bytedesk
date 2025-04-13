@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:37:01
+ * @LastEditTime: 2025-04-13 23:31:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,10 +25,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.category.CategoryRestService;
+// import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -43,7 +42,7 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
 
     private final UidUtils uidUtils;
 
-    private final CategoryRestService categoryRestService;
+    // private final CategoryRestService categoryRestService;
 
     private final AuthService authService;
 
@@ -83,10 +82,10 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
         TabooMessageEntity taboo_message = modelMapper.map(request, TabooMessageEntity.class);
         taboo_message.setUid(uidUtils.getUid());
         // categoryUid
-        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
-        if (categoryOptional.isPresent()) {
-            taboo_message.setCategoryUid(categoryOptional.get().getUid());
-        }
+        // Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+        // if (categoryOptional.isPresent()) {
+        //     taboo_message.setCategoryUid(categoryOptional.get().getUid());
+        // }
         // 
         TabooMessageEntity savedTabooMessage = save(taboo_message);
         if (savedTabooMessage == null) {
@@ -103,10 +102,10 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
             TabooMessageEntity taboo_message = optional.get();
             taboo_message.setContent(request.getContent());
             // categoryUid
-            Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
-            if (categoryOptional.isPresent()) {
-                taboo_message.setCategoryUid(categoryOptional.get().getUid());
-            }
+            // Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
+            // if (categoryOptional.isPresent()) {
+            //     taboo_message.setCategoryUid(categoryOptional.get().getUid());
+            // }
             // 
             TabooMessageEntity savedTabooMessage = save(taboo_message);
             if (savedTabooMessage == null) {
@@ -173,10 +172,11 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
     @Override
     public TabooMessageExcel convertToExcel(TabooMessageEntity response) {
         // categoryUid
-        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(response.getCategoryUid());
-        TabooMessageExcel taboo_messageExcel = modelMapper.map(response, TabooMessageExcel.class);
-        taboo_messageExcel.setCategory(categoryOptional.get().getName());
-        return taboo_messageExcel;
+        // Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(response.getCategoryUid());
+        // TabooMessageExcel taboo_messageExcel = modelMapper.map(response, TabooMessageExcel.class);
+        // taboo_messageExcel.setCategory(categoryOptional.get().getName());
+        // return taboo_messageExcel;
+        return null;
     }
 
     public TabooMessageEntity convertExcelToTabooMessage(TabooMessageExcel excel, String kbUid, String orgUid) {
