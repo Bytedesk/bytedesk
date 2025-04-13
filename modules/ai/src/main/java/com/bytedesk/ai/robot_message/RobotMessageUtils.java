@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 15:46:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:42:50
+ * @LastEditTime: 2025-04-13 18:18:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.uid.UidUtils;
@@ -30,23 +29,17 @@ import com.bytedesk.core.uid.UidUtils;
 public class RobotMessageUtils {
 
         public static MessageProtobuf createRobotMessage(ThreadEntity thread, ThreadProtobuf threadProtobuf,
-                        RobotProtobuf robot,
-                        MessageProtobuf messageProtobuf) {
+                        RobotProtobuf robot, MessageProtobuf messageProtobuf) {
                 MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
-                UserProtobuf user = UserProtobuf.builder()
-                                .nickname(robot.getNickname())
-                                .avatar(robot.getAvatar())
-                                .type(UserTypeEnum.ROBOT.name())
-                                .build();
-                user.setUid(robot.getUid());
+                UserProtobuf user = robot.toUserProtobuf();
                 String messageUid = UidUtils.getInstance().getUid();
                 MessageProtobuf message = MessageProtobuf.builder()
                                 .uid(messageUid)
                                 .status(MessageStatusEnum.SUCCESS)
                                 .thread(threadProtobuf)
                                 .user(user)
-                                .client(ClientEnum.ROBOT)
-                                .extra(JSONObject.toJSONString(extraObject))
+                                .client(ClientEnum.SYSTEM)
+                                .extra(extraObject.toJson())
                                 .createdAt(LocalDateTime.now())
                                 .build();
                 return message;
