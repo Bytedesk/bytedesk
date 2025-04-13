@@ -17,6 +17,7 @@ import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot_message.RobotMessage;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.enums.ClientEnum;
@@ -88,6 +89,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
             List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
             if (contentList.isEmpty()) {
                 // TODO: 记录未找到相关答案的问题到数据库
+                RobotMessage robotMessage = RobotMessage.builder()
+                        .uid(uidUtils.getUid())
+                        .content(query)
+                        .robot(robot.toJson())
+                        .build();
 
                 // 直接返回未找到相关问题答案
                 messageProtobuf.setType(MessageTypeEnum.TEXT);
