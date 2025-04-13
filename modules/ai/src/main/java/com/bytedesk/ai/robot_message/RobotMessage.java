@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 21:37:15
+ * @LastEditTime: 2025-04-13 23:15:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,10 +12,14 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot_message;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.AbstractMessageEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,8 +27,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 分表存储一对一客服消息
- * 同步message中客服消息，包括uid。用于查询一对一客服消息，减少message表压力
+ * 机器人：问答消息
  */
 @Entity
 @Data
@@ -37,5 +40,19 @@ public class RobotMessage extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
     
-    // 可以在这里添加 AgentMessage 特有的字段（如果有的话）
+    // 可以在这里添加特有的字段（如果有的话）
+
+    // 使用content作为question
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // private String question;
+
+    // answer
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String answer;
+
+    // 使用user作为提问者，robot回答者
+    @Builder.Default
+    @Column(name = "message_robot", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String robot = BytedeskConsts.EMPTY_JSON_STRING;
+    
 }
