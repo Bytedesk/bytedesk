@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_feedback;
+package com.bytedesk.service.message_correction;
 
 import java.util.Optional;
 
@@ -38,9 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackEntity, MessageFeedbackRequest, MessageFeedbackResponse> {
+public class MessageCorrectionRestService extends BaseRestService<MessageCorrectionEntity, MessageCorrectionRequest, MessageCorrectionResponse> {
 
-    private final MessageFeedbackRepository message_feedbackRepository;
+    private final MessageCorrectionRepository message_correctionRepository;
 
     private final ModelMapper modelMapper;
 
@@ -49,15 +49,15 @@ public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackE
     private final AuthService authService;
 
     @Override
-    public Page<MessageFeedbackResponse> queryByOrg(MessageFeedbackRequest request) {
+    public Page<MessageCorrectionResponse> queryByOrg(MessageCorrectionRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<MessageFeedbackEntity> spec = MessageFeedbackSpecification.search(request);
-        Page<MessageFeedbackEntity> page = message_feedbackRepository.findAll(spec, pageable);
+        Specification<MessageCorrectionEntity> spec = MessageCorrectionSpecification.search(request);
+        Page<MessageCorrectionEntity> page = message_correctionRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<MessageFeedbackResponse> queryByUser(MessageFeedbackRequest request) {
+    public Page<MessageCorrectionResponse> queryByUser(MessageCorrectionRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");
@@ -67,18 +67,18 @@ public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackE
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "message_feedback", key = "#uid", unless="#result==null")
+    @Cacheable(value = "message_correction", key = "#uid", unless="#result==null")
     @Override
-    public Optional<MessageFeedbackEntity> findByUid(String uid) {
-        return message_feedbackRepository.findByUid(uid);
+    public Optional<MessageCorrectionEntity> findByUid(String uid) {
+        return message_correctionRepository.findByUid(uid);
     }
 
     public Boolean existsByUid(String uid) {
-        return message_feedbackRepository.existsByUid(uid);
+        return message_correctionRepository.existsByUid(uid);
     }
 
     @Override
-    public MessageFeedbackResponse create(MessageFeedbackRequest request) {
+    public MessageCorrectionResponse create(MessageCorrectionRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -89,33 +89,33 @@ public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackE
             request.setUserUid(user.getUid());
         }
         // 
-        MessageFeedbackEntity entity = modelMapper.map(request, MessageFeedbackEntity.class);
+        MessageCorrectionEntity entity = modelMapper.map(request, MessageCorrectionEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        MessageFeedbackEntity savedEntity = save(entity);
+        MessageCorrectionEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create message_feedback failed");
+            throw new RuntimeException("Create message_correction failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Override
-    public MessageFeedbackResponse update(MessageFeedbackRequest request) {
-        Optional<MessageFeedbackEntity> optional = message_feedbackRepository.findByUid(request.getUid());
+    public MessageCorrectionResponse update(MessageCorrectionRequest request) {
+        Optional<MessageCorrectionEntity> optional = message_correctionRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            MessageFeedbackEntity entity = optional.get();
+            MessageCorrectionEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            MessageFeedbackEntity savedEntity = save(entity);
+            MessageCorrectionEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update message_feedback failed");
+                throw new RuntimeException("Update message_correction failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("MessageFeedback not found");
+            throw new RuntimeException("MessageCorrection not found");
         }
     }
 
@@ -131,7 +131,7 @@ public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackE
         backoff = @Backoff(delay = 1000, multiplier = 2)
     )
     @Override
-    public MessageFeedbackEntity save(MessageFeedbackEntity entity) {
+    public MessageCorrectionEntity save(MessageCorrectionEntity entity) {
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -140,20 +140,20 @@ public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackE
     }
 
     @Override
-    protected MessageFeedbackEntity doSave(MessageFeedbackEntity entity) {
-        log.info("Attempting to save message_feedback: {}", entity.getName());
-        return message_feedbackRepository.save(entity);
+    protected MessageCorrectionEntity doSave(MessageCorrectionEntity entity) {
+        log.info("Attempting to save message_correction: {}", entity.getName());
+        return message_correctionRepository.save(entity);
     }
 
     @Override
-    public MessageFeedbackEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, MessageFeedbackEntity entity) {
+    public MessageCorrectionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, MessageCorrectionEntity entity) {
         try {
-            Optional<MessageFeedbackEntity> latest = message_feedbackRepository.findByUid(entity.getUid());
+            Optional<MessageCorrectionEntity> latest = message_correctionRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                MessageFeedbackEntity latestEntity = latest.get();
+                MessageCorrectionEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return message_feedbackRepository.save(latestEntity);
+                return message_correctionRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
@@ -166,37 +166,37 @@ public class MessageFeedbackRestService extends BaseRestService<MessageFeedbackE
      * 重试失败后的回调方法
      */
     @Recover
-    public MessageFeedbackEntity recover(Exception e, MessageFeedbackEntity entity) {
-        log.error("Failed to save message_feedback after 3 attempts: {}", entity.getName(), e);
+    public MessageCorrectionEntity recover(Exception e, MessageCorrectionEntity entity) {
+        log.error("Failed to save message_correction after 3 attempts: {}", entity.getName(), e);
         // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save message_feedback after retries: " + e.getMessage());
+        throw new RuntimeException("Failed to save message_correction after retries: " + e.getMessage());
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<MessageFeedbackEntity> optional = message_feedbackRepository.findByUid(uid);
+        Optional<MessageCorrectionEntity> optional = message_correctionRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // message_feedbackRepository.delete(optional.get());
+            // message_correctionRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("MessageFeedback not found");
+            throw new RuntimeException("MessageCorrection not found");
         }
     }
 
     @Override
-    public void delete(MessageFeedbackRequest request) {
+    public void delete(MessageCorrectionRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public MessageFeedbackResponse convertToResponse(MessageFeedbackEntity entity) {
-        return modelMapper.map(entity, MessageFeedbackResponse.class);
+    public MessageCorrectionResponse convertToResponse(MessageCorrectionEntity entity) {
+        return modelMapper.map(entity, MessageCorrectionResponse.class);
     }
 
     @Override
-    public MessageFeedbackResponse queryByUid(MessageFeedbackRequest request) {
+    public MessageCorrectionResponse queryByUid(MessageCorrectionRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

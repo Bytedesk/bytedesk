@@ -11,26 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_feedback.event;
+package com.bytedesk.service.message_correction.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.service.message_feedback.MessageFeedbackEntity;
+import com.bytedesk.service.message_correction.MessageCorrectionEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class MessageFeedbackCreateEvent extends ApplicationEvent {
+public class MessageCorrectionCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private MessageFeedbackEntity message_feedback;
+    private MessageCorrectionEntity message_correction;
 
-    public MessageFeedbackCreateEvent(MessageFeedbackEntity message_feedback) {
-        super(message_feedback);
-        this.message_feedback = message_feedback;
+    public MessageCorrectionCreateEvent(MessageCorrectionEntity message_correction) {
+        super(message_correction);
+        this.message_correction = message_correction;
     }
 
 }

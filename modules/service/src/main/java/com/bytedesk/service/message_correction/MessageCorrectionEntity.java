@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_feedback;
+package com.bytedesk.service.message_correction;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -34,9 +34,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({MessageFeedbackEntityListener.class})
-@Table(name = "bytedesk_service_message_feedback")
-public class MessageFeedbackEntity extends BaseEntity {
+// @EntityListeners({MessageCorrectionEntityListener.class})
+@Table(name = "bytedesk_service_message_correction")
+public class MessageCorrectionEntity extends BaseEntity {
 
     private String name;
 
@@ -44,15 +44,15 @@ public class MessageFeedbackEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "message_feedback_type", nullable = false)
-    private String type = MessageFeedbackTypeEnum.CUSTOMER.name();
+    @Column(name = "message_correction_type", nullable = false)
+    private String type = MessageCorrectionTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "message_feedback_color", nullable = false)
+    @Column(name = "message_correction_color", nullable = false)
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "message_feedback_order", nullable = false)
+    @Column(name = "message_correction_order", nullable = false)
     private int order = 0;
 
     // @Builder.Default

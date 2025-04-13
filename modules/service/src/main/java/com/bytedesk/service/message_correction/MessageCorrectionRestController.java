@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_feedback;
+package com.bytedesk.service.message_correction;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -27,61 +27,61 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/message_feedback")
+@RequestMapping("/api/v1/message_correction")
 @AllArgsConstructor
-public class MessageFeedbackRestController extends BaseRestController<MessageFeedbackRequest> {
+public class MessageCorrectionRestController extends BaseRestController<MessageCorrectionRequest> {
 
-    private final MessageFeedbackRestService message_feedbackService;
+    private final MessageCorrectionRestService message_correctionService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(MessageFeedbackRequest request) {
+    public ResponseEntity<?> queryByOrg(MessageCorrectionRequest request) {
         
-        Page<MessageFeedbackResponse> message_feedbacks = message_feedbackService.queryByOrg(request);
+        Page<MessageCorrectionResponse> message_corrections = message_correctionService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(message_feedbacks));
+        return ResponseEntity.ok(JsonResult.success(message_corrections));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(MessageFeedbackRequest request) {
+    public ResponseEntity<?> queryByUser(MessageCorrectionRequest request) {
         
-        Page<MessageFeedbackResponse> message_feedbacks = message_feedbackService.queryByUser(request);
+        Page<MessageCorrectionResponse> message_corrections = message_correctionService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(message_feedbacks));
+        return ResponseEntity.ok(JsonResult.success(message_corrections));
     }
 
     @Override
-    public ResponseEntity<?> create(MessageFeedbackRequest request) {
+    public ResponseEntity<?> create(MessageCorrectionRequest request) {
         
-        MessageFeedbackResponse message_feedback = message_feedbackService.create(request);
+        MessageCorrectionResponse message_correction = message_correctionService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(message_feedback));
+        return ResponseEntity.ok(JsonResult.success(message_correction));
     }
 
     @Override
-    public ResponseEntity<?> update(MessageFeedbackRequest request) {
+    public ResponseEntity<?> update(MessageCorrectionRequest request) {
         
-        MessageFeedbackResponse message_feedback = message_feedbackService.update(request);
+        MessageCorrectionResponse message_correction = message_correctionService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(message_feedback));
+        return ResponseEntity.ok(JsonResult.success(message_correction));
     }
 
     @Override
-    public ResponseEntity<?> delete(MessageFeedbackRequest request) {
+    public ResponseEntity<?> delete(MessageCorrectionRequest request) {
         
-        message_feedbackService.delete(request);
+        message_correctionService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
-    public Object export(MessageFeedbackRequest request, HttpServletResponse response) {
+    public Object export(MessageCorrectionRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(MessageFeedbackRequest request) {
+    public ResponseEntity<?> queryByUid(MessageCorrectionRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

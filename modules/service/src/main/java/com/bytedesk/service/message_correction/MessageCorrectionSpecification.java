@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_feedback;
+package com.bytedesk.service.message_correction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MessageFeedbackSpecification extends BaseSpecification {
+public class MessageCorrectionSpecification extends BaseSpecification {
     
-    public static Specification<MessageFeedbackEntity> search(MessageFeedbackRequest request) {
+    public static Specification<MessageCorrectionEntity> search(MessageCorrectionRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
