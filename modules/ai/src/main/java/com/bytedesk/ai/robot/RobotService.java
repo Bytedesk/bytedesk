@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 21:14:09
+ * @LastEditTime: 2025-04-14 07:25:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -139,7 +139,8 @@ public class RobotService {
         //
         messageJson = messageService.processMessageJson(messageJson);
         //
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+        MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJson); 
+        //JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
         String query = messageProtobuf.getContent();
         log.info("processSseVisitorMessage robot processSseMessage {}", query);

@@ -15,7 +15,7 @@ package com.bytedesk.ai.robot_message.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.ai.robot_message.RobotMessage;
+import com.bytedesk.ai.robot_message.RobotMessageEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,9 +26,9 @@ public class RobotMessageUnanswered extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L; 
 
-    private final RobotMessage robotMessage;
+    private final RobotMessageEntity robotMessage;
 
-    public RobotMessageUnanswered(Object source, RobotMessage robotMessage) {
+    public RobotMessageUnanswered(Object source, RobotMessageEntity robotMessage) {
         super(source);
         this.robotMessage = robotMessage;
     }

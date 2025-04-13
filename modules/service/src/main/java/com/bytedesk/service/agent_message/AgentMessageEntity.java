@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 11:32:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 21:36:29
+ * @LastEditTime: 2025-04-14 07:14:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@ import lombok.experimental.SuperBuilder;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "bytedesk_service_agent_message")
-public class AgentMessage extends AbstractMessageEntity {
+public class AgentMessageEntity extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
     
