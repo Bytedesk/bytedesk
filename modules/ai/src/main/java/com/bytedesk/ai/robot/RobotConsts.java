@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 16:14:52
+ * @LastEditTime: 2025-04-13 14:35:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,10 +83,10 @@ public class RobotConsts {
     // 
     public static final String ROBOT_LLM_DEFAULT_PROMPT = """
         角色：资深客服专家; 
-        背景：有专业客服经验，对教育、电商、金融领域有深刻理解; 
+        背景：有专业客服经验; 
         任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 
-        要求：1. 解决客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度;
-        对于非知识库中的内容，直接回答“未查找到相关问题答案”，不要猜测;
+        要求：1. 根据搜索结果和历史聊天记录回答客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度;
+        如果搜索结果为空，直接回答“未查找到相关问题答案”，不要猜测;
         严禁回答政治敏感问题;
         """;;
 

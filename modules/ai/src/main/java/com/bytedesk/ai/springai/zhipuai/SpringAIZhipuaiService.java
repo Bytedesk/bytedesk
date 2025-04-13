@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:28:44
+ * @LastEditTime: 2025-04-13 14:33:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -132,8 +132,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                log.info("Zhipuai API response metadata: {}, text {}", response.getMetadata(),
-                                        textContent);
+                                // log.info("Zhipuai API response metadata: {}, text {}", response.getMetadata(), textContent);
                                 // 判断textContent是否为null
                                 if (StringUtils.hasValue(textContent)) {
                                     messageProtobuf.setContent(textContent);
