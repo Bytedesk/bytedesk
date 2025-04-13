@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 21:24:29
+ * @LastEditTime: 2025-04-13 23:27:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -162,6 +162,35 @@ public class VisitorRestControllerAnonymous {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
+    @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
+    @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
+        
+        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        
+        executorService.execute(() -> {
+            try {
+                robotService.processSseMemberMessage(message, emitter);
+            } catch (Exception e) {
+                log.error("Error processing SSE request", e);
+                emitter.completeWithError(e);
+            }
+        });
+        
+        // 添加超时和完成时的回调
+        emitter.onTimeout(() -> {
+            log.warn("sendSseMemberMessage SSE connection timed out");
+            emitter.complete();
+        });
+        
+        emitter.onCompletion(() -> {
+            log.info("sendSseMemberMessage SSE connection completed");
+        });
+        
+        return emitter;
+    }
+
     @BlackIpFilter(title = "black", action = "sendSseVisitorMessage")
     @BlackUserFilter(title = "black", action = "sendSseVisitorMessage")
     @TabooJsonFilter(title = "敏感词", action = "sendSseVisitorMessage")
@@ -188,35 +217,6 @@ public class VisitorRestControllerAnonymous {
         
         emitter.onCompletion(() -> {
             log.info("sendSseVisitorMessage SSE connection completed");
-        });
-        
-        return emitter;
-    }
-
-    @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
-    @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
-    @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
-        
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
-        
-        executorService.execute(() -> {
-            try {
-                robotService.processSseMemberMessage(message, emitter);
-            } catch (Exception e) {
-                log.error("Error processing SSE request", e);
-                emitter.completeWithError(e);
-            }
-        });
-        
-        // 添加超时和完成时的回调
-        emitter.onTimeout(() -> {
-            log.warn("sendSseMemberMessage SSE connection timed out");
-            emitter.complete();
-        });
-        
-        emitter.onCompletion(() -> {
-            log.info("sendSseMemberMessage SSE connection completed");
         });
         
         return emitter;

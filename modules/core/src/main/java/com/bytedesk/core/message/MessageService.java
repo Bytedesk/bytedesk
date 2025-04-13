@@ -50,20 +50,11 @@ public class MessageService {
             return null;
         }
 
-        // Filter sensitive words
-        // messageJson = filterTaboo(JSON.toJSONString(messageProtobuf));
-
         // Cache message for persistence
         messagePersistCache.pushForPersist(messageJson);
 
         return messageJson;
     }
 
-    // 过滤敏感词
-    // private String filterTaboo(String messageJson) {
-    //     // TODO: 过滤敏感词，将敏感词替换为*
-    //     // String filterJson = TabooUtil.replaceSensitiveWord(json, '*');
-    //     return messageJson;
-    // }
 
 }
