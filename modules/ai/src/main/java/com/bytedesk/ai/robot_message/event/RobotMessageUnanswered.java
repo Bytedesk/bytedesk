@@ -24,6 +24,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class RobotMessageUnanswered extends ApplicationEvent {
 
+    private final RobotMessage 
+
     public RobotMessageUnanswered(Object source, Clock clock) {
         super(source, clock);
         //TODO Auto-generated constructor stub
