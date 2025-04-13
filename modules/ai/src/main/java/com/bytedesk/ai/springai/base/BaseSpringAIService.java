@@ -70,24 +70,32 @@ public abstract class BaseSpringAIService implements SpringAIService {
         messages.add(new UserMessage(query));
         //
         Prompt aiPrompt = new Prompt(messages);
-        //
         processPrompt(aiPrompt, messageProtobuf);
     }
 
     @Override
     public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
-        // Assert.hasText(messageJson, "Message must not be empty");
+        Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+            if (contentList.isEmpty()) {
+                // TODO: 直接返回未找到相关问题答案
+                // messageProtobuf.setType(MessageTypeEnum.ERROR);
+                // messageProtobuf.setContent("未查找到相关问题答案");
+                // messageSendService.sendProtobufMessage(messageProtobuf);
+            }
             String context = String.join("\n", contentList);
+            // TODO: 历史聊天记录
+            // String history = "";
             prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
         } else {
             prompt = robot.getLlm().getPrompt();
         }
+        // TODO: 判断是否开启大模型
         //
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
@@ -95,7 +103,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
-        //
         processPromptSSE(aiPrompt, messageProtobuf, emitter);
     }
 
