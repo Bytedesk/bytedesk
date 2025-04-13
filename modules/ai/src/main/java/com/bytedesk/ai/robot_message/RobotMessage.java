@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 23:24:57
+ * @LastEditTime: 2025-04-14 07:08:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,9 +40,9 @@ public class RobotMessage extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // @Deprecated
-    // @Column(name = "thread_uid")
-    // private String threadUid;
+    @Deprecated
+    @Column(name = "thread_uid")
+    private String threadUid;
     
     // 可以在这里添加特有的字段（如果有的话）
 

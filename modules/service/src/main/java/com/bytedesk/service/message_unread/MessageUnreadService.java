@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 22:37:55
+ * @LastEditTime: 2025-04-14 07:06:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,36 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
     private final MessageUnreadRepository messageUnreadRepository;
 
     private final ModelMapper modelMapper;
+
+    @Override
+    public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+    }
+
+    @Override
+    public Page<MessageUnreadResponse> queryByUser(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    }
+
+    @Override
+    public Optional<MessageUnreadEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+    }
+
+    @Override
+    public MessageUnreadResponse create(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public MessageUnreadResponse update(MessageUnreadRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
 
     // 拉取的同时从数据库中删除，所以不需要缓存
     @Transactional
@@ -78,35 +108,7 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
         return messageUnreadRepository.countByUserUid(userUid);
     }
 
-    @Override
-    public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
-    }
-
-    @Override
-    public Page<MessageUnreadResponse> queryByUser(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public Optional<MessageUnreadEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
-    }
-
-    @Override
-    public MessageUnreadResponse create(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-    @Override
-    public MessageUnreadResponse update(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
+    
 
     @Override
     public MessageUnreadEntity save(MessageUnreadEntity entity) {
