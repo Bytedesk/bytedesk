@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-06 08:30:08
+ * @LastEditTime: 2025-04-13 21:16:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,17 +110,6 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
         }
     }
 
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     * recover: 当重试次数用完后的回调方法
-     */
-    @Retryable(
-        value = { Exception.class },
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
     @Override
     public KbaseInviteEntity save(KbaseInviteEntity entity) {
         try {
@@ -133,16 +122,6 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     @Override
     protected KbaseInviteEntity doSave(KbaseInviteEntity entity) {
         return tagRepository.save(entity);
-    }
-
-    /**
-     * 重试失败后的回调方法
-     */
-    @Recover
-    public KbaseInviteEntity recover(Exception e, KbaseInviteEntity entity) {
-        log.error("Failed to save tag after 3 attempts: {}", entity.getName(), e);
-        // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save tag after retries: " + e.getMessage());
     }
 
     @Override
