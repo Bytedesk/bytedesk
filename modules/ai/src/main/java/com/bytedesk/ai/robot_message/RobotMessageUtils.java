@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 15:46:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 18:18:31
+ * @LastEditTime: 2025-04-13 20:21:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@ package com.bytedesk.ai.robot_message;
 
 import java.time.LocalDateTime;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageExtra;
@@ -30,7 +29,7 @@ public class RobotMessageUtils {
 
         public static MessageProtobuf createRobotMessage(ThreadEntity thread, ThreadProtobuf threadProtobuf,
                         RobotProtobuf robot, MessageProtobuf messageProtobuf) {
-                MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+                MessageExtra extraObject = MessageExtra.fromJson(messageProtobuf.getExtra());
                 UserProtobuf user = robot.toUserProtobuf();
                 String messageUid = UidUtils.getInstance().getUid();
                 MessageProtobuf message = MessageProtobuf.builder()

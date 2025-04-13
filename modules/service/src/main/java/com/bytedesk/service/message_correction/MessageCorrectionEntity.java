@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:00:07
+ * @LastEditTime: 2025-04-13 20:25:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,14 +13,11 @@
  */
 package com.bytedesk.service.message_correction;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.I18Consts;
-import jakarta.persistence.Column;
+import com.bytedesk.core.message.AbstractMessageEntity;
+
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -32,34 +29,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
+// @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({MessageCorrectionEntityListener.class})
 @Table(name = "bytedesk_service_message_correction")
-public class MessageCorrectionEntity extends BaseEntity {
+public class MessageCorrectionEntity extends AbstractMessageEntity  {
 
-    private String name;
+    private static final long serialVersionUID = 1L;
 
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
-    @Builder.Default
-    @Column(name = "message_correction_type", nullable = false)
-    private String type = MessageCorrectionTypeEnum.CUSTOMER.name();
-
-    @Builder.Default
-    @Column(name = "message_correction_color", nullable = false)
-    private String color = "red";
-
-    @Builder.Default
-    @Column(name = "message_correction_order", nullable = false)
-    private int order = 0;
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
-
-    // private String userUid;
+    // 
 }
