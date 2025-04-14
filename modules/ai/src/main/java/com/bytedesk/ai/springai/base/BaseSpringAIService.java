@@ -193,7 +193,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         // 记录未找到相关答案的问题到另外一个表，便于梳理问题
         RobotMessageRequest robotMessage = RobotMessageRequest.builder()
-                .uid(messageProtobufQuery.getUid())
+                .uid(messageProtobufReply.getUid()) // 使用机器人回复消息作为uid
                 .type(messageProtobufQuery.getType().name())
                 .status(messageProtobufReply.getStatus().name())
                 // 
