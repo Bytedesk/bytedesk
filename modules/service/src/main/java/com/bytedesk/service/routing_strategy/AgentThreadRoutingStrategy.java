@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 10:55:44
+ * @LastEditTime: 2025-04-14 16:36:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
@@ -165,11 +166,12 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAgentAcceptTime(LocalDateTime.now());
         queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
+        // 
+        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        // 
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         // 
         return messageProtobuf;
     }
@@ -199,11 +201,12 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             log.error("Failed to save thread {}", thread.getUid());
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
+        // 
+        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        // 
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         // 
         return messageProtobuf;
     }
@@ -251,6 +254,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         // 
+        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
         applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         // 
         return messageProtobuf;
