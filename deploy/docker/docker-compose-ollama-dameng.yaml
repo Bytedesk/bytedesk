@@ -66,7 +66,7 @@ services:
       # ENTERPRISE, // 企业版-200人，付费，功能不限
       # ULTIMATE // 旗舰版-不限人数，付费，功能不限
       BYTEDESK_EDITION: enterprise
-      BYTEDESK_VERSION: 0.7.2
+      BYTEDESK_VERSION: 0.7.3
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: false
       # default null use default name
