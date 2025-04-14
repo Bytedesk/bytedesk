@@ -13,7 +13,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -110,8 +109,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 messageProtobufReply.setContent("未查找到相关问题答案");
                 messageProtobufReply.setClient(ClientEnum.SYSTEM);
                 // 保存消息到数据库
-                String messageJson = JSON.toJSONString(messageProtobufReply);
-                persistMessage(messageJson);
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+                String messageJson = messageProtobufReply.toJson();
                 try {
                     // 发送SSE事件
                     emitter.send(SseEmitter.event()
@@ -122,19 +121,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
                     emitter.completeWithError(e);
                 }
-                // 记录未找到相关答案的问题到另外一个表，便于梳理问题
-                RobotMessageEntity robotMessage = RobotMessageEntity.builder()
-                        .uid(messageProtobufQuery.getUid())
-                        .type(messageProtobufQuery.getType().name())
-                        .status(messageProtobufQuery.getStatus().name())
-                        .topic(messageProtobufQuery.getThread().getTopic())
-                        .threadUid(messageProtobufQuery.getThread().getUid())
-                        .content(query)
-                        .answer(messageProtobufReply.getContent())
-                        .user(messageProtobufQuery.getUser().toJson())
-                        .robot(robot.toJson())
-                        .build();
-                robotMessageRestService.save(robotMessage);
                 return;
             }
             String context = String.join("\n", contentList);
@@ -153,7 +139,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
-        processPromptSSE(aiPrompt, messageProtobufReply, emitter);
+        processPromptSSE(aiPrompt, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
     @Override
@@ -196,9 +182,34 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
+    // @Override
+    // public void persistMessage(String messageJson) {
+    // messagePersistCache.pushForPersist(messageJson);
+    // }
     @Override
-    public void persistMessage(String messageJson) {
-        messagePersistCache.pushForPersist(messageJson);
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
+        Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
+        messagePersistCache.pushForPersist(messageProtobufReply.toJson());
+        //
+        // 记录未找到相关答案的问题到另外一个表，便于梳理问题
+        RobotMessageEntity robotMessage = RobotMessageEntity.builder()
+                .uid(messageProtobufQuery.getUid())
+                .type(messageProtobufQuery.getType().name())
+                .status(messageProtobufQuery.getStatus().name())
+                // 
+                .topic(messageProtobufQuery.getThread().getTopic())
+                .threadUid(messageProtobufQuery.getThread().getUid())
+                // 
+                .content(messageProtobufQuery.getContent())
+                .answer(messageProtobufReply.getContent())
+                // 
+                .user(messageProtobufQuery.getUser().toJson())
+                .robot(messageProtobufReply.getUser().toJson())
+                // 
+                .build();
+        robotMessageRestService.save(robotMessage);
+
     }
 
     // private void sendSseTypingMessage(MessageProtobuf messageProtobuf, SseEmitter
@@ -231,7 +242,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected abstract String processPromptSync(String message);
 
-    protected abstract void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter);
+    protected abstract void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter);
 
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);

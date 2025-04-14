@@ -56,8 +56,8 @@ public interface SpringAIService {
      */
     void generateFaqPairsSync(String chunk);
 
-
-    void persistMessage(String messageJson);
+    // void persistMessage(String messageJson);
+    void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply);
 
 
     
