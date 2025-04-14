@@ -17,7 +17,7 @@ import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.robot_message.RobotMessageEntity;
+import com.bytedesk.ai.robot_message.RobotMessageRequest;
 import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
@@ -193,7 +193,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
         //
         // 记录未找到相关答案的问题到另外一个表，便于梳理问题
-        RobotMessageEntity robotMessage = RobotMessageEntity.builder()
+        RobotMessageRequest robotMessage = RobotMessageRequest.builder()
                 .uid(messageProtobufQuery.getUid())
                 .type(messageProtobufQuery.getType().name())
                 .status(messageProtobufQuery.getStatus().name())
@@ -208,7 +208,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 .robot(messageProtobufReply.getUser().toJson())
                 // 
                 .build();
-        robotMessageRestService.save(robotMessage);
+        robotMessageRestService.create(robotMessage);
 
     }
 
