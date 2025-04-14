@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 13:21:43
+ * @LastEditTime: 2025-04-14 14:55:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,10 +41,12 @@ public class MessageUnreadEventListener {
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
         MessageEntity message = event.getMessage();
-        if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
+        if (MessageTypeEnum.STREAM.name().equalsIgnoreCase(message.getType()) || 
+            MessageTypeEnum.NOTICE.name().equalsIgnoreCase(message.getType()) ||
+            MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
             return;
         }
-        if (ClientEnum.SYSTEM.name().equals(message.getClient())) {
+        if (ClientEnum.SYSTEM.name().equalsIgnoreCase(message.getClient())) {
             return;
         }
         log.info("message unread create event: {} {} {}", message.getUid(), message.getType(), message.getContent());
@@ -122,15 +124,18 @@ public class MessageUnreadEventListener {
             messageUnreadService.create(message, otherUid);
 
         }
+    
     }
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
         MessageEntity message = event.getMessage();
-        if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
+        if (MessageTypeEnum.STREAM.name().equalsIgnoreCase(message.getType()) || 
+            MessageTypeEnum.NOTICE.name().equalsIgnoreCase(message.getType()) || 
+            MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
             return;
         }
-        if (ClientEnum.SYSTEM.name().equals(message.getClient())) {
+        if (ClientEnum.SYSTEM.name().equalsIgnoreCase(message.getClient())) {
             return;
         }
         log.info("message unread update event: {} {} {}", message.getUid(), message.getType(), message.getContent());
@@ -191,6 +196,7 @@ public class MessageUnreadEventListener {
             messageUnreadService.delete(otherUid);
 
         }
+    
     }
 
     @EventListener
