@@ -37,25 +37,25 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     @Autowired(required = false)
     protected Optional<SpringAIVectorService> springAIVectorService;
-    
+
     @Autowired
     protected IMessageSendService messageSendService;
-    
+
     @Autowired
     protected UidUtils uidUtils;
-    
+
     @Autowired
     protected RobotRestService robotRestService;
-    
+
     @Autowired
     protected ThreadRestService threadRestService;
-    
+
     @Autowired
     protected MessagePersistCache messagePersistCache;
-    
+
     @Autowired
     protected RobotMessageRestService robotMessageRestService;
-    
+
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
@@ -95,8 +95,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, 
-        MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
@@ -122,16 +122,19 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
                     emitter.completeWithError(e);
                 }
-                 // 记录未找到相关答案的问题到数据库
-                 RobotMessageEntity robotMessage = RobotMessageEntity.builder()
-                 .uid(messageProtobufQuery.getUid())
-                 .type(messageProtobufQuery.getType().name())
-                 .content(query)
-                 .answer(messageProtobufReply.getContent())
-                 .user(messageProtobufQuery.getUser().toJson())
-                 .robot(robot.toJson())
-                 .build();
-                 robotMessageRestService.save(robotMessage);
+                // 记录未找到相关答案的问题到数据库
+                RobotMessageEntity robotMessage = RobotMessageEntity.builder()
+                        .uid(messageProtobufQuery.getUid())
+                        .type(messageProtobufQuery.getType().name())
+                        .status(messageProtobufQuery.getStatus().name())
+                        .topic(messageProtobufQuery.getThread().getTopic())
+                        .threadUid(messageProtobufQuery.getThread().getUid())
+                        .content(query)
+                        .answer(messageProtobufReply.getContent())
+                        .user(messageProtobufQuery.getUser().toJson())
+                        .robot(robot.toJson())
+                        .build();
+                robotMessageRestService.save(robotMessage);
                 return;
             }
             String context = String.join("\n", contentList);
