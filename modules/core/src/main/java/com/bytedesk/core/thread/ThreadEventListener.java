@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 14:59:35
+ * @LastEditTime: 2025-04-14 15:37:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,9 +92,9 @@ public class ThreadEventListener {
         ThreadEntity thread = event.getThread();
         UserEntity user = thread.getOwner();
         log.info("thread onThreadUpdateEvent: {}", thread.getUid());
-        if (thread.isClosed()) {
-            return;
-        }
+        // if (thread.isClosed()) {
+        //     return;
+        // }
 
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
         if (thread == null || user == null) {

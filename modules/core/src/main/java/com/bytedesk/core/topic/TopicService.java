@@ -45,10 +45,9 @@ public class TopicService {
 
     public void create(String topic, String uid) {
         TopicRequest request = TopicRequest.builder()
-                // .topic(topic)
+                .topic(topic)
                 .userUid(uid)
                 .build();
-        request.getTopics().add(topic);
         create(request);
     }
 
