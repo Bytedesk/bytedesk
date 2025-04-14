@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 08:06:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 18:55:36
+ * @LastEditTime: 2025-04-14 18:17:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,7 @@ public class NoticeExtraInvite extends BaseExtra {
     // 发起邀请客服
     private UserProtobuf sender;
 
-    // 转接状态：invite_pending/invite_accepted/invite_rejected/invite_timeout
+    // 转接状态：invite_pending/invite_accepted/invite_rejected/invite_timeout/invite_exit
     private String status;
 
     // 邀请消息uid，用于invite_accept/invite_reject
