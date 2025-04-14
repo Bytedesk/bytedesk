@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 12:03:57
+ * @LastEditTime: 2025-04-14 12:36:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,8 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.utils.MessageTypeConverter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -179,11 +181,11 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     @Override
     public RobotMessageExcel convertToExcel(RobotMessageEntity entity) {
         RobotMessageExcel excel = modelMapper.map(entity, RobotMessageExcel.class);
-        entity.setType(entity.getType());
-        entity.setContent(entity.getContent());
-        entity.setUser(entity.getUserProtobuf().getNickname());
-        entity.setRobot(entity.getRobotProtobuf().getNickname());
-        excel.setCreatedAt(entity.getCreatedAt().toString());
+        excel.setType(MessageTypeConverter.convertToChineseType(entity.getType()));
+        excel.setContent(entity.getContent());
+        excel.setUser(entity.getUserProtobuf().getNickname());
+        excel.setRobot(entity.getRobotProtobuf().getNickname());
+        excel.setCreatedAt(BdDateUtils.formatDatetimeToString(entity.getCreatedAt()));
         return excel;
     }
     
