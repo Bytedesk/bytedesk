@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:05:51
+ * @LastEditTime: 2025-04-14 10:20:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ import reactor.core.publisher.Flux;
 public class SpringAIZhipuaiService extends BaseSpringAIService {
 
     @Autowired
-    @Qualifier("bytedeskZhipuaiChatModel") 
+    @Qualifier("bytedeskZhipuaiChatModel")
     private ZhiPuAiChatModel bytedeskZhipuaiChatModel;
 
     public SpringAIZhipuaiService() {
@@ -99,7 +99,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
@@ -111,14 +112,15 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(), textContent);
+                                // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(),
+                                // textContent);
                                 // 判断textContent是否为null
                                 if (StringUtils.hasValue(textContent)) {
                                     messageProtobufReply.setContent(textContent);
                                     messageProtobufReply.setType(MessageTypeEnum.STREAM);
                                     // 保存消息到数据库
                                     persistMessage(messageProtobufQuery, messageProtobufReply);
-                                                String messageJson = messageProtobufReply.toJson();
+                                    String messageJson = messageProtobufReply.toJson();
                                     // 发送SSE事件
                                     emitter.send(SseEmitter.event()
                                             .data(messageJson)
