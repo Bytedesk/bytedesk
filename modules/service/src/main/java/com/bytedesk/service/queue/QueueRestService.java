@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:10:50
+ * @LastEditTime: 2025-04-14 09:30:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest, QueueResponse> {
+public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, QueueRequest, QueueResponse, QueueExcel> {
 
     private final QueueRepository queueRepository;
 
@@ -44,10 +44,15 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
     private final AuthService authService;
 
     @Override
-    public Page<QueueResponse> queryByOrg(QueueRequest request) {
+    public Page<QueueEntity> queryByOrgEntity(QueueRequest request) {
         Pageable pageable = request.getPageable();
         Specification<QueueEntity> specification = QueueSpecification.search(request);
-        Page<QueueEntity> page = queueRepository.findAll(specification, pageable);
+        return queueRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<QueueResponse> queryByOrg(QueueRequest request) {
+        Page<QueueEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -113,16 +118,6 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
     }
 
     @Override
-    public QueueEntity save(QueueEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
-    }
-
-    @Override
     protected QueueEntity doSave(QueueEntity entity) {
         return queueRepository.save(entity);
     }
@@ -171,6 +166,13 @@ public class QueueRestService extends BaseRestService<QueueEntity, QueueRequest,
 
     public QueueExcel convertToExcel(QueueResponse response) {
         return modelMapper.map(response, QueueExcel.class);
+    }
+
+    
+    @Override
+    public QueueExcel convertToExcel(QueueEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToExcel'");
     }
 
 }

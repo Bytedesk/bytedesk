@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 21:03:55
+ * @LastEditTime: 2025-04-14 09:32:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.retry.annotation.Recover;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -34,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagResponse> {
+public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagRequest, TagResponse, TagExcel> {
 
     private final TagRepository tagRepository;
 
@@ -45,10 +44,15 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     private final AuthService authService;
 
     @Override
-    public Page<TagResponse> queryByOrg(TagRequest request) {
+    public Page<TagEntity> queryByOrgEntity(TagRequest request) {
         Pageable pageable = request.getPageable();
         Specification<TagEntity> spec = TagSpecification.search(request);
-        Page<TagEntity> page = tagRepository.findAll(spec, pageable);
+        return tagRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<TagResponse> queryByOrg(TagRequest request) {
+        Page<TagEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -61,6 +65,12 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
         request.setUserUid(user.getUid());
         // 
         return queryByOrg(request);
+    }
+
+    @Override
+    public TagResponse queryByUid(TagRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
@@ -116,15 +126,6 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     }
 
     @Override
-    public TagEntity save(TagEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
     protected TagEntity doSave(TagEntity entity) {
         return tagRepository.save(entity);
     }
@@ -146,16 +147,6 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
-    }
-
-    /**
-     * 重试失败后的回调方法
-     */
-    @Recover
-    public TagEntity recover(Exception e, TagEntity entity) {
-        log.error("Failed to save tag after 3 attempts: {}", entity.getName(), e);
-        // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save tag after retries: " + e.getMessage());
     }
 
     @Override
@@ -182,9 +173,8 @@ public class TagRestService extends BaseRestService<TagEntity, TagRequest, TagRe
     }
 
     @Override
-    public TagResponse queryByUid(TagRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    public TagExcel convertToExcel(TagEntity entity) {
+        return modelMapper.map(entity, TagExcel.class);
     }
     
     

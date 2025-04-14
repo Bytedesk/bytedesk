@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 16:28:59
+ * @LastEditTime: 2025-04-14 09:39:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai.siliconflow;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 
@@ -55,8 +56,9 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
             UidUtils uidUtils,
             RobotRestService robotRestService,
             ThreadRestService threadRestService,
-            MessagePersistCache messagePersistCache) {
-        super(springAIVectorService,messageSendService,uidUtils,robotRestService,threadRestService,messagePersistCache);
+            MessagePersistCache messagePersistCache, 
+            RobotMessageRestService robotMessageRestService) {
+        super(springAIVectorService,messageSendService,uidUtils,robotRestService,threadRestService,messagePersistCache, robotMessageRestService);
         this.siliconFlowChatModel = siliconFlowChatModel;
     }
 
