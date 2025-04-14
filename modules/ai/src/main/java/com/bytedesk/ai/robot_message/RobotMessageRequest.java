@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:07:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:26:22
+ * @LastEditTime: 2025-04-14 11:33:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,10 @@ public class RobotMessageRequest extends BaseRequest {
     private String topic;
 
     private String threadUid;
+
+    private String userNickname;
+
+    private String robotNickname;
 
     private String status;
     

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 11:00:02
+ * @LastEditTime: 2025-04-14 11:53:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -36,16 +36,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageRestService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
+public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, MessageRequest, MessageResponse, MessageExcel> {
 
     private final MessageRepository messageRepository;
 
     private final AuthService authService;
 
-    public Page<MessageResponse> queryByOrg(MessageRequest request) {
+    @Override
+    public Page<MessageEntity> queryByOrgEntity(MessageRequest request) {
         Pageable pageable = request.getPageable();
         Specification<MessageEntity> specs = MessageSpecification.search(request);
-        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
+        return messageRepository.findAll(specs, pageable);
+    }
+
+    public Page<MessageResponse> queryByOrg(MessageRequest request) {
+        Page<MessageEntity> messagePage = queryByOrgEntity(request);
         return messagePage.map(this::convertToResponse);
     }
 
@@ -60,14 +65,12 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         return queryByOrg(request);
     }
 
-    // @Cacheable(value = "message", key = "#request.topic", unless = "#result ==
-    // null")
-    // public Page<MessageResponse> queryByTopic(MessageRequest request) {
-    // Pageable pageable = request.getPageable();
-    // Specification<MessageEntity> specs = MessageSpecification.search(request);
-    // Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-    // return messagePage.map(ConvertUtils::convertToMessageResponse);
-    // }
+    @Override
+    public MessageResponse queryByUid(MessageRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Optional<MessageEntity> findByUid(String uid) {
@@ -188,11 +191,15 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         }
         return null;
     }
-
+    
     @Override
-    public MessageResponse queryByUid(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    public MessageExcel convertToExcel(MessageEntity entity) {
+        MessageExcel messageExcel = new MessageExcel();
+        messageExcel.setType(entity.getType());
+        messageExcel.setContent(entity.getContent());
+        messageExcel.setSender(entity.getUser());
+        messageExcel.setCreatedAt(entity.getCreatedAt().toString());
+        return messageExcel;
     }
 
 }
