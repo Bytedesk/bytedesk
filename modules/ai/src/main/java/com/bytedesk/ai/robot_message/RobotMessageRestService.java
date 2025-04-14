@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 11:00:44
+ * @LastEditTime: 2025-04-14 12:03:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -178,7 +178,13 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
 
     @Override
     public RobotMessageExcel convertToExcel(RobotMessageEntity entity) {
-        return modelMapper.map(entity, RobotMessageExcel.class);
+        RobotMessageExcel excel = modelMapper.map(entity, RobotMessageExcel.class);
+        entity.setType(entity.getType());
+        entity.setContent(entity.getContent());
+        entity.setUser(entity.getUserProtobuf().getNickname());
+        entity.setRobot(entity.getRobotProtobuf().getNickname());
+        excel.setCreatedAt(entity.getCreatedAt().toString());
+        return excel;
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:25:59
+ * @LastEditTime: 2025-04-14 12:03:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.ai.robot_message;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message.AbstractMessageEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -73,5 +74,15 @@ public class RobotMessageEntity extends AbstractMessageEntity {
 
     @Builder.Default
     private int totalTokens = 0;
+
+    // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
+    public UserProtobuf getUserProtobuf() {
+        return UserProtobuf.fromJson(getUser());
+    }
+
+    // robotProtobuf
+    public UserProtobuf getRobotProtobuf() {
+        return UserProtobuf.fromJson(getRobot());
+    }
     
 }
