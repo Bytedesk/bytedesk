@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 08:34:14
+ * @LastEditTime: 2025-04-14 13:42:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,48 +97,46 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     // is transfer pending
-    public Boolean isTransferPending() {
-        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
-    }
+    // public Boolean isTransferPending() {
+    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
+    // }
 
-    // is transfer accepted
-    public Boolean isTransferAccepted() {
-        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
-    }
+    // public Boolean isTransferAccepted() {
+    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
+    // }
 
-    public Boolean isTransferRejected() {
-        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_REJECTED.name());
-    }
+    // public Boolean isTransferRejected() {
+    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_REJECTED.name());
+    // }
 
-    public Boolean isTransferTimeout() {
-        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_TIMEOUT.name());
-    }
+    // public Boolean isTransferTimeout() {
+    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_TIMEOUT.name());
+    // }
 
-    public Boolean isTransferCanceled() {
-        return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_CANCELED.name());
-    }
+    // public Boolean isTransferCanceled() {
+    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_CANCELED.name());
+    // }
 
     // is invite pending
-    public Boolean isInvitePending() {
-        return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_PENDING.name());
-    }
+    // public Boolean isInvitePending() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_PENDING.name());
+    // }
 
-    // is invite accepted
-    public Boolean isInviteAccepted() {
-        return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_ACCEPTED.name());
-    }
+    // public Boolean isInviteAccepted() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_ACCEPTED.name());
+    // }
 
-    public Boolean isInviteRejected() {
-        return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_REJECTED.name());
-    }
+    // public Boolean isInviteRejected() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_REJECTED.name());
+    // }
 
-    public Boolean isInviteTimeout() {
-        return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_TIMEOUT.name());
-    }
+    // public Boolean isInviteTimeout() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_TIMEOUT.name());
+    // }
 
-    public Boolean isInviteCanceled() {
-        return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
-    }
+    // public Boolean isInviteCanceled() {
+    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
+    // }
 
     public Boolean isCustomerService() {
         return getType().equals(ThreadTypeEnum.AGENT.name())

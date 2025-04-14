@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:59:14
+ * @LastEditTime: 2025-04-14 13:45:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,20 +75,20 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // TODO: 迁移到 queue member 表?
     // transfer status
-    @Builder.Default
-    @Column(name = "thread_transfer_status", nullable = false)
-    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
+    // @Builder.Default
+    // @Column(name = "thread_transfer_status", nullable = false)
+    // private String transferStatus = ThreadTransferStatusEnum.NONE.name();
 
-    // TODO: 可能同时邀请多个人
-    // invite status
-    @Builder.Default
-    @Column(name = "thread_invite_status", nullable = false)
-    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+    // // TODO: 可能同时邀请多个人
+    // // invite status
+    // @Builder.Default
+    // @Column(name = "thread_invite_status", nullable = false)
+    // private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    // resolved status
-    @Builder.Default
-    @Column(name = "thread_resolved_status", nullable = false)
-    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
+    // // resolved status
+    // @Builder.Default
+    // @Column(name = "thread_resolved_status", nullable = false)
+    // private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     // 
     @Builder.Default
