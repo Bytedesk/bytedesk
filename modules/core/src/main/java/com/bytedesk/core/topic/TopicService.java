@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 14:01:02
+ * @LastEditTime: 2025-04-14 17:41:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,10 +43,10 @@ public class TopicService {
 
     private final OptimisticLockingHandler optimisticLockingHandler;
 
-    public void create(String topic, String uid) {
+    public void create(String topic, String userUid) {
         TopicRequest request = TopicRequest.builder()
                 .topic(topic)
-                .userUid(uid)
+                .userUid(userUid)
                 .build();
         create(request);
     }
