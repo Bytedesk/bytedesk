@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 08:03:03
+ * @LastEditTime: 2025-04-14 22:07:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -173,6 +173,23 @@ public class QueueEntity extends BaseEntity {
 
                 int count3 = (int) workgroupQueueMembers.stream()
                                 .filter(member -> member.isRobotToAgent())
+                                .count();
+
+                return count1 + count2 + count3;
+        }
+
+        // getRobotingCount
+        public int getRobotingCount() {
+                int count1 = (int) agentQueueMembers.stream()
+                                .filter(member -> member.getThread() != null && member.getThread().isRoboting())
+                                .count();
+
+                int count2 = (int) robotQueueMembers.stream()
+                                .filter(member -> member.getThread() != null && member.getThread().isRoboting())
+                                .count();
+
+                int count3 = (int) workgroupQueueMembers.stream()
+                                .filter(member -> member.getThread() != null && member.getThread().isRoboting())
                                 .count();
 
                 return count1 + count2 + count3;

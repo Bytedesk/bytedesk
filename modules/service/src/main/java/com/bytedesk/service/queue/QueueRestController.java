@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:40:27
+ * @LastEditTime: 2025-04-14 22:06:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,13 +29,13 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/queue")
 public class QueueRestController extends BaseRestController <QueueRequest> {
 
-    private final QueueRestService queueService;
+    private final QueueRestService queueRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg (QueueRequest request) {
         
-        Page <QueueResponse> page = queueService.queryByOrg(request);
+        Page <QueueResponse> page = queueRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -43,7 +43,7 @@ public class QueueRestController extends BaseRestController <QueueRequest> {
     @Override
     public ResponseEntity<?> queryByUser (QueueRequest request) {
         
-        Page <QueueResponse> page = queueService.queryByUser(request);
+        Page <QueueResponse> page = queueRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -56,20 +56,24 @@ public class QueueRestController extends BaseRestController <QueueRequest> {
 
     @Override
     public ResponseEntity<?> create (QueueRequest request) {
+
+        QueueResponse queueResponse = queueRestService.create(request);
         
-        return ResponseEntity.ok(JsonResult.success(queueService.create(request)));
+        return ResponseEntity.ok(JsonResult.success(queueResponse));
     }
 
     @Override
     public ResponseEntity<?> update (QueueRequest request) {
+
+        QueueResponse queueResponse = queueRestService.update(request);
         
-        return ResponseEntity.ok(JsonResult.success(queueService.update(request)));
+        return ResponseEntity.ok(JsonResult.success(queueResponse));
     }
 
     @Override
     public ResponseEntity<?> delete (QueueRequest request) {
 
-        queueService.delete(request);
+        queueRestService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -79,7 +83,7 @@ public class QueueRestController extends BaseRestController <QueueRequest> {
         return exportTemplate(
             request,
             response,
-            queueService,
+            queueRestService,
             QueueExcel.class,
             "monitor",
             "queue"
