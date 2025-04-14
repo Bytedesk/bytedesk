@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:36:42
+ * @LastEditTime: 2025-04-14 10:17:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,7 +89,8 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     public RobotMessageResponse create(RobotMessageRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-            return convertToResponse(findByUid(request.getUid()).get());
+            // 已经存在，则更新
+            return update(request);
         }
         // 
         UserEntity user = authService.getUser();
@@ -115,6 +116,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
         if (optional.isPresent()) {
             RobotMessageEntity entity = optional.get();
             // modelMapper.map(request, entity);
+            entity.setContent(request.getContent());
             //
             RobotMessageEntity savedEntity = save(entity);
             if (savedEntity == null) {

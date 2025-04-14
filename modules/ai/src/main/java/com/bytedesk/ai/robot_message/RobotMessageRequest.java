@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:07:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 07:09:36
+ * @LastEditTime: 2025-04-14 10:14:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,4 +26,30 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class RobotMessageRequest extends BaseRequest {
     
+    private String topic;
+
+    private String threadUid;
+
+    private String status;
+    
+    // 可以在这里添加特有的字段（如果有的话）
+
+    // 使用content作为question
+    // 回答内容
+    private String answer;
+
+    // 使用user作为提问者
+    private String user;
+
+    // robot回答者
+    private String robot;
+
+    /**
+     * @{org.springframework.ai.chat.metadata.Usage}
+     */
+    private Integer promptTokens;
+
+    private Integer completionTokens;
+
+    private Integer totalTokens;
 }
