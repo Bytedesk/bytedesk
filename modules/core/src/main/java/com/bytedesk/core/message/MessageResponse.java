@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:51:05
+ * @LastEditTime: 2025-04-14 11:34:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,9 +53,6 @@ public class MessageResponse extends BaseResponse {
 
     private ThreadResponse thread;
 
-	// private String topic;
-
-    // private String threadUid;
     
 	private UserProtobuf user;
 
