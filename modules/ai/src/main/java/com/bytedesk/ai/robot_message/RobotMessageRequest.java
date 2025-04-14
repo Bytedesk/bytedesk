@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:07:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:22:17
+ * @LastEditTime: 2025-04-14 10:26:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,6 +45,9 @@ public class RobotMessageRequest extends BaseRequest {
 
     // robot回答者
     private String robot;
+
+    // 是否未搜索到到答案
+    private Boolean isUnAnswered;
 
     /**
      * @{org.springframework.ai.chat.metadata.Usage}
