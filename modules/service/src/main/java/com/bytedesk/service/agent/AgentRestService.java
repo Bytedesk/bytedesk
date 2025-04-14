@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:21:48
+ * @LastEditTime: 2025-04-14 16:53:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,8 +41,16 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.ThreadRequest;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadAcceptEvent;
+import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
@@ -84,7 +92,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final MqttConnectionService mqttConnectionService;
 
-    // private final ThreadRestService threadRestService;
+    private final ThreadRestService threadRestService;
 
     public Page<AgentResponse> queryByOrg(AgentRequest request) {
         Pageable pageable = request.getPageable();
@@ -269,6 +277,36 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         bytedeskEventPublisher.publishEvent(new AgentUpdateStatusEvent(this, updatedAgent));
 
         return convertToResponse(updatedAgent);
+    }
+
+
+     public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
+        UserEntity user = authService.getUser();
+        Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
+        if (!agentOptional.isPresent()) {
+            throw new RuntimeException("agent not found");
+        }
+        //
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
+        }
+        ThreadEntity thread = threadOptional.get();
+        AgentEntity agent = agentOptional.get();
+        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        thread.setAgent(agentProtobuf.toJson());
+        thread.setOwner(agent.getMember().getUser());
+        //
+        ThreadEntity updateThread = threadRestService.save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        // 通知queue更新，queue member更新, 增加agent接待数量
+        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, updateThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, updateThread));
+
+        return threadRestService.convertToResponse(updateThread);
     }
 
     public AgentResponse syncCurrentThreadCount(AgentRequest request) {

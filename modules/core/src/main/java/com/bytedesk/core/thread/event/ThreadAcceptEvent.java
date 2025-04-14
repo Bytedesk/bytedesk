@@ -26,8 +26,8 @@ public class ThreadAcceptEvent extends ApplicationEvent {
 
     private ThreadEntity thread;
 
-    public ThreadAcceptEvent(ThreadEntity thread) {
-        super(thread);
+    public ThreadAcceptEvent(Object source, ThreadEntity thread) {
+        super(source);
         this.thread = thread;
     }
 }

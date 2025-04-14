@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 15:56:44
+ * @LastEditTime: 2025-04-14 16:47:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -184,15 +184,6 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         threadService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete thread success"));
-    }
-
-    @ActionAnnotation(title = "会话", action = "accept", description = "accept thread")
-    @PostMapping("/accept")
-    public ResponseEntity<?> acceptByAgent (@RequestBody ThreadRequest request) {
-        
-        ThreadResponse threadResponse = threadService.acceptByAgent(request);
-
-        return ResponseEntity.ok(JsonResult.success(threadResponse));   
     }
 
     // https://github.com/alibaba/easyexcel
