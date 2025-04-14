@@ -122,7 +122,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
                     emitter.completeWithError(e);
                 }
-                // 记录未找到相关答案的问题到数据库
+                // 记录未找到相关答案的问题到另外一个表，便于梳理问题
                 RobotMessageEntity robotMessage = RobotMessageEntity.builder()
                         .uid(messageProtobufQuery.getUid())
                         .type(messageProtobufQuery.getType().name())
