@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:12:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 22:45:02
+ * @LastEditTime: 2025-04-14 15:40:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ public class TopicCacheService {
 
     // 假设我们使用"myList"作为缓存中的键
     private String topicRequestCacheKey = "topicRequestList";
+
+    // private String removeTopicCacheKey = "removeTopicList";
 
     private String clientIdCacheKey = "clientIdList";
 
