@@ -17,8 +17,8 @@ import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
-import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.enums.ClientEnum;
@@ -54,7 +54,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected MessagePersistCache messagePersistCache;
 
     @Autowired
-    protected RobotMessageRestService robotMessageRestService;
+    protected RobotMessageCache robotMessageCache;
 
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
@@ -210,7 +210,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 .orgUid(extraObject.getOrgUid())
                 // 
                 .build();
-        robotMessageRestService.create(robotMessage);
+        robotMessageCache.pushRequest(robotMessage);
 
     }
 
