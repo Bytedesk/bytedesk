@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 14:35:51
+ * @LastEditTime: 2025-04-14 10:27:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,6 +79,8 @@ public class RobotConsts {
     public static final String ROBOT_NAME_KEYWORD_EXTRACTION = "keyword_extraction"; // 关键词短语提取
     public static final String ROBOT_NAME_TEXT_CORRECTION = "text_correction"; // 文本纠错
     public static final String ROBOT_NAME_TEXT_CLASSIFICATION = "text_classification"; // 文本分类
+    // 
+    public static final String ROBOT_UNANSWERED = "未查找到相关问题答案";
 
     // 
     public static final String ROBOT_LLM_DEFAULT_PROMPT = """

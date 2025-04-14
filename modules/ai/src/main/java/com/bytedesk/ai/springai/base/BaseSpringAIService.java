@@ -23,6 +23,7 @@ import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -106,7 +107,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if (contentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
                 messageProtobufReply.setType(MessageTypeEnum.TEXT);
-                messageProtobufReply.setContent("未查找到相关问题答案");
+                messageProtobufReply.setContent(RobotConsts.ROBOT_UNANSWERED);
                 messageProtobufReply.setClient(ClientEnum.SYSTEM);
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply);
@@ -182,15 +183,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    // @Override
-    // public void persistMessage(String messageJson) {
-    // messagePersistCache.pushForPersist(messageJson);
-    // }
     @Override
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
+        // 
+        MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
         //
         // 记录未找到相关答案的问题到另外一个表，便于梳理问题
         RobotMessageRequest robotMessage = RobotMessageRequest.builder()
@@ -206,6 +205,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 // 
                 .user(messageProtobufQuery.getUser().toJson())
                 .robot(messageProtobufReply.getUser().toJson())
+                // 
+                .isUnAnswered(messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNANSWERED))
+                .orgUid(extraObject.getOrgUid())
                 // 
                 .build();
         robotMessageRestService.create(robotMessage);
