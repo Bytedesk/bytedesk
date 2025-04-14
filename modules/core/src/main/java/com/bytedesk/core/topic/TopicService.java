@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 22:47:30
+ * @LastEditTime: 2025-04-14 14:01:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,7 +48,6 @@ public class TopicService {
                 // .topic(topic)
                 .userUid(uid)
                 .build();
-        // topicRequest.setUserUid(uid);
         request.getTopics().add(topic);
         create(request);
     }
