@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-23 08:51:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 12:34:58
+ * @LastEditTime: 2025-04-14 16:39:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,8 +26,8 @@ public class ThreadCloseEvent extends ApplicationEvent {
 
     private ThreadEntity thread;
 
-    public ThreadCloseEvent(ThreadEntity thread) {
-        super(thread);
+    public ThreadCloseEvent(Object source, ThreadEntity thread) {
+        super(source);
         this.thread = thread;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:37:57
+ * @LastEditTime: 2025-04-14 16:41:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,13 +15,13 @@ package com.bytedesk.service.routing_strategy;
 
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -78,7 +78,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final WorkgroupRoutingService workgroupRoutingService;
 
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -184,7 +184,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         if (visitorRequest.getForceAgent()) {
             // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
-            applicationEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
+            bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
             queueMemberEntity.transferRobotToAgent();
             // 更新 queueMemberEntity
             queueMemberEntity = queueMemberRestService.save(queueMemberEntity);
@@ -231,8 +231,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.agentAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         //
-        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
@@ -266,7 +266,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread");
         }
         //
-        applicationEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
@@ -303,7 +303,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
-        applicationEventPublisher.publishEvent(new ThreadAgentOfflineEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAgentOfflineEvent(this, savedThread));
         //
         return messageProtobuf;
     }
@@ -362,7 +362,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.robotAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         //
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
         // 如果拉取的是访客的消息，会影响前端
         // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息

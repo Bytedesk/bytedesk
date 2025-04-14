@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 15:55:59
+ * @LastEditTime: 2025-04-14 16:53:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,6 @@ import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.tag.TagRequest;
 import com.bytedesk.core.tag.TagRestService;
 import com.bytedesk.core.tag.TagTypeEnum;
-import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -113,7 +112,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     public ThreadResponse create(ThreadRequest request) {
-
         UserEntity owner = authService.getUser();
         //
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);
@@ -498,28 +496,8 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
             throw new RuntimeException("thread save failed");
         }
         // 发布关闭事件
-        bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(updateThread));
+        bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
         //
-        return convertToResponse(updateThread);
-    }
-
-    public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
-        //
-        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
-        if (!threadOptional.isPresent()) {
-            throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
-        }
-        ThreadEntity thread = threadOptional.get();
-        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-        thread.setAgent(threadRequest.getAgent());
-        //
-        ThreadEntity updateThread = save(thread);
-        if (updateThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
-        // 通知queue更新，queue member更新, 增加agent接待数量
-        bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(updateThread));
-
         return convertToResponse(updateThread);
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:36:14
+ * @LastEditTime: 2025-04-14 16:41:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,11 +16,11 @@ package com.bytedesk.service.routing_strategy;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -70,7 +70,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final MessageRestService messageRestService;
 
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -167,8 +167,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         // 
-        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
@@ -202,8 +202,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
         // 
-        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
@@ -254,8 +254,8 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         // 
-        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         // 
         return messageProtobuf;
     }

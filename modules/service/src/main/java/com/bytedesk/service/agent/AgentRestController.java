@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 09:54:04
+ * @LastEditTime: 2025-04-14 16:47:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,8 @@ import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.thread.ThreadRequest;
+import com.bytedesk.core.thread.ThreadResponse;
 // import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -47,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/agent")
 public class AgentRestController extends BaseRestController<AgentRequest> {
 
-    private final AgentRestService agentService;
+    private final AgentRestService agentRestService;
 
     private final RobotService robotService;
 
@@ -57,7 +59,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
-        Page<AgentResponse> page = agentService.queryByOrg(request);
+        Page<AgentResponse> page = agentRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -66,7 +68,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
-        AgentResponse agentResponse = agentService.query(request);
+        AgentResponse agentResponse = agentRestService.query(request);
         
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
@@ -83,9 +85,18 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @GetMapping("/query/detail")
     public ResponseEntity<?> queryDetail(AgentRequest request) {
 
-        AgentResponse agent = agentService.queryDetail(request.getUid());
+        AgentResponse agent = agentRestService.queryDetail(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success(agent));
+    }
+
+    @ActionAnnotation(title = "会话", action = "accept", description = "accept thread")
+    @PostMapping("/accept")
+    public ResponseEntity<?> acceptByAgent (@RequestBody ThreadRequest request) {
+        
+        ThreadResponse threadResponse = agentRestService.acceptByAgent(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));   
     }
 
     // @PreAuthorize("hasAuthority('AGENT_READ')")
@@ -93,7 +104,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.syncCurrentThreadCount(request);
+        AgentResponse agent = agentRestService.syncCurrentThreadCount(request);
         if (agent != null) {
             return ResponseEntity.ok(JsonResult.success(agent));
         }
@@ -105,7 +116,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.create(request);
+        AgentResponse agent = agentRestService.create(request);
         if (agent == null) {
             return ResponseEntity.ok(JsonResult.error("create agent failed"));
         }
@@ -118,7 +129,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.update(request);
+        AgentResponse agent = agentRestService.update(request);
         //
         return ResponseEntity.ok(JsonResult.success(agent));
     }
@@ -129,7 +140,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.updateAvatar(request);
+        AgentResponse agent = agentRestService.updateAvatar(request);
 
         return ResponseEntity.ok(JsonResult.success(agent));
     }
@@ -139,7 +150,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.updateStatus(request);
+        AgentResponse agent = agentRestService.updateStatus(request);
         //
         return ResponseEntity.ok(JsonResult.success(agent));
     }
@@ -149,7 +160,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @PostMapping("/update/autoreply")
     public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentService.updateAutoReply(request);
+        AgentResponse agent = agentRestService.updateAutoReply(request);
         //
         return ResponseEntity.ok(JsonResult.success(agent));
     }
@@ -159,7 +170,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
 
-        agentService.deleteByUid(request.getUid());
+        agentRestService.deleteByUid(request.getUid());
         //
         return ResponseEntity.ok(JsonResult.success(request));
     }
