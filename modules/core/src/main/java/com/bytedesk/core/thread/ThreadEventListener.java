@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 15:52:06
+ * @LastEditTime: 2025-04-14 14:59:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,15 +17,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.event.MessageCreateEvent;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
-import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
 import com.bytedesk.core.topic.TopicCacheService;
@@ -75,20 +69,13 @@ public class ThreadEventListener {
                 || thread.getType().equals(ThreadTypeEnum.TICKET.name())) {
             // 防止首次消息延迟，立即订阅
             String topic = thread.getTopic();
-            // TopicRequest request = TopicRequest.builder()
-            //         .topic(thread.getTopic())
-            //         .userUid(user.getUid())
-            //         .build();
-            // topicService.create(request);
             // 订阅内部会话
             String topicInternal = TopicUtils.formatTopicInternal(topic);
             TopicRequest request = TopicRequest.builder()
-                    // .topic(topicInternal)
                     .userUid(user.getUid())
                     .build();
             request.getTopics().add(topic);
             request.getTopics().add(topicInternal);
-            // requestInternal.setUserUid(user.getUid());
             topicService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
@@ -96,7 +83,6 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // request.setUserUid(user.getUid());
             topicCacheService.pushRequest(request);
         }
     }
@@ -106,13 +92,7 @@ public class ThreadEventListener {
         ThreadEntity thread = event.getThread();
         UserEntity user = thread.getOwner();
         log.info("thread onThreadUpdateEvent: {}", thread.getUid());
-        if (thread.isClosed() 
-            // || thread.isTransferPending()
-            // || thread.isTransferAccepted() 
-            // || thread.isTransferRejected() 
-            // || thread.isTransferCanceled() 
-            // || thread.isTransferTimeout()
-            ) {
+        if (thread.isClosed()) {
             return;
         }
 
@@ -127,35 +107,31 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // request.setUserUid(user.getUid());
             topicService.create(request);
         } else if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 工作组会话，需要订阅topic
 
             // 判断状态，如果关闭，则取消订阅
-            if (thread.isClosed()) {
-                TopicRequest request = TopicRequest.builder()
-                        .topic(thread.getTopic())
-                        .userUid(user.getUid())
-                        .build();
-                // request.setUserUid(user.getUid());
-                topicService.remove(request);
-            } else {
-                // 重新订阅
-                TopicRequest request = TopicRequest.builder()
-                        .topic(thread.getTopic())
-                        .userUid(user.getUid())
-                        .build();
-                // request.setUserUid(user.getUid());
-                topicService.create(request);
-            }
+            // if (thread.isClosed()) {
+                // TopicRequest request = TopicRequest.builder()
+                    // .topic(thread.getTopic())
+                    // .userUid(user.getUid())
+                    // .build();
+                // topicService.remove(request);
+            // } else {
+            // 重新订阅
+            TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
+            topicService.create(request);
+            // }
         } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
             // 会员会话，需要订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // request.setUserUid(user.getUid());
             topicService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
@@ -163,60 +139,59 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // request.setUserUid(user.getUid());
             topicCacheService.pushRequest(request);
         }
     }
 
-    @EventListener
-    public void onThreadCloseEvent(ThreadCloseEvent event) {
-        ThreadEntity thread = event.getThread();
-        log.info("thread event listener onThreadCloseEvent: {}", thread.getAgent());
-        //
-        if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-            // TODO：工作组会话，会话关闭后，需要取消订阅topic
-            // if (thread.isClosed() && thread.getOwner() != null) {
-            //     // 取消订阅
-            //     TopicRequest request = TopicRequest.builder()
-            //             .topic(thread.getTopic())
-            //             .userUid(thread.getOwner().getUid())
-            //             .build();
-            //     topicService.remove(request);
-            // }
-        }
-    }
+    // @EventListener
+    // public void onThreadCloseEvent(ThreadCloseEvent event) {
+    // ThreadEntity thread = event.getThread();
+    // log.info("thread event listener onThreadCloseEvent: {}", thread.getAgent());
+    // //
+    // if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+    // TODO：工作组会话，会话关闭后，需要取消订阅topic
+    // if (thread.isClosed() && thread.getOwner() != null) {
+    // // 取消订阅
+    // TopicRequest request = TopicRequest.builder()
+    // .topic(thread.getTopic())
+    // .userUid(thread.getOwner().getUid())
+    // .build();
+    // topicService.remove(request);
+    // }
+    // }
+    // }
 
-    @EventListener
-    public void onMessageCreateEvent(MessageCreateEvent event) {
-        MessageEntity message = event.getMessage();
-        if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
-            return;
-        }
-        // Optional<Thread> threadOptional =
-        // threadService.findFirstByTopic(message.getThreadTopic());
-        // if (threadOptional.isPresent()) {
-        // Thread thread = threadOptional.get();
-        // thread.setHide(false);
-        // thread.setContent(message.getContent());
-        // // threadService.save(thread);
-        // threadPersistCache.pushForPersist(thread);
-        // }
-    }
+    // @EventListener
+    // public void onMessageCreateEvent(MessageCreateEvent event) {
+    // MessageEntity message = event.getMessage();
+    // if (message.getType().equalsIgnoreCase(MessageTypeEnum.STREAM.name())) {
+    // return;
+    // }
+    // Optional<Thread> threadOptional =
+    // threadService.findFirstByTopic(message.getThreadTopic());
+    // if (threadOptional.isPresent()) {
+    // Thread thread = threadOptional.get();
+    // thread.setHide(false);
+    // thread.setContent(message.getContent());
+    // // threadService.save(thread);
+    // threadPersistCache.pushForPersist(thread);
+    // }
+    // }
 
-    @EventListener
-    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
-        // if (threadList != null) {
-        // threadList.forEach(thread -> {
-        // threadService.save(thread);
-        // });
-        // }
-    }
+    // @EventListener
+    // public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+    // List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
+    // if (threadList != null) {
+    // threadList.forEach(thread -> {
+    // threadService.save(thread);
+    // });
+    // }
+    // }
 
-    @EventListener
-    public void onUserUpdateEvent(UserUpdateEvent event) {
-        // todo: on user avatar update, update thread entity user avatar
-        // update member thread avatar
-    }
+    // @EventListener
+    // public void onUserUpdateEvent(UserUpdateEvent event) {
+    // // todo: on user avatar update, update thread entity user avatar
+    // // update member thread avatar
+    // }
 
 }

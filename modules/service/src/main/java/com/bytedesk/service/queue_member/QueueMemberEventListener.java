@@ -103,6 +103,9 @@ public class QueueMemberEventListener {
         if (thread == null || message == null) {
             return;
         }
+        if (!message.isFromVisitor()) {
+            return;
+        }
         
         try {
             // 查找关联的队列成员记录
@@ -143,6 +146,9 @@ public class QueueMemberEventListener {
      */
     private void updateAgentMessageStats(MessageEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
+            return;
+        }
+        if (!message.isFromAgent()) {
             return;
         }
         
@@ -210,6 +216,9 @@ public class QueueMemberEventListener {
         if (thread == null || message == null) {
             return;
         }
+        if (!message.isFromRobot()) {
+            return;
+        }
         
         try {
             // 查找关联的队列成员记录
@@ -271,6 +280,9 @@ public class QueueMemberEventListener {
      */
     private void updateSystemMessageStats(MessageEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
+            return;
+        }
+        if (!message.isFromSystem()) {
             return;
         }
         
