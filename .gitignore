@@ -75,6 +75,7 @@ unified/
 agent_status/
 browse/
 # kanban/
+message_correction/
 message_parsed/
 message_feedback/
 # message_leave/

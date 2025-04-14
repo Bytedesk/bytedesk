@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:40:53
+ * @LastEditTime: 2025-04-14 13:21:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.service.message_unread;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -45,15 +44,14 @@ public class MessageUnreadEventListener {
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
             return;
         }
-        log.info("message unread create event: {} {} {}", message.getUid(), message.getType(), message.getContent());
-        // 
         if (ClientEnum.SYSTEM.name().equals(message.getClient())) {
             return;
         }
+        log.info("message unread create event: {} {} {}", message.getUid(), message.getType(), message.getContent());
         // 缓存未读消息
         String threadTopic = message.getThread().getTopic();
         String userString = message.getUser();
-        UserProtobuf user = JSONObject.parseObject(userString, UserProtobuf.class);
+        UserProtobuf user = UserProtobuf.fromJson(userString); //JSONObject.parseObject(userString, UserProtobuf.class);
         String userUid = user.getUid();
         //
         if (TopicUtils.isOrgAgentTopic(threadTopic)) {
@@ -129,15 +127,16 @@ public class MessageUnreadEventListener {
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
         MessageEntity message = event.getMessage();
-        // log.info("message unread update event: {}", message.getContent());
         if (message.getType().equals(MessageTypeEnum.STREAM.name())) {
+            return;
+        }
+        if (ClientEnum.SYSTEM.name().equals(message.getClient())) {
             return;
         }
         log.info("message unread update event: {} {} {}", message.getUid(), message.getType(), message.getContent());
         //
         String threadTopic = message.getThread().getTopic();
         MessageStatusEnum messageState = MessageStatusEnum.fromValue(message.getStatus());
-        //
         if (messageState.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {
             return;
         }
@@ -193,11 +192,6 @@ public class MessageUnreadEventListener {
 
         }
     }
-
-    // @EventListener
-    // public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
-    //     // log.info("message quartz five second event: " + event);
-    // }
 
     @EventListener
     public void onMqttConnectEvent(MqttConnectedEvent event) {
