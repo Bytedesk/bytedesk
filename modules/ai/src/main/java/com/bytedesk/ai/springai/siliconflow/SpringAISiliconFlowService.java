@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:07:37
+ * @LastEditTime: 2025-04-14 22:02:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ai.springai.siliconflow;
 
-import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -26,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -108,7 +108,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                                             String textContent = assistantMessage.getText();
                                             log.info("siliconFlow API response metadata: {}, text {}",
                                                     response.getMetadata(), textContent);
-                                            if (StringUtils.hasValue(textContent)) {
+                                            // StringUtils.hasLength() 检查字符串非 null 且长度大于 0，允许包含空格
+                                            if (StringUtils.hasLength(textContent)) {
                                                 messageProtobufReply.setContent(textContent);
                                                 messageProtobufReply.setType(MessageTypeEnum.STREAM);
                                                 // 保存消息到数据库
