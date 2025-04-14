@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 11:53:54
+ * @LastEditTime: 2025-04-14 11:57:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -197,7 +197,7 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         MessageExcel messageExcel = new MessageExcel();
         messageExcel.setType(entity.getType());
         messageExcel.setContent(entity.getContent());
-        messageExcel.setSender(entity.getUser());
+        messageExcel.setSender(entity.getUserProtobuf().getNickname());
         messageExcel.setCreatedAt(entity.getCreatedAt().toString());
         return messageExcel;
     }
