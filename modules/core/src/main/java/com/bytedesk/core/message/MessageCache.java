@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 10:01:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-13 16:09:26
+ * @LastEditTime: 2025-04-14 18:43:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,36 +13,36 @@
  */
 package com.bytedesk.core.message;
 
-import java.util.concurrent.TimeUnit;
+// import java.util.concurrent.TimeUnit;
 
-import org.springframework.stereotype.Component;
+// import org.springframework.stereotype.Component;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+// import com.github.benmanes.caffeine.cache.Cache;
+// import com.github.benmanes.caffeine.cache.Caffeine;
 
-import jakarta.annotation.PostConstruct;
+// import jakarta.annotation.PostConstruct;
 
-@Component
-public class MessageCache {
+// @Component
+// public class MessageCache {
 
-     // 创建一个caffeineCache实例
-    private Cache<String, MessageProtobuf> messageCache;
+//      // 创建一个caffeineCache实例
+//     private Cache<String, MessageProtobuf> messageCache;
 
-    @PostConstruct
-    public void init() {
-        // 初始化caffeineCache，设置缓存的最大大小、过期时间等参数
-        messageCache = Caffeine.newBuilder()
-                .maximumSize(10000) // 设置缓存的最大条目数
-                .expireAfterWrite(10, TimeUnit.MINUTES) // 设置缓存条目的过期时间
-                .build();
-    }
+//     @PostConstruct
+//     public void init() {
+//         // 初始化caffeineCache，设置缓存的最大大小、过期时间等参数
+//         messageCache = Caffeine.newBuilder()
+//                 .maximumSize(10000) // 设置缓存的最大条目数
+//                 .expireAfterWrite(10, TimeUnit.MINUTES) // 设置缓存条目的过期时间
+//                 .build();
+//     }
 
-    public void put(String key, MessageProtobuf message) {
-        messageCache.put(key, message);
-    }
+//     public void put(String key, MessageProtobuf message) {
+//         messageCache.put(key, message);
+//     }
 
-    public MessageProtobuf get(String key) {
-        return messageCache.getIfPresent(key);
-    }
+//     public MessageProtobuf get(String key) {
+//         return messageCache.getIfPresent(key);
+//     }
     
-}
+// }
