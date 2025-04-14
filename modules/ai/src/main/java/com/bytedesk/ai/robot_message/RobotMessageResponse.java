@@ -18,20 +18,20 @@ import com.bytedesk.core.base.BaseResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @AllArgsConstructor
+@NoArgsConstructor
 public class RobotMessageResponse extends BaseResponse {
     
     private String topic;
 
     private String threadUid;
     
-    // 可以在这里添加特有的字段（如果有的话）
-
     // 使用content作为question
     // answer
     private String answer;
