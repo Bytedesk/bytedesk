@@ -108,8 +108,8 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // topicService.create(request);
-            topicCacheService.pushRequest(request);
+            topicService.create(request);
+            // topicCacheService.pushRequest(request);
         } else if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 工作组会话，需要订阅topic
 
@@ -126,8 +126,8 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // topicService.create(request);
-            topicCacheService.pushRequest(request);
+            topicService.create(request);
+            // topicCacheService.pushRequest(request);
             // }
         } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
             // 会员会话，需要订阅topic
@@ -135,8 +135,8 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            // topicService.create(request);
-            topicCacheService.pushRequest(request);
+            topicService.create(request);
+            // topicCacheService.pushRequest(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
@@ -147,14 +147,12 @@ public class ThreadEventListener {
         }
     }
 
-
     @EventListener
     public void onThreadRemoveTopicEvent(ThreadRemoveTopicEvent event) {
         ThreadEntity thread = event.getThread();
         // UserEntity user = thread.getOwner();
         log.info("thread ThreadRemoveTopicEvent: {}", thread.getUid());
     }
-
 
     // @EventListener
     // public void onThreadCloseEvent(ThreadCloseEvent event) {

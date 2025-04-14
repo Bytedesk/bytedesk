@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 23:47:30
+ * @LastEditTime: 2025-04-14 16:37:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
 import com.bytedesk.core.thread.event.ThreadAgentQueueEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
@@ -217,7 +218,8 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setChatting().setContent(content).setUnreadCount(1).setOwner(agent.getMember().getUser());
+        thread.setChatting().setContent(content).setUnreadCount(1)
+            .setOwner(agent.getMember().getUser());
         //
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
@@ -229,10 +231,11 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.agentAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         //
+        applicationEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        //
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
         return messageProtobuf;
     }
@@ -263,10 +266,10 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread");
         }
         //
+        applicationEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
+        //
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        //
-        applicationEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
         //
         return messageProtobuf;
     }
