@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:34:18
+ * @LastEditTime: 2025-04-14 15:55:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -394,6 +394,26 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
         //
         ThreadEntity thread = threadOptional.get();
         thread.setTagList(threadRequest.getTagList());
+        //
+        ThreadEntity updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return convertToResponse(updateThread);
+    }
+
+    public ThreadResponse updateUnreadCount(ThreadRequest threadRequest) {
+        if (!StringUtils.hasText(threadRequest.getUid())) {
+            throw new RuntimeException("thread uid is required");
+        }
+        //
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+        }
+        //
+        ThreadEntity thread = threadOptional.get();
+        thread.setUnreadCount(threadRequest.getUnreadCount());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
