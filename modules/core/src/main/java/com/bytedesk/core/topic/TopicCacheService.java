@@ -52,6 +52,15 @@ public class TopicCacheService {
             });
     }
 
+    
+    public void push(String topic, String userUid) {
+        TopicRequest request = TopicRequest.builder()
+                .topic(topic)
+                .userUid(userUid)
+                .build();
+        pushRequest(request);
+    }
+
     public void pushRequest(TopicRequest request) {
         // push(JSON.toJSONString(request));
         push(topicRequestCacheKey, request.toJson());
