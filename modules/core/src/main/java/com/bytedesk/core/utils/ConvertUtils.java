@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:51:45
+ * @LastEditTime: 2025-04-14 10:54:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -166,7 +166,8 @@ public class ConvertUtils {
         MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
         // 
         if (message.getUser() != null) {
-            UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
+            // UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
+            UserProtobuf user = UserProtobuf.fromJson(message.getUser());
             if (user.getExtra() == null) {
                 user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
             }
@@ -174,7 +175,8 @@ public class ConvertUtils {
         }
         // extra
         if (message.getExtra() != null) {
-            MessageExtra extra = JSON.parseObject(message.getExtra(), MessageExtra.class);
+            // MessageExtra extra = JSON.parseObject(message.getExtra(), MessageExtra.class);
+            MessageExtra extra = MessageExtra.fromJson(message.getExtra());
             if (extra.getFeedback() == null) {
                 extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
             }

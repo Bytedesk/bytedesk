@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:17:47
+ * @LastEditTime: 2025-04-14 11:00:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -172,7 +173,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
 
     @Override
     public RobotMessageResponse convertToResponse(RobotMessageEntity entity) {
-        return modelMapper.map(entity, RobotMessageResponse.class);
+        return ConvertAiUtils.convertToRobotMessageResponse(entity);
     }
 
     @Override

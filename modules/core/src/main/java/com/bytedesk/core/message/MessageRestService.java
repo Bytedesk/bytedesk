@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:20:10
+ * @LastEditTime: 2025-04-14 11:00:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.core.message;
 import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +31,9 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Service
 @AllArgsConstructor
 public class MessageRestService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
@@ -56,16 +56,17 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
             throw new RuntimeException("User not found");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         return queryByOrg(request);
     }
 
-    // @Cacheable(value = "message", key = "#request.topic", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#request.topic", unless = "#result ==
+    // null")
     // public Page<MessageResponse> queryByTopic(MessageRequest request) {
-    //     Pageable pageable = request.getPageable();
-    //     Specification<MessageEntity> specs = MessageSpecification.search(request);
-    //     Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-    //     return messagePage.map(ConvertUtils::convertToMessageResponse);
+    // Pageable pageable = request.getPageable();
+    // Specification<MessageEntity> specs = MessageSpecification.search(request);
+    // Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
+    // return messagePage.map(ConvertUtils::convertToMessageResponse);
     // }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
@@ -79,8 +80,10 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     }
 
     @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")
-    public Optional<MessageEntity> findByThreadUidAndTypeAndUserContains(String threadUid, String type, String userUid) {
-        return messageRepository.findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(threadUid, type, userUid);
+    public Optional<MessageEntity> findByThreadUidAndTypeAndUserContains(String threadUid, String type,
+            String userUid) {
+        return messageRepository.findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(threadUid, type,
+                userUid);
     }
 
     // rate message extra helpful
@@ -92,12 +95,12 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
             MessageExtra messageExtra = JSON.parseObject(message.getExtra(), MessageExtra.class);
             messageExtra.setHelpful(MessageHelpfulEnum.HELPFUL.name());
             message.setExtra(JSON.toJSONString(messageExtra));
-            // 
+            //
             MessageEntity savedMessage = save(message);
             if (savedMessage == null) {
                 throw new RuntimeException("Message not saved");
             }
-            // 
+            //
             return ConvertUtils.convertToMessageResponse(message);
         }
         return null;
@@ -112,7 +115,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
             MessageExtra messageExtra = JSON.parseObject(message.getExtra(), MessageExtra.class);
             messageExtra.setHelpful(MessageHelpfulEnum.UNHELPFUL.name());
             message.setExtra(JSON.toJSONString(messageExtra));
-            // 
+            //
             MessageEntity savedMessage = save(message);
             if (savedMessage == null) {
                 throw new RuntimeException("Message not saved");
@@ -133,19 +136,6 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     public MessageResponse update(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Caching(put = {
-            @CachePut(value = "message", key = "#message.uid"),
-    })
-    @Override
-    public MessageEntity save(@NonNull MessageEntity message) {
-        try {
-            return doSave(message);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, message);
-        }
-        return null;
     }
 
     @Override
@@ -183,9 +173,20 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
 
     @Override
     public MessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            MessageEntity message) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+            MessageEntity entity) {
+        try {
+            Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                MessageEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                // 这里可以根据业务需求合并实体
+                return messageRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
