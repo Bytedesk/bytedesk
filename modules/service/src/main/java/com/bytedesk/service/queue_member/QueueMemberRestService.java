@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:49:44
+ * @LastEditTime: 2025-04-14 13:18:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,12 +76,6 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         return queueMemberRepository.findByThreadUid(threadUid);
     }
 
-    @Override
-    public QueueMemberEntity save(QueueMemberEntity entity) {
-        // 调用基类的方法，不再需要自己实现重试逻辑
-        return super.save(entity);
-    }
-    
     @Override
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);
