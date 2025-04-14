@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 07:06:51
+ * @LastEditTime: 2025-04-14 10:59:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,9 @@ import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
@@ -87,9 +89,6 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
     // @Caching(evict = { @CacheEvict(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void delete(String userUid) {
-        // org.springframework.orm.ObjectOptimisticLockingFailureException: Row was
-        // updated or deleted by another transaction (or unsaved-value mapping was
-        // incorrect) : [com.bytedesk.core.message_unread.MessageUnread#102]
         try {
             messageUnreadRepository.deleteByUserUid(userUid);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -108,17 +107,6 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
         return messageUnreadRepository.countByUserUid(userUid);
     }
 
-    
-
-    @Override
-    public MessageUnreadEntity save(MessageUnreadEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
     @Override
     protected MessageUnreadEntity doSave(MessageUnreadEntity entity) {
         return messageUnreadRepository.save(entity);
@@ -127,13 +115,19 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
     @Override
     public MessageUnreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             MessageUnreadEntity entity) {
-        try {
-            // 由于 MessageUnread 没有 uid 直接查询，可能需要其他字段组合查询
-            // 这里简化处理，直接尝试重新保存
-            return messageUnreadRepository.save(entity);
-        } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
+                try {
+                    Optional<MessageUnreadEntity> latest = messageUnreadRepository.findByUid(entity.getUid());
+                    if (latest.isPresent()) {
+                        MessageUnreadEntity latestEntity = latest.get();
+                        // 合并需要保留的数据
+                        // 这里可以根据业务需求合并实体
+                        return messageUnreadRepository.save(latestEntity);
+                    }
+                } catch (Exception ex) {
+                    log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
+                    throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+                }
+                return null;
     }
 
     @Override
