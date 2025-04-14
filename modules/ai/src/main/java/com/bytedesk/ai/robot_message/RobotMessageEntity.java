@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 07:14:08
+ * @LastEditTime: 2025-04-14 09:47:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,9 @@ import lombok.experimental.SuperBuilder;
 public class RobotMessageEntity extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
+
+    @Column(name = "thread_topic")
+    private String topic;
 
     @Deprecated
     @Column(name = "thread_uid")

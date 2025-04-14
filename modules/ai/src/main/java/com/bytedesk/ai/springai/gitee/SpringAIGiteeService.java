@@ -20,22 +20,16 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
-import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
-import com.bytedesk.ai.springai.spring.SpringAIVectorService;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,19 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.gitee.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGiteeService extends BaseSpringAIService {
 
-    private final Optional<OpenAiChatModel> giteeChatModel;
+    @Autowired(required = false)
+    private Optional<OpenAiChatModel> giteeChatModel;
 
-    public SpringAIGiteeService(
-            Optional<OpenAiChatModel> giteeChatModel,
-            Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService,
-            UidUtils uidUtils,
-            RobotRestService robotRestService,
-            ThreadRestService threadRestService,
-            MessagePersistCache messagePersistCache, RobotMessageRestService robotMessageRestService) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
-                messagePersistCache, robotMessageRestService);
-        this.giteeChatModel = giteeChatModel;
+    public SpringAIGiteeService() {
+        super(); // 调用基类的无参构造函数
     }
 
     @Override
