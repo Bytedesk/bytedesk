@@ -195,7 +195,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         RobotMessageRequest robotMessage = RobotMessageRequest.builder()
                 .uid(messageProtobufQuery.getUid())
                 .type(messageProtobufQuery.getType().name())
-                .status(messageProtobufQuery.getStatus().name())
+                .status(messageProtobufReply.getStatus().name())
                 // 
                 .topic(messageProtobufQuery.getThread().getTopic())
                 .threadUid(messageProtobufQuery.getThread().getUid())
