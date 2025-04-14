@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 10:50:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 12:48:47
+ * @LastEditTime: 2025-04-14 18:11:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,10 @@ public class I18ServiceConsts {
     public static final String I18N_INVITE_CANCEL_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.cancel.notice.title";
     // invite cancel notice content
     public static final String I18N_INVITE_CANCEL_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.cancel.notice.content";
+    // invite exit notice title
+    public static final String I18N_INVITE_EXIT_NOTICE_TITLE = I18Consts.I18N_PREFIX + "invite.exit.notice.title";
+    // invite exit notice content
+    public static final String I18N_INVITE_EXIT_NOTICE_CONTENT = I18Consts.I18N_PREFIX + "invite.exit.notice.content";
     // exception is already in invite pending state
     public static final String I18N_ALREADY_IN_INVITE_PENDING_STATE = I18Consts.I18N_PREFIX + "already.in.invite.pending.state";
     // exception is already in invite accepted state
