@@ -14,31 +14,23 @@
 package com.bytedesk.ai.springai.zhipuai;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-// import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
-import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
-import com.bytedesk.ai.springai.spring.SpringAIVectorService;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -48,19 +40,12 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
 public class SpringAIZhipuaiService extends BaseSpringAIService {
 
-    private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
+    @Autowired
+    @Qualifier("bytedeskZhipuaiChatModel") 
+    private ZhiPuAiChatModel bytedeskZhipuaiChatModel;
 
-    public SpringAIZhipuaiService(
-            @Qualifier("bytedeskZhipuaiChatModel") ZhiPuAiChatModel bytedeskZhipuaiChatModel,
-            Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService,
-            UidUtils uidUtils,
-            RobotRestService robotRestService,
-            ThreadRestService threadRestService,
-            MessagePersistCache messagePersistCache, RobotMessageRestService robotMessageRestService) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
-                messagePersistCache, robotMessageRestService);
-        this.bytedeskZhipuaiChatModel = bytedeskZhipuaiChatModel;
+    public SpringAIZhipuaiService() {
+        super(); // 调用基类的无参构造函数
     }
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:38:36
+ * @LastEditTime: 2025-04-14 09:45:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,8 +12,6 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.springai.dashscope;
-
-import java.util.Optional;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -25,17 +23,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
-import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
-import com.bytedesk.ai.springai.spring.SpringAIVectorService;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.uid.UidUtils;
-
 import lombok.extern.slf4j.Slf4j;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;

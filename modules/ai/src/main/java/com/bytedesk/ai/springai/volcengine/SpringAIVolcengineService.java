@@ -20,22 +20,16 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
-import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
-import com.bytedesk.ai.springai.spring.SpringAIVectorService;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.uid.UidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,178 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.volcengine.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIVolcengineService extends BaseSpringAIService {
 
-    private final Optional<OpenAiChatModel> volcengineChatModel;
+    @Autowired(required = false)
+    private Optional<OpenAiChatModel> volcengineChatModel;
 
-    public SpringAIVolcengineService(
-            Optional<OpenAiChatModel> volcengineChatModel,
-            Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService,
-            UidUtils uidUtils,
-            RobotRestService robotRestService,
-            ThreadRestService threadRestService,
-            MessagePersistCache messagePersistCache, RobotMessageRestService robotMessageRestService) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
-                messagePersistCache, robotMessageRestService);
-        this.volcengineChatModel = volcengineChatModel;
-
-    }
-
-    @Override
-    protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        volcengineChatModel.ifPresent(model -> model.stream(prompt).subscribe(
-                response -> {
-                    if (response != null) {
-                        log.info("Volcengine API response metadata: {}", response.getMetadata());
-                        List<Generation> generations = response.getResults();
-                        for (Generation generation : generations) {
-                            AssistantMessage assistantMessage = generation.getOutput();
-                            String textContent = assistantMessage.getText();
-
-                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                            messageProtobuf.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobuf);
-                        }
-                    }
-                },
-                error -> {
-                    log.error("Volcengine API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                },
-                () -> {
-                    log.info("Chat stream completed");
-                    // 发送流结束标记
-                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                    // messageSendService.sendProtobufMessage(messageProtobuf);
-                }));
-    }
-
-    @Override
-    protected String generateFaqPairs(String prompt) {
-        return volcengineChatModel.map(model -> model.call(prompt)).orElse("");
-    }
-
-    @Override
-    protected String processPromptSync(String message) {
-        try {
-            return volcengineChatModel.map(model -> model.call(message))
-                    .orElse("Volcengine service is not available");
-        } catch (Exception e) {
-            log.error("Volcengine API sync error: ", e);
-            return "服务暂时不可用，请稍后重试";
-        }
-    }
-
-    @Override
-    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter) {
-        volcengineChatModel.ifPresentOrElse(
-                model -> {
-                    model.stream(prompt).subscribe(
-                            response -> {
-                                try {
-                                    if (response != null) {
-                                        List<Generation> generations = response.getResults();
-                                        for (Generation generation : generations) {
-                                            AssistantMessage assistantMessage = generation.getOutput();
-                                            String textContent = assistantMessage.getText();
-                                            log.info("Volcengine API response metadata: {}, text {}",
-                                                    response.getMetadata(), textContent);
-                                            //
-                                            if (StringUtils.hasValue(textContent)) {
-                                                messageProtobuf.setContent(textContent);
-                                                messageProtobuf.setType(MessageTypeEnum.STREAM);
-                                                // 保存消息到数据库
-                                                String messageJson = JSON.toJSONString(messageProtobuf);
-                                                persistMessage(messageJson);
-                                                // 发送SSE事件
-                                                emitter.send(SseEmitter.event()
-                                                        .data(messageJson)
-                                                        .id(messageProtobuf.getUid())
-                                                        .name("message"));
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    log.error("Error sending SSE event", e);
-                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                                    // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
-                                    //
-                                    try {
-                                        emitter.send(SseEmitter.event()
-                                                .data(messageJson)
-                                                .id(messageProtobuf.getUid())
-                                                .name("error"));
-                                        emitter.complete();
-                                    } catch (Exception ex) {
-                                        emitter.completeWithError(ex);
-                                    }
-                                }
-                            },
-                            error -> {
-                                log.error("Volcengine API SSE error: ", error);
-                                //
-                                try {
-                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                                    // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobuf.getUid())
-                                            .name("message"));
-                                    emitter.complete();
-                                } catch (Exception ex) {
-                                    emitter.completeWithError(ex);
-                                }
-                            },
-                            () -> {
-                                log.info("Volcengine API SSE complete");
-                                try {
-                                    // 发送流结束标记
-                                    messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                                    messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                                    // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobuf.getUid())
-                                            .name("message"));
-                                    emitter.complete();
-                                } catch (Exception e) {
-                                    log.error("Error completing SSE", e);
-                                }
-                            });
-                },
-                () -> {
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    // 保存消息到数据库
-                    String messageJson = JSON.toJSONString(messageProtobuf);
-                    persistMessage(messageJson);
-                    //
-                    try {
-                        emitter.send(SseEmitter.event()
-                                .data(messageJson)
-                                .id(messageProtobuf.getUid())
-                                .name("message"));
-                        emitter.complete();
-                    } catch (Exception ex) {
-                        emitter.completeWithError(ex);
-                    }
-                });
-    }
-
-    public Optional<OpenAiChatModel> getVolcengineChatModel() {
-        return volcengineChatModel;
+    public SpringAIVolcengineService() {
+        super(); // 调用基类的无参构造函数
     }
 
 }
