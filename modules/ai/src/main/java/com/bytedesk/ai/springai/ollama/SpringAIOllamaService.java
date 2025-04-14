@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:39:43
+ * @LastEditTime: 2025-04-14 10:07:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -96,7 +95,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         //
         bytedeskOllamaChatModel.ifPresentOrElse(
                 model -> {
@@ -112,31 +111,31 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                             //         response.getMetadata(), textContent);
                                             //
                                             if (StringUtils.hasValue(textContent)) {
-                                                messageProtobuf.setContent(textContent);
-                                                messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                                messageProtobufReply.setContent(textContent);
+                                                messageProtobufReply.setType(MessageTypeEnum.STREAM);
                                                 // 保存消息到数据库
-                                                String messageJson = JSON.toJSONString(messageProtobuf);
-                                                persistMessage(messageJson);
+                                                persistMessage(messageProtobufQuery, messageProtobufReply);
+                                                String messageJson = messageProtobufReply.toJson();
                                                 // 发送SSE事件
                                                 emitter.send(SseEmitter.event()
                                                         .data(messageJson)
-                                                        .id(messageProtobuf.getUid())
+                                                        .id(messageProtobufReply.getUid())
                                                         .name("message"));
                                             }
                                         }
                                     }
                                 } catch (Exception e) {
                                     log.error("Ollama Error sending SSE event 1", e);
-                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
                                     // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
+                                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                                    String messageJson = messageProtobufReply.toJson();
                                     //
                                     try {
                                         emitter.send(SseEmitter.event()
                                                 .data(messageJson)
-                                                .id(messageProtobuf.getUid())
+                                                .id(messageProtobufReply.getUid())
                                                 .name("error"));
                                         emitter.complete();
                                     } catch (Exception ex) {
@@ -147,15 +146,15 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                             error -> {
                                 log.error("Ollama API SSE error: ", error);
                                 try {
-                                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
                                     // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
+                                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                                    String messageJson = messageProtobufReply.toJson();
                                     //
                                     emitter.send(SseEmitter.event()
                                             .data(messageJson)
-                                            .id(messageProtobuf.getUid())
+                                            .id(messageProtobufReply.getUid())
                                             .name("message"));
                                     emitter.complete();
                                 } catch (Exception e) {
@@ -165,15 +164,15 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                             () -> {
                                 try {
                                     // 发送流结束标记
-                                    messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                                    messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                                    messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                                    messageProtobufReply.setContent(""); // 或者可以是任何结束标记
                                     // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
+                                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                                    String messageJson = messageProtobufReply.toJson();
                                     //
                                     emitter.send(SseEmitter.event()
                                             .data(messageJson)
-                                            .id(messageProtobuf.getUid())
+                                            .id(messageProtobufReply.getUid())
                                             .name("message"));
                                     emitter.complete();
                                 } catch (Exception e) {
@@ -185,15 +184,15 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     log.info("Ollama API SSE complete");
                     try {
                         // 发送流结束标记
-                        messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobuf.setContent("Ollama service is not available"); // 或者可以是任何结束标记
+                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                        messageProtobufReply.setContent("Ollama service is not available"); // 或者可以是任何结束标记
                         // 保存消息到数据库
-                        String messageJson = JSON.toJSONString(messageProtobuf);
-                        persistMessage(messageJson);
+                        persistMessage(messageProtobufQuery, messageProtobufReply);
+                                                String messageJson = messageProtobufReply.toJson();
                         // 发送SSE事件
                         emitter.send(SseEmitter.event()
                                 .data(messageJson)
-                                .id(messageProtobuf.getUid())
+                                .id(messageProtobufReply.getUid())
                                 .name("message"));
                         emitter.complete();
                     } catch (Exception e) {

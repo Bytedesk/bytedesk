@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:40:27
+ * @LastEditTime: 2025-04-14 10:05:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -100,7 +99,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
         Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
 
@@ -115,31 +114,31 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                                 // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(), textContent);
                                 // 判断textContent是否为null
                                 if (StringUtils.hasValue(textContent)) {
-                                    messageProtobuf.setContent(textContent);
-                                    messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                    messageProtobufReply.setContent(textContent);
+                                    messageProtobufReply.setType(MessageTypeEnum.STREAM);
                                     // 保存消息到数据库
-                                    String messageJson = JSON.toJSONString(messageProtobuf);
-                                    persistMessage(messageJson);
+                                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                                                String messageJson = messageProtobufReply.toJson();
                                     // 发送SSE事件
                                     emitter.send(SseEmitter.event()
                                             .data(messageJson)
-                                            .id(messageProtobuf.getUid())
+                                            .id(messageProtobufReply.getUid())
                                             .name("message"));
                                 }
                             }
                         }
                     } catch (Exception e) {
                         log.error("Zhipuai API Error sending SSE event 1：", e);
-                        messageProtobuf.setType(MessageTypeEnum.ERROR);
-                        messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                        messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                        messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
                         // 保存消息到数据库
-                        String messageJson = JSON.toJSONString(messageProtobuf);
-                        persistMessage(messageJson);
+                        persistMessage(messageProtobufQuery, messageProtobufReply);
+                        String messageJson = messageProtobufReply.toJson();
                         //
                         try {
                             emitter.send(SseEmitter.event()
                                     .data(messageJson)
-                                    .id(messageProtobuf.getUid())
+                                    .id(messageProtobufReply.getUid())
                                     .name("message"));
                             emitter.complete();
                         } catch (Exception ex) {
@@ -150,16 +149,16 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("Zhipuai API SSE error 2:", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
                     // 保存消息到数据库
-                    String messageJson = JSON.toJSONString(messageProtobuf);
-                    persistMessage(messageJson);
+                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                    String messageJson = messageProtobufReply.toJson();
                     //
                     try {
                         emitter.send(SseEmitter.event()
                                 .data(messageJson)
-                                .id(messageProtobuf.getUid())
+                                .id(messageProtobufReply.getUid())
                                 .name("message"));
                         emitter.complete();
                     } catch (Exception ex) {
@@ -171,15 +170,15 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     log.info("Zhipuai API SSE complete");
                     try {
                         // 发送流结束标记
-                        messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobuf.setContent(""); // 或者可以是任何结束标记
+                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                        messageProtobufReply.setContent(""); // 或者可以是任何结束标记
                         // 保存消息到数据库
-                        String messageJson = JSON.toJSONString(messageProtobuf);
-                        persistMessage(messageJson);
+                        persistMessage(messageProtobufQuery, messageProtobufReply);
+                        String messageJson = messageProtobufReply.toJson();
                         // 发送SSE事件
                         emitter.send(SseEmitter.event()
                                 .data(messageJson)
-                                .id(messageProtobuf.getUid())
+                                .id(messageProtobufReply.getUid())
                                 .name("message"));
                         emitter.complete();
                     } catch (Exception e) {
