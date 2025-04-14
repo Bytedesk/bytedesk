@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 10:46:54
+ * @LastEditTime: 2025-04-14 10:51:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.message;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,9 +51,11 @@ public class MessageResponse extends BaseResponse {
 	// private String client;
 	private ClientEnum client;
 
-	private String topic;
+    private ThreadResponse thread;
 
-    private String threadUid;
+	// private String topic;
+
+    // private String threadUid;
     
 	private UserProtobuf user;
 

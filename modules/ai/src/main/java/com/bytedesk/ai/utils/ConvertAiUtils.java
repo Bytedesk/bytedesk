@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 11:00:15
+ * @LastEditTime: 2025-04-14 10:52:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,13 @@ import org.modelmapper.ModelMapper;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotResponse;
+import com.bytedesk.ai.robot_message.RobotMessageEntity;
+import com.bytedesk.ai.robot_message.RobotMessageResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageExtra;
+import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 // import com.bytedesk.ai.settings.RobotServiceSettings;
 // import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -58,6 +64,33 @@ public class ConvertAiUtils {
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettings serviceSettings) {
         return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
+    }
+
+    public static RobotMessageResponse convertToRobotMessageResponse(RobotMessageEntity message) {
+
+        RobotMessageResponse messageResponse = modelMapper.map(message, RobotMessageResponse.class);
+        // 
+        if (message.getUser() != null) {
+            UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
+            if (user.getExtra() == null) {
+                user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+            }
+            messageResponse.setUser(user);
+        }
+        // robot
+        if (message.getRobot()!= null) {
+            
+        }
+        // extra
+        if (message.getExtra() != null) {
+            MessageExtra extra = JSON.parseObject(message.getExtra(), MessageExtra.class);
+            if (extra.getFeedback() == null) {
+                extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
+            }
+            messageResponse.setExtra(extra);
+        }
+
+        return messageResponse;
     }
 
 }

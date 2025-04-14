@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:07:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:26:44
+ * @LastEditTime: 2025-04-14 10:49:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,11 @@
 package com.bytedesk.ai.robot_message;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.MessageExtra;
+import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,13 +36,28 @@ public class RobotMessageResponse extends BaseResponse {
     private String topic;
 
     private String threadUid;
-    
+
+    // private String type;
+	private MessageTypeEnum type;
+
+	private String content;
+
     // 使用content作为question
     // answer
     private String answer;
 
+	// private String status;
+	private MessageStatusEnum status;
+
+	// private String client;
+	private ClientEnum client;
+
+	private UserProtobuf user;
+
     // 使用user作为提问者，robot回答者
-    private String robot;
+    private UserProtobuf robot;
+
+	private MessageExtra extra;
 
     // 是否未搜索到到答案
     private Boolean isUnAnswered;
