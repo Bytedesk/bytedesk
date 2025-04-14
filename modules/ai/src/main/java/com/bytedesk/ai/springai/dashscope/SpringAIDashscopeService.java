@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:31:10
+ * @LastEditTime: 2025-04-14 09:38:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.oss.common.utils.StringUtils;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.base.BaseSpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.message.IMessageSendService;
@@ -44,29 +46,16 @@ import io.micrometer.core.instrument.Timer;
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeService extends BaseSpringAIService {
 
-    // private final Optional<DashScopeChatModel> bytedeskDashScopeChatModel;
-    // private final ChatClient bytedeskDashScopeChatClient;
+    @Autowired
     @Qualifier("bytedeskDashScopeChatClient")
-    private final ChatClient bytedeskDashScopeChatClient;
+    private ChatClient bytedeskDashScopeChatClient;
 
     private final Counter aiRequestCounter;
     private final Timer aiResponseTimer;
 
-    public SpringAIDashscopeService(
-            @Qualifier("bytedeskDashScopeChatClient") ChatClient bytedeskDashScopeChatClient,
-            Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService,
-            MeterRegistry registry,
-            UidUtils uidUtils,
-            RobotRestService robotRestService,
-            ThreadRestService threadRestService,
-            MessagePersistCache messagePersistCache) {
-        super(springAIVectorService, messageSendService, uidUtils, robotRestService, threadRestService,
-                messagePersistCache);
-
-        // this.bytedeskDashScopeChatModel = bytedeskDashScopeChatModel;
-        this.bytedeskDashScopeChatClient = bytedeskDashScopeChatClient;
-
+    public SpringAIDashscopeService(MeterRegistry registry) {
+        super(); // 调用基类的无参构造函数
+        
         // 初始化监控指标
         this.aiRequestCounter = Counter.builder("bytedesk.ai.dashscope.requests")
                 .description("Number of DashScope AI requests")

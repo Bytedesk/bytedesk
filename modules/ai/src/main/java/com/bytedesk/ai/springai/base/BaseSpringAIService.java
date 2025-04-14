@@ -8,6 +8,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -18,6 +19,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot_message.RobotMessageEntity;
+import com.bytedesk.ai.robot_message.RobotMessageRestService;
 import com.bytedesk.ai.springai.spring.SpringAIService;
 import com.bytedesk.ai.springai.spring.SpringAIVectorService;
 import com.bytedesk.core.enums.ClientEnum;
@@ -33,25 +35,39 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
 
-    protected final Optional<SpringAIVectorService> springAIVectorService;
-    protected final IMessageSendService messageSendService;
-    protected final UidUtils uidUtils;
-    protected final RobotRestService robotRestService;
-    protected final ThreadRestService threadRestService;
-    protected final MessagePersistCache messagePersistCache;
+    @Autowired(required = false)
+    protected Optional<SpringAIVectorService> springAIVectorService;
+    
+    @Autowired
+    protected IMessageSendService messageSendService;
+    
+    @Autowired
+    protected UidUtils uidUtils;
+    
+    @Autowired
+    protected RobotRestService robotRestService;
+    
+    @Autowired
+    protected ThreadRestService threadRestService;
+    
+    @Autowired
+    protected MessagePersistCache messagePersistCache;
+    
+    @Autowired
+    protected RobotMessageRestService robotMessageRestService;
+    
+    // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
+    // 保留一个无参构造函数，或者只接收特定的必需依赖
+    protected BaseSpringAIService() {
+        // 无参构造函数
+    }
+
+    // 可以保留一个带参数的构造函数用于单元测试或特殊情况
     protected BaseSpringAIService(Optional<SpringAIVectorService> springAIVectorService,
-            IMessageSendService messageSendService,
-            UidUtils uidUtils,
-            RobotRestService robotRestService,
-            ThreadRestService threadRestService,
-            MessagePersistCache messagePersistCache) {
+            IMessageSendService messageSendService) {
         this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;
-        this.uidUtils = uidUtils;
-        this.robotRestService = robotRestService;
-        this.threadRestService = threadRestService;
-        this.messagePersistCache = messagePersistCache;
     }
 
     @Override
@@ -79,7 +95,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobuf, SseEmitter emitter) {
+    public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, 
+        MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
@@ -88,30 +105,31 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
             if (contentList.isEmpty()) {
-                // TODO: 记录未找到相关答案的问题到数据库
-                RobotMessageEntity robotMessage = RobotMessageEntity.builder()
-                        .uid(uidUtils.getUid())
-                        .content(query)
-                        .robot(robot.toJson())
-                        .build();
-
                 // 直接返回未找到相关问题答案
-                messageProtobuf.setType(MessageTypeEnum.TEXT);
-                messageProtobuf.setContent("未查找到相关问题答案");
-                messageProtobuf.setClient(ClientEnum.SYSTEM);
+                messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                messageProtobufReply.setContent("未查找到相关问题答案");
+                messageProtobufReply.setClient(ClientEnum.SYSTEM);
                 // 保存消息到数据库
-                String messageJson = JSON.toJSONString(messageProtobuf);
+                String messageJson = JSON.toJSONString(messageProtobufReply);
                 persistMessage(messageJson);
                 try {
                     // 发送SSE事件
                     emitter.send(SseEmitter.event()
                             .data(messageJson)
-                            .id(messageProtobuf.getUid())
+                            .id(messageProtobufReply.getUid())
                             .name("message"));
                 } catch (Exception e) {
                     log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
                     emitter.completeWithError(e);
                 }
+                 // TODO: 记录未找到相关答案的问题到数据库
+                 RobotMessageEntity robotMessage = RobotMessageEntity.builder()
+                 .uid(uidUtils.getUid())
+                 .content(query)
+                 .answer(messageProtobufReply.getContent())
+                 .user(messageProtobufQuery.getUser().toJson())
+                 .robot(robot.toJson())
+                 .build();
                 return;
             }
             String context = String.join("\n", contentList);
@@ -130,7 +148,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
-        processPromptSSE(aiPrompt, messageProtobuf, emitter);
+        processPromptSSE(aiPrompt, messageProtobufReply, emitter);
     }
 
     @Override

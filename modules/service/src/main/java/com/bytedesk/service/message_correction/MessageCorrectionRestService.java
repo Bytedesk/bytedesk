@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 21:14:42
+ * @LastEditTime: 2025-04-14 09:29:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.retry.annotation.Recover;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -38,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageCorrectionRestService extends BaseRestService<MessageCorrectionEntity, MessageCorrectionRequest, MessageCorrectionResponse> {
 
-    private final MessageCorrectionRepository message_correctionRepository;
+    private final MessageCorrectionRepository messageCorrectionRepository;
 
     private final ModelMapper modelMapper;
 
@@ -50,7 +49,7 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
     public Page<MessageCorrectionResponse> queryByOrg(MessageCorrectionRequest request) {
         Pageable pageable = request.getPageable();
         Specification<MessageCorrectionEntity> spec = MessageCorrectionSpecification.search(request);
-        Page<MessageCorrectionEntity> page = message_correctionRepository.findAll(spec, pageable);
+        Page<MessageCorrectionEntity> page = messageCorrectionRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
@@ -68,11 +67,11 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
     @Cacheable(value = "message_correction", key = "#uid", unless="#result==null")
     @Override
     public Optional<MessageCorrectionEntity> findByUid(String uid) {
-        return message_correctionRepository.findByUid(uid);
+        return messageCorrectionRepository.findByUid(uid);
     }
 
     public Boolean existsByUid(String uid) {
-        return message_correctionRepository.existsByUid(uid);
+        return messageCorrectionRepository.existsByUid(uid);
     }
 
     @Override
@@ -101,7 +100,7 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
 
     @Override
     public MessageCorrectionResponse update(MessageCorrectionRequest request) {
-        Optional<MessageCorrectionEntity> optional = message_correctionRepository.findByUid(request.getUid());
+        Optional<MessageCorrectionEntity> optional = messageCorrectionRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             MessageCorrectionEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -117,35 +116,22 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
         }
     }
 
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     * recover: 当重试次数用完后的回调方法
-     */
-    public MessageCorrectionEntity save(MessageCorrectionEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
 
     @Override
     protected MessageCorrectionEntity doSave(MessageCorrectionEntity entity) {
         // log.info("Attempting to save message_correction: {}", entity.getName());
-        return message_correctionRepository.save(entity);
+        return messageCorrectionRepository.save(entity);
     }
 
     @Override
     public MessageCorrectionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, MessageCorrectionEntity entity) {
         try {
-            Optional<MessageCorrectionEntity> latest = message_correctionRepository.findByUid(entity.getUid());
+            Optional<MessageCorrectionEntity> latest = messageCorrectionRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 MessageCorrectionEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return message_correctionRepository.save(latestEntity);
+                return messageCorrectionRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
@@ -154,19 +140,9 @@ public class MessageCorrectionRestService extends BaseRestService<MessageCorrect
         return null;
     }
 
-    /**
-     * 重试失败后的回调方法
-     */
-    @Recover
-    public MessageCorrectionEntity recover(Exception e, MessageCorrectionEntity entity) {
-        // log.error("Failed to save message_correction after 3 attempts: {}", entity.getName(), e);
-        // 可以在这里添加告警通知
-        throw new RuntimeException("Failed to save message_correction after retries: " + e.getMessage());
-    }
-
     @Override
     public void deleteByUid(String uid) {
-        Optional<MessageCorrectionEntity> optional = message_correctionRepository.findByUid(uid);
+        Optional<MessageCorrectionEntity> optional = messageCorrectionRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());

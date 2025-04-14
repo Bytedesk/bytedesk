@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 10:04:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 20:44:18
+ * @LastEditTime: 2025-04-14 09:17:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.black.BlackService;
-import com.bytedesk.core.thread.ThreadProtobuf;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,28 +26,19 @@ public class MessageService {
 
     private final MessagePersistCache messagePersistCache;
 
-    private final BlackService blackService;
-
     public String processMessageJson(String messageJson) {
 
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
+
+        // 收到消息，更新消息状态为发送成功
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
         }
 
-        ThreadProtobuf thread = messageProtobuf.getThread();
-        if (thread == null) {
-            throw new RuntimeException("thread is null");
-        }
-
-        // Replace client timestamp
+        // 防止客户端时间错误，使用服务器时间戳
         messageProtobuf.setCreatedAt(LocalDateTime.now());
 
-        // Check blacklist
-        if (blackService.isBlackList(messageProtobuf)) {
-            return null;
-        }
-
+        // 保存消息
         // Cache message for persistence
         messagePersistCache.pushForPersist(messageJson);
 
