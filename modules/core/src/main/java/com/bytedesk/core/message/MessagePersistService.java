@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 09:25:34
+ * @LastEditTime: 2025-04-15 10:23:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,8 +20,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.notice.NoticeRestService;
 import com.bytedesk.core.notice.extra.NoticeExtraInvite;
 import com.bytedesk.core.notice.extra.NoticeExtraTransfer;
@@ -47,7 +45,8 @@ public class MessagePersistService {
 
     public void persist(String messageJSON) {
         // log.info("persist: {}", messageJSON);
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJSON, MessageProtobuf.class);
+        MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
+        //JSON.parseObject(messageJSON, MessageProtobuf.class);
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
@@ -95,7 +94,7 @@ public class MessagePersistService {
         message.setUser(messageProtobuf.getUser().toJson());
         message.setUserUid(messageProtobuf.getUser().getUid());
         // 
-        MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(), MessageExtra.class);
+        MessageExtra extraObject = MessageExtra.fromJson(messageProtobuf.getExtra()); 
         if (extraObject != null) {
             String orgUid = extraObject.getOrgUid();
             message.setOrgUid(orgUid);
@@ -153,7 +152,7 @@ public class MessagePersistService {
         if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
             // content为留言提示消息的uid
             if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithLeaveMsg(type, messageProtobuf);
+                dealWithMessageLeave(type, messageProtobuf);
                 return true;
             }
         }
@@ -239,8 +238,8 @@ public class MessagePersistService {
         }
     }
 
-    private void dealWithLeaveMsg(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithLeaveMsg");
+    private void dealWithMessageLeave(MessageTypeEnum type, MessageProtobuf message) {
+        log.info("dealWithMessageLeave");
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
@@ -283,8 +282,8 @@ public class MessagePersistService {
     // 处理转接消息
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithTransferMessage");
-        NoticeExtraTransfer transferContentObject = JSONObject.parseObject(message.getContent(),
-                NoticeExtraTransfer.class);
+        NoticeExtraTransfer transferContentObject = NoticeExtraTransfer.fromJson(message.getContent());
+         //JSONObject.parseObject(message.getContent(),NoticeExtraTransfer.class);
         //
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(transferContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
@@ -315,8 +314,10 @@ public class MessagePersistService {
 
     // 处理邀请消息
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
-        NoticeExtraInvite inviteContentObject = JSONObject.parseObject(message.getContent(),
-                NoticeExtraInvite.class);
+        // 
+        NoticeExtraInvite inviteContentObject = NoticeExtraInvite.fromJson(message.getContent()); 
+        //JSONObject.parseObject(message.getContent(), NoticeExtraInvite.class);
+
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(inviteContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
