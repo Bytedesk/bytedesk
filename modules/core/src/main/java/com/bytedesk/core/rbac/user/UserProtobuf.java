@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 18:12:11
+ * @LastEditTime: 2025-04-15 11:58:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,7 @@ public class UserProtobuf implements Serializable {
 
     // ROBOT/AGENT/SYSTEM/USER/VISITOR/WORKGROUP
     @Builder.Default
-    private String type = UserTypeEnum.VISITOR.name();
+    private String type = UserTypeEnum.USER.name();
 
     private String extra;
 
