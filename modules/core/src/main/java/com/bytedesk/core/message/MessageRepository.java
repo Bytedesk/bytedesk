@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 16:22:58
+ * @LastEditTime: 2025-04-15 18:41:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,11 +32,12 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
     //         String type, String messageUid, String status);
     
     // 或者更好的选择：使用JPQL查询，更灵活且性能更可控
-    @Query("SELECT m FROM MessageEntity m WHERE m.type = :type AND m.content LIKE %:messageUid% AND m.content LIKE %:status%")
+    @Query("SELECT m FROM MessageEntity m WHERE m.type = :type AND m.content LIKE %:messageUid%")
     Optional<MessageEntity> findTransferMessage(
             @Param("type") String type, 
-            @Param("messageUid") String messageUid, 
-            @Param("status") String status);
+            @Param("messageUid") String messageUid
+        //     @Param("status") String status
+            );
 
     // 根据thread.uid查询最新一条消息
     Optional<MessageEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
