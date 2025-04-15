@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 10:45:59
+ * @LastEditTime: 2025-04-15 23:29:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,6 @@ import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
@@ -147,13 +146,13 @@ public class SpringAIEventListener {
         qaUpdateMap.remove(qa.getUid());
     }
 
-    @EventListener
-    public void onFaqCreateEvent(FaqCreateEvent event) {
-        FaqEntity faq = event.getFaq();
-        log.info("SpringAIEventListener onFaqCreateEvent: {}", faq.getQuestion());
-        // 将FAQ实体添加到创建缓存中，而不是立即处理
-        faqCreateMap.put(faq.getUid(), faq);
-    }
+    // @EventListener
+    // public void onFaqCreateEvent(FaqCreateEvent event) {
+    //     FaqEntity faq = event.getFaq();
+    //     log.info("SpringAIEventListener onFaqCreateEvent: {}", faq.getQuestion());
+    //     // 将FAQ实体添加到创建缓存中，而不是立即处理
+    //     faqCreateMap.put(faq.getUid(), faq);
+    // }
 
     // @EventListener
     // public void onFaqUpdateEvent(FaqUpdateEvent event) {
