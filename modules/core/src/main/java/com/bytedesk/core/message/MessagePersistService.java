@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 16:36:40
+ * @LastEditTime: 2025-04-15 17:33:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.notice.NoticeProtobuf;
 // import com.bytedesk.core.notice.NoticeRestService;
 import com.bytedesk.core.notice.extra.NoticeExtraInvite;
 import com.bytedesk.core.notice.extra.NoticeExtraTransfer;
@@ -279,7 +280,7 @@ public class MessagePersistService {
 
     // 处理转接消息
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
-        // log.info("dealWithTransferMessage");
+        NoticeProtobuf noticeProtobuf = NoticeProtobuf.fromJson(message.getContent());
         NoticeExtraTransfer transferContentObject = NoticeExtraTransfer.fromJson(message.getContent());
         if (type.equals(MessageTypeEnum.TRANSFER)) {
             transferContentObject.setStatus(MessageStatusEnum.TRANSFER_PENDING.name());
@@ -314,7 +315,8 @@ public class MessagePersistService {
 
     // 处理邀请消息
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
-        NoticeExtraInvite inviteContentObject = NoticeExtraInvite.fromJson(message.getContent()); 
+        NoticeProtobuf noticeProtobuf = NoticeProtobuf.fromJson(message.getContent());
+        NoticeExtraInvite inviteContentObject = NoticeExtraInvite.fromJson(noticeProtobuf.getExtra()); 
         if (type.equals(MessageTypeEnum.INVITE)) {
             inviteContentObject.setStatus(MessageStatusEnum.INVITE_PENDING.name());
         } else if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
