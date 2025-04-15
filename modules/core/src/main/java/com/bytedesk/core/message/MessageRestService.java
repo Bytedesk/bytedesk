@@ -79,6 +79,11 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         return messageRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "message", key = "# type + #messageUid + #status", unless = "#result == null")
+    public Optional<MessageEntity> findFirstByTypeAndContentContainsAndContentContains(String type, String messageUid, String status) {
+        return messageRepository.findFirstByTypeAndContentContainsAndContentContains(type, messageUid, status);
+    }
+
     @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public Optional<MessageEntity> findLatestByThreadUid(String threadUid) {
         return messageRepository.findFirstByThread_UidOrderByCreatedAtDesc(threadUid);

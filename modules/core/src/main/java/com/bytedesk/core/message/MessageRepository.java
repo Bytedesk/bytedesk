@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 10:32:53
+ * @LastEditTime: 2025-04-15 15:55:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface MessageRepository extends JpaRepository<MessageEntity, Long>, JpaSpecificationExecutor<MessageEntity> {
 
     Optional<MessageEntity> findByUid(String uid);
+    // 用于搜索notice通知中的：转接消息uid和转接状态
+    Optional<MessageEntity> findFirstByTypeAndContentContainsAndContentContains(String type, String messageUid, String status);
 
     // 根据thread.uid查询最新一条消息
     Optional<MessageEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
