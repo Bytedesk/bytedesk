@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 10:24:05
+ * @LastEditTime: 2025-04-15 13:34:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,7 @@
 package com.bytedesk.core.message;
 
 import java.time.LocalDateTime;
-// import java.util.Date;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -36,7 +34,6 @@ public class MessageUtils {
         // 
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
-        String extra = JSON.toJSONString(messageExtra);
         // 
         MessageProtobuf message = MessageProtobuf.builder()
                 .uid(messageUid)
@@ -47,7 +44,7 @@ public class MessageUtils {
                 .client(ClientEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(system)
-                .extra(extra)
+                .extra(messageExtra.toJson())
                 .build();
         return message;
     }
@@ -55,7 +52,6 @@ public class MessageUtils {
     public static MessageProtobuf createThreadMessage(String messageUid, ThreadEntity thread, MessageTypeEnum type, String content) {
         //
         UserProtobuf sender = UserUtils.getSystemUser();
-        // 
         ThreadProtobuf threadProtobuf = thread.toProtobuf();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         //
@@ -68,7 +64,7 @@ public class MessageUtils {
                 .client(ClientEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(sender)
-                .extra(JSON.toJSONString(extra))
+                .extra(extra.toJson())
                 .build();
         return message;
     }
@@ -102,10 +98,9 @@ public class MessageUtils {
     }
 
     public static void notifyUser(MessageProtobuf messageProtobuf) {
-        String json = JSON.toJSONString(messageProtobuf);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishMessageJsonEvent(json);
+        bytedeskEventPublisher.publishMessageJsonEvent(messageProtobuf.toJson());
     }
     
 }

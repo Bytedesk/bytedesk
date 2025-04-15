@@ -330,4 +330,11 @@ public class I18Consts {
     public static final String I18N_REQUEST_REJECTED = "请求被拒绝"; // 请求被拒绝
     public static final String I18N_ENTITY_NOT_FOUND = "实体未找到"; // 实体未找到
     public static final String I18N_INTERNAL_SERVER_ERROR = "内部服务器错误"; // 内部服务器错误
+
+
+
+
+
+
+    // 
 }
