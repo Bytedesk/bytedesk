@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 11:22:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 12:23:24
+ * @LastEditTime: 2025-04-15 13:36:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,27 +33,26 @@ import lombok.RequiredArgsConstructor;
 public class NoticeService {
 
     private final ThreadRestService threadRestService;
-    private final NoticeRestService noticeRestService;
+    // private final NoticeRestService noticeRestService;
     private final IMessageSendService messageSendService;
     private final UidUtils uidUtils;
     private final ModelMapper modelMapper;
 
     // send notice
     public void sendNotice(NoticeRequest request) {
-        // create notice
-        NoticeResponse noticeResponse = noticeRestService.create(request);
-        if (noticeResponse != null) {
-            NoticeProtobuf noticeProtobuf = modelMapper.map(noticeResponse, NoticeProtobuf.class);
-            String jsonContent = noticeProtobuf.toJson();
-            // do something
-            String topic = TopicUtils.getSystemTopic(request.getUserUid());
-            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-            if (threadOptional.isPresent()) {
-                ThreadEntity thread = threadOptional.get();
-                // send notice message
-                MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread.toProtobuf(), request.getOrgUid(), jsonContent);
-                messageSendService.sendProtobufMessage(message);
-            }
+        // 存储暂时未用到，暂不存储
+        // NoticeResponse noticeResponse = noticeRestService.create(request);
+        NoticeProtobuf noticeProtobuf = modelMapper.map(request, NoticeProtobuf.class);
+        String jsonContent = noticeProtobuf.toJson();
+        // do something
+        String topic = TopicUtils.getSystemTopic(request.getUserUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        if (threadOptional.isPresent()) {
+            ThreadEntity thread = threadOptional.get();
+            // send notice message
+            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread.toProtobuf(),
+                    request.getOrgUid(), jsonContent);
+            messageSendService.sendProtobufMessage(message);
         }
     }
 
