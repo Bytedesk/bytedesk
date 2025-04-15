@@ -100,48 +100,61 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
-        //
-        String prompt = "";
-        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
-            if (contentList.isEmpty()) {
-                // 直接返回未找到相关问题答案
-                messageProtobufReply.setType(MessageTypeEnum.TEXT);
-                messageProtobufReply.setContent(RobotConsts.ROBOT_UNANSWERED);
-                messageProtobufReply.setClient(ClientEnum.SYSTEM);
-                // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply);
-                String messageJson = messageProtobufReply.toJson();
-                try {
-                    // 发送SSE事件
-                    emitter.send(SseEmitter.event()
-                            .data(messageJson)
-                            .id(messageProtobufReply.getUid())
-                            .name("message"));
-                } catch (Exception e) {
-                    log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
-                    emitter.completeWithError(e);
-                }
-                return;
-            }
-            String context = String.join("\n", contentList);
-            // TODO: 根据配置，拉取历史聊天记录
-            // String history = "";
-            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
-        } else {
-            prompt = robot.getLlm().getPrompt();
+        // 判断是否开启大模型
+        if (robot.getLlm().isEnabled()) {
+
+            
+
         }
-        // TODO: 判断是否开启大模型
-        // TODO: 返回消息中携带消息搜索结果(来源依据)
-        //
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(prompt));
-        messages.add(new UserMessage(query));
-        log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
-        //
-        Prompt aiPrompt = new Prompt(messages);
-        processPromptSSE(aiPrompt, messageProtobufQuery, messageProtobufReply, emitter);
+
     }
+
+
+    private void processLlmResponse(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            SseEmitter emitter) {
+                //
+            String prompt = "";
+            if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
+                List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+                if (contentList.isEmpty()) {
+                    // 直接返回未找到相关问题答案
+                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    messageProtobufReply.setContent(RobotConsts.ROBOT_UNMATCHED);
+                    messageProtobufReply.setClient(ClientEnum.SYSTEM);
+                    // 保存消息到数据库
+                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                    String messageJson = messageProtobufReply.toJson();
+                    try {
+                        // 发送SSE事件
+                        emitter.send(SseEmitter.event()
+                                .data(messageJson)
+                                .id(messageProtobufReply.getUid())
+                                .name("message"));
+                    } catch (Exception e) {
+                        log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
+                        emitter.completeWithError(e);
+                    }
+                    return;
+                }
+                String context = String.join("\n", contentList);
+                // TODO: 根据配置，拉取历史聊天记录
+                // String history = "";
+                prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+            } else {
+                prompt = robot.getLlm().getPrompt();
+            }
+            // TODO: 返回消息中携带消息搜索结果(来源依据)
+            //
+            List<Message> messages = new ArrayList<>();
+            messages.add(new SystemMessage(prompt));
+            messages.add(new UserMessage(query));
+            log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
+            //
+            Prompt aiPrompt = new Prompt(messages);
+            processPromptSSE(aiPrompt, messageProtobufQuery, messageProtobufReply, emitter);
+            }
+
+
 
     @Override
     public String generateFaqPairsAsync(String chunk) {
@@ -188,7 +201,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
-        // 
+        //
         MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
         //
         // 记录未找到相关答案的问题到另外一个表，便于梳理问题
@@ -196,19 +209,19 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 .uid(messageProtobufReply.getUid()) // 使用机器人回复消息作为uid
                 .type(messageProtobufQuery.getType().name())
                 .status(messageProtobufReply.getStatus().name())
-                // 
+                //
                 .topic(messageProtobufQuery.getThread().getTopic())
                 .threadUid(messageProtobufQuery.getThread().getUid())
-                // 
+                //
                 .content(messageProtobufQuery.getContent())
                 .answer(messageProtobufReply.getContent())
-                // 
+                //
                 .user(messageProtobufQuery.getUser().toJson())
                 .robot(messageProtobufReply.getUser().toJson())
-                // 
-                .isUnAnswered(messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNANSWERED))
+                //
+                .isUnAnswered(messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED))
                 .orgUid(extraObject.getOrgUid())
-                // 
+                //
                 .build();
         robotMessageCache.pushRequest(robotMessage);
 
