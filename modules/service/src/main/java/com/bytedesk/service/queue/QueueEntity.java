@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 22:07:55
+ * @LastEditTime: 2025-04-15 11:59:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,13 +77,6 @@ public class QueueEntity extends BaseEntity {
         @Builder.Default
         @Column(name = "queue_status", nullable = false)
         private String status = QueueStatusEnum.ACTIVE.name(); // 队列状态
-
-        // 记录存储一对一、技能组、机器人各自队列中的排队队员
-        // 添加与QueueMember的一对多关系
-        // @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, orphanRemoval =
-        // true)
-        // @Builder.Default
-        // private List<QueueMemberEntity> queueMembers = new ArrayList<>();
 
         // 仅用于在工作组情况下，记录存储robot/agent接待来自技能组数量
         // 添加新的一对多关系 - 作为工作组队列

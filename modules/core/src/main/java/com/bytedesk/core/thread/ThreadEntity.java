@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 13:42:45
+ * @LastEditTime: 2025-04-15 11:57:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -95,49 +95,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Boolean isClosed() {
         return getStatus().equals(ThreadProcessStatusEnum.CLOSED.name());
     }
-
-    // is transfer pending
-    // public Boolean isTransferPending() {
-    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
-    // }
-
-    // public Boolean isTransferAccepted() {
-    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
-    // }
-
-    // public Boolean isTransferRejected() {
-    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_REJECTED.name());
-    // }
-
-    // public Boolean isTransferTimeout() {
-    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_TIMEOUT.name());
-    // }
-
-    // public Boolean isTransferCanceled() {
-    //     return getTransferStatus().equals(ThreadTransferStatusEnum.TRANSFER_CANCELED.name());
-    // }
-
-    // is invite pending
-    // public Boolean isInvitePending() {
-    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_PENDING.name());
-    // }
-
-    // public Boolean isInviteAccepted() {
-    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_ACCEPTED.name());
-    // }
-
-    // public Boolean isInviteRejected() {
-    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_REJECTED.name());
-    // }
-
-    // public Boolean isInviteTimeout() {
-    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_TIMEOUT.name());
-    // }
-
-    // public Boolean isInviteCanceled() {
-    //     return getInviteStatus().equals(ThreadInviteStatusEnum.INVITE_CANCELED.name());
-    // }
-
+    
     public Boolean isCustomerService() {
         return getType().equals(ThreadTypeEnum.AGENT.name())
                 || getType().equals(ThreadTypeEnum.WORKGROUP.name())
@@ -168,29 +126,6 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Boolean isWeChatMini() {
         return getClient().equals(ClientEnum.WECHAT_MINI.name());
     }
-
-    /**
-     * 检查会话是否曾经处于离线状态
-     */
-    // public Boolean isOffline() {
-    //     ThreadExtra extra = getThreadExtra();
-    //     return extra != null && extra.isOffline();
-    // }
-
-    /**
-     * 将当前会话标记为离线状态
-     */
-    // public ThreadEntity setOffline() {
-    //     setStatus(ThreadProcessStatusEnum.OFFLINE.name());
-    //     // setOffline(true);
-    //     return this;
-    // }
-
-    // public ThreadEntity setOnline() {
-    //     setStatus(ThreadProcessStatusEnum.OFFLINE.name());
-    //     // setOffline(false);
-    //     return this;
-    // }
 
     // ---------------------------
 
@@ -335,5 +270,28 @@ public class ThreadEntity extends AbstractThreadEntity {
                 ", createdAt=" + getCreatedAt() +
                 '}';
     }
+
+    /**
+     * 检查会话是否曾经处于离线状态
+     */
+    // public Boolean isOffline() {
+    //     ThreadExtra extra = getThreadExtra();
+    //     return extra != null && extra.isOffline();
+    // }
+
+    /**
+     * 将当前会话标记为离线状态
+     */
+    // public ThreadEntity setOffline() {
+    //     setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+    //     // setOffline(true);
+    //     return this;
+    // }
+
+    // public ThreadEntity setOnline() {
+    //     setStatus(ThreadProcessStatusEnum.OFFLINE.name());
+    //     // setOffline(false);
+    //     return this;
+    // }
 
 }
