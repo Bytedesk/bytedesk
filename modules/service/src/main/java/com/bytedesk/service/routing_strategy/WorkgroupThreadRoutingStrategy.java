@@ -23,7 +23,7 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.NoticeEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -296,7 +296,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         queueMemberEntity.setAgentOffline(true);
         queueMemberRestService.save(queueMemberEntity);
         // 创建新的留言消息
-        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(content, savedThread);
+        NoticeEntity message = ThreadMessageUtil.getThreadOfflineMessage(content, savedThread);
         messageRestService.save(message);
         // 返回留言消息
         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
@@ -378,7 +378,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //     }
         // }
 
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
+        NoticeEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
         messageRestService.save(message);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
@@ -399,7 +399,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // }
         //
         String content = robotEntity.getServiceSettings().getWelcomeTip();
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
+        NoticeEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
         // 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }

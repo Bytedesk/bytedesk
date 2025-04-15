@@ -19,7 +19,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.NoticeEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.event.MessageUpdateEvent;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -39,7 +39,7 @@ public class MessageLeaveEventListener {
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
-        MessageEntity message = event.getMessage();
+        NoticeEntity message = event.getMessage();
         // log.info("message leave_msg update event: {}", message);
         //
         if (message.getStatus().equals(MessageStatusEnum.LEAVE_MSG_SUBMIT.name())) {

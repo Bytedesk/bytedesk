@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners({ MessageEntityListener.class })
 @Table(name = "bytedesk_core_message")
-public class MessageEntity extends AbstractMessageEntity {
+public class NoticeEntity extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
 
