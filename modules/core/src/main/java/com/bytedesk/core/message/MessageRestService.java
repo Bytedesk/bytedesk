@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 16:47:22
+ * @LastEditTime: 2025-04-15 18:42:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,9 +78,9 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         return messageRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "message", key = "# type + #messageUid + #status", unless = "#result == null")
-    public Optional<MessageEntity> findTransferMessage(String type, String messageUid, String status) {
-        return messageRepository.findTransferMessage(type, messageUid, status);
+    @Cacheable(value = "message", key = "# type + #messageUid", unless = "#result == null")
+    public Optional<MessageEntity> findTransferMessage(String type, String messageUid) {
+        return messageRepository.findTransferMessage(type, messageUid);
     }
 
     @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
