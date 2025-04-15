@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 14:59:57
+ * @LastEditTime: 2025-04-15 15:00:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -304,7 +304,8 @@ public class MessagePersistService {
                 // 更新notice表的状态
                 // noticeRestService.cancelTransfer(transferContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.TRANSFER_TIMEOUT)) {
-                
+                transferContentObject.setStatus(MessageStatusEnum.TRANSFER_TIMEOUT.name());
+                messageEntity.setContent(transferContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_TIMEOUT.name());
                 // 更新notice表的状态
                 // noticeRestService.timeOutTransfer(transferContentObject.getMessageUid());
@@ -315,25 +316,32 @@ public class MessagePersistService {
 
     // 处理邀请消息
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
-        // 
         NoticeExtraInvite inviteContentObject = NoticeExtraInvite.fromJson(message.getContent()); 
-
+        // 
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(inviteContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
+                inviteContentObject.setStatus(MessageStatusEnum.INVITE_ACCEPTED.name());
+                messageEntity.setContent(inviteContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.INVITE_ACCEPTED.name());
                 // 更新notice表的状态
                 // noticeRestService.acceptInvite(inviteContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.INVITE_REJECT)) {
+                inviteContentObject.setStatus(MessageStatusEnum.INVITE_REJECTED.name());
+                messageEntity.setContent(inviteContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.INVITE_REJECTED.name());
                 // 更新notice表的状态
                 // noticeRestService.rejectInvite(inviteContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.INVITE_CANCEL)) {
+                inviteContentObject.setStatus(MessageStatusEnum.INVITE_CANCELED.name());
+                messageEntity.setContent(inviteContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.INVITE_CANCELED.name());
                 // 更新notice表的状态
                 // noticeRestService.cancelInvite(inviteContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.INVITE_TIMEOUT)) {
+                inviteContentObject.setStatus(MessageStatusEnum.INVITE_TIMEOUT.name());
+                messageEntity.setContent(inviteContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.INVITE_TIMEOUT.name());
                 // 更新notice表的状态
                 // noticeRestService.timeOutInvite(inviteContentObject.getMessageUid());
