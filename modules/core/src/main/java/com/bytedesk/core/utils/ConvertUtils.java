@@ -24,7 +24,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
@@ -161,7 +161,7 @@ public class ConvertUtils {
                 return roleResponse;
     }
 
-    public static MessageResponse convertToMessageResponse(NoticeEntity message) {
+    public static MessageResponse convertToMessageResponse(MessageEntity message) {
 
         MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
         // 

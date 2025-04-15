@@ -65,9 +65,9 @@ public class MessagePersistService {
             // 流式消息单独处理下
             if (type.equals(MessageTypeEnum.STREAM)) {
                 // 更新消息内容
-                Optional<NoticeEntity> message = messageRestService.findByUid(uid);
+                Optional<MessageEntity> message = messageRestService.findByUid(uid);
                 if (message.isPresent()) {
-                    NoticeEntity m = message.get();
+                    MessageEntity m = message.get();
                     m.setContent(m.getContent() + messageProtobuf.getContent());
                     messageRestService.save(m);
                 }
@@ -78,7 +78,7 @@ public class MessagePersistService {
             return;
         }
         //
-        NoticeEntity message = modelMapper.map(messageProtobuf, NoticeEntity.class);
+        MessageEntity message = modelMapper.map(messageProtobuf, MessageEntity.class);
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
@@ -204,9 +204,9 @@ public class MessagePersistService {
         log.info("dealWithMessageReceipt: {}", type);
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ.name()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.READ)) {
                 messageEntity.setStatus(MessageStatusEnum.READ.name());
             } else if (type.equals(MessageTypeEnum.DELIVERED)) {
@@ -226,9 +226,9 @@ public class MessagePersistService {
     private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithMessageRateSubmit");
         // 如果是客服邀请评价，则content为邀请评价消息的uid，否则为空
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.RATE_SUBMIT)) {
                 messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT.name());
                 messageEntity.setContent(message.getExtra());
@@ -241,9 +241,9 @@ public class MessagePersistService {
 
     private void dealWithLeaveMsg(MessageTypeEnum type, MessageProtobuf message) {
         log.info("dealWithLeaveMsg");
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
                 messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
                 messageEntity.setContent(message.getExtra());
@@ -254,9 +254,9 @@ public class MessagePersistService {
 
     private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithFaqRateMessage");
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.FAQ_UP)) {
                 messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
             } else if (type.equals(MessageTypeEnum.FAQ_DOWN)) {
@@ -268,9 +268,9 @@ public class MessagePersistService {
 
     private void dealWithRobotRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithRobotRateMessage");
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.ROBOT_UP)) {
                 messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
             } else if (type.equals(MessageTypeEnum.ROBOT_DOWN)) {
@@ -286,9 +286,9 @@ public class MessagePersistService {
         NoticeExtraTransfer transferContentObject = JSONObject.parseObject(message.getContent(),
                 NoticeExtraTransfer.class);
         //
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(transferContentObject.getMessageUid());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(transferContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)) {
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPTED.name());
                 // 更新notice表的状态
@@ -317,9 +317,9 @@ public class MessagePersistService {
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
         NoticeExtraInvite inviteContentObject = JSONObject.parseObject(message.getContent(),
                 NoticeExtraInvite.class);
-        Optional<NoticeEntity> messageOpt = messageRestService.findByUid(inviteContentObject.getMessageUid());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(inviteContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
-            NoticeEntity messageEntity = messageOpt.get();
+            MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
                 messageEntity.setStatus(MessageStatusEnum.INVITE_ACCEPTED.name());
                 // 更新notice表的状态

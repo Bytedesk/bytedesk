@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
@@ -80,7 +80,7 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
 
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
     @Transactional
-    public void create(NoticeEntity message, String userUid) {
+    public void create(MessageEntity message, String userUid) {
         MessageUnreadEntity messageUnread = modelMapper.map(message, MessageUnreadEntity.class);
         messageUnread.setUserUid(userUid);
         messageUnreadRepository.save(messageUnread);

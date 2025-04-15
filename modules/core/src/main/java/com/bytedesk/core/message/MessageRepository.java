@@ -28,15 +28,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Repository
 @Tag(name = "message")
-public interface MessageRepository extends JpaRepository<NoticeEntity, Long>, JpaSpecificationExecutor<NoticeEntity> {
+public interface MessageRepository extends JpaRepository<MessageEntity, Long>, JpaSpecificationExecutor<MessageEntity> {
 
-    Optional<NoticeEntity> findByUid(String uid);
+    Optional<MessageEntity> findByUid(String uid);
 
     // 根据thread.uid查询最新一条消息
-    Optional<NoticeEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
+    Optional<MessageEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
 
     // thread.uid + type + user contains uid
-    Optional<NoticeEntity> findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(
+    Optional<MessageEntity> findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(
             @Param("threadUid") String threadUid, 
             @Param("type") String type, 
             @Param("userUid") String userUid);

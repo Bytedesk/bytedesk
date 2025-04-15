@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 20:42:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 09:34:43
+ * @LastEditTime: 2025-04-15 09:41:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@ package com.bytedesk.core.notice.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.notice.NoticeEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -20,6 +20,7 @@ import com.bytedesk.core.message.MessageStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +42,7 @@ import lombok.experimental.SuperBuilder;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({NoticeEntityListener.class})
 @Table(name = "bytedesk_core_notice")
 public class NoticeEntity extends BaseEntity {
     

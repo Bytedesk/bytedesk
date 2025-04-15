@@ -15,7 +15,7 @@ package com.bytedesk.core.message.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,9 +26,9 @@ public class MessageUpdateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
     
-    private final NoticeEntity message;
+    private final MessageEntity message;
 
-    public MessageUpdateEvent(Object source, NoticeEntity message) {
+    public MessageUpdateEvent(Object source, MessageEntity message) {
         super(source);
         this.message = message;
     }
