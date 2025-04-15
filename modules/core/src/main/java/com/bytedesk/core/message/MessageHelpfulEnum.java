@@ -14,10 +14,8 @@
 package com.bytedesk.core.message;
 
 public enum MessageHelpfulEnum {
-    // 有帮助
-    HELPFUL,
-    // 没帮助
-    UNHELPFUL,
-    // 其他
-    OTHER
+    UNKNOWN, // 未知
+    HELPFUL,  // 有帮助
+    UNHELPFUL, // 没帮助
+    OTHER // 其他
 }
