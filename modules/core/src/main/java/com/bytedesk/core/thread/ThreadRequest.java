@@ -121,6 +121,8 @@ public class ThreadRequest extends BaseRequest {
     @Builder.Default
     private Boolean forceNew = false;
 
+    // 在客服端需要将同一个访客所有的会话合并为一条会话显示，但在管理后台需要显示所有会话，所以需要区分
+    // 在客服端需要设置 mergeByTopic = true，在管理后台需要设置 mergeByTopic = false
     // 是否合并相同topic的记录
     @Builder.Default
     private Boolean mergeByTopic = false;
