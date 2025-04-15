@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 10:23:27
+ * @LastEditTime: 2025-04-15 10:55:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -283,7 +283,6 @@ public class MessagePersistService {
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithTransferMessage");
         NoticeExtraTransfer transferContentObject = NoticeExtraTransfer.fromJson(message.getContent());
-         //JSONObject.parseObject(message.getContent(),NoticeExtraTransfer.class);
         //
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(transferContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
@@ -307,16 +306,12 @@ public class MessagePersistService {
             }
             messageRestService.save(messageEntity);
         }
-
-        
-
     }
 
     // 处理邀请消息
     private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
         // 
         NoticeExtraInvite inviteContentObject = NoticeExtraInvite.fromJson(message.getContent()); 
-        //JSONObject.parseObject(message.getContent(), NoticeExtraInvite.class);
 
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(inviteContentObject.getMessageUid());
         if (messageOpt.isPresent()) {
