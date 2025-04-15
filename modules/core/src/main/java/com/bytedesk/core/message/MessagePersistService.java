@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 14:04:34
+ * @LastEditTime: 2025-04-15 14:59:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -286,18 +286,25 @@ public class MessagePersistService {
         if (messageOpt.isPresent()) {
             MessageEntity messageEntity = messageOpt.get();
             if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)) {
+                transferContentObject.setStatus(MessageStatusEnum.TRANSFER_ACCEPTED.name());
+                messageEntity.setContent(transferContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_ACCEPTED.name());
                 // 更新notice表的状态
                 // noticeRestService.acceptTransfer(transferContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
+                transferContentObject.setStatus(MessageStatusEnum.TRANSFER_REJECTED.name());
+                messageEntity.setContent(transferContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_REJECTED.name());
                 // 更新notice表的状态
                 // noticeRestService.rejectTransfer(transferContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.TRANSFER_CANCEL)) {
+                transferContentObject.setStatus(MessageStatusEnum.TRANSFER_CANCELED.name());
+                messageEntity.setContent(transferContentObject.toJson());
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_CANCELED.name());
                 // 更新notice表的状态
                 // noticeRestService.cancelTransfer(transferContentObject.getMessageUid());
             } else if (type.equals(MessageTypeEnum.TRANSFER_TIMEOUT)) {
+                
                 messageEntity.setStatus(MessageStatusEnum.TRANSFER_TIMEOUT.name());
                 // 更新notice表的状态
                 // noticeRestService.timeOutTransfer(transferContentObject.getMessageUid());
