@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.NoticeEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -61,7 +61,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     // cascade = CascadeType.ALL, orphanRemoval = true, 
     @Builder.Default
     @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
-    private List<MessageEntity> messages = new ArrayList<>();
+    private List<NoticeEntity> messages = new ArrayList<>();
 
     public Boolean isNew() {
         return getStatus().equals(ThreadProcessStatusEnum.NEW.name());
@@ -271,7 +271,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Integer getVisitorMessageCount() {
         // 遍历消息列表，统计访客消息数量
         int count = 0;
-        for (MessageEntity message : messages) {
+        for (NoticeEntity message : messages) {
             if (message.isFromVisitor()) {
                 count++;
             }
@@ -283,7 +283,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Integer getAgentMessageCount() {
         // 遍历消息列表，统计客服消息数量
         int count = 0;
-        for (MessageEntity message : messages) {
+        for (NoticeEntity message : messages) {
             if (message.isFromAgent()) {
                 count++;
             }
@@ -295,7 +295,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Integer getSystemMessageCount() {
         // 遍历消息列表，统计系统消息数量
         int count = 0;
-        for (MessageEntity message : messages) {
+        for (NoticeEntity message : messages) {
             if (message.isFromSystem()) {
                 count++;
             }
@@ -307,7 +307,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     public Integer getRobotMessageCount() {
         // 遍历消息列表，统计机器人消息数量
         int count = 0;
-        for (MessageEntity message : messages) {
+        for (NoticeEntity message : messages) {
             if (message.isFromRobot()) {
                 count++;
             }

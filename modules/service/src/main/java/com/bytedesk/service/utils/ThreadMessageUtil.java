@@ -16,7 +16,7 @@ package com.bytedesk.service.utils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.NoticeEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -38,7 +38,7 @@ public class ThreadMessageUtil {
     public static MessageProtobuf getThreadUnifiedWelcomeMessage(ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.WELCOME.name())
@@ -57,11 +57,11 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageEntity getThreadRobotWelcomeMessage(String content, ThreadEntity thread) {
+    public static NoticeEntity getThreadRobotWelcomeMessage(String content, ThreadEntity thread) {
 
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         // 
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
                 .thread(thread)
@@ -83,7 +83,7 @@ public class ThreadMessageUtil {
         //
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
                 .type(MessageTypeEnum.WELCOME.name())
@@ -105,7 +105,7 @@ public class ThreadMessageUtil {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.QUEUE.name())
@@ -127,7 +127,7 @@ public class ThreadMessageUtil {
     public static MessageProtobuf getThreadQueuingMessage(UserProtobuf user, ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
                 .type(MessageTypeEnum.QUEUE.name())
@@ -149,7 +149,7 @@ public class ThreadMessageUtil {
     public static MessageProtobuf getThreadContinueMessage(UserProtobuf user, ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(thread.getUid()) // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
                 .content(I18Consts.I18N_REENTER_TIP)
                 .type(MessageTypeEnum.CONTINUE.name())
@@ -168,12 +168,12 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
+    public static NoticeEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
@@ -192,12 +192,12 @@ public class ThreadMessageUtil {
         return message;
     }
 
-    public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
+    public static NoticeEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         
-        MessageEntity message = MessageEntity.builder()
+        NoticeEntity message = NoticeEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
                 .type(MessageTypeEnum.LEAVE_MSG.name())

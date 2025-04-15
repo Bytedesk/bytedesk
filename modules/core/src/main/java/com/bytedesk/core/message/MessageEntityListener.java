@@ -28,18 +28,18 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageEntityListener {
 
     @PostPersist
-    public void onPostPersist(MessageEntity message) {
+    public void onPostPersist(NoticeEntity message) {
         // log.info("message MessageEntityListener: onPostPersist");
-        MessageEntity clonedMessage = SerializationUtils.clone(message);
+        NoticeEntity clonedMessage = SerializationUtils.clone(message);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishMessageCreateEvent(clonedMessage);
     }
 
     @PostUpdate
-    public void onPostUpdate(MessageEntity message) {
+    public void onPostUpdate(NoticeEntity message) {
         // log.info("message MessageEntityListener: onPostUpdate");
-        MessageEntity clonedMessage = SerializationUtils.clone(message);
+        NoticeEntity clonedMessage = SerializationUtils.clone(message);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishMessageUpdateEvent(clonedMessage);

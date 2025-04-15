@@ -29,7 +29,7 @@ import jakarta.persistence.criteria.Predicate;
 
 public class MessageSpecification extends BaseSpecification {
 
-    public static Specification<MessageEntity> search(MessageRequest request) {
+    public static Specification<NoticeEntity> search(MessageRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

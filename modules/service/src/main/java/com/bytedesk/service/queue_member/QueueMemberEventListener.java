@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.NoticeEntity;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -56,7 +56,7 @@ public class QueueMemberEventListener {
 
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
-        MessageEntity message = event.getMessage();
+        NoticeEntity message = event.getMessage();
         if (message == null) {
             return;
         }
@@ -99,7 +99,7 @@ public class QueueMemberEventListener {
      * @param message 消息对象
      * @param thread 会话对象
      */
-    private void updateVisitorMessageStats(MessageEntity message, ThreadEntity thread) {
+    private void updateVisitorMessageStats(NoticeEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
             return;
         }
@@ -144,7 +144,7 @@ public class QueueMemberEventListener {
      * @param message 消息对象
      * @param thread 会话对象
      */
-    private void updateAgentMessageStats(MessageEntity message, ThreadEntity thread) {
+    private void updateAgentMessageStats(NoticeEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
             return;
         }
@@ -212,7 +212,7 @@ public class QueueMemberEventListener {
      * @param message 消息对象
      * @param thread 会话对象
      */
-    private void updateRobotMessageStats(MessageEntity message, ThreadEntity thread) {
+    private void updateRobotMessageStats(NoticeEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
             return;
         }
@@ -278,7 +278,7 @@ public class QueueMemberEventListener {
      * @param message 消息对象
      * @param thread 会话对象
      */
-    private void updateSystemMessageStats(MessageEntity message, ThreadEntity thread) {
+    private void updateSystemMessageStats(NoticeEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
             return;
         }

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.NoticeEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -132,7 +132,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         //     }
         // }
         // 
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
+        NoticeEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, savedThread);
         messageRestService.save(message);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
@@ -153,7 +153,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         // }
         //
         String content = robot.getServiceSettings().getWelcomeTip();
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
+        NoticeEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
