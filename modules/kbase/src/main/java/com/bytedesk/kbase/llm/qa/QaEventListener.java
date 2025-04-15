@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 16:59:39
+ * @LastEditTime: 2025-04-15 10:43:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ public class QaEventListener {
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
         log.info("QaEventListener UploadEventListener create: {}", upload.toString());
-
         if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM_QA.name())) {
             // llm qa 问答对导入
             try {
