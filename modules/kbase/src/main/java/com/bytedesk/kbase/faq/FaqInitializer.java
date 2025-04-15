@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 23:12:18
+ * @LastEditTime: 2025-04-15 23:28:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,12 @@
 package com.bytedesk.kbase.faq;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
-// import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.utils.Utils;
 
 // import com.bytedesk.core.constant.BytedeskConsts;
 // import com.bytedesk.core.utils.Utils;
@@ -24,8 +27,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class FaqInitializer implements SmartInitializingSingleton {
 
-    // @Autowired
-    // private FaqRestService faqService;
+    @Autowired
+    private FaqRestService faqService;
     
     // @Autowired
     // private ThreadPoolTaskScheduler taskScheduler;
@@ -61,10 +64,10 @@ public class FaqInitializer implements SmartInitializingSingleton {
     }
 
     public void init() {
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
-        // // 
-        // faqService.importFaqs(orgUid, kbUid);
-        // faqService.initRelationFaqs(orgUid, kbUid);
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
+        // 
+        faqService.importFaqs(orgUid, kbUid);
+        faqService.initRelationFaqs(orgUid, kbUid);
     }
 }
