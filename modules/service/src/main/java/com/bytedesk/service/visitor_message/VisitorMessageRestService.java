@@ -22,7 +22,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
@@ -33,15 +33,15 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class VisitorMessageRestService extends BaseRestService<NoticeEntity, MessageRequest, MessageResponse> {
+public class VisitorMessageRestService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
     
     @Override
     public Page<MessageResponse> queryByOrg(MessageRequest request) {
          Pageable pageable = request.getPageable();
-        Specification<NoticeEntity> specs = MessageSpecification.search(request);
-        Page<NoticeEntity> messagePage = messageRepository.findAll(specs, pageable);
+        Specification<MessageEntity> specs = MessageSpecification.search(request);
+        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
         return messagePage.map(ConvertUtils::convertToMessageResponse);
     }
 
@@ -60,7 +60,7 @@ public class VisitorMessageRestService extends BaseRestService<NoticeEntity, Mes
     // }
 
     @Override
-    public Optional<NoticeEntity> findByUid(String uid) {
+    public Optional<MessageEntity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
@@ -78,7 +78,7 @@ public class VisitorMessageRestService extends BaseRestService<NoticeEntity, Mes
     }
 
     @Override
-    public NoticeEntity save(NoticeEntity entity) {
+    public MessageEntity save(MessageEntity entity) {
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -87,7 +87,7 @@ public class VisitorMessageRestService extends BaseRestService<NoticeEntity, Mes
     }
     
     @Override
-    protected NoticeEntity doSave(NoticeEntity entity) {
+    protected MessageEntity doSave(MessageEntity entity) {
         return messageRepository.save(entity);
     }
 
@@ -104,12 +104,12 @@ public class VisitorMessageRestService extends BaseRestService<NoticeEntity, Mes
     }
 
     @Override
-    public NoticeEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            NoticeEntity entity) {
+    public MessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            MessageEntity entity) {
         try {
-            Optional<NoticeEntity> latest = messageRepository.findByUid(entity.getUid());
+            Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                NoticeEntity latestEntity = latest.get();
+                MessageEntity latestEntity = latest.get();
                 // 消息实体通常不应该修改
                 // 这里仅保留状态相关字段的更新
                 latestEntity.setStatus(entity.getStatus());
@@ -122,7 +122,7 @@ public class VisitorMessageRestService extends BaseRestService<NoticeEntity, Mes
     }
 
     @Override
-    public MessageResponse convertToResponse(NoticeEntity entity) {
+    public MessageResponse convertToResponse(MessageEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }

@@ -26,7 +26,7 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.push.PushNotifier;
 // import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.utils.Utils;
@@ -58,7 +58,7 @@ public class PushServiceImplSms extends PushNotifier {
 
     @Async
     @Override
-    public void notify(NoticeEntity e) {
+    public void notify(MessageEntity e) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'notify'");
     }

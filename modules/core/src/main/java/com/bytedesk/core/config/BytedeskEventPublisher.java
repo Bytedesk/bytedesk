@@ -24,7 +24,7 @@ import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.quartz.event.QuartzHalfHourEvent;
 import com.bytedesk.core.quartz.event.QuartzHourlyEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.message.event.MessageUpdateEvent;
@@ -84,11 +84,11 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new MessageJsonEvent(this, json));
     }
 
-    public void publishMessageCreateEvent(NoticeEntity message) {
+    public void publishMessageCreateEvent(MessageEntity message) {
         applicationEventPublisher.publishEvent(new MessageCreateEvent(this, message));
     }
 
-    public void publishMessageUpdateEvent(NoticeEntity message) {
+    public void publishMessageUpdateEvent(MessageEntity message) {
         applicationEventPublisher.publishEvent(new MessageUpdateEvent(this, message));
     }
 

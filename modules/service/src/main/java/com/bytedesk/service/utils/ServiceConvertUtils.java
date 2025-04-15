@@ -20,7 +20,7 @@ import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -70,7 +70,7 @@ public class ServiceConvertUtils {
     //     return modelMapper.map(visitorResponseSimple, UserProtobuf.class);
     // }
 
-    public static MessageProtobuf convertToMessageProtobuf(NoticeEntity lastMessage, ThreadEntity thread) {
+    public static MessageProtobuf convertToMessageProtobuf(MessageEntity lastMessage, ThreadEntity thread) {
         //
         MessageProtobuf messageProtobuf = modelMapper.map(lastMessage, MessageProtobuf.class);
         messageProtobuf.setThread(ConvertUtils.convertToThreadProtobuf(thread));
@@ -84,7 +84,7 @@ public class ServiceConvertUtils {
         return messageProtobuf;
     }
 
-    public static MessageResponse convertToMessageResponse(NoticeEntity lastMessage, ThreadEntity thread) {
+    public static MessageResponse convertToMessageResponse(MessageEntity lastMessage, ThreadEntity thread) {
         //
         MessageResponse messageResponse = modelMapper.map(lastMessage, MessageResponse.class);
         // messageResponse.setThread(ConvertUtils.convertToThreadProtobuf(thread));

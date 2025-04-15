@@ -17,7 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.enums.ClientEnum;
-import com.bytedesk.core.message.NoticeEntity;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageCreateEvent;
@@ -40,7 +40,7 @@ public class MessageUnreadEventListener {
 
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
-        NoticeEntity message = event.getMessage();
+        MessageEntity message = event.getMessage();
         if (MessageTypeEnum.STREAM.name().equalsIgnoreCase(message.getType()) || 
             MessageTypeEnum.NOTICE.name().equalsIgnoreCase(message.getType()) ||
             MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
@@ -129,7 +129,7 @@ public class MessageUnreadEventListener {
 
     @EventListener
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
-        NoticeEntity message = event.getMessage();
+        MessageEntity message = event.getMessage();
         if (MessageTypeEnum.STREAM.name().equalsIgnoreCase(message.getType()) || 
             MessageTypeEnum.NOTICE.name().equalsIgnoreCase(message.getType()) || 
             MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
