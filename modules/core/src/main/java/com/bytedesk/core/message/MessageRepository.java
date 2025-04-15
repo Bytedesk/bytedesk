@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 15:55:08
+ * @LastEditTime: 2025-04-15 16:22:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,19 +20,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-/**
- * QuerydslPredicateExecutor<Message>
- */
 @Repository
-@Tag(name = "message")
 public interface MessageRepository extends JpaRepository<MessageEntity, Long>, JpaSpecificationExecutor<MessageEntity> {
 
     Optional<MessageEntity> findByUid(String uid);
-    // 用于搜索notice通知中的：转接消息uid和转接状态
-    Optional<MessageEntity> findFirstByTypeAndContentContainsAndContentContains(String type, String messageUid, String status);
+
+    // 建议替代方案：使用更明确的方法名
+    // Optional<MessageEntity> findFirstByTypeAndContentContainsMessageUidAndContentContainsStatus(
+    //         String type, String messageUid, String status);
+    
+    // 或者更好的选择：使用JPQL查询，更灵活且性能更可控
+    @Query("SELECT m FROM MessageEntity m WHERE m.type = :type AND m.content LIKE %:messageUid% AND m.content LIKE %:status%")
+    Optional<MessageEntity> findTransferMessage(
+            @Param("type") String type, 
+            @Param("messageUid") String messageUid, 
+            @Param("status") String status);
 
     // 根据thread.uid查询最新一条消息
     Optional<MessageEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
