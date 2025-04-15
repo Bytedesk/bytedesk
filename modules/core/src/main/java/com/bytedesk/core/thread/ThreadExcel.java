@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-23 00:03:02
+ * @LastEditTime: 2025-04-15 11:06:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,20 +23,21 @@ import lombok.Data;
 @Data
 public class ThreadExcel {
 
-    @ExcelProperty(value = "Topic")
+    @ExcelProperty(value = "访客")
     @ColumnWidth(20)
-    private String topic;
+    private String visitorNickname;
 
-    @ExcelProperty(value = "Content")
+    @ExcelProperty(value = "客服")
     @ColumnWidth(20)
-    private String content;
+    private String agentNickname;
 
-    @ExcelProperty(value = "Type")
+    // robot
+    @ExcelProperty(value = "机器人")
     @ColumnWidth(20)
-    private String type;
+    private String robotNickname;
 
-    @ExcelProperty(value = "updatedAt")
+    @ExcelProperty(value = "创建时间")
     @ColumnWidth(20)
-    private String updatedAt;
+    private String createdAt;
 
 }

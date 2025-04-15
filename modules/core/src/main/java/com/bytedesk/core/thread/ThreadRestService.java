@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:53:32
+ * @LastEditTime: 2025-04-15 11:03:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -58,7 +58,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadRequest, ThreadResponse> {
+public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
 
     private final AuthService authService;
 
@@ -74,13 +74,15 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
 
     private final TagRestService tagRestService;
 
-    // private final IMessageSendService messageSendService;
-
-
-    public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
+    @Override
+    public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.search(request);
-        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
+        return threadRepository.findAll(specs, pageable);
+    }
+
+    public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
+        Page<ThreadEntity> threadPage = queryByOrgEntity(request);
         return threadPage.map(this::convertToResponse);
     }
 
@@ -557,15 +559,6 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
     }
 
     @Override
-    public ThreadEntity save(@NonNull ThreadEntity thread) {
-        try {
-            return doSave(thread);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, thread);
-        }
-    }
-
-    @Override
     protected ThreadEntity doSave(ThreadEntity entity) {
         return threadRepository.save(entity);
     }
@@ -673,6 +666,13 @@ public class ThreadRestService extends BaseRestService<ThreadEntity, ThreadReque
                     .build();
             tagRestService.create(tagRequest);
         }
+    }
+   
+    @Override
+    public ThreadExcel convertToExcel(ThreadEntity entity) {
+        ThreadExcel threadExcel = modelMapper.map(entity, ThreadExcel.class);
+
+        return threadExcel;
     }
 
 }
