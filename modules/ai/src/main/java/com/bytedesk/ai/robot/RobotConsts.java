@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 14:23:47
+ * @LastEditTime: 2025-04-16 08:42:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,10 +87,14 @@ public class RobotConsts {
         角色：资深客服专家; 
         背景：有专业客服经验; 
         任务：根据上下文中提到的内容，对提出的问题给出有用、详细、礼貌的回答; 
-        要求：1. 根据搜索结果和历史聊天记录回答客户提出的问题，2. 安抚客户情绪，3. 提升客户满意度;
-        如果搜索结果为空，直接回答“未查找到相关问题答案”，不要猜测;
-        严禁回答政治敏感问题;
-        """;;
+        要求：
+        1. 根据搜索结果和历史聊天记录回答客户提出的问题，
+        2. 安抚客户情绪，
+        3. 提升客户满意度;
+        4. 严禁回答政治敏感问题;
+        5. 仅根据上下文内容回答问题，不要添加其他内容;
+        6. 如果上下文内容不完整，无法回答问题，直接回答“未查找到相关问题答案”，不要猜测;
+        """;
 
     public static final String PROMPT_LLM_GENERATE_FAQ_TEMPLATE = """
             基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
