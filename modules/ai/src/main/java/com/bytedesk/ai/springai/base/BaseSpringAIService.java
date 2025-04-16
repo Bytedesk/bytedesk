@@ -108,7 +108,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 未开启大模型，关键词匹配，使用搜索
             processSearchResponse(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
         }
-
     }
 
     private void processLlmResponse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
