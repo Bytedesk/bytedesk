@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 16:10:02
+ * @LastEditTime: 2025-04-16 17:04:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,6 @@ import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
-import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseRequest;
 import com.bytedesk.kbase.kbase.KbaseRestService;
@@ -131,31 +130,6 @@ public class AgentEventListener {
         for (String userUid : userIds) {
             agentService.updateConnect(userUid, true);            
         }
-    }
-
-    // @EventListener
-    // public void onThreadCreateEvent(ThreadCreateEvent event) {
-    //     // log.info("agent onThreadCreateEvent: " + event);
-    // }
-
-    // @EventListener
-    // public void onThreadUpdateEvent(ThreadUpdateEvent event) {
-    //     // log.info("agent onThreadUpdateEvent: " + event);
-    // }
-
-    @EventListener
-    public void onThreadCloseEvent(ThreadCloseEvent event) {
-        // log.info("agent onThreadCloseEvent: " + event);
-        // ThreadEntity thread = event.getThread();
-        // log.info("agent onThreadCloseEvent: {}", thread.getAgent());
-        // String agentString = thread.getAgent();
-        // UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
-        // if (agentProtobuf.getType().equals(UserTypeEnum.AGENT.name())) {
-        //     // 减少客服当前接待数量
-        //     AgentEntity agent = agentService.findByUid(agentProtobuf.getUid()).orElseThrow(() -> new RuntimeException("agent not found"));
-        //     agent.decreaseThreadCount();
-        //     agentService.save(agent);
-        // } 
     }
 
     // 客服接待数量发生变化，增加接待数量，发送欢迎语
