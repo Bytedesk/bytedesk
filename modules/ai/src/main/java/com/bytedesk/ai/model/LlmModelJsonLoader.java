@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-24 15:26:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-11 17:22:02
+ * @LastEditTime: 2025-04-16 10:06:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,21 +47,9 @@ public class LlmModelJsonLoader {
             );
             // 使用getInputStream()而不是getFile()
             Map<String, List<ModelJson>> models = objectMapper.readValue(resource.getInputStream(), mapType);
-            // for (Map.Entry<String, List<ModelJson>> entry : models.entrySet()) {
-            //     String key = entry.getKey();
-            //     // log.info("loadModels key {} value {}", key, entry.getValue());
-            //     List<ModelJson> values = entry.getValue(); //(List<ModelJson>) entry.getValue();
-            //     StringBuilder sb = new StringBuilder();
-            //     for (ModelJson model : values) {
-            //         // sb.append(objectMapper.writeValueAsString(model));
-            //         sb.append(model.getName());
-            //         sb.append("\n");
-            //     }
-            //     log.info("loadModels key: {} value: {}", key, sb.toString());
-            // }
             return models;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load providers.json", e);
+            throw new RuntimeException("Failed to load models.json", e);
         }
     }
 
@@ -70,6 +58,8 @@ public class LlmModelJsonLoader {
     public static class ModelJson {
         private String name;
         private String nickname;
+        private String description;
+        private String type;
     }
 
 }
