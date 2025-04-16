@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:11:44
+ * @LastEditTime: 2025-04-16 12:27:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -536,7 +536,10 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         Optional<RobotEntity> robotOptional = findByUid(uid);
         robotOptional.ifPresent(robot -> {
             robot.setDeleted(true);
-            save(robot);
+            RobotEntity savedEntity = save(robot);
+            if (savedEntity == null) {
+                throw new RuntimeException("delete robot failed");
+            }
         });
     }
 

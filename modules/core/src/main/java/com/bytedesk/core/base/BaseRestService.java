@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:13:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:51:18
+ * @LastEditTime: 2025-04-16 12:27:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,7 @@ public abstract class BaseRestService<T, TRequest, TResponse> {
 
     abstract public void deleteByUid(String uid);
 
-    abstract public void delete(TRequest request);
+    abstract public void delete(TRequest entity);
 
     abstract public T handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             T entity);
