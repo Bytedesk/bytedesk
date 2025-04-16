@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:03:52
+ * @LastEditTime: 2025-04-16 17:01:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -154,55 +154,5 @@ public class ThreadEventListener {
         log.info("thread ThreadRemoveTopicEvent: {}", thread.getUid());
     }
 
-    // @EventListener
-    // public void onThreadCloseEvent(ThreadCloseEvent event) {
-    // ThreadEntity thread = event.getThread();
-    // log.info("thread event listener onThreadCloseEvent: {}", thread.getAgent());
-    // //
-    // if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-    // TODO：工作组会话，会话关闭后，需要取消订阅topic
-    // if (thread.isClosed() && thread.getOwner() != null) {
-    // // 取消订阅
-    // TopicRequest request = TopicRequest.builder()
-    // .topic(thread.getTopic())
-    // .userUid(thread.getOwner().getUid())
-    // .build();
-    // topicService.remove(request);
-    // }
-    // }
-    // }
-
-    // @EventListener
-    // public void onMessageCreateEvent(MessageCreateEvent event) {
-    // MessageEntity message = event.getMessage();
-    // if (message.getType().equalsIgnoreCase(MessageTypeEnum.STREAM.name())) {
-    // return;
-    // }
-    // Optional<Thread> threadOptional =
-    // threadService.findFirstByTopic(message.getThreadTopic());
-    // if (threadOptional.isPresent()) {
-    // Thread thread = threadOptional.get();
-    // thread.setHide(false);
-    // thread.setContent(message.getContent());
-    // // threadService.save(thread);
-    // threadPersistCache.pushForPersist(thread);
-    // }
-    // }
-
-    // @EventListener
-    // public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-    // List<ThreadEntity> threadList = threadPersistCache.getListForPersist();
-    // if (threadList != null) {
-    // threadList.forEach(thread -> {
-    // threadService.save(thread);
-    // });
-    // }
-    // }
-
-    // @EventListener
-    // public void onUserUpdateEvent(UserUpdateEvent event) {
-    // // todo: on user avatar update, update thread entity user avatar
-    // // update member thread avatar
-    // }
 
 }
