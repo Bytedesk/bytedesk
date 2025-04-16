@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-16 10:40:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-16 11:10:23
+ * @LastEditTime: 2025-04-16 11:23:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,19 +13,14 @@
  */
 package com.bytedesk.ai.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,8 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.springai.openai.SpringAIOpenaiService;
+import com.bytedesk.ai.config.AiProviderProperties;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -46,12 +42,38 @@ import reactor.core.publisher.Flux;
 public class AiRestController {
     
     @Autowired
-    private Optional<SpringAIOpenaiService> openaiService;
+    private ApplicationContext applicationContext;
     
     @Autowired
-    private Optional<OpenAiApi> openAiApi;
+    private AiProviderProperties aiProperties;
+    
+    private OpenAiApi selectedApi;
     
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    
+    @PostConstruct
+    public void init() {
+        String providerName = aiProperties.getProvider() + "Api";
+        log.info("Using AI provider: {}", providerName);
+        
+        Map<String, OpenAiApi> apiMap = applicationContext.getBeansOfType(OpenAiApi.class);
+        // OpenAiApi beans: [baiduApi, deepseekApi, giteeApi, siliconFlowApi, tencentApi, volcengineApi]
+        log.info("OpenAiApi beans: {}", apiMap.keySet());
+        if (apiMap.containsKey(providerName)) {
+            selectedApi = apiMap.get(providerName);
+        } else {
+            log.warn("Specified provider '{}' not found. Available providers: {}", 
+                    providerName, apiMap.keySet());
+            // 如果指定的提供商不存在，则使用第一个可用的提供商
+            if (!apiMap.isEmpty()) {
+                String firstProvider = apiMap.keySet().iterator().next();
+                selectedApi = apiMap.get(firstProvider);
+                log.info("Falling back to first available provider: {}", firstProvider);
+            } else {
+                log.error("No OpenAiApi providers available");
+            }
+        }
+    }
     
     /**
      * 文本补全接口
@@ -64,7 +86,10 @@ public class AiRestController {
     public ResponseEntity<OpenAiApi.ChatCompletion> createCompletion(
             @RequestBody OpenAiApi.ChatCompletionRequest request) {
         // OpenAI不再支持单独的completions接口，我们使用chat completions代替
-        return openAiApi.orElseThrow(() -> new IllegalStateException("OpenAI API not available")).chatCompletionEntity(request);
+        if (selectedApi == null) {
+            throw new IllegalStateException("OpenAI API not available");
+        }
+        return selectedApi.chatCompletionEntity(request);
     }
     
     /**
@@ -77,7 +102,10 @@ public class AiRestController {
     @PostMapping("/chat/completions")
     public ResponseEntity<OpenAiApi.ChatCompletion> createChatCompletion(
             @RequestBody OpenAiApi.ChatCompletionRequest request) {
-        return openAiApi.orElseThrow(() -> new IllegalStateException("OpenAI API not available")).chatCompletionEntity(request);
+        if (selectedApi == null) {
+            throw new IllegalStateException("OpenAI API not available");
+        }
+        return selectedApi.chatCompletionEntity(request);
     }
     
     /**
@@ -90,7 +118,10 @@ public class AiRestController {
     @PostMapping(path = "/chat/completions/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<OpenAiApi.ChatCompletionChunk> createChatCompletionStream(
             @RequestBody OpenAiApi.ChatCompletionRequest request) {
-        return openAiApi.orElseThrow(() -> new IllegalStateException("OpenAI API not available")).chatCompletionStream(request);
+        if (selectedApi == null) {
+            throw new IllegalStateException("OpenAI API not available");
+        }
+        return selectedApi.chatCompletionStream(request);
     }
     
     /**
@@ -103,8 +134,10 @@ public class AiRestController {
     @PostMapping("/embeddings")
     public ResponseEntity<OpenAiApi.EmbeddingList<OpenAiApi.Embedding>> createEmbedding(
             @RequestBody OpenAiApi.EmbeddingRequest<String> request) {
-        // 明确指定泛型类型为String
-        return openAiApi.orElseThrow(() -> new IllegalStateException("OpenAI API not available")).embeddings(request);
+        if (selectedApi == null) {
+            throw new IllegalStateException("OpenAI API not available");
+        }
+        return selectedApi.embeddings(request);
     }
     
     /**
@@ -119,9 +152,12 @@ public class AiRestController {
         
         executorService.execute(() -> {
             try {
+                if (selectedApi == null) {
+                    throw new IllegalStateException("OpenAI API not available");
+                }
                 // 明确指定泛型类型为String
                 ResponseEntity<OpenAiApi.EmbeddingList<OpenAiApi.Embedding>> response = 
-                    openAiApi.orElseThrow(() -> new IllegalStateException("OpenAI API not available")).embeddings(request);
+                    selectedApi.embeddings(request);
                 
                 if (response != null && response.getBody() != null && response.getBody().data() != null) {
                     for (OpenAiApi.Embedding embedding : response.getBody().data()) {
@@ -157,17 +193,7 @@ public class AiRestController {
      */
     @PostMapping("/chat")
     public ResponseEntity<ChatResponse> chat(@RequestBody String content) {
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage("You are a helpful assistant."));
-        messages.add(new UserMessage(content));
-        
-        Prompt prompt = new Prompt(messages);
-        
-        ChatResponse response = openaiService
-            .map(service -> service.getOpenaiChatModel().call(prompt))
-            .orElseThrow(() -> new IllegalStateException("OpenAI service not available"));
-            
-        return ResponseEntity.ok(response);
+        return null;
     }
     
     /**
@@ -178,15 +204,7 @@ public class AiRestController {
      */
     @PostMapping(path = "/chat/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ChatResponse> chatStream(@RequestBody String content) {
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage("You are a helpful assistant."));
-        messages.add(new UserMessage(content));
-        
-        Prompt prompt = new Prompt(messages);
-        
-        return openaiService
-            .map(service -> service.getOpenaiChatModel().stream(prompt))
-            .orElse(Flux.empty());
+        return null;
     }
     
     @PreDestroy
