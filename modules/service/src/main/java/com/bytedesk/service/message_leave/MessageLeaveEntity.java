@@ -52,6 +52,7 @@ public class MessageLeaveEntity extends BaseEntity {
     private String contact;
 
     // 留言内容
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
     // 支持图片
@@ -59,6 +60,10 @@ public class MessageLeaveEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
+
+    // 回复内容
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String reply;
 
     @Builder.Default
     private String status = MessageLeaveStatusEnum.PENDING.name();
