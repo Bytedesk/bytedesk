@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 11:05:40
+ * @LastEditTime: 2025-04-16 11:24:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.core.redis.JedisProperties;
 import com.bytedesk.kbase.config.KbaseConst;
-// import com.zhipu.oapi.ClientV4;
 
 import lombok.Data;
 import redis.clients.jedis.JedisPooled;
