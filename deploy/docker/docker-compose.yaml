@@ -139,11 +139,11 @@ services:
       # ollama
       # ollama pull qwen2.5:1.5b
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
-      SPRING_AI_OLLAMA_CHAT_ENABLED: false
+      SPRING_AI_OLLAMA_CHAT_ENABLED: true
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen2.5:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
+      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: qwen2.5:1.5b
       # deepseek
       # 申请key https://api-docs.deepseek.com/zh-cn/

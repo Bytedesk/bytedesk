@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:53:44
+ * @LastEditTime: 2025-04-16 09:15:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {
         
         Page<OrganizationResponse> orgPage = organizationService.queryByOrg(request);
-        // //
+        //
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
@@ -54,7 +54,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     public ResponseEntity<?> queryByUser(OrganizationRequest request) {
         
         Page<OrganizationResponse> orgPage = organizationService.queryByUser(request);
-        // //
+        //
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
@@ -72,32 +72,33 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
         //
-        OrganizationResponse org = organizationService.create(request);
-        if (org == null) {
+        OrganizationResponse response = organizationService.create(request);
+        if (response == null) {
             return ResponseEntity.ok(JsonResult.error("创建组织失败"));
         }
         //
-        return ResponseEntity.ok(JsonResult.success(org));
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @ActionAnnotation(title = "组织", action = "更新", description = "organization update")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
         //
-        OrganizationResponse org = organizationService.update(request);
-        if (org == null) {
+        OrganizationResponse response = organizationService.update(request);
+        if (response == null) {
             return ResponseEntity.ok(JsonResult.error("更新组织失败"));
         }
         //
-        return ResponseEntity.ok(JsonResult.success(org));
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     
-    
     @Override
     public ResponseEntity<?> delete(OrganizationRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        organizationService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
