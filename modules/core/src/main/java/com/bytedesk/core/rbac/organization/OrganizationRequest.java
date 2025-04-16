@@ -38,7 +38,6 @@ public class OrganizationRequest extends BaseRequest {
     
     private String description;
 
-
     // TODO: Identity Verification 实名认证
 
     // 认证类型：企业认证、个人认证、政府事业单位认证
