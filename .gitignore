@@ -73,6 +73,7 @@ taboo/
 taboo_message/
 unified/
 agent_status/
+agent_message/
 browse/
 # kanban/
 message_correction/
@@ -80,5 +81,11 @@ message_parsed/
 message_feedback/
 # message_leave/
 message_unanswered/
+message_unread/
 hanlp/
 visitor_rating/
+robot_message/
+workgroup_message/
+visitor_message/
+holiday/
+form/
