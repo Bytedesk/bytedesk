@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 14:49:43
+ * @LastEditTime: 2025-04-17 15:08:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -112,7 +111,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
         return convertToResponse(savedModel);
     }
 
-    public LlmModelResponse createFromModelJson(String providerUid, String providerName, ModelJson modelJson) {
+    public LlmModelResponse createFromModelJson(String providerUid, String providerName, ModelJson modelJson, String level, String orgUid) {
 
         LlmModelRequest request = LlmModelRequest.builder()
                 .providerUid(providerUid)
@@ -121,7 +120,8 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
                 .nickname(modelJson.getNickname())
                 .description(modelJson.getDescription())
                 .type(modelJson.getType())
-                .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
+                .level(level)
+                .orgUid(orgUid)
                 .build();
 
         return create(request);
