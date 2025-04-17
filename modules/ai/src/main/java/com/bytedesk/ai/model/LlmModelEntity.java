@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:52:26
+ * @LastEditTime: 2025-04-17 14:48:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.ai.model;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -48,6 +49,11 @@ public class LlmModelEntity extends BaseEntity {
 
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
+
+    // 模型类型
+    @Builder.Default
+    @Column(name = "model_type")
+    private String type = LlmModelTypeEnum.CHAT.name();
 
     private String providerUid;
 
