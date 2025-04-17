@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-24 15:26:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-11 17:21:46
+ * @LastEditTime: 2025-04-17 14:49:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,13 +45,6 @@ public class LlmProviderJsonLoader {
             );
             // 使用getInputStream()而不是getFile()
             Map<String, ProviderJson> providers = objectMapper.readValue(resource.getInputStream(), mapType);
-            // 你可以遍历providers映射，并访问每个Provider对象的属性
-            // for (Map.Entry<String, ProviderJson> entry : providers.entrySet()) {
-            //     String key = entry.getKey();
-            //     // log.info("loadProviders key: {} value: {}", key, entry.getValue());
-            //     ProviderJson provider = entry.getValue();
-            //     log.info("loadProviders key {} api.url {}", key, provider.getApi().getUrl());
-            // }
             return providers;
         } catch (IOException e) {
             throw new RuntimeException("Failed to load providers.json", e);
