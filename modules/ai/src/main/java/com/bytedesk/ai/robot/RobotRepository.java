@@ -20,10 +20,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+// import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Repository
-@Tag(name = "robot info")
+// @Tag(name = "robot info")
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface RobotRepository extends JpaRepository<RobotEntity, Long>, JpaSpecificationExecutor<RobotEntity> {
 
