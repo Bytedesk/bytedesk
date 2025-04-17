@@ -30,66 +30,74 @@
 
 	<dependencies>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
 		</dependency>
 
+
+		<!-- llm -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-openai-spring-boot-starter -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-openai-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/index.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-ollama-spring-boot-starter -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-ollama-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-moonshot-spring-boot-starter -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
 		</dependency>
 
 		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-moonshot-spring-boot-starter -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
+		</dependency> -->
+
+
+		<!-- reader -->
+		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
 		<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>io.swagger.core.v3</groupId>
-					<artifactId>swagger-annotations</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>1.0.0-M7</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-markdown-document-reader</artifactId>
+			<version>1.0.0-M7</version>
 		</dependency>
 		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
 		<!-- https://tika.apache.org/2.9.0/formats.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-tika-document-reader</artifactId>
+			<version>1.0.0-M7</version>
 		</dependency>
 
 
-		
+		<!-- vector db -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
 		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
 		<!--
@@ -100,16 +108,33 @@
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
-		<!-- <dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store-spring-boot-starter -->
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
-		</dependency> -->
+		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
-		<!-- <dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-elasticsearch -->
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
-		</dependency> -->
+			<version>1.0.0-M7</version>
+		</dependency>
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
+		</dependency>
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
+		</dependency>
 
 		<!-- ERROR: column cannot have more than 2000 dimensions for hnsw index -->
 		<!-- <dependency>
@@ -141,29 +166,17 @@
 			<artifactId>spring-ai-typesense-spring-boot-starter</artifactId>
 		</dependency> -->
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-
-
 
 		<!-- mcp -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-spring-boot-starter -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-spring-boot-starter -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
 		</dependency> -->
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-server-webmvc-spring-boot-starter -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-server-webmvc-spring-boot-starter -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-mcp-server-webmvc-spring-boot-starter</artifactId>
@@ -198,7 +211,8 @@
 
 		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
 		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
-		<!-- https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
+		<!--
+		https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
 		<!-- <dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
@@ -222,7 +236,8 @@
 
 		<!-- Open Manus -->
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
-		<!-- https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk/examples/java/src/test/java/dev/selenium/actions_api/ActionsTest.java -->
+		<!--
+		https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk/examples/java/src/test/java/dev/selenium/actions_api/ActionsTest.java -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
