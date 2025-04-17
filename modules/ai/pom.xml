@@ -110,39 +110,44 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-elasticsearch -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
-		</dependency> -->
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store-spring-boot-starter -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
-		</dependency> -->
+			<version>${spring-ai.version}</version>
+		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
-		</dependency> -->
+			<version>${spring-ai.version}</version>
+		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
-		</dependency> -->
+			<version>${spring-ai.version}</version>
+		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/oracle.html -->
 		<!-- <dependency>
