@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-17 14:44:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 14:46:59
+ * @LastEditTime: 2025-04-17 16:05:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,19 +13,19 @@
  */
 package com.bytedesk.ai.model;
 
-// 模型类型: chat、embedding、vision、code、text2image、image2text、audio2text、text2audio、text2video、video2text
+// 模型类型:
 public enum LlmModelTypeEnum {
-    CHAT("chat"),
-    EMBEDDING("embedding"),
-    VISION("vision"),
-    CODE("code"),
-    REASONING("reasoning"),
-    TEXT2IMAGE("text2image"),
-    IMAGE2TEXT("image2text"),
-    AUDIO2TEXT("audio2text"),
-    TEXT2AUDIO("text2audio"),
-    TEXT2VIDEO("text2video"),
-    VIDEO2TEXT("video2text");
+    CHAT("chat"), // 对话模型
+    EMBEDDING("embedding"), // 向量嵌入模型
+    VISION("vision"), // 视觉模型
+    CODE("code"),  // 代码模型
+    REASONING("reasoning"), // 推理模型
+    TEXT2IMAGE("text2image"), // 文本生成图像模型
+    IMAGE2TEXT("image2text"), // 图像理解文本模型
+    AUDIO2TEXT("audio2text"), // 语音转文本模型
+    TEXT2AUDIO("text2audio"), // 文本转语音模型
+    TEXT2VIDEO("text2video"), // 文本生成视频模型
+    VIDEO2TEXT("video2text"); // 视频理解模型
 
     private String type;
 
