@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 14:42:10
+ * @LastEditTime: 2025-04-17 14:44:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,8 @@
  */
 package com.bytedesk.ai.springai.zhipuai;
 
-import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.vectorstore.redis.RedisVectorStore;
-import org.springframework.ai.vectorstore.redis.RedisVectorStore.MetadataField;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
@@ -25,17 +22,12 @@ import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.bytedesk.core.redis.JedisProperties;
-import com.bytedesk.kbase.config.KbaseConst;
-
 import lombok.Data;
-import redis.clients.jedis.JedisPooled;
 /**
  * https://open.bigmodel.cn/dev/api#sdk_install
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
@@ -59,9 +51,6 @@ public class SpringAIZhipuaiConfig {
 
     @Value("${spring.ai.zhipuai.embedding.options.model:embedding-2}")
     String zhipuaiEmbeddingModel;
-
-    @Autowired
-    private JedisProperties jedisProperties;
 
     @Bean("bytedeskZhipuaiApi")
     ZhiPuAiApi bytedeskZhipuaiApi() {
@@ -118,25 +107,5 @@ public class SpringAIZhipuaiConfig {
         return new ZhiPuAiImageModel(bytedeskZhipuaiImageApi());
     }
 
-    @Bean("bytedeskZhipuaiRedisVectorStore")
-    @ConditionalOnProperty(name = { "spring.ai.zhipuai.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
-    public RedisVectorStore bytedeskZhipuaiRedisVectorStore(RedisVectorStoreProperties properties) {
-
-            var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
-            var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
-            //
-            var jedisPooled = new JedisPooled(jedisProperties.getHost(),
-                            jedisProperties.getPort(),
-                            null,
-                            jedisProperties.getPassword());
-            
-            // 初始化向量库, 创建索引
-            return RedisVectorStore.builder(jedisPooled, bytedeskZhipuaiEmbeddingModel())
-                    .indexName(properties.getIndex())
-                    .prefix(properties.getPrefix())
-                    .metadataFields(kbUid, fileUid)
-                    .initializeSchema(true)
-                    .build();
-    }
-
+    // 注意：RedisVectorStore相关配置已移至VectorStoreConfig类中统一管理
 }

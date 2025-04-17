@@ -80,8 +80,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
             List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+            // TODO: 根据配置，拉取历史聊天记录
+            String history = "";
             String context = String.join("\n", contentList);
-            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
         } else {
             prompt = robot.getLlm().getPrompt();
         }
@@ -124,8 +126,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
             String context = String.join("\n", contentList);
             // TODO: 根据配置，拉取历史聊天记录
-            // String history = "";
-            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
+            String history = "";
+            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
         } else {
             prompt = robot.getLlm().getPrompt();
         }
@@ -272,10 +274,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // }
     // }
 
-    public String buildKbPrompt(String systemPrompt, String query, String context) {
+    public String buildKbPrompt(String systemPrompt, String query, String history, String context) {
         return systemPrompt + "\n" +
                 "用户查询: " + query + "\n" +
-                "历史聊天记录: " + "\n" +
+                "历史聊天记录: " + history + "\n" +
                 "搜索结果: " + context;
     }
 

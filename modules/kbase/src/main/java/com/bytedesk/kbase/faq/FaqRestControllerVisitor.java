@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-18 12:27:36
+ * @LastEditTime: 2025-04-17 17:16:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,9 @@ package com.bytedesk.kbase.faq;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
+import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.utils.JsonResult;
@@ -40,6 +43,9 @@ public class FaqRestControllerVisitor {
     private final MessageRestService messageRestService;
 
     // 输入联想搜索faq
+    @BlackIpFilter(title = "black", action = "searchFaqVisitor")
+    @BlackUserFilter(title = "black", action = "searchFaqVisitor")
+    @TabooJsonFilter(title = "敏感词", action = "searchFaqVisitor")
     @GetMapping("/search")
     public ResponseEntity<?> search(FaqRequest request) {
 
