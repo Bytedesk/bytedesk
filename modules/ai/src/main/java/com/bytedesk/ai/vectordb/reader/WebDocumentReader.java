@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.utils.reader;
+package com.bytedesk.ai.vectordb.reader;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
