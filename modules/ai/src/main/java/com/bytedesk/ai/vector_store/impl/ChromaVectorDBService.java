@@ -3,8 +3,6 @@ package com.bytedesk.ai.vector_store.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
@@ -16,15 +14,16 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.vector_store.VectorDBService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Chroma向量数据库服务实现
  * 使用Spring AI的ChromaVectorStore实现向量存储和检索
  */
+@Slf4j
 @Service
 @ConditionalOnProperty(name = "spring.ai.vectorstore.chroma.enabled", havingValue = "true")
 public class ChromaVectorDBService implements VectorDBService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ChromaVectorDBService.class);
     
     @Autowired
     private ChromaVectorStore chromaVectorStore;
@@ -32,11 +31,11 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public int addDocuments(List<Document> documents, List<String> metadataFields) {
         try {
-            logger.debug("Adding {} documents to Chroma vector store", documents.size());
+            log.debug("Adding {} documents to Chroma vector store", documents.size());
             chromaVectorStore.add(documents);
             return documents.size();
         } catch (Exception e) {
-            logger.error("Error adding documents to Chroma vector store: {}", e.getMessage());
+            log.error("Error adding documents to Chroma vector store: {}", e.getMessage());
             return 0;
         }
     }
@@ -44,7 +43,7 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public List<Document> similaritySearch(String query, int k) {
         try {
-            logger.debug("Performing similarity search in Chroma for query with k={}", k);
+            log.debug("Performing similarity search in Chroma for query with k={}", k);
             // 修复：使用SearchRequest.builder()构建请求对象，指定topK参数
             SearchRequest searchRequest = SearchRequest.builder()
                     .query(query)
@@ -52,7 +51,7 @@ public class ChromaVectorDBService implements VectorDBService {
                     .build();
             return chromaVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error searching in Chroma vector store: {}", e.getMessage());
+            log.error("Error searching in Chroma vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -60,7 +59,7 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public List<Document> similaritySearch(String query, int k, Map<String, Object> filter) {
         try {
-            logger.debug("Performing filtered similarity search in Chroma with k={}", k);
+            log.debug("Performing filtered similarity search in Chroma with k={}", k);
             
             // 使用FilterExpressionBuilder创建过滤表达式
             FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
@@ -101,7 +100,7 @@ public class ChromaVectorDBService implements VectorDBService {
                     
             return chromaVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error searching with filter in Chroma vector store: {}", e.getMessage());
+            log.error("Error searching with filter in Chroma vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -109,10 +108,10 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public List<Document> search(SearchRequest searchRequest) {
         try {
-            logger.debug("Performing advanced search in Chroma with topK={}", searchRequest.getTopK());
+            log.debug("Performing advanced search in Chroma with topK={}", searchRequest.getTopK());
             return chromaVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error performing advanced search in Chroma vector store: {}", e.getMessage());
+            log.error("Error performing advanced search in Chroma vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -120,11 +119,11 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public int delete(List<String> ids) {
         try {
-            logger.debug("Deleting {} documents from Chroma vector store", ids.size());
+            log.debug("Deleting {} documents from Chroma vector store", ids.size());
             chromaVectorStore.delete(ids);
             return ids.size();
         } catch (Exception e) {
-            logger.error("Error deleting documents from Chroma vector store: {}", e.getMessage());
+            log.error("Error deleting documents from Chroma vector store: {}", e.getMessage());
             return 0;
         }
     }
@@ -132,11 +131,11 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public boolean clear() {
         try {
-            logger.debug("Clearing Chroma vector store");
+            log.debug("Clearing Chroma vector store");
             // chromaVectorStore.deleteAll();
             return true;
         } catch (Exception e) {
-            logger.error("Error clearing Chroma vector store: {}", e.getMessage());
+            log.error("Error clearing Chroma vector store: {}", e.getMessage());
             return false;
         }
     }
@@ -144,7 +143,7 @@ public class ChromaVectorDBService implements VectorDBService {
     @Override
     public long count() {
         // ChromaVectorStore不提供直接的计数方法
-        logger.debug("Count operation is not supported in ChromaVectorStore");
+        log.debug("Count operation is not supported in ChromaVectorStore");
         return -1;
     }
     

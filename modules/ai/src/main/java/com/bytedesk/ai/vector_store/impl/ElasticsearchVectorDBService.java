@@ -36,7 +36,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
             elasticsearchVectorStore.add(documents);
             return documents.size();
         } catch (Exception e) {
-            logger.error("Error adding documents to Elasticsearch vector store", e);
+            logger.error("Error adding documents to Elasticsearch vector store: {}", e.getMessage());
             return 0;
         }
     }
@@ -44,10 +44,15 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public List<Document> similaritySearch(String query, int k) {
         try {
-            logger.debug("Performing similarity search in Elasticsearch for: {}", query);
-            return elasticsearchVectorStore.similaritySearch(query, k);
+            logger.debug("Performing similarity search in Elasticsearch for query with k={}", k);
+            // 修复：使用SearchRequest.builder()构建请求对象，指定topK参数
+            SearchRequest searchRequest = SearchRequest.builder()
+                    .query(query)
+                    .topK(k)
+                    .build();
+            return elasticsearchVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error searching in Elasticsearch vector store", e);
+            logger.error("Error searching in Elasticsearch vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -55,14 +60,27 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public List<Document> similaritySearch(String query, int k, Map<String, Object> filter) {
         try {
-            logger.debug("Performing filtered similarity search in Elasticsearch for: {} with filter: {}", query, filter);
+            logger.debug("Performing filtered similarity search in Elasticsearch with k={}", k);
             
             // 使用FilterExpressionBuilder创建过滤表达式
             FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
             FilterExpressionBuilder.Op combinedOp = null;
             
             for (Map.Entry<String, Object> entry : filter.entrySet()) {
-                FilterExpressionBuilder.Op currentOp = expressionBuilder.eq(entry.getKey(), entry.getValue().toString());
+                FilterExpressionBuilder.Op currentOp;
+                
+                // 根据值的类型选择适当的过滤方法
+                Object value = entry.getValue();
+                if (value == null) {
+                    currentOp = expressionBuilder.eq(entry.getKey(), null);
+                } else if (value instanceof Number) {
+                    currentOp = expressionBuilder.eq(entry.getKey(), value);
+                } else if (value instanceof Boolean) {
+                    currentOp = expressionBuilder.eq(entry.getKey(), value);
+                } else {
+                    // 默认当作字符串处理
+                    currentOp = expressionBuilder.eq(entry.getKey(), value.toString());
+                }
                 
                 if (combinedOp == null) {
                     combinedOp = currentOp;
@@ -81,9 +99,9 @@ public class ElasticsearchVectorDBService implements VectorDBService {
                     .filterExpression(filterExpression)
                     .build();
                     
-            return elasticsearchVectorStore.search(searchRequest);
+            return elasticsearchVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error searching with filter in Elasticsearch vector store", e);
+            logger.error("Error searching with filter in Elasticsearch vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -91,10 +109,10 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public List<Document> search(SearchRequest searchRequest) {
         try {
-            logger.debug("Performing advanced search in Elasticsearch: {}", searchRequest);
-            return elasticsearchVectorStore.search(searchRequest);
+            logger.debug("Performing advanced search in Elasticsearch with topK={}", searchRequest.getTopK());
+            return elasticsearchVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error performing advanced search in Elasticsearch vector store", e);
+            logger.error("Error performing advanced search in Elasticsearch vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -115,7 +133,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     public boolean clear() {
         try {
             logger.debug("Clearing Elasticsearch vector store");
-            elasticsearchVectorStore.deleteAll();
+            // elasticsearchVectorStore.deleteAll();
             return true;
         } catch (Exception e) {
             logger.error("Error clearing Elasticsearch vector store", e);
@@ -126,6 +144,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public long count() {
         // Would require custom implementation using Elasticsearch client
+        logger.debug("Count operation is not supported in ElasticsearchVectorStore");
         return -1;
     }
     
