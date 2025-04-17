@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.redis.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,7 +44,7 @@ public class RedisVectorDBService implements VectorDBService {
     public List<Document> similaritySearch(String query, int k) {
         try {
             logger.debug("Performing similarity search in Redis for: {}", query);
-            return redisVectorStore.similaritySearch(query, k);
+            return redisVectorStore.similaritySearch(SearchRequest.defaults().withQuery(query).withTopK(k));
         } catch (Exception e) {
             logger.error("Error searching in Redis vector store", e);
             return List.of();
@@ -55,7 +55,10 @@ public class RedisVectorDBService implements VectorDBService {
     public List<Document> similaritySearch(String query, int k, Map<String, Object> filter) {
         try {
             logger.debug("Performing filtered similarity search in Redis for: {} with filter: {}", query, filter);
-            return redisVectorStore.similaritySearch(query, k, filter);
+            Filter metadataFilter = Filter.from(filter);
+            return redisVectorStore.similaritySearch(
+                SearchRequest.defaults().withQuery(query).withTopK(k).withSimilarityThreshold(0.0).withFilter(metadataFilter)
+            );
         } catch (Exception e) {
             logger.error("Error searching with filter in Redis vector store", e);
             return List.of();
@@ -66,7 +69,7 @@ public class RedisVectorDBService implements VectorDBService {
     public List<Document> search(SearchRequest searchRequest) {
         try {
             logger.debug("Performing advanced search in Redis: {}", searchRequest);
-            return redisVectorStore.search(searchRequest);
+            return redisVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
             logger.error("Error performing advanced search in Redis vector store", e);
             return List.of();
@@ -89,7 +92,7 @@ public class RedisVectorDBService implements VectorDBService {
     public boolean clear() {
         try {
             logger.debug("Clearing Redis vector store");
-            redisVectorStore.deleteAll();
+            redisVectorStore.reset();
             return true;
         } catch (Exception e) {
             logger.error("Error clearing Redis vector store", e);
