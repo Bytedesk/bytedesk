@@ -88,6 +88,8 @@
 			<artifactId>spring-ai-tika-document-reader</artifactId>
 		</dependency>
 
+
+		
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
 		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
 		<!--
@@ -101,6 +103,12 @@
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
 		</dependency> -->
 
 		<!-- ERROR: column cannot have more than 2000 dimensions for hnsw index -->
@@ -144,6 +152,9 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
 		</dependency> -->
+
+
+
 
 		<!-- mcp -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-spring-boot-starter -->
