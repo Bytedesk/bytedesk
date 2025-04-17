@@ -41,7 +41,7 @@ import java.util.Optional;
 import java.util.HashMap;
 import java.time.LocalDateTime;
 
-import com.bytedesk.ai.vectordb.reader.WebDocumentReader;
+import com.bytedesk.ai.vector_store.reader.WebDocumentReader;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;
