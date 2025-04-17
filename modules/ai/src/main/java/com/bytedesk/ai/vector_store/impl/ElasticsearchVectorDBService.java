@@ -3,8 +3,6 @@ package com.bytedesk.ai.vector_store.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
@@ -16,15 +14,16 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.vector_store.VectorDBService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Elasticsearch向量数据库服务实现
  * 使用Spring AI的ElasticsearchVectorStore实现向量存储和检索
  */
+@Slf4j
 @Service
 @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true")
 public class ElasticsearchVectorDBService implements VectorDBService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ElasticsearchVectorDBService.class);
     
     @Autowired
     private ElasticsearchVectorStore elasticsearchVectorStore;
@@ -32,11 +31,11 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public int addDocuments(List<Document> documents, List<String> metadataFields) {
         try {
-            logger.debug("Adding {} documents to Elasticsearch vector store", documents.size());
+            log.debug("Adding {} documents to Elasticsearch vector store", documents.size());
             elasticsearchVectorStore.add(documents);
             return documents.size();
         } catch (Exception e) {
-            logger.error("Error adding documents to Elasticsearch vector store: {}", e.getMessage());
+            log.error("Error adding documents to Elasticsearch vector store: {}", e.getMessage());
             return 0;
         }
     }
@@ -44,7 +43,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public List<Document> similaritySearch(String query, int k) {
         try {
-            logger.debug("Performing similarity search in Elasticsearch for query with k={}", k);
+            log.debug("Performing similarity search in Elasticsearch for query with k={}", k);
             // 修复：使用SearchRequest.builder()构建请求对象，指定topK参数
             SearchRequest searchRequest = SearchRequest.builder()
                     .query(query)
@@ -52,7 +51,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
                     .build();
             return elasticsearchVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error searching in Elasticsearch vector store: {}", e.getMessage());
+            log.error("Error searching in Elasticsearch vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -60,7 +59,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public List<Document> similaritySearch(String query, int k, Map<String, Object> filter) {
         try {
-            logger.debug("Performing filtered similarity search in Elasticsearch with k={}", k);
+            log.debug("Performing filtered similarity search in Elasticsearch with k={}", k);
             
             // 使用FilterExpressionBuilder创建过滤表达式
             FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
@@ -101,7 +100,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
                     
             return elasticsearchVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error searching with filter in Elasticsearch vector store: {}", e.getMessage());
+            log.error("Error searching with filter in Elasticsearch vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -109,10 +108,10 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public List<Document> search(SearchRequest searchRequest) {
         try {
-            logger.debug("Performing advanced search in Elasticsearch with topK={}", searchRequest.getTopK());
+            log.debug("Performing advanced search in Elasticsearch with topK={}", searchRequest.getTopK());
             return elasticsearchVectorStore.similaritySearch(searchRequest);
         } catch (Exception e) {
-            logger.error("Error performing advanced search in Elasticsearch vector store: {}", e.getMessage());
+            log.error("Error performing advanced search in Elasticsearch vector store: {}", e.getMessage());
             return List.of();
         }
     }
@@ -120,11 +119,11 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public int delete(List<String> ids) {
         try {
-            logger.debug("Deleting {} documents from Elasticsearch vector store", ids.size());
+            log.debug("Deleting {} documents from Elasticsearch vector store", ids.size());
             elasticsearchVectorStore.delete(ids);
             return ids.size();
         } catch (Exception e) {
-            logger.error("Error deleting documents from Elasticsearch vector store", e);
+            log.error("Error deleting documents from Elasticsearch vector store", e);
             return 0;
         }
     }
@@ -132,11 +131,11 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public boolean clear() {
         try {
-            logger.debug("Clearing Elasticsearch vector store");
+            log.debug("Clearing Elasticsearch vector store");
             // elasticsearchVectorStore.deleteAll();
             return true;
         } catch (Exception e) {
-            logger.error("Error clearing Elasticsearch vector store", e);
+            log.error("Error clearing Elasticsearch vector store", e);
             return false;
         }
     }
@@ -144,7 +143,7 @@ public class ElasticsearchVectorDBService implements VectorDBService {
     @Override
     public long count() {
         // Would require custom implementation using Elasticsearch client
-        logger.debug("Count operation is not supported in ElasticsearchVectorStore");
+        log.debug("Count operation is not supported in ElasticsearchVectorStore");
         return -1;
     }
     
