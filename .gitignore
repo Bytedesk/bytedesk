@@ -84,7 +84,7 @@ message_unanswered/
 message_unread/
 hanlp/
 visitor_rating/
-robot_message/
+# robot_message/
 workgroup_message/
 visitor_message/
 holiday/
