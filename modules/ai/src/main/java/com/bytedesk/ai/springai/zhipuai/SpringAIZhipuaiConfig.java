@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 10:12:40
+ * @LastEditTime: 2025-04-17 14:12:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -119,15 +119,9 @@ public class SpringAIZhipuaiConfig {
         return new ZhiPuAiImageModel(bytedeskZhipuaiImageApi());
     }
 
-    // @Bean("bytedeskZhipuaiClient")
-    // @ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
-    // ClientV4 bytedeskZhipuaiClient() {
-    //     return new ClientV4.Builder(zhipuaiApiKey).build();
-    // }
-
     @Bean("bytedeskZhipuaiRedisVectorStore")
     @ConditionalOnProperty(name = { "spring.ai.zhipuai.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema" }, havingValue = "true")
-    public RedisVectorStore bytedeskZhipuaiRedisVectorStore(EmbeddingModel bytedeskZhipuaiEmbeddingModel, RedisVectorStoreProperties properties) {
+    public RedisVectorStore bytedeskZhipuaiRedisVectorStore(RedisVectorStoreProperties properties) {
 
             var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
             var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
@@ -138,7 +132,7 @@ public class SpringAIZhipuaiConfig {
                             jedisProperties.getPassword());
             
             // 初始化向量库, 创建索引
-            return RedisVectorStore.builder(jedisPooled, bytedeskZhipuaiEmbeddingModel)
+            return RedisVectorStore.builder(jedisPooled, bytedeskZhipuaiEmbeddingModel())
                     .indexName(properties.getIndex())
                     .prefix(properties.getPrefix())
                     .metadataFields(kbUid, fileUid)
