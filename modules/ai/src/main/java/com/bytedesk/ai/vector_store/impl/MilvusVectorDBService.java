@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,32 @@ public class MilvusVectorDBService implements VectorDBService {
     public List<Document> similaritySearch(String query, int k, Map<String, Object> filter) {
         try {
             logger.debug("Performing filtered similarity search in Milvus for: {} with filter: {}", query, filter);
-            return milvusVectorStore.similaritySearch(query, k, filter);
+            
+            // 使用FilterExpressionBuilder创建过滤表达式
+            FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+            FilterExpressionBuilder.Op combinedOp = null;
+            
+            for (Map.Entry<String, Object> entry : filter.entrySet()) {
+                FilterExpressionBuilder.Op currentOp = expressionBuilder.eq(entry.getKey(), entry.getValue().toString());
+                
+                if (combinedOp == null) {
+                    combinedOp = currentOp;
+                } else {
+                    combinedOp = expressionBuilder.and(combinedOp, currentOp);
+                }
+            }
+            
+            // 构建最终表达式
+            Expression filterExpression = combinedOp != null ? combinedOp.build() : null;
+            
+            // 创建搜索请求
+            SearchRequest searchRequest = SearchRequest.builder()
+                    .query(query)
+                    .topK(k)
+                    .filterExpression(filterExpression)
+                    .build();
+                    
+            return milvusVectorStore.search(searchRequest);
         } catch (Exception e) {
             logger.error("Error searching with filter in Milvus vector store", e);
             return List.of();
