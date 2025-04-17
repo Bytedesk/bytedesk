@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 09:04:14
+ * @LastEditTime: 2025-04-17 13:51:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.utils.JsonResult;
 
-import io.swagger.v3.oas.annotations.Operation;
+// import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -182,7 +182,7 @@ public class SpringAIDashscopeController {
 	// http://127.0.0.1:9003/springai/image/image2text
 	@BlackIpFilter
 	@PostMapping("/image2text")
-	@Operation(summary = "DashScope Image Recognition")
+	// @Operation(summary = "DashScope Image Recognition")
 	public Flux<JsonResult<?>> image2text(@RequestParam("image") MultipartFile image) {
 
 		if (image.isEmpty()) {
@@ -201,7 +201,7 @@ public class SpringAIDashscopeController {
 	// over a calm ocean
 	@BlackIpFilter
 	@GetMapping("/text2Image")
-	@Operation(summary = "DashScope Image Generation")
+	// @Operation(summary = "DashScope Image Generation")
 	public JsonResult<?> text2Image(
 			@RequestParam(value = "prompt", defaultValue = "A beautiful sunset over a calm ocean") String prompt,
 			HttpServletResponse response) {

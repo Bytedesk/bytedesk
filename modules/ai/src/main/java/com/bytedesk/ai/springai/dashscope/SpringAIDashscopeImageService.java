@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:53:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 12:34:41
+ * @LastEditTime: 2025-04-17 12:35:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -27,13 +25,10 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.ai.model.Media;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
@@ -56,13 +51,13 @@ public class SpringAIDashscopeImageService {
 
     public Flux<String> image2Text(MultipartFile file) {
 
-		UserMessage message = new UserMessage(
-				"解释图片中的内容",
-				new Media(
-						MimeTypeUtils.IMAGE_PNG,
-						new FileSystemResource(Objects.requireNonNull(file.getOriginalFilename()))
-				)
-		);
+		// 创建UserMessage实例，然后设置媒体内容
+		UserMessage message = new UserMessage("解释图片中的内容");
+		// 设置媒体内容
+		// message.setMedia(List.of(new Media(
+		// 		MimeTypeUtils.IMAGE_PNG,
+		// 		new FileSystemResource(Objects.requireNonNull(file.getOriginalFilename()))
+		// )));
 		message.getMetadata().put(DashScopeChatModel.MESSAGE_FORMAT, MessageFormat.IMAGE);
 
 		List<ChatResponse> response = bytedeskDashScopeChatClient.prompt(

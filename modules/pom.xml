@@ -241,15 +241,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- 太久未更新，去掉 -->
-        <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-openapi3-jakarta-spring-boot-starter -->
-        <!-- <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-            <version>4.5.0</version>
-            <scope>provided</scope>
-        </dependency> -->
-
+        <!-- 跟Spring ai中swagger集成冲突，去掉 -->
         <!-- http://127.0.0.1:9003/swagger-ui/index.html -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
         <!-- 添加provided会报错 -->
@@ -265,13 +257,6 @@
 			<artifactId>springdoc-openapi-starter-webflux-api</artifactId>
 			<version>${springdoc.version}</version>
 		</dependency>
-
-        <!-- FIXME: not working? https://docs.spring.io/spring-data/rest/reference/tools.html -->
-        <!-- <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-rest-hal-explorer</artifactId>
-            <scope>provided</scope>
-        </dependency> -->
 
         <!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
         <dependency>
