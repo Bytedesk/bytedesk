@@ -13,19 +13,19 @@
  */
 package com.bytedesk.ai.springai.ollama.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.env.Environment;
 
 import java.net.Socket;
 
+@Slf4j
 public class OllamaAvailableCondition implements Condition {
-    
-    private static final Logger logger = LoggerFactory.getLogger(OllamaAvailableCondition.class);
-    
+        
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         Environment env = context.getEnvironment();
@@ -50,14 +50,14 @@ public class OllamaAvailableCondition implements Condition {
             
             // 尝试连接服务
             try (Socket socket = new Socket(hostname, port)) {
-                logger.info("Ollama 服务可用 - 主机: {}, 端口: {}", hostname, port);
+                log.info("Ollama 服务可用 - 主机: {}, 端口: {}", hostname, port);
                 return true;
             } catch (Exception e) {
-                logger.warn("Ollama 服务不可用 - 主机: {}, 端口: {}. 错误: {}", hostname, port, e.getMessage());
+                log.warn("Ollama 服务不可用 - 主机: {}, 端口: {}. 错误: {}", hostname, port, e.getMessage());
                 return false;
             }
         } catch (Exception e) {
-            logger.error("检查 Ollama 服务可用性时出错: {}", e.getMessage());
+            log.error("检查 Ollama 服务可用性时出错: {}", e.getMessage());
             return false;
         }
     }
