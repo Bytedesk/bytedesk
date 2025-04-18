@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.vector_store.impl.ChromaVectorDBService;
+// import com.bytedesk.ai.vector_store.impl.ChromaVectorDBService;
 import com.bytedesk.ai.vector_store.impl.ElasticsearchVectorDBService;
-import com.bytedesk.ai.vector_store.impl.MilvusVectorDBService;
+// import com.bytedesk.ai.vector_store.impl.MilvusVectorDBService;
 import com.bytedesk.ai.vector_store.impl.RedisVectorDBService;
-import com.bytedesk.ai.vector_store.impl.WeaviateVectorDBService;
+// import com.bytedesk.ai.vector_store.impl.WeaviateVectorDBService;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +49,12 @@ public class VectorDBFactory {
         
         // 根据配置文件选择向量数据库
         if (chromaEnabled) {
-            try {
-                this.primaryVectorDBService = context.getBean(ChromaVectorDBService.class);
-                log.info("Using Chroma as the primary vector database");
-            } catch (Exception e) {
-                log.warn("Failed to initialize Chroma vector database, falling back to Redis", e);
-            }
+            // try {
+            //     this.primaryVectorDBService = context.getBean(ChromaVectorDBService.class);
+            //     log.info("Using Chroma as the primary vector database");
+            // } catch (Exception e) {
+            //     log.warn("Failed to initialize Chroma vector database, falling back to Redis", e);
+            // }
         } else if (elasticsearchEnabled) {
             try {
                 this.primaryVectorDBService = context.getBean(ElasticsearchVectorDBService.class);
@@ -63,19 +63,19 @@ public class VectorDBFactory {
                 log.warn("Failed to initialize Elasticsearch vector database, falling back to Redis", e);
             }
         } else if (weaviateEnabled) {
-            try {
-                this.primaryVectorDBService = context.getBean(WeaviateVectorDBService.class);
-                log.info("Using Weaviate as the primary vector database");
-            } catch (Exception e) {
-                log.warn("Failed to initialize Weaviate vector database, falling back to Redis", e);
-            }
+            // try {
+            //     this.primaryVectorDBService = context.getBean(WeaviateVectorDBService.class);
+            //     log.info("Using Weaviate as the primary vector database");
+            // } catch (Exception e) {
+            //     log.warn("Failed to initialize Weaviate vector database, falling back to Redis", e);
+            // }
         } else if (milvusEnabled) {
-            try {
-                this.primaryVectorDBService = context.getBean(MilvusVectorDBService.class);
-                log.info("Using Milvus as the primary vector database");
-            } catch (Exception e) {
-                log.warn("Failed to initialize Milvus vector database, falling back to Redis", e);
-            }
+            // try {
+            //     this.primaryVectorDBService = context.getBean(MilvusVectorDBService.class);
+            //     log.info("Using Milvus as the primary vector database");
+            // } catch (Exception e) {
+            //     log.warn("Failed to initialize Milvus vector database, falling back to Redis", e);
+            // }
         } else {
             log.info("Using Redis as the primary vector database");
         }
@@ -102,26 +102,26 @@ public class VectorDBFactory {
         }
         
         switch (type.toLowerCase()) {
-            case "chroma":
-                if (chromaEnabled) {
-                    return context.getBean(ChromaVectorDBService.class);
-                }
-                break;
+            // case "chroma":
+            //     if (chromaEnabled) {
+            //         return context.getBean(ChromaVectorDBService.class);
+            //     }
+            //     break;
             case "elasticsearch":
                 if (elasticsearchEnabled) {
                     return context.getBean(ElasticsearchVectorDBService.class);
                 }
                 break;
-            case "weaviate":
-                if (weaviateEnabled) {
-                    return context.getBean(WeaviateVectorDBService.class);
-                }
-                break;
-            case "milvus":
-                if (milvusEnabled) {
-                    return context.getBean(MilvusVectorDBService.class);
-                }
-                break;
+            // case "weaviate":
+            //     if (weaviateEnabled) {
+            //         return context.getBean(WeaviateVectorDBService.class);
+            //     }
+            //     break;
+            // case "milvus":
+            //     if (milvusEnabled) {
+            //         return context.getBean(MilvusVectorDBService.class);
+            //     }
+            //     break;
             case "redis":
                 return redisVectorDBService;
             default:

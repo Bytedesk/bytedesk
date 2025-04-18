@@ -13,13 +13,13 @@ import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStoreOptions;
-import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
-import org.springframework.ai.vectorstore.weaviate.WeaviateVectorStore;
+// import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
+// import org.springframework.ai.vectorstore.weaviate.WeaviateVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore.MetadataField;
 // 更新 ChromaVectorStore 的正确导入
-import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
-import org.springframework.ai.chroma.vectorstore.ChromaApi;
+// import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
+// import org.springframework.ai.chroma.vectorstore.ChromaApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,65 +108,65 @@ public class VectorStoreConfig {
      * Weaviate向量存储配置
      * 指定使用zhipuaiEmbeddingModel作为嵌入模型
      */
-    @Bean
-    @ConditionalOnProperty(name = "spring.ai.vectorstore.weaviate.enabled", havingValue = "true")
-    public WeaviateVectorStore weaviateVectorStore(
-            io.weaviate.client.WeaviateClient weaviateClient,
-            @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel) {
+    // @Bean
+    // @ConditionalOnProperty(name = "spring.ai.vectorstore.weaviate.enabled", havingValue = "true")
+    // public WeaviateVectorStore weaviateVectorStore(
+    //         io.weaviate.client.WeaviateClient weaviateClient,
+    //         @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel) {
         
-        log.info("Configuring WeaviateVectorStore with class name: {} and textFieldName: {}", 
-                weaviateIndexName, weaviateTextFieldName);
+    //     log.info("Configuring WeaviateVectorStore with class name: {} and textFieldName: {}", 
+    //             weaviateIndexName, weaviateTextFieldName);
         
-        // 使用builder模式创建WeaviateVectorStore
-        return WeaviateVectorStore.builder(weaviateClient, embeddingModel)
-                .objectClass(weaviateIndexName)
-                .filterMetadataFields(List.of(
-                    WeaviateVectorStore.MetadataField.text("kbUid"),
-                    WeaviateVectorStore.MetadataField.text("fileUid")
-                ))
-                .build();
-    }
+    //     // 使用builder模式创建WeaviateVectorStore
+    //     return WeaviateVectorStore.builder(weaviateClient, embeddingModel)
+    //             .objectClass(weaviateIndexName)
+    //             .filterMetadataFields(List.of(
+    //                 WeaviateVectorStore.MetadataField.text("kbUid"),
+    //                 WeaviateVectorStore.MetadataField.text("fileUid")
+    //             ))
+    //             .build();
+    // }
     
     /**
      * Chroma向量存储配置
      * 指定使用zhipuaiEmbeddingModel作为嵌入模型
      */
-    @Bean
-    @ConditionalOnProperty(name = "spring.ai.vectorstore.chroma.enabled", havingValue = "true")
-    public ChromaVectorStore chromaVectorStore(
-            @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel,
-            ChromaApi chromaApi) {
+    // @Bean
+    // @ConditionalOnProperty(name = "spring.ai.vectorstore.chroma.enabled", havingValue = "true")
+    // public ChromaVectorStore chromaVectorStore(
+    //         @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel,
+    //         ChromaApi chromaApi) {
         
-        log.info("Configuring ChromaVectorStore with collection name: {}", chromaCollectionName);
+    //     log.info("Configuring ChromaVectorStore with collection name: {}", chromaCollectionName);
         
-        // 使用构建器模式创建ChromaVectorStore
-        return ChromaVectorStore.builder(chromaApi, embeddingModel)
-                .collectionName(chromaCollectionName)
-                .initializeSchema(true)
-                .build();
-    }
+    //     // 使用构建器模式创建ChromaVectorStore
+    //     return ChromaVectorStore.builder(chromaApi, embeddingModel)
+    //             .collectionName(chromaCollectionName)
+    //             .initializeSchema(true)
+    //             .build();
+    // }
     
     /**
      * Milvus向量存储配置
      * 指定使用zhipuaiEmbeddingModel作为嵌入模型
      */
-    @Bean
-    @ConditionalOnProperty(name = "spring.ai.vectorstore.milvus.enabled", havingValue = "true")
-    public MilvusVectorStore milvusVectorStore(
-            @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel,
-            io.milvus.client.MilvusServiceClient milvusClient) {
+    // @Bean
+    // @ConditionalOnProperty(name = "spring.ai.vectorstore.milvus.enabled", havingValue = "true")
+    // public MilvusVectorStore milvusVectorStore(
+    //         @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel,
+    //         io.milvus.client.MilvusServiceClient milvusClient) {
         
-        log.info("Configuring MilvusVectorStore with collection: {}, vectorField: {}, textField: {}, dimensions: {}", 
-                milvusCollectionName, milvusVectorField, milvusTextField, milvusDimensions);
+    //     log.info("Configuring MilvusVectorStore with collection: {}, vectorField: {}, textField: {}, dimensions: {}", 
+    //             milvusCollectionName, milvusVectorField, milvusTextField, milvusDimensions);
         
-        return MilvusVectorStore.builder(milvusClient, embeddingModel)
-                .collectionName(milvusCollectionName)
-                .embeddingFieldName(milvusVectorField)
-                .contentFieldName(milvusTextField)
-                .embeddingDimension(milvusDimensions)
-                .initializeSchema(true)
-                .build();
-    }
+    //     return MilvusVectorStore.builder(milvusClient, embeddingModel)
+    //             .collectionName(milvusCollectionName)
+    //             .embeddingFieldName(milvusVectorField)
+    //             .contentFieldName(milvusTextField)
+    //             .embeddingDimension(milvusDimensions)
+    //             .initializeSchema(true)
+    //             .build();
+    // }
 
     /**
      * 检查Ollama服务是否可用
