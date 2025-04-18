@@ -29,7 +29,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.ping();
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         throw new RuntimeException("Ollama4j is not running.");
     }
@@ -41,7 +41,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.listModels();
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         throw new RuntimeException("Ollama4j get local models error.");
     }
@@ -53,7 +53,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.listModelsFromLibrary();
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         } 
         throw new RuntimeException("Ollama4j get models error.");
     }
@@ -74,7 +74,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.getLibraryModelDetails(model);
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         } 
         throw new RuntimeException("Ollama4j get model details error.");
     }
@@ -89,7 +89,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.getModelDetails(ollamaModelType);
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         } 
         throw new RuntimeException("Ollama4j get model details error.");
     }
@@ -98,7 +98,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.findModelTagFromLibrary(model, tag);
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         throw new RuntimeException("Ollama4j get model tag error.");
     }
@@ -108,7 +108,7 @@ public class Ollama4jService {
         try {
             ollama4jApi.pullModel(libraryModelTag);
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         throw new RuntimeException("Ollama4j pull model error.");
     }
@@ -123,7 +123,7 @@ public class Ollama4jService {
             // OllamaModelType.LLAMA2
             ollama4jApi.pullModel(ollamaModelType);
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         throw new RuntimeException("Ollama4j pull model error.");
     }
@@ -133,7 +133,7 @@ public class Ollama4jService {
         try {
             ollama4jApi.deleteModel(model, true);
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         throw new RuntimeException("Ollama4j delete model error.");
     }
