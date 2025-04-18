@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 17:31:05
+ * @LastEditTime: 2025-04-18 18:17:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,9 +110,9 @@ public class Ollama4jRestController {
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/pull
     @PostMapping("/models/pull")
-    public ResponseEntity<?> pullModel(@RequestBody String model) {
+    public ResponseEntity<?> pullModel(@RequestBody OllamaRequest request) {
 
-        ollama4jService.pullModel(model);
+        ollama4jService.pullModel(request.getModel());
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -120,9 +120,9 @@ public class Ollama4jRestController {
     // 删除模型    
     // http://127.0.0.1:9003/api/v1/ollama4j/models/delete
     @PostMapping("/models/delete")
-    public ResponseEntity<?> deleteModel(@RequestBody String model) {
+    public ResponseEntity<?> deleteModel(@RequestBody OllamaRequest request) {
 
-        ollama4jService.deleteModel(model);
+        ollama4jService.deleteModel(request.getModel());
 
         return ResponseEntity.ok(JsonResult.success());
     }

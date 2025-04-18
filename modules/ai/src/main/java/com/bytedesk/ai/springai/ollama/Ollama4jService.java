@@ -107,10 +107,11 @@ public class Ollama4jService {
     public void pullModel(LibraryModelTag libraryModelTag) {
         try {
             ollama4jApi.pullModel(libraryModelTag);
+            return; // 成功时返回
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Ollama4j pull model error: " + e.getMessage());
         }
-        throw new RuntimeException("Ollama4j pull model error.");
     }
 
     /**
@@ -122,20 +123,22 @@ public class Ollama4jService {
         try {
             // OllamaModelType.LLAMA2
             ollama4jApi.pullModel(ollamaModelType);
+            return; // 成功时返回
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Ollama4j pull model error: " + e.getMessage());
         }
-        throw new RuntimeException("Ollama4j pull model error.");
     }
 
     // https://ollama4j.github.io/ollama4j/apis-model-management/delete-model
     public void deleteModel(String model) {
         try {
             ollama4jApi.deleteModel(model, true);
+            return; // 成功时返回
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Ollama4j delete model error: " + e.getMessage());
         }
-        throw new RuntimeException("Ollama4j delete model error.");
     }
     
     
