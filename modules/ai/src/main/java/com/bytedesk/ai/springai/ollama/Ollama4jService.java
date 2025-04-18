@@ -1,4 +1,4 @@
-package com.bytedesk.ai.provider.vendors.ollama;
+package com.bytedesk.ai.springai.ollama;
 
 import java.util.List;
 

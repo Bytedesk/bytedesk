@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.provider.vendors.ollama;
+package com.bytedesk.ai.springai.ollama;
 
 import java.util.List;
 
@@ -42,21 +42,27 @@ public class Ollama4jRestController {
     // http://127.0.0.1:9003/api/v1/ollama4j/ping
     @GetMapping("/ping")
     public ResponseEntity<JsonResult<Boolean>> ping() {
+
         boolean isReachable = ollama4jService.isOllama4jReachable();
+
         return ResponseEntity.ok(JsonResult.success(isReachable));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/local-models
     @GetMapping("/local-models")
     public ResponseEntity<JsonResult<List<Model>>> getLocalModels() {
+
         List<Model> models = ollama4jService.getLocalModels();
+
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models
     @GetMapping("/models")
     public ResponseEntity<JsonResult<List<LibraryModel>>> getModels() {
+
         List<LibraryModel> models = ollama4jService.getModels();
+
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
@@ -64,30 +70,38 @@ public class Ollama4jRestController {
     // http://127.0.0.1:9003/api/v1/ollama4j/ps
     @GetMapping("/ps")
     public ResponseEntity<JsonResult<ModelsProcessResponse>> processModels() {
+
         ModelsProcessResponse models = ollama4jService.getPs();
+
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/details
     @GetMapping("/models/{model}/details")
     public ResponseEntity<JsonResult<LibraryModelDetail>> getModelDetails(@PathVariable String model) {
+
         LibraryModel libraryModel = new LibraryModel();
         libraryModel.setName(model);
         LibraryModelDetail modelDetail = ollama4jService.getModelDetails(libraryModel);
+        
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/tags/{tag}
     @GetMapping("/models/{model}/tags/{tag}")
     public ResponseEntity<JsonResult<LibraryModelTag>> getModelTag(@PathVariable String model, @PathVariable String tag) {
+
         LibraryModelTag modelTag = ollama4jService.getModelTag(model, tag);
+
         return ResponseEntity.ok(JsonResult.success(modelTag));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/pull
     @PostMapping("/models/pull")
     public ResponseEntity<?> pullModel(@RequestBody LibraryModelTag libraryModelTag) {
+
         ollama4jService.pullModel(libraryModelTag);
+
         return ResponseEntity.ok(JsonResult.success());
     }
 
