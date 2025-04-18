@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-11 16:05:19
+ * @LastEditTime: 2025-04-18 14:22:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,6 +48,7 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(isReachable));
     }
 
+    // 本地已经下载的模型列表
     // http://127.0.0.1:9003/api/v1/ollama4j/local-models
     @GetMapping("/local-models")
     public ResponseEntity<JsonResult<List<Model>>> getLocalModels() {
@@ -57,6 +58,7 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
+    // 远程模型列表
     // http://127.0.0.1:9003/api/v1/ollama4j/models
     @GetMapping("/models")
     public ResponseEntity<JsonResult<List<LibraryModel>>> getModels() {
@@ -83,7 +85,7 @@ public class Ollama4jRestController {
         LibraryModel libraryModel = new LibraryModel();
         libraryModel.setName(model);
         LibraryModelDetail modelDetail = ollama4jService.getModelDetails(libraryModel);
-        
+
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 

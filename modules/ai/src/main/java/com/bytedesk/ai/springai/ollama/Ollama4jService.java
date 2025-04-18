@@ -34,8 +34,8 @@ public class Ollama4jService {
         throw new RuntimeException("Ollama4j is not running.");
     }
 
+    // 本地模型列表
     // https://ollama4j.github.io/ollama4j/apis-model-management/list-models
-    // This API Fetches all the models from Ollama library.
     // 拉取本地的模型
     public List<Model> getLocalModels() {
         try {
@@ -46,7 +46,8 @@ public class Ollama4jService {
         throw new RuntimeException("Ollama4j get local models error.");
     }
 
-    // This API Fetches all the models from Ollama library.
+    // 远程模型列表
+    // https://ollama4j.github.io/ollama4j/apis-model-management/list-library-models
     // 拉取所有的模型
     public List<LibraryModel> getModels() {
         try {
@@ -112,6 +113,7 @@ public class Ollama4jService {
     }
 
     /**
+     * ollamaAPI.pullModel(OllamaModelType.LLAMA2);
      * @{OllamaModelType}
      */
     public void pullModel(String ollamaModelType) {
