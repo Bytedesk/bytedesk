@@ -29,18 +29,19 @@
 	<dependencies>
 
 		<!-- 明确依赖，否则会拉取M6版 -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-core -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-core</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-retry -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-retry</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
@@ -143,25 +144,25 @@
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store-spring-boot-starter -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html -->
 		<!-- <dependency>

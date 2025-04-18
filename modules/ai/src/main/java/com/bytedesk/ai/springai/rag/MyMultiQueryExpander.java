@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-25 10:09:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 10:11:51
+ * @LastEditTime: 2025-04-18 11:08:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  * https://java2ai.com/blog/spring-ai-alibaba-module-rag/?spm=0.29160081.0.0.75c73b5blqQmqQ
  */
 @Slf4j
-public class MultiQueryExpander implements QueryExpander {
+public class MyMultiQueryExpander implements QueryExpander {
 
     // private static final PromptTemplate DEFAULT_PROMPT_TEMPLATE = new PromptTemplate(
     //         "Please enter [[number]] queries related to [[query]]"
