@@ -28,6 +28,17 @@
 
 	<dependencies>
 
+		<!-- 明确依赖，否则会拉取M6版 -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-core</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-retry</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
 		<dependency>
@@ -55,7 +66,7 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-		 <!--
+		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-zhipuai-spring-boot-starter -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -97,6 +108,16 @@
 			<artifactId>spring-ai-tika-document-reader</artifactId>
 			<version>${spring-ai.version}</version>
 			<!-- <version>1.0.0-M7</version> -->
+		</dependency>
+
+
+		<!-- rag -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-advisors-vector-store</artifactId>
 		</dependency>
 
 		<!-- vector store -->
@@ -323,14 +344,14 @@
 
 	<repositories>
 		<!-- https://java2ai.com/docs/dev/get-started/ -->
-		<repository>
+		<!-- <repository>
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>
 			<url>https://repo.spring.io/milestone</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</repository>
+		</repository> -->
 		<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
 		<repository>
 			<id>spring-snapshots</id>
