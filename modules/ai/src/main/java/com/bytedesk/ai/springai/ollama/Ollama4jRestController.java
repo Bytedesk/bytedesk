@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 14:22:23
+ * @LastEditTime: 2025-04-18 17:03:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,9 +100,9 @@ public class Ollama4jRestController {
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/pull
     @PostMapping("/models/pull")
-    public ResponseEntity<?> pullModel(@RequestBody LibraryModelTag libraryModelTag) {
+    public ResponseEntity<?> pullModel(@RequestBody String model) {
 
-        ollama4jService.pullModel(libraryModelTag);
+        ollama4jService.pullModel(model);
 
         return ResponseEntity.ok(JsonResult.success());
     }

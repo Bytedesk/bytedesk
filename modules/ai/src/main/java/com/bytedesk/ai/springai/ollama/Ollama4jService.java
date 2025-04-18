@@ -103,16 +103,17 @@ public class Ollama4jService {
         throw new RuntimeException("Ollama4j get model tag error.");
     }
 
-    public void pullModel(LibraryModelTag libraryModelTag) {
-        try {
-            ollama4jApi.pullModel(libraryModelTag);
-        } catch (Exception e) {
-            // e.printStackTrace();
-        }
-        throw new RuntimeException("Ollama4j pull model error.");
-    }
+    // public void pullModel(LibraryModelTag libraryModelTag) {
+    //     try {
+    //         ollama4jApi.pullModel(libraryModelTag);
+    //     } catch (Exception e) {
+    //         // e.printStackTrace();
+    //     }
+    //     throw new RuntimeException("Ollama4j pull model error.");
+    // }
 
     /**
+     * https://ollama4j.github.io/ollama4j/apis-model-management/pull-model
      * ollamaAPI.pullModel(OllamaModelType.LLAMA2);
      * @{OllamaModelType}
      */
