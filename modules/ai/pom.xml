@@ -41,7 +41,16 @@
 			<artifactId>spring-ai-retry</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-rag -->
+		<!--
+		https://repo.spring.io/ui/native/snapshot/org/springframework/ai/spring-ai-rag/1.0.0-SNAPSHOT/ -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-rag</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
@@ -354,6 +363,7 @@
 			</snapshots>
 		</repository> -->
 		<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
+		<!-- https://repo.spring.io/ui/native/snapshot/org/springframework/ai/ -->
 		<repository>
 			<id>spring-snapshots</id>
 			<name>Spring Snapshots</name>
