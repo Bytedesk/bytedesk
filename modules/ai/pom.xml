@@ -143,11 +143,11 @@
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/oracle.html -->
 		<!-- <dependency>

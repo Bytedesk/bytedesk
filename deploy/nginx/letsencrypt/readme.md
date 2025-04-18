@@ -1,4 +1,3 @@
-
 # letsencrypt.org https 通配证书
 
 - [letsencrypt](https://letsencrypt.org)
@@ -43,31 +42,13 @@ service nginx restart
 # The server will not issue certificates for the identifier :: Error creating new order :: Cannot issue for "*.*.bytedesk.com": Domain name has more than one wildcard
 ```
 
-## 域名说明
-
-```bash
-# 腾讯云 wememoorg@gmail.com
-bytedesk.com
-# 阿里云 appkefu2939499399
-kefux.com
-# 腾讯云：270580156@qq.com
-weikefu.net
-```
-
 ## 运行 sudo certbot certonly --manual --preferred-challenges=dns-01 详情，提示如下
 
 root@VM-4-17-ubuntu:~# sudo certbot certonly --manual --preferred-challenges=dns-01
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Please enter the domain name(s) you would like on your certificate (comma and/or
 <!-- 注意：添加多个域名，支持2级、3级通配符域名 -->
-space separated) (Enter 'c' to cancel): bytedesk.com,*.bytedesk.com,*.docs.bytedesk.com
-space separated) (Enter 'c' to cancel): liangshibao.com,*.liangshibao.com
-space separated) (Enter 'c' to cancel): liangshibao.cn,*.liangshibao.cn
-space separated) (Enter 'c' to cancel): liangshibao.com.cn,*.liangshibao.com.cn
-space separated) (Enter 'c' to cancel): liangshiyun.com.cn,*.liangshiyun.com.cn
-Requesting a certificate for bytedesk.com and *.bytedesk.com,*.docs.bytedesk.com
 space separated) (Enter 'c' to cancel): weiyuai.cn,*.weiyuai.cn
-space separated) (Enter 'c' to cancel): kefux.com,*.kefux.com
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 <!-- 添加域名解析TXT记录 -->
