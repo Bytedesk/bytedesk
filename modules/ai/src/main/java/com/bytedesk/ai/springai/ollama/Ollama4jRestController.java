@@ -107,5 +107,15 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    // 删除模型    
+    // http://127.0.0.1:9003/api/v1/ollama4j/models/delete
+    @PostMapping("/models/delete")
+    public ResponseEntity<?> deleteModel(@RequestBody String model) {
+
+        ollama4jService.deleteModel(model);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
     
 }
