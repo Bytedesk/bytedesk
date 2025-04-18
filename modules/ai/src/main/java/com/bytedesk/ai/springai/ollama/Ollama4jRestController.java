@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 17:28:45
+ * @LastEditTime: 2025-04-18 17:31:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,7 @@ import io.github.ollama4j.models.response.LibraryModel;
 import io.github.ollama4j.models.response.LibraryModelDetail;
 import io.github.ollama4j.models.response.LibraryModelTag;
 import io.github.ollama4j.models.response.Model;
+import io.github.ollama4j.models.response.ModelDetail;
 
 @RestController
 @RequestMapping("/api/v1/ollama4j")
@@ -78,13 +79,22 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
+    // http://127.0.0.1:9003/api/v1/ollama4j/library/models/{model}/details
+    @GetMapping("/library/models/{model}/details")
+    public ResponseEntity<JsonResult<LibraryModelDetail>> getLibraryModelDetails(@PathVariable String model) {
+
+        LibraryModel libraryModel = new LibraryModel();
+        libraryModel.setName(model);
+        LibraryModelDetail modelDetail = ollama4jService.getLibraryModelDetails(libraryModel);
+
+        return ResponseEntity.ok(JsonResult.success(modelDetail));
+    }
+
     // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/details
     @GetMapping("/models/{model}/details")
-    public ResponseEntity<JsonResult<LibraryModelDetail>> getModelDetails(@PathVariable String model) {
+    public ResponseEntity<JsonResult<ModelDetail>> getModelDetails(@PathVariable String model) {
 
-        // LibraryModel libraryModel = new LibraryModel();
-        // libraryModel.setName(model);
-        LibraryModelDetail modelDetail = ollama4jService.getModelDetails(model);
+        ModelDetail modelDetail = ollama4jService.getModelDetails(model);
 
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }

@@ -70,7 +70,7 @@ public class Ollama4jService {
     }
 
     // This API Fetches the tags associated with a specific model from Ollama library.
-    public LibraryModelDetail getModelDetails(LibraryModel model) {
+    public LibraryModelDetail getLibraryModelDetails(LibraryModel model) {
         try {
             return ollama4jApi.getLibraryModelDetails(model);
         } catch (Exception e) {
@@ -103,14 +103,15 @@ public class Ollama4jService {
         throw new RuntimeException("Ollama4j get model tag error.");
     }
 
-    // public void pullModel(LibraryModelTag libraryModelTag) {
-    //     try {
-    //         ollama4jApi.pullModel(libraryModelTag);
-    //     } catch (Exception e) {
-    //         // e.printStackTrace();
-    //     }
-    //     throw new RuntimeException("Ollama4j pull model error.");
-    // }
+    // 拉取远程模型
+    public void pullModel(LibraryModelTag libraryModelTag) {
+        try {
+            ollama4jApi.pullModel(libraryModelTag);
+        } catch (Exception e) {
+            // e.printStackTrace();
+        }
+        throw new RuntimeException("Ollama4j pull model error.");
+    }
 
     /**
      * https://ollama4j.github.io/ollama4j/apis-model-management/pull-model
