@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 11:08:11
+ * @LastEditTime: 2025-04-18 12:15:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,8 +73,7 @@ public class SpringAIRagController {
 
         // Retrieve documents similar to a query
         // FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
-        // Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID,
-        // kbUid).build();
+        // Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
         // log.info("expression: {}", expression.toString());
 
         // 创建qaAdvisor
