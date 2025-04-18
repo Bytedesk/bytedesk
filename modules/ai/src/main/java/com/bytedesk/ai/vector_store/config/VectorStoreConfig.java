@@ -199,33 +199,6 @@ public class VectorStoreConfig {
     }
 
     /**
-     * 创建降级的EmbeddingModel实现
-     * 当嵌入模型服务不可用时使用
-     * @return 降级的EmbeddingModel实现
-     */
-    // private EmbeddingModel createFallbackEmbeddingModel() {
-    //     return new EmbeddingModel() {
-    //         private static final int VECTOR_DIMENSIONS = 1536;
-    //         @Override
-    //         public EmbeddingResponse call(EmbeddingRequest request) {
-    //             log.debug("Using fallback embedding model");
-    //             List<Embedding> embeddings = IntStream.range(0, request.getInstructions().size())
-    //                 .mapToObj(i -> new Embedding(new float[VECTOR_DIMENSIONS], i))
-    //                 .collect(Collectors.toList());
-    //             return new EmbeddingResponse(embeddings);
-    //         }
-
-    //         @Override
-    //         public float[] embed(Document document) {
-    //             log.debug("Using fallback embedding for document: {}", document.getId());
-    //             float[] vector = new float[VECTOR_DIMENSIONS];
-    //             Arrays.fill(vector, 0.0f);
-    //             return vector;
-    //         }
-    //     };
-    // }
-
-    /**
      * 创建一个降级的VectorStore实现
      * 当向量存储服务不可用时使用
      */
@@ -285,6 +258,7 @@ public class VectorStoreConfig {
      * 空的RedisVectorStore实现，用于完全降级情况
      */
     private static class EmptyRedisVectorStore extends RedisVectorStore {
+        
         public EmptyRedisVectorStore() {
             super(null);
         }

@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Elasticsearch向量数据库服务实现
  * 使用Spring AI的ElasticsearchVectorStore实现向量存储和检索
+ * 
+ * https://java2ai.com/blog/spring-ai-alibaba-rag-ollama/?spm=0.29160081.0.0.5ecc25fb30LArO
  */
 @Slf4j
 @Service

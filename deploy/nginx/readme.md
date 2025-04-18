@@ -257,7 +257,7 @@ server {
 	listen 80;
 	listen [::]:80;
 
-    server_name api.weiyuai.cn demo.weiyuai.cn;
+    server_name api.weiyuai.cn;
 
     # 直接将所有请求代理到Spring Boot
     location / {
@@ -339,7 +339,7 @@ server {
 	ssl_certificate /etc/letsencrypt/live/weiyuai.cn/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/weiyuai.cn/privkey.pem; # managed by Certbot
 
-	server_name api.weiyuai.cn demo.weiyuai.cn;
+	server_name api.weiyuai.cn;
 
     # 直接将所有请求代理到Spring Boot
     location / {
@@ -409,11 +409,15 @@ server {
 ## 创建软链接
 
 ```bash
+# 删除默认的软连接（可选）
+sudo unlink /etc/nginx/sites-enabled/default
 # 创建软连接
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_80.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_443.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_80.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_443.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_80.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_443.conf /etc/nginx/sites-enabled/
 ```
 
 ## 使配置生效
