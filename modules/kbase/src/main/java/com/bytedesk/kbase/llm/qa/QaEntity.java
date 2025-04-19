@@ -83,9 +83,9 @@ public class QaEntity extends BaseEntity {
     private List<QaEntity> relatedQas = new ArrayList<>();
 
     // 是否是llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa")
-    private boolean isLlmQa = false;
+    // @Builder.Default
+    // @Column(name = "is_llm_qa")
+    // private boolean isLlmQa = false;
 
     @Builder.Default
     @Column(name = "qa_type", nullable = false)

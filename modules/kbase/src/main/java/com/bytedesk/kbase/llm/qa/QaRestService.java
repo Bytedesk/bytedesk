@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 16:05:58
+ * @LastEditTime: 2025-04-19 16:21:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -148,6 +148,14 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             // }
             // entity.setRelatedQas(relatedQas);
 
+            // 
+            Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+            if (kbase.isPresent()) {
+                entity.setKbaseEntity(kbase.get());
+            } else {
+                throw new RuntimeException("kbaseUid not found");
+            }
+
             try {
                 QaEntity savedEntity = save(entity);
                 if (savedEntity != null) {
@@ -199,25 +207,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             entity.setCategoryUid(request.getCategoryUid());
             // entity.setKbUid(request.getKbUid());
             //
-            // 根据request.relatedQaUids查找关联的FAQ
-            // List<QaEntity> relatedQas = new ArrayList<>();
-            // for (String relatedQaUid : request.getRelatedQaUids()) {
-            //     Optional<QaEntity> relatedQa = findByUid(relatedQaUid);
-            //     if (relatedQa.isPresent()) {
-            //         relatedQas.add(relatedQa.get());
-            //     } else {
-            //         throw new RuntimeException("relatedQaUid not found");
-            //     }
-            // }
-            // entity.setRelatedQas(relatedQas);
-
-            // 
-            Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
-            if (kbase.isPresent()) {
-                entity.setKbaseEntity(kbase.get());
-            } else {
-                throw new RuntimeException("kbaseUid not found");
-            }
 
             return convertToResponse(save(entity));
         } else {
@@ -345,9 +334,10 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         QaResponse response = QaResponse.builder()
                 .uid(entity.getUid())
                 .question(entity.getQuestion())
+                .questionList(entity.getQuestionList())
                 .answer(entity.getAnswer())
                 .answerList(entity.getAnswerList())
-                .isLlmQa(entity.isLlmQa())
+                // .isLlmQa(entity.isLlmQa())
                 .type(entity.getType())
                 .status(entity.getStatus())
                 .viewCount(entity.getViewCount())
