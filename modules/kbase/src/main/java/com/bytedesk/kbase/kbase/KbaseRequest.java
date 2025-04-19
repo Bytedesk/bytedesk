@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:22:40
+ * @LastEditTime: 2025-04-19 10:08:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -151,7 +151,8 @@ public class KbaseRequest extends BaseRequest {
 
     private String agentUid;
 
-    private String userUid;
+    // 机器人模拟测试知识库
+    private String robotUid;
 
     // 从 notebase 查询, 同时查询 HELPCENTER 和 NOTEBASE 两种类型
     @Builder.Default
