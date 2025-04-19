@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 16:10:35
+ * @LastEditTime: 2025-04-19 13:33:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,9 +64,10 @@ public class RobotLlm {
     private String embedding = "embedding-v2";
     // private String embeddingModel = defaultEmbeddingModel;
 
+    // 温度越低，回答结果越固定，随机性越低
     @Builder.Default
     @Column(name = "llm_temperature")
-    private float temperature = 0.9f;
+    private float temperature = 0.0f;
 
     @Builder.Default
     @Column(name = "llm_top_p")
