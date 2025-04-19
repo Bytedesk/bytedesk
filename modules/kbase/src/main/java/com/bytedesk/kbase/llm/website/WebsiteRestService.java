@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:38:09
+ * @LastEditTime: 2025-04-19 15:10:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,18 +25,23 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, WebsiteRequest, WebsiteResponse, WebsiteExcel> {
+public class WebsiteRestService
+        extends BaseRestServiceWithExcel<WebsiteEntity, WebsiteRequest, WebsiteResponse, WebsiteExcel> {
 
     private final WebsiteRepository websiteRepository;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     public Page<WebsiteEntity> queryByOrgEntity(WebsiteRequest request) {
@@ -57,7 +62,7 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "website", key = "#uid", unless="#result==null")
+    @Cacheable(value = "website", key = "#uid", unless = "#result==null")
     @Override
     public Optional<WebsiteEntity> findByUid(String uid) {
         return websiteRepository.findByUid(uid);
@@ -65,9 +70,17 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
 
     @Override
     public WebsiteResponse create(WebsiteRequest request) {
-        
+
         WebsiteEntity entity = modelMapper.map(request, WebsiteEntity.class);
         entity.setUid(uidUtils.getUid());
+
+        //
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        if (kbase.isPresent()) {
+            entity.setKbaseEntity(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
 
         WebsiteEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -88,8 +101,7 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
                 throw new RuntimeException("Update website failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("Website not found");
         }
     }
@@ -108,7 +120,8 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
     }
 
     @Override
-    public WebsiteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WebsiteEntity entity) {
+    public WebsiteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            WebsiteEntity entity) {
         try {
             Optional<WebsiteEntity> latest = websiteRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -119,11 +132,11 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setContent(entity.getContent());
                 latestEntity.setEnabled(entity.isEnabled());
-                
+
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
                 latestEntity.setStatus(entity.getStatus());
-                
+
                 return websiteRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -139,8 +152,7 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
             optional.get().setDeleted(true);
             save(optional.get());
             // websiteRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("Website not found");
         }
     }
@@ -159,5 +171,5 @@ public class WebsiteRestService extends BaseRestServiceWithExcel<WebsiteEntity, 
     public WebsiteExcel convertToExcel(WebsiteEntity website) {
         return modelMapper.map(website, WebsiteExcel.class);
     }
-    
+
 }

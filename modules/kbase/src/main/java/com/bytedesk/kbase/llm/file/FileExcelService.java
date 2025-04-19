@@ -52,13 +52,13 @@ public class FileExcelService {
         excel.setContent(entity.getContent());
         excel.setFileUrl(entity.getFileUrl());
         excel.setStatus(entity.getStatus());
-        excel.setLevel(entity.getLevel());
-        excel.setPlatform(entity.getPlatform());
-        excel.setCategoryUid(entity.getCategoryUid());
-        excel.setKbUid(entity.getKbUid());
-        excel.setUploadUid(entity.getUploadUid());
-        excel.setUserUid(entity.getUserUid());
-        excel.setDocIdList(String.join(",", entity.getDocIdList()));
+        // excel.setLevel(entity.getLevel());
+        // excel.setPlatform(entity.getPlatform());
+        // excel.setCategoryUid(entity.getCategoryUid());
+        // excel.setKbUid(entity.getKbaseEntity().getUid());
+        // excel.setUploadUid(entity.getUploadUid());
+        // excel.setUserUid(entity.getUserUid());
+        // excel.setDocIdList(String.join(",", entity.getDocIdList()));
         excel.setCreatedAt(entity.getCreatedAt().toString());
         excel.setUpdatedAt(entity.getUpdatedAt().toString());
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:32:09
+ * @LastEditTime: 2025-04-19 15:09:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,8 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -41,6 +43,8 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     public Page<TextEntity> queryByOrgEntity(TextRequest request) {
@@ -65,7 +69,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "text", key = "#uid", unless="#result==null")
+    @Cacheable(value = "text", key = "#uid", unless = "#result==null")
     @Override
     public Optional<TextEntity> findByUid(String uid) {
         return textRepository.findByUid(uid);
@@ -79,10 +83,19 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             throw new RuntimeException("User not found");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         TextEntity entity = modelMapper.map(request, TextEntity.class);
         entity.setUid(uidUtils.getUid());
-        // 
+
+        //
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        if (kbase.isPresent()) {
+            entity.setKbaseEntity(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
+
+        //
         TextEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create text failed");
@@ -102,8 +115,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
                 throw new RuntimeException("Update text failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("Text not found");
         }
     }
@@ -128,8 +140,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             optional.get().setDeleted(true);
             save(optional.get());
             // textRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("Text not found");
         }
     }
@@ -140,7 +151,8 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     }
 
     @Override
-    public TextEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TextEntity entity) {
+    public TextEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TextEntity entity) {
         try {
             Optional<TextEntity> latest = textRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -150,11 +162,11 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
                 latestEntity.setContent(entity.getContent());
                 latestEntity.setEnabled(entity.isEnabled());
                 latestEntity.setType(entity.getType());
-                
+
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
                 latestEntity.setStatus(entity.getStatus());
-                
+
                 return textRepository.save(latestEntity);
             }
         } catch (Exception ex) {
