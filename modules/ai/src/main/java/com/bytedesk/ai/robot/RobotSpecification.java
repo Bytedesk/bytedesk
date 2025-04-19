@@ -61,6 +61,10 @@ public class RobotSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
+            // kbEnabled
+            if (request.getKbEnabled() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("kbEnabled"), request.getKbEnabled()));
+            }
             // kbUid
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
