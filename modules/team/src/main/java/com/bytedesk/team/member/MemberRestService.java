@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:35:24
+ * @LastEditTime: 2025-04-19 11:45:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,6 +43,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserRequest;
+import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -422,7 +423,11 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
 
     @Override
     public MemberResponse convertToResponse(MemberEntity entity) {
-        return modelMapper.map(entity, MemberResponse.class);
+        MemberResponse response = modelMapper.map(entity, MemberResponse.class);
+        if (entity.getUser() != null) {
+            response.setUser(modelMapper.map(entity.getUser(), UserResponse.class));
+        }
+        return response;
     }
 
     @Override

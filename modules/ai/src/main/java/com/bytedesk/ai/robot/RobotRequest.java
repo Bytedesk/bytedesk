@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 11:02:23
+ * @LastEditTime: 2025-04-19 11:50:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ public class RobotRequest extends BaseRequest {
     private RobotLlm llm = new RobotLlm();
 
     @Builder.Default
-    private Boolean isFlowEnabled = false;
+    private Boolean flowEnabled = false;
 
     // @Builder.Default
     // private RobotFlow flow = new RobotFlow();
@@ -69,7 +69,7 @@ public class RobotRequest extends BaseRequest {
     private Boolean published = false;
 
     @Builder.Default
-    private Boolean isKbEnabled = false;
+    private Boolean kbEnabled = false;
 
     private String kbUid;
 
