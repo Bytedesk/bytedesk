@@ -43,6 +43,7 @@
 					</li>  -->
 					<!-- Nav item 2 Course -->
 					<li class="nav-item dropdown"><a class="nav-link" href="./docs/zh-CN/" target="_blank">文档</a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank">价格</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./helpcenter/df_hc_uid" target="_blank">帮助中心</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank">下载</a></li>
