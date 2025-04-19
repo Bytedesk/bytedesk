@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 16:04:26
+ * @LastEditTime: 2025-04-19 16:37:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,8 +49,8 @@ public class QaRequest extends BaseRequest {
     private List<String> relatedQaUids = new ArrayList<>();
 
     // 是否是llm问答
-    @Builder.Default
-    private Boolean isLlmQa = false;
+    // @Builder.Default
+    // private Boolean isLlmQa = false;
 
     @Builder.Default
     private String type = MessageTypeEnum.TEXT.name();
