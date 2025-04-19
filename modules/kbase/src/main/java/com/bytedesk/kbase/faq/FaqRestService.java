@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:03:37
+ * @LastEditTime: 2025-04-19 15:06:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -464,9 +464,9 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         // faq.setKbUid(kbUid);
         faq.setOrgUid(orgUid);
         // 
-        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
         if (kbase.isPresent()) {
-            entity.setKbaseEntity(kbase.get());
+            faq.setKbaseEntity(kbase.get());
         } else {
             throw new RuntimeException("kbaseUid not found");
         }
@@ -514,16 +514,23 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
                 if (StringUtils.hasText(question) && StringUtils.hasText(answer)) {
                     FaqEntity faq = FaqEntity.builder()
+                            .uid(uidUtils.getUid())
                             .question(question)
                             .answer(answer)
                             .type(MessageTypeEnum.TEXT.name())
                             // .tags(tags)
-                            .kbUid(kbUid)
+                            // .kbUid(kbUid)
                             // .docId(docId)
+                            .orgUid(orgUid)
                             .build();
+                    // 
+                    Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
+                    if (kbase.isPresent()) {
+                        faq.setKbaseEntity(kbase.get());
+                    } else {
+                        throw new RuntimeException("kbaseUid not found");
+                    }
 
-                    faq.setUid(uidUtils.getUid());
-                    faq.setOrgUid(orgUid);
                     save(faq);
                 }
             }
