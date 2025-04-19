@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 07:52:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-20 12:40:00
+ * @LastEditTime: 2025-04-19 11:45:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +48,17 @@ public class BytedeskConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        // return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        
+        // 设置更严格的匹配策略
+        modelMapper.getConfiguration()
+            .setMatchingStrategy(MatchingStrategies.STRICT)
+            .setSkipNullEnabled(true)
+            .setFieldMatchingEnabled(true)
+            .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
+        
+        return modelMapper;
     }
 
     @Bean

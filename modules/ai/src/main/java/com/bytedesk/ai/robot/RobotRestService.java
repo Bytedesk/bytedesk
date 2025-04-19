@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 11:32:53
+ * @LastEditTime: 2025-04-19 11:45:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -174,7 +174,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
-        robot.setKbEnabled(request.getIsKbEnabled());
+        robot.setKbEnabled(request.getKbEnabled());
         robot.setKbUid(request.getKbUid());
         //
         // Set common settings
@@ -341,7 +341,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setDescription(request.getDescription());
         robot.setPublished(request.getPublished());
         robot.setDefaultReply(request.getDefaultReply());
-        robot.setKbEnabled(request.getIsKbEnabled());
+        robot.setKbEnabled(request.getKbEnabled());
         robot.setKbUid(request.getKbUid());
         //
         // Set common settings
@@ -570,7 +570,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .nickname(I18Consts.I18N_ROBOT_NICKNAME)
                 .type(RobotTypeEnum.SERVICE.name())
                 .orgUid(orgUid)
-                .isKbEnabled(true)
+                .kbEnabled(true)
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID))
                 .build();
         //
@@ -741,7 +741,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         //
         RobotEntity robot = robotOptional.get();
-        robot.setKbEnabled(request.getIsKbEnabled());
+        robot.setKbEnabled(request.getKbEnabled());
         robot.setKbUid(request.getKbUid());
         //
         RobotEntity savedRobot = save(robot);
