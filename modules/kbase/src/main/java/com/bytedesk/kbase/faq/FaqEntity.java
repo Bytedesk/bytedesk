@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 14:58:02
+ * @LastEditTime: 2025-04-20 00:19:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,9 +83,9 @@ public class FaqEntity extends BaseEntity {
     private List<FaqEntity> relatedFaqs = new ArrayList<>();
 
     // 是否是llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa")
-    private boolean isLlmQa = false;
+    // @Builder.Default
+    // @Column(name = "is_llm_qa")
+    // private boolean isLlmQa = false;
 
     @Builder.Default
     @Column(name = "faq_type", nullable = false)
