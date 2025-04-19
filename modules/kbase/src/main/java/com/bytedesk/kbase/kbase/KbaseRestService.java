@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:46:14
+ * @LastEditTime: 2025-04-19 15:27:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
             throw new RuntimeException("user not found");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         return queryByOrg(request);
     }
 
@@ -103,24 +103,32 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
-        // 
+        //
         KbaseEntity entity = KbaseEntity.builder().build();
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
         } else {
             entity.setUid(uidUtils.getUid());
         }
+        //
+        UserEntity user = authService.getCurrentUser();
+        if (user != null) {
+            entity.setUserUid(user.getUid());
+        }
+        //
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
         entity.setType(request.getType());
         entity.setHeadline(request.getHeadline());
         entity.setDescriptionHtml(request.getDescriptionHtml());
         entity.setFooterHtml(request.getFooterHtml());
-        // entity.setEmbedding(request.getEmbedding());
         entity.setLanguage(request.getLanguage());
         entity.setLevel(request.getLevel());
         entity.setOrgUid(request.getOrgUid());
         entity.setAgentUid(request.getAgentUid());
+        //
+        entity.setEmbeddingProvider(request.getEmbeddingProvider());
+        entity.setEmbeddingModel(request.getEmbeddingModel());
         //
         KbaseEntity savedKb = save(entity);
         if (savedKb == null) {
@@ -142,10 +150,17 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
             entity.setHeadline(request.getHeadline());
             entity.setDescriptionHtml(request.getDescriptionHtml());
             entity.setFooterHtml(request.getFooterHtml());
-            // entity.setEmbedding(request.getEmbedding());
             entity.setLanguage(request.getLanguage());
             //
-            return convertToResponse(save(entity));
+            entity.setEmbeddingProvider(request.getEmbeddingProvider());
+            entity.setEmbeddingModel(request.getEmbeddingModel());
+            // 
+            KbaseEntity savedKb = save(entity);
+            if (savedKb == null) {
+                throw new RuntimeException("knowledge_base not saved");
+            }
+            //
+            return convertToResponse(savedKb);
         } else {
             throw new RuntimeException("knowledge_base not found");
         }
@@ -215,37 +230,37 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     }
 
     public Page<CategoryResponse> getCategories(KbaseEntity kbaseEntity) {
-        // 
+        //
         CategoryRequest categoryRequest = new CategoryRequest();
         categoryRequest.setPageNumber(0);
         categoryRequest.setPageSize(50);
         categoryRequest.setType(KbaseTypeEnum.HELPCENTER.name());
         categoryRequest.setKbUid(kbaseEntity.getUid());
         categoryRequest.setOrgUid(kbaseEntity.getOrgUid());
-        // 
+        //
         return categoryService.queryByOrg(categoryRequest);
     }
 
     public Page<ArticleResponse> getArticles(KbaseEntity kbaseEntity) {
-        // 
+        //
         ArticleRequest articleRequest = new ArticleRequest();
         articleRequest.setPageNumber(0);
         articleRequest.setPageSize(50);
         articleRequest.setKbUid(kbaseEntity.getUid());
         articleRequest.setOrgUid(kbaseEntity.getOrgUid());
-        // 
+        //
         return articleService.queryByOrg(articleRequest);
     }
-    
+
     public Page<ArticleResponse> getArticlesByCategory(KbaseEntity kbaseEntity, String categoryUid) {
-        // 
+        //
         ArticleRequest articleRequest = new ArticleRequest();
         articleRequest.setPageNumber(0);
         articleRequest.setPageSize(50);
         articleRequest.setCategoryUid(categoryUid);
         articleRequest.setKbUid(kbaseEntity.getUid());
         articleRequest.setOrgUid(kbaseEntity.getOrgUid());
-        // 
+        //
         return articleService.queryByOrg(articleRequest);
     }
 
@@ -254,17 +269,17 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
         // 平台-初始化快捷回复知识库
         // KbaseRequest kownledgebaseRequestQuickReplyPlatform = KbaseRequest.builder()
-        //         .name(KbaseConsts.KB_QUICKREPLY_NAME)
-        //         .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
-        //         .language(LanguageEnum.ZH_CN.name())
-        //         .level(LevelEnum.PLATFORM.name())
-        //         .build();
+        // .name(KbaseConsts.KB_QUICKREPLY_NAME)
+        // .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
+        // .language(LanguageEnum.ZH_CN.name())
+        // .level(LevelEnum.PLATFORM.name())
+        // .build();
         // kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
         // kownledgebaseRequestQuickReplyPlatform.setType(KbaseTypeEnum.QUICKREPLY.name());
         // // 方便超级管理员加载，避免重新写一个接口拉取
         // kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
         // create(kownledgebaseRequestQuickReplyPlatform);
-        
+
         // 初始化帮助文档知识库
         KbaseRequest kownledgebaseRequestHelpdoc = KbaseRequest.builder()
                 .name(KbaseConsts.KB_HELPCENTER_NAME)
@@ -353,6 +368,5 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
     }
-
 
 }
