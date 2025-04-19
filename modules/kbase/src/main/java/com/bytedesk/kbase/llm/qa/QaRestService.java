@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 16:21:11
+ * @LastEditTime: 2025-04-20 00:02:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -188,24 +188,16 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             QaEntity entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setQuestion(request.getQuestion());
+            entity.setQuestionList(request.getQuestionList());
             entity.setAnswer(request.getAnswer());
             entity.setAnswerList(request.getAnswerList());
             entity.setStatus(request.getStatus());
             entity.setTagList(request.getTagList());
             entity.setType(request.getType());
             entity.setEnabled(request.getEnabled());
-            // 如何将string类型startDate和endDate转换为LocalDateTime类型？
-            // if (StringUtils.hasText(request.getStartDate())) {
-            //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
-            // }
-            // if (StringUtils.hasText(request.getEndDate())) {
-            //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
-            // }
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
-            //
             entity.setCategoryUid(request.getCategoryUid());
-            // entity.setKbUid(request.getKbUid());
             //
 
             return convertToResponse(save(entity));
