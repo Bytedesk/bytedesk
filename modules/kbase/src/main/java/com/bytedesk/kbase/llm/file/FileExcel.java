@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 17:01:09
+ * @LastEditTime: 2025-04-19 15:07:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,33 +40,25 @@ public class FileExcel {
     @ColumnWidth(15)
     private String status;
 
-    @ExcelProperty(value = "级别")
-    @ColumnWidth(15)
-    private String level;
+    // @ExcelProperty(value = "分类")
+    // @ColumnWidth(20)
+    // private String categoryUid;
 
-    @ExcelProperty(value = "平台")
-    @ColumnWidth(15)
-    private String platform;
+    // @ExcelProperty(value = "知识库")
+    // @ColumnWidth(20)
+    // private String kbUid;
 
-    @ExcelProperty(value = "分类")
-    @ColumnWidth(20)
-    private String categoryUid;
+    // @ExcelProperty(value = "上传ID")
+    // @ColumnWidth(32)
+    // private String uploadUid;
 
-    @ExcelProperty(value = "知识库")
-    @ColumnWidth(20)
-    private String kbUid;
+    // @ExcelProperty(value = "用户ID")
+    // @ColumnWidth(32)
+    // private String userUid;
 
-    @ExcelProperty(value = "上传ID")
-    @ColumnWidth(32)
-    private String uploadUid;
-
-    @ExcelProperty(value = "用户ID")
-    @ColumnWidth(32)
-    private String userUid;
-
-    @ExcelProperty(value = "文档ID列表")
-    @ColumnWidth(50)
-    private String docIdList;
+    // @ExcelProperty(value = "文档ID列表")
+    // @ColumnWidth(50)
+    // private String docIdList;
 
     @ExcelProperty(value = "创建时间")
     @ColumnWidth(20)

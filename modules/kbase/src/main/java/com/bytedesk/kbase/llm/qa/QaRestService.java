@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 16:59:16
+ * @LastEditTime: 2025-04-19 15:08:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,6 +38,9 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +58,8 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     private final CategoryRestService categoryService;
 
     private final AuthService authService;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     public Page<QaEntity> queryByOrgEntity(QaRequest request) {
@@ -200,7 +205,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             entity.setEndDate(request.getEndDate());
             //
             entity.setCategoryUid(request.getCategoryUid());
-            entity.setKbUid(request.getKbUid());
+            // entity.setKbUid(request.getKbUid());
             //
             // 根据request.relatedQaUids查找关联的FAQ
             List<QaEntity> relatedQas = new ArrayList<>();
@@ -213,6 +218,14 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                 }
             }
             entity.setRelatedQas(relatedQas);
+
+            // 
+            Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+            if (kbase.isPresent()) {
+                entity.setKbaseEntity(kbase.get());
+            } else {
+                throw new RuntimeException("kbaseUid not found");
+            }
 
             return convertToResponse(save(entity));
         } else {
@@ -296,7 +309,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                 latestEntity.setType(entity.getType());
                 latestEntity.setEnabled(entity.isEnabled());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
-                latestEntity.setKbUid(entity.getKbUid());
+                // latestEntity.setKbUid(entity.getKbUid());
                 
                 // 处理相关问答时特别小心
                 if (entity.getRelatedQas() != null && !entity.getRelatedQas().isEmpty()) {
@@ -355,7 +368,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
                 .categoryUid(entity.getCategoryUid())
-                .kbUid(entity.getKbUid())
+                // .kbUid(entity.getKbUid())
                 .fileUid(entity.getFileUid())
                 // .docUid(entity.getDocId())
                 .createdAt(entity.getCreatedAt())
@@ -425,8 +438,16 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             qa.setCategoryUid(categoryResponse.getUid());
         }
         qa.setFileUid(fileUid);
-        qa.setKbUid(kbUid);
+        // qa.setKbUid(kbUid);
         qa.setOrgUid(orgUid);
+
+        // 
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
+        if (kbase.isPresent()) {
+            qa.setKbaseEntity(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
         //
         return qa;
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 16:55:59
+ * @LastEditTime: 2025-04-19 15:09:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,8 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,8 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     public Page<SplitEntity> queryByOrgEntity(SplitRequest request) {
@@ -69,7 +73,7 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "split", key = "#uid", unless="#result==null")
+    @Cacheable(value = "split", key = "#uid", unless = "#result==null")
     @Override
     public Optional<SplitEntity> findByUid(String uid) {
         return splitRepository.findByUid(uid);
@@ -79,29 +83,36 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     public SplitResponse create(SplitRequest request) {
         // log.info("SplitRestService create: {}", request);
         SplitEntity entity = SplitEntity.builder()
-            .uid(uidUtils.getUid())
-            .name(request.getName())
-            .content(request.getContent())
-            .type(request.getType())
-            .level(request.getLevel())
-            .platform(request.getPlatform())
-            .docId(request.getDocId())
-            .typeUid(request.getTypeUid())
-            .enabled(request.isEnabled())
-            .startDate(request.getStartDate())
-            .endDate(request.getEndDate())
-            .categoryUid(request.getCategoryUid())
-            .kbUid(request.getKbUid())
-            .orgUid(request.getOrgUid())
-            .build();
-            // 
-            UserEntity user = authService.getUser();
-            if (user != null) {
-                entity.setUserUid(user.getUid());
-            } else {
-                entity.setUserUid(request.getUserUid());
-            }
-        // 
+                .uid(uidUtils.getUid())
+                .name(request.getName())
+                .content(request.getContent())
+                .type(request.getType())
+                .level(request.getLevel())
+                .platform(request.getPlatform())
+                .docId(request.getDocId())
+                .typeUid(request.getTypeUid())
+                .enabled(request.isEnabled())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .categoryUid(request.getCategoryUid())
+                // .kbUid(request.getKbUid())
+                .orgUid(request.getOrgUid())
+                .build();
+        //
+        UserEntity user = authService.getUser();
+        if (user != null) {
+            entity.setUserUid(user.getUid());
+        } else {
+            entity.setUserUid(request.getUserUid());
+        }
+        //
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        if (kbase.isPresent()) {
+            entity.setKbaseEntity(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
+        //
         SplitEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create split failed");
@@ -111,7 +122,7 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
 
     @Override
     public SplitResponse update(SplitRequest request) {
-        // 
+        //
         Optional<SplitEntity> optional = splitRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             SplitEntity entity = optional.get();
@@ -133,8 +144,7 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
                 throw new RuntimeException("Update split failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("Split not found");
         }
     }
@@ -153,7 +163,8 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     }
 
     @Override
-    public SplitEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SplitEntity entity) {
+    public SplitEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            SplitEntity entity) {
         try {
             log.warn("处理乐观锁冲突: {}", entity.getUid());
             Optional<SplitEntity> latest = splitRepository.findByUid(entity.getUid());
@@ -169,11 +180,11 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
                 latestEntity.setEnabled(entity.isEnabled());
                 latestEntity.setStartDate(entity.getStartDate());
                 latestEntity.setEndDate(entity.getEndDate());
-                
+
                 // 文档ID列表和状态
                 // latestEntity.setStatus(entity.getStatus());
                 latestEntity.setDocId(entity.getDocId());
-                
+
                 return splitRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -201,8 +212,7 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("Split not found");
         }
     }
