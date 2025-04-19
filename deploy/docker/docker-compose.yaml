@@ -141,22 +141,22 @@ services:
       MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
-      # zhipuai
-      # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
-      SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
-      SPRING_AI_ZHIPUAI_CHAT_ENABLED: true
-      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
-      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: true
       # ollama
       # ollama pull qwen2.5:1.5b
+      # ollama pull nomic-embed-text:latest
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
-      # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen2.5:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
-      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: qwen2.5:1.5b
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: nomic-embed-text:latest
+      # zhipuai
+      # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
+      SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: false
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: false
       # deepseek
       # 申请key https://api-docs.deepseek.com/zh-cn/
       SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 17:00:14
+ * @LastEditTime: 2025-04-19 15:03:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,8 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +64,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     private final FaqJsonLoader faqJsonLoader;
 
     private final AuthService authService;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     public Page<FaqEntity> queryByOrgEntity(FaqRequest request) {
@@ -158,6 +162,14 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             }
             entity.setRelatedFaqs(relatedFaqs);
 
+            // 
+            Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+            if (kbase.isPresent()) {
+                entity.setKbaseEntity(kbase.get());
+            } else {
+                throw new RuntimeException("kbaseUid not found");
+            }
+
             try {
                 FaqEntity savedEntity = save(entity);
                 if (savedEntity != null) {
@@ -199,7 +211,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 entity.setStartDate(request.getStartDate());
                 entity.setEndDate(request.getEndDate());
                 entity.setCategoryUid(request.getCategoryUid());
-                entity.setKbUid(request.getKbUid());
+                // entity.setKbUid(request.getKbUid());
                 
                 // 处理相关FAQ
                 if (request.getRelatedFaqUids() != null && !request.getRelatedFaqUids().isEmpty()) {
@@ -314,7 +326,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 latestEntity.setType(entity.getType());
                 latestEntity.setEnabled(entity.isEnabled());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
-                latestEntity.setKbUid(entity.getKbUid());
+                // latestEntity.setKbUid(entity.getKbUid());
                 
                 // 避免覆盖计数器类字段
                 // latestEntity.setViewCount(entity.getViewCount());
@@ -378,7 +390,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
                 .categoryUid(entity.getCategoryUid())
-                .kbUid(entity.getKbUid())
+                .kbUid(entity.getKbaseEntity().getUid())
                 .fileUid(entity.getFileUid())
                 // .docUid(entity.getDocId())
                 .createdAt(entity.getCreatedAt())
@@ -449,8 +461,15 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             faq.setCategoryUid(categoryResponse.getUid());
         }
         faq.setFileUid(fileUid);
-        faq.setKbUid(kbUid);
+        // faq.setKbUid(kbUid);
         faq.setOrgUid(orgUid);
+        // 
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        if (kbase.isPresent()) {
+            entity.setKbaseEntity(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
         //
         return faq;
     }

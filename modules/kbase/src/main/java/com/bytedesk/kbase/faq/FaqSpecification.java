@@ -46,7 +46,8 @@ public class FaqSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
             if (StringUtils.hasText(request.getKbUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+                // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段
+                predicates.add(criteriaBuilder.equal(root.get("kbaseEntity").get("uid"), request.getKbUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

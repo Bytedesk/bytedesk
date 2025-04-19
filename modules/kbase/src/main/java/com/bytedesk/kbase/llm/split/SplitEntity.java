@@ -20,10 +20,14 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -82,7 +86,8 @@ public class SplitEntity extends BaseEntity {
     // 所属分类
     private String categoryUid;
 
-    // kbaseEntity 的 uid
-    private String kbUid;
+    // 替换kbUid为KbaseEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    private KbaseEntity kbaseEntity;
 
 }

@@ -303,11 +303,11 @@ public class SpringAIVectorService {
 			splitRestService.create(splitRequest);
 		});
 		// log.info("Parsing document, this will take a while.");
-		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		}
+		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+		// }
 		//
 		return docList;
 	}
