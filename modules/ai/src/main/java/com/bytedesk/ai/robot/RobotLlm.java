@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 14:06:15
+ * @LastEditTime: 2025-04-19 14:33:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
@@ -51,22 +52,24 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "llm_provider")
-    private String provider = "zhipu";
+    private String provider = LlmConsts.DEFAULT_PROVIDER;
     // private String provider = "ollama";
     
     @Builder.Default
     @Column(name = "llm_model")
-    private String model = "glm-4-flash";
+    private String model = LlmConsts.DEFAULT_MODEL; 
+    //"glm-4-flash";
     // private String model = defaultModel;
 
-    @Builder.Default
-    @Column(name = "llm_embedding_provider")
-    private String embeddingProvider = "zhipu";
+    // 迁移到kbase
+    // @Builder.Default
+    // @Column(name = "llm_embedding_provider")
+    // private String embeddingProvider = "zhipu";
     
-    @Builder.Default
-    @Column(name = "llm_embedding_model")
-    private String embeddingModel = "embedding-v2";
-    // private String embeddingModel = defaultEmbeddingModel;
+    // @Builder.Default
+    // @Column(name = "llm_embedding_model")
+    // private String embeddingModel = "embedding-v2";
+    // // private String embeddingModel = defaultEmbeddingModel;
 
     // 温度越低，回答结果越固定，随机性越低
     @Builder.Default

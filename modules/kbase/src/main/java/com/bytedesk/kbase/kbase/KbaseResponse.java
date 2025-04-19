@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 10:15:32
+ * @LastEditTime: 2025-04-19 14:15:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,13 +85,7 @@ public class KbaseResponse extends BaseResponse {
     // 自定义 CSS, 添加 Less/CSS 代码以自定义论坛外观，此设置将覆盖默认样式
     private String css;
 
-    // private String embedding;
-
     private String language;
-
-    // private String level;
-
-    // private String platform;
 
     private List<String> tagList;
 
@@ -99,15 +93,16 @@ public class KbaseResponse extends BaseResponse {
 
     private Boolean published;
 
-    // private String orgUid;
-
     // 有效开始日期
     private LocalDateTime startDate;
 
     // 有效结束日期
     private LocalDateTime endDate;
 
-    // private LocalDateTime updatedAt;
+    // 大模型知识库-嵌入向量提供者
+    private String embeddingProvider;
+    
+    private String embeddingModel;
 
     private String agentUid;
 

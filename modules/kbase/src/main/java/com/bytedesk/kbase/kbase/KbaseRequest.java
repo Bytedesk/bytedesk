@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 10:15:29
+ * @LastEditTime: 2025-04-19 14:30:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LanguageEnum;
@@ -142,6 +143,13 @@ public class KbaseRequest extends BaseRequest {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
+    // 大模型知识库-嵌入向量提供者
+    @Builder.Default
+    private String embeddingProvider = LlmConsts.DEFAULT_EMBEDDING_PROVIDER;
+    
+    @Builder.Default
+    private String embeddingModel = LlmConsts.DEFAULT_EMBEDDING_MODEL;
 
     @Builder.Default
     private boolean showChat = false;

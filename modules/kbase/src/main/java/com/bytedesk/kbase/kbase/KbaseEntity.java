@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 10:08:03
+ * @LastEditTime: 2025-04-19 14:13:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LanguageEnum;
@@ -137,17 +138,8 @@ public class KbaseEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String css = BytedeskConsts.EMPTY_STRING;
 
-    // @Builder.Default
-    // private String embedding = KbaseConsts.KB_EMBEDDING;
-
     @Builder.Default
     private String language = LanguageEnum.ZH_CN.name();
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
 
     // 有效开始日期
     private LocalDateTime startDate;
@@ -159,6 +151,15 @@ public class KbaseEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
+
+    // 大模型知识库-嵌入向量提供者
+    @Builder.Default
+    @Column(name = "llm_embedding_provider")
+    private String embeddingProvider = LlmConsts.DEFAULT_EMBEDDING_PROVIDER;
+    
+    @Builder.Default
+    @Column(name = "llm_embedding_model")
+    private String embeddingModel = LlmConsts.DEFAULT_EMBEDDING_MODEL; //"embedding-v2";
 
     @Builder.Default
     private boolean showChat = false;

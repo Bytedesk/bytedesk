@@ -22,7 +22,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.provider.LlmProviderConsts;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.baidu.SpringAIBaiduService;
 import com.bytedesk.ai.springai.dashscope.SpringAIDashscopeService;
@@ -33,6 +32,7 @@ import com.bytedesk.ai.springai.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.tencent.SpringAITencentService;
 import com.bytedesk.ai.springai.volcengine.SpringAIVolcengineService;
 import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
+import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -101,31 +101,31 @@ public class RobotService {
             return;
         }
 
-        if (LlmProviderConsts.OLLAMA.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        if (LlmConsts.OLLAMA.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIOllamaService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.DEEPSEEK.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.DEEPSEEK.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIDeepseekService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.DASHSCOPE.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.DASHSCOPE.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIDashscopeService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.ZHIPU.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.ZHIPU.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIZhipuaiService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.SILICONFLOW.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.SILICONFLOW.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAISiliconFlowService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.GITEE.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.GITEE.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIGiteeService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.TENCENT.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.TENCENT.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAITencentService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.BAIDU.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.BAIDU.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIBaiduService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.VOLCENGINE.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.VOLCENGINE.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIVolcengineService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
         } else {
@@ -171,31 +171,31 @@ public class RobotService {
             return;
         }
 
-        if (LlmProviderConsts.OLLAMA.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        if (LlmConsts.OLLAMA.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIOllamaService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.DEEPSEEK.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.DEEPSEEK.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIDeepseekService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.DASHSCOPE.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.DASHSCOPE.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIDashscopeService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.ZHIPU.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.ZHIPU.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIZhipuaiService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.SILICONFLOW.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.SILICONFLOW.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAISiliconFlowService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.GITEE.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.GITEE.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIGiteeService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.TENCENT.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.TENCENT.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAITencentService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.BAIDU.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.BAIDU.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIBaiduService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
-        } else if (LlmProviderConsts.VOLCENGINE.equalsIgnoreCase(robot.getLlm().getProvider())) {
+        } else if (LlmConsts.VOLCENGINE.equalsIgnoreCase(robot.getLlm().getProvider())) {
             springAIVolcengineService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
         } else {
