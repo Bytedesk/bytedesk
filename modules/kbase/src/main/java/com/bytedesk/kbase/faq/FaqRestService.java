@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:06:34
+ * @LastEditTime: 2025-04-20 00:03:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -202,6 +202,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 FaqEntity entity = optional.get();
                 // 设置属性
                 entity.setQuestion(request.getQuestion());
+                entity.setQuestionList(request.getQuestionList());
                 entity.setAnswer(request.getAnswer());
                 entity.setAnswerList(request.getAnswerList());
                 entity.setStatus(request.getStatus());
@@ -211,7 +212,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 entity.setStartDate(request.getStartDate());
                 entity.setEndDate(request.getEndDate());
                 entity.setCategoryUid(request.getCategoryUid());
-                // entity.setKbUid(request.getKbUid());
                 
                 // 处理相关FAQ
                 if (request.getRelatedFaqUids() != null && !request.getRelatedFaqUids().isEmpty()) {
@@ -371,31 +371,31 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     @Override
     public FaqResponse convertToResponse(FaqEntity entity) {
-        // return modelMapper.map(entity, FaqResponse.class);
-        FaqResponse response = FaqResponse.builder()
-                .uid(entity.getUid())
-                .question(entity.getQuestion())
-                .answer(entity.getAnswer())
-                .answerList(entity.getAnswerList())
-                .isLlmQa(entity.isLlmQa())
-                .type(entity.getType())
-                .status(entity.getStatus())
-                .viewCount(entity.getViewCount())
-                .clickCount(entity.getClickCount())
-                .upCount(entity.getUpCount())
-                .downCount(entity.getDownCount())
-                // .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
-                .enabled(entity.isEnabled())
-                .tagList(entity.getTagList())
-                .startDate(entity.getStartDate())
-                .endDate(entity.getEndDate())
-                .categoryUid(entity.getCategoryUid())
-                .kbUid(entity.getKbaseEntity().getUid())
-                .fileUid(entity.getFileUid())
-                // .docUid(entity.getDocId())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
+        FaqResponse response = modelMapper.map(entity, FaqResponse.class);
+        // FaqResponse response = FaqResponse.builder()
+        //         .uid(entity.getUid())
+        //         .question(entity.getQuestion())
+        //         .answer(entity.getAnswer())
+        //         .answerList(entity.getAnswerList())
+        //         .isLlmQa(entity.isLlmQa())
+        //         .type(entity.getType())
+        //         .status(entity.getStatus())
+        //         .viewCount(entity.getViewCount())
+        //         .clickCount(entity.getClickCount())
+        //         .upCount(entity.getUpCount())
+        //         .downCount(entity.getDownCount())
+        //         // .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
+        //         .enabled(entity.isEnabled())
+        //         .tagList(entity.getTagList())
+        //         .startDate(entity.getStartDate())
+        //         .endDate(entity.getEndDate())
+        //         .categoryUid(entity.getCategoryUid())
+        //         .kbUid(entity.getKbaseEntity().getUid())
+        //         .fileUid(entity.getFileUid())
+        //         // .docUid(entity.getDocId())
+        //         .createdAt(entity.getCreatedAt())
+        //         .updatedAt(entity.getUpdatedAt())
+        //         .build();
 
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedFaqs() != null) {
