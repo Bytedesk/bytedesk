@@ -49,8 +49,8 @@ public class FaqRequest extends BaseRequest {
     private List<String> relatedFaqUids = new ArrayList<>();
 
     // 是否是llm问答
-    @Builder.Default
-    private Boolean isLlmQa = false;
+    // @Builder.Default
+    // private Boolean isLlmQa = false;
 
     @Builder.Default
     private String type = MessageTypeEnum.TEXT.name();
