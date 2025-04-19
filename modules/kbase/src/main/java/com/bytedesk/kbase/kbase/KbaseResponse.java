@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:56:31
+ * @LastEditTime: 2025-04-19 10:08:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,6 +112,9 @@ public class KbaseResponse extends BaseResponse {
     private String agentUid;
 
     private String userUid;
+
+    // 机器人模拟测试知识库
+    private String robotUid;
 
     private List<UserProtobuf> members;
 }

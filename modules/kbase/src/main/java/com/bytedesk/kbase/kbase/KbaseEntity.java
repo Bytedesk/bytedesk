@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:56:18
+ * @LastEditTime: 2025-04-19 10:08:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -168,6 +168,9 @@ public class KbaseEntity extends BaseEntity {
 
     // 某人工客服快捷回复知识库
     private String agentUid;
+
+    // 机器人模拟测试知识库
+    private String robotUid;
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
