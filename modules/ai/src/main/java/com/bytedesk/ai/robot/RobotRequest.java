@@ -65,8 +65,8 @@ public class RobotRequest extends BaseRequest {
     // 机器人分类
     private String categoryUid;
 
-    @Builder.Default
-    private Boolean published = false;
+    // @Builder.Default
+    // private Boolean published = false;
 
     @Builder.Default
     private Boolean kbEnabled = false;
