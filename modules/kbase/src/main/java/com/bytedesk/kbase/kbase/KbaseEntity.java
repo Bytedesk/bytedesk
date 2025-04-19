@@ -169,9 +169,6 @@ public class KbaseEntity extends BaseEntity {
     // 某人工客服快捷回复知识库
     private String agentUid;
 
-    // 机器人模拟测试知识库
-    private String robotUid;
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<MemberEntity> members = new ArrayList<>();
