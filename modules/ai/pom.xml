@@ -23,7 +23,7 @@
 		<!-- <spring-ai.version>1.0.0-M6</spring-ai.version> -->
 		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 		<jsonp.version>1.18.3</jsonp.version>
-		<selenium.version>4.30.0</selenium.version>
+		<!-- <selenium.version>4.30.0</selenium.version> -->
 	</properties>
 
 	<dependencies>
@@ -282,7 +282,7 @@
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 		<!--
 		https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk/examples/java/src/test/java/dev/selenium/actions_api/ActionsTest.java -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 			<version>${selenium.version}</version>
@@ -311,15 +311,15 @@
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-http</artifactId>
 			<version>${selenium.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- 添加Chrome 134版本对应的DevTools支持 -->
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-devtools-v134 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-devtools-v134</artifactId>
 			<version>${selenium.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<dependency>
