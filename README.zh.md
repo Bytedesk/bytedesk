@@ -101,8 +101,10 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 #### 因项目默认使用ollama qwen2.5:1.5b模型，所以需要提前拉取模型。配置文件中可以配置其他模型，如deepseek-r1等
 
 ```bash
-ollama pull deepseek-r1:1.5b
+# 对话模型
 ollama pull qwen2.5:1.5b
+# 嵌入模型
+ollama pull nomic-embed-text:latest
 ```
 
 ### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:1.5b 模型
@@ -114,8 +116,10 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 #### docker 拉取ollama模型。配置文件中可以配置其他模型，如deepseek-r1等
 
 ```bash
-docker exec ollama-bytedesk ollama pull deepseek-r1
+# 对话模型
 docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
+# 嵌入模型
+docker exec ollama-bytedesk ollama pull nomic-embed-text:latest
 ```
 
 <!-- #### 如果不需要知识库AI问答功能，可以修改 `docker-compose.yaml` 或 `docker-compose-ollama.yaml` 关闭ollama对话和嵌入功能，以节省资源

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:58:47
+ * @LastEditTime: 2025-04-19 14:58:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.llm.split.SplitStatusEnum;
 
 import jakarta.persistence.Column;
@@ -29,6 +30,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,6 +59,13 @@ public class FaqEntity extends BaseEntity {
     // 问题
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String question;
+
+    // 同一个问题，支持多种问法
+    // 支持AI生成，手动编辑
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> questionList = new ArrayList<>();
 
     // 默认答案（对所有用户级别展示的通用答案），等级为0时答案
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -129,8 +138,9 @@ public class FaqEntity extends BaseEntity {
     // 分类
     private String categoryUid;
 
-    // 对应知识库
-    private String kbUid;
+    // 替换kbUid为KbaseEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    private KbaseEntity kbaseEntity;
 
     // used for auto-generate faq
     // private String docId; // 对应文档

@@ -84,11 +84,11 @@ services:
       else
         echo 'qwen2.5:1.5b model already exists'
       fi &&
-      if ! ollama list | grep -q 'deepseek-r1:1.5b'; then
-        echo 'Pulling deepseek-r1:1.5b model...'
-        ollama pull deepseek-r1:1.5b
+      if ! ollama list | grep -q 'nomic-embed-text:latest'; then
+        echo 'Pulling nomic-embed-text:latest model...'
+        ollama pull nomic-embed-text:latest
       else
-        echo 'deepseek-r1:1.5b model already exists'
+        echo 'nomic-embed-text:latest model already exists'
       fi &&
       wait"
     networks:
