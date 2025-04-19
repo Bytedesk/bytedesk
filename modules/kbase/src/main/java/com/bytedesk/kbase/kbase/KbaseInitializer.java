@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:27:40
+ * @LastEditTime: 2025-04-19 15:17:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
+import com.bytedesk.kbase.faq.FaqInitializer;
+import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
 
 import lombok.AllArgsConstructor;
 
@@ -29,25 +30,28 @@ public class KbaseInitializer implements SmartInitializingSingleton {
 
     private final KbaseRestService kbaseService;
 
-    private final QuickReplyRestService quickReplyRestService;
-
     private final AuthorityRestService authorityService;
+
+    private final FaqInitializer faqInitializer;
+
+    private final QuickReplyInitializer quickReplyInitializer;
 
     @Override
     public void afterSingletonsInstantiated() {
-        initKbase();
+        // 初始化权限
         initPermissions();
+        // 初始化知识库
+        initKbase();
+        // 初始化FAQ
+        faqInitializer.init();
+        // 初始化快捷回复
+        quickReplyInitializer.init();
     }
 
     public void initKbase() {
-        // 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 初始化知识库
         kbaseService.initKbase(orgUid);
-        // 初始化快捷回复分类
-        quickReplyRestService.initQuickReplyCategory(orgUid);
-        // 初始化快捷回复
-        quickReplyRestService.initQuickReply(orgUid);
     }
 
     private void initPermissions() {
