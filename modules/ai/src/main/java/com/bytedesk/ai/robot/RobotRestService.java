@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-16 13:55:33
+ * @LastEditTime: 2025-04-19 10:28:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -734,6 +734,24 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         RobotLlm llm = robot.getLlm();
         llm.setPrompt(request.getLlm().getPrompt());
         robot.setLlm(llm);
+        //
+        RobotEntity savedRobot = save(robot);
+        if (savedRobot == null) {
+            throw new RuntimeException("update robot " + request.getUid() + " failed");
+        }
+        return convertToResponse(savedRobot);
+    }
+
+    // update kbUid
+    public RobotResponse updateKbUid(RobotRequest request) {
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + request.getUid() + " not found");
+        }
+        //
+        RobotEntity robot = robotOptional.get();
+        robot.setKbEnabled(request.getIsKbEnabled());
+        robot.setKbUid(request.getKbUid());
         //
         RobotEntity savedRobot = save(robot);
         if (savedRobot == null) {

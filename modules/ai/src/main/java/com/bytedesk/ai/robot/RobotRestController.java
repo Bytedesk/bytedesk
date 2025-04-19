@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:51:23
+ * @LastEditTime: 2025-04-19 10:34:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -146,6 +146,17 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     public ResponseEntity<?> updatePromptRobot(@RequestBody RobotRequest request) {
 
         RobotResponse robotResponse = robotService.updatePromptRobot(request);
+
+        return ResponseEntity.ok(JsonResult.success(robotResponse));
+    }
+
+    // update kbUid
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot kbUid")
+    @PostMapping("/update/kbUid")
+    public ResponseEntity<?> updateKbUid(@RequestBody RobotRequest request) {
+        
+        RobotResponse robotResponse = robotService.updateKbUid(request);
 
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
