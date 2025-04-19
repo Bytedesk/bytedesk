@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 10:28:28
+ * @LastEditTime: 2025-04-19 11:32:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,9 +15,7 @@ package com.bytedesk.ai.robot;
 
 import java.util.List;
 import java.util.Optional;
-import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -98,21 +96,21 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     // private final OptimisticLockingHandler optimisticLockingHandler;
 
-    @PostConstruct
-    public void setupModelMapper() {
-        modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT)
-                .setSkipNullEnabled(true);
+    // @PostConstruct
+    // public void setupModelMapper() {
+    //     modelMapper.getConfiguration()
+    //             .setMatchingStrategy(MatchingStrategies.STRICT)
+    //             .setSkipNullEnabled(true);
 
-        // 配置 ThreadRequest 到 ThreadEntity 的映射
-        modelMapper.createTypeMap(ThreadRequest.class, ThreadEntity.class)
-                .addMappings(mapper -> {
-                    mapper.skip(ThreadEntity::setUser); // 跳过自动映射
-                    // 添加其他需要的映射
-                    mapper.map(ThreadRequest::getTopic, ThreadEntity::setTopic);
-                    mapper.map(ThreadRequest::getType, ThreadEntity::setType);
-                });
-    }
+    //     // 配置 ThreadRequest 到 ThreadEntity 的映射
+    //     modelMapper.createTypeMap(ThreadRequest.class, ThreadEntity.class)
+    //             .addMappings(mapper -> {
+    //                 mapper.skip(ThreadEntity::setUser); // 跳过自动映射
+    //                 // 添加其他需要的映射
+    //                 mapper.map(ThreadRequest::getTopic, ThreadEntity::setTopic);
+    //                 mapper.map(ThreadRequest::getType, ThreadEntity::setType);
+    //             });
+    // }
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
@@ -176,10 +174,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
-        // robot.setKbEnabled(request.getIsKbEnabled());
-        // robot.setKbUid(request.getKbUid());
-        robot.setKbEnabled(true);
-        robot.setKbUid(Utils.formatUid(request.getOrgUid(), BytedeskConsts.DEFAULT_KB_LLM_UID));
+        robot.setKbEnabled(request.getIsKbEnabled());
+        robot.setKbUid(request.getKbUid());
         //
         // Set common settings
         setRobotSettings(robot, request);
@@ -345,7 +341,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setDescription(request.getDescription());
         robot.setPublished(request.getPublished());
         robot.setDefaultReply(request.getDefaultReply());
-        // robot.setKbEnabled(request.getIsKbEnabled());
+        robot.setKbEnabled(request.getIsKbEnabled());
         robot.setKbUid(request.getKbUid());
         //
         // Set common settings
@@ -577,12 +573,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .isKbEnabled(true)
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID))
                 .build();
-        // robotRequest.setUid(uid);
-        // robotRequest.setType(RobotTypeEnum.SERVICE.name());
-        // robotRequest.setOrgUid(orgUid);
         //
-        // robotRequest.setIsKbEnabled(true);
-        // robotRequest.setKbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
         robotRequest.getServiceSettings().setShowFaqs(true);
         robotRequest.getServiceSettings().setShowQuickFaqs(true);
         robotRequest.getServiceSettings().setShowGuessFaqs(true);
@@ -619,7 +610,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .type(RobotTypeEnum.LLM.name())
                 .llm(llm)
                 .orgUid(orgUid)
-                .isKbEnabled(false)
+                .kbEnabled(false)
                 .build();
         //
         RobotEntity updatedRobot = save(robot);
