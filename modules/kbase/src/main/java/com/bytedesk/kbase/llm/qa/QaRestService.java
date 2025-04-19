@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:08:17
+ * @LastEditTime: 2025-04-19 16:05:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm.qa;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -136,25 +135,18 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (user != null) {
                 entity.setUserUid(user.getUid());
             }
-            // 如何将string类型startDate和endDate转换为LocalDateTime类型？
-            // if (StringUtils.hasText(request.getStartDate())) {
-            //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
-            // }
-            // if (StringUtils.hasText(request.getEndDate())) {
-            //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
-            // }
-            // entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+            // 
             // 根据request.relatedQaUids查找关联的FAQ
-            List<QaEntity> relatedQas = new ArrayList<>();
-            for (String relatedQaUid : request.getRelatedQaUids()) {
-                Optional<QaEntity> relatedQa = findByUid(relatedQaUid);
-                if (relatedQa.isPresent()) {
-                    relatedQas.add(relatedQa.get());
-                } else {
-                    throw new RuntimeException("relatedQaUid not found");
-                }
-            }
-            entity.setRelatedQas(relatedQas);
+            // List<QaEntity> relatedQas = new ArrayList<>();
+            // for (String relatedQaUid : request.getRelatedQaUids()) {
+            //     Optional<QaEntity> relatedQa = findByUid(relatedQaUid);
+            //     if (relatedQa.isPresent()) {
+            //         relatedQas.add(relatedQa.get());
+            //     } else {
+            //         throw new RuntimeException("relatedQaUid not found");
+            //     }
+            // }
+            // entity.setRelatedQas(relatedQas);
 
             try {
                 QaEntity savedEntity = save(entity);
@@ -208,16 +200,16 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             // entity.setKbUid(request.getKbUid());
             //
             // 根据request.relatedQaUids查找关联的FAQ
-            List<QaEntity> relatedQas = new ArrayList<>();
-            for (String relatedQaUid : request.getRelatedQaUids()) {
-                Optional<QaEntity> relatedQa = findByUid(relatedQaUid);
-                if (relatedQa.isPresent()) {
-                    relatedQas.add(relatedQa.get());
-                } else {
-                    throw new RuntimeException("relatedQaUid not found");
-                }
-            }
-            entity.setRelatedQas(relatedQas);
+            // List<QaEntity> relatedQas = new ArrayList<>();
+            // for (String relatedQaUid : request.getRelatedQaUids()) {
+            //     Optional<QaEntity> relatedQa = findByUid(relatedQaUid);
+            //     if (relatedQa.isPresent()) {
+            //         relatedQas.add(relatedQa.get());
+            //     } else {
+            //         throw new RuntimeException("relatedQaUid not found");
+            //     }
+            // }
+            // entity.setRelatedQas(relatedQas);
 
             // 
             Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
