@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.spring;
+package com.bytedesk.ai.springai.listener;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.ai.springai.service.SpringAIVectorService;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
