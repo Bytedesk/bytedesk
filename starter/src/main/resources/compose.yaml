@@ -149,7 +149,7 @@ services:
 
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
     container_name: elasticsearch-bytedesk
     environment:
       - node.name=bytedesk-es01

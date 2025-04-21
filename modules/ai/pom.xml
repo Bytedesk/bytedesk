@@ -128,6 +128,7 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-advisors-vector-store</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency>
 
 		<!-- vector store -->
