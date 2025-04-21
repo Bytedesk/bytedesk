@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 16:11:58
+ * @LastEditTime: 2025-04-21 14:57:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,7 @@ import java.util.Optional;
 import java.util.HashMap;
 import java.time.LocalDateTime;
 
-import com.bytedesk.ai.vector_store.reader.WebDocumentReader;
+import com.bytedesk.ai.utils.reader.WebDocumentReader;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;

@@ -1,4 +1,4 @@
-package com.bytedesk.ai.springai.base;
+package com.bytedesk.ai.springai.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +19,6 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
-import com.bytedesk.ai.springai.service.SpringAIService;
-import com.bytedesk.ai.springai.service.SpringAIVectorService;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageExtra;

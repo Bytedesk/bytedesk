@@ -1,4 +1,4 @@
-package com.bytedesk.ai.vector_store.config;
+package com.bytedesk.ai.springai.config;
 
 import java.util.List;
 import java.util.Arrays;
