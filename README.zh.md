@@ -92,22 +92,22 @@
 
 ## Docker 快速开始
 
-### 方法一：克隆项目并启动docker compose容器，需要另行安装ollama，默认使用 qwen2.5:1.5b 模型
+### 方法一：克隆项目并启动docker compose容器，需要另行安装ollama，默认使用 qwen2.5:latest 模型
 
 ```bash
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose.yaml up -d
 ```
 
-#### 因项目默认使用ollama qwen2.5:1.5b模型，所以需要提前拉取模型。配置文件中可以配置其他模型，如deepseek-r1等
+#### 因项目默认使用ollama qwen2.5:latest模型，所以需要提前拉取模型。配置文件中可以配置其他模型，如deepseek-r1等
 
 ```bash
 # 对话模型
-ollama pull qwen2.5:1.5b
+ollama pull qwen2.5:latest
 # 嵌入模型
 ollama pull bge-m3:latest
 ```
 
-### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:1.5b 模型
+### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:latest 模型
 
 ```bash
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
@@ -117,7 +117,7 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 
 ```bash
 # 对话模型
-docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
+docker exec ollama-bytedesk ollama pull qwen2.5:latest
 # 嵌入模型
 docker exec ollama-bytedesk ollama pull bge-m3:latest
 ```

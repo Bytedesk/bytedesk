@@ -44,7 +44,7 @@ public class LlmConsts {
     // 默认提供商
     public static final String DEFAULT_PROVIDER = OLLAMA;
     // 默认模型
-    public static final String DEFAULT_MODEL = "qwen2.5:1.5b";
+    public static final String DEFAULT_MODEL = "qwen2.5:latest";
     // 默认嵌入提供商
     public static final String DEFAULT_EMBEDDING_PROVIDER = OLLAMA;
     // 默认嵌入模型

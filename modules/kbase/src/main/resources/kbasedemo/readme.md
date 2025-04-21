@@ -310,14 +310,14 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
 # 运行模型
 # docker exec ollama-bytedesk ollama pull deepseek-r1
-docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
+docker exec ollama-bytedesk ollama pull qwen2.5:latest
 ```
 
-### 因项目默认使用ollama qwen2.5:1.5b模型，所以需要提前拉取模型
+### 因项目默认使用ollama qwen2.5:latest模型，所以需要提前拉取模型
 
 ```bash
 ollama pull deepseek-r1:1.5b
-ollama pull qwen2.5:1.5b
+ollama pull qwen2.5:latest
 ```
 
 ### 停止容器

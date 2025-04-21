@@ -31,10 +31,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RobotLlm {
 
-    // @Value("${spring.ai.ollama.chat.options.model:qwen2.5:1.5b}")
+    // @Value("${spring.ai.ollama.chat.options.model:qwen2.5:latest}")
     // private static String defaultModel;
 
-    // @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:1.5b}")
+    // @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:latest}")
     // private static String defaultEmbeddingModel;
 
     // 默认启用llm问答

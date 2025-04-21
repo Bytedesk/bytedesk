@@ -66,7 +66,7 @@ services:
     volumes:
       - ollama_models:/root/.ollama
     environment:
-      - OLLAMA_MODELS=qwen2.5:1.5b
+      - OLLAMA_MODELS=qwen2.5:latest
     # 添加健康检查
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:21434"]
@@ -78,11 +78,11 @@ services:
       /bin/sh -c "
       ollama serve &
       sleep 10 &&
-      if ! ollama list | grep -q 'qwen2.5:1.5b'; then
-        echo 'Pulling qwen2.5:1.5b model...'
-        ollama pull qwen2.5:1.5b
+      if ! ollama list | grep -q 'qwen2.5:latest'; then
+        echo 'Pulling qwen2.5:latest model...'
+        ollama pull qwen2.5:latest
       else
-        echo 'qwen2.5:1.5b model already exists'
+        echo 'qwen2.5:latest model already exists'
       fi &&
       if ! ollama list | grep -q 'bge-m3:latest'; then
         echo 'Pulling bge-m3:latest model...'

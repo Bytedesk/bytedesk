@@ -22,13 +22,13 @@ sidebar_position: 3
 git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose.yaml up -d
 ```
 
-### 因项目默认使用ollama qwen2.5:1.5b模型，所以需要提前拉取模型
+### 因项目默认使用ollama qwen2.5:latest模型，所以需要提前拉取模型
 
 ```bash
 ollama pull deepseek-r1:1.5b
-ollama pull qwen2.5:1.5b
+ollama pull qwen2.5:latest
 # 或docker拉取
-# docker exec ollama pull qwen2.5:1.5b
+# docker exec ollama pull qwen2.5:latest
 ```
 
 ### 停止容器
