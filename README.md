@@ -113,7 +113,7 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 # chat model
 ollama pull qwen2.5:1.5b
 # embedding model
-ollama pull nomic-embed-text:latest
+ollama pull bge-m3:latest
 ```
 
 ### method 2: run docker compose with ollama
@@ -128,7 +128,7 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 # chat model
 docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 # embedding model
-docker exec ollama-bytedesk ollama pull nomic-embed-text:latest
+docker exec ollama-bytedesk ollama pull bge-m3:latest
 ```
 
 <!-- #### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`

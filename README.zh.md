@@ -104,7 +104,7 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 # 对话模型
 ollama pull qwen2.5:1.5b
 # 嵌入模型
-ollama pull nomic-embed-text:latest
+ollama pull bge-m3:latest
 ```
 
 ### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:1.5b 模型
@@ -119,7 +119,7 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 # 对话模型
 docker exec ollama-bytedesk ollama pull qwen2.5:1.5b
 # 嵌入模型
-docker exec ollama-bytedesk ollama pull nomic-embed-text:latest
+docker exec ollama-bytedesk ollama pull bge-m3:latest
 ```
 
 <!-- #### 如果不需要知识库AI问答功能，可以修改 `docker-compose.yaml` 或 `docker-compose-ollama.yaml` 关闭ollama对话和嵌入功能，以节省资源
