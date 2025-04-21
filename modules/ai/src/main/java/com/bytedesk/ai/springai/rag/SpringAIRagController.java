@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 12:15:34
+ * @LastEditTime: 2025-04-21 10:50:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,6 +50,11 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * RAG知识库问答
+ * https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html
+ * https://mp.weixin.qq.com/s/ETmbEAE7lNligcM_A_GF8A
+ */
 @Slf4j
 @RestController
 @RequestMapping("/spring/ai/rag")
