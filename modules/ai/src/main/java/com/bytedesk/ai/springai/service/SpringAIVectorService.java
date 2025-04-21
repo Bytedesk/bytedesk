@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 15:15:39
+ * @LastEditTime: 2025-04-21 15:23:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,14 +31,13 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+// import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
-import java.util.Optional;
 import java.util.HashMap;
 import java.time.LocalDateTime;
 
@@ -372,7 +371,8 @@ public class SpringAIVectorService {
 		log.info("Converting string content to documents");
 		Assert.notNull(qaEntity, "QaEntity must not be null");
 		//
-		String content = qaEntity.getQuestion() + "\n" + qaEntity.getAnswer();
+		String content = qaEntity.toJson();
+		 //qaEntity.getQuestion() + "\n" + qaEntity.getAnswer();
 		// 创建Document对象
 		Document document = new Document(content);
 		// 使用TokenTextSplitter分割文本
@@ -421,11 +421,12 @@ public class SpringAIVectorService {
 	}
 
 	// 使用reader直接将qaEntity字符串，转换成 List<Document> documents
-	public List<Document> readFaq(FaqEntity fqaEntity) {
+	public List<Document> readFaq(FaqEntity faqEntity) {
 		log.info("Converting string content to documents");
-		Assert.notNull(fqaEntity, "FaqEntity must not be null");
+		Assert.notNull(faqEntity, "FaqEntity must not be null");
 		//
-		String content = fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
+		String content = faqEntity.toJson(); 
+		//fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
 		// 创建Document对象
 		Document document = new Document(content);
 		// 使用TokenTextSplitter分割文本
@@ -438,31 +439,31 @@ public class SpringAIVectorService {
 			log.info("faq doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, fqaEntity.getKbaseEntity().getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, faqEntity.getKbaseEntity().getUid());
 			// doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
 			// doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
 			// doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
 			SplitRequest splitRequest = SplitRequest.builder()
-					.name(fqaEntity.getQuestion())
+					.name(faqEntity.getQuestion())
 					.content(doc.getText())
 					.type(SplitTypeEnum.FAQ.name())
 					.docId(doc.getId())
-					.typeUid(fqaEntity.getUid())
-					.categoryUid(fqaEntity.getCategoryUid())
-					.kbUid(fqaEntity.getKbaseEntity().getUid())
-					.userUid(fqaEntity.getUserUid())
-					.orgUid(fqaEntity.getOrgUid())
-					.enabled(fqaEntity.isEnabled())
-					.startDate(fqaEntity.getStartDate() != null ? fqaEntity.getStartDate() : LocalDateTime.now())
-					.endDate(fqaEntity.getEndDate() != null ? fqaEntity.getEndDate() : LocalDateTime.now().plusYears(100))
+					.typeUid(faqEntity.getUid())
+					.categoryUid(faqEntity.getCategoryUid())
+					.kbUid(faqEntity.getKbaseEntity().getUid())
+					.userUid(faqEntity.getUserUid())
+					.orgUid(faqEntity.getOrgUid())
+					.enabled(faqEntity.isEnabled())
+					.startDate(faqEntity.getStartDate() != null ? faqEntity.getStartDate() : LocalDateTime.now())
+					.endDate(faqEntity.getEndDate() != null ? faqEntity.getEndDate() : LocalDateTime.now().plusYears(100))
 					.build();
 			splitRestService.create(splitRequest);
 		}
-		fqaEntity.setDocIdList(docIdList);
-		fqaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
-		faqRestService.save(fqaEntity);
+		faqEntity.setDocIdList(docIdList);
+		faqEntity.setStatus(SplitStatusEnum.SUCCESS.name());
+		faqRestService.save(faqEntity);
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
 		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
@@ -651,7 +652,7 @@ public class SpringAIVectorService {
 		// 					.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest))
 		// 					.orElse(List.of());
 		// 		});
-		
+		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
 		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		
 		// 获取当前时间，用于内存中过滤日期
@@ -708,37 +709,44 @@ public class SpringAIVectorService {
 		Assert.hasText(content, "Content must not be empty");
 		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
 		log.info("updateDoc docId: {}, content: {}", docId, content);
-		bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
-			try {
-				// 创建新的Document对象
-				Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
-				// 更新向量存储
-				redisVectorStore.delete(List.of(docId)); // 先删除旧的
-				redisVectorStore.add(List.of(document)); // 再添加新的
 
-				log.info("Successfully updated document: {}", docId);
-			} catch (Exception e) {
-				log.error("Failed to update document: {}", docId, e);
-				throw new RuntimeException("Failed to update document", e);
-			}
-		});
+		// 创建新的Document对象
+		Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
+		// 更新向量存储
+		vectorStore.delete(List.of(docId)); // 先删除旧的
+		vectorStore.add(List.of(document)); // 再添加新的
+
+		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
+		// 	try {
+		// 		// 创建新的Document对象
+		// 		Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
+		// 		// 更新向量存储
+		// 		redisVectorStore.delete(List.of(docId)); // 先删除旧的
+		// 		redisVectorStore.add(List.of(document)); // 再添加新的
+
+		// 		log.info("Successfully updated document: {}", docId);
+		// 	} catch (Exception e) {
+		// 		log.error("Failed to update document: {}", docId, e);
+		// 		throw new RuntimeException("Failed to update document", e);
+		// 	}
+		// });
 		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
-				try {
-					// 创建新的Document对象
-					Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
-					// 更新向量存储
-					redisVectorStore.delete(List.of(docId)); // 先删除旧的
-					redisVectorStore.add(List.of(document)); // 再添加新的
+		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> {
+		// 		try {
+		// 			// 创建新的Document对象
+		// 			Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
+		// 			// 更新向量存储
+		// 			redisVectorStore.delete(List.of(docId)); // 先删除旧的
+		// 			redisVectorStore.add(List.of(document)); // 再添加新的
 
-					log.info("Successfully updated document: {}", docId);
-				} catch (Exception e) {
-					log.error("Failed to update document: {}", docId, e);
-					throw new RuntimeException("Failed to update document", e);
-				}
-			});
-		}
+		// 			log.info("Successfully updated document: {}", docId);
+		// 		} catch (Exception e) {
+		// 			log.error("Failed to update document: {}", docId, e);
+		// 			throw new RuntimeException("Failed to update document", e);
+		// 		}
+		// 	});
+		// }
 	}
 
 	// 删除一个docId

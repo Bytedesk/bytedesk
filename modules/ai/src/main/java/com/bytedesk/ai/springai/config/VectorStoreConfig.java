@@ -11,12 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class VectorStoreConfig {
 
-    // @Autowired
-    // private JedisProperties jedisProperties;
-    
-    // @Autowired
-    // private ApplicationContext applicationContext;
-
     // @Value("${spring.ai.vectorstore.elasticsearch.index-name}")
     // private String elasticsearchIndexName;
 
@@ -30,11 +24,18 @@ public class VectorStoreConfig {
     // @Bean
     // @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true")
     // public ElasticsearchVectorStore elasticsearchVectorStore(
-    //         RestClient restClient,
+    //         RestClient restClient, // 修改为org.elasticsearch.client.RestClient
     //         @Qualifier("bytedeskZhipuaiEmbeddingModel") EmbeddingModel embeddingModel) {
         
     //     log.info("Configuring ElasticsearchVectorStore with index: {} and dimensions: {}", 
     //             elasticsearchIndexName, elasticsearchDimensions);
+        
+    //     // 创建MetadataField对象，用于定义可搜索的元数据字段
+    //     var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
+    //     var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
+    //     var enabled = MetadataField.text("enabled");
+    //     var startDate = MetadataField.text("startDate"); 
+    //     var endDate = MetadataField.text("endDate");
         
     //     // 创建选项对象
     //     ElasticsearchVectorStoreOptions options = new ElasticsearchVectorStoreOptions();
@@ -44,6 +45,7 @@ public class VectorStoreConfig {
     //     // 使用正确的builder方法调用，提供必需的RestClient和EmbeddingModel参数
     //     ElasticsearchVectorStore vectorStore = ElasticsearchVectorStore.builder(restClient, embeddingModel)
     //             .options(options)
+    //             .metadataFields(kbUid, fileUid, enabled, startDate, endDate)
     //             .initializeSchema(true)
     //             .build();
         
