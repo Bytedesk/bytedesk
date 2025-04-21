@@ -41,19 +41,30 @@
 			<artifactId>spring-ai-retry</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+		
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- rag -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-advisors-vector-store</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-rag -->
 		<!--
 		https://repo.spring.io/ui/native/snapshot/org/springframework/ai/spring-ai-rag/1.0.0-SNAPSHOT/ -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-rag</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-spring-boot-autoconfigure -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-spring-boot-autoconfigure</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
 
@@ -121,27 +132,8 @@
 		</dependency>
 
 
-		<!-- rag -->
-		<!-- https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-advisors-vector-store</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
-
+		
 		<!-- vector store -->
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
-		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-redis-store-spring-boot-starter -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-redis-store-spring-boot-starter</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
-
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-elasticsearch -->
@@ -151,6 +143,16 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
+		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-redis-store-spring-boot-starter -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-redis-store-spring-boot-starter</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
+		
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store-spring-boot-starter -->
