@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 22:02:34
+ * @LastEditTime: 2025-04-21 21:53:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,6 +81,13 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                 messageSendService.sendProtobufMessage(messageProtobuf);
             }
         });
+        
+        if (!bytedeskOllamaChatModel.isPresent()) {
+            log.info("Ollama API not available");
+            messageProtobuf.setType(MessageTypeEnum.ERROR);
+            messageProtobuf.setContent("Ollama service is not available");
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        }
     }
 
     @Override
@@ -188,6 +195,10 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                         emitter.completeWithError(e);
                     }
                 });
+
+        if (!bytedeskOllamaChatModel.isPresent()) {
+            log.info("Ollama API not available");
+        }
     }
     
     // 添加新的辅助方法处理SSE错误
