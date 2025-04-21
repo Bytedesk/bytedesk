@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:41:46
+ * @LastEditTime: 2025-04-21 13:06:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,15 +23,15 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
-import com.bytedesk.ai.springai.baidu.SpringAIBaiduService;
-import com.bytedesk.ai.springai.dashscope.SpringAIDashscopeService;
-import com.bytedesk.ai.springai.deepseek.SpringAIDeepseekService;
-import com.bytedesk.ai.springai.gitee.SpringAIGiteeService;
-import com.bytedesk.ai.springai.ollama.SpringAIOllamaService;
-import com.bytedesk.ai.springai.siliconflow.SpringAISiliconFlowService;
-import com.bytedesk.ai.springai.tencent.SpringAITencentService;
-import com.bytedesk.ai.springai.volcengine.SpringAIVolcengineService;
-import com.bytedesk.ai.springai.zhipuai.SpringAIZhipuaiService;
+import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
+import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
+import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
+import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
+import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
+import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
+import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
+import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
+import com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuaiService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
