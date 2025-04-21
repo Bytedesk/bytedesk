@@ -42,7 +42,7 @@ public class SpringAIOllamaConfig {
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;
 
-    @Value("${spring.ai.ollama.chat.options.model:qwen2.5:1.5b}")
+    @Value("${spring.ai.ollama.chat.options.model:qwen2.5:latest}")
     private String ollamaChatOptionsModel;
 
     @Value("${spring.ai.ollama.chat.options.numa:false}")

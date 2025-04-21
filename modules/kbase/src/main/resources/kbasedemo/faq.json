@@ -33,7 +33,7 @@
         {
             "uid": "faq_007",
             "question": "微语的AI大模型集成支持哪些功能？",
-            "answer": "微语支持多种AI大模型的集成，包括：1. 支持Ollama、DeepSeek、ZhipuAI等多个大模型；2. 提供智能体功能；3. 支持工作流集成；4. 可以通过配置文件灵活切换不同的AI模型。默认使用ollama qwen2.5:1.5b模型，需要提前使用'ollama pull qwen2.5:1.5b'命令拉取模型。"
+            "answer": "微语支持多种AI大模型的集成，包括：1. 支持Ollama、DeepSeek、ZhipuAI等多个大模型；2. 提供智能体功能；3. 支持工作流集成；4. 可以通过配置文件灵活切换不同的AI模型。默认使用ollama qwen2.5:latest模型，需要提前使用'ollama pull qwen2.5:latest'命令拉取模型。"
         },
         {
             "uid": "faq_008",
