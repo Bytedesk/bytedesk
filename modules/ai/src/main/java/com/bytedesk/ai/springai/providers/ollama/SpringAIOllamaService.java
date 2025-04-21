@@ -48,148 +48,137 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        bytedeskOllamaChatModel.ifPresent(model -> model.stream(prompt).subscribe(
-                response -> {
-                    if (response != null) {
-                        log.info("Ollama API response metadata: {}", response.getMetadata());
-                        List<Generation> generations = response.getResults();
-                        for (Generation generation : generations) {
-                            AssistantMessage assistantMessage = generation.getOutput();
-                            String textContent = assistantMessage.getText();
+        bytedeskOllamaChatModel.ifPresent(model -> {
+            try {
+                model.stream(prompt).subscribe(
+                    response -> {
+                        if (response != null) {
+                            log.info("Ollama API response metadata: {}", response.getMetadata());
+                            List<Generation> generations = response.getResults();
+                            for (Generation generation : generations) {
+                                AssistantMessage assistantMessage = generation.getOutput();
+                                String textContent = assistantMessage.getText();
 
-                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                            messageProtobuf.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobuf);
+                                messageProtobuf.setType(MessageTypeEnum.STREAM);
+                                messageProtobuf.setContent(textContent);
+                                messageSendService.sendProtobufMessage(messageProtobuf);
+                            }
                         }
-                    }
-                },
-                error -> {
-                    log.error("Ollama API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
-                },
-                () -> {
-                    log.info("Chat stream completed");
-                    // 发送流结束标记
-                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                    // messageSendService.sendProtobufMessage(messageProtobuf);
-                }));
+                    },
+                    error -> {
+                        log.error("Ollama API error: ", error);
+                        messageProtobuf.setType(MessageTypeEnum.ERROR);
+                        messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                    },
+                    () -> {
+                        log.info("Chat stream completed");
+                    });
+            } catch (Exception e) {
+                log.error("Error processing Ollama prompt", e);
+                messageProtobuf.setType(MessageTypeEnum.ERROR);
+                messageProtobuf.setContent("服务暂时不可用，请稍后重试");
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
+        });
     }
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return bytedeskOllamaChatModel.map(model -> model.call(prompt)).orElse("");
+        return bytedeskOllamaChatModel.map(model -> {
+            try {
+                return model.call(prompt);
+            } catch (Exception e) {
+                log.error("Error generating FAQ pairs", e);
+                return "生成FAQ对失败，请稍后重试";
+            }
+        }).orElse("");
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return bytedeskOllamaChatModel.map(model -> model.call(message))
-                    .orElse("Ollama service is not available");
+            return bytedeskOllamaChatModel.map(model -> {
+                try {
+                    return model.call(message);
+                } catch (Exception e) {
+                    log.error("Ollama API sync error", e);
+                    return "服务暂时不可用，请稍后重试";
+                }
+            }).orElse("Ollama service is not available");
         } catch (Exception e) {
-            log.error("Ollama API sync error: ", e);
+            log.error("Ollama API sync error", e);
             return "服务暂时不可用，请稍后重试";
         }
     }
 
     @Override
     protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        //
         bytedeskOllamaChatModel.ifPresentOrElse(
                 model -> {
-                    model.stream(prompt).subscribe(
-                            response -> {
-                                try {
-                                    if (response != null) {
-                                        List<Generation> generations = response.getResults();
-                                        for (Generation generation : generations) {
-                                            AssistantMessage assistantMessage = generation.getOutput();
-                                            String textContent = assistantMessage.getText();
-                                            // log.info("Ollama API response metadata: {}, text {}",
-                                            //         response.getMetadata(), textContent);
-                                            // StringUtils.hasLength() 检查字符串非 null 且长度大于 0，允许包含空格
-                                            if (StringUtils.hasLength(textContent)) {
-                                                messageProtobufReply.setContent(textContent);
-                                                messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                                // 保存消息到数据库
-                                                persistMessage(messageProtobufQuery, messageProtobufReply);
-                                                String messageJson = messageProtobufReply.toJson();
-                                                // 发送SSE事件
-                                                emitter.send(SseEmitter.event()
-                                                        .data(messageJson)
-                                                        .id(messageProtobufReply.getUid())
-                                                        .name("message"));
+                    try {
+                        model.stream(prompt).subscribe(
+                                response -> {
+                                    try {
+                                        if (response != null) {
+                                            List<Generation> generations = response.getResults();
+                                            for (Generation generation : generations) {
+                                                AssistantMessage assistantMessage = generation.getOutput();
+                                                String textContent = assistantMessage.getText();
+                                                
+                                                if (StringUtils.hasLength(textContent)) {
+                                                    messageProtobufReply.setContent(textContent);
+                                                    messageProtobufReply.setType(MessageTypeEnum.STREAM);
+                                                    // 保存消息到数据库
+                                                    persistMessage(messageProtobufQuery, messageProtobufReply);
+                                                    String messageJson = messageProtobufReply.toJson();
+                                                    // 发送SSE事件
+                                                    emitter.send(SseEmitter.event()
+                                                            .data(messageJson)
+                                                            .id(messageProtobufReply.getUid())
+                                                            .name("message"));
+                                                }
                                             }
                                         }
+                                    } catch (Exception e) {
+                                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                                     }
-                                } catch (Exception e) {
-                                    log.error("Ollama Error sending SSE event 1", e);
-                                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                                    // 保存消息到数据库
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    //
+                                },
+                                error -> {
+                                    log.error("Ollama API SSE error: ", error);
+                                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                                },
+                                () -> {
                                     try {
+                                        // 发送流结束标记
+                                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                                        messageProtobufReply.setContent(""); 
+                                        // 保存消息到数据库
+                                        persistMessage(messageProtobufQuery, messageProtobufReply);
+                                        String messageJson = messageProtobufReply.toJson();
+                                        //
                                         emitter.send(SseEmitter.event()
                                                 .data(messageJson)
                                                 .id(messageProtobufReply.getUid())
-                                                .name("error"));
+                                                .name("message"));
                                         emitter.complete();
-                                    } catch (Exception ex) {
-                                        emitter.completeWithError(ex);
+                                    } catch (Exception e) {
+                                        log.error("Ollama Error completing SSE", e);
                                     }
-                                }
-                            },
-                            error -> {
-                                log.error("Ollama API SSE error: ", error);
-                                try {
-                                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                                    // 保存消息到数据库
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    //
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobufReply.getUid())
-                                            .name("message"));
-                                    emitter.complete();
-                                } catch (Exception e) {
-                                    emitter.completeWithError(e);
-                                }
-                            },
-                            () -> {
-                                try {
-                                    // 发送流结束标记
-                                    messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                                    messageProtobufReply.setContent(""); // 或者可以是任何结束标记
-                                    // 保存消息到数据库
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    //
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobufReply.getUid())
-                                            .name("message"));
-                                    emitter.complete();
-                                } catch (Exception e) {
-                                    log.error("Ollama Error completing SSE", e);
-                                }
-                            });
+                                });
+                    } catch (Exception e) {
+                        log.error("Error starting Ollama stream", e);
+                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                    }
                 },
                 () -> {
-                    log.info("Ollama API SSE complete");
+                    log.info("Ollama API not available");
                     try {
-                        // 发送流结束标记
                         messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobufReply.setContent("Ollama service is not available"); // 或者可以是任何结束标记
-                        // 保存消息到数据库
+                        messageProtobufReply.setContent("Ollama service is not available"); 
                         persistMessage(messageProtobufQuery, messageProtobufReply);
-                                                String messageJson = messageProtobufReply.toJson();
-                        // 发送SSE事件
+                        String messageJson = messageProtobufReply.toJson();
+                        
                         emitter.send(SseEmitter.event()
                                 .data(messageJson)
                                 .id(messageProtobufReply.getUid())
@@ -200,12 +189,32 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     }
                 });
     }
+    
+    // 添加新的辅助方法处理SSE错误
+    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
+                               MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        try {
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+            // 保存消息到数据库
+            persistMessage(messageProtobufQuery, messageProtobufReply);
+            String messageJson = messageProtobufReply.toJson();
+            
+            emitter.send(SseEmitter.event()
+                    .data(messageJson)
+                    .id(messageProtobufReply.getUid())
+                    .name("message"));
+            emitter.complete();
+        } catch (Exception e) {
+            log.error("Error handling SSE error", e);
+            try {
+                emitter.completeWithError(e);
+            } catch (Exception ex) {
+                log.error("Failed to complete emitter with error", ex);
+            }
+        }
+    }
 
-    /**
-     * 检查Ollama服务是否正常运行
-     * 
-     * @return 如果服务正常运行返回true，否则返回false
-     */
     public boolean isServiceHealthy() {
         if (!bytedeskOllamaChatModel.isPresent()) {
             return false;
@@ -221,87 +230,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
     }
 
-    /**
-     * 获取Ollama所有可用的模型列表
-     * 
-     * @return 包含所有可用模型信息的对象
-     */
-    // public Object getAvailableModels() {
-    // if (!bytedeskOllamaChatModel.isPresent()) {
-    // throw new RuntimeException("Ollama service is not available");
-    // }
-
-    // try {
-    // // 这里假设OllamaChatModel有一个方法来获取模型列表
-    // // 如果没有现成的方法，我们可以通过发送特定的API请求来获取
-    // OllamaChatModel model = bytedeskOllamaChatModel.get();
-
-    // // 使用反射获取模型的client对象，这样可以访问底层的API
-    // // 注意：这种方法依赖于Spring AI的内部实现，如果库更新可能需要调整
-    // Object ollamaApi = getOllamaApiClient(model);
-    // if (ollamaApi != null) {
-    // // 通过反射调用模型列表API
-    // return invokeListModelsMethod(ollamaApi);
-    // }
-
-    // // 如果无法通过反射获取，则使用通用方法
-    // // 请求Ollama的模型列表API
-    // return getModelsViaPrompt();
-    // } catch (Exception e) {
-    // log.error("Error retrieving Ollama models", e);
-    // throw new RuntimeException("Failed to retrieve Ollama models: " +
-    // e.getMessage(), e);
-    // }
-    // }
-
-    // /**
-    // * 通过反射获取OllamaChatModel的API客户端
-    // */
-    // private Object getOllamaApiClient(OllamaChatModel model) {
-    // try {
-    // java.lang.reflect.Field clientField =
-    // model.getClass().getDeclaredField("client");
-    // clientField.setAccessible(true);
-    // return clientField.get(model);
-    // } catch (Exception e) {
-    // log.warn("Could not access Ollama API client through reflection", e);
-    // return null;
-    // }
-    // }
-
-    // /**
-    // * 通过反射调用API客户端的listModels方法
-    // */
-    // private Object invokeListModelsMethod(Object ollamaApi) {
-    // try {
-    // java.lang.reflect.Method listModelsMethod =
-    // ollamaApi.getClass().getMethod("listModels");
-    // return listModelsMethod.invoke(ollamaApi);
-    // } catch (Exception e) {
-    // log.warn("Could not invoke listModels method through reflection", e);
-    // return null;
-    // }
-    // }
-
-    // /**
-    // * 如果无法通过反射获取，则通过发送特定提示来获取模型列表
-    // */
-    // private Object getModelsViaPrompt() {
-    // // 向Ollama发送特定命令以获取模型列表
-    // String response = processPromptSync("Please list all available models in a
-    // JSON format");
-
-    // try {
-    // // 尝试解析响应为JSON
-    // return JSON.parse(response);
-    // } catch (Exception e) {
-    // // 如果无法解析为JSON，则返回原始字符串
-    // return response;
-    // }
-    // }
-
     public Optional<OllamaChatModel> getOllamaChatModel() {
         return bytedeskOllamaChatModel;
     }
-
 }

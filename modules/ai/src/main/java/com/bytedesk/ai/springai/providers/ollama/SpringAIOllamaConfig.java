@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 15:59:46
+ * @LastEditTime: 2025-04-21 17:23:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.springai.providers.ollama;
+
+import java.util.Collections;
 
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -63,58 +65,45 @@ public class SpringAIOllamaConfig {
     @Bean("bytedeskOllamaChatOptions")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaChatOptions() {
-        return OllamaOptions.builder()
-                .model(ollamaChatOptionsModel)
+        // 使用安全的方式创建 OllamaOptions，确保所有必要的属性都有值
+        return new OllamaOptions.Builder()
+                .withModel(ollamaChatOptionsModel)
+                .withNumPredict(100)
+                .withTemperature(0.7f)
+                .withTopK(40)
+                .withTopP(0.9f)
+                .withSystemPrompt("You are a helpful assistant.")  
+                // 确保设置为空列表而不是null
+                .withFunctionCallbacks(Collections.emptyList())
                 .build();
     }
 
     @Bean("bytedeskOllamaEmbeddingOptions")
     @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaEmbeddingOptions() {
-        return OllamaOptions.builder()
-                .model(ollamaEmbeddingOptionsModel)
+        return new OllamaOptions.Builder()
+                .withModel(ollamaEmbeddingOptionsModel)
+                .withFunctionCallbacks(Collections.emptyList())
                 .build();
     }
 
     @Bean("bytedeskOllamaChatModel")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaChatModel bytedeskOllamaChatModel() {
-        return OllamaChatModel.builder()
-                .ollamaApi(bytedeskOllamaApi())
-                .defaultOptions(bytedeskOllamaChatOptions())
-                .build();
+        try {
+            return new OllamaChatModel(bytedeskOllamaApi(), bytedeskOllamaChatOptions());
+        } catch (Exception e) {
+            log.error("Failed to create OllamaChatModel: {}", e.getMessage());
+            return null;
+        }
     }
 
     @Primary
     @Bean("bytedeskOllamaEmbeddingModel")
     @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
     EmbeddingModel bytedeskOllamaEmbeddingModel() {
-        return OllamaEmbeddingModel.builder()
-                .ollamaApi(bytedeskOllamaApi())
-                .defaultOptions(bytedeskOllamaEmbeddingOptions())
-                .build();
+        return new OllamaEmbeddingModel(bytedeskOllamaApi(), bytedeskOllamaEmbeddingOptions());
     }
-
-    // private EmbeddingModel createFallbackEmbeddingModel() {
-    //     return new EmbeddingModel() {
-    //         private static final int VECTOR_DIMENSIONS = 1536;
-    //         @Override
-    //         public EmbeddingResponse call(EmbeddingRequest request) {
-    //             log.debug("Using fallback embedding model");
-    //             List<Embedding> embeddings = IntStream.range(0, request.getInstructions().size())
-    //                 .mapToObj(i -> new Embedding(new float[VECTOR_DIMENSIONS], i))
-    //                 .collect(Collectors.toList());
-    //             return new EmbeddingResponse(embeddings);
-    //         }
-    //         @Override
-    //         public float[] embed(Document document) {
-    //             log.debug("Using fallback embedding for document: {}", document.getId());
-    //             float[] vector = new float[VECTOR_DIMENSIONS];
-    //             Arrays.fill(vector, 0.0f);
-    //             return vector;
-    //         }
-    //     };
-    // }
 
     // 注意：RedisVectorStore相关配置已移至VectorStoreConfig类中统一管理
 
