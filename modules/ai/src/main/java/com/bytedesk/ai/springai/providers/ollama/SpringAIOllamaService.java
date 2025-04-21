@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Autowired
