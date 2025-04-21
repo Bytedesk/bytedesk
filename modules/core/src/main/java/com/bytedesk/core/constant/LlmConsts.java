@@ -48,7 +48,7 @@ public class LlmConsts {
     // 默认嵌入提供商
     public static final String DEFAULT_EMBEDDING_PROVIDER = OLLAMA;
     // 默认嵌入模型
-    public static final String DEFAULT_EMBEDDING_MODEL = "nomic-embed-text:latest";
+    public static final String DEFAULT_EMBEDDING_MODEL = "bge-m3:latest";
 
     
 }

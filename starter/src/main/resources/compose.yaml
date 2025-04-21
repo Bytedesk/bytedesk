@@ -84,11 +84,11 @@ services:
       else
         echo 'qwen2.5:1.5b model already exists'
       fi &&
-      if ! ollama list | grep -q 'nomic-embed-text:latest'; then
-        echo 'Pulling nomic-embed-text:latest model...'
-        ollama pull nomic-embed-text:latest
+      if ! ollama list | grep -q 'bge-m3:latest'; then
+        echo 'Pulling bge-m3:latest model...'
+        ollama pull bge-m3:latest
       else
-        echo 'nomic-embed-text:latest model already exists'
+        echo 'bge-m3:latest model already exists'
       fi &&
       wait"
     networks:
