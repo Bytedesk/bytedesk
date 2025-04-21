@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ai.springai.providers.siliconflow;
 
-import com.bytedesk.ai.springai.base.BaseSpringAIService;
+import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import lombok.extern.slf4j.Slf4j;
