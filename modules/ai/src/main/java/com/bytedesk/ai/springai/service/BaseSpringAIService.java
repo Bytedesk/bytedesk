@@ -254,24 +254,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     }
 
-    // private void sendSseTypingMessage(MessageProtobuf messageProtobuf, SseEmitter
-    // emitter) {
-    // //
-    // MessageProtobuf clonedMessage = SerializationUtils.clone(messageProtobuf);
-    // clonedMessage.setUid(messageProtobuf.getUid());
-    // clonedMessage.setType(MessageTypeEnum.TYPING);
-    // // clonedMessage.setContent(I18Consts.I18N_TYPING);
-    // // clonedMessage.setContent("...");
-    // try {
-    // emitter.send(SseEmitter.event()
-    // .data(JSON.toJSONString(clonedMessage))
-    // .id(clonedMessage.getUid())
-    // .name("message"));
-    // } catch (Exception e) {
-    // // TODO: handle exception
-    // }
-    // }
-
     public String buildKbPrompt(String systemPrompt, String query, String history, String context) {
         return systemPrompt + "\n" +
                 "用户查询: " + query + "\n" +
@@ -289,14 +271,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
-    
-    // 新增辅助方法，用于安全地处理LLM提供商返回的异常
-    protected void handleLlmException(Exception e, String provider, String operation) {
-        log.error("{} exception during {}: {}", provider, operation, e.getMessage(), e);
-        if (e instanceof AbstractMethodError) {
-            log.error("Abstract method error detected, likely a version incompatibility in Spring AI libraries");
-        }
-    }
     
     // 新增通用的SSE错误处理方法
     protected void sendErrorSseMessage(String errorMessage, MessageProtobuf messageProtobufQuery,
@@ -319,4 +293,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
         }
     }
+
+
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 16:48:19
+ * @LastEditTime: 2025-04-21 17:43:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -114,6 +114,8 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 ollama pull qwen2.5:latest
 # embedding model
 ollama pull bge-m3:latest
+# or download model from huggingface
+# ollama pull hf.co/<username>/<model-repository>
 ```
 
 ### method 2: run docker compose with ollama

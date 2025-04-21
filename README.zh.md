@@ -105,6 +105,8 @@ git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && doc
 ollama pull qwen2.5:latest
 # 嵌入模型
 ollama pull bge-m3:latest
+# 或者从 huggingface 下载模型
+# ollama pull hf.co/<username>/<model-repository>
 ```
 
 ### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen2.5:latest 模型
