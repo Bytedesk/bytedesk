@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 15:59:46
+ * @LastEditTime: 2025-04-21 21:33:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,54 +95,4 @@ public class SpringAIOllamaConfig {
                 .build();
     }
 
-    // private EmbeddingModel createFallbackEmbeddingModel() {
-    //     return new EmbeddingModel() {
-    //         private static final int VECTOR_DIMENSIONS = 1536;
-    //         @Override
-    //         public EmbeddingResponse call(EmbeddingRequest request) {
-    //             log.debug("Using fallback embedding model");
-    //             List<Embedding> embeddings = IntStream.range(0, request.getInstructions().size())
-    //                 .mapToObj(i -> new Embedding(new float[VECTOR_DIMENSIONS], i))
-    //                 .collect(Collectors.toList());
-    //             return new EmbeddingResponse(embeddings);
-    //         }
-    //         @Override
-    //         public float[] embed(Document document) {
-    //             log.debug("Using fallback embedding for document: {}", document.getId());
-    //             float[] vector = new float[VECTOR_DIMENSIONS];
-    //             Arrays.fill(vector, 0.0f);
-    //             return vector;
-    //         }
-    //     };
-    // }
-
-    // 注意：RedisVectorStore相关配置已移至VectorStoreConfig类中统一管理
-
-        /**
-     * 检查 Ollama 服务是否可用
-     * @return true if Ollama service is available
-     */
-    // private boolean isOllamaServiceAvailable() {
-    //     if (!autoCheckService) {
-    //         log.info("Ollama service auto-check is disabled");
-    //         return true;
-    //     }
-        
-    //     try {
-    //         var restClient = org.springframework.web.client.RestClient.builder()
-    //             .baseUrl(ollamaBaseUrl)
-    //             .build();
-            
-    //         restClient.get()
-    //             .uri("/api/tags")
-    //             .retrieve()
-    //             .toBodilessEntity();
-            
-    //         log.info("Ollama service is available at {}", ollamaBaseUrl);
-    //         return true;
-    //     } catch (Exception e) {
-    //         log.warn("Ollama service is not available at {}: {}", ollamaBaseUrl, e.getMessage());
-    //         return false;
-    //     }
-    // }
 }
