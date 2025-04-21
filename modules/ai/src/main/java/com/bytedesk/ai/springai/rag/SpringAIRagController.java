@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 10:50:39
+ * @LastEditTime: 2025-04-21 13:01:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -74,7 +74,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/rag?message=什么时间考试？
     @GetMapping("/rag")
     ResponseEntity<JsonResult<?>> rag(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message, 
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         // Retrieve documents similar to a query
         // FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
@@ -107,7 +108,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/filter?message=什么时间考试？
     @GetMapping("/filter")
     ResponseEntity<JsonResult<?>> filter(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         ChatClient chatClient = ChatClient.builder(ollamaChatModel.get())
                 .defaultAdvisors(new QuestionAnswerAdvisor(ollamaRedisVectorStore,
@@ -129,7 +131,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/naive-rag?message=什么时间考试？
     @GetMapping("/naive-rag")
     ResponseEntity<JsonResult<?>> naiveRag(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
@@ -158,7 +161,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/advanced-rag?message=什么时间考试？
     @GetMapping("/advanced-rag")
     ResponseEntity<JsonResult<?>> advancedRag(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
@@ -188,7 +192,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/compression-query-transformer?message=什么时间考试？
     @GetMapping("/compression-query-transformer")
     ResponseEntity<JsonResult<?>> compressionQueryTransformer(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_compressionquerytransformer
         // 压缩查询
@@ -229,7 +234,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/rewrite-query-transformer?message=什么时间考试？
     @GetMapping("/rewrite-query-transformer")
     ResponseEntity<JsonResult<?>> rewriteQueryTransformer(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         Query query = new Query("I'm studying machine learning. What is an LLM?");
 
@@ -263,7 +269,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/translation-query-transformer?message=什么时间考试？
     @GetMapping("/translation-query-transformer")
     ResponseEntity<JsonResult<?>> translationQueryTransformer(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
@@ -294,7 +301,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/multi-query-expander?message=什么时间考试？
     @GetMapping("/multi-query-expander")
     ResponseEntity<JsonResult<?>> multiQueryExpander(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
                 .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
@@ -322,7 +330,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/vector-store-document-retriever?message=什么时间考试？
     @GetMapping("/vector-store-document-retriever")
     ResponseEntity<JsonResult<?>> vectorStoreDocumentRetriever(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
                 .vectorStore(ollamaRedisVectorStore)
@@ -355,7 +364,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/contextual-query-augmenter?message=什么时间考试？
     @GetMapping("/contextual-query-augmenter")
     ResponseEntity<JsonResult<?>> contextualQueryAugmenter(
-            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         ContextualQueryAugmenter queryAugmenter = ContextualQueryAugmenter.builder()
                 // .allowEmptyContext(true)
@@ -371,8 +381,8 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/search?kbUid=1626719517671552&query=什么时间考试
     @GetMapping("/search")
     ResponseEntity<JsonResult<?>> search(
-            @RequestParam(value = "kbUid", required = true) String kbUid,
-            @RequestParam(value = "query", defaultValue = "什么时间考试？") String query) {
+            @RequestParam(value = "query", defaultValue = "什么时间考试？") String query,
+            @RequestParam(value = "kbUid", required = true) String kbUid) {
 
         log.info("搜索向量数据，query: {}, kbUid: {}", query, kbUid);
         List<String> results = springAIVectorService.searchText(query, kbUid);
