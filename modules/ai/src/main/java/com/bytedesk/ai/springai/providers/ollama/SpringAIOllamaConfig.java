@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 17:53:26
+ * @LastEditTime: 2025-04-21 15:59:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,24 +13,16 @@
  */
 package com.bytedesk.ai.springai.providers.ollama;
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
-import org.springframework.ai.ollama.management.ModelManagementOptions;
-import org.springframework.ai.ollama.management.PullModelStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import io.micrometer.observation.ObservationRegistry;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 @Configuration
+// @Conditional(OllamaAvailableCondition.class)
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaConfig {
 
@@ -60,9 +53,6 @@ public class SpringAIOllamaConfig {
 
     @Value("${spring.ai.ollama.service.auto-check:true}")
     private boolean autoCheckService;
-    
-    @Value("${spring.ai.ollama.model-management.pull-model-strategy:IF_NOT_PRESENT}")
-    private String pullModelStrategy;
 
     @Bean("bytedeskOllamaApi")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
@@ -73,112 +63,86 @@ public class SpringAIOllamaConfig {
     @Bean("bytedeskOllamaChatOptions")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaChatOptions() {
-        OllamaOptions options = new OllamaOptions();
-        options.setModel(ollamaChatOptionsModel);
-        options.setNumPredict(100);
-        options.setTemperature(0.0d);
-        options.setTopK(40);
-        options.setTopP(0.9d);
-        
-        try {
-            if (OllamaOptions.class.getMethod("getToolCallbacks") != null) {
-                java.lang.reflect.Method method = OllamaOptions.class.getMethod("setToolCallbacks", java.util.List.class);
-                if (method != null) {
-                    method.invoke(options, Collections.emptyList());
-                }
-            }
-        } catch (Exception e) {
-            log.debug("ToolCallbacks not available in this version of OllamaOptions: {}", e.getMessage());
-        }
-        return options;
+        return OllamaOptions.builder()
+                .model(ollamaChatOptionsModel)
+                .build();
     }
 
     @Bean("bytedeskOllamaEmbeddingOptions")
     @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaEmbeddingOptions() {
-        OllamaOptions options = new OllamaOptions();
-        options.setModel(ollamaEmbeddingOptionsModel);
-        try {
-            if (OllamaOptions.class.getMethod("getToolCallbacks") != null) {
-                java.lang.reflect.Method method = OllamaOptions.class.getMethod("setToolCallbacks", java.util.List.class);
-                if (method != null) {
-                    method.invoke(options, Collections.emptyList());
-                }
-            }
-        } catch (Exception e) {
-            log.debug("ToolCallbacks not available in this version of OllamaOptions: {}", e.getMessage());
-        }
-        return options;
-    }
-    
-    @Bean
-    @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
-    ModelManagementOptions bytedeskOllamaModelManagementOptions() {
-        PullModelStrategy strategy;
-        try {
-            strategy = PullModelStrategy.valueOf(pullModelStrategy);
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid pull model strategy: {}. Using default WHEN_MISSING", pullModelStrategy);
-            strategy = PullModelStrategy.WHEN_MISSING;
-        }
-        
-        // 使用Builder模式创建ModelManagementOptions，提供所有必要的参数
-        return ModelManagementOptions.builder()
-                .pullModelStrategy(strategy)
-                .additionalModels(List.of()) // 空列表
-                .timeout(Duration.ofMinutes(5)) // 默认超时时间
-                .maxRetries(3) // 设置重试次数
+        return OllamaOptions.builder()
+                .model(ollamaEmbeddingOptionsModel)
                 .build();
-    }
-    
-    @Bean
-    ObservationRegistry observationRegistry() {
-        return ObservationRegistry.NOOP;
     }
 
     @Bean("bytedeskOllamaChatModel")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaChatModel bytedeskOllamaChatModel() {
-        try {
-            OllamaApi api = bytedeskOllamaApi();
-            OllamaOptions options = bytedeskOllamaChatOptions();
-            ObservationRegistry registry = observationRegistry();
-            ModelManagementOptions managementOptions = bytedeskOllamaModelManagementOptions();
-            
-            // 使用Builder模式创建OllamaChatModel
-            return OllamaChatModel.builder()
-                .ollamaApi(api)
-                .defaultOptions(options)
-                .observationRegistry(registry)
-                .modelManagementOptions(managementOptions)
+        return OllamaChatModel.builder()
+                .ollamaApi(bytedeskOllamaApi())
+                .defaultOptions(bytedeskOllamaChatOptions())
                 .build();
-        } catch (Exception e) {
-            log.error("Failed to create OllamaChatModel: {}", e.getMessage(), e);
-            return null;
-        }
-    }
-    
-    @Bean
-    ToolCallingManager toolCallingManager() {
-        return ToolCallingManager.builder().build();
     }
 
     @Primary
     @Bean("bytedeskOllamaEmbeddingModel")
     @ConditionalOnProperty(name = "spring.ai.ollama.embedding.enabled", havingValue = "true", matchIfMissing = false)
     EmbeddingModel bytedeskOllamaEmbeddingModel() {
-        try {
-            OllamaApi api = bytedeskOllamaApi();
-            OllamaOptions options = bytedeskOllamaEmbeddingOptions();
-            ObservationRegistry registry = observationRegistry();
-            ModelManagementOptions managementOptions = bytedeskOllamaModelManagementOptions();
-            
-            return new OllamaEmbeddingModel(api, options, registry, managementOptions);
-        } catch (Exception e) {
-            log.error("Failed to create OllamaEmbeddingModel: {}", e.getMessage(), e);
-            return null;
-        }
+        return OllamaEmbeddingModel.builder()
+                .ollamaApi(bytedeskOllamaApi())
+                .defaultOptions(bytedeskOllamaEmbeddingOptions())
+                .build();
     }
 
+    // private EmbeddingModel createFallbackEmbeddingModel() {
+    //     return new EmbeddingModel() {
+    //         private static final int VECTOR_DIMENSIONS = 1536;
+    //         @Override
+    //         public EmbeddingResponse call(EmbeddingRequest request) {
+    //             log.debug("Using fallback embedding model");
+    //             List<Embedding> embeddings = IntStream.range(0, request.getInstructions().size())
+    //                 .mapToObj(i -> new Embedding(new float[VECTOR_DIMENSIONS], i))
+    //                 .collect(Collectors.toList());
+    //             return new EmbeddingResponse(embeddings);
+    //         }
+    //         @Override
+    //         public float[] embed(Document document) {
+    //             log.debug("Using fallback embedding for document: {}", document.getId());
+    //             float[] vector = new float[VECTOR_DIMENSIONS];
+    //             Arrays.fill(vector, 0.0f);
+    //             return vector;
+    //         }
+    //     };
+    // }
+
     // 注意：RedisVectorStore相关配置已移至VectorStoreConfig类中统一管理
+
+        /**
+     * 检查 Ollama 服务是否可用
+     * @return true if Ollama service is available
+     */
+    // private boolean isOllamaServiceAvailable() {
+    //     if (!autoCheckService) {
+    //         log.info("Ollama service auto-check is disabled");
+    //         return true;
+    //     }
+        
+    //     try {
+    //         var restClient = org.springframework.web.client.RestClient.builder()
+    //             .baseUrl(ollamaBaseUrl)
+    //             .build();
+            
+    //         restClient.get()
+    //             .uri("/api/tags")
+    //             .retrieve()
+    //             .toBodilessEntity();
+            
+    //         log.info("Ollama service is available at {}", ollamaBaseUrl);
+    //         return true;
+    //     } catch (Exception e) {
+    //         log.warn("Ollama service is not available at {}: {}", ollamaBaseUrl, e.getMessage());
+    //         return false;
+    //     }
+    // }
 }
