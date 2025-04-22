@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 16:32:24
+ * @LastEditTime: 2025-04-22 16:47:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,24 +63,33 @@ public class SpringAIFullTextService {
         // 处理分类UID，避免可能的空指针
         String categoryUid = qa.getCategoryUid() != null ? qa.getCategoryUid() : "";
         
-        // 创建索引文档 - 使用Map.ofEntries代替Map.of，因为键值对超过10对
-        Map<String, Object> document = Map.ofEntries(
-            Map.entry("uid", qa.getUid()),
-            Map.entry("question", qa.getQuestion()),
-            Map.entry("answer", qa.getAnswer()),
-            Map.entry("questionList", qa.getQuestionList()),
-            Map.entry("tagList", qa.getTagList()),
-            Map.entry("orgUid", qa.getOrgUid()),
-            Map.entry("kbUid", kbUid),
-            Map.entry("categoryUid", categoryUid),
-            Map.entry("enabled", qa.isEnabled()),
-            Map.entry("createdAt", qa.getCreatedAt()),
-            Map.entry("updatedAt", qa.getUpdatedAt())
+        // 安全处理集合，确保不为null
+        List<String> questionList = qa.getQuestionList() != null ? qa.getQuestionList() : new ArrayList<>();
+        List<String> tagList = qa.getTagList() != null ? qa.getTagList() : new ArrayList<>();
+        
+        // 创建索引文档 - 使用安全的值构建文档
+        // 避免复杂对象可能导致的序列化问题
+        Map<String, Object> document = Map.of(
+            "uid", qa.getUid() != null ? qa.getUid() : "",
+            "question", qa.getQuestion() != null ? qa.getQuestion() : "",
+            "answer", qa.getAnswer() != null ? qa.getAnswer() : "",
+            "questionList", questionList,
+            "tagList", tagList,
+            "orgUid", qa.getOrgUid() != null ? qa.getOrgUid() : "",
+            "kbUid", kbUid,
+            "categoryUid", categoryUid,
+            "enabled", qa.isEnabled(),
+            "createdAt", qa.getCreatedAt() != null ? qa.getCreatedAt().toString() : "",
+            "updatedAt", qa.getUpdatedAt() != null ? qa.getUpdatedAt().toString() : ""
         );
         
-        // 将文档索引到Elasticsearch
-        elasticsearchOperations.save(document, IndexCoordinates.of(QA_INDEX));
-        log.info("QA索引成功: {}", qa.getUid());
+        try {
+            // 将文档索引到Elasticsearch
+            elasticsearchOperations.save(document, IndexCoordinates.of(QA_INDEX));
+            log.info("QA索引成功: {}", qa.getUid());
+        } catch (Exception e) {
+            log.error("索引QA时发生错误: {}, 错误消息: {}", qa.getUid(), e.getMessage(), e);
+        }
     }
     
     /**
