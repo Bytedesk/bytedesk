@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 23:29:47
+ * @LastEditTime: 2025-04-22 14:45:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,11 +34,11 @@ import com.bytedesk.kbase.llm.file.event.FileDeleteEvent;
 import com.bytedesk.kbase.llm.qa.QaEntity;
 import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
 import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
-import com.bytedesk.kbase.llm.qa.event.QaUpdateEvent;
+import com.bytedesk.kbase.llm.qa.event.QaUpdateDocEvent;
 import com.bytedesk.kbase.llm.text.TextEntity;
 import com.bytedesk.kbase.llm.text.event.TextCreateEvent;
 import com.bytedesk.kbase.llm.text.event.TextDeleteEvent;
-import com.bytedesk.kbase.llm.text.event.TextUpdateEvent;
+import com.bytedesk.kbase.llm.text.event.TextUpdateDocEvent;
 import com.bytedesk.kbase.llm.website.WebsiteEntity;
 import com.bytedesk.kbase.llm.website.event.WebsiteCreateEvent;
 import com.bytedesk.kbase.llm.website.event.WebsiteDeleteEvent;
@@ -94,7 +94,7 @@ public class SpringAIEventListener {
     }
 
     @EventListener
-    public void onTextUpdateEvent(TextUpdateEvent event) {
+    public void onTextUpdateDocEvent(TextUpdateDocEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getName());
         if (!text.isDeleted()) {
@@ -125,9 +125,9 @@ public class SpringAIEventListener {
     }
 
     @EventListener
-    public void onQaUpdateEvent(QaUpdateEvent event) {
+    public void onQaQaUpdateDocEvent(QaUpdateDocEvent event) {
         QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaUpdateEvent: {}", qa.getQuestion());
+        log.info("SpringAIEventListener QaUpdateDocEvent: {}", qa.getQuestion());
         if (!qa.isDeleted()) {
             // 将QA实体添加到更新缓存中
             qaUpdateMap.put(qa.getUid(), qa);
@@ -156,9 +156,9 @@ public class SpringAIEventListener {
     // }
 
     // @EventListener
-    // public void onFaqUpdateEvent(FaqUpdateEvent event) {
+    // public void onFaqUpdateDocEvent(FaqUpdateDocEvent event) {
     //     FaqEntity faq = event.getFaq();
-    //     log.info("SpringAIEventListener onFaqUpdateEvent: {}", faq.getQuestion());
+    //     log.info("SpringAIEventListener onFaqUpdateDocEvent: {}", faq.getQuestion());
     //     if (!faq.isDeleted()) {
     //         // 将FAQ实体添加到更新缓存中，而不是立即处理
     //         faqUpdateMap.put(faq.getUid(), faq);
