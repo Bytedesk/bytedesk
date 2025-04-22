@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 12:59:49
+ * @LastEditTime: 2025-04-22 13:36:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,6 +53,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -172,8 +173,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (owner == null) {
             throw new RuntimeException("should login first");
         }
-        RobotProtobuf agent = RobotProtobuf.fromJson(request.getAgent()); 
-        String robotUid = agent.getUid();
+        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getAgent()); 
+        String robotUid = robotProtobuf.getUid();
         if (!StringUtils.hasText(robotUid)) {
             throw new RuntimeException("robotUid is required");
         }
@@ -230,13 +231,14 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     public ThreadResponse updateLlmThread(ThreadRequest request) {
         //
         String topic = request.getTopic();
+        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getAgent());
+        // 
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("thread not found");
         }
         ThreadEntity thread = threadOptional.get();
-        //
-        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(thread.getAgent());
+        // 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService
                 .findByNameAndOrgUid(robotProtobuf.getLlm().getProvider(), thread.getOrgUid());
         if (!llmProviderOptional.isPresent()) {
@@ -246,13 +248,15 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
         thread.setAgent(robotProtobuf.toJson());
         thread.setRobot(robotProtobuf.toJson());
+        thread.setUser(robotProtobuf.toJson());
+        log.info("update thread robot: {}", robotProtobuf.toJson());
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
         //
-        return threadService.convertToResponse(savedThread);
+        return ConvertUtils.convertToThreadResponse(savedThread);
     }
 
 
