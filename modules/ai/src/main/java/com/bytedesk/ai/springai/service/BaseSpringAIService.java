@@ -32,8 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
 
-    @Autowired(required = false)
-    protected Optional<SpringAIVectorStoreService> springAIVectorService;
+    @Autowired
+    protected SpringAIVectorStoreService springAIVectorService;
+
+    @Autowired
+    protected SpringAIFullTextService springAIFullTextService;
 
     @Autowired
     protected IMessageSendService messageSendService;
@@ -61,7 +64,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 可以保留一个带参数的构造函数用于单元测试或特殊情况
-    protected BaseSpringAIService(Optional<SpringAIVectorStoreService> springAIVectorService,
+    protected BaseSpringAIService(SpringAIVectorStoreService springAIVectorService,
             IMessageSendService messageSendService) {
         this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;
@@ -72,11 +75,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
-        Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must be present");
 
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             // TODO: 根据配置，拉取历史聊天记录
             String history = "";
             String context = String.join("\n", contentList);
@@ -114,7 +116,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            log.info("BaseSpringAIService processLlmResponse fullTextList {}", fullTextList);
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             if (contentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
                 String answer = RobotConsts.ROBOT_UNMATCHED;
@@ -147,7 +151,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
+            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            log.info("BaseSpringAIService processLlmResponse fullTextList {}", fullTextList);
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             if (contentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
                 String answer = RobotConsts.ROBOT_UNMATCHED;
