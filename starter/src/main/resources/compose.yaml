@@ -95,41 +95,41 @@ services:
       - bytedesk-network
 
   # http://127.0.0.1:19090/
-  bytedesk-prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus-bytedesk
-    ports:
-      - "19090:9090"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.enable-lifecycle'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--storage.tsdb.retention.time=15d'
-      - '--web.enable-admin-api'
-      - '--web.external-url=http://localhost:19090'
-    volumes:
-      - prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - bytedesk-network
+  # bytedesk-prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus-bytedesk
+  #   ports:
+  #     - "19090:9090"
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.enable-lifecycle'
+  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+  #     - '--web.console.templates=/usr/share/prometheus/consoles'
+  #     - '--storage.tsdb.retention.time=15d'
+  #     - '--web.enable-admin-api'
+  #     - '--web.external-url=http://localhost:19090'
+  #   volumes:
+  #     - prometheus_data:/prometheus
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   networks:
+  #     - bytedesk-network
 
   # http://127.0.0.1:13000/
-  bytedesk-grafana:
-    image: grafana/grafana:latest
-    container_name: grafana-bytedesk
-    ports:
-      - "13000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-    networks:
-      - bytedesk-network
-    depends_on:
-      - bytedesk-prometheus
+  # bytedesk-grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana-bytedesk
+  #   ports:
+  #     - "13000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   networks:
+  #     - bytedesk-network
+  #   depends_on:
+  #     - bytedesk-prometheus
 
   # Chroma 向量数据库
   # bytedesk-chroma:
@@ -244,10 +244,10 @@ volumes:
     name: bytedesk_redis_data
   ollama_models:
     name: bytedesk_ollama_models
-  prometheus_data:
-    name: bytedesk_prometheus_data
-  grafana_data:
-    name: bytedesk_grafana_data
+  # prometheus_data:
+  #   name: bytedesk_prometheus_data
+  # grafana_data:
+  #   name: bytedesk_grafana_data
   ldap_data:
     name: bytedesk_ldap_data
   ldap_config:
