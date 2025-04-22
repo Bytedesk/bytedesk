@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微语 架构</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .architecture-diagram {
+            width: 100%;
+            overflow: auto;
+        }
+        .module {
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px;
+            background-color: #f8f9fa;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .module-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .submodule {
+            border: 1px solid #7f8c8d;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #ecf0f1;
+        }
+        .parent-module {
+            border: 3px solid #e74c3c;
+            background-color: #fadbd8;
+        }
+        .starter-module {
+            border: 3px solid #27ae60;
+            background-color: #d5f5e3;
+        }
+        .module-group {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .arrow {
+            font-size: 24px;
+            text-align: center;
+            margin: 10px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .legend {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .parent-color {
+            background-color: #fadbd8;
+            border: 2px solid #e74c3c;
+        }
+        .starter-color {
+            background-color: #d5f5e3;
+            border: 2px solid #27ae60;
+        }
+        .module-color {
+            background-color: #f8f9fa;
+            border: 2px solid #3498db;
+        }
+        .language-switcher {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .language-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .language-btn:hover {
+            background-color: #2980b9;
+        }
+        .language-btn.active {
+            background-color: #16a085;
+        }
+        /* 默认隐藏所有语言元素，由JavaScript控制显示 */
+        [lang="en"], [lang="zh"] {
+            display: none;
+        }
+        
+        /* 分层架构图样式 */
+        .layered-architecture {
+            width: 100%;
+            margin: 30px auto;
+            position: relative;
+        }
+        .layer {
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px dashed #aaa;
+            padding: 10px 0;
+            position: relative;
+        }
+        .layer-title {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .layer-content {
+            margin-left: 110px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .layer-component {
+            border: 1px solid #333;
+            background-color: white;
+            padding: 10px;
+            margin: 5px;
+            min-width: 100px;
+            text-align: center;
+        }
+        .layer-frontend {
+            background-color: #a8e6cf;
+        }
+        .layer-access {
+            background-color: #fdcb8e;
+        }
+        .layer-business {
+            background-color: #a8e6cf;
+        }
+        .layer-data-analysis {
+            background-color: #a8e6cf;
+        }
+        .layer-data-collection {
+            background-color: #a8e6cf;
+        }
+        .layer-database {
+            background-color: #a1c4fd;
+        }
+        .layer-environment {
+            background-color: #a1c4fd;
+        }
+        .vertical-module {
+            position: absolute;
+            right: 20px;
+            top: 130px;
+            bottom: 130px;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+        .vertical-module-left {
+            right: 150px;
+        }
+        .vertical-permissions {
+            background-color: #f79992;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            text-align: center;
+            padding: 15px 0;
+            flex: 1;
+        }
+        .vertical-logging {
+            background-color: #c1f7d0;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            text-align: center;
+            padding: 15px 0;
+            flex: 1;
+        }
+        
+        /* 选项卡样式 */
+        .tabs {
+            overflow: hidden;
+            margin-top: 30px;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab-button {
+            background-color: #f1f1f1;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 12px 20px;
+            transition: 0.3s;
+            font-size: 17px;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+            border-top: none;
+        }
+        
+        /* 前端技术栈样式 */
+        .frontend-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tech-category {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .tech-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+            color: #2c3e50;
+        }
+        .tech-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tech-item {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        .core-item {
+            background-color: #d4edff;
+            border-color: #3498db;
+        }
+        .ui-item {
+            background-color: #d4f6eb;
+            border-color: #27ae60;
+        }
+        .state-item {
+            background-color: #fde2c7;
+            border-color: #f39c12;
+        }
+        .chart-item {
+            background-color: #ffdde6;
+            border-color: #e74c3c;
+        }
+        .util-item {
+            background-color: #e5e5e5;
+            border-color: #7f8c8d;
+        }
+        .networking-item {
+            background-color: #e7d9ff;
+            border-color: #9b59b6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-switcher">
+            <!-- <button id="en-btn" class="language-btn" onclick="switchLanguage('en')">English</button> -->
+            <button id="zh-btn" class="language-btn active" onclick="switchLanguage('zh')">简体中文</button>
+        </div>
+        
+        <h1 lang="en">微语 Project Architecture</h1>
+        <h1 lang="zh">微语 项目架构</h1>
+        
+        <!-- 选项卡导航 -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('layered-view')">分层视图</button>
+            <button class="tab-button" onclick="openTab('module-view')">模块视图</button>
+            <button class="tab-button" onclick="openTab('frontend-view')">前端技术栈</button>
+        </div>
+        
+        <!-- 分层架构图选项卡 -->
+        <div id="layered-view" class="tab-content" style="display: block;">
+            <div class="layered-architecture">
+                <!-- 前端展示层 -->
+                <div class="layer layer-frontend">
+                    <div class="layer-title" lang="en">Frontend Layer</div>
+                    <div class="layer-title" lang="zh">前端展示层</div>
+                    <div class="layer-content">
+                        <div class="layer-component">PC端</div>
+                        <div class="layer-component">移动手机端</div>
+                        <div class="layer-component">微信公众号</div>
+                        <div class="layer-component">小程序</div>
+                        <div class="layer-component">... ...</div>
+                    </div>
+                </div>
+                
+                <!-- 接入层 -->
+                <div class="layer layer-access">
+                    <div class="layer-title" lang="en">Access Layer</div>
+                    <div class="layer-title" lang="zh">接入层</div>
+                    <div class="layer-content">
+                        <div class="layer-component">负载均衡</div>
+                        <div class="layer-component">API服务</div>
+                        <div class="layer-component">CDN</div>
+                        <div class="layer-component">加密算法</div>
+                    </div>
+                </div>
+                
+                <!-- 业务层 -->
+                <div class="layer layer-business">
+                    <div class="layer-title" lang="en">Business Layer</div>
+                    <div class="layer-title" lang="zh">业务层</div>
+                    <div class="layer-content">
+                        <div class="layer-component">企业IM</div>
+                        <div class="layer-component">在线客服</div>
+                        <div class="layer-component">AI助手</div>
+                        <div class="layer-component">知识库/帮助中心</div>
+                        <div class="layer-component">客户之声</div>
+                        <div class="layer-component">工单系统</div>
+                        <div class="layer-component">工作流</div>
+                        <div class="layer-component">项目管理</div>
+                    </div>
+                </div>
+                
+                <!-- 数据分析层 -->
+                <div class="layer layer-data-analysis">
+                    <div class="layer-title" lang="en">Data Analysis</div>
+                    <div class="layer-title" lang="zh">数据分析层</div>
+                    <div class="layer-content">
+                        <div class="layer-component">数据可视化</div>
+                        <div class="layer-component">数据分析</div>
+                        <div class="layer-component">多维分析</div>
+                        <div class="layer-component">标签查询</div>
+                        <div class="layer-component">安全机制</div>
+                        <div class="layer-component">... ...</div>
+                    </div>
+                </div>
+                
+                <!-- 数据采集层 -->
+                <div class="layer layer-data-collection">
+                    <div class="layer-title" lang="en">Data Collection</div>
+                    <div class="layer-title" lang="zh">数据采集层</div>
+                    <div class="layer-content">
+                        <div class="layer-component">结构化数据采集</div>
+                        <div class="layer-component">非结构化数据采集</div>
+                        <div class="layer-component">在线采集</div>
+                        <div class="layer-component">离线采集</div>
+                    </div>
+                </div>
+                
+                <!-- 数据库 -->
+                <div class="layer layer-database">
+                    <div class="layer-title" lang="en">Database</div>
+                    <div class="layer-title" lang="zh">数据库</div>
+                    <div class="layer-content">
+                        <div class="layer-component">关系数据库</div>
+                        <div class="layer-component">缓存数据库</div>
+                    </div>
+                </div>
+                
+                <!-- 运行环境 -->
+                <div class="layer layer-environment">
+                    <div class="layer-title" lang="en">Environment</div>
+                    <div class="layer-title" lang="zh">运行环境</div>
+                    <div class="layer-content">
+                        <div class="layer-component">阿里云主机</div>
+                        <div class="layer-component">独立服务器</div>
+                        <div class="layer-component">第三方VPS主机</div>
+                    </div>
+                </div>
+                
+                <!-- 垂直模块 - 权限控制 -->
+                <div class="vertical-module">
+                    <div class="vertical-permissions" lang="en">Permission Control</div>
+                    <div class="vertical-permissions" lang="zh">权限控制</div>
+                </div>
+                
+                <!-- 垂直模块 - 日志记录 -->
+                <div class="vertical-module vertical-module-left">
+                    <div class="vertical-logging" lang="en">Logging</div>
+                    <div class="vertical-logging" lang="zh">日志记录</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 模块架构图选项卡 -->
+        <div id="module-view" class="tab-content">
+            <div class="architecture-diagram">
+                <!-- Parent POM -->
+                <div class="module-group">
+                    <div class="module parent-module">
+                        <div class="module-title" lang="en">Parent POM (im)</div>
+                        <div class="module-title" lang="zh">父级 POM (im)</div>
+                        <div class="submodule">Spring Boot 3.4.4</div>
+                        <div class="submodule">Java 17</div>
+                        <div class="submodule" lang="en">Manages all modules</div>
+                        <div class="submodule" lang="zh">管理所有模块</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <!-- Main Modules -->
+                <div class="module-group">
+                    <div class="module">
+                        <div class="module-title" lang="en">Modules</div>
+                        <div class="module-title" lang="zh">模块</div>
+                        <div class="submodule" lang="en">core - Core functionality</div>
+                        <div class="submodule" lang="zh">core - 核心功能</div>
+                        <div class="submodule" lang="en">kbase - Knowledge Base</div>
+                        <div class="submodule" lang="zh">kbase - 知识库</div>
+                        <div class="submodule" lang="en">ai - AI capabilities</div>
+                        <div class="submodule" lang="zh">ai - 人工智能能力</div>
+                        <div class="submodule" lang="en">team - Team management</div>
+                        <div class="submodule" lang="zh">team - 团队管理</div>
+                        <div class="submodule" lang="en">service - Service modules</div>
+                        <div class="submodule" lang="zh">service - 服务模块</div>
+                        <div class="submodule" lang="en">social - Social integration</div>
+                        <div class="submodule" lang="zh">social - 社交整合</div>
+                        <div class="submodule" lang="en">ticket - Ticket system</div>
+                        <div class="submodule" lang="zh">ticket - 工单系统</div>
+                        <div class="submodule" lang="en">forum - Forum functionality</div>
+                        <div class="submodule" lang="zh">forum - 论坛功能</div>
+                        <div class="submodule" lang="en">voc - Voice of Customer</div>
+                        <div class="submodule" lang="zh">voc - 客户之声</div>
+                    </div>
+                    
+                    <div class="module">
+                        <div class="module-title" lang="en">Channels</div>
+                        <div class="module-title" lang="zh">渠道</div>
+                        <div class="submodule" lang="en">wechat - WeChat integration</div>
+                        <div class="submodule" lang="zh">wechat - 微信集成</div>
+                        <div class="submodule" lang="en">douyin - Douyin integration</div>
+                        <div class="submodule" lang="zh">douyin - 抖音集成</div>
+                        <div class="submodule" lang="en">social - Social media</div>
+                        <div class="submodule" lang="zh">social - 社交媒体</div>
+                        <div class="submodule" lang="en">shop - E-commerce</div>
+                        <div class="submodule" lang="zh">shop - 电子商务</div>
+                    </div>
+                    
+                    <div class="module">
+                        <div class="module-title" lang="en">Plugins</div>
+                        <div class="module-title" lang="zh">插件</div>
+                        <div class="submodule" lang="en">kanban - Kanban board</div>
+                        <div class="submodule" lang="zh">kanban - 看板</div>
+                        <div class="submodule" lang="en">remote - Remote capabilities</div>
+                        <div class="submodule" lang="zh">remote - 远程功能</div>
+                        <div class="submodule" lang="en">jitsi - Video conferencing</div>
+                        <div class="submodule" lang="zh">jitsi - 视频会议</div>
+                        <div class="submodule" lang="en">eam - Enterprise asset management</div>
+                        <div class="submodule" lang="zh">eam - 企业资产管理</div>
+                    </div>
+                    
+                    <div class="module">
+                        <div class="module-title" lang="en">Enterprise</div>
+                        <div class="module-title" lang="zh">企业版</div>
+                        <div class="submodule" lang="en">core - Enterprise core</div>
+                        <div class="submodule" lang="zh">core - 企业核心</div>
+                        <div class="submodule" lang="en">webrtc - WebRTC capabilities</div>
+                        <div class="submodule" lang="zh">webrtc - WebRTC 功能</div>
+                    </div>
+                    
+                    <div class="module">
+                        <div class="module-title" lang="en">Projects</div>
+                        <div class="module-title" lang="zh">项目</div>
+                        <div class="submodule" lang="en">Various project implementations</div>
+                        <div class="submodule" lang="zh">各种项目实现</div>
+                    </div>
+                    
+                    <div class="module">
+                        <div class="module-title" lang="en">Control</div>
+                        <div class="module-title" lang="zh">控制</div>
+                        <div class="submodule" lang="en">Management and control</div>
+                        <div class="submodule" lang="zh">管理与控制</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <!-- Starter Module -->
+                <div class="module-group">
+                    <div class="module starter-module">
+                        <div class="module-title" lang="en">Starter (bytedesk-starter)</div>
+                        <div class="module-title" lang="zh">启动器 (bytedesk-starter)</div>
+                        <div class="submodule" lang="en">Spring Boot Web (Jetty)</div>
+                        <div class="submodule" lang="zh">Spring Boot Web (Jetty)</div>
+                        <div class="submodule" lang="en">Spring Security</div>
+                        <div class="submodule" lang="zh">Spring Security</div>
+                        <div class="submodule" lang="en">Spring WebSocket</div>
+                        <div class="submodule" lang="zh">Spring WebSocket</div>
+                        <div class="submodule" lang="en">JPA & Redis</div>
+                        <div class="submodule" lang="zh">JPA & Redis</div>
+                        <div class="submodule" lang="en">APIs & Integration</div>
+                        <div class="submodule" lang="zh">API 和集成</div>
+                        <div class="submodule" lang="en">Messaging & Queues</div>
+                        <div class="submodule" lang="zh">消息和队列</div>
+                        <div class="submodule" lang="en">Application Entry Point</div>
+                        <div class="submodule" lang="zh">应用程序入口点</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 前端技术栈选项卡 -->
+        <div id="frontend-view" class="tab-content">
+            <div class="frontend-stack">
+                <h2>前端技术栈</h2>
+                <p>基于 React 和 Ant Design Pro 的企业级前端应用</p>
+                
+                <!-- 核心框架 -->
+                <div class="tech-category">
+                    <div class="tech-title">核心框架</div>
+                    <div class="tech-items">
+                        <div class="tech-item core-item">React 18</div>
+                        <div class="tech-item core-item">React DOM 18</div>
+                        <div class="tech-item core-item">React Router 6.18</div>
+                        <div class="tech-item core-item">Umijs Max 4.3.31</div>
+                        <div class="tech-item core-item">TypeScript</div>
+                    </div>
+                </div>
+                
+                <!-- UI 组件和样式 -->
+                <div class="tech-category">
+                    <div class="tech-title">UI 组件和样式</div>
+                    <div class="tech-items">
+                        <div class="tech-item ui-item">Ant Design 5.23.2</div>
+                        <div class="tech-item ui-item">Ant Design Pro Components</div>
+                        <div class="tech-item ui-item">Ant Design Pro Form</div>
+                        <div class="tech-item ui-item">Ant Design Icons</div>
+                        <div class="tech-item ui-item">Ant Design Pro Chat</div>
+                        <div class="tech-item ui-item">Emotion</div>
+                        <div class="tech-item ui-item">Antd Style</div>
+                        <div class="tech-item ui-item">ClassNames</div>
+                        <div class="tech-item ui-item">RC Menu</div>
+                        <div class="tech-item ui-item">Antd-img-crop</div>
+                    </div>
+                </div>
+                
+                <!-- 图表和可视化 -->
+                <div class="tech-category">
+                    <div class="tech-title">图表和可视化</div>
+                    <div class="tech-items">
+                        <div class="tech-item chart-item">@ant-design/charts 2.2.7</div>
+                        <div class="tech-item chart-item">@antv/x6 2.18.1</div>
+                        <div class="tech-item chart-item">GIF 组件</div>
+                    </div>
+                </div>
+                
+                <!-- 状态管理 -->
+                <div class="tech-category">
+                    <div class="tech-title">状态管理和钩子</div>
+                    <div class="tech-items">
+                        <div class="tech-item state-item">Zustand 4.4.4</div>
+                        <div class="tech-item state-item">ahooks 3.8.0</div>
+                        <div class="tech-item state-item">@use-gesture/react</div>
+                        <div class="tech-item state-item">@react-spring/web</div>
+                        <div class="tech-item state-item">use-debounce</div>
+                        <div class="tech-item state-item">React Hooks</div>
+                    </div>
+                </div>
+                
+                <!-- 网络和通讯 -->
+                <div class="tech-category">
+                    <div class="tech-title">网络和通讯</div>
+                    <div class="tech-items">
+                        <div class="tech-item networking-item">Axios 1.7.7</div>
+                        <div class="tech-item networking-item">MQTT 5.10.0</div>
+                        <div class="tech-item networking-item">event-source-polyfill</div>
+                        <div class="tech-item networking-item">bytedesk-web</div>
+                        <div class="tech-item networking-item">google-protobuf</div>
+                    </div>
+                </div>
+                
+                <!-- 工具和实用程序 -->
+                <div class="tech-category">
+                    <div class="tech-title">工具和实用程序</div>
+                    <div class="tech-items">
+                        <div class="tech-item util-item">Lodash 4.17.21</div>
+                        <div class="tech-item util-item">Dayjs 1.11.11</div>
+                        <div class="tech-item util-item">Moment 2.29.4</div>
+                        <div class="tech-item util-item">UUID 10.0.0</div>
+                        <div class="tech-item util-item">Mitt 3.0.1</div>
+                        <div class="tech-item util-item">Debug 4.3.7</div>
+                        <div class="tech-item util-item">Color 4.2.3</div>
+                    </div>
+                </div>
+                
+                <!-- 特殊功能 -->
+                <div class="tech-category">
+                    <div class="tech-title">特殊功能组件</div>
+                    <div class="tech-items">
+                        <div class="tech-item ui-item">AIEditor 1.0.13</div>
+                        <div class="tech-item ui-item">React Markdown Editor</div>
+                        <div class="tech-item ui-item">React Email Editor</div>
+                        <div class="tech-item ui-item">React JS Cron</div>
+                        <div class="tech-item ui-item">RC Resize Observer</div>
+                    </div>
+                </div>
+                
+                <!-- 开发工具 -->
+                <div class="tech-category">
+                    <div class="tech-title">开发工具</div>
+                    <div class="tech-items">
+                        <div class="tech-item util-item">ESLint</div>
+                        <div class="tech-item util-item">Prettier</div>
+                        <div class="tech-item util-item">Jest</div>
+                        <div class="tech-item util-item">TypeScript</div>
+                        <div class="tech-item util-item">Lint Staged</div>
+                        <div class="tech-item util-item">Cross Env</div>
+                        <div class="tech-item util-item">MockJS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <h2 lang="en">Legend</h2>
+            <h2 lang="zh">图例</h2>
+            <div class="legend-item">
+                <span class="legend-color parent-color"></span> 
+                <span lang="en">Parent Module</span>
+                <span lang="zh">父级模块</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color module-color"></span> 
+                <span lang="en">Component Modules</span>
+                <span lang="zh">组件模块</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color starter-color"></span> 
+                <span lang="en">Application Entry Point</span>
+                <span lang="zh">应用程序入口点</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px">
+            <h2 lang="en">Technology Stack</h2>
+            <h2 lang="zh">技术栈</h2>
+            <ul>
+                <li>
+                    <strong lang="en">Java Version:</strong>
+                    <strong lang="zh">Java版本:</strong>
+                    <span>17</span>
+                </li>
+                <li>
+                    <strong lang="en">Framework:</strong>
+                    <strong lang="zh">框架:</strong>
+                    <span>Spring Boot 3.4.4</span>
+                </li>
+                <li>
+                    <strong lang="en">Web Server:</strong>
+                    <strong lang="zh">Web服务器:</strong>
+                    <span lang="en">Jetty (replacing Tomcat)</span>
+                    <span lang="zh">Jetty (替代Tomcat)</span>
+                </li>
+                <li>
+                    <strong lang="en">Database Support:</strong>
+                    <strong lang="zh">数据库支持:</strong>
+                    <span>MySQL, PostgreSQL, H2, Oracle</span>
+                </li>
+                <li>
+                    <strong lang="en">Caching:</strong>
+                    <strong lang="zh">缓存:</strong>
+                    <span>Redis, Caffeine</span>
+                </li>
+                <li>
+                    <strong lang="en">Messaging:</strong>
+                    <strong lang="zh">消息系统:</strong>
+                    <span>Apache Artemis, Spring Integration</span>
+                </li>
+                <li>
+                    <strong lang="en">Security:</strong>
+                    <strong lang="zh">安全:</strong>
+                    <span>Spring Security, OAuth2, LDAP</span>
+                </li>
+                <li>
+                    <strong lang="en">API Documentation:</strong>
+                    <strong lang="zh">API文档:</strong>
+                    <span>SpringDoc OpenAPI</span>
+                </li>
+                <li>
+                    <strong lang="en">State Management:</strong>
+                    <strong lang="zh">状态管理:</strong>
+                    <span>Spring Statemachine, COLA Statemachine</span>
+                </li>
+                <li>
+                    <strong lang="en">UI Technologies:</strong>
+                    <strong lang="zh">UI技术:</strong>
+                    <span>Freemarker, Thymeleaf</span>
+                </li>
+                <li>
+                    <strong lang="en">Monitoring:</strong>
+                    <strong lang="zh">监控:</strong>
+                    <span>Spring Actuator, Prometheus</span>
+                </li>
+                <li>
+                    <strong lang="en">Container Support:</strong>
+                    <strong lang="zh">容器支持:</strong>
+                    <span>Docker</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function switchLanguage(lang) {
+            // Hide all language elements
+            const elementsEn = document.querySelectorAll('[lang="en"]');
+            const elementsZh = document.querySelectorAll('[lang="zh"]');
+            
+            if (lang === 'en') {
+                // Show English, hide Chinese
+                elementsEn.forEach(el => el.style.display = 'block');
+                elementsZh.forEach(el => el.style.display = 'none');
+                
+                // Update button states
+                document.getElementById('en-btn').classList.add('active');
+                document.getElementById('zh-btn').classList.remove('active');
+                
+                // Update document language
+                document.documentElement.lang = 'en';
+                document.title = '微语 Architecture';
+            } else {
+                // Show Chinese, hide English
+                elementsEn.forEach(el => el.style.display = 'none');
+                elementsZh.forEach(el => el.style.display = 'block');
+                
+                // Update button states
+                document.getElementById('en-btn').classList.remove('active');
+                document.getElementById('zh-btn').classList.add('active');
+                
+                // Update document language
+                document.documentElement.lang = 'zh';
+                document.title = '微语 架构';
+            }
+        }
+        
+        function openTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].style.display = 'none';
+            }
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content and mark its button as active
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Initialize with Chinese by default
+        document.addEventListener('DOMContentLoaded', function() {
+            switchLanguage('zh');
+        });
+    </script>
+</body>
+</html> 
