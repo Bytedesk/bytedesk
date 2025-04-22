@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 12:16:33
+ * @LastEditTime: 2025-04-22 13:03:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,6 +86,17 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
+
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot thread")
+    @PostMapping("/update/llm/thread")
+    public ResponseEntity<?> updateLlmThread(@RequestBody ThreadRequest request) {
+        //
+        ThreadResponse thread = robotService.updateLlmThread(request);
+
+        return ResponseEntity.ok(JsonResult.success(thread));
+    }
+
     // 创建智能体模板
     @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     // @ActionAnnotation(title = "机器人", action = "新建", description = "create prompt robot")
@@ -118,15 +129,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot thread")
-    @PostMapping("/update/thread")
-    public ResponseEntity<?> updateThread(@RequestBody ThreadRequest request) {
-        //
-        ThreadResponse thread = robotService.updateLlmThread(request);
-
-        return ResponseEntity.ok(JsonResult.success(thread));
-    }
+    
 
     @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
     @ActionAnnotation(title = "机器人", action = "更新", description = "update prompt robot")
