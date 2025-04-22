@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -71,21 +72,12 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        // 从messageProtobuf的extra字段中获取llm配置
-        RobotLlm llm = null;
-        try {
-            // 从消息中提取LLM配置
-            if (messageProtobuf.getExtra() != null) {
-                // 根据实际情况从消息中获取LLM配置
-                // 此处实现需根据实际应用逻辑调整
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract LLM config from message, using default model", e);
-        }
+    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
 
         // 使用自定义选项处理请求
-        processPromptStreamWithCustomOptions(prompt, messageProtobuf, llm);
+        processPromptStreamWithCustomOptions(prompt, messageProtobufReply, llm);
     }
 
     /**
@@ -154,16 +146,8 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        RobotLlm llm = null;
-        try {
-            if (messageProtobufQuery.getExtra() != null) {
-                // 从extra中解析RobotLlm配置
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract robot info, using default model", e);
-        }
+    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        RobotLlm llm = robot.getLlm();
 
         if (!giteeChatModel.isPresent()) {
             handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery,

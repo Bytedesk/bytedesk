@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 11:39:11
+ * @LastEditTime: 2025-04-22 11:48:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,30 +72,14 @@ public class SpringAIBaiduService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobuf) {
-        // 从messageProtobuf的extra字段中获取llm配置
-        RobotLlm llm = null;
-        try {
-            // 从消息中提取LLM配置
-            if (messageProtobuf.getExtra() != null) {
-                // 根据实际情况从消息中获取LLM配置
-                // 此处实现需根据实际应用逻辑调整
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract LLM config from message, using default model", e);
-        }
+    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
         
         // 使用自定义选项处理请求
-        processPromptStreamWithCustomOptions(prompt, messageProtobuf, llm);
+        processPromptStreamWithCustomOptions(prompt, messageProtobufReply, llm);
     }
 
-    /**
-     * 处理带有自定义选项的流式请求
-     * 
-     * @param prompt 提示
-     * @param messageProtobuf 消息对象
-     * @param llm 机器人LLM配置
-     */
     private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
         if (!baiduChatModel.isPresent()) {
             messageProtobuf.setType(MessageTypeEnum.ERROR);
@@ -103,15 +87,13 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             messageSendService.sendProtobufMessage(messageProtobuf);
             return;
         }
-        
-        // 如果有自定义选项，创建新的Prompt
+
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
-        
-        // 使用同一个ChatModel实例，但传入不同的选项
+
         baiduChatModel.get().stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
@@ -120,7 +102,6 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
-
                             messageProtobuf.setType(MessageTypeEnum.STREAM);
                             messageProtobuf.setContent(textContent);
                             messageSendService.sendProtobufMessage(messageProtobuf);
@@ -156,14 +137,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        RobotLlm llm = null;
-        try {
-            if (messageProtobufQuery.getExtra() != null) {
-                // 从extra中解析RobotLlm配置
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract robot info, using default model", e);
-        }
+        RobotLlm llm = robot.getLlm();
 
         if (!baiduChatModel.isPresent()) {
             handleSseError(new RuntimeException("Baidu service not available"), messageProtobufQuery, messageProtobufReply, emitter);
@@ -184,8 +158,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                log.info("Baidu API response metadata: {}, text {}",
-                                        response.getMetadata(), textContent);
+                                log.info("Baidu API response metadata: {}, text {}", response.getMetadata(), textContent);
                                 if (StringUtils.hasLength(textContent)) {
                                     messageProtobufReply.setContent(textContent);
                                     messageProtobufReply.setType(MessageTypeEnum.STREAM);
@@ -249,12 +222,11 @@ public class SpringAIBaiduService extends BaseSpringAIService {
     public Optional<OpenAiChatModel> getBaiduChatModel() {
         return baiduChatModel;
     }
-    
+
     public boolean isServiceHealthy() {
         if (!baiduChatModel.isPresent()) {
             return false;
         }
-
         try {
             String response = processPromptSync("test");
             return !response.contains("不可用") && !response.equals("Baidu service is not available");

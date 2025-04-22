@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotConsts;
-import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
@@ -69,14 +68,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    public void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
         Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must be present");
 
         String prompt = "";
-        if (StringUtils.hasText(robot.getKbUid()) && robot.isKbEnabled()) {
+        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> contentList = springAIVectorService.get().searchText(query, robot.getKbUid());
             // TODO: 根据配置，拉取历史聊天记录
             String history = "";
@@ -266,8 +265,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 抽象方法，由具体实现类提供
-    protected abstract void processPrompt(Prompt prompt, RobotProtobuf robot,  MessageProtobuf messageProtobufQuery,
-    MessageProtobuf messageProtobufReply);
+    protected abstract void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply);
 
     protected abstract String processPromptSync(String message);
 

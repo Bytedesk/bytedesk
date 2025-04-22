@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -84,19 +85,10 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式1：异步流式调用
      */
     @Override
-    protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        // 从messageProtobuf的extra字段中获取llm配置
-        RobotLlm llm = null;
-        try {
-            // 这里假设extra中有robotLlm字段，实际中可能需要调整
-            if (messageProtobuf.getExtra() != null) {
-                // 根据实际情况从消息中获取LLM配置
-                // 如果无法获取，将使用默认配置
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract LLM config from message, using default model", e);
-        }
-
+    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
+        
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
         
@@ -109,24 +101,20 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                            messageProtobuf.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobuf);
+                            messageProtobufReply.setType(MessageTypeEnum.STREAM);
+                            messageProtobufReply.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Zhipuai API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
-                    // 发送流结束标记
-                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                    // messageSendService.sendProtobufMessage(messageProtobuf);
                 });
     }
 
@@ -147,21 +135,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-
-        // 从messageProtobuf中提取RobotLlm信息
-        RobotLlm llm = null;
-        try {
-            // 此处根据实际应用逻辑从消息中获取机器人配置
-            // 例如可以从messageProtobufQuery的extra字段中获取机器人配置
-            if (messageProtobufQuery.getExtra() != null) {
-                // 从extra中解析RobotLlm配置
-                // 此处实现需根据实际应用逻辑调整
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract robot info, using default model", e);
-        }
+    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
