@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 10:59:05
+ * @LastEditTime: 2025-04-22 12:05:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     @Autowired
     @Qualifier("bytedeskZhipuaiChatModel")
     private ZhiPuAiChatModel bytedeskZhipuaiChatModel;
-    
+
     @Autowired
     @Qualifier("bytedeskZhipuaiApi")
     private ZhiPuAiApi zhipuaiApi;
@@ -70,8 +70,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         try {
             ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
                     .model(llm.getModel())
-                    .temperature(llm.getTemperature())  // 使用Double类型
-                    .topP(llm.getTopP())  // 使用Double类型
+                    .temperature(llm.getTemperature()) // 使用Double类型
+                    .topP(llm.getTopP()) // 使用Double类型
                     .build();
 
             return new ZhiPuAiChatModel(zhipuaiApi, options);
@@ -85,13 +85,14 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式1：异步流式调用
      */
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        
+
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
-        
+
         chatModel.stream(prompt).subscribe(
                 response -> {
                     if (response != null) {
@@ -135,7 +136,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
@@ -152,7 +154,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(), textContent);
+                                // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(),
+                                // textContent);
                                 // StringUtils.hasLength() 检查字符串非 null 且长度大于 0，允许包含空格
                                 if (StringUtils.hasLength(textContent)) {
                                     messageProtobufReply.setContent(textContent);
@@ -199,15 +202,15 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     }
 
     // 添加新的辅助方法处理SSE错误
-    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
-                               MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         try {
             messageProtobufReply.setType(MessageTypeEnum.ERROR);
             messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
             // 保存消息到数据库
             persistMessage(messageProtobufQuery, messageProtobufReply);
             String messageJson = messageProtobufReply.toJson();
-            
+
             emitter.send(SseEmitter.event()
                     .data(messageJson)
                     .id(messageProtobufReply.getUid())
@@ -227,7 +230,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     protected String generateFaqPairs(String prompt) {
         return bytedeskZhipuaiChatModel.call(prompt);
     }
-    
+
     public boolean isServiceHealthy() {
         try {
             // 发送一个简单的测试请求来检测服务是否响应
