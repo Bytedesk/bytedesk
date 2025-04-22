@@ -68,7 +68,7 @@ Listed course START -->
 						<img src="assets/images/element/online.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/ai" class="stretched-link" target="_blank">AI助手</a></h5>
+					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/ai" class="stretched-link" target="_blank">AI Agent</a></h5>
 					<span class="mb-0">对接Ollama/DeepSeek/智谱/Qwen通义千问等大模型，支持私有部署/Api调用大模型.</span>
 				</div>
 			</div>
