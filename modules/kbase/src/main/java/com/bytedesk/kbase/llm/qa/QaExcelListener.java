@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 14:37:00
+ * @LastEditTime: 2025-04-22 14:39:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.List;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.excel.util.ListUtils;
-import com.alibaba.fastjson2.JSON;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ public class QaExcelListener implements ReadListener<QaExcel> {
 
     private final QaRestService qaService;
 
-    // private final String categoryUid;
     private final String uploadType;
 
     private final String fileUid;
@@ -54,7 +52,7 @@ public class QaExcelListener implements ReadListener<QaExcel> {
      */
     @Override
     public void invoke(QaExcel data, AnalysisContext context) {
-        log.info("QaExcelListener invoke: {}", JSON.toJSONString(data));
+        log.info("QaExcelListener invoke: {}", data.getQuestion());
         QaEntity qa = qaService.convertExcelToQa(data, uploadType, fileUid, kbUid, orgUid);
         cachedDataList.add(qa);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
@@ -80,10 +78,6 @@ public class QaExcelListener implements ReadListener<QaExcel> {
      * 加上存储数据库
      */
     private void saveData() {
-        // if (cachedDataList.size() > 0) {
-        //     // 删除第一行标头
-        //     cachedDataList.remove(0);
-        // }
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
         qaService.saveAll(cachedDataList);
         log.info("存储数据库成功！");
