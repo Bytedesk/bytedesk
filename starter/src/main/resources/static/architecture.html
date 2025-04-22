@@ -283,6 +283,38 @@
             background-color: #e7d9ff;
             border-color: #9b59b6;
         }
+        
+        /* GitHub链接样式 */
+        .github-link {
+            display: inline-block;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            text-decoration: none;
+        }
+        .github-link:hover {
+            background-color: #24292e;
+        }
+        
+        /* 页脚样式 */
+        .footer {
+            margin-top: 50px;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+        }
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -290,6 +322,7 @@
         <div class="language-switcher">
             <!-- <button id="en-btn" class="language-btn" onclick="switchLanguage('en')">English</button> -->
             <button id="zh-btn" class="language-btn active" onclick="switchLanguage('zh')">简体中文</button>
+            <a href="https://github.com/Bytedesk/bytedesk" target="_blank" class="github-link">GitHub</a>
         </div>
         
         <h1 lang="en">微语 Project Architecture</h1>
@@ -310,10 +343,13 @@
                     <div class="layer-title" lang="en">Frontend Layer</div>
                     <div class="layer-title" lang="zh">前端展示层</div>
                     <div class="layer-content">
-                        <div class="layer-component">PC端</div>
+                        <div class="layer-component">PC端/网站/H5</div>
                         <div class="layer-component">移动手机端</div>
+                        <div class="layer-component">企业微信</div>
                         <div class="layer-component">微信公众号</div>
                         <div class="layer-component">小程序</div>
+                        <div class="layer-component">电商平台</div>
+                        <div class="layer-component">Whatsapp/Facebook/Ig/Line...</div>
                         <div class="layer-component">... ...</div>
                     </div>
                 </div>
@@ -724,6 +760,11 @@
                 </li>
             </ul>
         </div>
+        
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>© 2024 微语 - 智能客户服务平台 | <a href="https://www.weiyuai.cn" target="_blank">访问微语官网</a></p>
+        </div>
     </div>
 
     <script>
@@ -783,4 +824,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
