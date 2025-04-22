@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 16:19:08
+ * @LastEditTime: 2025-04-22 16:32:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.kbase.llm.qa.QaEntity;
@@ -88,10 +89,14 @@ public class SpringAIFullTextService {
      */
     public void deleteQa(String qaUid) {
         log.info("从索引中删除QA: {}", qaUid);
-        // 使用Query删除文档而不是直接传入ID字符串
-        Query deleteQuery = NativeQuery.builder()
+        
+        // 首先创建一个Query对象，用于查询要删除的文档
+        Query query = NativeQuery.builder()
             .withQuery(QueryBuilders.term().field("uid").value(qaUid).build()._toQuery())
             .build();
+        
+        // 然后创建DeleteQuery对象，将Query作为参数传入
+        DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
         
         elasticsearchOperations.delete(deleteQuery, Map.class, IndexCoordinates.of(QA_INDEX));
         log.info("成功删除QA索引: {}", qaUid);
@@ -139,16 +144,24 @@ public class SpringAIFullTextService {
             .withQuery(boolQueryBuilder.build()._toQuery())
             .build();
         
-        // 执行搜索
-        SearchHits<?> searchHits = elasticsearchOperations.search(searchQuery, Map.class, IndexCoordinates.of(QA_INDEX));
+        // 执行搜索 - 使用原始的通配符类型，避免类型不匹配问题
+        SearchHits<?> searchHits = elasticsearchOperations.search(
+            searchQuery, 
+            Map.class, 
+            IndexCoordinates.of(QA_INDEX)
+        );
         
-        // 解析结果
+        // 解析结果 - 使用安全类型转换
         List<String> qaUidList = new ArrayList<>();
         for (SearchHit<?> hit : searchHits) {
-            Map<String, Object> hitMap = (Map<String, Object>) hit.getContent();
-            String uid = (String) hitMap.get("uid");
-            if (uid != null) {
-                qaUidList.add(uid);
+            Object content = hit.getContent();
+            if (content instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> hitMap = (Map<String, Object>) content;
+                Object uidObj = hitMap.get("uid");
+                if (uidObj instanceof String) {
+                    qaUidList.add((String) uidObj);
+                }
             }
         }
         
