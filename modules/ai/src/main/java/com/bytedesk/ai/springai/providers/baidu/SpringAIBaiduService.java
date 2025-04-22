@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 11:30:09
+ * @LastEditTime: 2025-04-22 11:39:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -71,7 +72,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
+    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobuf) {
         // 从messageProtobuf的extra字段中获取llm配置
         RobotLlm llm = null;
         try {
@@ -154,7 +155,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         RobotLlm llm = null;
         try {
             if (messageProtobufQuery.getExtra() != null) {
