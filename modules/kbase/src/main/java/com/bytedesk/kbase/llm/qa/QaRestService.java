@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 14:41:20
+ * @LastEditTime: 2025-04-22 17:12:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -297,32 +297,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     @Override
     public QaResponse convertToResponse(QaEntity entity) {
         QaResponse response = modelMapper.map(entity, QaResponse.class);
-        // QaResponse response = QaResponse.builder()
-        // .uid(entity.getUid())
-        // .question(entity.getQuestion())
-        // .questionList(entity.getQuestionList())
-        // .answer(entity.getAnswer())
-        // .answerList(entity.getAnswerList())
-        // // .isLlmQa(entity.isLlmQa())
-        // .type(entity.getType())
-        // .status(entity.getStatus())
-        // .viewCount(entity.getViewCount())
-        // .clickCount(entity.getClickCount())
-        // .upCount(entity.getUpCount())
-        // .downCount(entity.getDownCount())
-        // // .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
-        // .enabled(entity.isEnabled())
-        // .tagList(entity.getTagList())
-        // .startDate(entity.getStartDate())
-        // .endDate(entity.getEndDate())
-        // .categoryUid(entity.getCategoryUid())
-        // // .kbUid(entity.getKbUid())
-        // .fileUid(entity.getFileUid())
-        // // .docUid(entity.getDocId())
-        // .orgUid(entity.getOrgUid())
-        // .createdAt(entity.getCreatedAt())
-        // .updatedAt(entity.getUpdatedAt())
-        // .build();
 
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedQas() != null) {

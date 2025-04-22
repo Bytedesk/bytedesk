@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 16:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 16:30:00
+ * @LastEditTime: 2025-04-22 17:29:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,7 @@ public class SearchController {
     private QaRestService qaRestService;
     
     /**
-     * 全文搜索QA
+     * 全文搜索QA: http://127.0.0.1:9003/api/v1/search/qa?query=你好&kbUid=xxxx&categoryUid=xxxx&orgUid=xxxx
      * @param query 搜索关键词
      * @param kbUid 知识库UID
      * @param categoryUid 分类UID
