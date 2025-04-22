@@ -69,10 +69,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf) {
+    public void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
-        Assert.notNull(messageProtobuf, "MessageProtobuf must not be null");
+        Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
         Assert.isTrue(springAIVectorService.isPresent(), "SpringAIVectorService must be present");
 
         String prompt = "";
@@ -91,7 +91,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         messages.add(new UserMessage(query));
         //
         Prompt aiPrompt = new Prompt(messages);
-        processPrompt(aiPrompt, messageProtobuf);
+        processPrompt(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
     }
 
     @Override
@@ -141,7 +141,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 添加机器人配置信息到消息中，使子类能获取
         // messageProtobufQuery.setRobotLlm(robot.getLlm());
         
-        processPromptSSE(aiPrompt, messageProtobufQuery, messageProtobufReply, emitter);
+        processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
     private void processSearchResponse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
@@ -266,11 +266,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 抽象方法，由具体实现类提供
-    protected abstract void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf);
+    protected abstract void processPrompt(Prompt prompt, RobotProtobuf robot,  MessageProtobuf messageProtobufQuery,
+    MessageProtobuf messageProtobufReply);
 
     protected abstract String processPromptSync(String message);
 
-    protected abstract void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
+    protected abstract void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter);
 
     // 抽象方法，由具体实现类提供

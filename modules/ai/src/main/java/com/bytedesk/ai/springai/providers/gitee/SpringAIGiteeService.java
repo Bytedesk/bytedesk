@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 22:02:27
+ * @LastEditTime: 2025-04-22 11:36:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,14 +56,14 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         if (llm == null || !StringUtils.hasText(llm.getModel())) {
             return null;
         }
-        
+
         try {
             // 创建自定义的选项对象
             return OpenAiChatOptions.builder()
-                .model(llm.getModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                .build();
+                    .model(llm.getModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
+                    .build();
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getModel(), e);
             return null;
@@ -83,7 +83,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         } catch (Exception e) {
             log.warn("Failed to extract LLM config from message, using default model", e);
         }
-        
+
         // 使用自定义选项处理请求
         processPromptStreamWithCustomOptions(prompt, messageProtobuf, llm);
     }
@@ -91,9 +91,9 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     /**
      * 处理带有自定义选项的流式请求
      * 
-     * @param prompt 提示
+     * @param prompt          提示
      * @param messageProtobuf 消息对象
-     * @param llm 机器人LLM配置
+     * @param llm             机器人LLM配置
      */
     private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
         if (!giteeChatModel.isPresent()) {
@@ -102,14 +102,14 @@ public class SpringAIGiteeService extends BaseSpringAIService {
             messageSendService.sendProtobufMessage(messageProtobuf);
             return;
         }
-        
+
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
-        
+
         // 使用同一个ChatModel实例，但传入不同的选项
         giteeChatModel.get().stream(requestPrompt).subscribe(
                 response -> {
@@ -154,7 +154,8 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         RobotLlm llm = null;
         try {
             if (messageProtobufQuery.getExtra() != null) {
@@ -165,7 +166,8 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         }
 
         if (!giteeChatModel.isPresent()) {
-            handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery,
+                    messageProtobufReply, emitter);
             return;
         }
 
@@ -224,7 +226,8 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                 });
     }
 
-    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         try {
             messageProtobufReply.setType(MessageTypeEnum.ERROR);
             messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
@@ -248,7 +251,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     public Optional<OpenAiChatModel> getGiteeChatModel() {
         return giteeChatModel;
     }
-    
+
     public boolean isServiceHealthy() {
         if (!giteeChatModel.isPresent()) {
             return false;

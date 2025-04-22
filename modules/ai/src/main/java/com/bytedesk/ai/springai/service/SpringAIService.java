@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:21:33
+ * @LastEditTime: 2025-04-22 11:41:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ public interface SpringAIService {
      * @param robot 机器人实体
      * @param messageProtobuf 消息协议
      */
-    void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf);
+    void sendWebsocketMessage(String query, RobotEntity robot, MessageProtobuf messageProtobufQuery,  MessageProtobuf messageProtobufReply);
     
     /**
      * 发送Sse消息
