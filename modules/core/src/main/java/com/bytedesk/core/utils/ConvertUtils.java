@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:54:53
+ * @LastEditTime: 2025-04-22 13:27:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,38 +110,38 @@ public class ConvertUtils {
         // }
         // agent
         if (thread.getAgent() != null) {
-            UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+            UserProtobuf agent = UserProtobuf.fromJson(thread.getAgent()); //JSON.parseObject(thread.getAgent(), UserProtobuf.class);
             threadResponse.setAgentProtobuf(agent);
         }
         if (thread.getUser() != null) {
-            UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
+            UserProtobuf user = UserProtobuf.fromJson(thread.getUser()); //JSON.parseObject(thread.getUser(), UserProtobuf.class);
             threadResponse.setUser(user);
         }
         // robot
         if (thread.getRobot() != null) {
-            UserProtobuf robot = JSON.parseObject(thread.getRobot(), UserProtobuf.class);
+            UserProtobuf robot = UserProtobuf.fromJson(thread.getRobot()); //JSON.parseObject(thread.getRobot(), UserProtobuf.class);
             threadResponse.setRobot(robot);
         }
         if (thread.getWorkgroup() != null) {
-            UserProtobuf workgroup = JSON.parseObject(thread.getWorkgroup(), UserProtobuf.class);
+            UserProtobuf workgroup =  UserProtobuf.fromJson(thread.getWorkgroup()); //JSON.parseObject(thread.getWorkgroup(), UserProtobuf.class);
             threadResponse.setWorkgroup(workgroup);
         }
         if (thread.getInvites() != null) {
             // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
             for (String invite : thread.getInvites()) {
-                UserProtobuf inviteUser = JSON.parseObject(invite, UserProtobuf.class);
+                UserProtobuf inviteUser =  UserProtobuf.fromJson(invite); //JSON.parseObject(invite, UserProtobuf.class);
                 threadResponse.getInvites().add(inviteUser);
             }
         }
         if (thread.getMonitors() != null) {
             for (String monitor : thread.getMonitors()) {
-                UserProtobuf monitorUser = JSON.parseObject(monitor, UserProtobuf.class);
+                UserProtobuf monitorUser = UserProtobuf.fromJson(monitor); //JSON.parseObject(monitor, UserProtobuf.class);
                 threadResponse.getMonitors().add(monitorUser);
             }
         }
         if (thread.getAssistants() != null) {
             for (String assistant : thread.getAssistants()) {
-                UserProtobuf assistantUser = JSON.parseObject(assistant, UserProtobuf.class);
+                UserProtobuf assistantUser = UserProtobuf.fromJson(assistant); //JSON.parseObject(assistant, UserProtobuf.class);
                 threadResponse.getAssistants().add(assistantUser);
             }
         }
