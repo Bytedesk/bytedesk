@@ -32,7 +32,7 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
-import com.bytedesk.ai.springai.service.SpringAIVectorService;
+import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -88,7 +88,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    private final Optional<SpringAIVectorService> springAIVectorService;
+    private final Optional<SpringAIVectorStoreService> springAIVectorService;
 
     private final LlmProviderRestService llmProviderRestService;
 

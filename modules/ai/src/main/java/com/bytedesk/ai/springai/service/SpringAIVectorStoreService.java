@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 15:18:45
+ * @LastEditTime: 2025-04-22 15:44:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,7 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.Map;
@@ -67,7 +68,7 @@ import org.springframework.util.Assert;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class SpringAIVectorService {
+public class SpringAIVectorStoreService {
 
 	// private final Optional<RedisVectorStore> bytedeskOllamaRedisVectorStore;
 	// private final Optional<RedisVectorStore> bytedeskZhipuaiRedisVectorStore;
@@ -273,6 +274,7 @@ public class SpringAIVectorService {
 	}
 
 	// string content 转换成 List<Document> documents
+	@Transactional
 	public List<Document> readTextDemo(String name, String content, String kbUid, String orgUid) {
 		log.info("Converting string content to documents");
 		Assert.hasText(content, "Content must not be empty");
@@ -314,6 +316,7 @@ public class SpringAIVectorService {
 	}
 
 	// 使用reader直接将content字符串，转换成 List<Document> documents
+	@Transactional
 	public List<Document> readText(TextEntity textEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(textEntity, "TextEntity must not be null");
@@ -367,13 +370,12 @@ public class SpringAIVectorService {
 	}
 
 	//
-	@Transactional(rollbackFor = Exception.class)
+	@Transactional
 	public List<Document> readQa(QaEntity qaEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(qaEntity, "QaEntity must not be null");
 		//
 		String content = qaEntity.toJson();
-		 //qaEntity.getQuestion() + "\n" + qaEntity.getAnswer();
 		// 创建Document对象
 		Document document = new Document(content);
 		// 使用TokenTextSplitter分割文本
@@ -422,6 +424,7 @@ public class SpringAIVectorService {
 	}
 
 	// 使用reader直接将qaEntity字符串，转换成 List<Document> documents
+	@Transactional
 	public List<Document> readFaq(FaqEntity faqEntity) {
 		log.info("Converting string content to documents");
 		Assert.notNull(faqEntity, "FaqEntity must not be null");
@@ -476,6 +479,7 @@ public class SpringAIVectorService {
 	}
 
 	// 抓取website
+	@Transactional
 	public List<Document> readWebsite(WebsiteEntity websiteEntity) {
 		log.info("Loading document from website: {}", websiteEntity.getUrl());
 		Assert.notNull(websiteEntity, "WebsiteEntity must not be null");
@@ -552,6 +556,7 @@ public class SpringAIVectorService {
 	}
 
 	// 存储到vector store
+	@Transactional
 	private void storeDocuments(List<Document> docList, FileEntity file) {
 		Assert.notNull(docList, "Document list must not be null");
 		Assert.notNull(file, "FileEntity must not be null");
@@ -705,6 +710,7 @@ public class SpringAIVectorService {
 	 * @param docId   文档ID
 	 * @param content 新的文档内容
 	 */
+	@Transactional
 	public void updateDoc(String docId, String content, String kbUid) {
 		Assert.hasText(docId, "Document ID must not be empty");
 		Assert.hasText(content, "Content must not be empty");
@@ -756,6 +762,7 @@ public class SpringAIVectorService {
 		deleteDocs(List.of(docId));
 	}
 
+	@Transactional
 	public void deleteDocs(List<String> docIdList) {
 		Assert.notEmpty(docIdList, "Document ID list must not be empty");
 		// 删除splitEntity

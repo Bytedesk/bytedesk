@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.ai.springai.service.SpringAIVectorService;
+import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class SpringAIRagController {
     @Qualifier("ollamaChatModel")
     private final Optional<OllamaChatModel> ollamaChatModel;
 
-    private final SpringAIVectorService springAIVectorService;
+    private final SpringAIVectorStoreService springAIVectorService;
 
     // rag
     // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_questionansweradvisor

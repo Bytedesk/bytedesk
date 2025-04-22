@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseSpringAIService implements SpringAIService {
 
     @Autowired(required = false)
-    protected Optional<SpringAIVectorService> springAIVectorService;
+    protected Optional<SpringAIVectorStoreService> springAIVectorService;
 
     @Autowired
     protected IMessageSendService messageSendService;
@@ -61,7 +61,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 可以保留一个带参数的构造函数用于单元测试或特殊情况
-    protected BaseSpringAIService(Optional<SpringAIVectorService> springAIVectorService,
+    protected BaseSpringAIService(Optional<SpringAIVectorStoreService> springAIVectorService,
             IMessageSendService messageSendService) {
         this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;

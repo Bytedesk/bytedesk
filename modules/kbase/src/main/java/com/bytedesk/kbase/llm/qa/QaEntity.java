@@ -42,7 +42,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * qa: Frequently Asked Questions
+ * qa: question answer for llm
  */
 @Entity
 @Data
