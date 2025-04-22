@@ -139,7 +139,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Prompt aiPrompt = new Prompt(messages);
         
         // 添加机器人配置信息到消息中，使子类能获取
-        messageProtobufQuery.setRobotLlm(robot.getLlm());
+        // messageProtobufQuery.setRobotLlm(robot.getLlm());
         
         processPromptSSE(aiPrompt, messageProtobufQuery, messageProtobufReply, emitter);
     }
@@ -304,17 +304,17 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @param messageProtobuf 包含RobotLlm配置的消息
      * @return 提取的RobotLlm配置，如果无法提取则返回null
      */
-    protected RobotLlm extractRobotLlm(MessageProtobuf messageProtobuf) {
-        if (messageProtobuf == null) {
-            return null;
-        }
+    // protected RobotLlm extractRobotLlm(MessageProtobuf messageProtobuf) {
+    //     if (messageProtobuf == null) {
+    //         return null;
+    //     }
         
-        try {
-            // 假设我们在MessageProtobuf中添加了RobotLlm字段
-            return messageProtobuf.getRobotLlm();
-        } catch (Exception e) {
-            log.warn("Failed to extract RobotLlm from message", e);
-            return null;
-        }
-    }
+    //     try {
+    //         // 假设我们在MessageProtobuf中添加了RobotLlm字段
+    //         return messageProtobuf.getRobotLlm();
+    //     } catch (Exception e) {
+    //         log.warn("Failed to extract RobotLlm from message", e);
+    //         return null;
+    //     }
+    // }
 }
