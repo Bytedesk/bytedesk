@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 18:36:03
+ * @LastEditTime: 2025-04-22 18:45:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,42 +59,6 @@ public class SpringAIOllamaConfig {
     OllamaApi bytedeskOllamaApi() {
         return new OllamaApi(ollamaBaseUrl);
     }
-
-    // 初始化方法，检查并拉取必要的嵌入模型
-    // @PostConstruct
-    // public void init() {
-    // ensureEmbeddingModelExists(ollamaEmbeddingOptionsModel, bytedeskOllamaApi());
-    // }
-
-    /**
-     * 检查并确保嵌入模型存在，如果不存在则尝试拉取
-     * 
-     * @param modelName 模型名称
-     */
-    // private void ensureEmbeddingModelExists(String modelName, OllamaApi
-    // bytedeskOllamaApi) {
-    // try {
-    // log.info("检查嵌入模型是否存在: {}", modelName);
-    // // 使用showModel方法替代不存在的getModelInfo方法
-    // bytedeskOllamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
-    // log.info("嵌入模型已存在: {}", modelName);
-    // } catch (HttpClientErrorException e) {
-    // if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-    // log.warn("嵌入模型不存在: {}，尝试拉取模型...", modelName);
-    // try {
-    // // 模型不存在，尝试拉取
-    // bytedeskOllamaApi.pullModel(new OllamaApi.PullModelRequest(modelName));
-    // log.info("成功拉取嵌入模型: {}", modelName);
-    // } catch (Exception pullEx) {
-    // log.error("拉取嵌入模型失败: {}, 错误: {}", modelName, pullEx.getMessage(), pullEx);
-    // }
-    // } else {
-    // log.error("检查嵌入模型时发生错误: {}, 状态码: {}", modelName, e.getStatusCode(), e);
-    // }
-    // } catch (Exception e) {
-    // log.error("检查嵌入模型时发生未知错误: {}, 错误: {}", modelName, e.getMessage(), e);
-    // }
-    // }
 
     @Bean("bytedeskOllamaChatOptions")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)

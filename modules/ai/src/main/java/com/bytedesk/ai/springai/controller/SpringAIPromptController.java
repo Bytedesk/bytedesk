@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 07:14:14
+ * @LastEditTime: 2025-04-22 18:40:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.JsonReader;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
@@ -66,9 +66,9 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
 public class SpringAIPromptController {
 
-	private final ChatClient defaultChatClient;
+	private final ChatClient bytedeskOllamaChatClient;
 
-	private final VectorStore ollamaRedisVectorStore;
+	private final ElasticsearchVectorStore vectorStore;
 
 	@Value("classpath:/aidemo/prompts/joke-prompt.st")
 	private Resource jokeResource;
@@ -97,7 +97,7 @@ public class SpringAIPromptController {
 		PromptTemplate promptTemplate = new PromptTemplate(jokeResource);
 		Prompt prompt = promptTemplate.create(Map.of("adjective", adjective, "topic", topic));
 
-		ChatResponse response = defaultChatClient.prompt(prompt)
+		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
@@ -120,7 +120,7 @@ public class SpringAIPromptController {
 		Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", name, "voice", voice));
 		Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 
-		ChatResponse response = defaultChatClient.prompt(prompt)
+		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
@@ -149,7 +149,7 @@ public class SpringAIPromptController {
 		Prompt prompt = promptTemplate.create(map);
 		log.info("prompt: {}", prompt);
 
-		ChatResponse response = defaultChatClient.prompt(prompt)
+		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
@@ -170,12 +170,12 @@ public class SpringAIPromptController {
 
 		// Step 2 - Create embeddings and save to vector store
 		log.info("Creating Embeddings...");
-		ollamaRedisVectorStore.add(documents);
+		vectorStore.add(documents);
 		log.info("Embeddings created.");
 
 		// Step 3 retrieve related documents to query
 		log.info("Retrieving relevant documents");
-		List<Document> similarDocuments = ollamaRedisVectorStore.similaritySearch(message);
+		List<Document> similarDocuments = vectorStore.similaritySearch(message);
 		log.info(String.format("Found %s relevant documents.", similarDocuments.size()));
 
 		// Step 4 Embed documents into SystemMessage with the `system-qa.st` prompt
@@ -188,7 +188,7 @@ public class SpringAIPromptController {
 		Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
 		log.info(prompt.toString());
 
-		ChatResponse chatResponse = defaultChatClient.prompt(prompt)
+		ChatResponse chatResponse = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 		log.info("AI responded.");
@@ -215,14 +215,14 @@ public class SpringAIPromptController {
 		PromptTemplate promptTemplate = new PromptTemplate(userMessage, Map.of("actor", actor, "format", format));
 		Prompt prompt = promptTemplate.create();
 
-		String response = defaultChatClient.prompt(prompt)
+		String response = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
 				.content();
 		log.info("response: " + response);
 
 		// 或者 使用structured output
 		// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
-		ActorsFilms actorsFilms = defaultChatClient.prompt()
+		ActorsFilms actorsFilms = bytedeskOllamaChatClient.prompt()
 				.user(u -> u.text("Generate the filmography of 5 movies for {actor}.")
 						.param("actor", "Tom Hanks"))
 				.call()
@@ -256,7 +256,7 @@ public class SpringAIPromptController {
 						Map.of("message", message, "format", outputConverter.getFormat()) // replace the "format"
 				).createMessage());
 
-		ChatResponse response = defaultChatClient.prompt(prompt)
+		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 

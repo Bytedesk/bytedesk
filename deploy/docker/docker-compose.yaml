@@ -149,7 +149,12 @@ services:
       SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen2.5:latest
       SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
+      # 如果主要处理中文内容，推荐使用BGE模型，在中文语义理解上表现更好
+      # https://huggingface.co/BAAI/bge-m3: Dimension: 1024, Sequence Length: 8192          
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: bge-m3:latest
+      # https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html#auto-pulling-models
+      # always/when_missing/never
+      SPRING_AI_OLLAMA_INIT_PULL_MODEL_STRATEGY: when_missing
       # zhipuai
       # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
       SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'

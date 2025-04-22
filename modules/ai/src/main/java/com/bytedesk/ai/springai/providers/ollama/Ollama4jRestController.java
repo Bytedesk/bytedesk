@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 18:17:12
+ * @LastEditTime: 2025-04-22 18:55:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,9 @@ import io.github.ollama4j.models.response.LibraryModelDetail;
 import io.github.ollama4j.models.response.LibraryModelTag;
 import io.github.ollama4j.models.response.Model;
 import io.github.ollama4j.models.response.ModelDetail;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/ollama4j")
 public class Ollama4jRestController {
@@ -127,5 +129,14 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    
+    // 检查嵌入模型是否已经存在
+    // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
+    @GetMapping("/embedding-model/exists")
+    public ResponseEntity<?> isEmbeddingModelExists() {
+        String modelName = ollama4jService.getEmbeddingModelName();
+        boolean exists = ollama4jService.isModelExists(modelName);
+        log.info("Embedding model exists: {}, {}", modelName, exists);
+        // 
+        return ResponseEntity.ok(JsonResult.success(exists));
+    }
 }
