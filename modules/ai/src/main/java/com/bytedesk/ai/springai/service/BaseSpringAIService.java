@@ -2,7 +2,6 @@ package com.bytedesk.ai.springai.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -152,7 +151,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
-            log.info("BaseSpringAIService processLlmResponse fullTextList {}", fullTextList);
+            log.info("BaseSpringAIService processSearchResponse fullTextList {}", fullTextList);
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             if (contentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
