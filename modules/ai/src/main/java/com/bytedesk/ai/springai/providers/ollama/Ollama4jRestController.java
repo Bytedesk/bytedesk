@@ -138,5 +138,6 @@ public class Ollama4jRestController {
         log.info("Embedding model exists: {}, {}", modelName, exists);
         // 
         return ResponseEntity.ok(JsonResult.success(exists));
+        // return ResponseEntity.ok(JsonResult.success(false));
     }
 }
