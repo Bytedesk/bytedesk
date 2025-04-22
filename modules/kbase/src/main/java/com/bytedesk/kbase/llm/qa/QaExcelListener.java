@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 16:58:45
+ * @LastEditTime: 2025-04-22 14:37:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,7 +85,7 @@ public class QaExcelListener implements ReadListener<QaExcel> {
         //     cachedDataList.remove(0);
         // }
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        qaService.save(cachedDataList);
+        qaService.saveAll(cachedDataList);
         log.info("存储数据库成功！");
     }
 
