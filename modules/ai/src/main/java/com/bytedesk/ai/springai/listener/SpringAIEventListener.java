@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.springai.service.SpringAIVectorService;
+import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SpringAIEventListener {
 
-    private final SpringAIVectorService springAiVectorService;
+    private final SpringAIVectorStoreService springAiVectorService;
 
     // 存储收集到的FAQ实体，用于批量处理
     private final ConcurrentHashMap<String, FaqEntity> faqCreateMap = new ConcurrentHashMap<>();
