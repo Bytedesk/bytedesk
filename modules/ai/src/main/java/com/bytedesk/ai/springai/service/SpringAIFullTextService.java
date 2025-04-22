@@ -40,9 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class SpringAIFullTextService {
-    
-    private static final String QA_INDEX = "bytedesk_kbase_llm_qa";
-    
+        
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
     
