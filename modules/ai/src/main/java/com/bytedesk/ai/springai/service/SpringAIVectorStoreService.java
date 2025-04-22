@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 15:44:41
+ * @LastEditTime: 2025-04-22 18:04:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,10 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 // import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
@@ -60,6 +64,7 @@ import com.bytedesk.kbase.llm.text.TextRestService;
 import com.bytedesk.kbase.llm.website.WebsiteEntity;
 import com.bytedesk.kbase.llm.website.WebsiteRestService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +79,12 @@ public class SpringAIVectorStoreService {
 	// private final Optional<RedisVectorStore> bytedeskZhipuaiRedisVectorStore;
 	// private RedisVectorStore vectorStore;
 	private ElasticsearchVectorStore vectorStore;
-	
+	// 
+	@Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")
+	private String defaultEmbeddingModel;
+
+	private final OllamaApi ollamaApi;
+
 	private final FileRestService fileRestService;
 
 	private final TextRestService textRestService;
@@ -88,6 +98,40 @@ public class SpringAIVectorStoreService {
 	private final QaRestService qaRestService;
 
 	private final UploadRestService uploadRestService;
+
+	// 初始化方法，检查并拉取必要的嵌入模型
+	@PostConstruct
+	public void init() {
+		ensureEmbeddingModelExists(defaultEmbeddingModel);
+	}
+
+	/**
+	 * 检查并确保嵌入模型存在，如果不存在则尝试拉取
+	 * @param modelName 模型名称
+	 */
+	private void ensureEmbeddingModelExists(String modelName) {
+		try {
+			log.info("检查嵌入模型是否存在: {}", modelName);
+			// 使用showModel方法替代不存在的getModelInfo方法
+			ollamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
+			log.info("嵌入模型已存在: {}", modelName);
+		} catch (HttpClientErrorException e) {
+			if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+				log.warn("嵌入模型不存在: {}，尝试拉取模型...", modelName);
+				try {
+					// 模型不存在，尝试拉取
+					ollamaApi.pullModel(new OllamaApi.PullModelRequest(modelName));
+					log.info("成功拉取嵌入模型: {}", modelName);
+				} catch (Exception pullEx) {
+					log.error("拉取嵌入模型失败: {}, 错误: {}", modelName, pullEx.getMessage(), pullEx);
+				}
+			} else {
+				log.error("检查嵌入模型时发生错误: {}, 状态码: {}", modelName, e.getStatusCode(), e);
+			}
+		} catch (Exception e) {
+			log.error("检查嵌入模型时发生未知错误: {}, 错误: {}", modelName, e.getMessage(), e);
+		}
+	}
 
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html

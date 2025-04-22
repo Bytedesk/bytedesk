@@ -8,6 +8,7 @@ spring:
         enabled: false  # 禁用 Weaviate
       redis:
         enabled: true   # 启用 Redis
+      default-model: bge-m3:latest
     zhipuai:
       chat:
         enabled: true  # 控制是否启用智谱AI相关功能
