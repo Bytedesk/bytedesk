@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 11:20:57
+ * @LastEditTime: 2025-04-22 21:16:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -114,6 +114,8 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 ollama pull qwen2.5:latest
 # embedding model
 ollama pull bge-m3:latest
+# rerank model
+ollama pull linux6200/bge-reranker-v2-m3:latest
 # or download model from huggingface
 # ollama pull hf.co/<username>/<model-repository>
 ```
@@ -131,6 +133,10 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 docker exec ollama-bytedesk ollama pull qwen2.5:latest
 # embedding model
 docker exec ollama-bytedesk ollama pull bge-m3:latest
+# rerank model
+docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
+# or download model from huggingface
+# docker exec ollama-bytedesk ollama pull hf.co/<username>/<model-repository>
 ```
 
 <!-- #### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`
