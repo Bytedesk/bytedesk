@@ -20,12 +20,14 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -44,9 +46,72 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         super(); // 调用基类的无参构造函数
     }
 
+    /**
+     * 根据机器人配置创建动态的OpenAiChatOptions
+     * 
+     * @param llm 机器人LLM配置
+     * @return 根据机器人配置创建的选项
+     */
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getModel())) {
+            return null;
+        }
+        
+        try {
+            // 创建自定义的选项对象
+            return OpenAiChatOptions.builder()
+                .model(llm.getModel())
+                .temperature(llm.getTemperature())
+                .topP(llm.getTopP())
+                .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
+            return null;
+        }
+    }
+
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        giteeChatModel.ifPresent(model -> model.stream(prompt).subscribe(
+        // 从messageProtobuf的extra字段中获取llm配置
+        RobotLlm llm = null;
+        try {
+            // 从消息中提取LLM配置
+            if (messageProtobuf.getExtra() != null) {
+                // 根据实际情况从消息中获取LLM配置
+                // 此处实现需根据实际应用逻辑调整
+            }
+        } catch (Exception e) {
+            log.warn("Failed to extract LLM config from message, using default model", e);
+        }
+        
+        // 使用自定义选项处理请求
+        processPromptStreamWithCustomOptions(prompt, messageProtobuf, llm);
+    }
+
+    /**
+     * 处理带有自定义选项的流式请求
+     * 
+     * @param prompt 提示
+     * @param messageProtobuf 消息对象
+     * @param llm 机器人LLM配置
+     */
+    private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
+        if (!giteeChatModel.isPresent()) {
+            messageProtobuf.setType(MessageTypeEnum.ERROR);
+            messageProtobuf.setContent("Gitee服务不可用");
+            messageSendService.sendProtobufMessage(messageProtobuf);
+            return;
+        }
+        
+        // 如果有自定义选项，创建新的Prompt
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+        
+        // 使用同一个ChatModel实例，但传入不同的选项
+        giteeChatModel.get().stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Gitee API response metadata: {}", response.getMetadata());
@@ -69,11 +134,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Chat stream completed");
-                    // 发送流结束标记
-                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                    // messageSendService.sendProtobufMessage(messageProtobuf);
-                }));
+                });
     }
 
     @Override
@@ -94,113 +155,111 @@ public class SpringAIGiteeService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        giteeChatModel.ifPresentOrElse(
-                model -> {
-                    model.stream(prompt).subscribe(
-                            response -> {
-                                try {
-                                    if (response != null) {
-                                        List<Generation> generations = response.getResults();
-                                        for (Generation generation : generations) {
-                                            AssistantMessage assistantMessage = generation.getOutput();
-                                            String textContent = assistantMessage.getText();
-                                            log.info("Gitee API response metadata: {}, text {}",
-                                                    response.getMetadata(), textContent);
-                                            //
-                                            // StringUtils.hasLength() 检查字符串非 null 且长度大于 0，允许包含空格
-                                            if (StringUtils.hasLength(textContent)) {
-                                                messageProtobufReply.setContent(textContent);
-                                                messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                                // 保存消息到数据库
-                                                persistMessage(messageProtobufQuery, messageProtobufReply);
-                                                String messageJson = messageProtobufReply.toJson();
-                                                // 发送SSE事件
-                                                emitter.send(SseEmitter.event()
-                                                        .data(messageJson)
-                                                        .id(messageProtobufReply.getUid())
-                                                        .name("message"));
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    log.error("Error sending SSE event", e);
-                                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                                    // 保存消息到数据库
+        RobotLlm llm = null;
+        try {
+            if (messageProtobufQuery.getExtra() != null) {
+                // 从extra中解析RobotLlm配置
+            }
+        } catch (Exception e) {
+            log.warn("Failed to extract robot info, using default model", e);
+        }
+
+        if (!giteeChatModel.isPresent()) {
+            handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
+
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+
+        giteeChatModel.get().stream(requestPrompt).subscribe(
+                response -> {
+                    try {
+                        if (response != null) {
+                            List<Generation> generations = response.getResults();
+                            for (Generation generation : generations) {
+                                AssistantMessage assistantMessage = generation.getOutput();
+                                String textContent = assistantMessage.getText();
+                                log.info("Gitee API response metadata: {}, text {}",
+                                        response.getMetadata(), textContent);
+                                if (StringUtils.hasLength(textContent)) {
+                                    messageProtobufReply.setContent(textContent);
+                                    messageProtobufReply.setType(MessageTypeEnum.STREAM);
                                     persistMessage(messageProtobufQuery, messageProtobufReply);
                                     String messageJson = messageProtobufReply.toJson();
-                                    //
-                                    try {
-                                        emitter.send(SseEmitter.event()
-                                                .data(messageJson)
-                                                .id(messageProtobufReply.getUid())
-                                                .name("error"));
-                                        emitter.complete();
-                                    } catch (Exception ex) {
-                                        emitter.completeWithError(ex);
-                                    }
-                                }
-                            },
-                            error -> {
-                                log.error("Gitee API SSE error: ", error);
-                                //
-                                try {
-                                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                                    // 保存消息到数据库
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    // 发送SSE事件
                                     emitter.send(SseEmitter.event()
                                             .data(messageJson)
                                             .id(messageProtobufReply.getUid())
                                             .name("message"));
-                                    emitter.complete();
-                                } catch (Exception ex) {
-                                    emitter.completeWithError(ex);
                                 }
-                            },
-                            () -> {
-                                log.info("Gitee API SSE complete");
-                                try {
-                                    // 发送流结束标记
-                                    messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                                    messageProtobufReply.setContent(""); // 或者可以是任何结束标记
-                                    // 保存消息到数据库
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobufReply.getUid())
-                                            .name("message"));
-                                    emitter.complete();
-                                } catch (Exception e) {
-                                    log.error("Error completing SSE", e);
-                                }
-                            });
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("Error sending SSE event", e);
+                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                    }
+                },
+                error -> {
+                    log.error("Gitee API SSE error: ", error);
+                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                 },
                 () -> {
-                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                    // 保存消息到数据库
-                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                    //
+                    log.info("Gitee API SSE complete");
                     try {
+                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                        messageProtobufReply.setContent("");
+                        persistMessage(messageProtobufQuery, messageProtobufReply);
+                        String messageJson = messageProtobufReply.toJson();
                         emitter.send(SseEmitter.event()
                                 .data(messageJson)
                                 .id(messageProtobufReply.getUid())
                                 .name("message"));
                         emitter.complete();
-                    } catch (Exception ex) {
-                        emitter.completeWithError(ex);
+                    } catch (Exception e) {
+                        log.error("Error completing SSE", e);
                     }
                 });
+    }
+
+    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        try {
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+            persistMessage(messageProtobufQuery, messageProtobufReply);
+            String messageJson = messageProtobufReply.toJson();
+            emitter.send(SseEmitter.event()
+                    .data(messageJson)
+                    .id(messageProtobufReply.getUid())
+                    .name("message"));
+            emitter.complete();
+        } catch (Exception e) {
+            log.error("Error handling SSE error", e);
+            try {
+                emitter.completeWithError(e);
+            } catch (Exception ex) {
+                log.error("Failed to complete emitter with error", ex);
+            }
+        }
     }
 
     public Optional<OpenAiChatModel> getGiteeChatModel() {
         return giteeChatModel;
     }
+    
+    public boolean isServiceHealthy() {
+        if (!giteeChatModel.isPresent()) {
+            return false;
+        }
 
+        try {
+            String response = processPromptSync("test");
+            return !response.contains("不可用") && !response.equals("Gitee service is not available");
+        } catch (Exception e) {
+            log.error("Error checking Gitee service health", e);
+            return false;
+        }
+    }
 }

@@ -49,33 +49,26 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     }
 
     /**
-     * 根据机器人配置创建动态的OpenAiChatModel（适用于SiliconFlow）
+     * 根据机器人配置创建动态的OpenAiChatOptions
      * 
      * @param llm 机器人LLM配置
-     * @return 配置了特定模型的OpenAiChatModel
+     * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatModel createDynamicChatModel(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getModel()) || !siliconFlowChatModel.isPresent()) {
-            // 如果没有指定模型或设置，使用默认配置
-            return siliconFlowChatModel.orElse(null);
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getModel())) {
+            return null;
         }
-
+        
         try {
-            // 获取默认模型以复用其API配置
-            OpenAiChatModel defaultModel = siliconFlowChatModel.get();
-
-            // 创建新的选项，应用自定义模型参数
-            OpenAiChatOptions options = OpenAiChatOptions.builder()
-                    .model(llm.getModel())
-                    .temperature(llm.getTemperature())
-                    .topP(llm.getTopP())
-                    .build();
-
-            // 使用相同的API客户端但应用新的选项
-            return new OpenAiChatModel(defaultModel.getClient(), options);
+            // 创建自定义的选项对象
+            return OpenAiChatOptions.builder()
+                .model(llm.getModel())
+                .temperature(llm.getTemperature())
+                .topP(llm.getTopP())
+                .build();
         } catch (Exception e) {
-            log.error("Error creating dynamic chat model for model {}", llm.getModel(), e);
-            return siliconFlowChatModel.orElse(null);
+            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
+            return null;
         }
     }
 
@@ -84,26 +77,43 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         // 从messageProtobuf的extra字段中获取llm配置
         RobotLlm llm = null;
         try {
-            // 这里假设extra中有robotLlm字段，实际中可能需要调整
+            // 从消息中提取LLM配置
             if (messageProtobuf.getExtra() != null) {
                 // 根据实际情况从消息中获取LLM配置
-                // 如果无法获取，将使用默认配置
+                // 此处实现需根据实际应用逻辑调整
             }
         } catch (Exception e) {
             log.warn("Failed to extract LLM config from message, using default model", e);
         }
+        
+        // 使用自定义选项处理请求
+        processPromptStreamWithCustomOptions(prompt, messageProtobuf, llm);
+    }
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : siliconFlowChatModel.orElse(null);
-
-        if (chatModel == null) {
+    /**
+     * 处理带有自定义选项的流式请求
+     * 
+     * @param prompt 提示
+     * @param messageProtobuf 消息对象
+     * @param llm 机器人LLM配置
+     */
+    private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
+        if (!siliconFlowChatModel.isPresent()) {
             messageProtobuf.setType(MessageTypeEnum.ERROR);
             messageProtobuf.setContent("SiliconFlow服务不可用");
             messageSendService.sendProtobufMessage(messageProtobuf);
             return;
         }
-
-        chatModel.stream(prompt).subscribe(
+        
+        // 如果有自定义选项，创建新的Prompt
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+        
+        // 使用同一个ChatModel实例，但传入不同的选项
+        siliconFlowChatModel.get().stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("siliconFlow API response metadata: {}", response.getMetadata());
@@ -126,10 +136,6 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Chat stream completed");
-                    // 发送流结束标记
-                    // messageProtobuf.setType(MessageTypeEnum.STREAM_END);
-                    // messageProtobuf.setContent(""); // 或者可以是任何结束标记
-                    // messageSendService.sendProtobufMessage(messageProtobuf);
                 });
     }
 
@@ -152,29 +158,28 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     @Override
     protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 从messageProtobuf中提取RobotLlm信息
         RobotLlm llm = null;
         try {
-            // 此处根据实际应用逻辑从消息中获取机器人配置
-            // 例如可以从messageProtobufQuery的extra字段中获取机器人配置
             if (messageProtobufQuery.getExtra() != null) {
                 // 从extra中解析RobotLlm配置
-                // 此处实现需根据实际应用逻辑调整
             }
         } catch (Exception e) {
             log.warn("Failed to extract robot info, using default model", e);
         }
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : siliconFlowChatModel.orElse(null);
-
-        if (chatModel == null) {
+        if (!siliconFlowChatModel.isPresent()) {
             handleSseError(new RuntimeException("SiliconFlow service not available"), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
         }
 
-        chatModel.stream(prompt).subscribe(
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+
+        siliconFlowChatModel.get().stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -184,14 +189,11 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("siliconFlow API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
-                                // StringUtils.hasLength() 检查字符串非 null 且长度大于 0，允许包含空格
                                 if (StringUtils.hasLength(textContent)) {
                                     messageProtobufReply.setContent(textContent);
                                     messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                    // 保存消息到数据库
                                     persistMessage(messageProtobufQuery, messageProtobufReply);
                                     String messageJson = messageProtobufReply.toJson();
-                                    // 发送SSE事件
                                     emitter.send(SseEmitter.event()
                                             .data(messageJson)
                                             .id(messageProtobufReply.getUid())
@@ -211,13 +213,10 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                 () -> {
                     log.info("siliconFlow API SSE complete");
                     try {
-                        // 发送流结束标记
                         messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobufReply.setContent(""); // 或者可以是任何结束标记
-                        // 保存消息到数据库
+                        messageProtobufReply.setContent("");
                         persistMessage(messageProtobufQuery, messageProtobufReply);
                         String messageJson = messageProtobufReply.toJson();
-                        // 发送SSE事件
                         emitter.send(SseEmitter.event()
                                 .data(messageJson)
                                 .id(messageProtobufReply.getUid())

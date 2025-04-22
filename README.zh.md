@@ -42,7 +42,7 @@
 - 工单统计和报表
 - ...
 
-### [AI大模型](./modules/ai/readme.zh.md)
+### [AI Agent](./modules/ai/readme.zh.md)
 
 - Ollama/DeepSeek/ZhipuAI/...
 - 智能体
