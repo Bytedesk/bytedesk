@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 14:52:12
+ * @LastEditTime: 2025-04-22 16:06:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,12 +21,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
+import com.bytedesk.ai.springai.service.SpringAIFullTextService;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
 import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
 import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
 import com.bytedesk.kbase.llm.file.event.FileDeleteEvent;
@@ -51,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIEventListener {
 
     private final SpringAIVectorStoreService springAiVectorService;
+    private final SpringAIFullTextService springAIFullTextService;
 
     // 存储收集到的FAQ实体，用于批量处理
     private final ConcurrentHashMap<String, FaqEntity> faqCreateMap = new ConcurrentHashMap<>();
@@ -119,15 +120,21 @@ public class SpringAIEventListener {
         log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getQuestion());
         // 将QA实体添加到创建缓存中
         qaCreateMap.put(qa.getUid(), qa);
+        
+        // 添加到全文索引
+        springAIFullTextService.indexQa(qa);
     }
 
     @EventListener
-    public void onQaQaUpdateDocEvent(QaUpdateDocEvent event) {
+    public void onQaUpdateDocEvent(QaUpdateDocEvent event) {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener QaUpdateDocEvent: {}", qa.getQuestion());
         if (!qa.isDeleted()) {
             // 将QA实体添加到更新缓存中
             qaUpdateMap.put(qa.getUid(), qa);
+            
+            // 更新全文索引
+            springAIFullTextService.indexQa(qa);
         }
     }
 
@@ -140,35 +147,9 @@ public class SpringAIEventListener {
         // 从缓存中移除
         qaCreateMap.remove(qa.getUid());
         qaUpdateMap.remove(qa.getUid());
-    }
-
-    // @EventListener
-    // public void onFaqCreateEvent(FaqCreateEvent event) {
-    // FaqEntity faq = event.getFaq();
-    // log.info("SpringAIEventListener onFaqCreateEvent: {}", faq.getQuestion());
-    // // 将FAQ实体添加到创建缓存中，而不是立即处理
-    // faqCreateMap.put(faq.getUid(), faq);
-    // }
-
-    // @EventListener
-    // public void onFaqUpdateDocEvent(FaqUpdateDocEvent event) {
-    // FaqEntity faq = event.getFaq();
-    // log.info("SpringAIEventListener onFaqUpdateDocEvent: {}", faq.getQuestion());
-    // if (!faq.isDeleted()) {
-    // // 将FAQ实体添加到更新缓存中，而不是立即处理
-    // faqUpdateMap.put(faq.getUid(), faq);
-    // }
-    // }
-
-    @EventListener
-    public void onFaqDeleteEvent(FaqDeleteEvent event) {
-        FaqEntity faq = event.getFaq();
-        log.info("SpringAIEventListener onFaqDeleteEvent: {}", faq.getQuestion());
-        // 删除faq对应的document，以及redis中缓存的document
-        springAiVectorService.deleteDocs(faq.getDocIdList());
-        // 从缓存中移除
-        faqCreateMap.remove(faq.getUid());
-        faqUpdateMap.remove(faq.getUid());
+        
+        // 从全文索引中删除
+        springAIFullTextService.deleteQa(qa.getUid());
     }
 
     @EventListener
@@ -373,51 +354,11 @@ public class SpringAIEventListener {
     public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
         RedisPubsubMessageFile messageFile = event.getMessageFile();
         log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
-        //
-        // UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
-        // .orElseThrow(() -> new RuntimeException("upload not found by uid: " +
-        // messageFile.getFileUid()));
-        // upload.setDocIdList(messageFile.getDocIds());
-        // upload.setStatus(UploadStatusEnum.PARSE_FILE_SUCCESS.name());
-        // uploadService.save(upload);
-        // //
-        // String user = upload.getUser();
-        // UserProtobuf uploadUser = JSON.parseObject(user, UserProtobuf.class);
-
-        // // 通知前端
-        // JSONObject contentObject = new JSONObject();
-        // contentObject.put(I18Consts.I18N_NOTICE_TITLE,
-        // I18Consts.I18N_NOTICE_PARSE_FILE_SUCCESS);
-        // //
-        // MessageProtobuf message =
-        // MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(),
-        // uploadUser.getUid(), upload.getOrgUid(),
-        // JSON.toJSONString(contentObject));
-        // messageSendService.sendProtobufMessage(message);
     }
 
     @EventListener
     public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent event) {
         RedisPubsubMessageFile messageFile = event.getMessageFile();
         log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
-        // UploadEntity upload = uploadService.findByUid(messageFile.getFileUid())
-        // .orElseThrow(() -> new RuntimeException("upload not found by uid: " +
-        // messageFile.getFileUid()));
-        // upload.setStatus(UploadStatusEnum.PARSE_FILE_ERROR.name());
-        // uploadService.save(upload);
-        // //
-        // String user = upload.getUser();
-        // UserProtobuf uploadUser = JSON.parseObject(user, UserProtobuf.class);
-        // // 通知前端
-        // JSONObject contentObject = new JSONObject();
-        // contentObject.put(I18Consts.I18N_NOTICE_TITLE,
-        // I18Consts.I18N_NOTICE_PARSE_FILE_ERROR);
-        // //
-        // MessageProtobuf message =
-        // MessageUtils.createNoticeMessage(uidUtils.getCacheSerialUid(),
-        // uploadUser.getUid(), upload.getOrgUid(),
-        // JSON.toJSONString(contentObject));
-        // messageSendService.sendProtobufMessage(message);
     }
-
 }
