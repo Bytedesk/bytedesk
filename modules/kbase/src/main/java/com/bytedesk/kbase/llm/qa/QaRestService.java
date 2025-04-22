@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 17:12:10
+ * @LastEditTime: 2025-04-22 22:37:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,6 +104,11 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     @Override
     public Optional<QaEntity> findByUid(String uid) {
         return qaRepository.findByUid(uid);
+    }
+
+    @Cacheable(value = "qa", key="#kbUid", unless = "#result == null")
+    public List<QaEntity> findByKbUid(String kbUid) {
+        return qaRepository.findByKbaseEntity_Uid(kbUid);
     }
 
     @Cacheable(value = "qa", key = "#question", unless = "#result == null")
@@ -292,6 +297,16 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     @Override
     public void delete(QaRequest entity) {
         deleteByUid(entity.getUid());
+    }
+
+    public void delateAll(QaRequest entity) {
+        // 查询kbUid所有的问答对
+        List<QaEntity> qaEntities = findByKbUid(entity.getKbUid());
+        // 遍历所有的问答对，设置deleted为true
+        for (QaEntity qaEntity : qaEntities) {
+            qaEntity.setDeleted(true);
+            save(qaEntity);
+        }
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 15:48:32
+ * @LastEditTime: 2025-04-22 22:37:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,6 +90,16 @@ public class QaRestController extends BaseRestController<QaRequest> {
     public ResponseEntity<?> delete(@RequestBody QaRequest request) {
 
         qaRestService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @ActionAnnotation(title = "问答对", action = "删除所有", description = "delete qa all")
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    @PostMapping("/deleteAll")
+    public ResponseEntity<?> deleteAll(@RequestBody QaRequest request) {
+
+        qaRestService.delateAll(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
