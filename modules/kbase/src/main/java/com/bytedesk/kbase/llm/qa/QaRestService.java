@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-20 00:02:28
+ * @LastEditTime: 2025-04-22 14:35:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,8 +90,8 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         if (optionalEntity.isPresent()) {
             QaEntity entity = optionalEntity.get();
             entity.increaseClickCount();
-            // 
-            QaEntity savedEntity = qaRepository.save(entity);
+            //
+            QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
@@ -135,44 +135,20 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (user != null) {
                 entity.setUserUid(user.getUid());
             }
-            // 
-            // 根据request.relatedQaUids查找关联的FAQ
-            // List<QaEntity> relatedQas = new ArrayList<>();
-            // for (String relatedQaUid : request.getRelatedQaUids()) {
-            //     Optional<QaEntity> relatedQa = findByUid(relatedQaUid);
-            //     if (relatedQa.isPresent()) {
-            //         relatedQas.add(relatedQa.get());
-            //     } else {
-            //         throw new RuntimeException("relatedQaUid not found");
-            //     }
-            // }
-            // entity.setRelatedQas(relatedQas);
-
-            // 
+            //
             Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
             if (kbase.isPresent()) {
                 entity.setKbaseEntity(kbase.get());
             } else {
                 throw new RuntimeException("kbaseUid not found");
             }
-
-            try {
-                QaEntity savedEntity = save(entity);
-                if (savedEntity != null) {
-                    return convertToResponse(savedEntity);
-                }
-            } catch (Exception e) {
-                // 如果保存时发生唯一键冲突，再次尝试查找
-                if (e.getCause() instanceof java.sql.SQLIntegrityConstraintViolationException) {
-                    Optional<QaEntity> existingQa = findByUid(entity.getUid());
-                    if (existingQa.isPresent()) {
-                        return convertToResponse(existingQa.get());
-                    }
-                }
-                throw e;
+            // 
+            QaEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to create FAQ");
             }
-
-            throw new RuntimeException("Failed to create FAQ");
+            // 
+            return convertToResponse(savedEntity);
         } catch (Exception e) {
             log.error("Error creating FAQ: {}", e.getMessage(), e);
             throw new RuntimeException("Error creating FAQ", e);
@@ -199,8 +175,12 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());
             //
-
-            return convertToResponse(save(entity));
+            QaEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to create FAQ");
+            }
+            // 
+            return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("qa not found");
         }
@@ -212,6 +192,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         if (optional.isPresent()) {
             QaEntity entity = optional.get();
             entity.setEnabled(request.getEnabled());
+            // 
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update FAQ");
@@ -227,7 +208,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         if (optional.isPresent()) {
             QaEntity entity = optional.get();
             entity.increaseUpCount();
-            // 
+            //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to rate up FAQ");
@@ -243,7 +224,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         if (optional.isPresent()) {
             QaEntity entity = optional.get();
             entity.increaseDownCount();
-            // 
+            //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to rate down FAQ");
@@ -255,21 +236,13 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     }
 
     @Override
-    public QaEntity save(QaEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
     protected QaEntity doSave(QaEntity entity) {
         return qaRepository.save(entity);
     }
 
     @Override
-    public QaEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, QaEntity entity) {
+    public QaEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            QaEntity entity) {
         try {
             log.warn("处理乐观锁冲突: {}", entity.getUid());
             Optional<QaEntity> latest = qaRepository.findByUid(entity.getUid());
@@ -283,26 +256,27 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                 latestEntity.setEnabled(entity.isEnabled());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
                 // latestEntity.setKbUid(entity.getKbUid());
-                
+
                 // 处理相关问答时特别小心
                 if (entity.getRelatedQas() != null && !entity.getRelatedQas().isEmpty()) {
                     latestEntity.setRelatedQas(entity.getRelatedQas());
                 }
-                
+
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
                 latestEntity.setStatus(entity.getStatus());
                 latestEntity.setTagList(entity.getTagList());
-                
+
                 return qaRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
         }
+        
         throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
-    public void save(List<QaEntity> entities) {
+    public void saveAll(List<QaEntity> entities) {
         qaRepository.saveAll(entities);
     }
 
@@ -324,31 +298,31 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     public QaResponse convertToResponse(QaEntity entity) {
         QaResponse response = modelMapper.map(entity, QaResponse.class);
         // QaResponse response = QaResponse.builder()
-        //         .uid(entity.getUid())
-        //         .question(entity.getQuestion())
-        //         .questionList(entity.getQuestionList())
-        //         .answer(entity.getAnswer())
-        //         .answerList(entity.getAnswerList())
-        //         // .isLlmQa(entity.isLlmQa())
-        //         .type(entity.getType())
-        //         .status(entity.getStatus())
-        //         .viewCount(entity.getViewCount())
-        //         .clickCount(entity.getClickCount())
-        //         .upCount(entity.getUpCount())
-        //         .downCount(entity.getDownCount())
-        //         // .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
-        //         .enabled(entity.isEnabled())
-        //         .tagList(entity.getTagList())
-        //         .startDate(entity.getStartDate())
-        //         .endDate(entity.getEndDate())
-        //         .categoryUid(entity.getCategoryUid())
-        //         // .kbUid(entity.getKbUid())
-        //         .fileUid(entity.getFileUid())
-        //         // .docUid(entity.getDocId())
-        //         .orgUid(entity.getOrgUid())
-        //         .createdAt(entity.getCreatedAt())
-        //         .updatedAt(entity.getUpdatedAt())
-        //         .build();
+        // .uid(entity.getUid())
+        // .question(entity.getQuestion())
+        // .questionList(entity.getQuestionList())
+        // .answer(entity.getAnswer())
+        // .answerList(entity.getAnswerList())
+        // // .isLlmQa(entity.isLlmQa())
+        // .type(entity.getType())
+        // .status(entity.getStatus())
+        // .viewCount(entity.getViewCount())
+        // .clickCount(entity.getClickCount())
+        // .upCount(entity.getUpCount())
+        // .downCount(entity.getDownCount())
+        // // .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
+        // .enabled(entity.isEnabled())
+        // .tagList(entity.getTagList())
+        // .startDate(entity.getStartDate())
+        // .endDate(entity.getEndDate())
+        // .categoryUid(entity.getCategoryUid())
+        // // .kbUid(entity.getKbUid())
+        // .fileUid(entity.getFileUid())
+        // // .docUid(entity.getDocId())
+        // .orgUid(entity.getOrgUid())
+        // .createdAt(entity.getCreatedAt())
+        // .updatedAt(entity.getUpdatedAt())
+        // .build();
 
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedQas() != null) {
@@ -416,7 +390,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         // qa.setKbUid(kbUid);
         qa.setOrgUid(orgUid);
 
-        // 
+        //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
         if (kbase.isPresent()) {
             qa.setKbaseEntity(kbase.get());
@@ -426,6 +400,5 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         //
         return qa;
     }
-
 
 }
