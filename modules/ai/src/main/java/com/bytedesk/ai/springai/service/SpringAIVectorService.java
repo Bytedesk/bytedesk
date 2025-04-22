@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 15:23:15
+ * @LastEditTime: 2025-04-22 14:04:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -382,7 +382,7 @@ public class SpringAIVectorService {
 		Iterator<Document> iterator = docList.iterator();
 		while (iterator.hasNext()) {
 			Document doc = iterator.next();
-			log.info("faq doc id: {}", doc.getId());
+			log.info("qa doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbaseEntity().getUid());
