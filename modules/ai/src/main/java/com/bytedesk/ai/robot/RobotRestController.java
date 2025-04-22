@@ -123,7 +123,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/update/thread")
     public ResponseEntity<?> updateThread(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = robotService.updateThread(request);
+        ThreadResponse thread = robotService.updateLlmThread(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
