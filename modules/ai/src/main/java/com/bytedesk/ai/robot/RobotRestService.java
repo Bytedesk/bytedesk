@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 12:37:59
+ * @LastEditTime: 2025-04-22 12:59:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.demo.bytedesk.SpringAIBytedeskService;
 import com.bytedesk.ai.demo.utils.FileContent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
@@ -45,7 +44,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -55,7 +53,6 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
-// import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
@@ -93,24 +90,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     private final Optional<SpringAIVectorService> springAIVectorService;
 
     private final LlmProviderRestService llmProviderRestService;
-
-    // private final OptimisticLockingHandler optimisticLockingHandler;
-
-    // @PostConstruct
-    // public void setupModelMapper() {
-    //     modelMapper.getConfiguration()
-    //             .setMatchingStrategy(MatchingStrategies.STRICT)
-    //             .setSkipNullEnabled(true);
-
-    //     // 配置 ThreadRequest 到 ThreadEntity 的映射
-    //     modelMapper.createTypeMap(ThreadRequest.class, ThreadEntity.class)
-    //             .addMappings(mapper -> {
-    //                 mapper.skip(ThreadEntity::setUser); // 跳过自动映射
-    //                 // 添加其他需要的映射
-    //                 mapper.map(ThreadRequest::getTopic, ThreadEntity::setTopic);
-    //                 mapper.map(ThreadRequest::getType, ThreadEntity::setType);
-    //             });
-    // }
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
@@ -193,7 +172,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (owner == null) {
             throw new RuntimeException("should login first");
         }
-        UserProtobuf agent = JSON.parseObject(request.getAgent(), UserProtobuf.class);
+        RobotProtobuf agent = RobotProtobuf.fromJson(request.getAgent()); 
         String robotUid = agent.getUid();
         if (!StringUtils.hasText(robotUid)) {
             throw new RuntimeException("robotUid is required");
@@ -248,7 +227,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return threadService.convertToResponse(savedThread);
     }
 
-    public ThreadResponse updateThread(ThreadRequest request) {
+    public ThreadResponse updateLlmThread(ThreadRequest request) {
         //
         String topic = request.getTopic();
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
@@ -256,9 +235,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             throw new RuntimeException("thread not found");
         }
         ThreadEntity thread = threadOptional.get();
-        thread.setUser(JSON.toJSONString(request.getUser()));
         //
-        RobotProtobuf robotProtobuf = JSON.parseObject(request.getAgent(), RobotProtobuf.class);
+        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(thread.getAgent());
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService
                 .findByNameAndOrgUid(robotProtobuf.getLlm().getProvider(), thread.getOrgUid());
         if (!llmProviderOptional.isPresent()) {
@@ -266,8 +244,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         }
         robotProtobuf.setAvatar(llmProviderOptional.get().getLogo());
         robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
-        thread.setAgent(JSON.toJSONString(robotProtobuf));
-        // thread.setAgent(request.getAgent());
+        thread.setAgent(robotProtobuf.toJson());
+        thread.setRobot(robotProtobuf.toJson());
         //
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
