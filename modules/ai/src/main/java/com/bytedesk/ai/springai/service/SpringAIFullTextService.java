@@ -15,18 +15,17 @@ package com.bytedesk.ai.springai.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.kbase.llm.qa.QaElastic;
 import com.bytedesk.kbase.llm.qa.QaEntity;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
@@ -42,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SpringAIFullTextService {
     
-    private static final String QA_INDEX = "qa_index";
+    private static final String QA_INDEX = "bytedesk_kbase_llm_qa";
     
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
@@ -54,38 +53,12 @@ public class SpringAIFullTextService {
     public void indexQa(QaEntity qa) {
         log.info("为QA创建索引: {}", qa.getUid());
         
-        // 获取知识库UID，安全处理可能的空值
-        String kbUid = "";
-        if (qa.getKbaseEntity() != null) {
-            kbUid = qa.getKbaseEntity().getUid();
-        }
-        
-        // 处理分类UID，避免可能的空指针
-        String categoryUid = qa.getCategoryUid() != null ? qa.getCategoryUid() : "";
-        
-        // 安全处理集合，确保不为null
-        List<String> questionList = qa.getQuestionList() != null ? qa.getQuestionList() : new ArrayList<>();
-        List<String> tagList = qa.getTagList() != null ? qa.getTagList() : new ArrayList<>();
-        
-        // 创建索引文档 - 使用安全的值构建文档
-        // 避免复杂对象可能导致的序列化问题
-        Map<String, Object> document = Map.of(
-            "uid", qa.getUid() != null ? qa.getUid() : "",
-            "question", qa.getQuestion() != null ? qa.getQuestion() : "",
-            "answer", qa.getAnswer() != null ? qa.getAnswer() : "",
-            "questionList", questionList,
-            "tagList", tagList,
-            "orgUid", qa.getOrgUid() != null ? qa.getOrgUid() : "",
-            "kbUid", kbUid,
-            "categoryUid", categoryUid,
-            "enabled", qa.isEnabled(),
-            "createdAt", qa.getCreatedAt() != null ? qa.getCreatedAt().toString() : "",
-            "updatedAt", qa.getUpdatedAt() != null ? qa.getUpdatedAt().toString() : ""
-        );
-        
         try {
+            // 将QaEntity转换为QaElastic对象
+            QaElastic qaElastic = QaElastic.fromQaEntity(qa);
+            
             // 将文档索引到Elasticsearch
-            elasticsearchOperations.save(document, IndexCoordinates.of(QA_INDEX));
+            elasticsearchOperations.save(qaElastic);
             log.info("QA索引成功: {}", qa.getUid());
         } catch (Exception e) {
             log.error("索引QA时发生错误: {}, 错误消息: {}", qa.getUid(), e.getMessage(), e);
@@ -107,7 +80,7 @@ public class SpringAIFullTextService {
         // 然后创建DeleteQuery对象，将Query作为参数传入
         DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
         
-        elasticsearchOperations.delete(deleteQuery, Map.class, IndexCoordinates.of(QA_INDEX));
+        elasticsearchOperations.delete(deleteQuery, QaElastic.class);
         log.info("成功删除QA索引: {}", qaUid);
     }
     
@@ -153,25 +126,17 @@ public class SpringAIFullTextService {
             .withQuery(boolQueryBuilder.build()._toQuery())
             .build();
         
-        // 执行搜索 - 使用原始的通配符类型，避免类型不匹配问题
-        SearchHits<?> searchHits = elasticsearchOperations.search(
+        // 执行搜索 - 使用QaElastic类型
+        SearchHits<QaElastic> searchHits = elasticsearchOperations.search(
             searchQuery, 
-            Map.class, 
-            IndexCoordinates.of(QA_INDEX)
+            QaElastic.class
         );
         
-        // 解析结果 - 使用安全类型转换
+        // 解析结果 - 直接从QaElastic对象中获取uid
         List<String> qaUidList = new ArrayList<>();
-        for (SearchHit<?> hit : searchHits) {
-            Object content = hit.getContent();
-            if (content instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> hitMap = (Map<String, Object>) content;
-                Object uidObj = hitMap.get("uid");
-                if (uidObj instanceof String) {
-                    qaUidList.add((String) uidObj);
-                }
-            }
+        for (SearchHit<QaElastic> hit : searchHits) {
+            QaElastic qaElastic = hit.getContent();
+            qaUidList.add(qaElastic.getUid());
         }
         
         log.info("搜索到 {} 个QA结果", qaUidList.size());
