@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 22:03:10
+ * @LastEditTime: 2025-04-22 10:59:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
+import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -42,9 +45,39 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     @Autowired
     @Qualifier("bytedeskZhipuaiChatModel")
     private ZhiPuAiChatModel bytedeskZhipuaiChatModel;
+    
+    @Autowired
+    @Qualifier("bytedeskZhipuaiApi")
+    private ZhiPuAiApi zhipuaiApi;
 
     public SpringAIZhipuaiService() {
         super(); // 调用基类的无参构造函数
+    }
+
+    /**
+     * 根据机器人配置创建动态的ZhiPuAiChatModel
+     * 
+     * @param llm 机器人LLM配置
+     * @return 配置了特定模型的ZhiPuAiChatModel
+     */
+    private ZhiPuAiChatModel createDynamicChatModel(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getModel())) {
+            // 如果没有指定模型或设置，使用默认配置
+            return bytedeskZhipuaiChatModel;
+        }
+
+        try {
+            ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
+                    .model(llm.getModel())
+                    .temperature(llm.getTemperature())  // 使用Double类型
+                    .topP(llm.getTopP())  // 使用Double类型
+                    .build();
+
+            return new ZhiPuAiChatModel(zhipuaiApi, options);
+        } catch (Exception e) {
+            log.error("Error creating dynamic chat model for model {}", llm.getModel(), e);
+            return bytedeskZhipuaiChatModel;
+        }
     }
 
     /**
@@ -52,7 +85,22 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      */
     @Override
     protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        bytedeskZhipuaiChatModel.stream(prompt).subscribe(
+        // 从messageProtobuf的extra字段中获取llm配置
+        RobotLlm llm = null;
+        try {
+            // 这里假设extra中有robotLlm字段，实际中可能需要调整
+            if (messageProtobuf.getExtra() != null) {
+                // 根据实际情况从消息中获取LLM配置
+                // 如果无法获取，将使用默认配置
+            }
+        } catch (Exception e) {
+            log.warn("Failed to extract LLM config from message, using default model", e);
+        }
+
+        // 获取适当的模型实例
+        ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
+        
+        chatModel.stream(prompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Zhipuai API response metadata: {}", response.getMetadata());
@@ -102,7 +150,23 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     public void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
-        Flux<ChatResponse> responseFlux = bytedeskZhipuaiChatModel.stream(prompt);
+        // 从messageProtobuf中提取RobotLlm信息
+        RobotLlm llm = null;
+        try {
+            // 此处根据实际应用逻辑从消息中获取机器人配置
+            // 例如可以从messageProtobufQuery的extra字段中获取机器人配置
+            if (messageProtobufQuery.getExtra() != null) {
+                // 从extra中解析RobotLlm配置
+                // 此处实现需根据实际应用逻辑调整
+            }
+        } catch (Exception e) {
+            log.warn("Failed to extract robot info, using default model", e);
+        }
+
+        // 获取适当的模型实例
+        ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
+
+        Flux<ChatResponse> responseFlux = chatModel.stream(prompt);
 
         responseFlux.subscribe(
                 response -> {
@@ -130,42 +194,12 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         }
                     } catch (Exception e) {
                         log.error("Zhipuai API Error sending SSE event 1：", e);
-                        messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                        messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                        // 保存消息到数据库
-                        persistMessage(messageProtobufQuery, messageProtobufReply);
-                        String messageJson = messageProtobufReply.toJson();
-                        //
-                        try {
-                            emitter.send(SseEmitter.event()
-                                    .data(messageJson)
-                                    .id(messageProtobufReply.getUid())
-                                    .name("message"));
-                            emitter.complete();
-                        } catch (Exception ex) {
-                            log.error("Zhipuai API SSE complete Error 1", ex);
-                            emitter.completeWithError(ex);
-                        }
+                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                     }
                 },
                 error -> {
                     log.error("Zhipuai API SSE error 2:", error);
-                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                    // 保存消息到数据库
-                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                    String messageJson = messageProtobufReply.toJson();
-                    //
-                    try {
-                        emitter.send(SseEmitter.event()
-                                .data(messageJson)
-                                .id(messageProtobufReply.getUid())
-                                .name("message"));
-                        emitter.complete();
-                    } catch (Exception ex) {
-                        log.error("Zhipuai API SSE complete Error 2", ex);
-                        emitter.completeWithError(ex);
-                    }
+                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                 },
                 () -> {
                     log.info("Zhipuai API SSE complete");
@@ -188,8 +222,44 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 });
     }
 
+    // 添加新的辅助方法处理SSE错误
+    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
+                               MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        try {
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+            // 保存消息到数据库
+            persistMessage(messageProtobufQuery, messageProtobufReply);
+            String messageJson = messageProtobufReply.toJson();
+            
+            emitter.send(SseEmitter.event()
+                    .data(messageJson)
+                    .id(messageProtobufReply.getUid())
+                    .name("message"));
+            emitter.complete();
+        } catch (Exception e) {
+            log.error("Error handling SSE error", e);
+            try {
+                emitter.completeWithError(e);
+            } catch (Exception ex) {
+                log.error("Failed to complete emitter with error", ex);
+            }
+        }
+    }
+
     @Override
     protected String generateFaqPairs(String prompt) {
         return bytedeskZhipuaiChatModel.call(prompt);
+    }
+    
+    public boolean isServiceHealthy() {
+        try {
+            // 发送一个简单的测试请求来检测服务是否响应
+            String response = processPromptSync("test");
+            return !response.contains("不可用");
+        } catch (Exception e) {
+            log.error("Error checking Zhipuai service health", e);
+            return false;
+        }
     }
 }
