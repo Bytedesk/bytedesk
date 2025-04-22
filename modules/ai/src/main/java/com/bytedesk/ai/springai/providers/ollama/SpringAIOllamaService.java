@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 10:41:23
+ * @LastEditTime: 2025-04-22 10:44:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -49,9 +48,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     @Autowired
     @Qualifier("bytedeskOllamaApi")
     private OllamaApi ollamaApi;
-
-    @Autowired
-    private SpringAIOllamaConfig ollamaConfig;
 
     public SpringAIOllamaService() {
         super(); // 调用基类的无参构造函数
