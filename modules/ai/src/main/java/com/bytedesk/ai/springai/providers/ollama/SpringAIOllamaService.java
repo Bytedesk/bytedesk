@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 10:44:03
+ * @LastEditTime: 2025-04-22 11:51:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -83,27 +84,18 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, MessageProtobuf messageProtobuf) {
-        // 从messageProtobuf的extra字段中获取llm配置
-        RobotLlm llm = null;
-        try {
-            // 这里假设extra中有robotLlm字段，实际中可能需要调整
-            if (messageProtobuf.getExtra() != null) {
-                // 根据实际情况从消息中获取LLM配置
-                // 如果无法获取，将使用默认配置
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract LLM config from message, using default model", e);
-        }
+    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例
         OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel.orElse(null);
         
         if (chatModel == null) {
             log.info("Ollama API not available");
-            messageProtobuf.setType(MessageTypeEnum.ERROR);
-            messageProtobuf.setContent("Ollama service is not available");
-            messageSendService.sendProtobufMessage(messageProtobuf);
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            messageProtobufReply.setContent("Ollama service is not available");
+            messageSendService.sendProtobufMessage(messageProtobufReply);
             return;
         }
 
@@ -117,26 +109,26 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                            messageProtobuf.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobuf);
+                            messageProtobufReply.setType(MessageTypeEnum.STREAM);
+                            messageProtobufReply.setContent(textContent);
+                            messageSendService.sendProtobufMessage(messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Ollama API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
                 });
         } catch (Exception e) {
             log.error("Error processing Ollama prompt", e);
-            messageProtobuf.setType(MessageTypeEnum.ERROR);
-            messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-            messageSendService.sendProtobufMessage(messageProtobuf);
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+            messageSendService.sendProtobufMessage(messageProtobufReply);
         }
     }
 
@@ -171,19 +163,9 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 从messageProtobuf中提取RobotProtobuf信息
-        RobotLlm llm = null;
-        try {
-            // 此处根据实际应用逻辑从消息中获取机器人配置
-            // 例如可以从messageProtobufQuery的extra字段中获取机器人配置
-            if (messageProtobufQuery.getExtra() != null) {
-                // 从extra中解析RobotLlm配置
-                // 此处实现需根据实际应用逻辑调整
-            }
-        } catch (Exception e) {
-            log.warn("Failed to extract robot info, using default model", e);
-        }
+    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例
         OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel.orElse(null);
