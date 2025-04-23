@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 16:47:46
+ * @LastEditTime: 2025-04-23 18:05:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,17 +40,6 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 
 	private final UploadRestService uploadService;
 	
-	@ActionAnnotation(title = "上传", action = "新建", description = "upload File")
-	@PostMapping("/file")
-	public ResponseEntity<?> uploadFile(
-			@RequestParam("file") MultipartFile file,
-			UploadRequest request) {
-	
-		UploadResponse response = uploadService.handleFileUpload(file, request);
-		
-		return ResponseEntity.ok(JsonResult.success("upload file success", response));
-	}
-
 	@Override
 	public ResponseEntity<?> queryByOrg(UploadRequest request) {
 
@@ -63,6 +52,12 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 	public ResponseEntity<?> queryByUser(UploadRequest request) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'query'");
+	}
+
+	@Override
+	public ResponseEntity<?> queryByUid(UploadRequest request) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
 	}
 
 	@Override
@@ -94,10 +89,14 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 		throw new UnsupportedOperationException("Unimplemented method 'export'");
 	}
 
-	@Override
-	public ResponseEntity<?> queryByUid(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+	@ActionAnnotation(title = "上传", action = "新建", description = "upload File")
+	@PostMapping("/file")
+	public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, UploadRequest request) {
+	
+		UploadResponse response = uploadService.handleFileUpload(file, request);
+		
+		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}
+
 
 }
