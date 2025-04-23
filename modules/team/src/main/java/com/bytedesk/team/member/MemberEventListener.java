@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 14:09:09
+ * @LastEditTime: 2025-04-23 15:29:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,6 +44,7 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.utils.BdFileUtils;
 import com.bytedesk.team.department.DepartmentConsts;
 import com.bytedesk.team.department.DepartmentRequest;
 import com.bytedesk.team.department.DepartmentResponse;
@@ -85,7 +86,7 @@ public class MemberEventListener {
                 .orgUid(orgUid)
                 .build();
         DepartmentResponse departmentResponse = departmentService.create(departmentRequest);
-        // 
+        //
         if (departmentResponse != null) {
             Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
             // 创建团队成员
@@ -125,57 +126,60 @@ public class MemberEventListener {
                 .topic(topic)
                 .userUid(user.getUid())
                 .build();
-            // request.setUserUid(user.getUid());
+        // request.setUserUid(user.getUid());
         topicCacheService.pushRequest(request);
     }
 
     // @EventListener
     // public void onMemberUpdateEvent(MemberUpdateEvent event) {
-    //     // MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent) event.getObject();
-    //     log.info("member updated: {}", event);
-    //     // TODO: 删除旧的部门主题
+    // // MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent)
+    // event.getObject();
+    // log.info("member updated: {}", event);
+    // // TODO: 删除旧的部门主题
     // }
 
     // @EventListener
-    // public void onRoleUpdateEvent(GenericApplicationEvent<RoleUpdateEvent> event) {
-    //     RoleUpdateEvent roleUpdateEvent = event.getObject();
-    //     RoleEntity roleEntity = roleUpdateEvent.getRoleEntity();
-    //     log.info("onRoleUpdateEvent: {}", roleEntity.toString());
-    //     // 给member对应的userUid删除/添加角色
-    //     // 遍历roleEntity.getMemberUids
-    //     if (roleEntity.getLevel().equals(LevelEnum.ORGANIZATION.name())) {
-    //         // 
-    //     } else {
-    //         log.info("not support yet");
-    //     }
+    // public void onRoleUpdateEvent(GenericApplicationEvent<RoleUpdateEvent> event)
+    // {
+    // RoleUpdateEvent roleUpdateEvent = event.getObject();
+    // RoleEntity roleEntity = roleUpdateEvent.getRoleEntity();
+    // log.info("onRoleUpdateEvent: {}", roleEntity.toString());
+    // // 给member对应的userUid删除/添加角色
+    // // 遍历roleEntity.getMemberUids
+    // if (roleEntity.getLevel().equals(LevelEnum.ORGANIZATION.name())) {
+    // //
+    // } else {
+    // log.info("not support yet");
+    // }
     // }
 
-     @EventListener
+    @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
         UploadEntity upload = event.getUpload();
         log.info("UploadEventListener create: {}", upload.toString());
+        //
+        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.MEMBER.name())) {
+            // 检查文件类型是否为Excel
+            String fileName = upload.getFileName();
+            if (!BdFileUtils.isExcelFile(fileName)) {
+                log.warn("不是Excel文件，无法导入成员: {}", fileName);
+                return;
+            }
 
-        // 导入Excel文件
-        Resource resource = uploadService.loadAsResource(upload.getFileName());
-        if (resource.exists()) {
-            String filePath = resource.getFile().getAbsolutePath();
-            log.info("UploadEventListener loadAsResource: {}", filePath);
-            // 
-            if (upload.getType().equalsIgnoreCase(UploadTypeEnum.MEMBER.name())) {
+            // 导入Excel文件
+            Resource resource = uploadService.loadAsResource(upload.getFileName());
+            if (resource.exists()) {
+                String filePath = resource.getFile().getAbsolutePath();
+                log.info("UploadEventListener loadAsResource: {}", filePath);
                 // 导入成员
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                EasyExcel.read(filePath, 
-                    MemberExcel.class, 
-                    new MemberExcelListener(memberService, upload.getOrgUid())
-                ).sheet().doRead();
+                EasyExcel.read(filePath,
+                        MemberExcel.class,
+                        new MemberExcelListener(memberService, upload.getOrgUid())).sheet().doRead();
             }
         }
 
-
-        
     }
-
-
 
 }
