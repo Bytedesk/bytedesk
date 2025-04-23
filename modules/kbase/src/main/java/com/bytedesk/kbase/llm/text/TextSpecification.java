@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 17:25:51
+ * @LastEditTime: 2025-04-23 10:35:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,9 +44,9 @@ public class TextSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
-            // kbUid
-            if (StringUtils.hasText(request.getKbUid())) {  
-                predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            if (StringUtils.hasText(request.getKbUid())) {
+                // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段
+                predicates.add(criteriaBuilder.equal(root.get("kbaseEntity").get("uid"), request.getKbUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
