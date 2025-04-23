@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 18:25:13
+ * @LastEditTime: 2025-04-23 10:05:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,8 +37,7 @@ import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.ai.observation.annotation.AiObserved;
-import io.micrometer.observation.ObservationRegistry;
+// import io.micrometer.observation.ObservationRegistry;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,7 +70,7 @@ public class SpringAIRagController {
 
     private final SpringAIVectorStoreService springAIVectorService;
 
-    private final ObservationRegistry observationRegistry;
+//     private final ObservationRegistry observationRegistry;
 
     // rag
     // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_questionansweradvisor
@@ -394,27 +393,6 @@ public class SpringAIRagController {
         return ResponseEntity.ok(JsonResult.success(results));
     }
 
-    // 通过@AiObserved注解启用Observability监控
-    // http://127.0.0.1:9003/spring/ai/rag/observability?message=什么是Spring AI？
-    @AiObserved
-    @GetMapping("/observability")
-    ResponseEntity<JsonResult<?>> observabilityDemo(
-            @RequestParam(value = "message", defaultValue = "什么是Spring AI？") String message) {
-            
-        log.info("执行带有Observability监控的AI操作");
-        
-        // 使用chatClient - 通过ObservationRegistry可以自动收集操作指标
-        String answer = ChatClient.builder(ollamaChatModel.get())
-                .withObservationRegistry(observationRegistry)
-                .build()
-                .prompt()
-                .user(message)
-                .call()
-                .content();
-                
-        log.info("AI操作完成，响应内容长度: {}", answer.length());
-        
-        return ResponseEntity.ok(JsonResult.success(answer));
-    }
+    
 
 }
