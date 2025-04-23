@@ -173,18 +173,15 @@
 		</dependency> -->
 
 		<!-- mcp -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-client-spring-boot-starter -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
+			<artifactId>spring-ai-starter-mcp-client</artifactId>
 		</dependency> -->
-
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp-server-webmvc-spring-boot-starter -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-mcp-server-webmvc-spring-boot-starter</artifactId>
+			<artifactId>spring-ai-starter-mcp-server</artifactId>
 		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
@@ -294,6 +291,31 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- 添加Spring Boot Actuator依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		
+		<!-- 添加Spring AI Chat Observation依赖 -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-autoconfigure-model-chat-observation</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- 添加Micrometer依赖 -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-observation</artifactId>
+		</dependency>
+		
+		<!-- 可选: 添加Prometheus监控支持 -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 
 	</dependencies>
