@@ -27,5 +27,5 @@ public interface SplitRepository extends JpaRepository<SplitEntity, Long>, JpaSp
 
     // Boolean existsByPlatform(String platform);
 
-    List<SplitEntity> findByKbaseEntity_Uid(String kbUid);
+    List<SplitEntity> findByKbase_Uid(String kbUid);
 }

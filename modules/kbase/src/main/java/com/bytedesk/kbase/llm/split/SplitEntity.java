@@ -88,6 +88,6 @@ public class SplitEntity extends BaseEntity {
 
     // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
-    private KbaseEntity kbaseEntity;
+    private KbaseEntity kbase;
 
 }

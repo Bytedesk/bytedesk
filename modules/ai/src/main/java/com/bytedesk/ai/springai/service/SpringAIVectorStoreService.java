@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 10:53:30
+ * @LastEditTime: 2025-04-23 18:28:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -331,7 +331,7 @@ public class SpringAIVectorStoreService {
 			// log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbaseEntity().getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbase().getUid());
 			// doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
 			// doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
 			// doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
@@ -344,7 +344,7 @@ public class SpringAIVectorStoreService {
 					.docId(doc.getId())
 					.typeUid(textEntity.getUid())
 					.categoryUid(textEntity.getCategoryUid())
-					.kbUid(textEntity.getKbaseEntity().getUid())
+					.kbUid(textEntity.getKbase().getUid())
 					.userUid(textEntity.getUserUid())
 					.orgUid(textEntity.getOrgUid())
 					.enabled(textEntity.isEnabled())
@@ -386,7 +386,7 @@ public class SpringAIVectorStoreService {
 			log.info("qa doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbaseEntity().getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbase().getUid());
 			// doc.getMetadata().put("enabled", String.valueOf(qaEntity.isEnabled()));
 			// doc.getMetadata().put("startDate", qaEntity.getStartDate() != null ? qaEntity.getStartDate().toString() : LocalDateTime.now().toString());
 			// doc.getMetadata().put("endDate", qaEntity.getEndDate() != null ? qaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
@@ -399,7 +399,7 @@ public class SpringAIVectorStoreService {
 					.docId(doc.getId())
 					.typeUid(qaEntity.getUid())
 					.categoryUid(qaEntity.getCategoryUid())
-					.kbUid(qaEntity.getKbaseEntity().getUid())
+					.kbUid(qaEntity.getKbase().getUid())
 					.userUid(qaEntity.getUserUid())
 					.orgUid(qaEntity.getOrgUid())
 					.enabled(qaEntity.isEnabled())
@@ -441,7 +441,7 @@ public class SpringAIVectorStoreService {
 			log.info("faq doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, faqEntity.getKbaseEntity().getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, faqEntity.getKbase().getUid());
 			// doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
 			// doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
 			// doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
@@ -454,7 +454,7 @@ public class SpringAIVectorStoreService {
 					.docId(doc.getId())
 					.typeUid(faqEntity.getUid())
 					.categoryUid(faqEntity.getCategoryUid())
-					.kbUid(faqEntity.getKbaseEntity().getUid())
+					.kbUid(faqEntity.getKbase().getUid())
 					.userUid(faqEntity.getUserUid())
 					.orgUid(faqEntity.getOrgUid())
 					.enabled(faqEntity.isEnabled())
@@ -490,7 +490,7 @@ public class SpringAIVectorStoreService {
 			URI uri = UriComponentsBuilder.fromUriString(websiteEntity.getUrl()).build().toUri();
 			// 创建元数据
 			Map<String, String> metadata = new HashMap<>();
-			metadata.put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbaseEntity().getUid());
+			metadata.put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbase().getUid());
 			metadata.put("source_url", websiteEntity.getUrl());
 			// 创建WebDocumentReader
 			WebDocumentReader webReader = new WebDocumentReader(uri, metadata);
@@ -506,7 +506,7 @@ public class SpringAIVectorStoreService {
 				log.info("doc id: {}", doc.getId());
 				docIdList.add(doc.getId());
 				// 添加元数据: 知识库kb_uid、启用状态、有效期
-				doc.getMetadata().put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbaseEntity().getUid());
+				doc.getMetadata().put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbase().getUid());
 				doc.getMetadata().put("enabled", String.valueOf(websiteEntity.isEnabled()));
 				doc.getMetadata().put("startDate", websiteEntity.getStartDate() != null ? websiteEntity.getStartDate().toString() : LocalDateTime.now().toString());
 				doc.getMetadata().put("endDate", websiteEntity.getEndDate() != null ? websiteEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
@@ -519,7 +519,7 @@ public class SpringAIVectorStoreService {
 						.docId(doc.getId())
 						.typeUid(websiteEntity.getUid())
 						.categoryUid(websiteEntity.getCategoryUid())
-						.kbUid(websiteEntity.getKbaseEntity().getUid())
+						.kbUid(websiteEntity.getKbase().getUid())
 						.userUid(websiteEntity.getUserUid())
 						.orgUid(websiteEntity.getOrgUid())
 						.enabled(websiteEntity.isEnabled())
@@ -529,9 +529,9 @@ public class SpringAIVectorStoreService {
 				splitRestService.create(splitRequest);
 			}
 			// 如果需要存储到向量数据库
-			// if (websiteEntity.getKbaseEntity().getUid() != null) {
+			// if (websiteEntity.getKbase().getUid() != null) {
 			// 	bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-			// 	log.info("Website content stored in vector store for kbUid: {}", websiteEntity.getKbaseEntity().getUid());
+			// 	log.info("Website content stored in vector store for kbUid: {}", websiteEntity.getKbase().getUid());
 			// }
 			//
 			websiteEntity.setDocIdList(docIdList);
@@ -559,7 +559,7 @@ public class SpringAIVectorStoreService {
 		Assert.notNull(docList, "Document list must not be null");
 		Assert.notNull(file, "FileEntity must not be null");
 		Assert.notNull(file.getUid(), "File UID must not be null");
-		Assert.notNull(file.getKbaseEntity().getUid(), "Knowledge base UID must not be null");
+		Assert.notNull(file.getKbase().getUid(), "Knowledge base UID must not be null");
 		// 
 		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
 		List<String> docIdList = new ArrayList<>();
@@ -569,7 +569,7 @@ public class SpringAIVectorStoreService {
 			log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
 			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbaseEntity().getUid());
+			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbase().getUid());
 			// 添加元数据: 启用状态和有效期，使用FileEntity中的字段
 			// doc.getMetadata().put("enabled", String.valueOf(file.isEnabled()));
 			// doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
@@ -582,7 +582,7 @@ public class SpringAIVectorStoreService {
 					.docId(doc.getId())
 					.typeUid(file.getUid())
 					.categoryUid(file.getCategoryUid())
-					.kbUid(file.getKbaseEntity().getUid())
+					.kbUid(file.getKbase().getUid())
 					.userUid(file.getUserUid())
 					.orgUid(file.getOrgUid())
 					.enabled(file.isEnabled()) // 使用文件的启用状态，默认为true

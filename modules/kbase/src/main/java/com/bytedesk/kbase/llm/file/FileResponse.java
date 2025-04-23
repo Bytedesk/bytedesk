@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:13:36
+ * @LastEditTime: 2025-04-23 18:23:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.upload.UploadResponse;
+import com.bytedesk.kbase.kbase.KbaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -79,10 +81,12 @@ public class FileResponse extends BaseResponse {
 
     private String categoryUid; // 所属分类
 
-    private String kbUid; // 所属知识库
+    // private String kbUid; // 所属知识库
+    private KbaseResponse kbase;
 
     // 对应 uploadEntity 的 uid
-    private String uploadUid;
+    // private String uploadUid;
+    private UploadResponse upload;
 
     // 上传用户
     private String userUid;

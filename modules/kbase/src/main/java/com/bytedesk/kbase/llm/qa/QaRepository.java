@@ -25,7 +25,7 @@ public interface QaRepository extends JpaRepository<QaEntity, Long>, JpaSpecific
 
     Boolean existsByUid(String uid);
 
-    List<QaEntity> findByKbaseEntity_Uid(String kbUid);
+    List<QaEntity> findByKbase_Uid(String kbUid);
 
     // auto complete, 根据问题关键字查询
     List<QaEntity> findByQuestionContains(String question);

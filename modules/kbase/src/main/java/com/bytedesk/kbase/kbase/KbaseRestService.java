@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:27:38
+ * @LastEditTime: 2025-04-23 18:38:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.kbase.kbase;
 import java.util.List;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +39,7 @@ import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.ArticleRestService;
+import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -48,8 +48,6 @@ import lombok.AllArgsConstructor;
 public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest, KbaseResponse> {
 
     private final KbaseRepository kbaseRepository;
-
-    private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
@@ -179,15 +177,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     }
 
     @Override
-    public KbaseEntity save(KbaseEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
     protected KbaseEntity doSave(KbaseEntity entity) {
         return kbaseRepository.save(entity);
     }
@@ -226,7 +215,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     @Override
     public KbaseResponse convertToResponse(KbaseEntity entity) {
-        return modelMapper.map(entity, KbaseResponse.class);
+        return KbaseConvertUtils.convertToKbaseResponse(entity);
     }
 
     public Page<CategoryResponse> getCategories(KbaseEntity kbaseEntity) {

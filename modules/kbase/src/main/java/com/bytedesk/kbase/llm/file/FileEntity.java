@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:10:09
+ * @LastEditTime: 2025-04-23 18:24:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.llm.split.SplitStatusEnum;
 
@@ -123,10 +124,13 @@ public class FileEntity extends BaseEntity {
 
     // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
-    private KbaseEntity kbaseEntity;
+    private KbaseEntity kbase;
 
     // 对应 uploadEntity 的 uid
-    private String uploadUid;
+    // private String uploadUid;
+    // 多对一关联UploadEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UploadEntity upload;
 
     // vector store id
     @Builder.Default

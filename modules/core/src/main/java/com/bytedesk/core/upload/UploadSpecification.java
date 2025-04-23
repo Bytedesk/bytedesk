@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-26 12:03:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:09:50
+ * @LastEditTime: 2025-04-23 18:10:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,6 +56,8 @@ public class UploadSpecification extends BaseSpecification {
             // orgUid
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            } else {
+                // TODO: 超级管理员查询所有
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

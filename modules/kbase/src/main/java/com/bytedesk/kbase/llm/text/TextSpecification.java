@@ -46,7 +46,7 @@ public class TextSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getKbUid())) {
                 // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段
-                predicates.add(criteriaBuilder.equal(root.get("kbaseEntity").get("uid"), request.getKbUid()));
+                predicates.add(criteriaBuilder.equal(root.get("kbase").get("uid"), request.getKbUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

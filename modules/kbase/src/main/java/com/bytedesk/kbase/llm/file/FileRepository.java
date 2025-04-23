@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 09:14:26
+ * @LastEditTime: 2025-04-23 18:27:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,5 +25,5 @@ public interface FileRepository extends JpaRepository<FileEntity, Long>, JpaSpec
 
     // Boolean existsByPlatform(String platform);
 
-    List<FileEntity> findByKbaseEntity_Uid(String kbUid);
+    List<FileEntity> findByKbase_Uid(String kbUid);
 }

@@ -67,7 +67,7 @@ public class SplitSpecification extends BaseSpecification {
             // kbUid
             if (StringUtils.hasText(request.getKbUid())) {
                 // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段
-                predicates.add(criteriaBuilder.equal(root.get("kbaseEntity").get("uid"), request.getKbUid()));
+                predicates.add(criteriaBuilder.equal(root.get("kbase").get("uid"), request.getKbUid()));
             }
             // userUid
             if (StringUtils.hasText(request.getUserUid())) {
