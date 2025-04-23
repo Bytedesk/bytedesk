@@ -299,9 +299,9 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         deleteByUid(entity.getUid());
     }
 
-    public void delateAll(QaRequest entity) {
+    public void delateAll(QaRequest request) {
         // 查询kbUid所有的问答对
-        List<QaEntity> qaEntities = findByKbUid(entity.getKbUid());
+        List<QaEntity> qaEntities = findByKbUid(request.getKbUid());
         // 遍历所有的问答对，设置deleted为true
         for (QaEntity qaEntity : qaEntities) {
             qaEntity.setDeleted(true);

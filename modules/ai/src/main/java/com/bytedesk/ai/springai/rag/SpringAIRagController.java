@@ -37,6 +37,8 @@ import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.ai.observation.annotation.AiObserved;
+import io.micrometer.observation.ObservationRegistry;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,6 +70,8 @@ public class SpringAIRagController {
     private final Optional<OllamaChatModel> ollamaChatModel;
 
     private final SpringAIVectorStoreService springAIVectorService;
+
+    private final ObservationRegistry observationRegistry;
 
     // rag
     // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_questionansweradvisor
@@ -388,6 +392,29 @@ public class SpringAIRagController {
         List<String> results = springAIVectorService.searchText(query, kbUid);
 
         return ResponseEntity.ok(JsonResult.success(results));
+    }
+
+    // 通过@AiObserved注解启用Observability监控
+    // http://127.0.0.1:9003/spring/ai/rag/observability?message=什么是Spring AI？
+    @AiObserved
+    @GetMapping("/observability")
+    ResponseEntity<JsonResult<?>> observabilityDemo(
+            @RequestParam(value = "message", defaultValue = "什么是Spring AI？") String message) {
+            
+        log.info("执行带有Observability监控的AI操作");
+        
+        // 使用chatClient - 通过ObservationRegistry可以自动收集操作指标
+        String answer = ChatClient.builder(ollamaChatModel.get())
+                .withObservationRegistry(observationRegistry)
+                .build()
+                .prompt()
+                .user(message)
+                .call()
+                .content();
+                
+        log.info("AI操作完成，响应内容长度: {}", answer.length());
+        
+        return ResponseEntity.ok(JsonResult.success(answer));
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:21:32
+ * @LastEditTime: 2025-04-23 09:18:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,6 +92,17 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         faqRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
+    }
+
+    // deleteAll
+    @ActionAnnotation(title = "常见问题", action = "删除所有", description = "delete faq all")
+    @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    @PostMapping("/deleteAll")
+    public ResponseEntity<?> deleteAll(@RequestBody FaqRequest request) {
+
+        faqRestService.delateAll(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     // enable/disable faq
