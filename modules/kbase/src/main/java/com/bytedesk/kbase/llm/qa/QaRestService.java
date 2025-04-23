@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:34:37
+ * @LastEditTime: 2025-04-23 18:45:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -355,15 +355,15 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
 
     public QaEntity convertExcelToQa(QaExcel excel, String uploadType, String fileUid, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Qa.class); // String categoryUid,
-        QaEntity qa = QaEntity.builder().build();
-        qa.setUid(uidUtils.getUid());
-        qa.setQuestion(excel.getQuestion());
-        qa.setAnswer(excel.getAnswer());
-        qa.setType(MessageTypeEnum.fromValue(excel.getType()).name());
+        QaEntity qaEntity = QaEntity.builder().build();
+        qaEntity.setUid(uidUtils.getUid());
+        qaEntity.setQuestion(excel.getQuestion());
+        qaEntity.setAnswer(excel.getAnswer());
+        qaEntity.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         //
         Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
-            qa.setCategoryUid(categoryOptional.get().getUid());
+            qaEntity.setCategoryUid(categoryOptional.get().getUid());
         } else {
             // create category
             CategoryRequest categoryRequest = CategoryRequest.builder()
@@ -373,20 +373,20 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
                     .orgUid(orgUid)
                     .build();
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
-            qa.setCategoryUid(categoryResponse.getUid());
+            qaEntity.setCategoryUid(categoryResponse.getUid());
         }
-        qa.setFileUid(fileUid);
+        qaEntity.setFileUid(fileUid);
         // qa.setKbUid(kbUid);
-        qa.setOrgUid(orgUid);
+        qaEntity.setOrgUid(orgUid);
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
         if (kbase.isPresent()) {
-            qa.setKbase(kbase.get());
+            qaEntity.setKbase(kbase.get());
         } else {
             throw new RuntimeException("kbaseUid not found");
         }
         //
-        return qa;
+        return qaEntity;
     }
 
 }

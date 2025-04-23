@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:34:21
+ * @LastEditTime: 2025-04-23 18:43:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.llm.split.SplitStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -88,7 +87,8 @@ public class QaEntity extends BaseEntity {
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = QaStatusEnum.NEW.name();
+
     /**
      * 标签列表
      */
