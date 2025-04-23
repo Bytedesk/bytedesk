@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 16:06:45
+ * @LastEditTime: 2025-04-23 17:19:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -92,8 +92,13 @@ public class SpringAIEventListener {
     public void onTextCreateEvent(TextCreateEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextCreateEvent: {}", text.getName());
-        // 将Text实体添加到创建缓存中
-        textCreateMap.put(text.getUid(), text);
+        if (text.isAutoDeleteLlmSplit()) {
+            // 仅当文件需要分割时，才添加到创建缓存中
+            textCreateMap.put(text.getUid(), text);
+        } else if (text.isAutoGenerateLlmQa()) {
+            // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
+            // faqCreateMap.put(file.getUid(), file);
+        }
     }
 
     @EventListener
@@ -158,8 +163,15 @@ public class SpringAIEventListener {
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
         WebsiteEntity website = event.getWebsite();
         log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.getName());
-        // 生成document
-        springAiVectorService.readWebsite(website);
+        if (website.isAutoLlmSplit()) {
+            // 仅当文件需要分割时，才添加到创建缓存中
+            // websiteCreateMap.put(website.getUid(), website);
+            // 生成document
+            springAiVectorService.readWebsite(website);
+        } else if (website.isAutoGenerateLlmQa()) {
+            // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
+            // faqCreateMap.put(file.getUid(), file);
+        }
     }
 
     @EventListener
