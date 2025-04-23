@@ -211,7 +211,7 @@
 		<!--  开始：运行 Embedding 模型依赖   -->
 		<!-- https://github.com/deepjavalibrary/djl-demo -->
 		<!-- https://docs.djl.ai/master/docs/quick_start.html -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>ai.djl</groupId>
 			<artifactId>api</artifactId>
 			<version>${ai.djl.version}</version>
@@ -235,7 +235,7 @@
 			<groupId>ai.djl.onnxruntime</groupId>
 			<artifactId>onnxruntime-engine</artifactId>
 			<version>${ai.djl.version}</version>
-		</dependency>
+		</dependency> -->
 		<!--  结束：运行 Embedding 模型依赖   -->
 
 		<!-- https://java2ai.com/docs/1.0.0-M5.1/overview/?spm=5176.29160081.0.0.2856aa5cNBNg4X -->
