@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 10:24:19
+ * @LastEditTime: 2025-04-23 12:26:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
  * RAG知识库问答
  * https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html
  * https://mp.weixin.qq.com/s/ETmbEAE7lNligcM_A_GF8A
+ * https://www.xiaohongshu.com/explore/67b422600000000029008c9f?note_flow_source=wechat&xsec_token=CBKBzlIFWDRmY2lKlLXYLivyqzKeFCE-9sd-_DNTLH-rM=
  */
 @Slf4j
 @RestController
