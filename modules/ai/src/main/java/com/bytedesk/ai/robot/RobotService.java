@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 23:08:06
+ * @LastEditTime: 2025-04-23 23:10:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,11 +133,6 @@ public class RobotService {
         }
     }
 
-    // 
-    public void processSyncVisitorMessage(String messageJson) {
-        log.info("processSyncVisitorMessage: {}", messageJson);
-    }
-
     // 处理访客端SSE请求消息
     public void processSseVisitorMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseVisitorMessage: messageJson: {}", messageJson);
@@ -208,13 +203,10 @@ public class RobotService {
         }
     }
 
-    // 处理访客端同步请求消息，用于微信公众号等平台
-    public void processSyncVisitorMessage(String messageJson) {
+    // 处理访客端同步请求消息，机器人设置为stream=false的情况，用于微信公众号等平台
+    public MessageProtobuf processSyncVisitorMessage(String messageJson) {
         MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
         MessageTypeEnum messageType = messageProtobuf.getType();
-        if (messageType.equals(MessageTypeEnum.STREAM)) {
-            return;
-        }
         String query = messageProtobuf.getContent();
         log.info("robot processSyncMessage {}", query);
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
@@ -223,12 +215,15 @@ public class RobotService {
         }
         // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
         if (!messageType.equals(MessageTypeEnum.TEXT)) {
-            return;
+            return null;
         }
         // String threadTopic = threadProtobuf.getTopic();
         if (!threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-            return;
+            return null;
         }
+
+        
+        return messageProtobuf;
     }
 
     // websocket消息容易导致消息乱序，暂不采用
