@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 16:49:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 19:02:12
+ * @LastEditTime: 2025-04-23 19:05:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,10 +67,10 @@ public class QaElastic {
     @Field(type = FieldType.Boolean)
     private boolean enabled;
     
-    @Field(type = FieldType.Date)
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime createdAt;
     
-    @Field(type = FieldType.Date)
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime updatedAt;
     
     @Field(type = FieldType.Integer)
