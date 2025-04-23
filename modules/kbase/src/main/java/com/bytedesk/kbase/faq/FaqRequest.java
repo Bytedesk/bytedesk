@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 16:05:02
+ * @LastEditTime: 2025-04-23 15:05:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,14 @@ public class FaqRequest extends BaseRequest {
     // private Boolean valid = true;
     @Builder.Default
     private Boolean enabled = true;
+
+    // 是否开启自动生成enable_llm_qa问答
+    @Builder.Default
+    private Boolean autoGenerateLlmQa = false;
+
+    // 是否已经生成llm问答
+    @Builder.Default
+    private Boolean llmQaGenerated = false;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();

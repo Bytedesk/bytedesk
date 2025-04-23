@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 15:30:19
+ * @LastEditTime: 2025-04-23 15:03:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -126,6 +126,17 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
+
+    // 是否开启自动生成enable_llm_qa问答
+    @Builder.Default
+    @Column(name = "is_auto_generate_llm_qa")
+    private boolean autoGenerateLlmQa = false;
+
+    // 是否已经生成llm问答
+    @Builder.Default
+    @Column(name = "is_llm_qa_generated")
+    private boolean llmQaGenerated = false;
+
 
     // 有效开始日期
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 16:11:05
+ * @LastEditTime: 2025-04-23 15:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,6 +52,12 @@ public class FileResponse extends BaseResponse {
     private LocalDateTime endDate;
 
     private Boolean enabled;
+
+    // 是否开启自动生成enable_llm_qa问答
+    private Boolean autoGenerateLlmQa;
+
+    // 是否已经生成llm问答
+    private Boolean llmQaGenerated;
 
     private String categoryUid; // 所属分类
 
