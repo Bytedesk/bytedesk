@@ -294,11 +294,11 @@
 		</dependency>
 
 		<!-- 添加Spring AI Chat Observation依赖 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-autoconfigure-model-chat-observation</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- 添加Micrometer依赖 -->
 		<dependency>
