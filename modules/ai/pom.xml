@@ -113,10 +113,10 @@
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
 		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-redis -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-vector-store-redis</artifactId>
-		</dependency>
+		</dependency> -->
 		
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
 		<!--
