@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-18 12:06:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 13:57:36
+ * @LastEditTime: 2025-04-23 16:38:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,14 +16,14 @@ package com.bytedesk.core.upload;
 import com.bytedesk.core.base.BaseRequest;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadRequest extends BaseRequest {
@@ -42,19 +42,15 @@ public class UploadRequest extends BaseRequest {
 
     private String user;
 
-    // 大模型
-    // private String loader;
-
-    // private String splitter;
-
-    // private int docsCount;
-
-    // private boolean isLlm;
-    // private UploadTypeEnum type;
-
     private UploadStatusEnum status;
 
     private String categoryUid; // 所属分类
 
     private String kbUid; // 所属知识库
+
+    private String kbType;     // 知识库类型
+    
+    private Boolean isAvatar;  // 是否为头像
+    // 
+    private String extra; // 额外附加信息
 }

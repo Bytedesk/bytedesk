@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 09:28:26
+ * @LastEditTime: 2025-04-23 16:37:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.upload;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,10 +27,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -48,26 +50,24 @@ public class UploadEntity extends BaseEntity {
 
     private String fileType;
 
-    // @Enumerated(EnumType.STRING)
     @Builder.Default
-    // private ClientEnum client = ClientEnum.WEB;
     private String client = ClientEnum.WEB.name();
 
-    // @Enumerated(EnumType.STRING)
     @Builder.Default
-    // private boolean isLlm = false;
     @Column(name ="upload_type")
-    // private UploadTypeEnum type = UploadTypeEnum.LLM;
     private String type = UploadTypeEnum.LLM.name();
 
     @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private UploadStatusEnum status = UploadStatusEnum.UPLOADED;
     private String status = UploadStatusEnum.UPLOADED.name();
 
     private String categoryUid; // 所属分类
 
     private String kbUid; // 所属知识库
+
+    // 额外附加信息
+    @Builder.Default
+    @Column(name = "upload_extra", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)   
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 上传用户
     @Builder.Default
