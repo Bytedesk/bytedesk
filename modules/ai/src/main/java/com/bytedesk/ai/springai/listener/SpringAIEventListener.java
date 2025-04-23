@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 16:35:17
+ * @LastEditTime: 2025-04-23 16:06:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,9 +23,6 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.ai.springai.service.SpringAIFullTextService;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileErrorEvent;
-import com.bytedesk.core.redis.pubsub.RedisPubsubParseFileSuccessEvent;
-import com.bytedesk.core.redis.pubsub.message.RedisPubsubMessageFile;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
@@ -114,23 +111,25 @@ public class SpringAIEventListener {
         textUpdateMap.remove(text.getUid());
     }
 
+    // Qa仅用于全文搜索
     @EventListener
     public void onQaCreateEvent(QaCreateEvent event) {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getQuestion());
         // 将QA实体添加到创建缓存中
-        qaCreateMap.put(qa.getUid(), qa);
+        // qaCreateMap.put(qa.getUid(), qa);
         // 添加到全文索引
         springAIFullTextService.indexQa(qa);
     }
 
+    // Qa仅用于全文搜索
     @EventListener
     public void onQaUpdateDocEvent(QaUpdateDocEvent event) {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener QaUpdateDocEvent: {}", qa.getQuestion());
         if (!qa.isDeleted()) {
             // 将QA实体添加到更新缓存中
-            qaUpdateMap.put(qa.getUid(), qa);
+            // qaUpdateMap.put(qa.getUid(), qa);
             // 更新全文索引
             springAIFullTextService.indexQa(qa);
         }
@@ -347,15 +346,16 @@ public class SpringAIEventListener {
         }
     }
 
-    @EventListener
-    public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
-        RedisPubsubMessageFile messageFile = event.getMessageFile();
-        log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
-    }
+    // @EventListener
+    // public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
+    //     RedisPubsubMessageFile messageFile = event.getMessageFile();
+    //     log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
+    // }
 
-    @EventListener
-    public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent event) {
-        RedisPubsubMessageFile messageFile = event.getMessageFile();
-        log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
-    }
+    // @EventListener
+    // public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent event) {
+    //     RedisPubsubMessageFile messageFile = event.getMessageFile();
+    //     log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
+    // }
+
 }
