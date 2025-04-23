@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
 import com.bytedesk.core.enums.ClientEnum;
@@ -100,6 +101,17 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
+        // search type
+        if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.FULLTEXT.name()) {
+            // 使用全文搜索
+        } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.VECTOR.name()) {
+            // 使用向量搜索
+        } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.MIXED.name()) {
+            // 混合搜索
+        } else {
+            // 默认全文搜索
+        }
+
         // 判断是否开启大模型
         if (robot.getLlm().isEnabled()) {
             // 启用大模型
