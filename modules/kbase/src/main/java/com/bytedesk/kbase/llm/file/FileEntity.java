@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 15:31:05
+ * @LastEditTime: 2025-04-23 15:41:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,7 +67,7 @@ public class FileEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
-    // 是否开启自动生成enable_llm_qa问答
+    // 是否开启自动生成llm问答
     @Builder.Default
     @Column(name = "is_auto_generate_llm_qa")
     private boolean autoGenerateLlmQa = false;
