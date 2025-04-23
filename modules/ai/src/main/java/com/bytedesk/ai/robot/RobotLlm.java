@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 12:19:46
+ * @LastEditTime: 2025-04-23 14:06:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,16 +31,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RobotLlm {
 
-    // @Value("${spring.ai.ollama.chat.options.model:qwen2.5:latest}")
-    // private static String defaultModel;
-
-    // @Value("${spring.ai.ollama.embedding.options.model:qwen2.5:latest}")
-    // private static String defaultEmbeddingModel;
-
     // 默认启用llm问答
     @Builder.Default
     @Column(name = "is_llm_enabled")
     private boolean enabled = true;
+
+    // stream流式输出
+    @Builder.Default
+    @Column(name = "is_stream_enabled")
+    private boolean streamEnabled = true;
 
     // chat model provider
     @Builder.Default
