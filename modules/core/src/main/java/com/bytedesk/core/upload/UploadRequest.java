@@ -52,5 +52,9 @@ public class UploadRequest extends BaseRequest {
     
     private Boolean isAvatar;  // 是否为头像
     // 
+    private String visitorUid; // 游客ID
+    private String visitorNickname; // 游客昵称
+    private String visitorAvatar; // 游客头像
+    // 
     private String extra; // 额外附加信息
 }
