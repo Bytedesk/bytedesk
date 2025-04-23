@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 15:27:46
+ * @LastEditTime: 2025-04-23 18:44:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ public class QaEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
-        log.info("QaEventListener UploadEventListener create: {}", upload.toString());
         // 
         if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM_QA.name())) {
             // 检查文件类型是否为Excel
@@ -48,10 +47,11 @@ public class QaEventListener {
                 log.warn("不是Excel文件，无法导入问答对: {}", fileName);
                 return;
             }
+            log.info("QaEventListener LLM_QA: {}", fileName);
             
             // llm qa 问答对导入
             try {
-                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                Resource resource = uploadRestService.loadAsResource(fileName);
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("UploadEventListener loadAsResource: {}", filePath);
