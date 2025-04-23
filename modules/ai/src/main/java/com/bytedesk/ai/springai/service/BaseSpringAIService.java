@@ -102,41 +102,52 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
         // search type
+        List<String> searchContentList = new ArrayList<>();
         if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.FULLTEXT.name()) {
             // 使用全文搜索
+            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            searchContentList.addAll(fullTextList);
         } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.VECTOR.name()) {
             // 使用向量搜索
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
+            searchContentList.addAll(contentList);
+            // 
         } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.MIXED.name()) {
             // 混合搜索
+            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            searchContentList.addAll(fullTextList);
+            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
+            searchContentList.addAll(contentList);
         } else {
             // 默认全文搜索
+            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            searchContentList.addAll(fullTextList);
         }
+        log.info("BaseSpringAIService sendSseMessage searchContentList {}", searchContentList);
 
         // 判断是否开启大模型
         if (robot.getLlm().isEnabled()) {
             // 启用大模型
-            processLlmResponse(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } else {
             // 未开启大模型，关键词匹配，使用搜索
-            processSearchResponse(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processSearchResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply, emitter);
         }
     }
 
-    private void processLlmResponse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    private void processLlmResponse(String query, List<String> searchContentList, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
-            log.info("BaseSpringAIService processLlmResponse fullTextList {}", fullTextList);
-            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
-            if (contentList.isEmpty()) {
+            
+            if (searchContentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
                 String answer = RobotConsts.ROBOT_UNMATCHED;
                 processAnswerMessage(answer, robot, messageProtobufQuery, messageProtobufReply, emitter);
                 return;
             }
-            String context = String.join("\n", contentList);
+            String context = String.join("\n", searchContentList);
             // TODO: 根据配置，拉取历史聊天记录
             String history = "";
             prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
@@ -158,21 +169,19 @@ public abstract class BaseSpringAIService implements SpringAIService {
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
-    private void processSearchResponse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    private void processSearchResponse(String query, List<String> searchContentList, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
-            log.info("BaseSpringAIService processSearchResponse fullTextList {}", fullTextList);
-            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
-            if (contentList.isEmpty()) {
+
+            if (searchContentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
                 String answer = RobotConsts.ROBOT_UNMATCHED;
                 processAnswerMessage(answer, robot, messageProtobufQuery, messageProtobufReply, emitter);
                 return;
             } else {
                 // 搜索到内容，返回搜索内容
-                String answer = String.join("\n", contentList);
+                String answer = String.join("\n", searchContentList);
                 processAnswerMessage(answer, robot, messageProtobufQuery, messageProtobufReply, emitter);
             }
         } else {
