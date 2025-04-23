@@ -90,7 +90,7 @@ public class SpringAIFullTextService {
      * @param orgUid 组织UID（可选）
      * @return 搜索结果列表
      */
-    public List<String> searchQa(String query, String kbUid, String categoryUid, String orgUid) {
+    public List<QaElastic> searchQa(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("全文搜索QA: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         // 构建查询条件
@@ -130,14 +130,14 @@ public class SpringAIFullTextService {
             QaElastic.class
         );
         
-        // 解析结果 - 直接从QaElastic对象中获取uid
-        List<String> qaUidList = new ArrayList<>();
+        // 解析结果 - 返回完整的QaElastic对象
+        List<QaElastic> qaElasticList = new ArrayList<>();
         for (SearchHit<QaElastic> hit : searchHits) {
             QaElastic qaElastic = hit.getContent();
-            qaUidList.add(qaElastic.getUid());
+            qaElasticList.add(qaElastic);
         }
         
-        log.info("搜索到 {} 个QA结果", qaUidList.size());
-        return qaUidList;
+        log.info("搜索到 {} 个QA结果", qaElasticList.size());
+        return qaElasticList;
     }
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 16:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 18:40:32
+ * @LastEditTime: 2025-04-23 22:49:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.ai.springai.service.SpringAIFullTextService;
 import com.bytedesk.kbase.llm.qa.QaEntity;
 import com.bytedesk.kbase.llm.qa.QaRestService;
+import com.bytedesk.kbase.llm.qa.QaElastic;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,13 +64,13 @@ public class SearchController {
         
         Map<String, Object> result = new HashMap<>();
         try {
-            // 调用全文搜索服务搜索QA
-            List<String> qaUidList = springAIFullTextService.searchQa(query, kbUid, categoryUid, orgUid);
+            // 调用全文搜索服务搜索QA - 现在返回的是QaElastic对象列表
+            List<QaElastic> qaElasticList = springAIFullTextService.searchQa(query, kbUid, categoryUid, orgUid);
             
-            // 根据UID列表获取QA实体列表
+            // 根据QaElastic列表获取QA实体列表或者直接使用QaElastic列表
             List<QaEntity> qaList = new ArrayList<>();
-            for (String uid : qaUidList) {
-                qaRestService.findByUid(uid).ifPresent(qaList::add);
+            for (QaElastic qaElastic : qaElasticList) {
+                qaRestService.findByUid(qaElastic.getUid()).ifPresent(qaList::add);
             }
             
             // 构建返回结果

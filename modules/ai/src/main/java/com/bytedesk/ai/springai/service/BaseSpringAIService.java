@@ -26,6 +26,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.llm.qa.QaElastic;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -105,8 +106,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<String> searchContentList = new ArrayList<>();
         if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.FULLTEXT.name()) {
             // 使用全文搜索
-            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
-            searchContentList.addAll(fullTextList);
+            List<QaElastic> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            // 将QaElastic对象转换为格式化的字符串
+            for (QaElastic qa : fullTextList) {
+                String formattedQa = String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
+                searchContentList.add(formattedQa);
+            }
         } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.VECTOR.name()) {
             // 使用向量搜索
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
@@ -114,14 +119,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 
         } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.MIXED.name()) {
             // 混合搜索
-            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
-            searchContentList.addAll(fullTextList);
+            List<QaElastic> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            // 将QaElastic对象转换为格式化的字符串
+            for (QaElastic qa : fullTextList) {
+                String formattedQa = String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
+                searchContentList.add(formattedQa);
+            }
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
             searchContentList.addAll(contentList);
         } else {
             // 默认全文搜索
-            List<String> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
-            searchContentList.addAll(fullTextList);
+            List<QaElastic> fullTextList = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            // 将QaElastic对象转换为格式化的字符串
+            for (QaElastic qa : fullTextList) {
+                String formattedQa = String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
+                searchContentList.add(formattedQa);
+            }
         }
         log.info("BaseSpringAIService sendSseMessage searchContentList {}", searchContentList);
 
