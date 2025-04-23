@@ -293,12 +293,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- 添加Spring Boot Actuator依赖 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		
 		<!-- 添加Spring AI Chat Observation依赖 -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -311,12 +305,7 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-observation</artifactId>
 		</dependency>
-		
-		<!-- 可选: 添加Prometheus监控支持 -->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
-		</dependency>
+
 
 	</dependencies>
 
