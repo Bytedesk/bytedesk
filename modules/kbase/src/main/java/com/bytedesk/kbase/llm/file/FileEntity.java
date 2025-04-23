@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 15:04:25
+ * @LastEditTime: 2025-04-23 15:31:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,10 +57,6 @@ public class FileEntity extends BaseEntity {
     // 对应 uploadEntity 的 fileUrl
     private String fileUrl;
 
-    // @Builder.Default
-    // @Column(name = "file_type")
-    // private String type = MessageTypeEnum.FILE.name();
-
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -80,7 +76,6 @@ public class FileEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_llm_qa_generated")
     private boolean llmQaGenerated = false;
-
 
     // 有效开始日期
     @Builder.Default
