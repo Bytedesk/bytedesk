@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 15:51:44
+ * @LastEditTime: 2025-04-23 17:11:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,6 +76,14 @@ public class ArticleRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmQaGenerated = false;
 
+    // 是否开启自动删除llm问答
+    @Builder.Default
+    private Boolean autoDeleteLlmQa = false;
+
+    // 是否已经删除llm问答
+    @Builder.Default
+    private Boolean llmQaDeleted = false;
+
     // 是否开启自动llm split切块
     @Builder.Default
     private Boolean autoLlmSplit = false;
@@ -84,6 +92,14 @@ public class ArticleRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmSplitted = false;
 
+    // 是否开启自动删除llm split切块
+    @Builder.Default
+    private Boolean autoDeleteLlmSplit = false;
+
+    // 是否已经删除llm split切块
+    @Builder.Default
+    private Boolean llmSplitDeleted = false;
+    
     @Builder.Default
     private Boolean markdown = false;
 

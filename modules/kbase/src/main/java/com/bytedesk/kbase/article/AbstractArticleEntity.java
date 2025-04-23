@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 15:49:21
+ * @LastEditTime: 2025-04-23 17:09:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,7 +76,7 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     private boolean markdown = false;
 
-    // 是否开启自动生成enable_llm_qa问答
+    // 是否开启自动生成llm问答
     @Builder.Default
     @Column(name = "is_auto_generate_llm_qa")
     private boolean autoGenerateLlmQa = false;
@@ -85,6 +85,16 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_llm_qa_generated")
     private boolean llmQaGenerated = false;
+
+    // is auto delete llm qa
+    @Builder.Default
+    @Column(name = "is_auto_delete_llm_qa")
+    private boolean autoDeleteLlmQa = false;
+
+    // 是否已经删除llm问答
+    @Builder.Default
+    @Column(name = "is_llm_qa_deleted")
+    private boolean llmQaDeleted = false;
 
     // 是否开启自动llm split切块
     @Builder.Default
@@ -95,6 +105,16 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_llm_splitted")
     private boolean llmSplitted = false;
+
+    // is auto delete llm split
+    @Builder.Default
+    @Column(name = "is_auto_delete_llm_split")
+    private boolean autoDeleteLlmSplit = false;
+
+    // 是否已经删除llm split切块
+    @Builder.Default
+    @Column(name = "is_llm_split_deleted")
+    private boolean llmSplitDeleted = false;
 
     @Builder.Default
     private int readCount = 0;
