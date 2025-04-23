@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 16:53:58
+ * @LastEditTime: 2025-04-23 18:38:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,19 +67,35 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	private final AuthService authService;
 
+	@Override
+	public Page<UploadResponse> queryByOrg(UploadRequest request) {
+		Pageable pageable = request.getPageable();
+		Specification<UploadEntity> specification = UploadSpecification.search(request);
+		Page<UploadEntity> page = uploadRepository.findAll(specification, pageable);
+		return page.map(this::convertToResponse);
+	}
+
+	@Override
+	public Page<UploadResponse> queryByUser(UploadRequest request) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+	}
+
+	@Override
+	public UploadResponse queryByUid(UploadRequest request) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+	}
+
+	@Override
+	public Optional<UploadEntity> findByUid(String uid) {
+		return uploadRepository.findByUid(uid);
+	}
+
 	public UploadResponse create(UploadRequest request) {
 
 		UploadEntity upload = modelMapper.map(request, UploadEntity.class);
 		upload.setUid(uidUtils.getUid());
-		// upload.setClient(ClientEnum.fromValue(request.getClient()).name());
-		upload.setClient(request.getClient());
-		// upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
-		upload.setType(request.getType());
-		// if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
-		// 	upload.setStatus(UploadStatusEnum.PARSING.name());
-		// } else {
-		// 	upload.setStatus(UploadStatusEnum.UPLOADED.name());
-		// }
 		//
 		UploadEntity savedUpload = save(upload);
 		if (savedUpload == null) {
@@ -89,12 +105,10 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		return convertToResponse(savedUpload);
 	}
 
-	public UploadEntity save(UploadEntity upload) {
-		try {
-			return doSave(upload);
-		} catch (ObjectOptimisticLockingFailureException e) {
-			return handleOptimisticLockingFailureException(e, upload);
-		}
+	@Override
+	public UploadResponse update(UploadRequest request) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'update'");
 	}
 
 	@Override
@@ -112,6 +126,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				latestEntity.setStatus(entity.getStatus());
 				latestEntity.setFileName(entity.getFileName());
 				latestEntity.setFileUrl(entity.getFileUrl());
+				// 
 				return uploadRepository.save(latestEntity);
 			}
 		} catch (Exception ex) {
@@ -265,31 +280,6 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	// }
 
 	@Override
-	public Page<UploadResponse> queryByOrg(UploadRequest request) {
-		Pageable pageable = request.getPageable();
-		Specification<UploadEntity> specification = UploadSpecification.search(request);
-		Page<UploadEntity> page = uploadRepository.findAll(specification, pageable);
-		return page.map(this::convertToResponse);
-	}
-
-	@Override
-	public Page<UploadResponse> queryByUser(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-	}
-
-	@Override
-	public Optional<UploadEntity> findByUid(String uid) {
-		return uploadRepository.findByUid(uid);
-	}
-
-	@Override
-	public UploadResponse update(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'update'");
-	}
-
-	@Override
 	public void deleteByUid(String uid) {
 		Optional<UploadEntity> uploadOptional = findByUid(uid);
 		if (uploadOptional.isPresent()) {
@@ -307,16 +297,10 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	@Override
 	public UploadResponse convertToResponse(UploadEntity entity) {
-		UploadResponse uploadResponse = this.modelMapper.map(entity, UploadResponse.class);
-		// 上一行没有自动初始化isLlm字段，所以这里需要手动设置
-		// uploadResponse.setIsLlm(entity.isLlm());
-		return uploadResponse;
+		return ConvertUtils.convertToUploadResponse(entity);
 	}
 
-	
-
-	public UploadResponse handleFileUpload(MultipartFile file, 
-										UploadRequest request) {
+	public UploadResponse handleFileUpload(MultipartFile file, UploadRequest request) {
 		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}, extra {}", 
 		request.getFileName(), request.getFileType(), request.getKbType(), request.getExtra());
 
@@ -330,34 +314,17 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
                 .build();
 		} else {
 			userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+			request.setUserUid(user.getUid());
+			request.setOrgUid(user.getOrgUid());
 		}		
 		String fileUrl = store(file, request.getFileName());
-		// 
-		request.setFileName(fileUrl);
+		request.setFileUrl(fileUrl);
 		request.setType(request.getKbType());
 		request.setUser(userProtobuf.toJson());
-		
-		// UploadRequest uploadRequest = UploadRequest.builder()
-		// 		.fileName(fileName)
-		// 		.fileSize(String.valueOf(file.getSize()))
-		// 		.fileUrl(fileUrl)
-		// 		.fileType(fileType)
-		// 		.type(kbType)
-		// 		.client(client)
-		// 		.user(JSON.toJSONString(userProtobuf))
-		// 		.categoryUid(categoryUid)
-		// 		.kbUid(kbUid)
-		// 		.extra(extra)
-		// 		.orgUid(orgUid)
-		// 		.build();
-		
+		// 
 		return create(request);
 	}
 
-	@Override
-	public UploadResponse queryByUid(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-	}
+	
 
 }

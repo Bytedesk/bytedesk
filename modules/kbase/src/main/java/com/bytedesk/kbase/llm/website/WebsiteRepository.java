@@ -25,5 +25,5 @@ public interface WebsiteRepository extends JpaRepository<WebsiteEntity, Long>, J
 
     // Boolean existsByPlatform(String platform);
 
-    List<WebsiteEntity> findByKbaseEntity_Uid(String kbUid);
+    List<WebsiteEntity> findByKbase_Uid(String kbUid);
 }

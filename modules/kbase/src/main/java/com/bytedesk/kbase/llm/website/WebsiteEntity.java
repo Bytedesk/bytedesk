@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:09:51
+ * @LastEditTime: 2025-04-23 18:32:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,10 +132,10 @@ public class WebsiteEntity extends BaseEntity {
 
     // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
-    private KbaseEntity kbaseEntity;
+    private KbaseEntity kbase;
 
     // 对应 uploadEntity 的 uid
-    private String uploadUid;
+    // private String uploadUid;
 
     // vector store id
     @Builder.Default

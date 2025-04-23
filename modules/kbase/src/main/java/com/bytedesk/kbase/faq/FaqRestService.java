@@ -115,7 +115,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     @Cacheable(value = "faq", key = "#kbUid", unless = "#result == null")
     public List<FaqEntity> findByKbUid(String kbUid) {
-        return faqRepository.findByKbaseEntity_Uid(kbUid);
+        return faqRepository.findByKbase_Uid(kbUid);
     }
 
     @Cacheable(value = "faq", key = "#question", unless = "#result == null")
@@ -170,7 +170,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             // 
             Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
             if (kbase.isPresent()) {
-                entity.setKbaseEntity(kbase.get());
+                entity.setKbase(kbase.get());
             } else {
                 throw new RuntimeException("kbaseUid not found");
             }
@@ -405,7 +405,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         //         .startDate(entity.getStartDate())
         //         .endDate(entity.getEndDate())
         //         .categoryUid(entity.getCategoryUid())
-        //         .kbUid(entity.getKbaseEntity().getUid())
+        //         .kbUid(entity.getKbase().getUid())
         //         .fileUid(entity.getFileUid())
         //         // .docUid(entity.getDocId())
         //         .createdAt(entity.getCreatedAt())
@@ -481,7 +481,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         // 
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
         if (kbase.isPresent()) {
-            faq.setKbaseEntity(kbase.get());
+            faq.setKbase(kbase.get());
         } else {
             throw new RuntimeException("kbaseUid not found");
         }
@@ -541,7 +541,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     // 
                     Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
                     if (kbase.isPresent()) {
-                        faq.setKbaseEntity(kbase.get());
+                        faq.setKbase(kbase.get());
                     } else {
                         throw new RuntimeException("kbaseUid not found");
                     }

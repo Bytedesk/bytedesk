@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 22:37:30
+ * @LastEditTime: 2025-04-23 18:34:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,7 +108,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
 
     @Cacheable(value = "qa", key="#kbUid", unless = "#result == null")
     public List<QaEntity> findByKbUid(String kbUid) {
-        return qaRepository.findByKbaseEntity_Uid(kbUid);
+        return qaRepository.findByKbase_Uid(kbUid);
     }
 
     @Cacheable(value = "qa", key = "#question", unless = "#result == null")
@@ -143,7 +143,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             //
             Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
             if (kbase.isPresent()) {
-                entity.setKbaseEntity(kbase.get());
+                entity.setKbase(kbase.get());
             } else {
                 throw new RuntimeException("kbaseUid not found");
             }
@@ -381,7 +381,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
         if (kbase.isPresent()) {
-            qa.setKbaseEntity(kbase.get());
+            qa.setKbase(kbase.get());
         } else {
             throw new RuntimeException("kbaseUid not found");
         }

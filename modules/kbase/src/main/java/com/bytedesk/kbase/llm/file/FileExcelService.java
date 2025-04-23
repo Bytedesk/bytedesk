@@ -55,7 +55,7 @@ public class FileExcelService {
         // excel.setLevel(entity.getLevel());
         // excel.setPlatform(entity.getPlatform());
         // excel.setCategoryUid(entity.getCategoryUid());
-        // excel.setKbUid(entity.getKbaseEntity().getUid());
+        // excel.setKbUid(entity.getKbase().getUid());
         // excel.setUploadUid(entity.getUploadUid());
         // excel.setUserUid(entity.getUserUid());
         // excel.setDocIdList(String.join(",", entity.getDocIdList()));

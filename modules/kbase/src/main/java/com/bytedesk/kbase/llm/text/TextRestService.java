@@ -90,7 +90,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
         if (kbase.isPresent()) {
-            entity.setKbaseEntity(kbase.get());
+            entity.setKbase(kbase.get());
         } else {
             throw new RuntimeException("kbaseUid not found");
         }

@@ -25,7 +25,7 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
 
     Boolean existsByUid(String uid);
 
-    List<FaqEntity> findByKbaseEntity_Uid(String kbUid);
+    List<FaqEntity> findByKbase_Uid(String kbUid);
 
     // auto complete, 根据问题关键字查询
     List<FaqEntity> findByQuestionContains(String question);

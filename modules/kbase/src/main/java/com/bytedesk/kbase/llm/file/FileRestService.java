@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:03:32
+ * @LastEditTime: 2025-04-23 18:37:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,8 +25,12 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadRestService;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -41,6 +45,8 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     private final UidUtils uidUtils;
 
     private final KbaseRestService kbaseRestService;
+
+    private final UploadRestService uploadRestService;
 
     @Override
     public Page<FileEntity> queryByOrgEntity(FileRequest request) {
@@ -76,9 +82,16 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
         if (kbase.isPresent()) {
-            entity.setKbaseEntity(kbase.get());
+            entity.setKbase(kbase.get());
         } else {
             throw new RuntimeException("kbaseUid not found");
+        }
+        // 
+        Optional<UploadEntity> upload = uploadRestService.findByUid(request.getUploadUid());
+        if (upload.isPresent()) {
+            entity.setUpload(upload.get());
+        } else {
+            throw new RuntimeException("uploadUid not found");
         }
 
         FileEntity savedEntity = save(entity);
@@ -139,7 +152,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
                 latestEntity.setOrgUid(entity.getOrgUid());
                 latestEntity.setUserUid(entity.getUserUid());
                 // latestEntity.setKbUid(entity.getKbUid());
-                latestEntity.setUploadUid(entity.getUploadUid());
+                // latestEntity.setUploadUid(entity.getUploadUid());
 
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
@@ -172,7 +185,10 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
 
     @Override
     public FileResponse convertToResponse(FileEntity entity) {
-        return modelMapper.map(entity, FileResponse.class);
+        FileResponse response = modelMapper.map(entity, FileResponse.class);
+        response.setKbase(KbaseConvertUtils.convertToKbaseResponse(entity.getKbase()));
+        response.setUpload(ConvertUtils.convertToUploadResponse(entity.getUpload()));
+        return response;
     }
 
     @Override

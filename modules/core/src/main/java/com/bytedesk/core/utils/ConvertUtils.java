@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 13:27:53
+ * @LastEditTime: 2025-04-23 18:36:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,6 +38,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.upload.UploadEntity;
+import com.bytedesk.core.upload.UploadResponse;
 
 public class ConvertUtils {
 
@@ -200,5 +202,12 @@ public class ConvertUtils {
     public static BytedeskPropertiesResponse convertToBytedeskPropertiesResponse(BytedeskProperties bytedeskProperties) {
         return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
     }
+
+    public static UploadResponse convertToUploadResponse(UploadEntity entity) {
+		UploadResponse uploadResponse = modelMapper.map(entity, UploadResponse.class);
+		// 上一行没有自动初始化isLlm字段，所以这里需要手动设置
+		// uploadResponse.setIsLlm(entity.isLlm());
+		return uploadResponse;
+	}
 
 }
