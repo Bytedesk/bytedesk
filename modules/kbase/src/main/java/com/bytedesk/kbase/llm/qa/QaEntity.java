@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:43:25
+ * @LastEditTime: 2025-04-23 18:58:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * qa: question answer for llm
+ * 用于全文检索：文件、文本、网站等所有全文检索内容全部存储在此
+ * 全文检索内容全部放到且仅放在此表中
  */
 @Entity
 @Data

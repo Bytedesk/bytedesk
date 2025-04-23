@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 16:49:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:26:11
+ * @LastEditTime: 2025-04-23 18:59:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 用于Elasticsearch的Qa实体
+ * 全文检索对应到elasticsearch的文档
+ * @author jackning
+ * 浏览器可视化插件管理 es-client: https://gitee.com/q2316367743/es-client
+ */
 @Data
 @Builder
 @NoArgsConstructor
