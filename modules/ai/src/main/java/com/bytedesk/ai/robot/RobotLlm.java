@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 10:39:23
+ * @LastEditTime: 2025-04-23 09:28:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,16 +50,30 @@ public class RobotLlm {
     @Column(name = "llm_score_threshold")
     private Double scoreThreshold = 0.5;
 
+    // chat model provider
     @Builder.Default
     @Column(name = "llm_provider")
-    private String provider = LlmConsts.DEFAULT_PROVIDER;
-    // private String provider = "ollama";
+    private String provider = LlmConsts.DEFAULT_CHAT_PROVIDER;
     
+    // chat model name
     @Builder.Default
     @Column(name = "llm_model")
-    private String model = LlmConsts.DEFAULT_MODEL; 
-    //"glm-4-flash";
-    // private String model = defaultModel;
+    private String model = LlmConsts.DEFAULT_CHAT_MODEL; 
+
+    // rerank model provider
+    @Builder.Default
+    @Column(name = "rerank_provider")
+    private String rerankProvider = LlmConsts.DEFAULT_RERANK_PROVIDER;
+
+    // rerank model name
+    @Builder.Default
+    @Column(name = "rerank_model")
+    private String rerankModel = LlmConsts.DEFAULT_RERANK_MODEL;
+
+    // search type
+    @Builder.Default
+    @Column(name = "search_type")
+    private String searchType = RobotSearchTypeEnum.FULLTEXT.name();
 
     // 迁移到kbase
     // @Builder.Default
