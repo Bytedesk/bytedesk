@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:21:08
+ * @LastEditTime: 2025-04-23 16:38:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -335,8 +335,10 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 										 String orgUid,
 										 UserProtobuf userProtobuf,
 										 String categoryUid,
-										 String kbUid) {
-		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}", fileName, fileType, kbType);
+										 String kbUid, 
+										 String extra) {
+		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}, extra {}", 
+		fileName, fileType, kbType, extra);
 		
 		String fileUrl = store(file, fileName);
 		
@@ -345,10 +347,13 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				.fileSize(String.valueOf(file.getSize()))
 				.fileUrl(fileUrl)
 				.fileType(fileType)
+				.kbType(kbType)
 				.client(client)
 				.user(JSON.toJSONString(userProtobuf))
 				.categoryUid(categoryUid)
 				.kbUid(kbUid)
+				.extra(extra)
+				.org
 				.build();
 		uploadRequest.setType(kbType);
 		uploadRequest.setOrgUid(orgUid);

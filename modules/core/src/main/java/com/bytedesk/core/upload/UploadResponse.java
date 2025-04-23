@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-18 12:06:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 17:54:37
+ * @LastEditTime: 2025-04-23 16:24:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ public class UploadResponse extends BaseResponse {
 
     private ClientEnum client;
 
-    // private Boolean isLlm;
     private UploadTypeEnum type;
 
     private UploadStatusEnum status;
@@ -50,7 +49,7 @@ public class UploadResponse extends BaseResponse {
 
     private String user;
 
-    // private LocalDateTime updatedAt;
-
     private List<String> docIdList;
+
+    private String extra;
 }

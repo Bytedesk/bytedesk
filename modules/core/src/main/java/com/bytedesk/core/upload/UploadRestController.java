@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:54:33
+ * @LastEditTime: 2025-04-23 16:26:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,41 +52,19 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 	@PostMapping("/file")
 	public ResponseEntity<?> uploadFile(
 			@RequestParam("file") MultipartFile file,
-			@RequestParam("file_name") String fileName,
-			@RequestParam("file_type") String fileType,
-			@RequestParam(name = "is_avatar", required = false, defaultValue = "false") Boolean isAvatar,
-			@RequestParam(name = "kb_type", required = false) String kbType,
-			@RequestParam(name = "category_uid", required = false) String categoryUid,
-			@RequestParam(name = "kb_uid", required = false) String kbUid,
-			@RequestParam(name = "client", required = false) String client) {
+			UploadRequest request) {
 		
 		UserEntity user = authService.getUser();
 		UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
 		
 		UploadResponse response = uploadService.handleFileUpload(
-				file, fileName, fileType, kbType, client,
-				user.getOrgUid(), userProtobuf, categoryUid, kbUid);
+				file, request.getFileName(), request.getFileType(), 
+				request.getKbType(), request.getClient(),
+				user.getOrgUid(), userProtobuf, request.getCategoryUid(), request.getKbUid());
 		
 		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}
 
-	// @ActionAnnotation(title = "上传", action = "process", description = "process upload")
-	// @PostMapping("/process")
-	// public ResponseEntity<?> process(@RequestBody UploadRequest request) {
-
-	// 	Optional<UploadEntity> uploadOptional = uploadService.findByUid(request.getUid());
-	// 	if (uploadOptional.isPresent()) {
-	// 		UploadEntity upload = uploadOptional.get();
-	// 		// springAIVectorService.readSplitWriteToVectorStore(upload);
-	// 		//
-	// 		return ResponseEntity.ok(JsonResult.success("process success"));
-	// 	} else {
-	// 		log.error("upload not found");
-	// 		return ResponseEntity.badRequest().body(JsonResult.error("upload not found"));
-	// 	}
-	// }
-
-	// @PreAuthorize(RolePermissions.ROLE_ADMIN)
 	@Override
 	public ResponseEntity<?> queryByOrg(UploadRequest request) {
 
