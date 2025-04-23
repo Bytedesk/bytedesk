@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 16:26:29
+ * @LastEditTime: 2025-04-23 16:47:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.core.upload;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,11 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.auth.AuthService;
-// import com.bytedesk.core.rbac.role.RolePermissions;
-import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/upload")
 public class UploadRestController extends BaseRestController<UploadRequest> {
 
-	private final AuthService authService;
-
 	private final UploadRestService uploadService;
 	
 	@ActionAnnotation(title = "上传", action = "新建", description = "upload File")
@@ -53,14 +45,8 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 	public ResponseEntity<?> uploadFile(
 			@RequestParam("file") MultipartFile file,
 			UploadRequest request) {
-		
-		UserEntity user = authService.getUser();
-		UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
-		
-		UploadResponse response = uploadService.handleFileUpload(
-				file, request.getFileName(), request.getFileType(), 
-				request.getKbType(), request.getClient(),
-				user.getOrgUid(), userProtobuf, request.getCategoryUid(), request.getKbUid());
+	
+		UploadResponse response = uploadService.handleFileUpload(file, request);
 		
 		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}

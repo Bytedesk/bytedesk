@@ -71,7 +71,13 @@ public class SpringAIEventListener {
         FileEntity file = event.getFile();
         log.info("SpringAIEventListener onFileCreateEvent: {}", file.getFileName());
         // 将File实体添加到创建缓存中，而不是立即处理
-        fileCreateMap.put(file.getUid(), file);
+        if (file.isAutoLlmSplit()) {
+            // 仅当文件需要分割时，才添加到创建缓存中
+            fileCreateMap.put(file.getUid(), file);
+        } else if (file.isAutoGenerateLlmQa()) {
+            // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
+            // faqCreateMap.put(file.getUid(), file);
+        }
     }
 
     @EventListener

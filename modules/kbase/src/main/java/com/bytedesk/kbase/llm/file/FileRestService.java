@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 10:43:14
+ * @LastEditTime: 2025-04-23 17:03:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "file", key = "#uid", unless="#result==null")
+    @Cacheable(value = "file", key = "#uid", unless = "#result==null")
     @Override
     public Optional<FileEntity> findByUid(String uid) {
         return fileRepository.findByUid(uid);
@@ -69,17 +69,17 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
 
     @Override
     public FileResponse create(FileRequest request) {
-        
+
         FileEntity entity = modelMapper.map(request, FileEntity.class);
         entity.setUid(uidUtils.getUid());
 
         //
-            Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
-            if (kbase.isPresent()) {
-                entity.setKbaseEntity(kbase.get());
-            } else {
-                throw new RuntimeException("kbaseUid not found");
-            }
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        if (kbase.isPresent()) {
+            entity.setKbaseEntity(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
 
         FileEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -100,8 +100,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
                 throw new RuntimeException("Update file failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("File not found");
         }
     }
@@ -121,7 +120,8 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     }
 
     @Override
-    public FileEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FileEntity entity) {
+    public FileEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            FileEntity entity) {
         try {
             Optional<FileEntity> latest = fileRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -140,11 +140,11 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
                 latestEntity.setUserUid(entity.getUserUid());
                 // latestEntity.setKbUid(entity.getKbUid());
                 latestEntity.setUploadUid(entity.getUploadUid());
-                
+
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
                 latestEntity.setStatus(entity.getStatus());
-                
+
                 return fileRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -160,8 +160,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
             optional.get().setDeleted(true);
             save(optional.get());
             // fileRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("File not found");
         }
     }
@@ -175,11 +174,10 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     public FileResponse convertToResponse(FileEntity entity) {
         return modelMapper.map(entity, FileResponse.class);
     }
-    
 
     @Override
     public FileExcel convertToExcel(FileEntity file) {
         return modelMapper.map(file, FileExcel.class);
     }
-    
+
 }

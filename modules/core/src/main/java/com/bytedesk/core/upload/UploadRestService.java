@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 16:38:15
+ * @LastEditTime: 2025-04-23 16:53:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,14 +38,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.alibaba.fastjson2.JSON;
 
 // https://spring.io/guides/gs/uploading-files
 @Slf4j
@@ -63,6 +65,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	private final BytedeskProperties bytedeskProperties;
 
+	private final AuthService authService;
+
 	public UploadResponse create(UploadRequest request) {
 
 		UploadEntity upload = modelMapper.map(request, UploadEntity.class);
@@ -71,11 +75,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		upload.setClient(request.getClient());
 		// upload.setType(UploadTypeEnum.fromValue(request.getType()).name());
 		upload.setType(request.getType());
-		if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
-			upload.setStatus(UploadStatusEnum.PARSING.name());
-		} else {
-			upload.setStatus(UploadStatusEnum.UPLOADED.name());
-		}
+		// if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM.name())) {
+		// 	upload.setStatus(UploadStatusEnum.PARSING.name());
+		// } else {
+		// 	upload.setStatus(UploadStatusEnum.UPLOADED.name());
+		// }
 		//
 		UploadEntity savedUpload = save(upload);
 		if (savedUpload == null) {
@@ -233,24 +237,6 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			throw new UploadStorageFileNotFoundException("Could not read file: " + filename, e);
 		}
 	}
-	
-	// TODO: 待删除
-	// @Deprecated
-	// public Resource loadAsResourceOld(String filename) {
-	// 	try {
-	// 		Path file = uploadDir.resolve(filename);
-	// 		//load(filename);
-	// 		Resource resource = new UrlResource(file.toUri());
-	// 		if (resource.exists() || resource.isReadable()) {
-	// 			return resource;
-	// 		} else {
-	// 			throw new UploadStorageFileNotFoundException(
-	// 					"Could not read file: " + filename);
-	// 		}
-	// 	} catch (MalformedURLException e) {
-	// 		throw new UploadStorageFileNotFoundException("Could not read file: " + filename, e);
-	// 	}
-	// }
 
 	public void initUploadDir() {
 		try {
@@ -327,38 +313,45 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		return uploadResponse;
 	}
 
+	
+
 	public UploadResponse handleFileUpload(MultipartFile file, 
-										 String fileName, 
-										 String fileType, 
-										 String kbType,
-										 String client,
-										 String orgUid,
-										 UserProtobuf userProtobuf,
-										 String categoryUid,
-										 String kbUid, 
-										 String extra) {
+										UploadRequest request) {
 		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}, extra {}", 
-		fileName, fileType, kbType, extra);
+		request.getFileName(), request.getFileType(), request.getKbType(), request.getExtra());
+
+		UserEntity user = authService.getUser();
+		UserProtobuf userProtobuf = null;
+		if (user == null) {
+			userProtobuf = UserProtobuf.builder()
+				.uid(request.getVisitorUid())
+                .nickname(request.getVisitorNickname())
+                .avatar(request.getVisitorAvatar())
+                .build();
+		} else {
+			userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+		}		
+		String fileUrl = store(file, request.getFileName());
+		// 
+		request.setFileName(fileUrl);
+		request.setType(request.getKbType());
+		request.setUser(userProtobuf.toJson());
 		
-		String fileUrl = store(file, fileName);
+		// UploadRequest uploadRequest = UploadRequest.builder()
+		// 		.fileName(fileName)
+		// 		.fileSize(String.valueOf(file.getSize()))
+		// 		.fileUrl(fileUrl)
+		// 		.fileType(fileType)
+		// 		.type(kbType)
+		// 		.client(client)
+		// 		.user(JSON.toJSONString(userProtobuf))
+		// 		.categoryUid(categoryUid)
+		// 		.kbUid(kbUid)
+		// 		.extra(extra)
+		// 		.orgUid(orgUid)
+		// 		.build();
 		
-		UploadRequest uploadRequest = UploadRequest.builder()
-				.fileName(fileName)
-				.fileSize(String.valueOf(file.getSize()))
-				.fileUrl(fileUrl)
-				.fileType(fileType)
-				.kbType(kbType)
-				.client(client)
-				.user(JSON.toJSONString(userProtobuf))
-				.categoryUid(categoryUid)
-				.kbUid(kbUid)
-				.extra(extra)
-				.org
-				.build();
-		uploadRequest.setType(kbType);
-		uploadRequest.setOrgUid(orgUid);
-		
-		return create(uploadRequest);
+		return create(request);
 	}
 
 	@Override
