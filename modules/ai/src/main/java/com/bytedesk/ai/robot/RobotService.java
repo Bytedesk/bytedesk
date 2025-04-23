@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 17:15:21
+ * @LastEditTime: 2025-04-23 23:08:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -131,6 +131,11 @@ public class RobotService {
             springAIZhipuaiService
                     .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter));
         }
+    }
+
+    // 
+    public void processSyncVisitorMessage(String messageJson) {
+        log.info("processSyncVisitorMessage: {}", messageJson);
     }
 
     // 处理访客端SSE请求消息

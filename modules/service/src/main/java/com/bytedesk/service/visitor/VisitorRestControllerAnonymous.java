@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 23:27:50
+ * @LastEditTime: 2025-04-23 23:06:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -221,6 +221,22 @@ public class VisitorRestControllerAnonymous {
         
         return emitter;
     }
+
+
+    // message/sync
+    @BlackIpFilter(title = "black", action = "sync")
+    @BlackUserFilter(title = "black", action = "sync")
+    @TabooJsonFilter(title = "敏感词", action = "sync")
+    @ApiRateLimiter(value = 10.0, timeout = 1)
+    @VisitorAnnotation(title = "visitor", action = "sync", description = "sync visitor message")
+    @PostMapping("/message/sync")
+    public ResponseEntity<?> sync(@RequestBody VisitorRequest visitorRequest) {
+
+        
+
+        return ResponseEntity.ok(JsonResult.success("sync success"));
+    }
+
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
