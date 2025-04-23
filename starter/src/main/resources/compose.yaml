@@ -90,6 +90,12 @@ services:
       else
         echo 'bge-m3:latest model already exists'
       fi &&
+      if ! ollama list | grep -q 'linux6200/bge-reranker-v2-m3:latest'; then
+        echo 'Pulling linux6200/bge-reranker-v2-m3:latest model...'
+        ollama pull linux6200/bge-reranker-v2-m3:latest
+      else
+        echo 'linux6200/bge-reranker-v2-m3:latest model already exists'
+      fi &&
       wait"
     networks:
       - bytedesk-network
