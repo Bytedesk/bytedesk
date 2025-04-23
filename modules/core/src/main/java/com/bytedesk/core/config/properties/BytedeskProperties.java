@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 20:53:30
+ * @LastEditTime: 2025-04-23 17:44:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -167,7 +167,7 @@ public class BytedeskProperties {
     public static enum Edition {
         COMMUNITY, // 社区版-免费, 功能受限，人数不限
         ENTERPRISE, // 企业版-200人，付费，功能不限
-        ULTIMATE // 旗舰版-不限人数，付费，功能不限
+        PLATFORM // 平台版-不限人数，付费，功能不限
     }
 
     private String version; 
