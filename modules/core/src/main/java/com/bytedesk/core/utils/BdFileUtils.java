@@ -343,4 +343,19 @@ public class BdFileUtils {
         }
         return true;
     }
+
+
+    /**
+     * 判断文件是否为Excel文件
+     * 
+     * @param fileName 文件名
+     * @return 如果是Excel文件返回true，否则返回false
+     */
+    public static boolean isExcelFile(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return false;
+        }
+        String lowerFileName = fileName.toLowerCase();
+        return lowerFileName.endsWith(".xlsx") || lowerFileName.endsWith(".xls");
+    }
 }
