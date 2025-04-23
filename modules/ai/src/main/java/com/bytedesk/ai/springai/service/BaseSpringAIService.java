@@ -153,7 +153,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            
             if (searchContentList.isEmpty()) {
                 // 直接返回未找到相关问题答案
                 String answer = RobotConsts.ROBOT_UNMATCHED;
@@ -175,10 +174,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
-        
-        // 添加机器人配置信息到消息中，使子类能获取
-        // messageProtobufQuery.setRobotLlm(robot.getLlm());
-        
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
