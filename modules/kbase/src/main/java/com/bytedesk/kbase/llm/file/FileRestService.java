@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:07:41
+ * @LastEditTime: 2025-04-23 10:43:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -37,6 +39,8 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     public Page<FileEntity> queryByOrgEntity(FileRequest request) {
@@ -68,6 +72,14 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
         
         FileEntity entity = modelMapper.map(request, FileEntity.class);
         entity.setUid(uidUtils.getUid());
+
+        //
+            Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+            if (kbase.isPresent()) {
+                entity.setKbaseEntity(kbase.get());
+            } else {
+                throw new RuntimeException("kbaseUid not found");
+            }
 
         FileEntity savedEntity = save(entity);
         if (savedEntity == null) {
