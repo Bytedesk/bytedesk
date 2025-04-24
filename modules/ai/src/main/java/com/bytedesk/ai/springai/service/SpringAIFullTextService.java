@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 16:47:44
+ * @LastEditTime: 2025-04-24 08:56:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.kbase.llm.qa.QaElastic;
 import com.bytedesk.kbase.llm.qa.QaEntity;
+import com.bytedesk.kbase.llm.qa.QaRestService;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -43,6 +44,9 @@ public class SpringAIFullTextService {
         
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
+
+    @Autowired
+    private QaRestService qaRestService;
     
     /**
      * 索引QA实体到Elasticsearch
@@ -58,6 +62,11 @@ public class SpringAIFullTextService {
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(qaElastic);
             log.info("QA索引成功: {}", qa.getUid());
+
+            // 将索引结果保存到数据库中
+            qa.setSuccess();
+            qaRestService.save(qa);
+
         } catch (Exception e) {
             log.error("索引QA时发生错误: {}, 错误消息: {}", qa.getUid(), e.getMessage(), e);
         }
