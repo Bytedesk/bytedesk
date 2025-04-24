@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 16:26:06
+ * @LastEditTime: 2025-04-24 16:27:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -164,7 +164,8 @@ public class MemberEventListener {
                 log.warn("不是Excel文件，无法导入成员: {}", fileName);
                 return;
             }
-
+            log.info("MemberEventListener MEMBER: {}", fileName);
+        
             // 导入Excel文件
             Resource resource = uploadService.loadAsResource(upload.getFileName());
             if (resource.exists()) {
