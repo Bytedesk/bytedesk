@@ -106,7 +106,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // sendSseTypingMessage(messageProtobuf, emitter);
         // search type
-        List<String> searchContentList = new ArrayList<>();
+        
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             //
             if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.FULLTEXT.name()) {
@@ -118,11 +118,31 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     String formattedQa = String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
                     searchContentList.add(formattedQa);
                 }
+                // 判断是否开启大模型
+                if (robot.getLlm().isEnabled()) {
+                    // 启用大模型
+                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                } else {
+                    // 未开启大模型，关键词匹配，使用搜索
+                    processSearchResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                }
             } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.VECTOR.name()) {
                 // 使用向量搜索
                 List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
                 searchContentList.addAll(contentList);
                 //
+                // 判断是否开启大模型
+                if (robot.getLlm().isEnabled()) {
+                    // 启用大模型
+                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                } else {
+                    // 未开启大模型，关键词匹配，使用搜索
+                    processSearchResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                }
             } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.MIXED.name()) {
                 // 混合搜索
                 List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
@@ -134,6 +154,16 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 }
                 List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
                 searchContentList.addAll(contentList);
+                // 判断是否开启大模型
+                if (robot.getLlm().isEnabled()) {
+                    // 启用大模型
+                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                } else {
+                    // 未开启大模型，关键词匹配，使用搜索
+                    processSearchResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                }
             } else {
                 // 默认全文搜索
                 List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
@@ -143,23 +173,25 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     String formattedQa = String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
                     searchContentList.add(formattedQa);
                 }
+                // 判断是否开启大模型
+                if (robot.getLlm().isEnabled()) {
+                    // 启用大模型
+                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                } else {
+                    // 未开启大模型，关键词匹配，使用搜索
+                    processSearchResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                }
             }
         }
         log.info("BaseSpringAIService sendSseMessage searchContentList {}", searchContentList);
 
-        // 判断是否开启大模型
-        if (robot.getLlm().isEnabled()) {
-            // 启用大模型
-            processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply, emitter);
-        } else {
-            // 未开启大模型，关键词匹配，使用搜索
-            processSearchResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply, emitter);
-        }
     }
 
     private void processLlmResponse(String query, List<String> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, 
+            MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
         //
         if (searchContentList.isEmpty()) {
@@ -186,7 +218,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     private void processSearchResponse(String query, List<String> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 
+        //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = RobotConsts.ROBOT_UNMATCHED;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 10:18:33
+ * @LastEditTime: 2025-04-24 13:19:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,6 +68,10 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     public Page<QaEntity> queryByOrgEntity(QaRequest request) {
         Pageable pageable = request.getPageable();
         Specification<QaEntity> spec = QaSpecification.search(request);
+        // 是否导出全部
+        if (request.isExportAll()) {
+            pageable = Pageable.unpaged();
+        }
         return qaRepository.findAll(spec, pageable);
     }
 
