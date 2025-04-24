@@ -139,8 +139,6 @@ public class SpringAIEventListener {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener QaUpdateDocEvent: {}", qa.getQuestion());
         if (!qa.isDeleted()) {
-            // 将QA实体添加到更新缓存中
-            // qaUpdateMap.put(qa.getUid(), qa);
             // 更新全文索引
             springAIFullTextService.indexQa(qa);
         }
