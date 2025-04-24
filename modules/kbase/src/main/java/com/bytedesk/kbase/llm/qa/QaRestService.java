@@ -92,6 +92,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         return queryByOrg(request);
     }
 
+    @Transactional
     @Override
     public QaResponse queryByUid(QaRequest request) {
         Optional<QaEntity> optionalEntity = findByUid(request.getUid());
@@ -103,6 +104,9 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
+            // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
+            // 插入问题消息
+
             return convertToResponse(savedEntity);
         }
         return null;
