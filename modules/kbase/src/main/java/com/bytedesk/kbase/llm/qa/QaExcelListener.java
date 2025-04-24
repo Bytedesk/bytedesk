@@ -54,6 +54,9 @@ public class QaExcelListener implements ReadListener<QaExcel> {
     public void invoke(QaExcel data, AnalysisContext context) {
         log.info("QaExcelListener invoke: {}", data.getQuestion());
         QaEntity qa = qaService.convertExcelToQa(data, uploadType, fileUid, kbUid, orgUid);
+        if (qa == null) {
+            return;
+        }
         cachedDataList.add(qa);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
