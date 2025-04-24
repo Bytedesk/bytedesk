@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 12:34:16
+ * @LastEditTime: 2025-04-24 12:41:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ai.springai.providers.ollama;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,8 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -309,17 +306,19 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     
     // 添加一个新方法来检查SseEmitter是否已完成
     private boolean isEmitterCompleted(SseEmitter emitter) {
+        if (emitter == null) {
+            return true;
+        }
+        
         try {
-            // 尝试使用反射检查SseEmitter的完成状态
-            // 这里我们尝试获取ResponseBodyEmitter中的completed字段
-            Field completedField = ResponseBodyEmitter.class.getDeclaredField("completed");
-            completedField.setAccessible(true);
-            Boolean completed = (Boolean) completedField.get(emitter);
-            return completed != null && completed;
+            // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
+            // 使用一个空注释作为心跳，这不会影响客户端
+            emitter.send(SseEmitter.event().comment("heartbeat"));
+            return false; // 如果发送成功，则表示emitter未完成
         } catch (Exception e) {
-            // 如果反射失败，我们采用更安全的方式检查
-            log.warn("Could not determine emitter completion status via reflection", e);
-            return false;
+            // 如果发送失败，说明emitter已经完成或关闭
+            log.debug("Emitter appears to be completed: {}", e.getMessage());
+            return true;
         }
     }
 
