@@ -263,21 +263,32 @@ services:
       SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
       SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
       
-      # moonshot
-      SPRING_AI_MOONSHOT_CHAT_ENABLED: false
-      SPRING_AI_MINIMAX_CHAT_ENABLED: false
       # vector store
       SPRING_AI_VECTORSTORE_REDIS_INITIALIZE_SCHEMA: true
       # SPRING_AI_VECTORSTORE_REDIS_URI: redis://:qfRxz3tVT8Nh@redis-bytedesk:6379
       SPRING_AI_VECTORSTORE_REDIS_INDEX_NAME: bytedesk_vs_index
       # SPRING_AI_VECTORSTORE_REDIS_PREFIX: bytedesk_vs_prefix:
+      
+      # elasticsearch
+      # 浏览器可视化插件管理 es-client: https://gitee.com/q2316367743/es-client
+      # 配置参数 https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html#elasticsearchvector-properties
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch-bytedesk:9200
+      SPRING_ELASTICSEARCH_USERNAME: elastic
+      SPRING_ELASTICSEARCH_PASSWORD: bytedesk123
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED: true
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA: true
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INDEX_NAME: bytedesk_vs_index
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_DIMENSIONS: 1536
+      # cosine/l2_norm/dot_product
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_SIMILARITY: cosine
+      
       # mcp
       SPRING_AI_MCP_CLIENT_ENABLED: false
       SPRING_AI_MCP_SERVER_ENABLED: false
       SPRING_AI_MCP_SERVER_STDIO: false
       SPRING_AI_MCP_SERVER_TYPE: SYNC
       # weaviate
-      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: false
+      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: falsese
       # SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: true
       # wechat config
       WECHAT_PAY_ENABLED: false
@@ -317,6 +328,7 @@ volumes:
   elasticsearch_data:
     name: bytedesk_elasticsearch_data
   upload_data:
+    name: bytedesk_upload_data
 
 networks:
   bytedesk-network:
