@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 18:45:07
+ * @LastEditTime: 2025-04-24 12:00:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,6 +65,10 @@ public class SpringAIOllamaConfig {
     OllamaOptions bytedeskOllamaChatOptions() {
         return OllamaOptions.builder()
                 .model(ollamaChatOptionsModel)
+                // 使用keepAlive而不是timeout来设置超时
+                .keepAlive("30s") // 使用30秒的超时设置
+                // .numKeep(0)  // 不保留历史对话
+                .useNUMA(ollamaChatOptionsNuma) // 使用正确的方法名useNUMA而不是numa
                 .build();
     }
 
