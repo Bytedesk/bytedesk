@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:40:03
+ * @LastEditTime: 2025-04-24 09:46:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,6 +42,7 @@ public class QaRestControllerVisitor {
     private final MessageRestService messageRestService;
 
     // 输入联想搜索qa
+    @Deprecated
     @GetMapping("/search")
     public ResponseEntity<?> search(QaRequest request) {
 
@@ -54,9 +55,9 @@ public class QaRestControllerVisitor {
     @GetMapping("/suggest")
     public ResponseEntity<?> suggest(QaRequest request) {
 
-        qaService.suggestQa(request.getQuestion(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
+        List<QaElasticSearchResult> suggestList = qaService.suggestQa(request.getQuestion(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
 
-        return ResponseEntity.ok(JsonResult.success(page));
+        return ResponseEntity.ok(JsonResult.success(suggestList));
     }
 
     // 换一换qa
