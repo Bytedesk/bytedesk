@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-24 13:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 13:35:57
+ * @LastEditTime: 2025-04-24 14:02:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,8 @@
 package com.bytedesk.kbase.llm.qa;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
 
@@ -37,6 +39,9 @@ public class QaProtobuf implements Serializable {
     private String question;
 
     private String answer;
+
+    @Builder.Default
+    private List<QaProtobuf> relatedQas = new ArrayList<>();
 
     public static QaProtobuf fromJson(String qa) {
         return JSON.parseObject(qa, QaProtobuf.class);
