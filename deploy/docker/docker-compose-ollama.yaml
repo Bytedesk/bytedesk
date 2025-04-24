@@ -37,6 +37,30 @@ services:
     networks:
       - bytedesk-network
 
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=bytedesk123
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
     # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
@@ -281,7 +305,11 @@ services:
 
 volumes:
   mysql_data:
+    name: bytedesk_mysql_data
   redis_data:
+    name: bytedesk_redis_data
+  elasticsearch_data:
+    name: bytedesk_elasticsearch_data
   upload_data:
   ollama_data:
 
