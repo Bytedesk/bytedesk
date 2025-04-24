@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:44:33
+ * @LastEditTime: 2025-04-24 09:48:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -139,7 +139,12 @@ public class QaService {
         for (SearchHit<QaElastic> hit : searchHits) {
             QaElastic qaElastic = hit.getContent();
             float score = hit.getScore();
-            qaElasticResultList.add(new QaElasticSearchResult(qaElastic, score));
+            // 创建结果对象
+            QaElasticSearchResult result = QaElasticSearchResult.builder()
+                .qaElastic(qaElastic)
+                .score(score)
+                .build();
+            qaElasticResultList.add(result);
         }
  
         return qaElasticResultList;
@@ -193,24 +198,50 @@ public class QaService {
             boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
         }
         
-        // 构建查询
+        // 使用NativeQuery而不是直接处理高亮
         NativeQuery searchQuery = NativeQuery.builder()
             .withQuery(boolQueryBuilder.build()._toQuery())
+            .withFields("question", "questionList", "tagList") // 指定需要返回的字段
             .withMaxResults(10) // 限制结果数量
             .build();
         
-        // 执行搜索
+        // 执行搜索，暂时不使用高亮功能
         SearchHits<QaElastic> searchHits = elasticsearchOperations.search(
             searchQuery, 
             QaElastic.class
         );
         
-        // 处理结果，返回QaElasticSearchResult对象列表
+        // 处理结果，返回QaElasticSearchResult对象列表，并保留高亮功能
         List<QaElasticSearchResult> qaElasticResultList = new ArrayList<>();
         for (SearchHit<QaElastic> hit : searchHits) {
             QaElastic qaElastic = hit.getContent();
             float score = hit.getScore();
-            qaElasticResultList.add(new QaElasticSearchResult(qaElastic, score));
+            
+            // 创建结果对象
+            QaElasticSearchResult result = QaElasticSearchResult.builder()
+                .qaElastic(qaElastic)
+                .score(score)
+                .build();
+            
+            // 手动添加高亮
+            String question = qaElastic.getQuestion();
+            if (question != null && !question.trim().isEmpty() && query != null && !query.isEmpty()) {
+                // 在包含查询词的部分手动添加高亮标签
+                if (question.toLowerCase().contains(query.toLowerCase())) {
+                    int startIdx = question.toLowerCase().indexOf(query.toLowerCase());
+                    int endIdx = startIdx + query.length();
+                    String highlightedQuestion = question.substring(0, startIdx) + 
+                                  "<em>" + question.substring(startIdx, endIdx) + "</em>" +
+                                  question.substring(endIdx);
+                    result.setHighlightedQuestion(highlightedQuestion);
+                } else {
+                    result.setHighlightedQuestion(question);
+                }
+            } else if (question != null) {
+                result.setHighlightedQuestion(question);
+            }
+            
+            qaElasticResultList.add(result);
         }
         
         return qaElasticResultList;
