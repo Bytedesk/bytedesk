@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:19:49
+ * @LastEditTime: 2025-04-24 08:38:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -128,9 +128,7 @@ public class SpringAIEventListener {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getQuestion());
         // 将QA实体添加到创建缓存中
-        // qaCreateMap.put(qa.getUid(), qa);
-        // 添加到全文索引
-        springAIFullTextService.indexQa(qa);
+        qaCreateMap.put(qa.getUid(), qa);
     }
 
     // Qa仅用于全文搜索
@@ -253,7 +251,9 @@ public class SpringAIEventListener {
 
             qaCreateMap.forEach((uid, qa) -> {
                 try {
-                    springAiVectorService.readQa(qa);
+                    // springAiVectorService.readQa(qa); // qa不做向量
+                    // 仅做全文索引
+                    springAIFullTextService.indexQa(qa);
                     processedKeys.add(uid);
                 } catch (Exception e) {
                     log.error("处理QA创建失败: {} - {}", uid, e.getMessage());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 09:17:21
+ * @LastEditTime: 2025-04-24 08:45:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -121,6 +121,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     @Cacheable(value = "faq", key = "#question", unless = "#result == null")
     public List<FaqEntity> findByQuestionContains(String question) {
         return faqRepository.findByQuestionContains(question);
+    }
+
+    public Boolean existsByQuestionAndAnswerAndKbUidAndOrgUid(String question, String answer, String kbUid, String orgUid) {
+        return faqRepository.existsByQuestionAndAnswerAndKbase_UidAndOrgUid(question, answer, kbUid, orgUid);
     }
 
     public Boolean existsByUid(String uid) {
@@ -454,6 +458,11 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     public FaqEntity convertExcelToFaq(FaqExcel excel, String uploadType, String fileUid, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Faq.class); // String categoryUid,
+        // 检索问题+答案+kbUid+orgUid是否已经存在，如果存在则不创建新的问答对
+        if (existsByQuestionAndAnswerAndKbUidAndOrgUid(excel.getQuestion(), excel.getAnswer(), kbUid, orgUid)) {
+            return null;
+        }
+
         FaqEntity faq = FaqEntity.builder().build();
         faq.setUid(uidUtils.getUid());
         faq.setQuestion(excel.getQuestion());

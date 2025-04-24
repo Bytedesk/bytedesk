@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 17:00:06
+ * @LastEditTime: 2025-04-24 08:46:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,6 +56,9 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
     public void invoke(FaqExcel data, AnalysisContext context) {
         log.info("FaqExcelListener invoke: {}", JSON.toJSONString(data));
         FaqEntity faq = faqService.convertExcelToFaq(data, uploadType, fileUid, kbUid, orgUid);
+        if (faq == null) {
+            return;
+        }
         cachedDataList.add(faq);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
