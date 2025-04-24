@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 08:56:54
+ * @LastEditTime: 2025-04-24 09:05:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,9 +97,9 @@ public class SpringAIFullTextService {
      * @param kbUid 知识库UID（可选）
      * @param categoryUid 分类UID（可选）
      * @param orgUid 组织UID（可选）
-     * @return 搜索结果列表
+     * @return 带权重的搜索结果列表
      */
-    public List<QaElastic> searchQa(String query, String kbUid, String categoryUid, String orgUid) {
+    public List<QaElasticWithScore> searchQa(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("全文搜索QA: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         // 构建查询条件
@@ -139,14 +139,36 @@ public class SpringAIFullTextService {
             QaElastic.class
         );
         
-        // 解析结果 - 返回完整的QaElastic对象
-        List<QaElastic> qaElasticList = new ArrayList<>();
+        // 解析结果 - 返回带权重的QaElastic对象
+        List<QaElasticWithScore> qaElasticWithScoreList = new ArrayList<>();
         for (SearchHit<QaElastic> hit : searchHits) {
             QaElastic qaElastic = hit.getContent();
-            qaElasticList.add(qaElastic);
+            float score = hit.getScore();
+            qaElasticWithScoreList.add(new QaElasticWithScore(qaElastic, score));
         }
         
-        log.info("搜索到 {} 个QA结果", qaElasticList.size());
-        return qaElasticList;
+        log.info("搜索到 {} 个QA结果", qaElasticWithScoreList.size());
+        return qaElasticWithScoreList;
+    }
+
+    /**
+     * 带权重分数的QA搜索结果类
+     */
+    public static class QaElasticWithScore {
+        private QaElastic qaElastic;
+        private float score;
+        
+        public QaElasticWithScore(QaElastic qaElastic, float score) {
+            this.qaElastic = qaElastic;
+            this.score = score;
+        }
+        
+        public QaElastic getQaElastic() {
+            return qaElastic;
+        }
+        
+        public float getScore() {
+            return score;
+        }
     }
 }
