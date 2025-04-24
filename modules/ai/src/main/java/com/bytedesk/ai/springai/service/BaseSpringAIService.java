@@ -34,7 +34,6 @@ import com.bytedesk.kbase.llm.qa.QaService;
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson2.JSON;
 
-
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
 
@@ -107,123 +106,82 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
-        // sendSseTypingMessage(messageProtobuf, emitter);
-        // search type
+        
+        // 如果知识库未启用，直接返回
+        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
+            log.info("知识库未启用或未指定知识库UID");
+            return;
+        }
+        
         List<String> searchContentList = new ArrayList<>();
         List<QaProtobuf> qaProtobufList = new ArrayList<>();
-        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            //
-            if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.FULLTEXT.name()) {
-                log.info("使用全文搜索");
-                // 使用全文搜索
-                List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
-                // 将QaElastic对象转换为格式化的字符串
-                for (QaElasticSearchResult withScore : searchResults) {
-                    QaElastic qa = withScore.getQaElastic();
-                    String formattedQa = QaProtobuf.fromElastic(qa).toJson(); //String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
-                    searchContentList.add(formattedQa);
-                    // 
-                    QaProtobuf qaProtobuf = QaProtobuf.fromElastic(qa);
-                    qaProtobufList.add(qaProtobuf);
-                }
-                // 判断是否开启大模型
-                if (robot.getLlm().isEnabled()) {
-                    // 启用大模型
-                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                } else {
-                    // 未开启大模型，关键词匹配，使用搜索
-                    processSearchResponse(query, qaProtobufList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                }
-            } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.VECTOR.name()) {
-                log.info("使用向量搜索");
-                // 使用向量搜索
-                List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
-                searchContentList.addAll(contentList);
-                // 将QaElastic对象转换为格式化的字符串
-                for (String content : contentList) {
-                    // 
-                    QaProtobuf qaProtobuf = QaProtobuf.builder()
-                            .uid(uidUtils.getUid())
-                            .question(query)
-                            .answer(content)
-                            .build();
-                    qaProtobufList.add(qaProtobuf);
-                }
-                //
-                // 判断是否开启大模型
-                if (robot.getLlm().isEnabled()) {
-                    // 启用大模型
-                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                } else {
-                    // 未开启大模型，关键词匹配，使用搜索
-                    processSearchResponse(query, qaProtobufList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                }
-            } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.MIXED.name()) {
-                log.info("使用混合搜索");
-                // 混合搜索
-                List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
-                // 将QaElastic对象转换为格式化的字符串
-                for (QaElasticSearchResult withScore : searchResults) {
-                    QaElastic qa = withScore.getQaElastic();
-                    String formattedQa = QaProtobuf.fromElastic(qa).toJson(); //String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
-                    searchContentList.add(formattedQa);
-                    // 
-                    QaProtobuf qaProtobuf = QaProtobuf.fromElastic(qa);
-                    qaProtobufList.add(qaProtobuf);
-                }
-                List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
-                searchContentList.addAll(contentList);
-                // 将QaElastic对象转换为格式化的字符串
-                for (String content : contentList) {
-                    // 
-                    QaProtobuf qaProtobuf = QaProtobuf.builder()
-                            .uid(uidUtils.getUid())
-                            .question(query)
-                            .answer(content)
-                            .build();
-                    qaProtobufList.add(qaProtobuf);
-                }
-                // 判断是否开启大模型
-                if (robot.getLlm().isEnabled()) {
-                    // 启用大模型
-                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                } else {
-                    // 未开启大模型，关键词匹配，使用搜索
-                    processSearchResponse(query, qaProtobufList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                }
-            } else {
-                log.info("auto_reply search type not support: {}", robot.getLlm().getSearchType());
-                // 默认全文搜索
-                List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
-                // 将QaElastic对象转换为格式化的字符串
-                for (QaElasticSearchResult withScore : searchResults) {
-                    QaElastic qa = withScore.getQaElastic();
-                    String formattedQa = QaProtobuf.fromElastic(qa).toJson(); //String.format("问题: %s\n答案: %s", qa.getQuestion(), qa.getAnswer());
-                    searchContentList.add(formattedQa);
-                    // 
-                    QaProtobuf qaProtobuf = QaProtobuf.fromElastic(qa);
-                    qaProtobufList.add(qaProtobuf);
-                }
-                // 判断是否开启大模型
-                if (robot.getLlm().isEnabled()) {
-                    // 启用大模型
-                    processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                } else {
-                    // 未开启大模型，关键词匹配，使用搜索
-                    processSearchResponse(query, qaProtobufList, robot, messageProtobufQuery, messageProtobufReply,
-                            emitter);
-                }
-            }
+        
+        // 根据搜索类型执行相应的搜索
+        String searchType = robot.getLlm().getSearchType();
+        if (searchType == null) {
+            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
         }
+        
+        // 执行搜索
+        switch (RobotSearchTypeEnum.valueOf(searchType)) {
+            case VECTOR:
+                log.info("使用向量搜索");
+                executeVectorSearch(query, robot.getKbUid(), searchContentList, qaProtobufList);
+                break;
+            case MIXED:
+                log.info("使用混合搜索");
+                executeFulltextSearch(query, robot.getKbUid(), searchContentList, qaProtobufList);
+                executeVectorSearch(query, robot.getKbUid(), searchContentList, qaProtobufList);
+                break;
+            case FULLTEXT:
+            default:
+                log.info("使用全文搜索");
+                executeFulltextSearch(query, robot.getKbUid(), searchContentList, qaProtobufList);
+                break;
+        }
+        
+        // 根据是否启用LLM决定如何处理结果
+        if (robot.getLlm().isEnabled()) {
+            // 启用大模型
+            processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        } else {
+            // 未开启大模型，使用搜索结果直接回复
+            processSearchResponse(query, qaProtobufList, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        }
+        
         log.info("BaseSpringAIService sendSseMessage searchContentList {}", searchContentList);
-
+    }
+    
+    /**
+     * 执行全文搜索
+     */
+    private void executeFulltextSearch(String query, String kbUid, List<String> searchContentList, List<QaProtobuf> qaProtobufList) {
+        List<QaElasticSearchResult> searchResults = qaService.searchQa(query, kbUid, null, null);
+        for (QaElasticSearchResult withScore : searchResults) {
+            QaElastic qa = withScore.getQaElastic();
+            QaProtobuf qaProtobuf = QaProtobuf.fromElastic(qa);
+            
+            String formattedQa = qaProtobuf.toJson();
+            searchContentList.add(formattedQa);
+            qaProtobufList.add(qaProtobuf);
+        }
+    }
+    
+    /**
+     * 执行向量搜索
+     */
+    private void executeVectorSearch(String query, String kbUid, List<String> searchContentList, List<QaProtobuf> qaProtobufList) {
+        List<String> contentList = springAIVectorService.searchText(query, kbUid);
+        searchContentList.addAll(contentList);
+        
+        for (String content : contentList) {
+            QaProtobuf qaProtobuf = QaProtobuf.builder()
+                    .uid(uidUtils.getUid())
+                    .question(query)
+                    .answer(content)
+                    .build();
+            qaProtobufList.add(qaProtobuf);
+        }
     }
 
     private void processLlmResponse(String query, List<String> searchContentList, RobotProtobuf robot,
@@ -234,7 +192,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
         String context = String.join("\n", searchContentList);
@@ -259,19 +217,32 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
         } else {
             // 搜索到内容，返回搜索内容
-            // String answer = searchContentList.get(0).getAnswer();
-            String answer = JSON.toJSONString(searchContentList);
-            processAnswerMessage(answer, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            QaProtobuf firstQa = searchContentList.get(0);
+            QaProtobuf resultQa = QaProtobuf.builder()
+                    .uid(firstQa.getUid())
+                    .question(firstQa.getQuestion())
+                    .answer(firstQa.getAnswer())
+                    .build();
+            
+            // 如果有多个搜索结果，将其余的添加为相关问题
+            if (searchContentList.size() > 1) {
+                List<QaProtobuf> relatedQas = new ArrayList<>(searchContentList.subList(1, searchContentList.size()));
+                resultQa.setRelatedQas(relatedQas);
+            }
+            
+            // 将处理后的单个QaProtobuf对象转换为JSON字符串
+            String answer = JSON.toJSONString(resultQa);
+            processAnswerMessage(answer, MessageTypeEnum.QA, robot, messageProtobufQuery, messageProtobufReply, emitter);
         }
     }
 
-    private void processAnswerMessage(String answer, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    private void processAnswerMessage(String answer, MessageTypeEnum type, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        messageProtobufReply.setType(MessageTypeEnum.TEXT);
+        messageProtobufReply.setType(type);
         messageProtobufReply.setContent(answer);
         messageProtobufReply.setClient(ClientEnum.SYSTEM);
         // 保存消息到数据库
@@ -283,6 +254,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     .data(messageJson)
                     .id(messageProtobufReply.getUid())
                     .name("message"));
+            emitter.complete();
         } catch (Exception e) {
             log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
             emitter.completeWithError(e);
