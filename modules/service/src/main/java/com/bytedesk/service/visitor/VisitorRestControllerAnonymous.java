@@ -43,6 +43,7 @@ import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.message_unread.MessageUnreadService;
+import com.bytedesk.service.utils.KeepAliveHelper;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
@@ -167,7 +168,11 @@ public class VisitorRestControllerAnonymous {
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
         
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        // 延长超时时间至10分钟
+        SseEmitter emitter = new SseEmitter(600_000L);
+        
+        // 添加心跳机制，每30秒发送一个保活消息
+        KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
         
         executorService.execute(() -> {
             try {
@@ -186,6 +191,7 @@ public class VisitorRestControllerAnonymous {
         
         emitter.onCompletion(() -> {
             log.info("sendSseMemberMessage SSE connection completed");
+            KeepAliveHelper.removeKeepAliveEvent(emitter);
         });
         
         return emitter;
@@ -198,7 +204,11 @@ public class VisitorRestControllerAnonymous {
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
         
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        // 延长超时时间至10分钟
+        SseEmitter emitter = new SseEmitter(600_000L);
+        
+        // 添加心跳机制，每30秒发送一个保活消息
+        KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
         
         executorService.execute(() -> {
             try {
@@ -217,6 +227,7 @@ public class VisitorRestControllerAnonymous {
         
         emitter.onCompletion(() -> {
             log.info("sendSseVisitorMessage SSE connection completed");
+            KeepAliveHelper.removeKeepAliveEvent(emitter);
         });
         
         return emitter;

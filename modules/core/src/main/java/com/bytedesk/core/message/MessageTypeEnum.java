@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 15:22:03
+ * @LastEditTime: 2025-04-24 12:30:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,6 +46,7 @@ public enum MessageTypeEnum {
     TYPING, // 正在输入
     PROCESSING, // 正在处理，等待大模型回复中
     STREAM, // 流式消息TEXT，大模型回复
+    STREAM_START, // 流式消息开始
     STREAM_END, // 流式消息结束
     PREVIEW, // 消息预知
     RECALL, // 撤回

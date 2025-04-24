@@ -159,7 +159,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     private void processLlmResponse(String query, List<String> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, 
+            SseEmitter emitter) {
         //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
