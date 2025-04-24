@@ -95,6 +95,12 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmQaSynced = false;
 
+    // 同步到llm qa kbUid 
+    private String llmQaKbUid;
+
+    // 同步到llm qa uid
+    private String llmQaUid;
+
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
