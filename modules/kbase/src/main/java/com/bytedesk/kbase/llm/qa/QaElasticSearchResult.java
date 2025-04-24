@@ -9,15 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QaElasticWithScore {
+public class QaElasticSearchResult {
+    
     // QA内容
     private QaElastic qaElastic;
-    // 搜索得分
+   
     private float score;
-    
-    // 构造函数
-    public QaElasticWithScore(QaElastic qaElastic, float score) {
-        this.qaElastic = qaElastic;
-        this.score = score;
-    }
+ 
 }

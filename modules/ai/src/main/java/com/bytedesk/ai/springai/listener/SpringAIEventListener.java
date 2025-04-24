@@ -21,13 +21,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
-import com.bytedesk.ai.springai.service.SpringAIFullTextService;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
 import com.bytedesk.kbase.llm.file.event.FileDeleteEvent;
 import com.bytedesk.kbase.llm.qa.QaEntity;
+import com.bytedesk.kbase.llm.qa.QaService;
 import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
 import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
 import com.bytedesk.kbase.llm.qa.event.QaUpdateDocEvent;
@@ -48,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIEventListener {
 
     private final SpringAIVectorStoreService springAiVectorService;
-    private final SpringAIFullTextService springAIFullTextService;
+    private final QaService springAIFullTextService;
 
     // 存储收集到的FAQ实体，用于批量处理
     private final ConcurrentHashMap<String, FaqEntity> faqCreateMap = new ConcurrentHashMap<>();
