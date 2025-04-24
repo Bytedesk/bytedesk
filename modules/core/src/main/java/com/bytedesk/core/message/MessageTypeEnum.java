@@ -55,12 +55,18 @@ public enum MessageTypeEnum {
     KICKOFF, // kickoff other clients
     SHAKE, // shake window
     FAQ, // 点击查看常见问题
+    FAQ_Q, // 常见问题问题
+    FAQ_A, // 常见问题答案
     FAQ_UP, // 常见问题答案评价:UP
     FAQ_DOWN, // 常见问题答案评价:DOWN
     QA, // 点击查看问答对
+    QA_Q, // 问答对问题
+    QA_A, // 问答对答案
     QA_UP, // 问答对答案评价:UP
     QA_DOWN, // 问答对答案评价:DOWN
     ROBOT, // 机器人
+    ROBOT_Q, // 机器人问题
+    ROBOT_A, // 机器人答案
     ROBOT_UP, // 机器人答案评价:UP
     ROBOT_DOWN, // 机器人答案评价:DOWN
     RATE, // 访客主动评价
