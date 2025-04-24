@@ -175,6 +175,14 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         Optional<QaEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             QaEntity entity = optional.get();
+            // 
+            // 判断question/answer/questionList/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
+            if (entity.hasChanged(request)) {
+                // 发布事件，更新文档
+                QaUpdateDocEvent qaUpdateDocEvent = new QaUpdateDocEvent(entity);
+                bytedeskEventPublisher.publishEvent(qaUpdateDocEvent);
+            }
+            // 
             // modelMapper.map(request, entity);
             entity.setQuestion(request.getQuestion());
             entity.setQuestionList(request.getQuestionList());
@@ -187,13 +195,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());
-            
-            // 判断question/answer/questionList/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
-            if (entity.hasChanged(request)) {
-                // 发布事件，更新文档
-                QaUpdateDocEvent qaUpdateDocEvent = new QaUpdateDocEvent(entity);
-                bytedeskEventPublisher.publishEvent(qaUpdateDocEvent);
-            }
             //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
