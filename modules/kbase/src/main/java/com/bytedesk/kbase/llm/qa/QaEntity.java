@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:58:28
+ * @LastEditTime: 2025-04-24 08:54:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -173,6 +173,16 @@ public class QaEntity extends BaseEntity {
     //     this.setDownCount(this.downCount + 1);
     // }
 
+    public QaEntity setSuccess() {
+        this.setStatus(QaStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    public QaEntity setError() {
+        this.setStatus(QaStatusEnum.ERROR.name());
+        return this;
+    }
+
     /**
      * 获取指定VIP等级的答案，如果没有对应等级的答案，则返回默认答案
      * @param vipLevel 用户VIP等级
@@ -240,4 +250,5 @@ public class QaEntity extends BaseEntity {
     public String toJson() {
         return JSON.toJSONString(this);
     }
+
 }

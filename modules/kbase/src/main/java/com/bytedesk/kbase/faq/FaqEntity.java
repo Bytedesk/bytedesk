@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:25:01
+ * @LastEditTime: 2025-04-24 09:02:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,6 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.llm.split.SplitStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -93,7 +92,7 @@ public class FaqEntity extends BaseEntity {
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = FaqStatusEnum.NEW.name();
     /**
      * 标签列表
      */
@@ -118,24 +117,20 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private int downCount = 0;
 
-    // 当用户点踩的时候，是否显示转人工按钮
-    // @Builder.Default
-    // private boolean downShowTransferToAgentButton = true;
-
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
-    // 是否开启自动生成enable_llm_qa问答
+    // 是否开启自动同步到llm_qa问答
     @Builder.Default
-    @Column(name = "is_auto_generate_llm_qa")
-    private boolean autoGenerateLlmQa = false;
+    @Column(name = "is_auto_sync_llm_qa")
+    private boolean autoSyncLlmQa = false;
 
-    // 是否已经生成llm问答
+    // 是否已经同步llm问答
     @Builder.Default
-    @Column(name = "is_llm_qa_generated")
-    private boolean llmQaGenerated = false;
+    @Column(name = "is_llm_qa_synced")
+    private boolean llmQaSynced = false;
 
     // 有效开始日期
     @Builder.Default
@@ -203,6 +198,18 @@ public class FaqEntity extends BaseEntity {
     // public void down() {
     //     this.setDownCount(this.downCount + 1);
     // }
+
+    // set Success
+    public FaqEntity setSuccess() {
+        this.setStatus(FaqStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    // set Error
+    public FaqEntity setError() {
+        this.setStatus(FaqStatusEnum.ERROR.name());
+        return this;
+    }
 
     /**
      * 获取指定VIP等级的答案，如果没有对应等级的答案，则返回默认答案

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 15:05:13
+ * @LastEditTime: 2025-04-24 08:59:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.kbase.llm.split.SplitStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,7 +55,7 @@ public class FaqRequest extends BaseRequest {
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = FaqStatusEnum.NEW.name();
 
     // 被展示次数
     @Builder.Default
@@ -88,13 +87,13 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
 
-    // 是否开启自动生成enable_llm_qa问答
+    // 是否开启自动同步到llm_qa问答
     @Builder.Default
-    private Boolean autoGenerateLlmQa = false;
+    private Boolean autoSyncLlmQa = false;
 
-    // 是否已经生成llm问答
+    // 是否已经同步llm问答
     @Builder.Default
-    private Boolean llmQaGenerated = false;
+    private Boolean llmQaSynced = false;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
