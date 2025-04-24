@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 08:45:56
+ * @LastEditTime: 2025-04-24 14:40:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -91,6 +91,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         return queryByOrg(request);
     }
 
+    @Transactional
     @Override
     public FaqResponse queryByUid(FaqRequest request) {
         Optional<FaqEntity> optionalEntity = findByUid(request.getUid());
@@ -102,6 +103,9 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
+            // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
+            // 插入问题消息
+
             return convertToResponse(savedEntity);
         }
         return null;
