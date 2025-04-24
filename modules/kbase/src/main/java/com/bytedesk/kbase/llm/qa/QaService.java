@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 10:15:19
+ * @LastEditTime: 2025-04-24 16:35:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -188,9 +188,15 @@ public class QaService {
     }
 
     // 用户在输入过程中，给出输入联想
-    public List<QaElasticSearchResult> suggestQa(String query, String kbUid, String categoryUid, String orgUid) {
-        log.info("QA输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
+    public List<QaElasticSearchResult> suggestQa(QaRequest request) {
+        log.info("QA输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}", 
+            request.getQuestion(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
         
+        String query = request.getQuestion();
+        // String kbUid = request.getKbUid();
+        String categoryUid = request.getCategoryUid();
+        String orgUid = request.getOrgUid();
+        // 
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
@@ -223,9 +229,9 @@ public class QaService {
         boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
         
         // 添加可选的过滤条件：知识库、分类、组织
-        if (kbUid != null && !kbUid.isEmpty()) {
-            boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
-        }
+        // if (kbUid != null && !kbUid.isEmpty()) {
+        //     boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
+        // }
         
         if (categoryUid != null && !categoryUid.isEmpty()) {
             boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
