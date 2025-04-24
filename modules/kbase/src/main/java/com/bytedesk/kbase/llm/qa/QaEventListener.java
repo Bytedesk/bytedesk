@@ -100,7 +100,11 @@ public class QaEventListener {
         QaEntity qa = event.getQa();
         log.info("SpringAIEventListener onQaDeleteEvent: {}", qa.getQuestion());
         // 从全文索引中删除
-        qaService.deleteQa(qa.getUid());
+        boolean deleted = qaService.deleteQa(qa.getUid());
+        if (!deleted) {
+            log.warn("从Elasticsearch中删除QA索引失败: {}", qa.getUid());
+            // 可以考虑添加重试逻辑或者其他错误处理
+        }
     }
 
     @EventListener
