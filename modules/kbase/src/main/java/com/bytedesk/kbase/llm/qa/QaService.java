@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:48:11
+ * @LastEditTime: 2025-04-24 10:15:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,14 @@ public class QaService {
      * @param qa 要索引的QA实体
      */
     public void indexQa(QaEntity qa) {
-        log.info("为QA创建索引: {}", qa.getUid());
+        // 检查文档是否已存在
+        boolean exists = elasticsearchOperations.exists(qa.getUid(), QaElastic.class);
+        
+        if (exists) {
+            log.info("更新已存在的QA索引: {}", qa.getUid());
+        } else {
+            log.info("为QA创建新索引: {}", qa.getUid());
+        }
         
         try {
             // 将QaEntity转换为QaElastic对象
@@ -56,7 +63,12 @@ public class QaService {
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(qaElastic);
-            log.info("QA索引成功: {}", qa.getUid());
+            
+            if (exists) {
+                log.info("QA索引更新成功: {}", qa.getUid());
+            } else {
+                log.info("QA索引创建成功: {}", qa.getUid());
+            }
 
             // 将索引结果保存到数据库中
             qa.setSuccess();
@@ -70,20 +82,45 @@ public class QaService {
     /**
      * 从Elasticsearch中删除QA的索引
      * @param qaUid 要删除的QA的UID
+     * @return 是否删除成功
      */
-    public void deleteQa(String qaUid) {
+    public boolean deleteQa(String qaUid) {
         log.info("从索引中删除QA: {}", qaUid);
         
-        // 首先创建一个Query对象，用于查询要删除的文档
-        Query query = NativeQuery.builder()
-            .withQuery(QueryBuilders.term().field("uid").value(qaUid).build()._toQuery())
-            .build();
-        
-        // 然后创建DeleteQuery对象，将Query作为参数传入
-        DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
-        
-        elasticsearchOperations.delete(deleteQuery, QaElastic.class);
-        log.info("成功删除QA索引: {}", qaUid);
+        try {
+            // 首先检查文档是否存在
+            boolean exists = elasticsearchOperations.exists(qaUid, QaElastic.class);
+            if (!exists) {
+                log.warn("索引中不存在此QA文档: {}", qaUid);
+                return true; // 文档不存在也视为删除成功
+            }
+            
+            // 创建Query对象，用于查询要删除的文档
+            Query query = NativeQuery.builder()
+                .withQuery(QueryBuilders.term().field("uid").value(qaUid).build()._toQuery())
+                .build();
+            
+            // 创建DeleteQuery对象
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
+            
+            // 执行删除 - 返回 ByQueryResponse 而不是 long
+            var response = elasticsearchOperations.delete(deleteQuery, QaElastic.class);
+            
+            // 从响应中获取删除的文档数
+            long deletedCount = response.getDeleted();
+            
+            // 检查删除结果
+            if (deletedCount > 0) {
+                log.info("成功删除QA索引: {}, 删除文档数: {}", qaUid, deletedCount);
+                return true;
+            } else {
+                log.warn("删除QA索引操作没有匹配到文档: {}", qaUid);
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("删除QA索引时发生错误: {}, 错误消息: {}", qaUid, e.getMessage(), e);
+            return false;
+        }
     }
     
     /**
