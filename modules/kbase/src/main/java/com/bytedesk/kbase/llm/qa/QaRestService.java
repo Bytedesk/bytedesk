@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 08:43:20
+ * @LastEditTime: 2025-04-24 10:02:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,12 +33,14 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm.qa.event.QaUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +61,8 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     private final AuthService authService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     public Page<QaEntity> queryByOrgEntity(QaRequest request) {
@@ -183,6 +187,13 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());
+            
+            // 判断question/answer/questionList/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
+            if (entity.hasChanged(request)) {
+                // 发布事件，更新文档
+                QaUpdateDocEvent qaUpdateDocEvent = new QaUpdateDocEvent(entity);
+                bytedeskEventPublisher.publishEvent(qaUpdateDocEvent);
+            }
             //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 08:54:03
+ * @LastEditTime: 2025-04-24 10:02:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -249,6 +249,49 @@ public class QaEntity extends BaseEntity {
     // to json
     public String toJson() {
         return JSON.toJSONString(this);
+    }
+
+    /**
+     * 判断问题和答案是否有变化
+     * @param request QaRequest 请求
+     * @return 如果问题或答案有变化返回 true，否则返回 false
+     */
+    public boolean hasChanged(QaRequest request) {
+        // 比较问题是否变化
+        if ((question == null && request.getQuestion() != null) ||
+            (question != null && !question.equals(request.getQuestion()))) {
+            return true;
+        }
+        
+        // 比较答案是否变化
+        if ((answer == null && request.getAnswer() != null) ||
+            (answer != null && !answer.equals(request.getAnswer()))) {
+            return true;
+        }
+        
+        // 比较问题列表是否变化
+        if ((questionList == null && request.getQuestionList() != null && !request.getQuestionList().isEmpty()) ||
+            (questionList != null && request.getQuestionList() == null) ||
+            (questionList != null && request.getQuestionList() != null && !questionList.equals(request.getQuestionList()))) {
+            return true;
+        }
+        
+        // 比较答案列表是否变化
+        if ((answerList == null && request.getAnswerList() != null && !request.getAnswerList().isEmpty()) ||
+            (answerList != null && request.getAnswerList() == null) ||
+            (answerList != null && request.getAnswerList() != null && !answerList.equals(request.getAnswerList()))) {
+            return true;
+        }
+        
+        // 比较标签列表是否变化
+        if ((tagList == null && request.getTagList() != null && !request.getTagList().isEmpty()) ||
+            (tagList != null && request.getTagList() == null) ||
+            (tagList != null && request.getTagList() != null && !tagList.equals(request.getTagList()))) {
+            return true;
+        }
+        
+        // 所有字段都没有变化
+        return false;
     }
 
 }

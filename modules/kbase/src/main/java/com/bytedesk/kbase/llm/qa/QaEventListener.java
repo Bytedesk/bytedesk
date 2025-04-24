@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:44:32
+ * @LastEditTime: 2025-04-24 10:07:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,11 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.core.utils.BdFileUtils;
+import com.bytedesk.kbase.faq.FaqEntity;
+import com.bytedesk.kbase.faq.event.FaqCreateEvent;
+import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
+import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
+import com.bytedesk.kbase.llm.qa.event.QaUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class QaEventListener {
+
+    private final QaService qaService;
 
     private final QaRestService qaRestService;
 
@@ -69,5 +76,49 @@ public class QaEventListener {
             }
         }
     }
-    
+
+    // Qa仅用于全文搜索
+    @EventListener
+    public void onQaCreateEvent(QaCreateEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getQuestion());
+        // 仅做全文索引
+        qaService.indexQa(qa);
+    }
+
+    // Qa仅用于全文搜索
+    @EventListener
+    public void onQaUpdateDocEvent(QaUpdateDocEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener QaUpdateDocEvent: {}", qa.getQuestion());
+        // 更新全文索引
+        qaService.indexQa(qa);
+    }
+
+    @EventListener
+    public void onQaDeleteEvent(QaDeleteEvent event) {
+        QaEntity qa = event.getQa();
+        log.info("SpringAIEventListener onQaDeleteEvent: {}", qa.getQuestion());
+        // 从全文索引中删除
+        qaService.deleteQa(qa.getUid());
+    }
+
+    @EventListener
+    public void onFaqCreateEvent(FaqCreateEvent event) {
+        FaqEntity faq = event.getFaq();
+        log.info("SpringAIEventListener onFaqCreateEvent: {}", faq.getQuestion());
+        // TODO: 将faq转换为qa, 用于全文搜索，kbUid待处理
+        // if (faq.isAutoSyncLlmQa()) {
+        //     // 将faq转换为qa, 用于全文搜索
+        //     QaRequest qaRequest = QaRequest.builder()
+        //         .question(faq.getQuestion())
+        //         .answer(faq.getAnswer())
+        //         .categoryUid(faq.getCategoryUid())
+        //         .orgUid(faq.getOrgUid())
+        //         .build();
+        // }
+
+    }
+
+
 }
