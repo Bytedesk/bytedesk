@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:32:38
+ * @LastEditTime: 2025-04-24 09:44:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -146,7 +146,7 @@ public class QaService {
     }
 
     // 用户在输入过程中，给出输入联想
-    public List<String> suggestQa(String query, String kbUid, String categoryUid, String orgUid) {
+    public List<QaElasticSearchResult> suggestQa(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("QA输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         if (query == null || query.trim().isEmpty()) {
@@ -193,42 +193,27 @@ public class QaService {
             boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
         }
         
-        // 使用NativeQuery而不是直接处理高亮
-        // Spring Data Elasticsearch 5.x版本中，使用highlight字段名方式
+        // 构建查询
         NativeQuery searchQuery = NativeQuery.builder()
             .withQuery(boolQueryBuilder.build()._toQuery())
-            .withFields("question", "questionList", "tagList") // 指定需要返回的字段
             .withMaxResults(10) // 限制结果数量
             .build();
         
-        // 执行搜索，暂时不使用高亮功能
+        // 执行搜索
         SearchHits<QaElastic> searchHits = elasticsearchOperations.search(
             searchQuery, 
             QaElastic.class
         );
         
-        // 处理结果，由于没有高亮功能，直接返回匹配的问题
-        List<String> suggestions = new ArrayList<>();
+        // 处理结果，返回QaElasticSearchResult对象列表
+        List<QaElasticSearchResult> qaElasticResultList = new ArrayList<>();
         for (SearchHit<QaElastic> hit : searchHits) {
             QaElastic qaElastic = hit.getContent();
-            // 优先使用主问题
-            String question = qaElastic.getQuestion();
-            if (question != null && !question.trim().isEmpty()) {
-                // 添加简单的高亮标记 - 在包含查询词的部分手动添加标签
-                if (query != null && !query.isEmpty() && question.toLowerCase().contains(query.toLowerCase())) {
-                    int startIdx = question.toLowerCase().indexOf(query.toLowerCase());
-                    int endIdx = startIdx + query.length();
-                    question = question.substring(0, startIdx) + 
-                              "<em>" + question.substring(startIdx, endIdx) + "</em>" +
-                              question.substring(endIdx);
-                }
-                suggestions.add(question);
-            }
+            float score = hit.getScore();
+            qaElasticResultList.add(new QaElasticSearchResult(qaElastic, score));
         }
         
-        // 去重
-        return suggestions.stream().distinct().toList();
+        return qaElasticResultList;
     }
-
 
 }
