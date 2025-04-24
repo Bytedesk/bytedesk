@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 17:22:54
+ * @LastEditTime: 2025-04-24 17:53:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -104,7 +104,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
-            // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
+            // TODO: 插入问题 + 答案 两条消息记录，目前放到发送消息里面
             // 插入问题消息
 
             return convertToResponse(savedEntity);
@@ -242,6 +242,8 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to rate up FAQ");
             }
+            // TODO: 更新消息状态
+
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("qa not found");
@@ -258,6 +260,8 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to rate down FAQ");
             }
+            // TODO: 更新消息状态
+            
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("qa not found");

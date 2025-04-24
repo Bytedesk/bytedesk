@@ -109,7 +109,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
-            // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
+            // TODO: 插入问题 + 答案 两条消息记录，目前放到发送消息里面
             // 插入问题消息
 
             return convertToResponse(savedEntity);
@@ -294,6 +294,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to rate up FAQ");
             }
+            // TODO: 更新消息状态
+
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("faq not found");
@@ -310,6 +312,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to rate down FAQ");
             }
+            // TODO: 更新消息状态
+
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("faq not found");
