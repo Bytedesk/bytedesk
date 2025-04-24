@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 17:33:18
+ * @LastEditTime: 2025-04-24 17:34:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,7 +50,6 @@ public class MessagePersistService {
 
         // 返回true表示该消息是系统通知，不应该保存到数据库
         if (dealWithMessageNotification(type, messageProtobuf)) {
-            // log.info("message should not be saved uid {}, type {}", messageProtobuf.getUid(), type);
             return;
         }
         //
@@ -165,10 +164,10 @@ public class MessagePersistService {
         }
 
         // QA
-        if (type.equals(MessageTypeEnum.QA)) {
-            dealWithQaMessage(messageProtobuf);
-            return true;
-        }
+        // if (type.equals(MessageTypeEnum.QA)) {
+        //     dealWithQaMessage(messageProtobuf);
+        //     return true;
+        // }
 
         //
         if (type.equals(MessageTypeEnum.ROBOT_UP)
@@ -181,22 +180,22 @@ public class MessagePersistService {
         }
 
         //
-        // if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)
-        //         || type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
-        //     // content为转接消息的uid
-        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
-        //         dealWithTransferMessage(type, messageProtobuf);
-        //         return true;
-        //     }
-        // }
+        if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)
+                || type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
+            // content为转接消息的uid
+            if (StringUtils.hasText(messageProtobuf.getContent())) {
+                dealWithTransferMessage(type, messageProtobuf);
+                return true;
+            }
+        }
 
-        // if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
-        //         || type.equals(MessageTypeEnum.INVITE_REJECT)) {
-        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
-        //         dealWithInviteMessage(type, messageProtobuf);
-        //         return true;
-        //     }
-        // }
+        if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
+                || type.equals(MessageTypeEnum.INVITE_REJECT)) {
+            if (StringUtils.hasText(messageProtobuf.getContent())) {
+                dealWithInviteMessage(type, messageProtobuf);
+                return true;
+            }
+        }
 
         return false;
     }
@@ -254,16 +253,6 @@ public class MessagePersistService {
         }
     }
 
-    private void dealWithQaMessage(MessageProtobuf message) {
-        // log.info("dealWithQaMessage");
-        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-        if (messageOpt.isPresent()) {
-            MessageEntity messageEntity = messageOpt.get();
-            
-            messageRestService.save(messageEntity);
-        }
-    }
-
     private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithFaqRateMessage");
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
@@ -290,6 +279,14 @@ public class MessagePersistService {
             }
             messageRestService.save(messageEntity);
         }
+    }
+
+    // 处理转接消息
+    private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
+    }
+
+    // 处理邀请消息
+    private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
     }
 
 
