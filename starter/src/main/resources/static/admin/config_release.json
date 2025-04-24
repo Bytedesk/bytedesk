@@ -1,6 +1,0 @@
-{
-    "enabled": false,
-    "apiUrl": "https://api.weiyuai.cn",
-    "websocketUrl": "wss://api.weiyuai.cn/websocket",
-    "htmlUrl": "https://www.weiyuai.cn"
-}
