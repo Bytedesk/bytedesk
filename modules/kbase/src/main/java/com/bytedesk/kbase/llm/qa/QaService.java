@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 15:26:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:07:38
+ * @LastEditTime: 2025-04-24 09:32:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,11 +11,10 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.service;
+package com.bytedesk.kbase.llm.qa;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -24,10 +23,6 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.kbase.llm.qa.QaElastic;
-import com.bytedesk.kbase.llm.qa.QaEntity;
-import com.bytedesk.kbase.llm.qa.QaRestService;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -40,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-public class SpringAIFullTextService {
+public class QaService {
         
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
@@ -97,9 +92,9 @@ public class SpringAIFullTextService {
      * @param kbUid 知识库UID（可选）
      * @param categoryUid 分类UID（可选）
      * @param orgUid 组织UID（可选）
-     * @return 带权重的搜索结果列表
+     * @return 带权重的搜索结果列表和元数据
      */
-    public List<QaElasticWithScore> searchQa(String query, String kbUid, String categoryUid, String orgUid) {
+    public List<QaElasticSearchResult> searchQa(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("全文搜索QA: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         // 构建查询条件
@@ -140,35 +135,100 @@ public class SpringAIFullTextService {
         );
         
         // 解析结果 - 返回带权重的QaElastic对象
-        List<QaElasticWithScore> qaElasticWithScoreList = new ArrayList<>();
+        List<QaElasticSearchResult> qaElasticResultList = new ArrayList<>();
         for (SearchHit<QaElastic> hit : searchHits) {
             QaElastic qaElastic = hit.getContent();
             float score = hit.getScore();
-            qaElasticWithScoreList.add(new QaElasticWithScore(qaElastic, score));
+            qaElasticResultList.add(new QaElasticSearchResult(qaElastic, score));
         }
-        
-        log.info("搜索到 {} 个QA结果", qaElasticWithScoreList.size());
-        return qaElasticWithScoreList;
+ 
+        return qaElasticResultList;
     }
 
-    /**
-     * 带权重分数的QA搜索结果类
-     */
-    public static class QaElasticWithScore {
-        private QaElastic qaElastic;
-        private float score;
+    // 用户在输入过程中，给出输入联想
+    public List<String> suggestQa(String query, String kbUid, String categoryUid, String orgUid) {
+        log.info("QA输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
-        public QaElasticWithScore(QaElastic qaElastic, float score) {
-            this.qaElastic = qaElastic;
-            this.score = score;
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 构建查询条件
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        
+        // 添加前缀匹配查询，主要针对问题字段
+        boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+            .field("question")
+            .query(query)
+            .boost(3.0f)
+            .build()._toQuery());
+            
+        // 也在问题列表中查找
+        boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+            .field("questionList")
+            .query(query)
+            .boost(2.0f)
+            .build()._toQuery());
+            
+        // 在标签中查找
+        boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+            .field("tagList")
+            .query(query)
+            .boost(1.0f)
+            .build()._toQuery());
+        
+        // 添加过滤条件：启用状态
+        boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+        
+        // 添加可选的过滤条件：知识库、分类、组织
+        if (kbUid != null && !kbUid.isEmpty()) {
+            boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
         }
         
-        public QaElastic getQaElastic() {
-            return qaElastic;
+        if (categoryUid != null && !categoryUid.isEmpty()) {
+            boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
         }
         
-        public float getScore() {
-            return score;
+        if (orgUid != null && !orgUid.isEmpty()) {
+            boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
         }
+        
+        // 使用NativeQuery而不是直接处理高亮
+        // Spring Data Elasticsearch 5.x版本中，使用highlight字段名方式
+        NativeQuery searchQuery = NativeQuery.builder()
+            .withQuery(boolQueryBuilder.build()._toQuery())
+            .withFields("question", "questionList", "tagList") // 指定需要返回的字段
+            .withMaxResults(10) // 限制结果数量
+            .build();
+        
+        // 执行搜索，暂时不使用高亮功能
+        SearchHits<QaElastic> searchHits = elasticsearchOperations.search(
+            searchQuery, 
+            QaElastic.class
+        );
+        
+        // 处理结果，由于没有高亮功能，直接返回匹配的问题
+        List<String> suggestions = new ArrayList<>();
+        for (SearchHit<QaElastic> hit : searchHits) {
+            QaElastic qaElastic = hit.getContent();
+            // 优先使用主问题
+            String question = qaElastic.getQuestion();
+            if (question != null && !question.trim().isEmpty()) {
+                // 添加简单的高亮标记 - 在包含查询词的部分手动添加标签
+                if (query != null && !query.isEmpty() && question.toLowerCase().contains(query.toLowerCase())) {
+                    int startIdx = question.toLowerCase().indexOf(query.toLowerCase());
+                    int endIdx = startIdx + query.length();
+                    question = question.substring(0, startIdx) + 
+                              "<em>" + question.substring(startIdx, endIdx) + "</em>" +
+                              question.substring(endIdx);
+                }
+                suggestions.add(question);
+            }
+        }
+        
+        // 去重
+        return suggestions.stream().distinct().toList();
     }
+
+
 }
