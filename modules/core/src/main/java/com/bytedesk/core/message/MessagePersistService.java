@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 18:05:24
+ * @LastEditTime: 2025-04-24 17:33:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -152,6 +152,8 @@ public class MessagePersistService {
             }
         }
 
+        // FAQ
+
         //
         if (type.equals(MessageTypeEnum.FAQ_UP)
                 || type.equals(MessageTypeEnum.FAQ_DOWN)) {
@@ -160,6 +162,12 @@ public class MessagePersistService {
                 dealWithFaqRateMessage(type, messageProtobuf);
                 return true;
             }
+        }
+
+        // QA
+        if (type.equals(MessageTypeEnum.QA)) {
+            dealWithQaMessage(messageProtobuf);
+            return true;
         }
 
         //
@@ -173,22 +181,22 @@ public class MessagePersistService {
         }
 
         //
-        if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)
-                || type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
-            // content为转接消息的uid
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithTransferMessage(type, messageProtobuf);
-                return true;
-            }
-        }
+        // if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)
+        //         || type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
+        //     // content为转接消息的uid
+        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
+        //         dealWithTransferMessage(type, messageProtobuf);
+        //         return true;
+        //     }
+        // }
 
-        if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
-                || type.equals(MessageTypeEnum.INVITE_REJECT)) {
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithInviteMessage(type, messageProtobuf);
-                return true;
-            }
-        }
+        // if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
+        //         || type.equals(MessageTypeEnum.INVITE_REJECT)) {
+        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
+        //         dealWithInviteMessage(type, messageProtobuf);
+        //         return true;
+        //     }
+        // }
 
         return false;
     }
@@ -246,6 +254,16 @@ public class MessagePersistService {
         }
     }
 
+    private void dealWithQaMessage(MessageProtobuf message) {
+        // log.info("dealWithQaMessage");
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        if (messageOpt.isPresent()) {
+            MessageEntity messageEntity = messageOpt.get();
+            
+            messageRestService.save(messageEntity);
+        }
+    }
+
     private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithFaqRateMessage");
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
@@ -272,77 +290,6 @@ public class MessagePersistService {
             }
             messageRestService.save(messageEntity);
         }
-    }
-
-    // 处理转接消息
-    private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
-        // NoticeExtraTransfer transferExtra = NoticeExtraTransfer.fromJson(message.getContent());
-        // if (type.equals(MessageTypeEnum.TRANSFER)) {
-        //     transferExtra.setStatus(MessageStatusEnum.TRANSFER_PENDING.name());
-        // } else if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)) {
-        //     transferExtra.setStatus(MessageStatusEnum.TRANSFER_ACCEPTED.name());
-        // } else if (type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
-        //     transferExtra.setStatus(MessageStatusEnum.TRANSFER_REJECTED.name());
-        // } else if (type.equals(MessageTypeEnum.TRANSFER_TIMEOUT)) {
-        //     transferExtra.setStatus(MessageStatusEnum.TRANSFER_TIMEOUT.name());
-        // } else if (type.equals(MessageTypeEnum.TRANSFER_CANCEL)) {
-        //     transferExtra.setStatus(MessageStatusEnum.TRANSFER_CANCELED.name());
-        // } else {
-        //     transferExtra.setStatus(type.name());
-        // }
-        // // 
-        // String messageUid = transferExtra.getMessageUid();
-        // Optional<MessageEntity> messageOpt = messageRestService.findByUid(messageUid);
-        // if (messageOpt.isPresent()) {
-        //     MessageEntity messageEntity = messageOpt.get();
-        //     messageEntity.setContent(transferExtra.toJson());
-        //     messageEntity.setStatus(transferExtra.getStatus());
-        //     messageRestService.save(messageEntity);
-        // }
-        // // 更新通知消息的状态
-        // Optional<MessageEntity> noticeMessageOpt = messageRestService.findTransferMessage(MessageTypeEnum.NOTICE.name(), messageUid, MessageStatusEnum.TRANSFER_PENDING.name());
-        // if (noticeMessageOpt.isPresent()) {
-        //     NoticeProtobuf noticeProtobuf = NoticeProtobuf.fromJson(message.getContent());
-        //     noticeProtobuf.setExtra(transferExtra.toJson());
-        //     MessageEntity noticeMessage = noticeMessageOpt.get();
-        //     noticeMessage.setContent(noticeProtobuf.toJson());
-        //     messageRestService.save(noticeMessage);
-        // }
-    }
-
-    // 处理邀请消息
-    private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
-        // NoticeExtraInvite inviteExtra = NoticeExtraInvite.fromJson(message.getContent()); 
-        // if (type.equals(MessageTypeEnum.INVITE)) {
-        //     inviteExtra.setStatus(MessageStatusEnum.INVITE_PENDING.name());
-        // } else if (type.equals(MessageTypeEnum.INVITE_ACCEPT)) {
-        //     inviteExtra.setStatus(MessageStatusEnum.INVITE_ACCEPTED.name());
-        // } else if (type.equals(MessageTypeEnum.INVITE_REJECT)) {
-        //     inviteExtra.setStatus(MessageStatusEnum.INVITE_REJECTED.name());
-        // } else if (type.equals(MessageTypeEnum.INVITE_TIMEOUT)) {
-        //     inviteExtra.setStatus(MessageStatusEnum.INVITE_TIMEOUT.name());
-        // } else if (type.equals(MessageTypeEnum.INVITE_CANCEL)) {
-        //     inviteExtra.setStatus(MessageStatusEnum.INVITE_CANCELED.name());
-        // } else {
-        //     inviteExtra.setStatus(type.name());
-        // }
-        // String messageUid = inviteExtra.getMessageUid();
-        // Optional<MessageEntity> messageOpt = messageRestService.findByUid(messageUid);
-        // if (messageOpt.isPresent()) {
-        //     MessageEntity messageEntity = messageOpt.get();
-        //     messageEntity.setContent(inviteExtra.toJson());
-        //     messageEntity.setStatus(inviteExtra.getStatus());
-        //     messageRestService.save(messageEntity);
-        // }
-        // // 更新通知消息的状态
-        // Optional<MessageEntity> noticeMessageOpt = messageRestService.findTransferMessage(MessageTypeEnum.NOTICE.name(), messageUid, MessageStatusEnum.INVITE_PENDING.name());
-        // if (noticeMessageOpt.isPresent()) {
-        //     MessageEntity noticeMessage = noticeMessageOpt.get();
-        //     NoticeProtobuf noticeProtobuf = NoticeProtobuf.fromJson(noticeMessage.getContent());
-        //     noticeProtobuf.setExtra(inviteExtra.toJson());
-        //     noticeMessage.setContent(noticeProtobuf.toJson());
-        //     messageRestService.save(noticeMessage);
-        // }
     }
 
 
