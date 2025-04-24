@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 08:38:16
+ * @LastEditTime: 2025-04-24 09:54:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,11 +26,6 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.llm.file.FileEntity;
 import com.bytedesk.kbase.llm.file.event.FileCreateEvent;
 import com.bytedesk.kbase.llm.file.event.FileDeleteEvent;
-import com.bytedesk.kbase.llm.qa.QaEntity;
-import com.bytedesk.kbase.llm.qa.QaService;
-import com.bytedesk.kbase.llm.qa.event.QaCreateEvent;
-import com.bytedesk.kbase.llm.qa.event.QaDeleteEvent;
-import com.bytedesk.kbase.llm.qa.event.QaUpdateDocEvent;
 import com.bytedesk.kbase.llm.text.TextEntity;
 import com.bytedesk.kbase.llm.text.event.TextCreateEvent;
 import com.bytedesk.kbase.llm.text.event.TextDeleteEvent;
@@ -48,15 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIEventListener {
 
     private final SpringAIVectorStoreService springAiVectorService;
-    private final QaService springAIFullTextService;
-
+    
     // 存储收集到的FAQ实体，用于批量处理
     private final ConcurrentHashMap<String, FaqEntity> faqCreateMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, FaqEntity> faqUpdateMap = new ConcurrentHashMap<>();
-
-    // 存储收集到的QA实体，用于批量处理
-    private final ConcurrentHashMap<String, QaEntity> qaCreateMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, QaEntity> qaUpdateMap = new ConcurrentHashMap<>();
 
     // 存储收集到的Text实体，用于批量处理
     private final ConcurrentHashMap<String, TextEntity> textCreateMap = new ConcurrentHashMap<>();
@@ -122,39 +112,6 @@ public class SpringAIEventListener {
         textUpdateMap.remove(text.getUid());
     }
 
-    // Qa仅用于全文搜索
-    @EventListener
-    public void onQaCreateEvent(QaCreateEvent event) {
-        QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaCreateEvent: {}", qa.getQuestion());
-        // 将QA实体添加到创建缓存中
-        qaCreateMap.put(qa.getUid(), qa);
-    }
-
-    // Qa仅用于全文搜索
-    @EventListener
-    public void onQaUpdateDocEvent(QaUpdateDocEvent event) {
-        QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener QaUpdateDocEvent: {}", qa.getQuestion());
-        if (!qa.isDeleted()) {
-            // 更新全文索引
-            springAIFullTextService.indexQa(qa);
-        }
-    }
-
-    @EventListener
-    public void onQaDeleteEvent(QaDeleteEvent event) {
-        QaEntity qa = event.getQa();
-        log.info("SpringAIEventListener onQaDeleteEvent: {}", qa.getQuestion());
-        // 删除qa对应的document，以及redis中缓存的document
-        springAiVectorService.deleteDocs(qa.getDocIdList());
-        // 从缓存中移除
-        qaCreateMap.remove(qa.getUid());
-        qaUpdateMap.remove(qa.getUid());
-        // 从全文索引中删除
-        springAIFullTextService.deleteQa(qa.getUid());
-    }
-
     @EventListener
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
         WebsiteEntity website = event.getWebsite();
@@ -187,10 +144,10 @@ public class SpringAIEventListener {
         processFaqUpdates();
 
         // 批量处理QA创建
-        processQaCreations();
+        // processQaCreations();
 
         // 批量处理QA更新
-        processQaUpdates();
+        // processQaUpdates();
 
         // 批量处理Text创建
         processTextCreations();
@@ -241,47 +198,6 @@ public class SpringAIEventListener {
 
             // 移除已处理的实体
             processedKeys.forEach(faqUpdateMap::remove);
-        }
-    }
-
-    private void processQaCreations() {
-        if (!qaCreateMap.isEmpty()) {
-            log.info("处理QA创建: 数量: {}", qaCreateMap.size());
-            Set<String> processedKeys = new HashSet<>();
-
-            qaCreateMap.forEach((uid, qa) -> {
-                try {
-                    // springAiVectorService.readQa(qa); // qa不做向量
-                    // 仅做全文索引
-                    springAIFullTextService.indexQa(qa);
-                    processedKeys.add(uid);
-                } catch (Exception e) {
-                    log.error("处理QA创建失败: {} - {}", uid, e.getMessage());
-                }
-            });
-
-            // 移除已处理的实体
-            processedKeys.forEach(qaCreateMap::remove);
-        }
-    }
-
-    private void processQaUpdates() {
-        if (!qaUpdateMap.isEmpty()) {
-            log.info("处理QA更新: 数量: {}", qaUpdateMap.size());
-            Set<String> processedKeys = new HashSet<>();
-
-            qaUpdateMap.forEach((uid, qa) -> {
-                try {
-                    springAiVectorService.deleteDocs(qa.getDocIdList());
-                    springAiVectorService.readQa(qa);
-                    processedKeys.add(uid);
-                } catch (Exception e) {
-                    log.error("处理QA更新失败: {} - {}", uid, e.getMessage());
-                }
-            });
-
-            // 移除已处理的实体
-            processedKeys.forEach(qaUpdateMap::remove);
         }
     }
 

@@ -39,7 +39,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected SpringAIVectorStoreService springAIVectorService;
 
     @Autowired
-    protected QaService springAIFullTextService;
+    protected QaService qaService;
 
     @Autowired
     protected IMessageSendService messageSendService;
@@ -108,7 +108,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<String> searchContentList = new ArrayList<>();
         if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.FULLTEXT.name()) {
             // 使用全文搜索
-            List<QaElasticSearchResult> searchResults = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
             // 将QaElastic对象转换为格式化的字符串
             for (QaElasticSearchResult withScore : searchResults) {
                 QaElastic qa = withScore.getQaElastic();
@@ -122,7 +122,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 
         } else if (robot.getLlm().getSearchType() == RobotSearchTypeEnum.MIXED.name()) {
             // 混合搜索
-            List<QaElasticSearchResult> searchResults = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
             // 将QaElastic对象转换为格式化的字符串
             for (QaElasticSearchResult withScore : searchResults) {
                 QaElastic qa = withScore.getQaElastic();
@@ -133,7 +133,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchContentList.addAll(contentList);
         } else {
             // 默认全文搜索
-            List<QaElasticSearchResult> searchResults = springAIFullTextService.searchQa(query, robot.getKbUid(), null, null);
+            List<QaElasticSearchResult> searchResults = qaService.searchQa(query, robot.getKbUid(), null, null);
             // 将QaElastic对象转换为格式化的字符串
             for (QaElasticSearchResult withScore : searchResults) {
                 QaElastic qa = withScore.getQaElastic();
