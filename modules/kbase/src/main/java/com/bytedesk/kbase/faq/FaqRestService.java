@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 14:40:57
+ * @LastEditTime: 2025-04-24 15:45:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,7 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -44,6 +45,9 @@ import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm.qa.QaRequest;
+import com.bytedesk.kbase.llm.qa.QaResponse;
+import com.bytedesk.kbase.llm.qa.QaRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +70,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     private final AuthService authService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final QaRestService qaRestService;
 
     @Override
     public Page<FaqEntity> queryByOrgEntity(FaqRequest request) {
@@ -457,7 +463,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         } else {
             excel.setEnabled("否");
         }
-
         return excel;
     }
 
@@ -485,12 +490,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
-            //
             CategoryResponse categoryResponse = categoryService.create(categoryRequest);
             faq.setCategoryUid(categoryResponse.getUid());
         }
         faq.setFileUid(fileUid);
-        // faq.setKbUid(kbUid);
         faq.setOrgUid(orgUid);
         // 
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
@@ -584,6 +587,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         try {
             // 加载JSON文件中的FAQ数据
             FaqConfiguration config = faqJsonLoader.loadFaqs();
+            String llmQaKbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
 
             // 遍历并保存每个FAQ
             for (Faq faq : config.getFaqs()) {
@@ -596,6 +600,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .answer(faq.getAnswer())
                             .type(MessageTypeEnum.TEXT.name())
                             .enabled(true)
+                            .autoSyncLlmQa(true)
+                            .llmQaKbUid(llmQaKbUid)
                             .kbUid(kbUid)
                             .orgUid(orgUid)
                             .build();
@@ -649,13 +655,11 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                         .kbUid(kbUid)
                         .orgUid(orgUid)
                         .build();
-                
                 // 为部分FAQ添加多答案和相关问题
                 if (count < 5) {
                     request.setAnswerList(answerList);
                     request.setRelatedFaqUids(relatedFaqUids);
                 }
-
                 update(request);
                 count++;
             }
@@ -664,6 +668,89 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         } catch (Exception e) {
             log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to initialize FAQ relations", e);
+        }
+    }
+
+    // 同步QA
+    public void syncQa(FaqEntity faq) {
+        if (faq.isAutoSyncLlmQa()) {
+            log.info("SpringAIEventListener onFaqCreateEvent: {}", faq.getQuestion());
+            // 将faq转换为qa, 用于全文搜索
+            QaRequest qaRequest = QaRequest.builder()
+                .question(faq.getQuestion())
+                .questionList(faq.getQuestionList())
+                .answer(faq.getAnswer())
+                .kbUid(faq.getLlmQaKbUid())
+                // .categoryUid(faq.getCategoryUid()) // 暂时不使用categoryUid，因为faq和qa是两个不同的库
+                .orgUid(faq.getOrgUid())
+                .build();
+            QaResponse qaResponse = qaRestService.create(qaRequest);
+            // 创建成功后，更新faq的llmQaUid
+            if (qaResponse != null) {
+                Optional<FaqEntity> faqEntityOptional = findByUid(faq.getUid());
+                if (faqEntityOptional.isPresent()) {
+                    FaqEntity faqEntity = faqEntityOptional.get();
+                    faqEntity.setLlmQaSynced(true);
+                    faqEntity.setLlmQaUid(qaResponse.getUid());
+                    save(faqEntity);
+                } else {
+                    log.warn("faq not found: {}", faq.getUid());
+                    return;
+                }
+            } else {
+                log.warn("创建QA失败: {}", faq.getQuestion());
+            }   
+        }
+    }
+
+    // 更新QA
+    public void syncUpdateQa(FaqEntity faq) {
+        if (faq.isAutoSyncLlmQa()) {
+            log.info("SpringAIEventListener onFaqUpdateEvent: {}", faq.getQuestion());
+            // 判断之前是否已经同步过，并且绑定llmQaUid
+            if (faq.isLlmQaSynced() && faq.getLlmQaUid()!= null) {
+                // 更新qa
+                QaRequest qaRequest = QaRequest.builder()
+                    .uid(faq.getLlmQaUid())
+                    .question(faq.getQuestion())
+                    .questionList(faq.getQuestionList())
+                    .answer(faq.getAnswer())
+                    .kbUid(faq.getLlmQaKbUid())
+                    // .categoryUid(faq.getCategoryUid()) // 暂时不使用categoryUid，因为faq和qa是两个不同的库
+                    .orgUid(faq.getOrgUid())
+                    .build();
+                QaResponse qaResponse = qaRestService.update(qaRequest);
+                if (qaResponse != null) {
+                    log.info("更新QA成功: {}", faq.getQuestion());
+                } else {
+                    log.warn("更新QA失败: {}", faq.getQuestion());
+                }
+            } else if (faq.isAutoSyncLlmQa()) {
+                // 如果没有同步过，则创建qa
+                QaRequest qaRequest = QaRequest.builder()
+                    .question(faq.getQuestion())
+                    .questionList(faq.getQuestionList())
+                    .answer(faq.getAnswer())
+                    .kbUid(faq.getLlmQaKbUid())
+                    // .categoryUid(faq.getCategoryUid()) // 暂时不使用categoryUid，因为faq和qa是两个不同的库
+                    .orgUid(faq.getOrgUid())
+                    .build();
+                QaResponse qaResponse = qaRestService.create(qaRequest);
+                if (qaResponse!= null) {
+                    log.info("创建QA成功: {}", faq.getQuestion());
+                    // 创建成功后，更新faq的llmQaUid
+                    Optional<FaqEntity> faqEntityOptional = findByUid(faq.getUid());
+                    if (faqEntityOptional.isPresent()) {
+                        FaqEntity faqEntity = faqEntityOptional.get();
+                        faqEntity.setLlmQaSynced(true);
+                        faqEntity.setLlmQaUid(qaResponse.getUid());
+                        save(faqEntity);
+                    } else {
+                        log.warn("faq not found: {}", faq.getUid());
+                        return;
+                    }
+                }
+            }
         }
     }
 

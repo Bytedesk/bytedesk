@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:38:38
+ * @LastEditTime: 2025-04-24 15:30:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -291,7 +291,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         kownledgebaseRequestNotebase.setOrgUid(orgUid);
         create(kownledgebaseRequestNotebase);
 
-        // 初始化AI知识库
+        // 初始化LLM知识库
         KbaseRequest kownledgebaseRequestLlm = KbaseRequest.builder()
                 .name(KbaseConsts.KB_LLM_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
