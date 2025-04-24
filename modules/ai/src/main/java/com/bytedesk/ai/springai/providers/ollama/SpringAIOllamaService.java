@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 07:18:56
+ * @LastEditTime: 2025-04-24 12:03:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai.providers.ollama;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -165,10 +167,11 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     @Override
     protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+        // RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例
-        OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel.orElse(null);
+        // OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel.orElse(null);
+        OllamaChatModel chatModel = bytedeskOllamaChatModel.orElse(null);
         
         if (chatModel == null) {
             log.info("Ollama API not available");
@@ -214,11 +217,12 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                 }
                             }
                         } catch (Exception e) {
+                            log.error("Ollama API SSE error 1: ", e);
                             handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         }
                     },
                     error -> {
-                        log.error("Ollama API SSE error: ", error);
+                        log.error("Ollama API SSE error 2: ", error);
                         handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     },
                     () -> {
@@ -236,11 +240,11 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     .name("message"));
                             emitter.complete();
                         } catch (Exception e) {
-                            log.error("Ollama Error completing SSE", e);
+                            log.error("Ollama Error completing SSE 3", e);
                         }
                     });
         } catch (Exception e) {
-            log.error("Error starting Ollama stream", e);
+            log.error("Error starting Ollama stream 4", e);
             handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
         }
     }
@@ -249,24 +253,50 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
                                MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         try {
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-            // 保存消息到数据库
-            persistMessage(messageProtobufQuery, messageProtobufReply);
-            String messageJson = messageProtobufReply.toJson();
-            
-            emitter.send(SseEmitter.event()
-                    .data(messageJson)
-                    .id(messageProtobufReply.getUid())
-                    .name("message"));
-            emitter.complete();
+            // 检查emitter是否已完成
+            if (emitter != null && !isEmitterCompleted(emitter)) {
+                messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+                String messageJson = messageProtobufReply.toJson();
+                
+                emitter.send(SseEmitter.event()
+                        .data(messageJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+                emitter.complete();
+            } else {
+                log.warn("SSE emitter already completed, skipping sending error message");
+                // 仍然需要持久化消息
+                messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+            }
         } catch (Exception e) {
             log.error("Error handling SSE error", e);
             try {
-                emitter.completeWithError(e);
+                if (emitter != null && !isEmitterCompleted(emitter)) {
+                    emitter.completeWithError(e);
+                }
             } catch (Exception ex) {
                 log.error("Failed to complete emitter with error", ex);
             }
+        }
+    }
+    
+    // 添加一个新方法来检查SseEmitter是否已完成
+    private boolean isEmitterCompleted(SseEmitter emitter) {
+        try {
+            // 尝试使用反射检查SseEmitter的完成状态
+            // 这里我们尝试获取ResponseBodyEmitter中的completed字段
+            Field completedField = ResponseBodyEmitter.class.getDeclaredField("completed");
+            completedField.setAccessible(true);
+            return (boolean) completedField.get(emitter);
+        } catch (Exception e) {
+            // 如果反射失败，我们假设emitter没有完成，让后续操作决定
+            log.warn("Could not determine emitter completion status", e);
+            return false;
         }
     }
 
