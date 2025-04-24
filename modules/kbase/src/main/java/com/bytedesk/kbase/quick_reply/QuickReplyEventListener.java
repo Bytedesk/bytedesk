@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-20 14:31:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 12:02:13
+ * @LastEditTime: 2025-04-24 16:26:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.utils.BdFileUtils;
 import com.alibaba.excel.EasyExcel;
 
 import lombok.RequiredArgsConstructor;
@@ -56,8 +57,16 @@ public class QuickReplyEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
-        log.info("UploadEventListener create: {}", upload.toString());
+        
         if (upload.getType().equalsIgnoreCase(UploadTypeEnum.QUICKREPLY.name())) {
+            // 检查文件类型是否为Excel
+            String fileName = upload.getFileName();
+            if (!BdFileUtils.isExcelFile(fileName)) {
+                log.warn("不是Excel文件，无法导入常见问题: {}", fileName);
+                return;
+            }
+            log.info("QuickReplyEventListener QUICKREPLY: {}", fileName);
+
             try {
                 // 导入Excel文件
                 Resource resource = uploadRestService.loadAsResource(upload.getFileName());

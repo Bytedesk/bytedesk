@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:52:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 09:18:29
+ * @LastEditTime: 2025-04-24 16:26:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -174,7 +174,6 @@ public class TicketEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
-        log.info("TicketEventListener upload bpmn create: {}", upload.toString());
         // 上传BPMN流程图
         if (upload.getType().equalsIgnoreCase(UploadTypeEnum.BPMN.name())) {
             // 启动流程
