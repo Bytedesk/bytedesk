@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 12:03:43
+ * @LastEditTime: 2025-04-24 12:34:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
@@ -166,12 +167,17 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        Assert.notNull(emitter, "SseEmitter must not be null");
         // 从robot中获取llm配置
-        // RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
 
-        // 获取适当的模型实例
-        // OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel.orElse(null);
+        // 获取适当的模型实例并配置较长的超时时间
         OllamaChatModel chatModel = bytedeskOllamaChatModel.orElse(null);
+        if (chatModel != null && llm != null) {
+            chatModel = createDynamicChatModel(llm);
+            // 配置更长的超时时间 - 5分钟
+            chatModel = configureModelWithTimeout(chatModel, 300000);
+        }
         
         if (chatModel == null) {
             log.info("Ollama API not available");
@@ -193,14 +199,27 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
 
         try {
+            // 发送初始消息，告知用户请求已收到，正在处理
+            if (!isEmitterCompleted(emitter)) {
+                messageProtobufReply.setType(MessageTypeEnum.STREAM_START);
+                messageProtobufReply.setContent("正在思考中...");
+                String startJson = messageProtobufReply.toJson();
+                emitter.send(SseEmitter.event()
+                        .data(startJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+            }
+            
             chatModel.stream(prompt).subscribe(
                     response -> {
                         try {
-                            if (response != null) {
+                            if (response != null && !isEmitterCompleted(emitter)) {
                                 List<Generation> generations = response.getResults();
                                 for (Generation generation : generations) {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
+                                    log.info("Ollama API response metadata: {}, text {}",
+                                            response.getMetadata(), textContent);
                                     
                                     if (StringUtils.hasLength(textContent)) {
                                         messageProtobufReply.setContent(textContent);
@@ -227,20 +246,23 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     },
                     () -> {
                         try {
-                            // 发送流结束标记
-                            messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                            messageProtobufReply.setContent(""); 
-                            // 保存消息到数据库
-                            persistMessage(messageProtobufQuery, messageProtobufReply);
-                            String messageJson = messageProtobufReply.toJson();
-                            //
-                            emitter.send(SseEmitter.event()
-                                    .data(messageJson)
-                                    .id(messageProtobufReply.getUid())
-                                    .name("message"));
-                            emitter.complete();
+                            if (!isEmitterCompleted(emitter)) {
+                                // 发送流结束标记
+                                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                                messageProtobufReply.setContent(""); 
+                                // 保存消息到数据库
+                                persistMessage(messageProtobufQuery, messageProtobufReply);
+                                String messageJson = messageProtobufReply.toJson();
+                                //
+                                emitter.send(SseEmitter.event()
+                                        .data(messageJson)
+                                        .id(messageProtobufReply.getUid())
+                                        .name("message"));
+                                emitter.complete();
+                            }
                         } catch (Exception e) {
                             log.error("Ollama Error completing SSE 3", e);
+                            handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         }
                     });
         } catch (Exception e) {
@@ -292,11 +314,42 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             // 这里我们尝试获取ResponseBodyEmitter中的completed字段
             Field completedField = ResponseBodyEmitter.class.getDeclaredField("completed");
             completedField.setAccessible(true);
-            return (boolean) completedField.get(emitter);
+            Boolean completed = (Boolean) completedField.get(emitter);
+            return completed != null && completed;
         } catch (Exception e) {
-            // 如果反射失败，我们假设emitter没有完成，让后续操作决定
-            log.warn("Could not determine emitter completion status", e);
+            // 如果反射失败，我们采用更安全的方式检查
+            log.warn("Could not determine emitter completion status via reflection", e);
             return false;
+        }
+    }
+
+    // 修改响应超时配置方法
+    private OllamaChatModel configureModelWithTimeout(OllamaChatModel model, long timeoutMillis) {
+        try {
+            // 因为OllamaOptions.Builder没有from方法，所以需要使用getDefaultOptions()获取当前选项
+            // 然后手动复制所有必要的配置
+            OllamaOptions defaultOptions = (OllamaOptions)model.getDefaultOptions();
+            
+            // 创建新的选项，设置超时时间
+            OllamaOptions options = OllamaOptions.builder()
+                    .model(defaultOptions.getModel())
+                    .temperature(defaultOptions.getTemperature())
+                    .topP(defaultOptions.getTopP())
+                    .topK(defaultOptions.getTopK())
+                    .numPredict(defaultOptions.getNumPredict())
+                    .numCtx(defaultOptions.getNumCtx())
+                    // 设置更长的保活时间
+                    .keepAlive(String.format("%ds", timeoutMillis / 1000)) // 将毫秒转换为秒，如"300s"
+                    .build();
+            
+            // 创建一个新的模型实例，具有更长的超时时间
+            return OllamaChatModel.builder()
+                    .ollamaApi(ollamaApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.warn("无法配置模型超时，使用默认模型: {}", e.getMessage());
+            return model;
         }
     }
 

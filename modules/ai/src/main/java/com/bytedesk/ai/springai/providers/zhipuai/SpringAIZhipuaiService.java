@@ -197,6 +197,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         emitter.complete();
                     } catch (Exception e) {
                         log.error("Zhipuai API SSE complete Error completing SSE", e);
+                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                     }
                 });
     }
