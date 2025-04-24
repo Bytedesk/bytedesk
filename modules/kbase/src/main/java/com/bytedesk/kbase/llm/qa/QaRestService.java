@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 10:02:43
+ * @LastEditTime: 2025-04-24 10:18:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -304,8 +304,9 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     public void deleteByUid(String uid) {
         Optional<QaEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            optional.get().setDeleted(true);
-            save(optional.get());
+            QaEntity entity = optional.get();
+            entity.setDeleted(true);
+            save(entity);
         }
     }
 
