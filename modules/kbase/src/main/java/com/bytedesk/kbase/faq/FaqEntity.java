@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:02:26
+ * @LastEditTime: 2025-04-24 15:07:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,6 +132,14 @@ public class FaqEntity extends BaseEntity {
     @Column(name = "is_llm_qa_synced")
     private boolean llmQaSynced = false;
 
+    // 同步到llm qa kbUid 
+    @Column(name = "llm_kb_uid")
+    private String llmQaKbUid;
+
+    // 同步到llm qa uid
+    @Column(name = "llm_qa_uid")
+    private String llmQaUid;
+
     // 有效开始日期
     @Builder.Default
     private LocalDateTime startDate = LocalDateTime.now();
@@ -148,22 +156,7 @@ public class FaqEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;
 
-    // used for auto-generate faq
-    // private String docId; // 对应文档
-
     private String fileUid; // 对应文件
-    
-    /**
-     * 排序权重
-     */
-    // @Builder.Default
-    // private int weight = 0;
-
-    /**
-     * 点击次数
-     */
-    // @Builder.Default
-    // private int hits = 0;
 
     // vector store id
     @Builder.Default

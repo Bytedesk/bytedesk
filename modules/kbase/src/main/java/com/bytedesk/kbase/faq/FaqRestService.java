@@ -155,6 +155,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (user != null) {
                 entity.setUserUid(user.getUid());
             }
+            // 
             // 如何将string类型startDate和endDate转换为LocalDateTime类型？
             // if (StringUtils.hasText(request.getStartDate())) {
             //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
@@ -163,6 +164,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
             // }
             // entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+            // 
             // 根据request.relatedFaqUids查找关联的FAQ
             List<FaqEntity> relatedFaqs = new ArrayList<>();
             for (String relatedFaqUid : request.getRelatedFaqUids()) {
@@ -174,7 +176,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 }
             }
             entity.setRelatedFaqs(relatedFaqs);
-
             // 
             Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
             if (kbase.isPresent()) {

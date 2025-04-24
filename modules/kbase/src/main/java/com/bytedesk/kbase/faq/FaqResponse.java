@@ -68,6 +68,13 @@ public class FaqResponse extends BaseResponse {
     // 是否已经同步llm问答
     private Boolean llmQaSynced;
 
+    // 同步到llm qa kbUid 
+    private String llmQaKbUid;
+
+    // 同步到llm qa uid
+    private String llmQaUid;
+
+
     private List<String> tagList;
 
     // 有效开始日期
