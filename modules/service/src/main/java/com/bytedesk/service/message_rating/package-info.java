@@ -3,6 +3,6 @@
  * 提供标签的CRUD、搜索等功能
  */
 @NonNullApi
-package com.bytedesk.service.message_correction;
+package com.bytedesk.service.message_rating;
 
 import org.springframework.lang.NonNullApi;
