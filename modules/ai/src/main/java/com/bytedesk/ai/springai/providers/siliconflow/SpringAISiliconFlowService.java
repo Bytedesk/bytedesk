@@ -214,31 +214,6 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                 });
     }
 
-    // 添加新的辅助方法处理SSE错误
-    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        try {
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-            // 保存消息到数据库
-            persistMessage(messageProtobufQuery, messageProtobufReply);
-            String messageJson = messageProtobufReply.toJson();
-
-            emitter.send(SseEmitter.event()
-                    .data(messageJson)
-                    .id(messageProtobufReply.getUid())
-                    .name("message"));
-            emitter.complete();
-        } catch (Exception e) {
-            log.error("Error handling SSE error", e);
-            try {
-                emitter.completeWithError(e);
-            } catch (Exception ex) {
-                log.error("Failed to complete emitter with error", ex);
-            }
-        }
-    }
-
     public Optional<OpenAiChatModel> getSiliconFlowChatModel() {
         return siliconFlowChatModel;
     }

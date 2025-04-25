@@ -24,40 +24,6 @@ services:
     networks:
       - bytedesk-network
 
-  bytedesk-ldap:
-    image: osixia/openldap:latest
-    container_name: ldap-bytedesk
-    ports:
-      - "389:389"
-      - "636:636"
-    environment:
-      - LDAP_ORGANISATION=ByteDesk
-      - LDAP_DOMAIN=example.com
-      - LDAP_BASE_DN=dc=example,dc=com
-      - LDAP_ADMIN_PASSWORD=admin
-    volumes:
-      - ldap_data:/var/lib/ldap
-      - ldap_config:/etc/ldap/slapd.d
-    networks:
-      - bytedesk-network
-
-  # http://localhost:18080
-  # 登录凭据：
-  # - DN: cn=admin,dc=example,dc=com
-  # - 密码: admin
-  bytedesk-phpldapadmin:
-    image: osixia/phpldapadmin:latest
-    container_name: phpldapadmin-bytedesk
-    ports:
-      - "18080:80"
-    environment:
-      - PHPLDAPADMIN_LDAP_HOSTS=bytedesk-ldap
-      - PHPLDAPADMIN_HTTPS=false
-    depends_on:
-      - bytedesk-ldap
-    networks:
-      - bytedesk-network
-
   bytedesk-ollama:
     image: ollama/ollama:latest
     container_name: ollama-bytedesk
@@ -65,40 +31,75 @@ services:
       - "21434:11434"
     volumes:
       - ollama_models:/root/.ollama
-    environment:
-      - OLLAMA_MODELS=qwen2.5:latest
+    # 移除这行可能导致问题的环境变量配置
+    # environment:
+    #   - OLLAMA_MODELS=qwen2.5:latest
     # 添加健康检查
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:21434"]
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
       interval: 30s
       timeout: 10s
       retries: 3
-    # 添加初始化脚本
-    entrypoint: >
-      /bin/sh -c "
-      ollama serve &
-      sleep 10 &&
-      if ! ollama list | grep -q 'qwen2.5:latest'; then
-        echo 'Pulling qwen2.5:latest model...'
-        ollama pull qwen2.5:latest
-      else
-        echo 'qwen2.5:latest model already exists'
-      fi &&
-      if ! ollama list | grep -q 'bge-m3:latest'; then
-        echo 'Pulling bge-m3:latest model...'
-        ollama pull bge-m3:latest
-      else
-        echo 'bge-m3:latest model already exists'
-      fi &&
-      if ! ollama list | grep -q 'linux6200/bge-reranker-v2-m3:latest'; then
-        echo 'Pulling linux6200/bge-reranker-v2-m3:latest model...'
-        ollama pull linux6200/bge-reranker-v2-m3:latest
-      else
-        echo 'linux6200/bge-reranker-v2-m3:latest model already exists'
-      fi &&
-      wait"
     networks:
       - bytedesk-network
+
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=bytedesk123
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+
+  # bytedesk-ldap:
+  #   image: osixia/openldap:latest
+  #   container_name: ldap-bytedesk
+  #   ports:
+  #     - "389:389"
+  #     - "636:636"
+  #   environment:
+  #     - LDAP_ORGANISATION=ByteDesk
+  #     - LDAP_DOMAIN=example.com
+  #     - LDAP_BASE_DN=dc=example,dc=com
+  #     - LDAP_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - ldap_data:/var/lib/ldap
+  #     - ldap_config:/etc/ldap/slapd.d
+  #   networks:
+  #     - bytedesk-network
+
+  # http://localhost:18080
+  # 登录凭据：
+  # - DN: cn=admin,dc=example,dc=com
+  # - 密码: admin
+  # bytedesk-phpldapadmin:
+  #   image: osixia/phpldapadmin:latest
+  #   container_name: phpldapadmin-bytedesk
+  #   ports:
+  #     - "18080:80"
+  #   environment:
+  #     - PHPLDAPADMIN_LDAP_HOSTS=bytedesk-ldap
+  #     - PHPLDAPADMIN_HTTPS=false
+  #   depends_on:
+  #     - bytedesk-ldap
+  #   networks:
+  #     - bytedesk-network
 
   # http://127.0.0.1:19090/
   # bytedesk-prometheus:
@@ -153,30 +154,6 @@ services:
   #   networks:
   #     - bytedesk-network
 
-  # ElasticSearch 向量数据库
-  bytedesk-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
-    container_name: elasticsearch-bytedesk
-    environment:
-      - node.name=bytedesk-es01
-      - cluster.name=bytedesk-es-cluster
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=bytedesk123
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    ports:
-      - "19200:9200"
-      - "19300:9300"
-    networks:
-      - bytedesk-network
-    
   # Weaviate 向量数据库
   # bytedesk-weaviate:
   #   image: semitechnologies/weaviate:1.24.5

@@ -209,29 +209,6 @@ public class SpringAITencentService extends BaseSpringAIService {
                     }
                 });
     }
-    
-    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
-                               MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        try {
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-            persistMessage(messageProtobufQuery, messageProtobufReply);
-            String messageJson = messageProtobufReply.toJson();
-            
-            emitter.send(SseEmitter.event()
-                    .data(messageJson)
-                    .id(messageProtobufReply.getUid())
-                    .name("message"));
-            emitter.complete();
-        } catch (Exception e) {
-            log.error("Error handling SSE error", e);
-            try {
-                emitter.completeWithError(e);
-            } catch (Exception ex) {
-                log.error("Failed to complete emitter with error", ex);
-            }
-        }
-    }
 
     public Optional<OpenAiChatModel> getTencentChatModel() {
         return tencentChatModel;

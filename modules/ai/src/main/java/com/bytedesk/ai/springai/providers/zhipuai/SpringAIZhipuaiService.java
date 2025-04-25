@@ -143,6 +143,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
+        
+        // 发送起始消息
+        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
 
         Flux<ChatResponse> responseFlux = chatModel.stream(prompt);
 
@@ -154,21 +157,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                // log.info("Zhipuai API response metadata: {}, text {}",response.getMetadata(),
-                                // textContent);
-                                // StringUtils.hasLength() 检查字符串非 null 且长度大于 0，允许包含空格
-                                if (StringUtils.hasLength(textContent)) {
-                                    messageProtobufReply.setContent(textContent);
-                                    messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                    // 保存消息到数据库
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    // 发送SSE事件
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobufReply.getUid())
-                                            .name("message"));
-                                }
+                                
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                         }
                     } catch (Exception e) {
@@ -182,49 +172,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Zhipuai API SSE complete");
-                    try {
-                        // 发送流结束标记
-                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobufReply.setContent(""); // 或者可以是任何结束标记
-                        // 保存消息到数据库
-                        persistMessage(messageProtobufQuery, messageProtobufReply);
-                        String messageJson = messageProtobufReply.toJson();
-                        // 发送SSE事件
-                        emitter.send(SseEmitter.event()
-                                .data(messageJson)
-                                .id(messageProtobufReply.getUid())
-                                .name("message"));
-                        emitter.complete();
-                    } catch (Exception e) {
-                        log.error("Zhipuai API SSE complete Error completing SSE", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
-                    }
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
                 });
-    }
-
-    // 添加新的辅助方法处理SSE错误
-    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        try {
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-            // 保存消息到数据库
-            persistMessage(messageProtobufQuery, messageProtobufReply);
-            String messageJson = messageProtobufReply.toJson();
-
-            emitter.send(SseEmitter.event()
-                    .data(messageJson)
-                    .id(messageProtobufReply.getUid())
-                    .name("message"));
-            emitter.complete();
-        } catch (Exception e) {
-            log.error("Error handling SSE error", e);
-            try {
-                emitter.completeWithError(e);
-            } catch (Exception ex) {
-                log.error("Failed to complete emitter with error", ex);
-            }
-        }
     }
 
     @Override
