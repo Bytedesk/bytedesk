@@ -82,6 +82,7 @@ message_feedback/
 # message_leave/
 message_unanswered/
 # message_unread/
+message_rating/
 hanlp/
 visitor_rating/
 # robot_message/
