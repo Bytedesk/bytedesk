@@ -106,9 +106,11 @@ public class RobotEntity extends BaseEntity {
 
     // flow enabled
     @Builder.Default
+    @Column(name = "is_flow_enabled")
     private boolean flowEnabled = false;
 
-    
+    // flow uid
+    private String flowUid;
 
     private String categoryUid; // 机器人分类
 
