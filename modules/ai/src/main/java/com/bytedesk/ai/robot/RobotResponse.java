@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-20 07:44:32
+ * @LastEditTime: 2025-04-25 12:50:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,10 +48,6 @@ public class RobotResponse extends BaseResponse {
 
     private RobotLlm llm;
 
-    // private Boolean flowEnabled;
-
-    // private RobotFlow flow;
-
     private String defaultReply;
 
     // 机器人分类
@@ -62,4 +58,10 @@ public class RobotResponse extends BaseResponse {
     private Boolean kbEnabled;
 
     private String kbUid; // 对应知识库
+
+    // flow enabled
+    private Boolean flowEnabled;
+
+    // flow uid
+    private String flowUid;
 }
