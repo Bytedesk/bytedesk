@@ -351,25 +351,144 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
 
-    // 新增通用的SSE错误处理方法
-    protected void sendErrorSseMessage(String errorMessage, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    /**
+     * 检查SseEmitter是否已完成
+     * @param emitter SSE发射器
+     * @return 如果emitter已完成或关闭返回true，否则返回false
+     */
+    protected boolean isEmitterCompleted(SseEmitter emitter) {
+        if (emitter == null) {
+            return true;
+        }
+        
         try {
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent(errorMessage);
-            persistMessage(messageProtobufQuery, messageProtobufReply);
-            emitter.send(SseEmitter.event()
-                    .data(messageProtobufReply.toJson())
-                    .id(messageProtobufReply.getUid())
-                    .name("error"));
-            emitter.complete();
+            // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
+            // 使用一个空注释作为心跳，这不会影响客户端
+            emitter.send(SseEmitter.event().comment("heartbeat"));
+            return false; // 如果发送成功，则表示emitter未完成
         } catch (Exception e) {
-            log.error("Error sending SSE error message", e);
+            // 如果发送失败，说明emitter已经完成或关闭
+            log.debug("Emitter appears to be completed: {}", e.getMessage());
+            return true;
+        }
+    }
+
+    /**
+     * 处理SSE错误的通用方法
+     * @param error 发生的错误
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param emitter SSE发射器
+     */
+    protected void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
+                                 MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        try {
+            // 检查emitter是否已完成
+            if (emitter != null && !isEmitterCompleted(emitter)) {
+                messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+                String messageJson = messageProtobufReply.toJson();
+                
+                emitter.send(SseEmitter.event()
+                        .data(messageJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+                emitter.complete();
+            } else {
+                log.warn("SSE emitter already completed, skipping sending error message");
+                // 仍然需要持久化消息
+                messageProtobufReply.setType(MessageTypeEnum.ERROR);
+                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+            }
+        } catch (Exception e) {
+            log.error("Error handling SSE error", e);
             try {
-                emitter.completeWithError(e);
+                if (emitter != null && !isEmitterCompleted(emitter)) {
+                    emitter.completeWithError(e);
+                }
             } catch (Exception ex) {
                 log.error("Failed to complete emitter with error", ex);
             }
+        }
+    }
+
+    /**
+     * 发送流式开始消息
+     * @param messageProtobufReply 回复消息对象
+     * @param emitter SSE发射器
+     * @param initialContent 初始内容，通常为"正在思考中..."
+     */
+    protected void sendStreamStartMessage(MessageProtobuf messageProtobufReply, SseEmitter emitter, String initialContent) {
+        try {
+            if (!isEmitterCompleted(emitter)) {
+                messageProtobufReply.setType(MessageTypeEnum.STREAM_START);
+                messageProtobufReply.setContent(initialContent);
+                String startJson = messageProtobufReply.toJson();
+                emitter.send(SseEmitter.event()
+                        .data(startJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+            }
+        } catch (Exception e) {
+            log.error("Error sending stream start message", e);
+        }
+    }
+
+    /**
+     * 发送流式内容消息
+     * @param messageProtobufQuery 查询消息对象
+     * @param messageProtobufReply 回复消息对象
+     * @param emitter SSE发射器
+     * @param content 消息内容
+     */
+    protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, 
+            SseEmitter emitter, String content) {
+        try {
+            if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
+                messageProtobufReply.setContent(content);
+                messageProtobufReply.setType(MessageTypeEnum.STREAM);
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+                String messageJson = messageProtobufReply.toJson();
+                // 发送SSE事件
+                emitter.send(SseEmitter.event()
+                        .data(messageJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+            }
+        } catch (Exception e) {
+            log.error("Error sending stream message", e);
+        }
+    }
+
+    /**
+     * 发送流式结束消息
+     * @param messageProtobufQuery 查询消息对象
+     * @param messageProtobufReply 回复消息对象
+     * @param emitter SSE发射器
+     */
+    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, 
+            SseEmitter emitter) {
+        try {
+            if (!isEmitterCompleted(emitter)) {
+                // 发送流结束标记
+                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                messageProtobufReply.setContent(""); 
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply);
+                String messageJson = messageProtobufReply.toJson();
+                //
+                emitter.send(SseEmitter.event()
+                        .data(messageJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+                emitter.complete();
+            }
+        } catch (Exception e) {
+            log.error("Error sending stream end message", e);
         }
     }
 }

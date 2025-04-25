@@ -197,15 +197,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
         try {
             // 发送初始消息，告知用户请求已收到，正在处理
-            if (!isEmitterCompleted(emitter)) {
-                messageProtobufReply.setType(MessageTypeEnum.STREAM_START);
-                messageProtobufReply.setContent("正在思考中...");
-                String startJson = messageProtobufReply.toJson();
-                emitter.send(SseEmitter.event()
-                        .data(startJson)
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-            }
+            sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
             
             chatModel.stream(prompt).subscribe(
                     response -> {
@@ -215,21 +207,8 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                 for (Generation generation : generations) {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
-                                    // log.info("Ollama API response metadata: {}, text {}",
-                                    //         response.getMetadata(), textContent);
                                     
-                                    if (StringUtils.hasLength(textContent)) {
-                                        messageProtobufReply.setContent(textContent);
-                                        messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                        // 保存消息到数据库
-                                        persistMessage(messageProtobufQuery, messageProtobufReply);
-                                        String messageJson = messageProtobufReply.toJson();
-                                        // 发送SSE事件
-                                        emitter.send(SseEmitter.event()
-                                                .data(messageJson)
-                                                .id(messageProtobufReply.getUid())
-                                                .name("message"));
-                                    }
+                                    sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                                 }
                             }
                         } catch (Exception e) {
@@ -242,83 +221,11 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                         handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     },
                     () -> {
-                        try {
-                            if (!isEmitterCompleted(emitter)) {
-                                // 发送流结束标记
-                                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                                messageProtobufReply.setContent(""); 
-                                // 保存消息到数据库
-                                persistMessage(messageProtobufQuery, messageProtobufReply);
-                                String messageJson = messageProtobufReply.toJson();
-                                //
-                                emitter.send(SseEmitter.event()
-                                        .data(messageJson)
-                                        .id(messageProtobufReply.getUid())
-                                        .name("message"));
-                                emitter.complete();
-                            }
-                        } catch (Exception e) {
-                            log.error("Ollama Error completing SSE 3", e);
-                            handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
-                        }
+                        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
                     });
         } catch (Exception e) {
             log.error("Error starting Ollama stream 4", e);
             handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
-        }
-    }
-    
-    // 添加新的辅助方法处理SSE错误
-    private void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
-                               MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        try {
-            // 检查emitter是否已完成
-            if (emitter != null && !isEmitterCompleted(emitter)) {
-                messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply);
-                String messageJson = messageProtobufReply.toJson();
-                
-                emitter.send(SseEmitter.event()
-                        .data(messageJson)
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-                emitter.complete();
-            } else {
-                log.warn("SSE emitter already completed, skipping sending error message");
-                // 仍然需要持久化消息
-                messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                persistMessage(messageProtobufQuery, messageProtobufReply);
-            }
-        } catch (Exception e) {
-            log.error("Error handling SSE error", e);
-            try {
-                if (emitter != null && !isEmitterCompleted(emitter)) {
-                    emitter.completeWithError(e);
-                }
-            } catch (Exception ex) {
-                log.error("Failed to complete emitter with error", ex);
-            }
-        }
-    }
-    
-    // 添加一个新方法来检查SseEmitter是否已完成
-    private boolean isEmitterCompleted(SseEmitter emitter) {
-        if (emitter == null) {
-            return true;
-        }
-        
-        try {
-            // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
-            // 使用一个空注释作为心跳，这不会影响客户端
-            emitter.send(SseEmitter.event().comment("heartbeat"));
-            return false; // 如果发送成功，则表示emitter未完成
-        } catch (Exception e) {
-            // 如果发送失败，说明emitter已经完成或关闭
-            log.debug("Emitter appears to be completed: {}", e.getMessage());
-            return true;
         }
     }
 
