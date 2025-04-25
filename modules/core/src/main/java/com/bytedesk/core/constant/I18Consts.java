@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 17:14:11
+ * @LastEditTime: 2025-04-25 17:06:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -331,7 +331,8 @@ public class I18Consts {
     public static final String I18N_ENTITY_NOT_FOUND = "实体未找到"; // 实体未找到
     public static final String I18N_INTERNAL_SERVER_ERROR = "内部服务器错误"; // 内部服务器错误
 
-
+    public static final String I18N_NO_ANSWER = "您的这个问题暂时无法回答，请提问其他问题。";
+    public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
 
 
 
