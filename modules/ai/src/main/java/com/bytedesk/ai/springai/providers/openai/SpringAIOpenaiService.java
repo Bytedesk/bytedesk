@@ -154,6 +154,9 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             return;
         }
 
+        // 发送起始消息
+        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
@@ -170,16 +173,8 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Openai API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
-                                if (StringUtils.hasLength(textContent)) {
-                                    messageProtobufReply.setContent(textContent);
-                                    messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobufReply.getUid())
-                                            .name("message"));
-                                }
+                                
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                         }
                     } catch (Exception e) {
@@ -193,19 +188,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Openai API SSE complete");
-                    try {
-                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobufReply.setContent("");
-                        persistMessage(messageProtobufQuery, messageProtobufReply);
-                        String messageJson = messageProtobufReply.toJson();
-                        emitter.send(SseEmitter.event()
-                                .data(messageJson)
-                                .id(messageProtobufReply.getUid())
-                                .name("message"));
-                        emitter.complete();
-                    } catch (Exception e) {
-                        log.error("Error completing SSE", e);
-                    }
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
                 });
     }
 

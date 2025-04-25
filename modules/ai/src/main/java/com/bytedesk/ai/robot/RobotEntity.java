@@ -104,6 +104,12 @@ public class RobotEntity extends BaseEntity {
 
     private String kbUid; // 对应知识库
 
+    // flow enabled
+    @Builder.Default
+    private boolean flowEnabled = false;
+
+    
+
     private String categoryUid; // 机器人分类
 
     public UserProtobuf toUserProtobuf() {
