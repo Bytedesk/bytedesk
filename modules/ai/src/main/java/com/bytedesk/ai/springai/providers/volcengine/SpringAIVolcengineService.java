@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 11:59:50
+ * @LastEditTime: 2025-04-25 12:29:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -154,6 +154,9 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
             return;
         }
 
+        // 发送起始消息
+        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -171,16 +174,8 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Volcengine API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
-                                if (StringUtils.hasLength(textContent)) {
-                                    messageProtobufReply.setContent(textContent);
-                                    messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                                    persistMessage(messageProtobufQuery, messageProtobufReply);
-                                    String messageJson = messageProtobufReply.toJson();
-                                    emitter.send(SseEmitter.event()
-                                            .data(messageJson)
-                                            .id(messageProtobufReply.getUid())
-                                            .name("message"));
-                                }
+                                
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                         }
                     } catch (Exception e) {
@@ -194,19 +189,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Volcengine API SSE complete");
-                    try {
-                        messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                        messageProtobufReply.setContent("");
-                        persistMessage(messageProtobufQuery, messageProtobufReply);
-                        String messageJson = messageProtobufReply.toJson();
-                        emitter.send(SseEmitter.event()
-                                .data(messageJson)
-                                .id(messageProtobufReply.getUid())
-                                .name("message"));
-                        emitter.complete();
-                    } catch (Exception e) {
-                        log.error("Error completing SSE", e);
-                    }
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
                 });
     }
 
