@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:51:42
+ * @LastEditTime: 2025-04-25 21:10:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,12 +54,4 @@ public class TagEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "tag_order", nullable = false)
     private int order = 0;
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
-
-    // private String userUid;
 }
