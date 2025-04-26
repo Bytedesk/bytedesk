@@ -11,6 +11,11 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - bytedesk-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   bytedesk-redis:
     image: redis/redis-stack-server:latest
@@ -23,6 +28,11 @@ services:
       - redis_data:/data
     networks:
       - bytedesk-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "qfRxz3tVT8Nh", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   bytedesk-ollama:
     image: ollama/ollama:latest
@@ -31,17 +41,15 @@ services:
       - "21434:11434"
     volumes:
       - ollama_models:/root/.ollama
-    # 移除这行可能导致问题的环境变量配置
-    # environment:
-    #   - OLLAMA_MODELS=qwen2.5:latest
-    # 添加健康检查
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    environment:
+      - OLLAMA_MODELS=qwen2.5:latest
     networks:
       - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
@@ -66,6 +74,11 @@ services:
       - "19300:9300"
     networks:
       - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # bytedesk-ldap:
   #   image: osixia/openldap:latest

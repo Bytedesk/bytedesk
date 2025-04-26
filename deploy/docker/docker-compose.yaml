@@ -57,6 +57,11 @@ services:
       - "19300:9300"
     networks:
       - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
@@ -68,6 +73,8 @@ services:
       bytedesk-mysql:
         condition: service_healthy
       bytedesk-redis:
+        condition: service_healthy
+      bytedesk-elasticsearch:
         condition: service_healthy
     environment:
       SERVER_PORT: 9003
