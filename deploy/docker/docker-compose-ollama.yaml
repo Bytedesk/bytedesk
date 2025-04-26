@@ -69,7 +69,8 @@ services:
     depends_on:
       - bytedesk-mysql
       - bytedesk-redis
-      - ollama
+      - bytedesk-ollama
+      - bytedesk-elasticsearch
     environment:
       SERVER_PORT: 9003
       # db config
