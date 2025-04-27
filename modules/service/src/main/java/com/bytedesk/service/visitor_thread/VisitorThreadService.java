@@ -90,7 +90,7 @@ public class VisitorThreadService
 
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         //
-        String user = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         if (visitorRequest.isWeChat()) {
@@ -137,7 +137,7 @@ public class VisitorThreadService
         // String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         // 访客信息
-        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 考虑到配置可能变化，更新配置
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         // 
@@ -182,7 +182,7 @@ public class VisitorThreadService
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
         //
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
-        String visitor = ServiceConvertUtils.convertToUserProtobufJSONString(visitorRequest);
+        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
         //

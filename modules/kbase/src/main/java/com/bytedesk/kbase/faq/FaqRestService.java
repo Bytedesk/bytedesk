@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 17:23:20
+ * @LastEditTime: 2025-04-27 17:53:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -162,15 +162,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 entity.setUserUid(user.getUid());
             }
             // 
-            // 如何将string类型startDate和endDate转换为LocalDateTime类型？
-            // if (StringUtils.hasText(request.getStartDate())) {
-            //     entity.setStartDate(BdDateUtils.parseLocalDateTime(request.getStartDate()));
-            // }
-            // if (StringUtils.hasText(request.getEndDate())) {
-            //     entity.setEndDate(BdDateUtils.parseLocalDateTime(request.getEndDate()));
-            // }
-            // entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
-            // 
             // 根据request.relatedFaqUids查找关联的FAQ
             List<FaqEntity> relatedFaqs = new ArrayList<>();
             for (String relatedFaqUid : request.getRelatedFaqUids()) {
@@ -224,6 +215,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 entity.setQuestion(request.getQuestion());
                 entity.setQuestionList(request.getQuestionList());
                 entity.setAnswer(request.getAnswer());
+                entity.setAnswerHtml(request.getAnswerHtml());
+                entity.setAnswerMarkdown(request.getAnswerMarkdown());
+                entity.setImages(request.getImages());
+                entity.setAttachments(request.getAttachments());
                 entity.setAnswerList(request.getAnswerList());
                 entity.setStatus(request.getStatus());
                 entity.setTagList(request.getTagList());
@@ -250,8 +245,13 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     entity.setRelatedFaqs(relatedFaqs);
                 }
 
+                FaqEntity savedEntity = save(entity);
+                if (savedEntity == null) {
+                    throw new RuntimeException("Failed to update FAQ");
+                }
+
                 try {
-                    return convertToResponse(save(entity));
+                    return convertToResponse(savedEntity);
                 } catch (ObjectOptimisticLockingFailureException e) {
                     // 乐观锁异常，交给调用者处理重试
                     throw e;
