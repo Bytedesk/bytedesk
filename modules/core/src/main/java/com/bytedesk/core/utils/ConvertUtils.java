@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:36:48
+ * @LastEditTime: 2025-04-27 13:09:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
@@ -175,15 +174,18 @@ public class ConvertUtils {
             }
             messageResponse.setUser(user);
         }
+
+        // extra格式不固定，前端需要根据type字段来解析，所以此处不能使用MessageExtra
         // extra
-        if (message.getExtra() != null) {
-            // MessageExtra extra = JSON.parseObject(message.getExtra(), MessageExtra.class);
-            MessageExtra extra = MessageExtra.fromJson(message.getExtra());
-            if (extra.getFeedback() == null) {
-                extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
-            }
-            messageResponse.setExtra(extra);
-        }
+        // if (message.getExtra() != null) {
+        //     // MessageExtra extra = JSON.parseObject(message.getExtra(), MessageExtra.class);
+        //     MessageExtra extra = MessageExtra.fromJson(message.getExtra());
+        //     if (extra.getFeedback() == null) {
+        //         extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
+        //     }
+        //     messageResponse.setExtra(extra);
+        // }
+        
         // thread
         if (message.getThread() != null) {
             ThreadResponse thread = convertToThreadResponse(message.getThread());

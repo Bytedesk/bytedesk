@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 12:18:27
+ * @LastEditTime: 2025-04-27 13:08:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,7 +55,9 @@ public class MessageResponse extends BaseResponse {
 
 	private UserProtobuf user;
 
-	private MessageExtra extra;
+    // extra格式不固定，前端需要根据type字段来解析，所以此处不能使用MessageExtra
+	// private MessageExtra extra;
+    private String extra;
 
 	// 有帮助、没帮助
     private String helpful;
