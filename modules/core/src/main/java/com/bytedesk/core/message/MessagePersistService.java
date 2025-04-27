@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 17:34:45
+ * @LastEditTime: 2025-04-27 13:26:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -143,13 +143,13 @@ public class MessagePersistService {
         }
 
         //
-        if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
-            // content为留言提示消息的uid
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithMessageLeave(type, messageProtobuf);
-                return true;
-            }
-        }
+        // if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
+        //     // content为留言提示消息的uid
+        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
+        //         dealWithMessageLeave(type, messageProtobuf);
+        //         return true;
+        //     }
+        // }
 
         // FAQ
 
@@ -240,18 +240,18 @@ public class MessagePersistService {
         }
     }
 
-    private void dealWithMessageLeave(MessageTypeEnum type, MessageProtobuf message) {
-        log.info("dealWithMessageLeave");
-        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-        if (messageOpt.isPresent()) {
-            MessageEntity messageEntity = messageOpt.get();
-            if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
-                messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
-                messageEntity.setContent(message.getExtra());
-                messageRestService.save(messageEntity);
-            }
-        }
-    }
+    // private void dealWithMessageLeave(MessageTypeEnum type, MessageProtobuf message) {
+    //     log.info("dealWithMessageLeave");
+    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
+    //     if (messageOpt.isPresent()) {
+    //         MessageEntity messageEntity = messageOpt.get();
+    //         if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
+    //             messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
+    //             messageEntity.setContent(message.getExtra());
+    //             messageRestService.save(messageEntity);
+    //         }
+    //     }
+    // }
 
     private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
         // log.info("dealWithFaqRateMessage");
