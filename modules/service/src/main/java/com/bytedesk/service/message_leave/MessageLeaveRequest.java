@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 13:59:26
+ * @LastEditTime: 2025-04-27 14:20:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,21 +48,17 @@ public class MessageLeaveRequest extends BaseRequest {
     @Builder.Default
     private List<String> replyImages = new ArrayList<>();
 
-    @Builder.Default
-    private String status = MessageLeaveStatusEnum.PENDING.name();
+    // 回复时间
+    private LocalDateTime repliedAt;
+
+    private String status;
     
     // 留言分类（如：咨询、投诉、建议、其他）
     private String categoryUid;
     
     // 留言优先级（如：低、中、高、紧急）
-    @Builder.Default
-    private String priority = "中";
+    private String priority;
 
-    // 处理时间
-    private Long handleTime;
-    
-    // 处理备注
-    private String handleRemark;
     
     // 关联工单ID（如果生成了工单）
     private String ticketUid;
@@ -96,5 +93,5 @@ public class MessageLeaveRequest extends BaseRequest {
 
     private String user;
 
-    private String handler;
+    private String replyUser;
 }

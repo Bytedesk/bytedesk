@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -48,6 +49,9 @@ public class MessageLeaveResponse extends BaseResponse {
     // 回复图片
     private List<String> replyImages;
 
+    // 回复时间
+    private LocalDateTime repliedAt;
+
     // 
     private String status;
     
@@ -55,14 +59,7 @@ public class MessageLeaveResponse extends BaseResponse {
     private String categoryUid;
     
     // 留言优先级（如：低、中、高、紧急）
-    @Builder.Default
-    private String priority = "中";
-
-    // 处理时间
-    private Long handleTime;
-    
-    // 处理备注
-    private String handleRemark;
+    private String priority;
     
     // 关联工单ID（如果生成了工单）
     private String ticketUid;
@@ -96,5 +93,5 @@ public class MessageLeaveResponse extends BaseResponse {
 
     private UserProtobuf user;
 
-    private String handler;
+    private String replyUser;
 }
