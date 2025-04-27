@@ -91,7 +91,7 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: true
       BYTEDESK_EDITION: enterprise
-      BYTEDESK_VERSION: 0.7.4
+      BYTEDESK_VERSION: 0.7.5
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: false
       BYTEDESK_CUSTOM_NAME: 
