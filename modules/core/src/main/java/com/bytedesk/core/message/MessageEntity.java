@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 12:21:47
+ * @LastEditTime: 2025-04-27 16:05:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -76,10 +76,10 @@ public class MessageEntity extends AbstractMessageEntity {
     }
 
     // isHelpful, 解析 MessageExtra 字段，
-    public String helpful() {
-        MessageExtra messageExtra = MessageExtra.fromJson(getExtra());
-        return messageExtra.getHelpful();
-    }
+    // public String helpful() {
+    //     MessageExtra messageExtra = MessageExtra.fromJson(getExtra());
+    //     return messageExtra.getHelpful();
+    // }
     
     /**
      * 重写toString方法避免循环引用
