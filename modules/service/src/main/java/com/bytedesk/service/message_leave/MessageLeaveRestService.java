@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 12:30:40
+ * @LastEditTime: 2025-04-27 12:56:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -109,7 +109,7 @@ public class MessageLeaveRestService extends
             throw new RuntimeException("MessageLeave not saved");
         }
 
-        // 更新留言状态
+        // 更新留言提示消息状态
         Optional<MessageEntity> messageOptional = messageRestService.findByUid(savedMessageLeave.getMessageUid());
         if (messageOptional.isPresent()) {
             MessageEntity message = messageOptional.get();
@@ -121,7 +121,7 @@ public class MessageLeaveRestService extends
                     .images(request.getImages())
                     .status(messageLeave.getStatus())
                     .build();
-            message.setContent(messageLeaveExtra.toJson());
+            message.setExtra(messageLeaveExtra.toJson());
             messageRestService.save(message);
         }
 

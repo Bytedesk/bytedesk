@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 11:00:54
+ * @LastEditTime: 2025-04-27 13:11:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import com.bytedesk.ai.robot_message.RobotMessageEntity;
 import com.bytedesk.ai.robot_message.RobotMessageResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.MessageExtra;
+// import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.settings.ServiceSettings;
@@ -81,13 +81,13 @@ public class ConvertAiUtils {
             messageResponse.setRobot(robot);
         }
         // extra
-        if (message.getExtra() != null) {
-            MessageExtra extra = MessageExtra.fromJson(message.getExtra());
-            if (extra.getFeedback() == null) {
-                extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
-            }
-            messageResponse.setExtra(extra);
-        }
+        // if (message.getExtra() != null) {
+        //     MessageExtra extra = MessageExtra.fromJson(message.getExtra());
+        //     if (extra.getFeedback() == null) {
+        //         extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
+        //     }
+        //     messageResponse.setExtra(extra);
+        // }
 
         return messageResponse;
     }

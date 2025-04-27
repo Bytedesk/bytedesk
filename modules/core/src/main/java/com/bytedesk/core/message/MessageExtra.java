@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 19:21:07
+ * @LastEditTime: 2025-04-27 13:10:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.core.message;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseExtra;
-import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +24,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-// 消息扩展字段
+/**
+ * 消息扩展字段，用于存储额外的信息
+ * TODO：待重构，仅需要保留orgUid字段即可，作为基类使用
+ * 
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -34,15 +37,15 @@ import lombok.experimental.SuperBuilder;
 public class MessageExtra extends BaseExtra {
 
     // 有帮助、没帮助
-    @Builder.Default
-    private String helpful = MessageHelpfulEnum.UNKNOWN.name();
+    // @Builder.Default
+    // private String helpful = MessageHelpfulEnum.UNKNOWN.name();
 
     /**
      * 没有帮助的情况下，支持用户输入反馈内容 feedback
      * @{MessageFeedback}
      */
-    @Builder.Default
-    private String feedback = BytedeskConsts.EMPTY_JSON_STRING;
+    // @Builder.Default
+    // private String feedback = BytedeskConsts.EMPTY_JSON_STRING;
     
     // 自动回复
     @Builder.Default
@@ -51,10 +54,10 @@ public class MessageExtra extends BaseExtra {
     private String autoReplyType;
     
     // 翻译
-    private String translation;
+    // private String translation;
 
     // 引用
-    private String quotation;
+    // private String quotation;
     
     // 企业id
     private String orgUid;

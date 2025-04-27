@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 18:09:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-23 13:29:51
+ * @LastEditTime: 2025-04-27 13:15:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,23 @@
  */
 package com.bytedesk.kbase.faq;
 
+import com.bytedesk.core.message.MessageExtra;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-public class FaqMessageExtra {
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+public class FaqMessageExtra extends MessageExtra {
+
+    private static final long serialVersionUID = 1L;
+
     private String uid;
     private String faqUid;
     private String rate;
