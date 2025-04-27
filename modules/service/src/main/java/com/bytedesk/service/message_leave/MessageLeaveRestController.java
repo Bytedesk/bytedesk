@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:32:57
+ * @LastEditTime: 2025-04-27 13:51:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.service.message_leave;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,6 +70,15 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     public ResponseEntity<?> update(MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // reply
+    @PostMapping("/reply")
+    public ResponseEntity<?> reply(@RequestBody MessageLeaveRequest request) {
+
+        MessageLeaveResponse response = messageLeaveRestService.reply(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

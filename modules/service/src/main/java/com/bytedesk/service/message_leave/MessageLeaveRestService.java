@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 12:56:36
+ * @LastEditTime: 2025-04-27 13:53:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,6 +33,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -152,16 +153,41 @@ public class MessageLeaveRestService extends
             }
             return convertToResponse(updateMessageLeave);
         }
+
         throw new RuntimeException("MessageLeave not found");
     }
 
-    @Override
-    public MessageLeaveEntity save(MessageLeaveEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
+    // reply
+    public MessageLeaveResponse reply(MessageLeaveRequest request) {
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setReply(request.getReply());
+            messageLeave.setStatus(MessageLeaveStatusEnum.REPLIED.name());
+
+            // 
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not updated");
+            }
+            // 更新留言提示消息状态
+            Optional<MessageEntity> messageOptional = messageRestService.findByUid(messageLeave.getMessageUid());
+            if (messageOptional.isPresent()) {
+                MessageEntity message = messageOptional.get();
+                message.setStatus(MessageStatusEnum.LEAVE_MSG_REPLIED.name());
+                // 
+                MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.builder()
+                        .content(request.getContent())
+                        .contact(request.getContact())
+                        .images(request.getImages())
+                        .status(messageLeave.getStatus())
+                        .build();
+                message.setExtra(messageLeaveExtra.toJson());
+                messageRestService.save(message);
+            }
+            return convertToResponse(updateMessageLeave);
         }
+        throw new RuntimeException("MessageLeave not found");
     }
 
     @Override
@@ -204,7 +230,7 @@ public class MessageLeaveRestService extends
 
     @Override
     public MessageLeaveResponse convertToResponse(MessageLeaveEntity entity) {
-        return modelMapper.map(entity, MessageLeaveResponse.class);
+        return ServiceConvertUtils.convertToMessageLeaveResponse(entity);
     }
 
     @Override
@@ -212,17 +238,7 @@ public class MessageLeaveRestService extends
         MessageLeaveExcel excel = modelMapper.map(entity, MessageLeaveExcel.class);
         excel.setImages(Utils.convertListToString(entity.getImages()));
         excel.setStatus(MessageLeaveStatusEnum.fromString(entity.getStatus()).getDescription());
-        // if (StringUtils.hasText(entity.getCategoryUid())) {
-        // Optional<CategoryEntity> categoryOptional =
-        // categoryService.findByUid(entity.getCategoryUid());
-        // if (categoryOptional.isPresent()) {
-        // excel.setCategory(categoryOptional.get().getName());
-        // } else {
-        // excel.setCategory("未分类");
-        // }
-        // } else {
-        // excel.setCategory("未分类");
-        // }
+        // 
         UserProtobuf user = UserProtobuf.fromJson(entity.getUser());
         if (user != null) {
             excel.setUser(user.getNickname());
