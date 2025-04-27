@@ -213,9 +213,21 @@ public class ConvertUtils {
             BytedeskProperties bytedeskProperties) {
         // return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
         BytedeskPropertiesResponse response = modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
-        // 明确设置showRightCornerChat的值，确保从配置中获取
+        // 明确设置Custom所有字段的值，确保从配置中获取
         if (bytedeskProperties.getCustom() != null) {
             response.getCustom().setShowRightCornerChat(bytedeskProperties.getCustom().getShowRightCornerChat());
+            response.getCustom().setLoginUsernameEnable(bytedeskProperties.getCustom().getLoginUsernameEnable());
+            response.getCustom().setLoginMobileEnable(bytedeskProperties.getCustom().getLoginMobileEnable());
+            response.getCustom().setLoginEmailEnable(bytedeskProperties.getCustom().getLoginEmailEnable());
+            response.getCustom().setLoginScanEnable(bytedeskProperties.getCustom().getLoginScanEnable());
+            response.getCustom().setDocUrlShow(bytedeskProperties.getCustom().getDocUrlShow());
+            response.getCustom().setDocUrl(bytedeskProperties.getCustom().getDocUrl());
+            response.getCustom().setEnabled(bytedeskProperties.getCustom().getEnabled());
+            response.getCustom().setName(bytedeskProperties.getCustom().getName());
+            response.getCustom().setLogo(bytedeskProperties.getCustom().getLogo());
+            response.getCustom().setDescription(bytedeskProperties.getCustom().getDescription());
+            response.getCustom().setPrivacyPolicyUrl(bytedeskProperties.getCustom().getPrivacyPolicyUrl());
+            response.getCustom().setTermsOfServiceUrl(bytedeskProperties.getCustom().getTermsOfServiceUrl());
         }
         return response;
     }
