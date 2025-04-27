@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 14:21:47
+ * @LastEditTime: 2025-04-27 14:42:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -159,14 +159,19 @@ public class MessageLeaveRestService extends
 
     // reply
     public MessageLeaveResponse reply(MessageLeaveRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+
         Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
         if (messageLeaveOptional.isPresent()) {
             MessageLeaveEntity messageLeave = messageLeaveOptional.get();
             messageLeave.setReply(request.getReply());
             messageLeave.setReplyImages(request.getReplyImages());
             messageLeave.setRepliedAt(request.getRepliedAt());
+            messageLeave.setReplyUser(user.toProtobuf().toJson());
             messageLeave.setStatus(MessageLeaveStatusEnum.REPLIED.name());
-
             // 
             MessageLeaveEntity updateMessageLeave = save(messageLeave);
             if (updateMessageLeave == null) {
@@ -178,12 +183,10 @@ public class MessageLeaveRestService extends
                 MessageEntity message = messageOptional.get();
                 message.setStatus(MessageStatusEnum.LEAVE_MSG_REPLIED.name());
                 // 
-                MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.builder()
-                        .content(request.getContent())
-                        .contact(request.getContact())
-                        .images(request.getImages())
-                        .status(messageLeave.getStatus())
-                        .build();
+                MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.fromJson(message.getExtra());
+                messageLeaveExtra.setReply(request.getReply());
+                messageLeaveExtra.setReplyImages(request.getReplyImages());
+                messageLeaveExtra.setStatus(messageLeave.getStatus());
                 message.setExtra(messageLeaveExtra.toJson());
                 messageRestService.save(message);
             }
