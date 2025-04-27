@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 09:04:48
+ * @LastEditTime: 2025-04-27 14:20:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +72,9 @@ public class MessageLeaveEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> replyImages = new ArrayList<>();
 
+    // 回复时间
+    private LocalDateTime repliedAt;
+
     @Builder.Default
     private String status = MessageLeaveStatusEnum.PENDING.name();
     
@@ -79,15 +83,8 @@ public class MessageLeaveEntity extends BaseEntity {
     
     // 留言优先级（如：低、中、高、紧急）
     @Builder.Default
-    private String priority = "中";
+    private String priority = MessageLeavePriorityEnum.LOW.name();
 
-    // 处理时间
-    private Long handleTime;
-    
-    // 处理备注
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String handleRemark;
-    
     // 关联工单ID（如果生成了工单）
     private String ticketUid;
     
@@ -125,9 +122,9 @@ public class MessageLeaveEntity extends BaseEntity {
     @Column(name = "leavemsg_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 处理人
+    // 回复人信息
     @Builder.Default
-    @Column(name = "handler_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String handler = BytedeskConsts.EMPTY_JSON_STRING;
-    // private AgentEntity handler;
+    @Column(name = "reply_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String replyUser = BytedeskConsts.EMPTY_JSON_STRING;
+
 }
