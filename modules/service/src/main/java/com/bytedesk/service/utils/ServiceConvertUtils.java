@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 13:42:34
+ * @LastEditTime: 2025-04-27 18:46:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,28 +48,26 @@ public class ServiceConvertUtils {
         return modelMapper.map(visitor, VisitorResponse.class);
     }
 
-    public static UserProtobuf convertToUserProtobuf(VisitorEntity visitor) {
-        return modelMapper.map(visitor, UserProtobuf.class);
+    // public static UserProtobuf convertToUserProtobuf(VisitorEntity visitor) {
+    //     return modelMapper.map(visitor, UserProtobuf.class);
+    // }
+
+    public static UserProtobuf convertToVisitorProtobuf(VisitorResponse visitor) {
+        UserProtobuf userProtobuf = modelMapper.map(visitor, UserProtobuf.class);
+        userProtobuf.setType(UserTypeEnum.VISITOR.name());
+        return userProtobuf;
     }
 
-    public static UserProtobuf convertToUserProtobuf(VisitorResponse visitor) {
-        return modelMapper.map(visitor, UserProtobuf.class);
-    }
-
-    public static UserProtobuf convertToUserProtobuf(VisitorRequest visitorRequest) {
+    public static UserProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
         UserProtobuf userProtobuf = modelMapper.map(visitorRequest, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
         return userProtobuf;
     }
 
-    public static String convertToUserProtobufJSONString(VisitorRequest visitorRequest) {
-        UserProtobuf userProtobuf = convertToUserProtobuf(visitorRequest);
+    public static String convertToVisitorProtobufJSONString(VisitorRequest visitorRequest) {
+        UserProtobuf userProtobuf = convertToVisitorProtobuf(visitorRequest);
         return userProtobuf.toJson();
     }
-
-    // public static UserProtobuf convertToUserResponseSimple(UserProtobuf visitorResponseSimple) {
-    //     return modelMapper.map(visitorResponseSimple, UserProtobuf.class);
-    // }
 
     public static MessageProtobuf convertToMessageProtobuf(MessageEntity lastMessage, ThreadEntity thread) {
         //
@@ -88,7 +86,6 @@ public class ServiceConvertUtils {
     public static MessageResponse convertToMessageResponse(MessageEntity lastMessage, ThreadEntity thread) {
         //
         MessageResponse messageResponse = modelMapper.map(lastMessage, MessageResponse.class);
-        // messageResponse.setThread(ConvertUtils.convertToThreadProtobuf(thread));
         //
         UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
