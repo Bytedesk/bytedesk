@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 09:51:12
+ * @LastEditTime: 2025-04-27 13:42:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.message_leave.MessageLeaveEntity;
+import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
@@ -135,8 +137,7 @@ public class ServiceConvertUtils {
         return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
-    public static String convertToServiceSettingsResponseVisitorJSONString(
-        ServiceSettings serviceSettings) {
+    public static String convertToServiceSettingsResponseVisitorJSONString( ServiceSettings serviceSettings) {
         return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
     }
 
@@ -144,6 +145,13 @@ public class ServiceConvertUtils {
         return modelMapper.map(entity, QueueResponse.class);
     }
     
+    public static MessageLeaveResponse convertToMessageLeaveResponse(MessageLeaveEntity entity) {
+        MessageLeaveResponse messageLeaveResponse = modelMapper.map(entity, MessageLeaveResponse.class);
+        if (entity.getUser() != null) {
+            messageLeaveResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
+        }
+        return messageLeaveResponse;
+    }
     
 
 }

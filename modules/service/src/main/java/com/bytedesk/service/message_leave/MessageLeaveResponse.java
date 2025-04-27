@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 11:33:13
+ * @LastEditTime: 2025-04-27 13:59:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.message_leave;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +44,9 @@ public class MessageLeaveResponse extends BaseResponse {
 
     // 回复内容
     private String reply;
+
+    // 回复图片
+    private List<String> replyImages;
 
     // 
     private String status;
@@ -90,7 +94,7 @@ public class MessageLeaveResponse extends BaseResponse {
     // 标签，用于分类和检索
     private List<String> tagList;
 
-    private String user;
+    private UserProtobuf user;
 
     private String handler;
 }

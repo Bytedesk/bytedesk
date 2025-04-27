@@ -65,6 +65,12 @@ public class MessageLeaveEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String reply;
 
+    // 回复支持图片
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> replyImages = new ArrayList<>();
+
     @Builder.Default
     private String status = MessageLeaveStatusEnum.PENDING.name();
     

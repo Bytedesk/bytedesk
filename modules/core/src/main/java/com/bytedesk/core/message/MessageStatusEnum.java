@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:33:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 13:59:02
+ * @LastEditTime: 2025-04-27 13:52:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ public enum MessageStatusEnum {
     UNPROCESSED, // leave message unprocessed
     PROCESSED, // leave message processed
     LEAVE_MSG_SUBMIT, // 提交留言
+    LEAVE_MSG_REPLIED, // 留言已回复
     RATE_SUBMIT, // 提交会话评价
     RATE_CANCEL, // 取消会话评价
     RATE_UP, // 评价消息up
