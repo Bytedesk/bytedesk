@@ -85,7 +85,9 @@ public class MessageLeaveEntity extends BaseEntity {
     // 关联工单ID（如果生成了工单）
     private String ticketUid;
     
-    // 关联会话ID（如果转为了会话）
+    // 关联消息uID（用于更新提示留言消息状态）
+    private String messageUid;
+    // 关联会话uID（本身对应的会话）
     private String threadUid;
     // 关联的会话
     // private String threadTopic;

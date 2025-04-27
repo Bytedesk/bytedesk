@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-02 14:20:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 09:17:01
+ * @LastEditTime: 2025-04-27 11:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageLeaveSpecification extends BaseSpecification {
 
     public static Specification<MessageLeaveEntity> search(MessageLeaveRequest request) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

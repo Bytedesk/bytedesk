@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-16 23:17:43
+ * @LastEditTime: 2025-04-27 11:33:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,8 +63,10 @@ public class MessageLeaveRequest extends BaseRequest {
     // 关联工单ID（如果生成了工单）
     private String ticketUid;
     
-    // 关联会话ID（如果转为了会话）
-    private String threadUid;
+   // 关联消息uID（用于更新提示留言消息状态）
+   private String messageUid;
+   // 关联会话uID（本身对应的会话）
+   private String threadUid;
     // 关联的会话
     // private String threadTopic;
     // private ThreadEntity thread;
