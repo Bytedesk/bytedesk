@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/leavemsg")
+@RequestMapping("/api/v1/message/leave")
 @AllArgsConstructor
 public class MessageLeaveRestController extends BaseRestController<MessageLeaveRequest> {
 

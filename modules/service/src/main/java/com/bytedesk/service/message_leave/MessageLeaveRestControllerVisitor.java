@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-27 10:55:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 11:04:15
+ * @LastEditTime: 2025-04-27 12:44:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,7 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/visitor/api/v1/leavemsg")
+@RequestMapping("/visitor/api/v1/message/leave")
 @AllArgsConstructor
 public class MessageLeaveRestControllerVisitor {
 
