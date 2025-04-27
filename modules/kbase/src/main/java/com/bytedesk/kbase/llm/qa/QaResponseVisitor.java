@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.llm.qa;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +34,10 @@ public class QaResponseVisitor implements Serializable {
     private String question;
 
     private String answer;
+
+    private List<String> images;
+
+    private List<String> attachments;
 
     private String type;
 
