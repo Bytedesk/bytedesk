@@ -289,6 +289,16 @@ public class UserEntity extends BaseEntityNoOrg {
 		UNKNOWN // unknown
 	}
 
+	public UserProtobuf toProtobuf() {
+		return UserProtobuf.builder()
+				.uid(this.getUid())
+				.nickname(this.getNickname())
+				.avatar(this.getAvatar())
+				.type(UserTypeEnum.USER.name())
+				.extra(this.getExtra())
+				.build();
+	}
+
 	@Override
 	public String toString() {
 		return "User [uid=" + this.getUid() +
