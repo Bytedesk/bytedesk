@@ -16,7 +16,6 @@
 
     <modules>
         <module>ai</module>
-        <module>callcenter</module>
         <module>core</module>
         <module>forum</module>
         <module>kbase</module>
