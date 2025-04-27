@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 21:37:11
+ * @LastEditTime: 2025-04-27 16:05:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 
 // import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -111,5 +112,13 @@ public abstract class BaseEntity implements Serializable {
     // 默认bytedesk平台
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
+
+    public String getCreatedAtString() {
+        return BdDateUtils.formatDatetimeToString(createdAt);
+    }
+
+    public String getUpdatedAtString() {
+        return BdDateUtils.formatDatetimeToString(updatedAt);
+    }
     
 }

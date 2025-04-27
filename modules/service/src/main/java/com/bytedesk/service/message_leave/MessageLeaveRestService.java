@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 14:42:59
+ * @LastEditTime: 2025-04-27 16:07:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -169,7 +170,7 @@ public class MessageLeaveRestService extends
             MessageLeaveEntity messageLeave = messageLeaveOptional.get();
             messageLeave.setReply(request.getReply());
             messageLeave.setReplyImages(request.getReplyImages());
-            messageLeave.setRepliedAt(request.getRepliedAt());
+            messageLeave.setRepliedAt(LocalDateTime.now());
             messageLeave.setReplyUser(user.toProtobuf().toJson());
             messageLeave.setStatus(MessageLeaveStatusEnum.REPLIED.name());
             // 
@@ -250,6 +251,15 @@ public class MessageLeaveRestService extends
         } else {
             excel.setUser("未知");
         }
+        // 回复人
+        UserProtobuf replyUser = UserProtobuf.fromJson(entity.getReplyUser());
+        if (replyUser != null) {
+            excel.setReplyUser(replyUser.getNickname());
+        } else {
+            excel.setReplyUser("未知");
+        }
+        excel.setCreatedAt(entity.getCreatedAtString());
+        excel.setRepliedAt(entity.getRepliedAtString());
         return excel;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 14:20:00
+ * @LastEditTime: 2025-04-27 16:08:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -62,6 +63,12 @@ public class MessageLeaveEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
 
+    // 附件
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> attachments = new ArrayList<>();
+
     // 回复内容
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String reply;
@@ -71,6 +78,12 @@ public class MessageLeaveEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> replyImages = new ArrayList<>();
+
+    // 回复附件
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> replyAttachments = new ArrayList<>();
 
     // 回复时间
     private LocalDateTime repliedAt;
@@ -127,4 +140,8 @@ public class MessageLeaveEntity extends BaseEntity {
     @Column(name = "reply_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String replyUser = BytedeskConsts.EMPTY_JSON_STRING;
 
+
+    public String getRepliedAtString() {
+        return BdDateUtils.formatDatetimeToString(repliedAt);
+    }
 }

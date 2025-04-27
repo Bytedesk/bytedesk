@@ -150,6 +150,9 @@ public class ServiceConvertUtils {
         if (entity.getUser() != null) {
             messageLeaveResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
         }
+        if (entity.getReplyUser() != null) {
+            messageLeaveResponse.setReplyUser(UserProtobuf.fromJson(entity.getReplyUser()));
+        }
         return messageLeaveResponse;
     }
     

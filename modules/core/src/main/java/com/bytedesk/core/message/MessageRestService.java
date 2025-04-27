@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 13:11:31
+ * @LastEditTime: 2025-04-27 16:07:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.MessageTypeConverter;
 
@@ -204,7 +203,7 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         messageExcel.setType(MessageTypeConverter.convertToChineseType(entity.getType()));
         messageExcel.setContent(entity.getContent());
         messageExcel.setSender(entity.getUserProtobuf().getNickname());
-        messageExcel.setCreatedAt(BdDateUtils.formatDatetimeToString(entity.getCreatedAt()));
+        messageExcel.setCreatedAt(entity.getCreatedAtString());
         return messageExcel;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 14:20:49
+ * @LastEditTime: 2025-04-27 15:06:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,10 +43,17 @@ public class MessageLeaveRequest extends BaseRequest {
     @Builder.Default
     private List<String> images = new ArrayList<>();
 
+    // 支持附件
+    @Builder.Default
+    private List<String> attachments = new ArrayList<>();
+
     private String reply;
 
     @Builder.Default
     private List<String> replyImages = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> replyAttachments = new ArrayList<>();
 
     // 回复时间
     private LocalDateTime repliedAt;
