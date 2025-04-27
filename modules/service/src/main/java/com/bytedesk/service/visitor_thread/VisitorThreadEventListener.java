@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 17:13:35
+ * @LastEditTime: 2025-04-27 16:59:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,8 @@ import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -58,6 +60,8 @@ public class VisitorThreadEventListener {
 
     private final ThreadRestService threadRestService;
 
+    private final QueueMemberRestService queueMemberRestService;
+
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
@@ -65,6 +69,15 @@ public class VisitorThreadEventListener {
         String topic = thread.getTopic();
         String content = "会话已结束";
         if (thread.isAutoClose()) {
+            // 自动关闭会话
+            Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+            if (queueMemberOptional.isPresent()) {
+                QueueMemberEntity queueMember = queueMemberOptional.get();
+                if (queueMember.isAgentOffline()) {
+                    // 客服离线，自动关闭会话，不发送自动关闭消息
+                    return;
+                }
+            }
             // 自动关闭，根据会话类型显示提示语
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
                 String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);

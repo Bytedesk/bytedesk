@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 10:02:35
+ * @LastEditTime: 2025-04-27 16:45:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,6 +72,18 @@ public class QaEntity extends BaseEntity {
     // 默认答案（对所有用户级别展示的通用答案），等级为0时答案
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String answer;
+
+    // 支持图片
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> images = new ArrayList<>();
+
+    // 附件
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> attachments = new ArrayList<>();
     
     // 支持一问多答，根据不同VIP等级对应不同答案
     @Builder.Default
@@ -84,6 +96,8 @@ public class QaEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<QaEntity> relatedQas = new ArrayList<>();
 
+    // 答案格式类型
+    // 暂时忽略掉，因为答案里面可以同时包含：文本、图片、附件等
     @Builder.Default
     @Column(name = "qa_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();

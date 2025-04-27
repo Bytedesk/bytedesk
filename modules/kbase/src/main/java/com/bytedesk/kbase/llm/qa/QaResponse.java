@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 16:37:05
+ * @LastEditTime: 2025-04-27 16:47:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,6 +38,12 @@ public class QaResponse extends BaseResponse {
     private List<String> questionList;
 
     private String answer;
+
+    // 支持图片
+    private List<String> images;
+
+    // 支持附件
+    private List<String> attachments;
 
     private List<QaAnswer> answerList;
 
