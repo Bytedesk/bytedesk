@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:33:11
+ * @LastEditTime: 2025-04-27 12:30:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,11 +23,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLeaveEntity, MessageLeaveRequest, MessageLeaveResponse, MessageLeaveExcel> {
+public class MessageLeaveRestService extends
+        BaseRestServiceWithExcel<MessageLeaveEntity, MessageLeaveRequest, MessageLeaveResponse, MessageLeaveExcel> {
 
     private final MessageLeaveRepository messageLeaveRepository;
 
@@ -44,6 +50,10 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
     private final ModelMapper modelMapper;
 
     private final AuthService authService;
+
+    private final MessageRestService messageRestService;
+
+    private final QueueMemberRestService queueMemberRestService;
 
     @Override
     public Page<MessageLeaveEntity> queryByOrgEntity(MessageLeaveRequest request) {
@@ -65,7 +75,7 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
             throw new RuntimeException("User should login first.");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         return queryByOrg(request);
     }
 
@@ -99,12 +109,38 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
             throw new RuntimeException("MessageLeave not saved");
         }
 
+        // 更新留言状态
+        Optional<MessageEntity> messageOptional = messageRestService.findByUid(savedMessageLeave.getMessageUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            message.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
+            //
+            MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.builder()
+                    .content(request.getContent())
+                    .contact(request.getContact())
+                    .images(request.getImages())
+                    .status(messageLeave.getStatus())
+                    .build();
+            message.setContent(messageLeaveExtra.toJson());
+            messageRestService.save(message);
+        }
+
+        // 更新队列留言状态
+        Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService
+                .findByThreadUid(savedMessageLeave.getThreadUid());
+        if (queueMemberOptional.isPresent()) {
+            QueueMemberEntity queueMember = queueMemberOptional.get();
+            queueMember.setLeaveMsg(true);
+            queueMember.setLeaveMsgAt(savedMessageLeave.getCreatedAt());
+            queueMemberRestService.save(queueMember);
+        }
+
         return convertToResponse(savedMessageLeave);
     }
 
     @Override
     public MessageLeaveResponse update(MessageLeaveRequest request) {
-        
+
         Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());
         if (messageLeaveOptional.isPresent()) {
             MessageLeaveEntity messageLeave = messageLeaveOptional.get();
@@ -127,7 +163,7 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
             return handleOptimisticLockingFailureException(e, entity);
         }
     }
-    
+
     @Override
     protected MessageLeaveEntity doSave(MessageLeaveEntity entity) {
         return messageLeaveRepository.save(entity);
@@ -171,22 +207,21 @@ public class MessageLeaveRestService extends BaseRestServiceWithExcel<MessageLea
         return modelMapper.map(entity, MessageLeaveResponse.class);
     }
 
-    
-
     @Override
     public MessageLeaveExcel convertToExcel(MessageLeaveEntity entity) {
         MessageLeaveExcel excel = modelMapper.map(entity, MessageLeaveExcel.class);
         excel.setImages(Utils.convertListToString(entity.getImages()));
         excel.setStatus(MessageLeaveStatusEnum.fromString(entity.getStatus()).getDescription());
         // if (StringUtils.hasText(entity.getCategoryUid())) {
-        //     Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
-        //     if (categoryOptional.isPresent()) {
-        //         excel.setCategory(categoryOptional.get().getName());
-        //     } else {
-        //         excel.setCategory("未分类");
-        //     }
+        // Optional<CategoryEntity> categoryOptional =
+        // categoryService.findByUid(entity.getCategoryUid());
+        // if (categoryOptional.isPresent()) {
+        // excel.setCategory(categoryOptional.get().getName());
         // } else {
-        //     excel.setCategory("未分类");
+        // excel.setCategory("未分类");
+        // }
+        // } else {
+        // excel.setCategory("未分类");
         // }
         UserProtobuf user = UserProtobuf.fromJson(entity.getUser());
         if (user != null) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-17 23:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-20 06:44:23
+ * @LastEditTime: 2025-04-27 12:20:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,8 +78,6 @@ public class MessageLeaveSettings implements Serializable {
 
     // 留言表单
     @Builder.Default
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
-    // @JdbcTypeCode(SqlTypes.JSON)
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
 
@@ -87,6 +85,8 @@ public class MessageLeaveSettings implements Serializable {
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER)
     private List<WorktimeEntity> worktimes = new ArrayList<>();
+
+    // TODO: 通知：邮箱、企业微信、钉钉、飞书、短信等
 
     //
     public boolean isInServiceTime() {
