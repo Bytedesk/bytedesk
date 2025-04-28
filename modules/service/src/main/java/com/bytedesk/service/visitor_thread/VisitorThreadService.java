@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 12:13:24
+ * @LastEditTime: 2025-04-28 13:50:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,6 +38,8 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -58,6 +60,8 @@ public class VisitorThreadService
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final QueueMemberRestService queueMemberRestService;
 
     @Override
     public Page<VisitorThreadResponse> queryByOrg(VisitorThreadRequest request) {
@@ -281,6 +285,10 @@ public class VisitorThreadService
             }
 
             // TODO: 查询超时未回复会话, 发送会话超时提醒
+            Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+            if (queueMemberOpt.isPresent()) {
+                
+            }
 
 
         });
