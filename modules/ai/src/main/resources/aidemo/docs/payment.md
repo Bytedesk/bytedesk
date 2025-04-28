@@ -13,7 +13,7 @@ sidebar_label: "费用相关"
 | Header    | Title |  Title  |
 | Paragraph | Text  |  Text   |
 
-### AI助手
+### AI Agent
 
 | 功能      | 开源  |  企业版 |
 | --------- | ----- |  ------ |
