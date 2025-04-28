@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:52:09
+ * @LastEditTime: 2025-04-28 14:27:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -38,6 +43,7 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -62,6 +68,10 @@ public class VisitorThreadService
     private final UidUtils uidUtils;
 
     private final QueueMemberRestService queueMemberRestService;
+
+    private final AgentRestService agentRestService;
+
+    private final IMessageSendService messageSendService;
 
     @Override
     public Page<VisitorThreadResponse> queryByOrg(VisitorThreadRequest request) {
@@ -96,7 +106,8 @@ public class VisitorThreadService
         //
         String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+        String extra = ServiceConvertUtils
+                .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         if (visitorRequest.isWeChat()) {
             extra = visitorRequest.getThreadExtra();
         }
@@ -119,12 +130,14 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         //
         if (visitorRequest.isWeChat()) {
             thread.setExtra(visitorRequest.getThreadExtra());
         } else {
-            String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+            String extra = ServiceConvertUtils
+                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
             thread.setExtra(extra);
         }
         // 保存
@@ -138,13 +151,15 @@ public class VisitorThreadService
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         // 考虑到客服信息发生变化，更新客服信息
-        // String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
+        // String agentString =
+        // ServiceConvertUtils.convertToUserProtobufJSONString(agent);
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         // 访客信息
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 考虑到配置可能变化，更新配置
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
-        // 
+        String extra = ServiceConvertUtils
+                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        //
         String orgUid = agent.getOrgUid();
         //
         ThreadEntity thread = ThreadEntity.builder()
@@ -159,7 +174,7 @@ public class VisitorThreadService
                 .client(visitorRequest.getClient())
                 .orgUid(orgUid)
                 .build();
-        // 
+        //
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {
             throw new RuntimeException("Could not save visitor thread");
@@ -211,7 +226,8 @@ public class VisitorThreadService
 
     public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
         //
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
+        String extra = ServiceConvertUtils
+                .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
@@ -256,7 +272,6 @@ public class VisitorThreadService
      */
     @Async
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
-        // List<ThreadEntity> threads = threadRestService.findStateOpen();
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
             // LocalDateTime转为时间戳需借助ZoneId和系统默认时区
@@ -266,23 +281,48 @@ public class VisitorThreadService
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
             // log.info("before autoCloseThread threadUid {} threadType {} threadId {}
-            // diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(),diffInMinutes);
-            ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
+            // diffInMinutes {}", thread.getUid(), thread.getType(),
+            // thread.getUid(),diffInMinutes);
+            ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
+                    ServiceSettingsResponseVisitor.class);
             Double autoCloseMinutes = settings.getAutoCloseMin();
-            // 
+            //
             // 添加空值检查，如果为null则使用默认值30分钟
             double autoCloseValue = (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
             if (diffInMinutes > autoCloseValue) {
                 threadRestService.autoClose(thread);
             }
 
-            // TODO: 查询超时未回复会话, 发送会话超时提醒
-            Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
-            if (queueMemberOpt.isPresent()) {
-                
+            // 查询超时未回复会话, 发送会话超时提醒
+            UserProtobuf agentProtobuf = thread.getAgentProtobuf();
+            if (agentProtobuf != null && StringUtils.hasText(agentProtobuf.getUid())) {
+                Optional<AgentEntity> agentOpt = agentRestService.findByUid(agentProtobuf.getUid());
+                if (agentOpt.isPresent()) {
+                    AgentEntity agent = agentOpt.get();
+                    // 判断是否超时未回复
+                    if (diffInMinutes > agent.getTimeoutRemindTime()) {
+                        // 发送会话超时提醒
+                        MessageProtobuf messageProtobuf = MessageUtils.createTimeoutRemindMessage(thread,
+                                agent.getTimeoutRemindTip());
+                        messageSendService.sendProtobufMessage(messageProtobuf);
+                        // 更新会话超时提醒时间
+                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
+                                .findByThreadUid(thread.getUid());
+                        if (queueMemberOpt.isPresent()) {
+                            QueueMemberEntity queueMember = queueMemberOpt.get();
+                            // 只设置首次超时时间，后续不再更新
+                            if (queueMember.getAgentTimeoutAt() == null) {
+                                queueMember.setAgentTimeoutAt(LocalDateTime.now());
+                                queueMember.setAgentTimeout(true);
+                            }
+                            // 更新超时次数
+                            queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
+                            // 保存队列成员信息
+                            queueMemberRestService.save(queueMember);
+                        }
+                    }
+                }
             }
-
-
         });
     }
 

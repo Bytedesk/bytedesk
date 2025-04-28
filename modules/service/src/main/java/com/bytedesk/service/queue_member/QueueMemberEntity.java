@@ -151,6 +151,10 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_agent_timeout")
     private boolean agentTimeout = false; // 是否超时
 
+    // agent timeout count
+    @Builder.Default
+    private int agentTimeoutCount = 0;  // 超时次数
+
     // 人工是否离线
     @Builder.Default
     @Column(name = "is_agent_offline")
