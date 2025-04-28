@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:14:29
+ * @LastEditTime: 2025-04-28 13:09:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,15 +37,7 @@ public class FaqInitializer implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         initAuthority();
         // init();
-        // 使用异步方式延迟初始化FAQ，不阻塞项目启动
-        // scheduleFaqInitialization();
     }
-
-    // private void scheduleFaqInitialization() {
-    //     taskScheduler.schedule(() -> {
-    //         initFaq();
-    //     }, java.time.Instant.now().plusSeconds(60));
-    // }
 
     private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {

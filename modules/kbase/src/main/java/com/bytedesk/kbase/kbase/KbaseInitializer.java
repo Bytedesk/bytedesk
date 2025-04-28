@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:17:13
+ * @LastEditTime: 2025-04-28 13:10:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,6 +46,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         faqInitializer.init();
         // 初始化快捷回复
         quickReplyInitializer.init();
+        // 初始化QA
+        
     }
 
     public void initKbase() {

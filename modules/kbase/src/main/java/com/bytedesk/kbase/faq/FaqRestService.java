@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 20:02:53
+ * @LastEditTime: 2025-04-28 13:17:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -582,6 +582,14 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .build();
                     // 保存FAQ到数据库
                     create(request);
+                    // 
+                    QaRequest qaRequest = QaRequest.builder()
+                        .question(faq.getQuestion())
+                        .answer(faq.getAnswer())
+                        .kbUid(llmQaKbUid)
+                        .orgUid(orgUid)
+                        .build();
+                    qaRestService.create(qaRequest);
                 } else {
                     // log.info("FAQ already exists: {}", faq.getUid());
                 }
