@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:56:29
+ * @LastEditTime: 2025-04-28 14:00:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -116,16 +116,20 @@ public class QueueMemberEntity extends BaseEntity {
      */
     private String agentAcceptType ;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime agentAcceptTime;  // 开始服务时间
+    private LocalDateTime agentAcceptedAt;  // 开始服务时间
 
     @Builder.Default
     private boolean agentFirstResponse = false;  // 人工客服是否首次响应
 
-    private LocalDateTime agentFirstResponseTime;  // 首次响应时间
+    private LocalDateTime agentFirstResponseAt;  // 首次响应时间
 
-    private LocalDateTime agentLastResponseTime;  // 最后响应时间
+    private LocalDateTime agentLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime agentCloseTime;  // 结束时间
+    private LocalDateTime agentClosedAt;  // 结束时间
+
+    @Builder.Default
+    @Column(name = "is_agent_close")
+    private boolean agentClose = false;  // 是否客服手动结束
 
     /**
      * 响应时间计算：
@@ -158,16 +162,17 @@ public class QueueMemberEntity extends BaseEntity {
      */
     private String robotAcceptType ;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime robotAcceptTime;  // 开始服务时间
+    private LocalDateTime robotAcceptedAt;  // 开始服务时间
     
     @Builder.Default
-    private boolean robotFirstResponse = false;  // 人工客服是否首次响应
+    @Column(name = "is_robot_first_response")
+    private boolean robotFirstResponse = false;  // 机器人客服是否首次响应
 
-    private LocalDateTime robotFirstResponseTime;  // 首次响应时间
+    private LocalDateTime robotFirstResponseAt;  // 首次响应时间
 
-    private LocalDateTime robotLastResponseTime;  // 最后响应时间
+    private LocalDateTime robotLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime robotCloseTime;  // 结束时间
+    private LocalDateTime robotClosedAt;  // 结束时间
 
     @Builder.Default
     private int robotAvgResponseTime = 0;  // 平均响应时间(秒)
@@ -192,6 +197,10 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime systemLastResponseTime;  // 系统最后响应时间
 
     private LocalDateTime systemCloseTime;  // 系统结束时间，即：autoCloseTime
+
+    @Builder.Default
+    @Column(name = "is_system_close")
+    private boolean systemClose = false;  // 是否系统自动结束
 
     @Builder.Default
     private int systemMessageCount = 0;  // 系统消息数量
@@ -275,26 +284,26 @@ public class QueueMemberEntity extends BaseEntity {
         if (visitorEnqueueTime == null) return 0;
         if (thread.isOffline()) return 0;
         // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
-        if (robotAcceptTime != null) {
-            return Duration.between(visitorEnqueueTime, robotAcceptTime).getSeconds();
+        if (robotAcceptedAt != null) {
+            return Duration.between(visitorEnqueueTime, robotAcceptedAt).getSeconds();
         }
-        LocalDateTime endWaitTime = agentAcceptTime != null ? agentAcceptTime : LocalDateTime.now();
+        LocalDateTime endWaitTime = agentAcceptedAt != null ? agentAcceptedAt : LocalDateTime.now();
         return Duration.between(visitorEnqueueTime, endWaitTime).getSeconds();
     }
 
     public void manualAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
-        this.agentAcceptTime = LocalDateTime.now();
+        this.agentAcceptedAt = LocalDateTime.now();
     }
 
     public void agentAutoAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
-        this.agentAcceptTime = LocalDateTime.now();
+        this.agentAcceptedAt = LocalDateTime.now();
     }
 
     public void robotAutoAcceptThread() {
         this.robotAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
-        this.robotAcceptTime = LocalDateTime.now();
+        this.robotAcceptedAt = LocalDateTime.now();
     }
 
     public void transferRobotToAgent() {
