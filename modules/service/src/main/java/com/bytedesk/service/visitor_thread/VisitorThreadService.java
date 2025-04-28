@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:50:50
+ * @LastEditTime: 2025-04-28 13:52:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -259,9 +259,6 @@ public class VisitorThreadService
         // List<ThreadEntity> threads = threadRestService.findStateOpen();
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
-            // 计算两个日期之间的毫秒差
-            // long diffInMilliseconds = Math.abs(new Date().getTime() -
-            // thread.getUpdatedAt().getTime());
             // LocalDateTime转为时间戳需借助ZoneId和系统默认时区
             long currentTimeMillis = System.currentTimeMillis();
             long updatedAtMillis = thread.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -269,15 +266,10 @@ public class VisitorThreadService
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
             // log.info("before autoCloseThread threadUid {} threadType {} threadId {}
-            // diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(),
-            // diffInMinutes);
-            // if (thread.isCustomerService()) {
+            // diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(),diffInMinutes);
             ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
             Double autoCloseMinutes = settings.getAutoCloseMin();
-            // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {},
-            // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
-            // diffInMinutes);
-            
+            // 
             // 添加空值检查，如果为null则使用默认值30分钟
             double autoCloseValue = (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
             if (diffInMinutes > autoCloseValue) {

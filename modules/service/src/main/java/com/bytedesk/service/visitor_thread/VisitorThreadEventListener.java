@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +74,8 @@ public class VisitorThreadEventListener {
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
+                queueMember.setSystemCloseTime(LocalDateTime.now());
+                queueMember.setSystemClose(true);
                 if (queueMember.isAgentOffline()) {
                     // 客服离线，自动关闭会话，不发送自动关闭消息
                     return;

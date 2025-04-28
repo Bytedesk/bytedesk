@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:44:42
+ * @LastEditTime: 2025-04-28 13:56:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,14 +93,14 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private LocalDateTime visitorEnqueueTime = LocalDateTime.now();  // 加入时间
 
-    private LocalDateTime visitorFirstMessageTime;  // 访客首次发送消息时间
+    private LocalDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
-    private LocalDateTime visitorLastMessageTime;  // 访客最后发送消息时间
+    private LocalDateTime visitorLastMessageAt;  // 访客最后发送消息时间
 
     @Builder.Default
     private int visitorMessageCount = 0;  // 访客消息数量
 
-    private LocalDateTime visitorLeaveTime;  // 离开时间
+    private LocalDateTime visitorLeavedAt;  // 离开时间
 
     @Builder.Default
     private int visitorPriority = 0;  // 优先级(0-100)
