@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:41:09
+ * @LastEditTime: 2025-04-28 12:13:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -246,14 +246,12 @@ public class VisitorThreadService
     }
 
     /**
-     * TODO: 座席端25分钟不回复则自动断开，推送满意度
-     * TODO: 客户端2分钟没有回复坐席则自动推送1分钟计时提醒：
      * TODO: 频繁查库，待优化
-     * 温馨提示：您已经有2分钟未有操作了，如再有1分钟未有操作，系统将自动结束本次对话，感谢您的支持与谅解
-     * 如果1分钟之内无回复，则推送满意度：
+     * 1. 超时关闭会话
+     * 2. 超时未回复会话，发送会话超时提醒
      */
     @Async
-    public void autoCloseThread(List<ThreadEntity> threads) {
+    public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
         // List<ThreadEntity> threads = threadRestService.findStateOpen();
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
@@ -270,8 +268,7 @@ public class VisitorThreadService
             // diffInMinutes {}", thread.getUid(), thread.getType(), thread.getUid(),
             // diffInMinutes);
             // if (thread.isCustomerService()) {
-            ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
-                    ServiceSettingsResponseVisitor.class);
+            ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
             Double autoCloseMinutes = settings.getAutoCloseMin();
             // log.info("autoCloseThread threadUid {} threadType {} autoCloseMinutes {},
             // diffInMinutes {}", thread.getUid(), thread.getType(), autoCloseMinutes,
@@ -279,11 +276,13 @@ public class VisitorThreadService
             
             // 添加空值检查，如果为null则使用默认值30分钟
             double autoCloseValue = (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
-            
             if (diffInMinutes > autoCloseValue) {
                 threadRestService.autoClose(thread);
             }
-            // }
+
+            // TODO: 查询超时未回复会话, 发送会话超时提醒
+
+
         });
     }
 

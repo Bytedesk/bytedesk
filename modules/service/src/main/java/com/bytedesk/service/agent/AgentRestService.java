@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:53:05
+ * @LastEditTime: 2025-04-28 12:06:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -214,6 +214,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setDescription(request.getDescription());
         agent.setStatus(request.getStatus()); // 更新接待状态
         agent.setMaxThreadCount(request.getMaxThreadCount());
+        agent.setTimeoutRemindTime(request.getTimeoutRemindTime());
         // 暂不允许修改绑定成员
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
@@ -279,6 +280,24 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
+    // 在定时任务中执行
+    public void updateConnect() {
+        List<AgentEntity> agents = findAllConnected();
+        Set<String> userIds = mqttConnectionService.getConnectedUserUids();
+        // 遍历agents，判断是否在线，如果不在，则更新为离线状态
+        for (AgentEntity agent : agents) {
+            String userUid = agent.getUserUid();
+            if (!userIds.contains(userUid)) {
+                log.info("agent updateConnect uid {} offline", userUid);
+                updateConnect(userUid, false);
+            }
+        }
+        // 遍历userIds，更新为在线状态
+        for (String userUid : userIds) {
+            updateConnect(userUid, true);            
+        }
+    }
+
 
      public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
         UserEntity user = authService.getUser();
@@ -340,6 +359,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         return convertToResponse(updatedAgent);
     }
+
+    // 
+
 
     /**
      * 更新坐席在线状态
