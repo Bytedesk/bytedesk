@@ -21,7 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.llm.split.SplitStatusEnum;
+import com.bytedesk.kbase.llm.chunk.SplitStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;

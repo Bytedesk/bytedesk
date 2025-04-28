@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm.split;
+package com.bytedesk.kbase.llm.chunk;
 
 import org.springframework.stereotype.Component;
 

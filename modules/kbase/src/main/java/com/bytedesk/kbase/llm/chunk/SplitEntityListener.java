@@ -11,16 +11,16 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm.split;
+package com.bytedesk.kbase.llm.chunk;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.llm.split.event.SplitCreateEvent;
-import com.bytedesk.kbase.llm.split.event.SplitDeleteEvent;
-import com.bytedesk.kbase.llm.split.event.SplitUpdateEvent;
+import com.bytedesk.kbase.llm.chunk.event.SplitCreateEvent;
+import com.bytedesk.kbase.llm.chunk.event.SplitDeleteEvent;
+import com.bytedesk.kbase.llm.chunk.event.SplitUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;

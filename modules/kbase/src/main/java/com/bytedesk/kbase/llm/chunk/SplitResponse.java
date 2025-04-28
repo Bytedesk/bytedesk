@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm.split;
+package com.bytedesk.kbase.llm.chunk;
 
 import java.time.LocalDateTime;
 import java.util.List;
