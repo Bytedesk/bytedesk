@@ -143,7 +143,7 @@
     <script src="/assets/vendor/jquery-3.7.1.min.js"></script>
     <script src="/assets/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
     <#--  <script src="/js/ticket/index.js"></script>  -->
-        <!-- bytedesk.com -->
+    <!-- bytedesk.com -->
     <script src="https://www.weiyuai.cn/embed/bytedesk-web.js"></script>
     <script>
         const config = {
@@ -151,7 +151,7 @@
             placement: 'bottom-right',
             autoPopup: false,
             inviteConfig: {
-            show: true,
+            show: false,
             text: '需要帮助么',
             delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
             loop: true, // 是否启用循环
