@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 17:50:15
+ * @LastEditTime: 2025-04-28 18:20:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -39,8 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class FaqRestControllerVisitor {
 
     private final FaqRestService faqRestService;
-
-    private final MessageRestService messageRestService;
 
     // 输入联想搜索faq
     @BlackIpFilter(title = "black", action = "searchFaqVisitor")
@@ -73,30 +70,12 @@ public class FaqRestControllerVisitor {
         }
         return ResponseEntity.ok(JsonResult.success(faq));
     }
-
-    // rate up faq
-    @PostMapping("/rate/up")
-    public ResponseEntity<?> rateUp(@RequestBody FaqRequest request) {
-
-        FaqResponse faq = faqRestService.rateUp(request);
-
-        return ResponseEntity.ok(JsonResult.success(faq));
-    }
-
-    // rate down faq
-    @PostMapping("/rate/down")
-    public ResponseEntity<?> rateDown(@RequestBody FaqRequest request) {
-
-        FaqResponse faq = faqRestService.rateDown(request);
-
-        return ResponseEntity.ok(JsonResult.success(faq));
-    }
-
+    
     // rate message helpful
     @PostMapping("/rate/message/helpful")
     public ResponseEntity<?> rateMessageHelpful(@RequestBody FaqRequest request) {
 
-        MessageResponse message = messageRestService.rateUp(request.getUid());
+        MessageResponse message = faqRestService.rateUp(request);
 
         return ResponseEntity.ok(JsonResult.success(message));
     }
@@ -105,7 +84,7 @@ public class FaqRestControllerVisitor {
     @PostMapping("/rate/message/unhelpful")
     public ResponseEntity<?> rateMessageNotHelpful(@RequestBody FaqRequest request) {
         
-        MessageResponse message = messageRestService.rateDown(request.getUid());
+        MessageResponse message = faqRestService.rateDown(request);
 
         return ResponseEntity.ok(JsonResult.success(message));
     }

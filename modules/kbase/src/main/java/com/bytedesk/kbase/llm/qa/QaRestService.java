@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 17:41:54
+ * @LastEditTime: 2025-04-28 18:24:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -224,7 +225,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         }
         //
         return convertToResponse(savedEntity);
-
     }
 
     @Override
@@ -287,40 +287,74 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         }
     }
 
-    public QaResponse rateUp(String uid) {
-        Optional<QaEntity> optional = findByUid(uid);
-        if (optional.isPresent()) {
-            QaEntity entity = optional.get();
-            entity.increaseUpCount();
-            //
-            QaEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Failed to rate up QA");
-            }
-            // TODO: 更新消息状态
+    // public QaResponse rateUp(QaRequest request) {
+    //     Optional<QaEntity> optional = findByUid(request.getUid());
+    //     if (optional.isPresent()) {
+    //         QaEntity entity = optional.get();
+    //         entity.increaseUpCount();
+    //         //
+    //         QaEntity savedEntity = save(entity);
+    //         if (savedEntity == null) {
+    //             throw new RuntimeException("Failed to rate up QA");
+    //         }
+    //         // TODO: 更新消息状态
+    //         return convertToResponse(savedEntity);
+    //     } else {
+    //         throw new RuntimeException("qa not found");
+    //     }
+    // }
 
-            return convertToResponse(savedEntity);
-        } else {
-            throw new RuntimeException("qa not found");
+    // public QaResponse rateDown(QaRequest request) {
+    //     Optional<QaEntity> optional = findByUid(request.getUid());
+    //     if (optional.isPresent()) {
+    //         QaEntity entity = optional.get();
+    //         entity.increaseDownCount();
+    //         //
+    //         QaEntity savedEntity = save(entity);
+    //         if (savedEntity == null) {
+    //             throw new RuntimeException("Failed to rate down QA");
+    //         }
+    //         // TODO: 更新消息状态
+    //         return convertToResponse(savedEntity);
+    //     } else {
+    //         throw new RuntimeException("qa not found");
+    //     }
+    // }
+
+    // rate message extra helpful
+    public MessageResponse rateUp(QaRequest request) {
+        Optional<MessageEntity> messageOptional = messageRestService.findByUid(request.getMessageUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            message.setStatus(MessageStatusEnum.RATE_UP.name());
+            //
+            MessageEntity savedMessage = messageRestService.save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            // TODO: 增加qa的点赞数
+            //
+            return ConvertUtils.convertToMessageResponse(message);
         }
+        return null;
     }
 
-    public QaResponse rateDown(String uid) {
-        Optional<QaEntity> optional = findByUid(uid);
-        if (optional.isPresent()) {
-            QaEntity entity = optional.get();
-            entity.increaseDownCount();
+    // rate message extra unhelpful
+    public MessageResponse rateDown(QaRequest request) {
+        Optional<MessageEntity> optionalMessage = messageRestService.findByUid(request.getMessageUid());
+        if (optionalMessage.isPresent()) {
+            MessageEntity message = optionalMessage.get();
+            message.setStatus(MessageStatusEnum.RATE_DOWN.name());
             //
-            QaEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Failed to rate down QA");
+            MessageEntity savedMessage = messageRestService.save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
             }
-            // TODO: 更新消息状态
-
-            return convertToResponse(savedEntity);
-        } else {
-            throw new RuntimeException("qa not found");
+            // TODO: 增加qa的点踩数
+            //
+            return ConvertUtils.convertToMessageResponse(message);
         }
+        return null;
     }
 
     @Override

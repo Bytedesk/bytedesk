@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 17:34:20
+ * @LastEditTime: 2025-04-28 18:22:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,6 @@ package com.bytedesk.kbase.llm.qa;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -39,7 +38,7 @@ public class QaRestControllerVisitor {
 
     private final QaRestService qaRestService;
 
-    private final MessageRestService messageRestService;
+    // private final MessageRestService messageRestService;
 
     // 输入联想搜索qa
     // suggest qa
@@ -71,29 +70,11 @@ public class QaRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(qa));
     }
 
-    // rate up qa
-    @PostMapping("/rate/up")
-    public ResponseEntity<?> rateUp(@RequestBody QaRequest request) {
-
-        QaResponse qa = qaRestService.rateUp(request.getUid());
-
-        return ResponseEntity.ok(JsonResult.success(qa));
-    }
-
-    // rate down qa
-    @PostMapping("/rate/down")
-    public ResponseEntity<?> rateDown(@RequestBody QaRequest request) {
-
-        QaResponse qa = qaRestService.rateDown(request.getUid());
-
-        return ResponseEntity.ok(JsonResult.success(qa));
-    }
-
     // rate message helpful
     @PostMapping("/rate/message/helpful")
     public ResponseEntity<?> rateMessageHelpful(@RequestBody QaRequest request) {
 
-        MessageResponse message = messageRestService.rateUp(request.getUid());
+        MessageResponse message = qaRestService.rateUp(request);
 
         return ResponseEntity.ok(JsonResult.success(message));
     }
@@ -102,7 +83,7 @@ public class QaRestControllerVisitor {
     @PostMapping("/rate/message/unhelpful")
     public ResponseEntity<?> rateMessageNotHelpful(@RequestBody QaRequest request) {
         
-        MessageResponse message = messageRestService.rateDown(request.getUid());
+        MessageResponse message = qaRestService.rateDown(request);
 
         return ResponseEntity.ok(JsonResult.success(message));
     }

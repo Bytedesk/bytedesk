@@ -54,16 +54,6 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Builder.Default
     private String client = ClientEnum.WEB.name();
 
-    // 使用thread代替topic和threadUid, 待去掉
-    // @Deprecated
-    // /** message belongs to */
-    // @Column(name = "thread_topic")
-    // private String topic;
-
-    // @Deprecated
-    // @Column(name = "thread_uid")
-    // private String threadUid;
-
     /**
      * sender信息的JSON表示
      */
