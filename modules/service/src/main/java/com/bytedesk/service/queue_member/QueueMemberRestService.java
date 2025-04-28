@@ -111,10 +111,10 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
                 }
                 
                 // 保持最新的时间戳
-                if (entity.getVisitorLastMessageTime() != null && 
-                    (latestEntity.getVisitorLastMessageTime() == null || 
-                     entity.getVisitorLastMessageTime().isAfter(latestEntity.getVisitorLastMessageTime()))) {
-                    latestEntity.setVisitorLastMessageTime(entity.getVisitorLastMessageTime());
+                if (entity.getVisitorLastMessageAt() != null && 
+                    (latestEntity.getVisitorLastMessageAt() == null || 
+                     entity.getVisitorLastMessageAt().isAfter(latestEntity.getVisitorLastMessageAt()))) {
+                    latestEntity.setVisitorLastMessageAt(entity.getVisitorLastMessageAt());
                 }
                 
                 if (entity.getAgentLastResponseTime() != null && 

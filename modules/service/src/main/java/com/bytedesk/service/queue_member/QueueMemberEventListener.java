@@ -119,12 +119,12 @@ public class QueueMemberEventListener {
             LocalDateTime now = LocalDateTime.now();
             
             // 更新首次消息时间（如果尚未设置）
-            if (queueMember.getVisitorFirstMessageTime() == null) {
-                queueMember.setVisitorFirstMessageTime(now);
+            if (queueMember.getVisitorFirstMessageAt() == null) {
+                queueMember.setVisitorFirstMessageAt(now);
             }
             
             // 更新最后一次访客消息时间
-            queueMember.setVisitorLastMessageTime(now);
+            queueMember.setVisitorLastMessageAt(now);
             
             // 更新访客消息计数
             queueMember.setVisitorMessageCount(queueMember.getVisitorMessageCount() + 1);
@@ -167,17 +167,17 @@ public class QueueMemberEventListener {
             queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
             
             // 如果是首次响应，记录首次响应时间
-            if (!queueMember.isAgentFirstResponse() && queueMember.getVisitorLastMessageTime() != null) {
+            if (!queueMember.isAgentFirstResponse() && queueMember.getVisitorLastMessageAt() != null) {
                 queueMember.setAgentFirstResponse(true);
                 queueMember.setAgentFirstResponseTime(now);
                 
                 // 计算首次响应时间（秒）
-                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageTime(), now).getSeconds();
+                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
                 queueMember.setAgentMaxResponseTime((int) responseTimeInSeconds);
                 queueMember.setAgentAvgResponseTime((int) responseTimeInSeconds);
-            } else if (queueMember.getVisitorLastMessageTime() != null) {
+            } else if (queueMember.getVisitorLastMessageAt() != null) {
                 // 非首次响应，更新平均和最大响应时间
-                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageTime(), now).getSeconds();
+                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
                 
                 // 更新最大响应时间
                 if (responseTimeInSeconds > queueMember.getAgentMaxResponseTime()) {
@@ -243,8 +243,8 @@ public class QueueMemberEventListener {
             queueMember.setRobotMessageCount(queueMember.getRobotMessageCount() + 1);
             
             // 如果是访客提问后的机器人回复，计算响应时间
-            if (queueMember.getVisitorLastMessageTime() != null) {
-                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageTime(), now).getSeconds();
+            if (queueMember.getVisitorLastMessageAt() != null) {
+                long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
                 
                 // 更新最大响应时间
                 if (queueMember.getRobotMaxResponseTime() == 0 || 
