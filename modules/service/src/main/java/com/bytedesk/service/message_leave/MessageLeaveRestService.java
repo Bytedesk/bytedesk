@@ -132,8 +132,8 @@ public class MessageLeaveRestService extends
                 .findByThreadUid(savedMessageLeave.getThreadUid());
         if (queueMemberOptional.isPresent()) {
             QueueMemberEntity queueMember = queueMemberOptional.get();
-            queueMember.setLeaveMsg(true);
-            queueMember.setLeaveMsgAt(savedMessageLeave.getCreatedAt());
+            queueMember.setMessageLeave(true);
+            queueMember.setMessageLeaveAt(savedMessageLeave.getCreatedAt());
             queueMemberRestService.save(queueMember);
         }
 

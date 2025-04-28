@@ -76,6 +76,7 @@ public enum MessageTypeEnum {
     RATE_CANCEL, // 访客取消评价
     AUTO_CLOSED, // 自动关闭
     AGENT_CLOSED, // 客服关闭
+    TIMEOUT_REMIND, // 超时提醒
     TRANSFER,
     TRANSFER_REJECT,
     TRANSFER_ACCEPT,

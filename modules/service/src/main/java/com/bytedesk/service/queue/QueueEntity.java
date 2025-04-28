@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 11:59:01
+ * @LastEditTime: 2025-04-28 13:46:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,17 +138,17 @@ public class QueueEntity extends BaseEntity {
         }
 
         // leaveMsgCount
-        public int getLeaveMsgCount() {
+        public int getMessageLeaveCount() {
                 int count1 = (int) agentQueueMembers.stream()
-                                .filter(member -> (member.isLeaveMsg()))
+                                .filter(member -> (member.isMessageLeave()))
                                 .count();
 
                 int count2 = (int) robotQueueMembers.stream()
-                                .filter(member -> (member.isLeaveMsg()))
+                                .filter(member -> (member.isMessageLeave()))
                                 .count();
 
                 int count3 = (int) workgroupQueueMembers.stream()
-                                .filter(member -> (member.isLeaveMsg()))
+                                .filter(member -> (member.isMessageLeave()))
                                 .count();
 
                 return count1 + count2 + count3;
