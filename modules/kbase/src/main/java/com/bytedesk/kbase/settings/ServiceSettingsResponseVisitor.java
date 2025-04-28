@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 09:25:15
+ * @LastEditTime: 2025-04-28 10:16:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,6 +84,8 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private Boolean showQuickFaqs;
     // 快捷问题
     private List<FaqResponseVisitor> quickFaqs;
+    // 快捷问题知识库
+    private String quickFaqKbUid;
     //
     private Boolean showGuessFaqs;
     // 猜你想问

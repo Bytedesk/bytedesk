@@ -121,13 +121,14 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showFaqs = true;
     @Builder.Default
     private List<String> faqUids = new ArrayList<>();
-
     private String faqKbUid;
 
     @Builder.Default
     private Boolean showQuickFaqs = true;
     @Builder.Default
     private List<String> quickFaqUids = new ArrayList<>();
+    // 快捷问题知识库
+    private String quickFaqKbUid;
 
     @Builder.Default
     private Boolean showGuessFaqs = true;
