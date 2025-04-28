@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 17:52:56
+ * @LastEditTime: 2025-04-28 16:37:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.message.MessageResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,10 +53,7 @@ public class FaqResponse extends BaseResponse {
     private List<FaqAnswer> answerList;
 
     // 修改这里，使用简化版的响应对象避免循环依赖
-    private List<SimpleFaqResponse> relatedFaqs;
-
-    // 是否是llm问答
-    // private Boolean isLlmQa;
+    private List<FaqResponseSimple> relatedFaqs;
 
     private String type;
 
@@ -107,16 +105,20 @@ public class FaqResponse extends BaseResponse {
     /**
      * 简化版FAQ响应，用于相关问题展示，避免循环依赖
      */
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SimpleFaqResponse {
-        private String uid;
-        private String question;
-        private String answer;
-        private String type;
-        private String status;
-    }
+    // @Data
+    // @Builder
+    // @NoArgsConstructor
+    // @AllArgsConstructor
+    // public static class SimpleFaqResponse {
+    //     private String uid;
+    //     private String question;
+    //     private String answer;
+    //     private String type;
+    //     private String status;
+    // }
+
+    // 
+    private MessageResponse questionMessage;
+    private MessageResponse answerMessage;
 
 }

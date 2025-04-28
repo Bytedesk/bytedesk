@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 13:10:02
+ * @LastEditTime: 2025-04-28 16:59:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseExtra;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,10 +47,10 @@ public class MessageExtra extends BaseExtra {
     // private String feedback = BytedeskConsts.EMPTY_JSON_STRING;
     
     // 自动回复
-    @Builder.Default
-    private Boolean isAutoReply = false;
+    // @Builder.Default
+    // private Boolean isAutoReply = false;
     
-    private String autoReplyType;
+    // private String autoReplyType;
     
     // 翻译
     // private String translation;

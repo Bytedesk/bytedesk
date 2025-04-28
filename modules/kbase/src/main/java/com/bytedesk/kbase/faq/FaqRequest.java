@@ -130,4 +130,7 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private List<String> docIdList = new ArrayList<>();
 
+
+    // 用于客户端点击uid
+    private String threadUid; // 对应会话
 }
