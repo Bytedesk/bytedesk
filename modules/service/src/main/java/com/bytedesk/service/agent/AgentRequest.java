@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 10:56:41
+ * @LastEditTime: 2025-04-28 12:42:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,7 +88,11 @@ public class AgentRequest extends BaseRequest {
     private Integer maxThreadCount = 10;
 
     @Builder.Default
-    private Integer timeoutRemindTime = 30;
+    private Integer timeoutRemindTime = 5;
+
+    // 超时提醒提示
+    @Builder.Default
+    private String timeoutRemindTip = I18Consts.I18N_AGENT_TIMEOUT_TIP;
 
     //
     @NotBlank

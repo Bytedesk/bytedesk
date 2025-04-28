@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-25 17:06:01
+ * @LastEditTime: 2025-04-28 12:43:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -151,6 +151,7 @@ public class I18Consts {
     // public static final String I18N_AUTO_CLOSED = I18N_PREFIX + "auto.closed"; // 已自动关闭
     // public static final String I18N_AGENT_CLOSED = I18N_PREFIX + "agent.closed"; // 已被客服关闭
     // public static final String I18N_AGENT_TRANSFER = I18N_PREFIX + "agent.transfer"; // 已被客服转接
+    // public static final String I18N_AGENT_TIMEOUT = "超时未回复，请尽快回复客户"; // 超时未回复
     // // 黑名单
     // public static final String I18N_BLACK_USER_ALREADY_EXISTS = I18N_PREFIX + "black.user.already.exists"; // 黑名单用户已存在
     // // 输入状态
@@ -222,6 +223,7 @@ public class I18Consts {
     public static final String I18N_AUTO_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 会话已自动关闭
     public static final String I18N_AGENT_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 客服已关闭会话
     public static final String I18N_AGENT_TRANSFER_TIP = "客服已将会话转接"; // 客服已将会话转接
+    public static final String I18N_AGENT_TIMEOUT_TIP = "超时未回复，请尽快回复客户"; // 超时未回复
     // 评价提示
     public static final String I18N_INVITE_RATE_TIP = "邀请评价提示"; // 邀请评价提示
     // 统一
@@ -303,10 +305,11 @@ public class I18Consts {
     // 文件解析
     public static final String I18N_NOTICE_PARSE_FILE_SUCCESS = "文件解析成功"; // 文件解析成功
     public static final String I18N_NOTICE_PARSE_FILE_ERROR = "文件解析错误"; // 文件解析错误
-    // 会话状态
+    // 会话状态,  用于更新thread.content
     public static final String I18N_AUTO_CLOSED = "已自动关闭"; // 已自动关闭
     public static final String I18N_AGENT_CLOSED = "已被客服关闭"; // 已被客服关闭
     public static final String I18N_AGENT_TRANSFER = "已被客服转接"; // 已被客服转接
+    public static final String I18N_AGENT_TIMEOUT = "超时未回复"; // 超时未回复
     // 黑名单
     public static final String I18N_BLACK_USER_ALREADY_EXISTS = "黑名单用户已存在"; // 黑名单用户已存在
     // 输入状态
