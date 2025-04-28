@@ -130,6 +130,7 @@ public class AgentEventListener {
         for (String userUid : userIds) {
             agentService.updateConnect(userUid, true);            
         }
+        // TODO: 查询超时未回复会话
     }
 
     // 客服接待数量发生变化，增加接待数量，发送欢迎语

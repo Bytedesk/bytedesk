@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 10:58:47
+ * @LastEditTime: 2025-04-28 11:45:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -132,12 +132,12 @@ public class AgentEntity extends BaseEntity {
     // 最大同时接待数量
     // max concurrent chatting thread count
     @Builder.Default
-    private int maxThreadCount = 5;
+    private int maxThreadCount = 10;
 
     // 超时提醒时间：分钟
     // 当客服超过这个时间没有接待新的会话时，会提醒客服
     @Builder.Default
-    private int timeoutRemindTime = 30;
+    private int timeoutRemindTime = 5;
 
     /** 存储当前接待数量等 */
     @Builder.Default

@@ -37,8 +37,8 @@ Download START -->
 					<!-- App store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
 						<#--  <a href="#"><img src="assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
-						<a href="https://www.kefux.com/assets/img/qrcode/qiye.png" target="_blank">
-							<img src="https://www.kefux.com/assets/img/qrcode/qiye.png"/>
+						<a href="/assets/images/qrcode/wechat.png" target="_blank">
+							<img src="/assets/images/qrcode/wechat.png"/>
 						</a>
 					</div>
 				</div>
