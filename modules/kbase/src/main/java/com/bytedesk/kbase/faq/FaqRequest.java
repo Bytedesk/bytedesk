@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 17:53:59
+ * @LastEditTime: 2025-04-28 17:56:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -124,8 +124,6 @@ public class FaqRequest extends BaseRequest {
     private String kbUid; // 对应知识库
 
     private String fileUid; // 对应文件
-
-    // private String docUid; // 对应文档
 
     @Builder.Default
     private List<String> docIdList = new ArrayList<>();
