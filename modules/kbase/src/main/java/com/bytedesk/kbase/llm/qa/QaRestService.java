@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 20:03:42
+ * @LastEditTime: 2025-04-28 17:41:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm.qa;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,10 +35,17 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm.qa.event.QaUpdateDocEvent;
@@ -63,6 +71,10 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
     private final KbaseRestService kbaseRestService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final ThreadRestService threadRestService;
+
+    private final MessageRestService messageRestService;
 
     @Override
     public Page<QaEntity> queryByOrgEntity(QaRequest request) {
@@ -111,6 +123,46 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         }
         return null;
     }
+
+    // 点击qa
+    public QaResponse clickQa(QaRequest request) {
+        Optional<QaEntity> optionalEntity = findByUid(request.getUid());
+        if (optionalEntity.isPresent()) {
+            QaEntity entity = optionalEntity.get();
+            entity.increaseClickCount();
+            //
+            QaEntity savedEntity = qaRepository.save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update click count");
+            }
+            QaResponse qaResponse = convertToResponse(savedEntity);
+
+            // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
+            // 插入问题消息
+            Optional<ThreadEntity> thread = threadRestService.findByUid(request.getThreadUid());
+            if (thread.isPresent()) {
+                ThreadEntity threadEntity = thread.get();
+                // 插入问题消息
+                MessageEntity questionMessage = getQaQuestionMessage(qaResponse, threadEntity);
+                MessageEntity savedQuestionMessage = messageRestService.save(questionMessage);
+                if (savedQuestionMessage == null) {
+                    throw new RuntimeException("Failed to insert question message");
+                }
+                qaResponse.setQuestionMessage(ConvertUtils.convertToMessageResponse(savedQuestionMessage));
+                // 
+                MessageEntity answerMessage = getQaAnswerMessage(qaResponse, threadEntity);
+                MessageEntity savedAnswerMessage = messageRestService.save(answerMessage);
+                if (savedAnswerMessage == null) {
+                    throw new RuntimeException("Failed to insert answer message");
+                }
+                qaResponse.setAnswerMessage(ConvertUtils.convertToMessageResponse(savedAnswerMessage));
+            }
+            //
+            return qaResponse;
+        }
+        return null;
+    }
+
 
     @Cacheable(value = "qa", key = "#uid", unless = "#result == null")
     @Override
@@ -168,7 +220,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         //
         QaEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Failed to create FAQ");
+            throw new RuntimeException("Failed to create QA");
         }
         //
         return convertToResponse(savedEntity);
@@ -209,7 +261,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Failed to create FAQ");
+                throw new RuntimeException("Failed to create QA");
             }
             //
             return convertToResponse(savedEntity);
@@ -227,7 +279,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Failed to update FAQ");
+                throw new RuntimeException("Failed to update QA");
             }
             return convertToResponse(savedEntity);
         } else {
@@ -243,7 +295,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Failed to rate up FAQ");
+                throw new RuntimeException("Failed to rate up QA");
             }
             // TODO: 更新消息状态
 
@@ -261,7 +313,7 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             //
             QaEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Failed to rate down FAQ");
+                throw new RuntimeException("Failed to rate down QA");
             }
             // TODO: 更新消息状态
 
@@ -347,13 +399,11 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
 
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedQas() != null) {
-            List<QaResponse.SimpleQaResponse> simpleQas = entity.getRelatedQas().stream()
-                    .map(relatedQa -> QaResponse.SimpleQaResponse.builder()
+            List<QaResponseSimple> simpleQas = entity.getRelatedQas().stream()
+                    .map(relatedQa -> QaResponseSimple.builder()
                             .uid(relatedQa.getUid())
                             .question(relatedQa.getQuestion())
                             .answer(relatedQa.getAnswer())
-                            .type(relatedQa.getType())
-                            .status(relatedQa.getStatus())
                             .build())
                     .collect(Collectors.toList());
             response.setRelatedQas(simpleQas);
@@ -426,4 +476,66 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         return qaEntity;
     }
 
+    public static MessageEntity getQaQuestionMessage(QaResponse qaResponse, ThreadEntity threadEntity) {
+        // 
+        QaMessageExtra questionExtra = QaMessageExtra.builder()
+                .qaUid(qaResponse.getUid())
+                .build();
+        //
+        String content = qaResponse.getQuestion();
+        String extra = questionExtra.toJson();
+        String user = threadEntity.getUser();
+        //
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .type(MessageTypeEnum.QA_QUESTION.name())
+                .status(MessageStatusEnum.SUCCESS.name())
+                .client(threadEntity.getClient())
+                .user(user)
+                .orgUid(threadEntity.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .thread(threadEntity)
+                .extra(extra)
+                .build();
+
+        return message;
+    }
+
+    public static MessageEntity getQaAnswerMessage(QaResponse qaResponse, ThreadEntity threadEntity) {
+        // 
+        QaMessageExtra answerExtra = QaMessageExtra.builder()
+                        .qaUid(qaResponse.getUid())
+                        .relatedQas(qaResponse.getRelatedQas())
+                        .build();
+        // 
+        String content = qaResponse.getAnswer();
+        String extra = answerExtra.toJson();
+        // 插入答案消息
+        String answerUser = threadEntity.getRobot();
+        if (threadEntity.isAgentType()) {
+            answerUser = threadEntity.getAgent();
+        } else if (answerUser == null) {
+            answerUser = threadEntity.getWorkgroup();
+        }
+        // 
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .type(MessageTypeEnum.QA_ANSWER.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(answerUser)
+                .orgUid(threadEntity.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .thread(threadEntity)
+                .extra(extra)
+                .build();
+
+        return message;
+    }
+
+    
 }
