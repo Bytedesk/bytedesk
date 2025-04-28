@@ -27,14 +27,14 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">微语AI助手</a>
+            <a class="navbar-brand" href="#">微语AI Agent</a>
         </div>
     </nav>
 
     <div class="container my-5">
         <div class="row text-center mb-5">
             <div class="col">
-                <h1 class="display-4 mb-3">智能AI助手系统</h1>
+                <h1 class="display-4 mb-3">智能AI Agent系统</h1>
                 <p class="lead">整合多种大语言模型，提供智能对话、自动化工作流、知识库管理等全方位AI解决方案</p>
             </div>
         </div>

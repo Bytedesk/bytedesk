@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 09:46:07
+ * @LastEditTime: 2025-04-28 10:58:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -122,8 +122,10 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
 
-    // 容易导致不一致，使用实时计算chatting thread数量
-    // current thread count
+    /**
+     * 迁移到 @{QueueEntity}
+     * 容易导致不一致，使用实时计算chatting thread数量
+     */
     // @Builder.Default
     // private int currentThreadCount = 0;
 
@@ -169,23 +171,6 @@ public class AgentEntity extends BaseEntity {
     public Boolean isConnectedAndAvailable() {
         return this.isConnected() && this.isAvailable();
     }
-
-    // public Boolean canAcceptMore() {
-    //     return this.currentThreadCount < this.maxThreadCount;
-    // }
-
-    // public void increaseThreadCount() {
-    //     this.currentThreadCount++;
-    // }
-    // public void decreaseThreadCount() {
-    //     if (this.currentThreadCount > 0) {
-    //         this.currentThreadCount--;
-    //     }
-    // }
-
-    // public void resetThreadCount() {
-    //     this.currentThreadCount = 0;
-    // }
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
