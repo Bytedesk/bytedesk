@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.llm.split.SplitStatusEnum;
+import com.bytedesk.kbase.llm.chunk.SplitStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

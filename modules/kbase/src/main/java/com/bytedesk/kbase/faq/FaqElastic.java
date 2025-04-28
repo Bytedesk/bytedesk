@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 17:05:00
+ * @LastEditTime: 2025-04-28 21:35:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -40,19 +41,31 @@ public class FaqElastic {
     private String question;
     
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
-    private List<String> questionList;
-    
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String answer;
     
-    @Field(type = FieldType.Keyword)
-    private String type;
-    
-    @Field(type = FieldType.Keyword)
-    private String status;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    private List<String> questionList;
     
     @Field(type = FieldType.Keyword)
     private List<String> tagList;
+    
+    @Field(type = FieldType.Keyword)
+    private String orgUid;
+    
+    @Field(type = FieldType.Keyword)
+    private String kbUid;
+    
+    @Field(type = FieldType.Keyword)
+    private String categoryUid;
+    
+    @Field(type = FieldType.Boolean)
+    private boolean enabled;
+    
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private LocalDateTime createdAt;
+    
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private LocalDateTime updatedAt;
     
     @Field(type = FieldType.Integer)
     private int viewCount;
@@ -66,36 +79,30 @@ public class FaqElastic {
     @Field(type = FieldType.Integer)
     private int downCount;
     
-    @Field(type = FieldType.Boolean)
-    private boolean enabled;
-    
-    @Field(type = FieldType.Date)
-    private LocalDateTime startDate;
-    
-    @Field(type = FieldType.Date)
-    private LocalDateTime endDate;
-    
-    @Field(type = FieldType.Keyword)
-    private String categoryUid;
-    
-    @Field(type = FieldType.Keyword)
-    private String kbaseUid;
-    
-    @Field(type = FieldType.Keyword)
-    private String fileUid;
-    
-    @Field(type = FieldType.Keyword)
-    private List<String> docIdList;
-    
-    @Field(type = FieldType.Keyword)
-    private String createdBy;
-    
-    @Field(type = FieldType.Date)
-    private LocalDateTime createdAt;
-    
-    @Field(type = FieldType.Keyword)
-    private String updatedBy;
-    
-    @Field(type = FieldType.Date)
-    private LocalDateTime updatedAt;
+    // 从FaqEntity创建FaqElastic的静态方法
+    public static FaqElastic fromFaqEntity(FaqEntity faq) {
+        String kbUid = "";
+        if (faq.getKbase() != null) {
+            kbUid = faq.getKbase().getUid();
+        }
+        
+        return FaqElastic.builder()
+            .uid(faq.getUid())
+            .question(faq.getQuestion())
+            .answer(faq.getAnswer())
+            .questionList(faq.getQuestionList())
+            .tagList(faq.getTagList())
+            .orgUid(faq.getOrgUid())
+            .kbUid(kbUid)
+            .categoryUid(faq.getCategoryUid())
+            .enabled(faq.isEnabled())
+            .createdAt(faq.getCreatedAt())
+            .updatedAt(faq.getUpdatedAt())
+            .viewCount(faq.getViewCount())
+            .clickCount(faq.getClickCount())
+            .upCount(faq.getUpCount())
+            .downCount(faq.getDownCount())
+            .build();
+    }
+
 }
