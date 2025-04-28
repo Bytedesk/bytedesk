@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:17:20
+ * @LastEditTime: 2025-04-28 17:15:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,10 +37,17 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
@@ -72,6 +80,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     private final KbaseRestService kbaseRestService;
 
     private final QaRestService qaRestService;
+
+    private final ThreadRestService threadRestService;
+
+    private final MessageRestService messageRestService;
 
     @Override
     public Page<FaqEntity> queryByOrgEntity(FaqRequest request) {
@@ -109,10 +121,47 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
-            // TODO: 插入问题 + 答案 两条消息记录，目前放到发送消息里面
-            // 插入问题消息
-
+            //
             return convertToResponse(savedEntity);
+        }
+        return null;
+    }
+
+    // 点击faq
+    public FaqResponse clickFaq(FaqRequest request) {
+        Optional<FaqEntity> optionalEntity = findByUid(request.getUid());
+        if (optionalEntity.isPresent()) {
+            FaqEntity entity = optionalEntity.get();
+            entity.increaseClickCount();
+            //
+            FaqEntity savedEntity = faqRepository.save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update click count");
+            }
+            FaqResponse faqResponse = convertToResponse(savedEntity);
+
+            // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
+            // 插入问题消息
+            Optional<ThreadEntity> thread = threadRestService.findByUid(request.getThreadUid());
+            if (thread.isPresent()) {
+                ThreadEntity threadEntity = thread.get();
+                // 插入问题消息
+                MessageEntity questionMessage = getFaqQuestionMessage(faqResponse, threadEntity);
+                MessageEntity savedQuestionMessage = messageRestService.save(questionMessage);
+                if (savedQuestionMessage == null) {
+                    throw new RuntimeException("Failed to insert question message");
+                }
+                faqResponse.setQuestionMessage(ConvertUtils.convertToMessageResponse(savedQuestionMessage));
+                // 
+                MessageEntity answerMessage = getFaqAnswerMessage(faqResponse, threadEntity);
+                MessageEntity savedAnswerMessage = messageRestService.save(answerMessage);
+                if (savedAnswerMessage == null) {
+                    throw new RuntimeException("Failed to insert answer message");
+                }
+                faqResponse.setAnswerMessage(ConvertUtils.convertToMessageResponse(savedAnswerMessage));
+            }
+            //
+            return faqResponse;
         }
         return null;
     }
@@ -248,7 +297,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         }
     }
 
-    // update enable
     public FaqResponse enable(FaqRequest request) {
         Optional<FaqEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
@@ -377,40 +425,14 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     @Override
     public FaqResponse convertToResponse(FaqEntity entity) {
         FaqResponse response = modelMapper.map(entity, FaqResponse.class);
-        // FaqResponse response = FaqResponse.builder()
-        // .uid(entity.getUid())
-        // .question(entity.getQuestion())
-        // .answer(entity.getAnswer())
-        // .answerList(entity.getAnswerList())
-        // .isLlmQa(entity.isLlmQa())
-        // .type(entity.getType())
-        // .status(entity.getStatus())
-        // .viewCount(entity.getViewCount())
-        // .clickCount(entity.getClickCount())
-        // .upCount(entity.getUpCount())
-        // .downCount(entity.getDownCount())
-        // // .downShowTransferToAgentButton(entity.isDownShowTransferToAgentButton())
-        // .enabled(entity.isEnabled())
-        // .tagList(entity.getTagList())
-        // .startDate(entity.getStartDate())
-        // .endDate(entity.getEndDate())
-        // .categoryUid(entity.getCategoryUid())
-        // .kbUid(entity.getKbase().getUid())
-        // .fileUid(entity.getFileUid())
-        // // .docUid(entity.getDocId())
-        // .createdAt(entity.getCreatedAt())
-        // .updatedAt(entity.getUpdatedAt())
-        // .build();
 
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedFaqs() != null) {
-            List<FaqResponse.SimpleFaqResponse> simpleFaqs = entity.getRelatedFaqs().stream()
-                    .map(relatedFaq -> FaqResponse.SimpleFaqResponse.builder()
+            List<FaqResponseSimple> simpleFaqs = entity.getRelatedFaqs().stream()
+                    .map(relatedFaq -> FaqResponseSimple.builder()
                             .uid(relatedFaq.getUid())
                             .question(relatedFaq.getQuestion())
                             .answer(relatedFaq.getAnswer())
-                            .type(relatedFaq.getType())
-                            .status(relatedFaq.getStatus())
                             .build())
                     .collect(Collectors.toList());
             response.setRelatedFaqs(simpleFaqs);
@@ -582,13 +604,13 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .build();
                     // 保存FAQ到数据库
                     create(request);
-                    // 
+                    //
                     QaRequest qaRequest = QaRequest.builder()
-                        .question(faq.getQuestion())
-                        .answer(faq.getAnswer())
-                        .kbUid(llmQaKbUid)
-                        .orgUid(orgUid)
-                        .build();
+                            .question(faq.getQuestion())
+                            .answer(faq.getAnswer())
+                            .kbUid(llmQaKbUid)
+                            .orgUid(orgUid)
+                            .build();
                     qaRestService.create(qaRequest);
                 } else {
                     // log.info("FAQ already exists: {}", faq.getUid());
@@ -735,6 +757,67 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 }
             }
         }
+    }
+
+    public static MessageEntity getFaqQuestionMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
+        // 
+        FaqMessageExtra questionExtra = FaqMessageExtra.builder()
+                .faqUid(faqResponse.getUid())
+                .build();
+        //
+        String content = faqResponse.getQuestion();
+        String extra = questionExtra.toJson();
+        String user = threadEntity.getUser();
+        //
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .type(MessageTypeEnum.FAQ_QUESTION.name())
+                .status(MessageStatusEnum.SUCCESS.name())
+                .client(threadEntity.getClient())
+                .user(user)
+                .orgUid(threadEntity.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .thread(threadEntity)
+                .extra(extra)
+                .build();
+
+        return message;
+    }
+
+    public static MessageEntity getFaqAnswerMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
+        // 
+        FaqMessageExtra answerExtra = FaqMessageExtra.builder()
+                        .faqUid(faqResponse.getUid())
+                        .relatedFaqs(faqResponse.getRelatedFaqs())
+                        .build();
+        // 
+        String content = faqResponse.getAnswer();
+        String extra = answerExtra.toJson();
+        // 插入答案消息
+        String answerUser = threadEntity.getRobot();
+        if (threadEntity.isAgentType()) {
+            answerUser = threadEntity.getAgent();
+        } else if (answerUser == null) {
+            answerUser = threadEntity.getWorkgroup();
+        }
+        // 
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .type(MessageTypeEnum.FAQ_ANSWER.name())
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(answerUser)
+                .orgUid(threadEntity.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .thread(threadEntity)
+                .extra(extra)
+                .build();
+
+        return message;
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 14:17:15
+ * @LastEditTime: 2025-04-28 17:14:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,6 +108,27 @@ public class MessageUtils {
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishMessageJsonEvent(messageProtobuf.toJson());
+    }
+
+    public static MessageEntity getThreadMessage(String content, String type, String extra, String user, ThreadEntity thread) {
+        // UserProtobuf system = UserProtobuf.getSystemUser();
+        // MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .type(type)
+                .status(MessageStatusEnum.READ.name())
+                .client(ClientEnum.SYSTEM.name())
+                .user(user)
+                .orgUid(thread.getOrgUid())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .thread(thread)
+                .extra(extra)
+                .build();
+        
+        return message;
     }
     
 }
