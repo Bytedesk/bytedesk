@@ -13,8 +13,11 @@
  */
 package com.bytedesk.kbase.llm.qa;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -25,6 +28,7 @@ import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import lombok.extern.slf4j.Slf4j;
@@ -147,6 +151,24 @@ public class QaService {
         // 添加过滤条件：启用状态
         boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
         
+        // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
+        LocalDateTime currentTime = LocalDateTime.now();
+        String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        
+        // 创建startDate范围查询
+        DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+            .field("startDate")
+            .lte(currentTimeStr)
+            .build();
+        boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+        
+        // 创建endDate范围查询
+        DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+            .field("endDate")
+            .gte(currentTimeStr)
+            .build();
+        boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+        
         // 添加可选的过滤条件：知识库、分类、组织
         if (kbUid != null && !kbUid.isEmpty()) {
             boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
@@ -227,6 +249,24 @@ public class QaService {
         
         // 添加过滤条件：启用状态
         boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+        
+        // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
+        LocalDateTime currentTime = LocalDateTime.now();
+        String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        
+        // 创建startDate范围查询
+        DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+            .field("startDate")
+            .lte(currentTimeStr)
+            .build();
+        boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+        
+        // 创建endDate范围查询
+        DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+            .field("endDate")
+            .gte(currentTimeStr)
+            .build();
+        boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
         
         // 添加可选的过滤条件：知识库、分类、组织
         // if (kbUid != null && !kbUid.isEmpty()) {

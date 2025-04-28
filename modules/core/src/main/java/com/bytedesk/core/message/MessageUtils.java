@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 13:34:15
+ * @LastEditTime: 2025-04-28 14:17:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,6 +80,13 @@ public class MessageUtils {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AGENT_CLOSED,
+                content);
+    }
+
+    public static MessageProtobuf createTimeoutRemindMessage(ThreadEntity thread, String content) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.TIMEOUT_REMIND,
                 content);
     }
 
