@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 18:24:49
+ * @LastEditTime: 2025-04-28 18:28:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -313,41 +313,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         }
     }
 
-    // public FaqResponse rateUp(FaqRequest request) {
-    //     Optional<FaqEntity> optional = findByUid(request.getUid());
-    //     if (optional.isPresent()) {
-    //         FaqEntity entity = optional.get();
-    //         entity.increaseUpCount();
-    //         //
-    //         FaqEntity savedEntity = save(entity);
-    //         if (savedEntity == null) {
-    //             throw new RuntimeException("Failed to rate up FAQ");
-    //         }
-    //         // TODO: 更新消息状态
-
-    //         return convertToResponse(savedEntity);
-    //     } else {
-    //         throw new RuntimeException("faq not found");
-    //     }
-    // }
-
-    // public FaqResponse rateDown(FaqRequest request) {
-    //     Optional<FaqEntity> optional = findByUid(request.getUid());
-    //     if (optional.isPresent()) {
-    //         FaqEntity entity = optional.get();
-    //         entity.increaseDownCount();
-    //         //
-    //         FaqEntity savedEntity = save(entity);
-    //         if (savedEntity == null) {
-    //             throw new RuntimeException("Failed to rate down FAQ");
-    //         }
-    //         // TODO: 更新消息状态
-    //         return convertToResponse(savedEntity);
-    //     } else {
-    //         throw new RuntimeException("faq not found");
-    //     }
-    // }
-
     // rate message extra helpful
     public MessageResponse rateUp(FaqRequest request) {
         Optional<MessageEntity> messageOptional = messageRestService.findByUid(request.getMessageUid());
@@ -359,9 +324,18 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedMessage == null) {
                 throw new RuntimeException("Message not saved");
             }
-            // TODO: 添加faq的点赞数
-            //
-            return ConvertUtils.convertToMessageResponse(message);
+            // 添加faq的点赞数
+            FaqMessageExtra faqMessageExtra = FaqMessageExtra.fromJson(savedMessage.getExtra());
+            if (faqMessageExtra != null) {
+                String faqUid = faqMessageExtra.getFaqUid();
+                Optional<FaqEntity> optionalFaq = findByUid(faqUid);
+                if (optionalFaq.isPresent()) {
+                    FaqEntity faqEntity = optionalFaq.get();
+                    faqEntity.increaseUpCount();
+                    faqRepository.save(faqEntity);
+                }
+            }
+            return ConvertUtils.convertToMessageResponse(savedMessage);
         }
         return null;
     }
@@ -377,9 +351,18 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             if (savedMessage == null) {
                 throw new RuntimeException("Message not saved");
             }
-            // TODO: 添加faq的点踩数
-            //
-            return ConvertUtils.convertToMessageResponse(message);
+            // 添加faq的点踩数
+            FaqMessageExtra faqMessageExtra = FaqMessageExtra.fromJson(savedMessage.getExtra());
+            if (faqMessageExtra != null) {
+                String faqUid = faqMessageExtra.getFaqUid();
+                Optional<FaqEntity> optionalFaq = findByUid(faqUid);
+                if (optionalFaq.isPresent()) {
+                    FaqEntity faqEntity = optionalFaq.get();
+                    faqEntity.increaseDownCount();
+                    faqRepository.save(faqEntity);
+                }
+            }
+            return ConvertUtils.convertToMessageResponse(savedMessage);
         }
         return null;
     }
