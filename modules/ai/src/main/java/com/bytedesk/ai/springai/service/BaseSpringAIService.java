@@ -81,7 +81,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
-
+        // 
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
@@ -188,6 +188,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
+        log.info("BaseSpringAIService processLlmResponse searchContentList {}", searchContentList);
         //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
@@ -213,6 +214,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     private void processSearchResponse(String query, List<QaProtobuf> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        log.info("BaseSpringAIService processSearchResponse searchContentList {}", searchContentList);
         //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
@@ -245,6 +247,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(answer);
         messageProtobufReply.setClient(ClientEnum.SYSTEM);
+        log.info("BaseSpringAIService processAnswerMessage messageProtobufReply {}", messageProtobufReply);
         // 保存消息到数据库
         persistMessage(messageProtobufQuery, messageProtobufReply);
         String messageJson = messageProtobufReply.toJson();
@@ -256,7 +259,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     .name("message"));
             emitter.complete();
         } catch (Exception e) {
-            log.error("BaseSpringAIService sendSseMemberMessage Error sending SSE event 1：", e);
+            log.error("BaseSpringAIService processAnswerMessage Error sending SSE event 1：", e);
             emitter.completeWithError(e);
         }
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 15:28:55
+ * @LastEditTime: 2025-04-28 13:10:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,9 +22,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class QaInitializer implements SmartInitializingSingleton {
 
-    // private final QaRestService qaService;
-
-    // private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {
