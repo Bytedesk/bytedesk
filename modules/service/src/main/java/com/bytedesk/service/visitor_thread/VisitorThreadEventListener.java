@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 12:10:11
+ * @LastEditTime: 2025-04-28 14:01:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,6 +76,7 @@ public class VisitorThreadEventListener {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
                 queueMember.setSystemCloseTime(LocalDateTime.now());
                 queueMember.setSystemClose(true);
+                queueMemberRestService.save(queueMember);
                 if (queueMember.isAgentOffline()) {
                     // 客服离线，自动关闭会话，不发送自动关闭消息
                     return;
@@ -111,6 +112,14 @@ public class VisitorThreadEventListener {
                 }
             }
         } else {
+            // 手动关闭会话
+            Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+            if (queueMemberOptional.isPresent()) {
+                QueueMemberEntity queueMember = queueMemberOptional.get();
+                queueMember.setAgentClosedAt(LocalDateTime.now());
+                queueMember.setAgentClose(true);
+                queueMemberRestService.save(queueMember);
+            }
             // 非自动关闭，客服手动关闭，显示客服关闭提示语
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
                 String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);

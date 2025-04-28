@@ -169,7 +169,7 @@ public class QueueMemberEventListener {
             // 如果是首次响应，记录首次响应时间
             if (!queueMember.isAgentFirstResponse() && queueMember.getVisitorLastMessageAt() != null) {
                 queueMember.setAgentFirstResponse(true);
-                queueMember.setAgentFirstResponseTime(now);
+                queueMember.setAgentFirstResponseAt(now);
                 
                 // 计算首次响应时间（秒）
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
@@ -194,7 +194,7 @@ public class QueueMemberEventListener {
             }
             
             // 更新最后响应时间
-            queueMember.setAgentLastResponseTime(now);
+            queueMember.setAgentLastResponseAt(now);
             
             // 保存更新
             queueMemberRestService.save(queueMember);
@@ -232,12 +232,12 @@ public class QueueMemberEventListener {
             LocalDateTime now = LocalDateTime.now();
             
             // 更新首次机器人消息时间（如果尚未设置）
-            if (queueMember.getRobotFirstResponseTime() == null) {
-                queueMember.setRobotFirstResponseTime(now);
+            if (queueMember.getRobotFirstResponseAt() == null) {
+                queueMember.setRobotFirstResponseAt(now);
             }
             
             // 更新最后一次机器人消息时间
-            queueMember.setRobotLastResponseTime(now);
+            queueMember.setRobotLastResponseAt(now);
             
             // 更新机器人消息计数
             queueMember.setRobotMessageCount(queueMember.getRobotMessageCount() + 1);

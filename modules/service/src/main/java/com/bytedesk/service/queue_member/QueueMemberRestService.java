@@ -117,10 +117,10 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
                     latestEntity.setVisitorLastMessageAt(entity.getVisitorLastMessageAt());
                 }
                 
-                if (entity.getAgentLastResponseTime() != null && 
-                    (latestEntity.getAgentLastResponseTime() == null || 
-                     entity.getAgentLastResponseTime().isAfter(latestEntity.getAgentLastResponseTime()))) {
-                    latestEntity.setAgentLastResponseTime(entity.getAgentLastResponseTime());
+                if (entity.getAgentLastResponseAt() != null && 
+                    (latestEntity.getAgentLastResponseAt() == null || 
+                     entity.getAgentLastResponseAt().isAfter(latestEntity.getAgentLastResponseAt()))) {
+                    latestEntity.setAgentLastResponseAt(entity.getAgentLastResponseAt());
                 }
                 
                 // 保存合并后的实体

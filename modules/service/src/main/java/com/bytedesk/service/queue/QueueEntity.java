@@ -250,15 +250,15 @@ public class QueueEntity extends BaseEntity {
          */
         public int getAvgWaitTime() {
                 List<QueueMemberEntity> servedMembers1 = agentQueueMembers.stream()
-                                .filter(member -> member.getAgentAcceptTime() != null)
+                                .filter(member -> member.getAgentAcceptedAt() != null)
                                 .toList();
 
                 List<QueueMemberEntity> servedMembers2 = robotQueueMembers.stream()
-                                .filter(member -> member.getAgentAcceptTime() != null)
+                                .filter(member -> member.getAgentAcceptedAt() != null)
                                 .toList();
 
                 List<QueueMemberEntity> servedMembers3 = workgroupQueueMembers.stream()
-                                .filter(member -> member.getAgentAcceptTime() != null)
+                                .filter(member -> member.getAgentAcceptedAt() != null)
                                 .toList();
 
                 int totalCount = servedMembers1.size() + servedMembers2.size() + servedMembers3.size();
@@ -288,20 +288,20 @@ public class QueueEntity extends BaseEntity {
         public int getAvgResolveTime() {
                 List<QueueMemberEntity> closedMembers1 = agentQueueMembers.stream()
                                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
-                                .filter(member -> member.getAgentAcceptTime() != null
-                                                && member.getAgentCloseTime() != null)
+                                .filter(member -> member.getAgentAcceptedAt() != null
+                                                && member.getAgentClosedAt() != null)
                                 .toList();
 
                 List<QueueMemberEntity> closedMembers2 = robotQueueMembers.stream()
                                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
-                                .filter(member -> member.getAgentAcceptTime() != null
-                                                && member.getAgentCloseTime() != null)
+                                .filter(member -> member.getAgentAcceptedAt() != null
+                                                && member.getAgentClosedAt() != null)
                                 .toList();
 
                 List<QueueMemberEntity> closedMembers3 = workgroupQueueMembers.stream()
                                 .filter(member -> member.getThread() != null && member.getThread().isClosed())
-                                .filter(member -> member.getAgentAcceptTime() != null
-                                                && member.getAgentCloseTime() != null)
+                                .filter(member -> member.getAgentAcceptedAt() != null
+                                                && member.getAgentClosedAt() != null)
                                 .toList();
 
                 int totalCount = closedMembers1.size() + closedMembers2.size() + closedMembers3.size();
@@ -313,8 +313,8 @@ public class QueueEntity extends BaseEntity {
                 long totalResolveTime1 = closedMembers1.stream()
                                 .mapToLong(member -> {
                                         return java.time.Duration.between(
-                                                        member.getAgentAcceptTime(),
-                                                        member.getAgentCloseTime())
+                                                        member.getAgentAcceptedAt(),
+                                                        member.getAgentClosedAt())
                                                         .getSeconds();
                                 })
                                 .sum();
@@ -322,8 +322,8 @@ public class QueueEntity extends BaseEntity {
                 long totalResolveTime2 = closedMembers2.stream()
                                 .mapToLong(member -> {
                                         return java.time.Duration.between(
-                                                        member.getAgentAcceptTime(),
-                                                        member.getAgentCloseTime())
+                                                        member.getAgentAcceptedAt(),
+                                                        member.getAgentClosedAt())
                                                         .getSeconds();
                                 })
                                 .sum();
@@ -331,8 +331,8 @@ public class QueueEntity extends BaseEntity {
                 long totalResolveTime3 = closedMembers3.stream()
                                 .mapToLong(member -> {
                                         return java.time.Duration.between(
-                                                        member.getAgentAcceptTime(),
-                                                        member.getAgentCloseTime())
+                                                        member.getAgentAcceptedAt(),
+                                                        member.getAgentClosedAt())
                                                         .getSeconds();
                                 })
                                 .sum();
