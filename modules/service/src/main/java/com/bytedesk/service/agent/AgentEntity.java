@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 11:45:04
+ * @LastEditTime: 2025-04-28 12:45:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -139,6 +139,10 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private int timeoutRemindTime = 5;
 
+    // 超时提醒提示
+    @Builder.Default
+    private String timeoutRemindTip = I18Consts.I18N_AGENT_TIMEOUT_TIP;
+
     /** 存储当前接待数量等 */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
@@ -147,9 +151,6 @@ public class AgentEntity extends BaseEntity {
     // org member
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
-
-    // for quick query, space exchange for speed
-    // private String userUid;
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());
