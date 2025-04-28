@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 10:07:22
+ * @LastEditTime: 2025-04-28 09:27:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,6 +71,8 @@ public class ServiceSettingsResponse implements Serializable {
 
     private List<FaqResponse> welcomeFaqs;
 
+    private String welcomeKbUid;
+
     private String queueTip;
 
     private String leavemsgTip;
@@ -93,6 +95,7 @@ public class ServiceSettingsResponse implements Serializable {
 
     private Boolean showFaqs;
     private List<FaqResponse> faqs;
+    private String faqKbUid;
 
     private Boolean showQuickFaqs;
     private List<FaqResponse> quickFaqs;
