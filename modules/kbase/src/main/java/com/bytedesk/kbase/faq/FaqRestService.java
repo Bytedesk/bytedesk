@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 17:15:09
+ * @LastEditTime: 2025-04-28 17:50:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -312,8 +312,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         }
     }
 
-    public FaqResponse rateUp(String uid) {
-        Optional<FaqEntity> optional = findByUid(uid);
+    public FaqResponse rateUp(FaqRequest request) {
+        Optional<FaqEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
             entity.increaseUpCount();
@@ -330,8 +330,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         }
     }
 
-    public FaqResponse rateDown(String uid) {
-        Optional<FaqEntity> optional = findByUid(uid);
+    public FaqResponse rateDown(FaqRequest request) {
+        Optional<FaqEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
             entity.increaseDownCount();

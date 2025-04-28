@@ -13,8 +13,10 @@
  */
 package com.bytedesk.kbase.llm.qa;
 
-import com.bytedesk.core.message.MessageExtra;
+import java.util.List;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.message.MessageExtra;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +32,16 @@ public class QaMessageExtra extends MessageExtra {
 
     private static final long serialVersionUID = 1L;
     
-    private String uid;
+    // private String uid;
+    // private String qaUid;
+    // private String rate;
+    // private String orgUid;
+
+    // 
     private String qaUid;
-    private String rate;
-    private String orgUid;
+    private List<QaResponseSimple> relatedQas;
+
+    public static QaMessageExtra fromJson(String json) {
+        return JSON.parseObject(json, QaMessageExtra.class);
+    }
 }
