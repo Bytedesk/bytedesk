@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 18:24:21
+ * @LastEditTime: 2025-04-28 18:37:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -287,40 +287,6 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
         }
     }
 
-    // public QaResponse rateUp(QaRequest request) {
-    //     Optional<QaEntity> optional = findByUid(request.getUid());
-    //     if (optional.isPresent()) {
-    //         QaEntity entity = optional.get();
-    //         entity.increaseUpCount();
-    //         //
-    //         QaEntity savedEntity = save(entity);
-    //         if (savedEntity == null) {
-    //             throw new RuntimeException("Failed to rate up QA");
-    //         }
-    //         // TODO: 更新消息状态
-    //         return convertToResponse(savedEntity);
-    //     } else {
-    //         throw new RuntimeException("qa not found");
-    //     }
-    // }
-
-    // public QaResponse rateDown(QaRequest request) {
-    //     Optional<QaEntity> optional = findByUid(request.getUid());
-    //     if (optional.isPresent()) {
-    //         QaEntity entity = optional.get();
-    //         entity.increaseDownCount();
-    //         //
-    //         QaEntity savedEntity = save(entity);
-    //         if (savedEntity == null) {
-    //             throw new RuntimeException("Failed to rate down QA");
-    //         }
-    //         // TODO: 更新消息状态
-    //         return convertToResponse(savedEntity);
-    //     } else {
-    //         throw new RuntimeException("qa not found");
-    //     }
-    // }
-
     // rate message extra helpful
     public MessageResponse rateUp(QaRequest request) {
         Optional<MessageEntity> messageOptional = messageRestService.findByUid(request.getMessageUid());
@@ -332,9 +298,18 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (savedMessage == null) {
                 throw new RuntimeException("Message not saved");
             }
-            // TODO: 增加qa的点赞数
+            // 增加qa的点赞数
+            QaMessageExtra qaMessageExtra = QaMessageExtra.fromJson(savedMessage.getExtra());
+            if (qaMessageExtra != null) {
+                Optional<QaEntity> optionalQa = findByUid(qaMessageExtra.getQaUid());
+                if (optionalQa.isPresent()) {
+                    QaEntity qaEntity = optionalQa.get();
+                    qaEntity.increaseUpCount();
+                    save(qaEntity);
+                }
+            }
             //
-            return ConvertUtils.convertToMessageResponse(message);
+            return ConvertUtils.convertToMessageResponse(savedMessage);
         }
         return null;
     }
@@ -350,9 +325,18 @@ public class QaRestService extends BaseRestServiceWithExcel<QaEntity, QaRequest,
             if (savedMessage == null) {
                 throw new RuntimeException("Message not saved");
             }
-            // TODO: 增加qa的点踩数
+            // 增加qa的点踩数
+            QaMessageExtra qaMessageExtra = QaMessageExtra.fromJson(savedMessage.getExtra());
+            if (qaMessageExtra != null) {
+                Optional<QaEntity> optionalQa = findByUid(qaMessageExtra.getQaUid());
+                if (optionalQa.isPresent()) {
+                    QaEntity qaEntity = optionalQa.get();
+                    qaEntity.increaseDownCount();
+                    save(qaEntity);
+                }
+            }
             //
-            return ConvertUtils.convertToMessageResponse(message);
+            return ConvertUtils.convertToMessageResponse(savedMessage);
         }
         return null;
     }
