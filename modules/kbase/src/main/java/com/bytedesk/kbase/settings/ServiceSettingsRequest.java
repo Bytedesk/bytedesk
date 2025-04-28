@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 16:39:11
+ * @LastEditTime: 2025-04-28 09:27:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,6 +88,8 @@ public class ServiceSettingsRequest  implements Serializable {
     @Builder.Default
     private List<String> welcomeFaqUids = new ArrayList<>();
 
+    private String welcomeKbUid;
+
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP;
 
@@ -119,6 +121,8 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showFaqs = true;
     @Builder.Default
     private List<String> faqUids = new ArrayList<>();
+
+    private String faqKbUid;
 
     @Builder.Default
     private Boolean showQuickFaqs = true;
