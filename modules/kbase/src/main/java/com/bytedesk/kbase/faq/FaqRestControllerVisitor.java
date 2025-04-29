@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:46:07
+ * @LastEditTime: 2025-04-29 17:29:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,6 +81,15 @@ public class FaqRestControllerVisitor {
     public ResponseEntity<?> rateMessageNotHelpful(@RequestBody FaqRequest request) {
         
         MessageResponse message = faqRestService.rateDown(request);
+
+        return ResponseEntity.ok(JsonResult.success(message));
+    }
+
+    // rate message feedback
+    @PostMapping("/rate/message/feedback")
+    public ResponseEntity<?> rateMessageFeedback(@RequestBody FaqRequest request) {
+
+        MessageResponse message = faqRestService.rateFeedback(request);
 
         return ResponseEntity.ok(JsonResult.success(message));
     }
