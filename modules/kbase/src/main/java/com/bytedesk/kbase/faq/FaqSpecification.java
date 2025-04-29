@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 21:08:53
+ * @LastEditTime: 2025-04-29 10:11:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,14 @@ public class FaqSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getKbUid())) {
                 // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段
                 predicates.add(criteriaBuilder.equal(root.get("kbase").get("uid"), request.getKbUid()));
+            }
+            // onlyLoadValid
+            if (request.getOnlyLoadValid() != null && request.getOnlyLoadValid()) {
+                predicates.add(criteriaBuilder.equal(root.get("enabled"), true));
+                // 当前时间 > startDate && 当前时间 < endDate
+                LocalDateTime now = LocalDateTime.now();
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), now));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), now));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

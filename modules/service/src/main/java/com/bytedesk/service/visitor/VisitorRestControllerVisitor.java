@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 18:42:17
+ * @LastEditTime: 2025-04-29 10:06:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,7 @@ import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.message_unread.MessageUnreadService;
-import com.bytedesk.service.utils.KeepAliveHelper;
+// import com.bytedesk.service.utils.KeepAliveHelper;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
@@ -172,7 +172,7 @@ public class VisitorRestControllerVisitor {
         SseEmitter emitter = new SseEmitter(600_000L);
         
         // 添加心跳机制，每30秒发送一个保活消息
-        KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
+        // KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
         
         executorService.execute(() -> {
             try {
@@ -191,7 +191,7 @@ public class VisitorRestControllerVisitor {
         
         emitter.onCompletion(() -> {
             log.info("sendSseMemberMessage SSE connection completed");
-            KeepAliveHelper.removeKeepAliveEvent(emitter);
+            // KeepAliveHelper.removeKeepAliveEvent(emitter);
         });
         
         return emitter;
@@ -208,7 +208,7 @@ public class VisitorRestControllerVisitor {
         SseEmitter emitter = new SseEmitter(600_000L);
         
         // 添加心跳机制，每30秒发送一个保活消息
-        KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
+        // KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
         
         executorService.execute(() -> {
             try {
@@ -227,7 +227,7 @@ public class VisitorRestControllerVisitor {
         
         emitter.onCompletion(() -> {
             log.info("sendSseVisitorMessage SSE connection completed");
-            KeepAliveHelper.removeKeepAliveEvent(emitter);
+            // KeepAliveHelper.removeKeepAliveEvent(emitter);
         });
         
         return emitter;
