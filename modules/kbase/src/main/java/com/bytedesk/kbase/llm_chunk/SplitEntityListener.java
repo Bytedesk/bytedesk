@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 09:57:30
+ * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:00:27
+ * @LastEditTime: 2025-04-12 15:39:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,47 +11,46 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.faq.event.FaqCreateEvent;
-import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
-import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
+import com.bytedesk.kbase.llm_chunk.event.SplitCreateEvent;
+import com.bytedesk.kbase.llm_chunk.event.SplitDeleteEvent;
+import com.bytedesk.kbase.llm_chunk.event.SplitUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j  
+@Slf4j
 @Component
-public class FaqEntityListener {
+public class SplitEntityListener {
 
     @PostPersist
-    public void onPostPersist(FaqEntity faq) {
-        // log.info("FaqEntityListener onPostPersist: {}", faq.getUid());
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
+    public void onPostPersist(SplitEntity split) {
+        log.info("SplitEntityListener onPostPersist: {}", split.getName());
+        SplitEntity clonedSplit = SerializationUtils.clone(split);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new FaqCreateEvent(clonedFaq));
+        publisher.publishEvent(new SplitCreateEvent(clonedSplit));
     }
 
     @PostUpdate
-    public void onPostUpdate(FaqEntity faq) {
-        // log.info("FaqEntityListener onPostUpdate: {}", faq.getUid());
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
+    public void onPostUpdate(SplitEntity split) {
+        log.info("SplitEntityListener onPostUpdate: {}", split.getName());
+        SplitEntity clonedSplit = SerializationUtils.clone(split);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (faq.isDeleted()) {
-            log.info("FaqEntityListener FaqDeleteEvent: {}", faq.getQuestion());
-            publisher.publishEvent(new FaqDeleteEvent(clonedFaq));
-        } else {
-            log.info("FaqEntityListener FaqUpdateEvent: {}", faq.getQuestion());
-            publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
-        }
+        if (split.isDeleted()) {
+            log.info("SplitEntityListener onPostUpdate: Split is deleted");
+            publisher.publishEvent(new SplitDeleteEvent(clonedSplit));
+        }else {
+            log.info("SplitEntityListener onPostUpdate: Split is update");
+            publisher.publishEvent(new SplitUpdateEvent(clonedSplit));
+        }   
     }
-    
 }

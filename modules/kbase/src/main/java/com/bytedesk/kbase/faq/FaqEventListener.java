@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 16:29:12
+ * @LastEditTime: 2025-04-29 08:38:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,9 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.core.utils.BdFileUtils;
+import com.bytedesk.kbase.faq.event.FaqCreateEvent;
+import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
+import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,28 +35,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class FaqEventListener {
 
+    private final FaqService faqService;
+
     private final FaqRestService faqRestService;
 
     private final UploadRestService uploadRestService;
-
-    // @EventListener
-    // public void onMessageUpdateEvent(MessageUpdateEvent event) {
-    //     MessageEntity message = event.getMessage();
-    //     //
-    //     if (message.getStatus().equals(MessageStatusEnum.RATE_UP.name())
-    //             || message.getStatus().equals(MessageStatusEnum.RATE_DOWN.name())) {
-    //         log.info("message faq update event: {}", message);
-    //         //
-    //         FaqMessageExtra extra = JSON.parseObject(message.getExtra(), FaqMessageExtra.class);
-    //         log.info("faq rate extra faqUid {}, rate {}", extra.getFaqUid(), extra.getRate());
-    //         //
-    //         if (message.getStatus().equals(MessageStatusEnum.RATE_UP.name())) {
-    //             faqRestService.rateUp(extra.getFaqUid());
-    //         } else if (message.getStatus().equals(MessageStatusEnum.RATE_DOWN.name())) {
-    //             faqRestService.rateDown(extra.getFaqUid());
-    //         }
-    //     }
-    // }
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -86,6 +72,36 @@ public class FaqEventListener {
             } catch (Exception e) {
                 log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
             }
+        }
+    }
+
+    // Faq仅用于全文搜索
+    @EventListener
+    public void onFaqCreateEvent(FaqCreateEvent event) {
+        FaqEntity faq = event.getFaq();
+        log.info("FaqEventListener onFaqCreateEvent: {}", faq.getQuestion());
+        // 仅做全文索引
+        faqService.indexFaq(faq);
+    }
+
+    // Faq仅用于全文搜索
+    @EventListener
+    public void onFaqUpdateDocEvent(FaqUpdateDocEvent event) {
+        FaqEntity faq = event.getFaq();
+        log.info("SpringAIEventListener FaqUpdateDocEvent: {}", faq.getQuestion());
+        // 更新全文索引
+        faqService.indexFaq(faq);
+    }
+
+    @EventListener
+    public void onFaqDeleteEvent(FaqDeleteEvent event) {
+        FaqEntity faq = event.getFaq();
+        log.info("SpringAIEventListener onFaqDeleteEvent: {}", faq.getQuestion());
+        // 从全文索引中删除
+        boolean deleted = faqService.deleteFaq(faq.getUid());
+        if (!deleted) {
+            log.warn("从Elasticsearch中删除QA索引失败: {}", faq.getUid());
+            // 可以考虑添加重试逻辑或者其他错误处理
         }
     }
 }

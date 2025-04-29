@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:09:04
+ * @LastEditTime: 2025-04-29 08:58:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,9 +58,10 @@ public class FaqInitializer implements SmartInitializingSingleton {
     // 迁移到kbaseInitializer
     public void init() {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
+        // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID); // 替换到LLM_FAQ_UID
+        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID); // 替换到LLM_FAQ_UID, 合并faq和qa
         // 
         faqService.importFaqs(orgUid, kbUid);
-        faqService.initRelationFaqs(orgUid, kbUid);
+        // faqService.initRelationFaqs(orgUid, kbUid);
     }
 }
