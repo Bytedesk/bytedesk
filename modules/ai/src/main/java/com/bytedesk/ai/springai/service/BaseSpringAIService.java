@@ -238,7 +238,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             // 将处理后的单个FaqProtobuf对象转换为JSON字符串
             String answer = JSON.toJSONString(resultFaq);
-            processAnswerMessage(answer, MessageTypeEnum.QA, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply, emitter);
         }
     }
 
@@ -354,6 +354,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);
+
+    /**
+     * 发送消息的通用方法
+     * @param type 消息类型
+     * @param content 消息内容
+     * @param messageProtobufReply 回复消息对象
+     */
+    protected void sendMessage(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
+        messageProtobufReply.setType(type);
+        messageProtobufReply.setContent(content);
+        messageSendService.sendProtobufMessage(messageProtobufReply);
+    }
 
     /**
      * 检查SseEmitter是否已完成

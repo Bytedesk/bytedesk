@@ -89,9 +89,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
      */
     private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
         if (!openaiChatModel.isPresent()) {
-            messageProtobuf.setType(MessageTypeEnum.ERROR);
-            messageProtobuf.setContent("OpenAI服务不可用");
-            messageSendService.sendProtobufMessage(messageProtobuf);
+            sendMessage(MessageTypeEnum.ERROR, "OpenAI服务不可用", messageProtobuf);
             return;
         }
         
@@ -112,17 +110,13 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                            messageProtobuf.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobuf);
+                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobuf);
                         }
                     }
                 },
                 error -> {
                     log.error("Openai API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobuf);
                 },
                 () -> {
                     log.info("Chat stream completed");

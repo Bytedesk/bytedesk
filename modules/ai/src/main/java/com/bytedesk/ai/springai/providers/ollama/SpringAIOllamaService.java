@@ -93,9 +93,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         
         if (chatModel == null) {
             log.info("Ollama API not available");
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("Ollama service is not available");
-            messageSendService.sendProtobufMessage(messageProtobufReply);
+            sendMessage(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
             return;
         }
 
@@ -109,26 +107,20 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                            messageProtobufReply.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobufReply);
+                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Ollama API error: ", error);
-                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
                 });
         } catch (Exception e) {
             log.error("Error processing Ollama prompt", e);
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-            messageSendService.sendProtobufMessage(messageProtobufReply);
+            sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
         }
     }
 
