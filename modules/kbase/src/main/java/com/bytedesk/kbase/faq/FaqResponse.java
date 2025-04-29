@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 16:37:09
+ * @LastEditTime: 2025-04-29 09:14:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,25 +97,8 @@ public class FaqResponse extends BaseResponse {
 
     private String fileUid; // 对应文件
 
-    // private String docUid; // 对应文档
-
     @Builder.Default
     private List<String> docIdList = new ArrayList<>();
-
-    /**
-     * 简化版FAQ响应，用于相关问题展示，避免循环依赖
-     */
-    // @Data
-    // @Builder
-    // @NoArgsConstructor
-    // @AllArgsConstructor
-    // public static class SimpleFaqResponse {
-    //     private String uid;
-    //     private String question;
-    //     private String answer;
-    //     private String type;
-    //     private String status;
-    // }
 
     // 
     private MessageResponse questionMessage;

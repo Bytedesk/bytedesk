@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 15:30:07
+ * @LastEditTime: 2025-04-29 09:04:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -314,15 +314,15 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         create(kownledgebaseRequestKeyword);
 
         // 初始化FAQ知识库
-        KbaseRequest kownledgebaseRequestFaq = KbaseRequest.builder()
-                .name(KbaseConsts.KB_FAQ_NAME)
-                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
-                .language(LanguageEnum.ZH_CN.name())
-                .build();
-        kownledgebaseRequestFaq.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID));
-        kownledgebaseRequestFaq.setType(KbaseTypeEnum.FAQ.name());
-        kownledgebaseRequestFaq.setOrgUid(orgUid);
-        create(kownledgebaseRequestFaq);
+        // KbaseRequest kownledgebaseRequestFaq = KbaseRequest.builder()
+        //         .name(KbaseConsts.KB_FAQ_NAME)
+        //         .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
+        //         .language(LanguageEnum.ZH_CN.name())
+        //         .build();
+        // kownledgebaseRequestFaq.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID));
+        // kownledgebaseRequestFaq.setType(KbaseTypeEnum.FAQ.name());
+        // kownledgebaseRequestFaq.setOrgUid(orgUid);
+        // create(kownledgebaseRequestFaq);
 
         // 初始化自动回复知识库
         KbaseRequest kownledgebaseRequestAutoReply = KbaseRequest.builder()
