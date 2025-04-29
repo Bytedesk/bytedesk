@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:34:02
+ * @LastEditTime: 2025-04-29 16:24:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,10 +46,10 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.llm_chunk.SplitRequest;
-import com.bytedesk.kbase.llm_chunk.SplitRestService;
-import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
-import com.bytedesk.kbase.llm_chunk.SplitTypeEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkRequest;
+import com.bytedesk.kbase.llm_chunk.ChunkRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkTypeEnum;
 import com.bytedesk.kbase.llm_file.FileEntity;
 import com.bytedesk.kbase.llm_file.FileRestService;
 import com.bytedesk.kbase.llm_text.TextEntity;
@@ -74,7 +74,7 @@ public class SpringAIVectorStoreService {
 
 	private final TextRestService textRestService;
 
-	private final SplitRestService splitRestService;
+	private final ChunkRestService chunkRestService;
 
 	private final WebsiteRestService websiteRestService;
 
@@ -285,10 +285,10 @@ public class SpringAIVectorStoreService {
 			doc.getMetadata().put("endDate", LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
-			SplitRequest splitRequest = SplitRequest.builder()
+			ChunkRequest splitRequest = ChunkRequest.builder()
 					.name(name)
 					.content(doc.getText())
-					.type(SplitTypeEnum.TEXT.name())
+					.type(ChunkTypeEnum.TEXT.name())
 					.docId(doc.getId())
 					.kbUid(kbUid)
 					.orgUid(orgUid)
@@ -296,7 +296,7 @@ public class SpringAIVectorStoreService {
 					.startDate(LocalDateTime.now()) // 默认从现在开始
 					.endDate(LocalDateTime.now().plusYears(100)) // 默认有效期100年
 					.build();
-			splitRestService.create(splitRequest);
+			chunkRestService.create(splitRequest);
 		});
 		// log.info("Parsing document, this will take a while.");
 		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
@@ -332,10 +332,10 @@ public class SpringAIVectorStoreService {
 			// doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
-			SplitRequest splitRequest = SplitRequest.builder()
+			ChunkRequest splitRequest = ChunkRequest.builder()
 					.name(textEntity.getName())
 					.content(doc.getText())
-					.type(SplitTypeEnum.TEXT.name())
+					.type(ChunkTypeEnum.TEXT.name())
 					.docId(doc.getId())
 					.typeUid(textEntity.getUid())
 					.categoryUid(textEntity.getCategoryUid())
@@ -346,10 +346,10 @@ public class SpringAIVectorStoreService {
 					.startDate(textEntity.getStartDate())
 					.endDate(textEntity.getEndDate())
 					.build();
-			splitRestService.create(splitRequest);
+			chunkRestService.create(splitRequest);
 		}
 		textEntity.setDocIdList(docIdList);
-		textEntity.setStatus(SplitStatusEnum.SUCCESS.name());
+		textEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
 		textRestService.save(textEntity);
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
@@ -388,10 +388,10 @@ public class SpringAIVectorStoreService {
 			// doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
-			SplitRequest splitRequest = SplitRequest.builder()
+			ChunkRequest splitRequest = ChunkRequest.builder()
 					.name(faqEntity.getQuestion())
 					.content(doc.getText())
-					.type(SplitTypeEnum.FAQ.name())
+					.type(ChunkTypeEnum.FAQ.name())
 					.docId(doc.getId())
 					.typeUid(faqEntity.getUid())
 					.categoryUid(faqEntity.getCategoryUid())
@@ -402,10 +402,10 @@ public class SpringAIVectorStoreService {
 					.startDate(faqEntity.getStartDate() != null ? faqEntity.getStartDate() : LocalDateTime.now())
 					.endDate(faqEntity.getEndDate() != null ? faqEntity.getEndDate() : LocalDateTime.now().plusYears(100))
 					.build();
-			splitRestService.create(splitRequest);
+			chunkRestService.create(splitRequest);
 		}
 		faqEntity.setDocIdList(docIdList);
-		faqEntity.setStatus(SplitStatusEnum.SUCCESS.name());
+		faqEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
 		faqRestService.save(faqEntity);
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
@@ -453,10 +453,10 @@ public class SpringAIVectorStoreService {
 				doc.getMetadata().put("endDate", websiteEntity.getEndDate() != null ? websiteEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 				
 				// 将doc写入到splitEntity
-				SplitRequest splitRequest = SplitRequest.builder()
+				ChunkRequest splitRequest = ChunkRequest.builder()
 						.name(websiteEntity.getName())
 						.content(doc.getText())
-						.type(SplitTypeEnum.WEBSITE.name())
+						.type(ChunkTypeEnum.WEBSITE.name())
 						.docId(doc.getId())
 						.typeUid(websiteEntity.getUid())
 						.categoryUid(websiteEntity.getCategoryUid())
@@ -467,7 +467,7 @@ public class SpringAIVectorStoreService {
 						.startDate(websiteEntity.getStartDate())
 						.endDate(websiteEntity.getEndDate())
 						.build();
-				splitRestService.create(splitRequest);
+				chunkRestService.create(splitRequest);
 			}
 			// 如果需要存储到向量数据库
 			// if (websiteEntity.getKbase().getUid() != null) {
@@ -476,7 +476,7 @@ public class SpringAIVectorStoreService {
 			// }
 			//
 			websiteEntity.setDocIdList(docIdList);
-			websiteEntity.setStatus(SplitStatusEnum.SUCCESS.name());
+			websiteEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
 			websiteRestService.save(websiteEntity);
 			// log.info("Parsing document, this will take a while.");
 			vectorStore.write(docList);
@@ -516,10 +516,10 @@ public class SpringAIVectorStoreService {
 			// doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
 			// doc.getMetadata().put("endDate", file.getEndDate() != null ? file.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			// 
-			SplitRequest splitRequest = SplitRequest.builder()
+			ChunkRequest splitRequest = ChunkRequest.builder()
 					.name(file.getFileName())
 					.content(doc.getText())
-					.type(SplitTypeEnum.FILE.name())
+					.type(ChunkTypeEnum.FILE.name())
 					.docId(doc.getId())
 					.typeUid(file.getUid())
 					.categoryUid(file.getCategoryUid())
@@ -530,10 +530,10 @@ public class SpringAIVectorStoreService {
 					.startDate(file.getStartDate() != null ? file.getStartDate() : LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
 					.endDate(file.getEndDate() != null ? file.getEndDate() : LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
 					.build();
-			splitRestService.create(splitRequest);
+			chunkRestService.create(splitRequest);
 		}
 		file.setDocIdList(docIdList);
-		file.setStatus(SplitStatusEnum.SUCCESS.name());
+		file.setStatus(ChunkStatusEnum.SUCCESS.name());
 		fileRestService.save(file);
 		// 
 		vectorStore.write(docList);
@@ -706,7 +706,7 @@ public class SpringAIVectorStoreService {
 	public void deleteDocs(List<String> docIdList) {
 		Assert.notEmpty(docIdList, "Document ID list must not be empty");
 		// 删除splitEntity
-		splitRestService.deleteByDocList(docIdList);
+		chunkRestService.deleteByDocList(docIdList);
 		// 删除向量存储中的文档
 		vectorStore.delete(docIdList);
 		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));

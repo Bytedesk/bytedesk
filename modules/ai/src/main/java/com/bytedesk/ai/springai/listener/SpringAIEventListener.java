@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 12:14:17
+ * @LastEditTime: 2025-04-29 16:22:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,7 +61,7 @@ public class SpringAIEventListener {
         FileEntity file = event.getFile();
         log.info("SpringAIEventListener onFileCreateEvent: {}", file.getFileName());
         // 将File实体添加到创建缓存中，而不是立即处理
-        if (file.isAutoLlmSplit()) {
+        if (file.isAutoLlmChunk()) {
             // 仅当文件需要分割时，才添加到创建缓存中
             fileCreateMap.put(file.getUid(), file);
         } else if (file.isAutoGenerateLlmQa()) {
@@ -81,7 +81,7 @@ public class SpringAIEventListener {
     public void onTextCreateEvent(TextCreateEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextCreateEvent: {}", text.getName());
-        if (text.isAutoDeleteLlmSplit()) {
+        if (text.isAutoDeleteLlmChunk()) {
             // 仅当文件需要分割时，才添加到创建缓存中
             textCreateMap.put(text.getUid(), text);
         } else if (text.isAutoGenerateLlmQa()) {
@@ -114,7 +114,7 @@ public class SpringAIEventListener {
     public void onWebsiteCreateEvent(WebsiteCreateEvent event) {
         WebsiteEntity website = event.getWebsite();
         log.info("SpringAIEventListener onWebsiteCreateEvent: {}", website.getName());
-        if (website.isAutoLlmSplit()) {
+        if (website.isAutoLlmChunk()) {
             // 仅当文件需要分割时，才添加到创建缓存中
             // websiteCreateMap.put(website.getUid(), website);
             // 生成document
@@ -238,7 +238,7 @@ public class SpringAIEventListener {
 
             fileCreateMap.forEach((uid, file) -> {
                 try {
-                    springAiVectorService.readSplitWriteToVectorStore(file);
+                    springAiVectorService.readChunkWriteToVectorStore(file);
                     processedKeys.add(uid);
                 } catch (Exception e) {
                     log.error("处理File创建失败: {} - {}", uid, e.getMessage());
