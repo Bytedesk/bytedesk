@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 21:35:54
+ * @LastEditTime: 2025-04-29 10:00:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,6 +60,14 @@ public class FaqElastic {
     
     @Field(type = FieldType.Boolean)
     private boolean enabled;
+
+    // startDate
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private LocalDateTime startDate;
+
+    // endDate
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private LocalDateTime endDate;
     
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime createdAt;
@@ -96,6 +104,8 @@ public class FaqElastic {
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.isEnabled())
+            .startDate(faq.getStartDate())
+            .endDate(faq.getEndDate())
             .createdAt(faq.getCreatedAt())
             .updatedAt(faq.getUpdatedAt())
             .viewCount(faq.getViewCount())
