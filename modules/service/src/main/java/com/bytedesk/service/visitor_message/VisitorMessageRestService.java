@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-20 13:21:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 13:04:26
+ * @LastEditTime: 2025-04-29 12:47:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
          Pageable pageable = request.getPageable();
         Specification<MessageEntity> specs = MessageSpecification.search(request);
         Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-        return messagePage.map(ConvertUtils::convertToMessageResponse);
+        return messagePage.map(this::convertToResponse);
     }
 
     @Override
@@ -50,14 +50,6 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
-
-    // @Cacheable(value = "message", key = "#request.threadTopic", unless = "#result == null")
-    // public Page<MessageResponse> queryByThreadTopic(MessageRequest request) {
-    //     Pageable pageable = request.getPageable();
-    //     Specification<MessageEntity> specs = MessageSpecification.search(request);
-    //     Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-    //     return messagePage.map(ConvertUtils::convertToMessageResponse);
-    // }
 
     @Override
     public Optional<MessageEntity> findByUid(String uid) {
@@ -77,15 +69,6 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
-    @Override
-    public MessageEntity save(MessageEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-    
     @Override
     protected MessageEntity doSave(MessageEntity entity) {
         return messageRepository.save(entity);
@@ -123,8 +106,7 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
 
     @Override
     public MessageResponse convertToResponse(MessageEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+        return ConvertUtils.convertToMessageResponse(entity);
     }
     
 }
