@@ -88,9 +88,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
      */
     private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
         if (!volcengineChatModel.isPresent()) {
-            messageProtobuf.setType(MessageTypeEnum.ERROR);
-            messageProtobuf.setContent("火山引擎服务不可用");
-            messageSendService.sendProtobufMessage(messageProtobuf);
+            sendMessage(MessageTypeEnum.ERROR, "火山引擎服务不可用", messageProtobuf);
             return;
         }
         
@@ -111,17 +109,13 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            messageProtobuf.setType(MessageTypeEnum.STREAM);
-                            messageProtobuf.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobuf);
+                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobuf);
                         }
                     }
                 },
                 error -> {
                     log.error("Volcengine API error: ", error);
-                    messageProtobuf.setType(MessageTypeEnum.ERROR);
-                    messageProtobuf.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobuf);
                 },
                 () -> {
                     log.info("Chat stream completed");

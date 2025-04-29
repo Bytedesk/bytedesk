@@ -102,17 +102,13 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            messageProtobufReply.setType(MessageTypeEnum.STREAM);
-                            messageProtobufReply.setContent(textContent);
-                            messageSendService.sendProtobufMessage(messageProtobufReply);
+                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Zhipuai API error: ", error);
-                    messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                    messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");

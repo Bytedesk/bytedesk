@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:59:20
+ * @LastEditTime: 2025-04-29 11:05:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,7 +55,7 @@ public enum MessageTypeEnum {
     QUOTATION, // 引用消息
     KICKOFF, // kickoff other clients
     SHAKE, // shake window
-    FAQ, // 点击查看常见问题
+    // FAQ, // 点击查看常见问题
     FAQ_QUESTION, // 常见问题问题
     FAQ_ANSWER, // 常见问题答案
     FAQ_UP, // 常见问题答案评价:UP
@@ -65,7 +65,7 @@ public enum MessageTypeEnum {
     // QA_ANSWER, // 问答对答案
     // QA_UP, // 问答对答案评价:UP
     // QA_DOWN, // 问答对答案评价:DOWN
-    ROBOT, // 机器人
+    // ROBOT, // 机器人
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
     ROBOT_UP, // 机器人答案评价:UP

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 12:41:36
+ * @LastEditTime: 2025-04-29 11:06:03
  * @Description: 消息类型转换工具类
  */
 package com.bytedesk.core.utils;
@@ -57,10 +57,11 @@ public class MessageTypeConverter {
         typeToChineseMap.put(MessageTypeEnum.QUOTATION.name(), "引用消息");
         typeToChineseMap.put(MessageTypeEnum.KICKOFF.name(), "踢出");
         typeToChineseMap.put(MessageTypeEnum.SHAKE.name(), "窗口抖动");
-        typeToChineseMap.put(MessageTypeEnum.FAQ.name(), "常见问题");
-        typeToChineseMap.put(MessageTypeEnum.FAQ_UP.name(), "问题点赞");
-        typeToChineseMap.put(MessageTypeEnum.FAQ_DOWN.name(), "问题点踩");
-        typeToChineseMap.put(MessageTypeEnum.ROBOT.name(), "机器人消息");
+        typeToChineseMap.put(MessageTypeEnum.FAQ_QUESTION.name(), "常见问题问题");
+        typeToChineseMap.put(MessageTypeEnum.FAQ_ANSWER.name(), "常见问题答案");
+        typeToChineseMap.put(MessageTypeEnum.FAQ_UP.name(), "常见问题点赞");
+        typeToChineseMap.put(MessageTypeEnum.FAQ_DOWN.name(), "常见问题点踩");
+        typeToChineseMap.put(MessageTypeEnum.ROBOT_ANSWER.name(), "机器人回答");
         typeToChineseMap.put(MessageTypeEnum.ROBOT_UP.name(), "机器人点赞");
         typeToChineseMap.put(MessageTypeEnum.ROBOT_DOWN.name(), "机器人点踩");
         typeToChineseMap.put(MessageTypeEnum.RATE.name(), "评价");
