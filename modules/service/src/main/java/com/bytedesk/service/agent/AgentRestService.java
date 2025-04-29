@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 12:06:39
+ * @LastEditTime: 2025-04-29 15:45:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,6 @@ import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -235,8 +234,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
         agent.setQueueSettings(queueSettings);
         // 
-        InviteSettings inviteSettings = serviceSettingsService.formatAgentInviteSettings(request);
-        agent.setInviteSettings(inviteSettings);
+        // InviteSettings inviteSettings = serviceSettingsService.formatAgentInviteSettings(request);
+        // agent.setInviteSettings(inviteSettings);
         // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {

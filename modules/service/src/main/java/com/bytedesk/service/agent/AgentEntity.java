@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 14:27:14
+ * @LastEditTime: 2025-04-29 15:44:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,10 +21,10 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.IntentionSettings;
-import com.bytedesk.kbase.settings.InviteSettings;
-import com.bytedesk.kbase.settings.RateDownSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
+import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.team.member.MemberEntity;
@@ -120,17 +120,17 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
 
-    @Embedded
-    @Builder.Default
-    private InviteSettings inviteSettings = new InviteSettings();
+    // @Embedded
+    // @Builder.Default
+    // private InviteSettings inviteSettings = new InviteSettings();
 
-    @Embedded
-    @Builder.Default
-    private RateDownSettings rateDownSettings = new RateDownSettings();
+    // @Embedded
+    // @Builder.Default
+    // private RateDownSettings rateDownSettings = new RateDownSettings();
 
-    @Embedded
-    @Builder.Default
-    private IntentionSettings intentionSettings = new IntentionSettings();
+    // @Embedded
+    // @Builder.Default
+    // private IntentionSettings intentionSettings = new IntentionSettings();
 
     /**
      * 迁移到 @{QueueEntity}
@@ -161,6 +161,18 @@ public class AgentEntity extends BaseEntity {
     // org member
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
+
+    // 邀请设置
+    @ManyToOne(fetch = FetchType.LAZY)
+    private InviteSettingsEntity inviteSettings;
+
+    // 点踩设置
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RatedownSettingsEntity rateDownSettings;
+
+    // 意图识别
+    @ManyToOne(fetch = FetchType.LAZY)
+    private IntentionSettingsEntity intentionSetting;
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());

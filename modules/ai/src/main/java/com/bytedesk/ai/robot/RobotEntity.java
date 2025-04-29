@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 14:26:51
+ * @LastEditTime: 2025-04-29 15:42:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,15 +18,17 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.settings.IntentionSettings;
-import com.bytedesk.kbase.settings.InviteSettings;
-import com.bytedesk.kbase.settings.RateDownSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
+import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -79,17 +81,17 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
 
-    @Embedded
-    @Builder.Default
-    private InviteSettings inviteSettings = new InviteSettings();
+    // @Embedded
+    // @Builder.Default
+    // private InviteSettings inviteSettings = new InviteSettings();
 
-    @Embedded
-    @Builder.Default
-    private RateDownSettings rateDownSettings = new RateDownSettings();
+    // @Embedded
+    // @Builder.Default
+    // private RateDownSettings rateDownSettings = new RateDownSettings();
 
-    @Embedded
-    @Builder.Default
-    private IntentionSettings intentionSettings = new IntentionSettings();
+    // @Embedded
+    // @Builder.Default
+    // private IntentionSettings intentionSettings = new IntentionSettings();
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
@@ -123,6 +125,18 @@ public class RobotEntity extends BaseEntity {
     private String flowUid;
 
     private String categoryUid; // 机器人分类
+
+    // 邀请设置
+    @ManyToOne(fetch = FetchType.LAZY)
+    private InviteSettingsEntity inviteSettings;
+
+    // 点踩设置
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RatedownSettingsEntity rateDownSettings;
+
+    // 意图识别
+    @ManyToOne(fetch = FetchType.LAZY)
+    private IntentionSettingsEntity intentionSetting;
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()

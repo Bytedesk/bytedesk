@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:32:56
+ * @LastEditTime: 2025-04-29 15:28:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,8 +138,8 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
                 TagEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
-                latestEntity.setOrder(entity.getOrder());
-                latestEntity.setDeleted(entity.isDeleted());
+                // latestEntity.setOrder(entity.getOrder());
+                // latestEntity.setDeleted(entity.isDeleted());
                 return tagRepository.save(latestEntity);
             }
         } catch (Exception ex) {

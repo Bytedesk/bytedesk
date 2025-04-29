@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 18:06:42
+ * @LastEditTime: 2025-04-29 15:46:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,6 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -113,8 +112,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
         workgroup.setQueueSettings(queueSettings);
         //
-        InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
-        workgroup.setInviteSettings(inviteSettings);
+        // InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
+        // workgroup.setInviteSettings(inviteSettings);
         //
         Iterator<String> agentIterator = request.getAgentUids().iterator();
         while (agentIterator.hasNext()) {
@@ -174,8 +173,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
         workgroup.setQueueSettings(queueSettings);
         //
-        InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
-        workgroup.setInviteSettings(inviteSettings);
+        // InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
+        // workgroup.setInviteSettings(inviteSettings);
         //
         workgroup.getAgents().clear();
         Iterator<String> iterator = request.getAgentUids().iterator();

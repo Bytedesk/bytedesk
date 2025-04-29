@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 13:36:51
+ * @LastEditTime: 2025-04-29 15:44:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,6 @@ import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
@@ -440,12 +439,12 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         robot.setServiceSettings(serviceSettings);
 
         // Set Invite Settings
-        if (request == null || request.getInviteSettings() == null) {
-            robot.setInviteSettings(InviteSettings.builder().build());
-        } else {
-            InviteSettings inviteSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
-            robot.setInviteSettings(inviteSettings);
-        }
+        // if (request == null || request.getInviteSettings() == null) {
+        //     robot.setInviteSettings(InviteSettings.builder().build());
+        // } else {
+        //     InviteSettings inviteSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
+        //     robot.setInviteSettings(inviteSettings);
+        // }
 
         // Set LLM
         if (request.getLlm() == null) {

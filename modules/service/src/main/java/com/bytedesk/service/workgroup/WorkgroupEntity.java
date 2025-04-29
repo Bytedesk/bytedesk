@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:19:25
+ * @LastEditTime: 2025-04-29 15:46:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,9 +24,9 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.settings.IntentionSettings;
-import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
@@ -98,13 +98,13 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
 
-    @Embedded
-    @Builder.Default
-    private InviteSettings inviteSettings = new InviteSettings();
+    // @Embedded
+    // @Builder.Default
+    // private InviteSettings inviteSettings = new InviteSettings();
 
-    @Embedded
-    @Builder.Default
-    private IntentionSettings intentionSettings = new IntentionSettings();
+    // @Embedded
+    // @Builder.Default
+    // private IntentionSettings intentionSettings = new IntentionSettings();
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
@@ -124,6 +124,14 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 邀请设置
+    @ManyToOne(fetch = FetchType.LAZY)
+    private InviteSettingsEntity inviteSettings;
+
+    // 意图识别
+    @ManyToOne(fetch = FetchType.LAZY)
+    private IntentionSettingsEntity intentionSetting;
 
     /**
      * 获取可用客服
