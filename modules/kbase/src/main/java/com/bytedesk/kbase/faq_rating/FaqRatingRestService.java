@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:29:27
+ * @LastEditTime: 2025-04-29 18:00:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -160,7 +160,9 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
 
     @Override
     public FaqRatingResponse convertToResponse(FaqRatingEntity entity) {
-        return modelMapper.map(entity, FaqRatingResponse.class);
+        FaqRatingResponse response = modelMapper.map(entity, FaqRatingResponse.class);
+        
+        return response;
     }
 
     @Override
