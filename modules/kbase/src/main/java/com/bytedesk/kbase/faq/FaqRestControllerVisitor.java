@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 18:20:32
+ * @LastEditTime: 2025-04-29 10:46:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,6 @@ package com.bytedesk.kbase.faq;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.annotation.BlackIpFilter;
-import com.bytedesk.core.annotation.BlackUserFilter;
-import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -37,18 +34,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 public class FaqRestControllerVisitor {
 
+    private final FaqService faqService;
+
     private final FaqRestService faqRestService;
 
     // 输入联想搜索faq
-    @BlackIpFilter(title = "black", action = "searchFaqVisitor")
-    @BlackUserFilter(title = "black", action = "searchFaqVisitor")
-    @TabooJsonFilter(title = "敏感词", action = "searchFaqVisitor")
-    @GetMapping("/search")
-    public ResponseEntity<?> search(FaqRequest request) {
+    @GetMapping("/suggest")
+    public ResponseEntity<?> suggest(FaqRequest request) {
 
-        List<FaqEntity> faqList = faqRestService.findByQuestionContains(request.getQuestion());
-        
-        return ResponseEntity.ok(JsonResult.success(faqList));
+        List<FaqElasticSearchResult> suggestList = faqService.suggestFaq(request);
+
+        return ResponseEntity.ok(JsonResult.success(suggestList));
     }
 
     // 换一换faq

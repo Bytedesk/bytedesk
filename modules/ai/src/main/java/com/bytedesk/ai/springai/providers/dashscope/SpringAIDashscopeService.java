@@ -47,9 +47,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
         // 由于目前没有实现具体的DashScope调用逻辑，仅添加符合新接口的方法签名
         // 实际实现需要根据DashScope API进行适配
-        messageProtobufReply.setType(MessageTypeEnum.ERROR);
-        messageProtobufReply.setContent("DashScope服务尚未实现");
-        messageSendService.sendProtobufMessage(messageProtobufReply);
+        sendMessage(MessageTypeEnum.ERROR, "DashScope服务尚未实现", messageProtobufReply);
     }
 
     @Override
