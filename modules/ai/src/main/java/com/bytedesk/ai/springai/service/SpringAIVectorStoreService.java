@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 16:24:59
+ * @LastEditTime: 2025-04-29 16:26:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,7 +85,7 @@ public class SpringAIVectorStoreService {
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
 	 */
-	public void readSplitWriteToVectorStore(@NonNull FileEntity file) {
+	public void readChunkWriteToVectorStore(@NonNull FileEntity file) {
 		String fileUrl = file.getFileUrl();
 		log.info("Loading document from URL: {}", fileUrl);
 		Assert.hasText(fileUrl, "File URL must not be empty");
