@@ -37,9 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, SplitRequest, SplitResponse, SplitExcel> {
+public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, ChunkRequest, ChunkResponse, ChunkExcel> {
 
-    private final SplitRepository splitRepository;
+    private final ChunkRepository chunkRepository;
 
     private final ModelMapper modelMapper;
 
@@ -50,20 +50,20 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     private final KbaseRestService kbaseRestService;
 
     @Override
-    public Page<SplitEntity> queryByOrgEntity(SplitRequest request) {
+    public Page<ChunkEntity> queryByOrgEntity(ChunkRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<SplitEntity> spec = SplitSpecification.search(request);
-        return splitRepository.findAll(spec, pageable);
+        Specification<ChunkEntity> spec = ChunkSpecification.search(request);
+        return chunkRepository.findAll(spec, pageable);
     }
 
     @Override
-    public Page<SplitResponse> queryByOrg(SplitRequest request) {
-        Page<SplitEntity> page = queryByOrgEntity(request);
+    public Page<ChunkResponse> queryByOrg(ChunkRequest request) {
+        Page<ChunkEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<SplitResponse> queryByUser(SplitRequest request) {
+    public Page<ChunkResponse> queryByUser(ChunkRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -73,16 +73,16 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "split", key = "#uid", unless = "#result==null")
+    @Cacheable(value = "chunk", key = "#uid", unless = "#result==null")
     @Override
-    public Optional<SplitEntity> findByUid(String uid) {
-        return splitRepository.findByUid(uid);
+    public Optional<ChunkEntity> findByUid(String uid) {
+        return chunkRepository.findByUid(uid);
     }
 
     @Override
-    public SplitResponse create(SplitRequest request) {
-        // log.info("SplitRestService create: {}", request);
-        SplitEntity entity = SplitEntity.builder()
+    public ChunkResponse create(ChunkRequest request) {
+        // log.info("ChunkRestService create: {}", request);
+        ChunkEntity entity = ChunkEntity.builder()
                 .uid(uidUtils.getUid())
                 .name(request.getName())
                 .content(request.getContent())
@@ -113,19 +113,19 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             throw new RuntimeException("kbaseUid not found");
         }
         //
-        SplitEntity savedEntity = save(entity);
+        ChunkEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create split failed");
+            throw new RuntimeException("Create chunk failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Override
-    public SplitResponse update(SplitRequest request) {
+    public ChunkResponse update(ChunkRequest request) {
         //
-        Optional<SplitEntity> optional = splitRepository.findByUid(request.getUid());
+        Optional<ChunkEntity> optional = chunkRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            SplitEntity entity = optional.get();
+            ChunkEntity entity = optional.get();
             // modelMapper.map(request, entity);
             entity.setName(request.getName());
             entity.setContent(request.getContent());
@@ -139,18 +139,18 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
             // entity.setType(request.getType());
             // entity.setDocId(request.getDocId());
             //
-            SplitEntity savedEntity = save(entity);
+            ChunkEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update split failed");
+                throw new RuntimeException("Update chunk failed");
             }
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("Split not found");
+            throw new RuntimeException("Chunk not found");
         }
     }
 
     @Override
-    public SplitEntity save(SplitEntity entity) {
+    public ChunkEntity save(ChunkEntity entity) {
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -158,18 +158,18 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
         }
     }
 
-    protected SplitEntity doSave(SplitEntity entity) {
-        return splitRepository.save(entity);
+    protected ChunkEntity doSave(ChunkEntity entity) {
+        return chunkRepository.save(entity);
     }
 
     @Override
-    public SplitEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            SplitEntity entity) {
+    public ChunkEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            ChunkEntity entity) {
         try {
             log.warn("处理乐观锁冲突: {}", entity.getUid());
-            Optional<SplitEntity> latest = splitRepository.findByUid(entity.getUid());
+            Optional<ChunkEntity> latest = chunkRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                SplitEntity latestEntity = latest.get();
+                ChunkEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 latestEntity.setContent(entity.getContent());
@@ -185,7 +185,7 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
                 // latestEntity.setStatus(entity.getStatus());
                 latestEntity.setDocId(entity.getDocId());
 
-                return splitRepository.save(latestEntity);
+                return chunkRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -196,39 +196,39 @@ public class SplitRestService extends BaseRestServiceWithExcel<SplitEntity, Spli
     public void deleteByDocList(List<String> docIdList) {
         // 遍历 docIdList
         for (String docId : docIdList) {
-            // 查找 docId 对应的所有 split
-            Optional<SplitEntity> splitList = splitRepository.findByDocId(docId);
+            // 查找 docId 对应的所有 chunk
+            Optional<ChunkEntity> chunkList = chunkRepository.findByDocId(docId);
             // 删除
-            splitList.ifPresent(split -> {
-                split.setDeleted(true);
-                save(split);
+            chunkList.ifPresent(chunk -> {
+                chunk.setDeleted(true);
+                save(chunk);
             });
         }
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<SplitEntity> optional = splitRepository.findByUid(uid);
+        Optional<ChunkEntity> optional = chunkRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
         } else {
-            throw new RuntimeException("Split not found");
+            throw new RuntimeException("Chunk not found");
         }
     }
 
     @Override
-    public void delete(SplitRequest request) {
+    public void delete(ChunkRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public SplitResponse convertToResponse(SplitEntity entity) {
-        return modelMapper.map(entity, SplitResponse.class);
+    public ChunkResponse convertToResponse(ChunkEntity entity) {
+        return modelMapper.map(entity, ChunkResponse.class);
     }
 
     @Override
-    public SplitExcel convertToExcel(SplitEntity split) {
-        return modelMapper.map(split, SplitExcel.class);
+    public ChunkExcel convertToExcel(ChunkEntity chunk) {
+        return modelMapper.map(chunk, ChunkExcel.class);
     }
 }

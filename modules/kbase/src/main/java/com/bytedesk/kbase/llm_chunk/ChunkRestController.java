@@ -26,74 +26,74 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/llm/split")
+@RequestMapping("/api/v1/llm/chunk")
 @AllArgsConstructor
-public class SplitRestController extends BaseRestController<SplitRequest> {
+public class ChunkRestController extends BaseRestController<ChunkRequest> {
 
-    private final SplitRestService splitRestService;
+    private final ChunkRestService chunkRestService;
 
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
-    public ResponseEntity<?> queryByOrg(SplitRequest request) {
+    public ResponseEntity<?> queryByOrg(ChunkRequest request) {
         
-        Page<SplitResponse> splits = splitRestService.queryByOrg(request);
+        Page<ChunkResponse> chunks = chunkRestService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(splits));
+        return ResponseEntity.ok(JsonResult.success(chunks));
     }
 
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
-    public ResponseEntity<?> queryByUser(SplitRequest request) {
+    public ResponseEntity<?> queryByUser(ChunkRequest request) {
         
-        Page<SplitResponse> splits = splitRestService.queryByUser(request);
+        Page<ChunkResponse> chunks = chunkRestService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(splits));
+        return ResponseEntity.ok(JsonResult.success(chunks));
     }
 
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
-    public ResponseEntity<?> queryByUid(SplitRequest request) {
+    public ResponseEntity<?> queryByUid(ChunkRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
-    public ResponseEntity<?> create(SplitRequest request) {
+    public ResponseEntity<?> create(ChunkRequest request) {
         
-        SplitResponse split = splitRestService.create(request);
+        ChunkResponse chunk = chunkRestService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(split));
+        return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
-    public ResponseEntity<?> update(SplitRequest request) {
+    public ResponseEntity<?> update(ChunkRequest request) {
         
-        SplitResponse split = splitRestService.update(request);
+        ChunkResponse chunk = chunkRestService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(split));
+        return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
-    public ResponseEntity<?> delete(SplitRequest request) {
+    public ResponseEntity<?> delete(ChunkRequest request) {
         
-        splitRestService.delete(request);
+        chunkRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
-    public Object export(SplitRequest request, HttpServletResponse response) {
+    public Object export(ChunkRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
-            splitRestService,
-            SplitExcel.class,
+            chunkRestService,
+            ChunkExcel.class,
             "分词",
-            "split"
+            "chunk"
         );
     }
 }

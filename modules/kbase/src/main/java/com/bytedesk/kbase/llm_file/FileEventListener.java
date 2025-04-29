@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:04:53
+ * @LastEditTime: 2025-04-29 16:20:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,7 @@ public class FileEventListener {
                 .fileName(upload.getFileName())
                 .fileUrl(upload.getFileUrl())
                 .autoGenerateLlmQa(extra.isAutoGenerateLlmQa())
-                .autoLlmSplit(extra.isAutoLlmSplit())
+                .autoLlmChunk(extra.isAutoLlmChunk())
                 .categoryUid(upload.getCategoryUid())
                 .kbUid(upload.getKbUid())
                 .userUid(userProtobuf.getUid())

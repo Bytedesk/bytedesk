@@ -31,7 +31,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class SplitResponse extends BaseResponse {
+public class ChunkResponse extends BaseResponse {
 
     private String name;
 

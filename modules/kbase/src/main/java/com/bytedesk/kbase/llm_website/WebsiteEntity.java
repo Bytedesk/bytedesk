@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:32:26
+ * @LastEditTime: 2025-04-29 16:20:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -67,7 +67,7 @@ public class WebsiteEntity extends BaseEntity {
     // private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
@@ -99,25 +99,25 @@ public class WebsiteEntity extends BaseEntity {
     @Column(name = "is_llm_qa_deleted")
     private boolean llmQaDeleted = false;
 
-    // 是否开启自动llm split切块
+    // 是否开启自动llm Chunk切块
     @Builder.Default
-    @Column(name = "is_auto_llm_split")
-    private boolean autoLlmSplit = false;
+    @Column(name = "is_auto_llm_Chunk")
+    private boolean autoLlmChunk = false;
 
-    // 是否已经自动llm split切块
+    // 是否已经自动llm Chunk切块
     @Builder.Default
-    @Column(name = "is_llm_splitted")
-    private boolean llmSplitted = false;
+    @Column(name = "is_llm_Chunkted")
+    private boolean llmChunkted = false;
 
-    // is auto delete llm split
+    // is auto delete llm Chunk
     @Builder.Default
-    @Column(name = "is_auto_delete_llm_split")
-    private boolean autoDeleteLlmSplit = false;
+    @Column(name = "is_auto_delete_llm_Chunk")
+    private boolean autoDeleteLlmChunk = false;
 
-    // 是否已经删除llm split切块
+    // 是否已经删除llm Chunk切块
     @Builder.Default
-    @Column(name = "is_llm_split_deleted")
-    private boolean llmSplitDeleted = false;
+    @Column(name = "is_llm_Chunk_deleted")
+    private boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default

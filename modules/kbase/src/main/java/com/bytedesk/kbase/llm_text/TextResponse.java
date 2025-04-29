@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:13:45
+ * @LastEditTime: 2025-04-29 16:20:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,20 +61,20 @@ public class TextResponse extends BaseResponse {
     // 是否已经删除llm问答
     private Boolean llmQaDeleted;
 
-    // 是否开启自动llm split切块
-    private Boolean autoLlmSplit;
+    // 是否开启自动llm Chunk切块
+    private Boolean autoLlmChunk;
 
-    // 是否已经自动llm split切块
-    private Boolean llmSplitted;
+    // 是否已经自动llm Chunk切块
+    private Boolean llmChunkted;
 
-    // 是否开启自动删除llm split切块
-    private Boolean autoDeleteLlmSplit;
+    // 是否开启自动删除llm Chunk切块
+    private Boolean autoDeleteLlmChunk;
 
-    // 是否已经删除llm split切块
-    private Boolean llmSplittedDeleted;
+    // 是否已经删除llm Chunk切块
+    private Boolean llmChunktedDeleted;
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = ChunkStatusEnum.NEW.name();
 
     private String categoryUid; // 所属分类
 

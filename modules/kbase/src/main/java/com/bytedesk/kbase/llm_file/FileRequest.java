@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:22:29
+ * @LastEditTime: 2025-04-29 16:20:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -63,21 +63,21 @@ public class FileRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmQaDeleted = false;
 
-    // 是否开启自动llm split切块
+    // 是否开启自动llm Chunk切块
     @Builder.Default
-    private Boolean autoLlmSplit = false;
+    private Boolean autoLlmChunk = false;
 
-    // 是否已经自动llm split切块
+    // 是否已经自动llm Chunk切块
     @Builder.Default
-    private Boolean llmSplitted = false;
+    private Boolean llmChunkted = false;
 
-    // 是否开启自动删除llm split切块
+    // 是否开启自动删除llm Chunk切块
     @Builder.Default
-    private Boolean autoDeleteLlmSplit = false;
+    private Boolean autoDeleteLlmChunk = false;
 
-    // 是否已经删除llm split切块
+    // 是否已经删除llm Chunk切块
     @Builder.Default
-    private Boolean llmSplitDeleted = false;
+    private Boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default
@@ -89,7 +89,7 @@ public class FileRequest extends BaseRequest {
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = ChunkStatusEnum.NEW.name();
 
     // 所属分类
     private String categoryUid;
