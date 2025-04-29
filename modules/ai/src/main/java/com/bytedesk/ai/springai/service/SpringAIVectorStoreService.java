@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:28:44
+ * @LastEditTime: 2025-04-29 08:47:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,18 +47,16 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.llm.chunk.SplitRequest;
-import com.bytedesk.kbase.llm.chunk.SplitRestService;
-import com.bytedesk.kbase.llm.chunk.SplitStatusEnum;
-import com.bytedesk.kbase.llm.chunk.SplitTypeEnum;
-import com.bytedesk.kbase.llm.file.FileEntity;
-import com.bytedesk.kbase.llm.file.FileRestService;
-import com.bytedesk.kbase.llm.qa.QaEntity;
-import com.bytedesk.kbase.llm.qa.QaRestService;
-import com.bytedesk.kbase.llm.text.TextEntity;
-import com.bytedesk.kbase.llm.text.TextRestService;
-import com.bytedesk.kbase.llm.website.WebsiteEntity;
-import com.bytedesk.kbase.llm.website.WebsiteRestService;
+import com.bytedesk.kbase.llm_chunk.SplitRequest;
+import com.bytedesk.kbase.llm_chunk.SplitRestService;
+import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
+import com.bytedesk.kbase.llm_chunk.SplitTypeEnum;
+import com.bytedesk.kbase.llm_file.FileEntity;
+import com.bytedesk.kbase.llm_file.FileRestService;
+import com.bytedesk.kbase.llm_text.TextEntity;
+import com.bytedesk.kbase.llm_text.TextRestService;
+import com.bytedesk.kbase.llm_website.WebsiteEntity;
+import com.bytedesk.kbase.llm_website.WebsiteRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,8 +80,6 @@ public class SpringAIVectorStoreService {
 	private final WebsiteRestService websiteRestService;
 
 	private final FaqRestService faqRestService;
-
-	private final QaRestService qaRestService;
 
 	private final UploadRestService uploadRestService;
 
@@ -364,60 +360,6 @@ public class SpringAIVectorStoreService {
 		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
 		// }
 
-		return docList;
-	}
-
-	//
-	@Transactional
-	public List<Document> readQa(QaEntity qaEntity) {
-		log.info("Converting string content to documents");
-		Assert.notNull(qaEntity, "QaEntity must not be null");
-		//
-		String content = qaEntity.toJson();
-		// 创建Document对象
-		Document document = new Document(content);
-		// 使用TokenTextSplitter分割文本
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(List.of(document));
-		List<String> docIdList = new ArrayList<>();
-		Iterator<Document> iterator = docList.iterator();
-		while (iterator.hasNext()) {
-			Document doc = iterator.next();
-			log.info("qa doc id: {}", doc.getId());
-			docIdList.add(doc.getId());
-			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, qaEntity.getKbase().getUid());
-			// doc.getMetadata().put("enabled", String.valueOf(qaEntity.isEnabled()));
-			// doc.getMetadata().put("startDate", qaEntity.getStartDate() != null ? qaEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			// doc.getMetadata().put("endDate", qaEntity.getEndDate() != null ? qaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
-			
-			// 将doc写入到splitEntity
-			SplitRequest splitRequest = SplitRequest.builder()
-					.name(qaEntity.getQuestion())
-					.content(doc.getText())
-					.type(SplitTypeEnum.QA.name())
-					.docId(doc.getId())
-					.typeUid(qaEntity.getUid())
-					.categoryUid(qaEntity.getCategoryUid())
-					.kbUid(qaEntity.getKbase().getUid())
-					.userUid(qaEntity.getUserUid())
-					.orgUid(qaEntity.getOrgUid())
-					.enabled(qaEntity.isEnabled())
-					.startDate(qaEntity.getStartDate() != null ? qaEntity.getStartDate() : LocalDateTime.now())
-					.endDate(qaEntity.getEndDate() != null ? qaEntity.getEndDate() : LocalDateTime.now().plusYears(100))
-					.build();
-			splitRestService.create(splitRequest);
-		}
-		qaEntity.setDocIdList(docIdList);
-		qaEntity.setStatus(SplitStatusEnum.SUCCESS.name());
-		qaRestService.save(qaEntity);
-		// log.info("Parsing document, this will take a while.");
-		vectorStore.write(docList);
-		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// }
 		return docList;
 	}
 

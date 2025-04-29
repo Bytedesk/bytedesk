@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 09:57:30
+ * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:00:27
+ * @LastEditTime: 2025-04-12 13:37:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,46 +11,48 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.llm_website;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.faq.event.FaqCreateEvent;
-import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
-import com.bytedesk.kbase.faq.event.FaqUpdateEvent;
+import com.bytedesk.kbase.llm_website.event.WebsiteCreateEvent;
+import com.bytedesk.kbase.llm_website.event.WebsiteDeleteEvent;
+import com.bytedesk.kbase.llm_website.event.WebsiteUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j  
+@Slf4j
 @Component
-public class FaqEntityListener {
+public class WebsiteEntityListener {
 
     @PostPersist
-    public void onPostPersist(FaqEntity faq) {
-        // log.info("FaqEntityListener onPostPersist: {}", faq.getUid());
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
+    public void onPostPersist(WebsiteCreateEvent event) {
+        WebsiteEntity website = event.getWebsite();
+        log.info("WebsiteEntityListener onPostPersist: {}", website.toString());
+        // 
+        WebsiteEntity clonedWebsite = SerializationUtils.clone(website);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new FaqCreateEvent(clonedFaq));
+        publisher.publishEvent(new WebsiteCreateEvent(clonedWebsite));
     }
 
-    @PostUpdate
-    public void onPostUpdate(FaqEntity faq) {
-        // log.info("FaqEntityListener onPostUpdate: {}", faq.getUid());
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
+    @PostUpdate 
+    public void onPostUpdate(WebsiteUpdateEvent event) {
+        WebsiteEntity website = event.getWebsite();
+        log.info("WebsiteEntityListener onPostUpdate: {}", website.toString());
+        // 
+        WebsiteEntity clonedWebsite = SerializationUtils.clone(website);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (faq.isDeleted()) {
-            log.info("FaqEntityListener FaqDeleteEvent: {}", faq.getQuestion());
-            publisher.publishEvent(new FaqDeleteEvent(clonedFaq));
+        if (website.isDeleted()) {
+            publisher.publishEvent(new WebsiteDeleteEvent(clonedWebsite));
         } else {
-            log.info("FaqEntityListener FaqUpdateEvent: {}", faq.getQuestion());
-            publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
+            publisher.publishEvent(new WebsiteUpdateEvent(clonedWebsite));
         }
     }
     
