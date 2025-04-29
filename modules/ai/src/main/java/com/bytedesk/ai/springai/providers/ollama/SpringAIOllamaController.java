@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 11:31:19
+ * @LastEditTime: 2025-04-29 12:08:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
@@ -67,9 +68,12 @@ public class SpringAIOllamaController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return springAIOllamaService.getOllamaChatModel()
-            .map(model -> model.stream(prompt))
-            .orElse(Flux.empty());
+        OllamaChatModel model = springAIOllamaService.getChatModel();
+        if (model != null) {
+            return model.stream(prompt);
+        } else {
+            return Flux.empty();
+        }
     }
 
     /**
@@ -111,12 +115,13 @@ public class SpringAIOllamaController {
     public ResponseEntity<JsonResult<?>> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-                if (!springAIOllamaService.getOllamaChatModel().isPresent()) {
-                    return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+                OllamaChatModel model = springAIOllamaService.getChatModel();
+                if (model == null) {
+                    return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
                 }
         
                 try {
-                    ChatResponse response = springAIOllamaService.getOllamaChatModel().get().call(
+                    ChatResponse response = model.call(
                         new Prompt(
                             message,
                             OllamaOptions.builder()

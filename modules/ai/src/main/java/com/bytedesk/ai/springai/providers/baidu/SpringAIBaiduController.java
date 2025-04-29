@@ -70,7 +70,7 @@ public class SpringAIBaiduController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIBaiduService.getBaiduChatModel();
+        OpenAiChatModel model = springAIBaiduService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -118,7 +118,7 @@ public class SpringAIBaiduController {
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        OpenAiChatModel model = springAIBaiduService.getBaiduChatModel();
+        OpenAiChatModel model = springAIBaiduService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Baidu service is not available"));
         }

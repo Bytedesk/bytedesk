@@ -72,7 +72,7 @@ public class SpringAISiliconFlowController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return springAISiliconFlowService.getSiliconFlowChatModel()
+        return springAISiliconFlowService.getChatModel()
                 .map(model -> model.stream(prompt))
                 .orElse(Flux.empty());
     }
@@ -117,12 +117,12 @@ public class SpringAISiliconFlowController {
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
 
-        if (!springAISiliconFlowService.getSiliconFlowChatModel().isPresent()) {
+        if (!springAISiliconFlowService.getChatModel().isPresent()) {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
 
         try {
-            ChatResponse response = springAISiliconFlowService.getSiliconFlowChatModel().get().call(
+            ChatResponse response = springAISiliconFlowService.getChatModel().get().call(
                     new Prompt(
                             message,
                             OpenAiChatOptions.builder()
