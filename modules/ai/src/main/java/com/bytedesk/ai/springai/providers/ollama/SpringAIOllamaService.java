@@ -178,20 +178,8 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         
         if (chatModel == null) {
             log.info("Ollama API not available");
-            try {
-                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                messageProtobufReply.setContent("Ollama service is not available"); 
-                persistMessage(messageProtobufQuery, messageProtobufReply);
-                String messageJson = messageProtobufReply.toJson();
-                
-                emitter.send(SseEmitter.event()
-                        .data(messageJson)
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-                emitter.complete();
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-            }
+            // 使用sendStreamEndMessage方法替代重复的代码
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
