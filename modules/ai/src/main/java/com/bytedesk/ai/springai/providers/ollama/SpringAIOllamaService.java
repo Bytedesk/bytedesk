@@ -55,6 +55,22 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     /**
+     * 根据机器人配置创建动态的OllamaOptions
+     * 
+     * @param llm 机器人LLM配置
+     * @return 根据机器人配置创建的选项
+     */
+    private OllamaOptions createDynamicOptions(RobotLlm llm) {
+        return super.createDynamicOptions(llm, robotLlm -> 
+            OllamaOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
+    }
+
+    /**
      * 根据机器人配置创建动态的OllamaChatModel
      * 
      * @param llm 机器人LLM配置
@@ -67,11 +83,10 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
 
         try {
-            OllamaOptions options = OllamaOptions.builder()
-                    .model(llm.getModel())
-                    .temperature(llm.getTemperature())  // 现在直接使用Double类型
-                    .topP(llm.getTopP())  // 现在直接使用Double类型
-                    .build();
+            OllamaOptions options = createDynamicOptions(llm);
+            if (options == null) {
+                return bytedeskOllamaChatModel.orElse(null);
+            }
 
             return OllamaChatModel.builder()
                     .ollamaApi(ollamaApi)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:39:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 18:20:34
+ * @LastEditTime: 2025-04-29 11:31:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,7 +55,7 @@ package com.bytedesk.ai.springai.providers.dashscope;
 // @RestController
 // @RequestMapping("/springai/dashscope")
 // @RequiredArgsConstructor
-// @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true")
+// @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
 // public class SpringAIDashscopeController {
 
 // 	// private final SpringAIDashscopeService springAIDashscopeService;
