@@ -96,18 +96,18 @@ public class FaqRequest extends BaseRequest {
     private Boolean enabled = true;
 
     // 是否开启自动同步到llm_qa问答
-    @Builder.Default
-    private Boolean autoSyncLlmQa = false;
+    // @Builder.Default
+    // private Boolean autoSyncLlmQa = false;
 
-    // 是否已经同步llm问答
-    @Builder.Default
-    private Boolean llmQaSynced = false;
+    // // 是否已经同步llm问答
+    // @Builder.Default
+    // private Boolean llmQaSynced = false;
 
-    // 同步到llm qa kbUid 
-    private String llmQaKbUid;
+    // // 同步到llm qa kbUid 
+    // private String llmQaKbUid;
 
-    // 同步到llm qa uid
-    private String llmQaUid;
+    // // 同步到llm qa uid
+    // private String llmQaUid;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();

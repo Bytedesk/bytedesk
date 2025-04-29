@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 08:54:29
+ * @LastEditTime: 2025-04-29 09:35:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,6 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
@@ -610,7 +609,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         try {
             // 加载JSON文件中的FAQ数据
             FaqConfiguration config = faqJsonLoader.loadFaqs();
-            String llmQaKbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
+            // String llmQaKbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
 
             // 遍历并保存每个FAQ
             for (Faq faq : config.getFaqs()) {
@@ -623,8 +622,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .answer(faq.getAnswer())
                             .type(MessageTypeEnum.TEXT.name())
                             .enabled(true)
-                            .autoSyncLlmQa(true)
-                            .llmQaKbUid(llmQaKbUid)
+                            // .autoSyncLlmQa(true)
+                            // .llmQaKbUid(llmQaKbUid)
                             .kbUid(kbUid)
                             .orgUid(orgUid)
                             .build();

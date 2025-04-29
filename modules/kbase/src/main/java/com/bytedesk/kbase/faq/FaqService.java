@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 21:33:58
+ * @LastEditTime: 2025-04-29 10:00:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -248,25 +248,25 @@ public class FaqService {
             .build()._toQuery());
         
         // 添加过滤条件：启用状态
-        boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+        // boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
         
         // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
-        LocalDateTime currentTime = LocalDateTime.now();
-        String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        // LocalDateTime currentTime = LocalDateTime.now();
+        // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
         
-        // 创建startDate范围查询
-        DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-            .field("startDate")
-            .lte(currentTimeStr)
-            .build();
-        boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+        // // 创建startDate范围查询
+        // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+        //     .field("startDate")
+        //     .lte(currentTimeStr)
+        //     .build();
+        // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
         
-        // 创建endDate范围查询
-        DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-            .field("endDate")
-            .gte(currentTimeStr)
-            .build();
-        boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+        // // 创建endDate范围查询
+        // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+        //     .field("endDate")
+        //     .gte(currentTimeStr)
+        //     .build();
+        // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
         
         // 添加可选的过滤条件：知识库、分类、组织
         // if (kbUid != null && !kbUid.isEmpty()) {
