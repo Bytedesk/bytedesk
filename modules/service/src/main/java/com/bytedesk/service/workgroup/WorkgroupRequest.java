@@ -19,7 +19,6 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsRequest;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue.settings.QueueSettingsRequest;
@@ -70,8 +69,8 @@ public class WorkgroupRequest extends BaseRequest {
     @Builder.Default
     private QueueSettingsRequest queueSettings = new QueueSettingsRequest();
 
-    @Builder.Default
-    private InviteSettings inviteSettings = new InviteSettings();
+    // @Builder.Default
+    // private InviteSettings inviteSettings = new InviteSettings();
 
     // 是否统一入口
     // @Builder.Default

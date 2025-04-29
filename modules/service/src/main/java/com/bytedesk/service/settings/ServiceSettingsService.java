@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-03 16:57:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 15:47:14
+ * @LastEditTime: 2025-04-29 15:47:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.settings.InviteSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
@@ -203,16 +202,16 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-    public InviteSettings formatAgentInviteSettings(AgentRequest request) {
-        // 
-        if (request == null || request.getInviteSettings() == null) {
-            return InviteSettings.builder().build();
-        }
-        //
-        InviteSettings serviceSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
-        //
-        return serviceSettings;
-    }
+    // public InviteSettings formatAgentInviteSettings(AgentRequest request) {
+    //     // 
+    //     if (request == null || request.getInviteSettings() == null) {
+    //         return InviteSettings.builder().build();
+    //     }
+    //     //
+    //     InviteSettings serviceSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
+    //     //
+    //     return serviceSettings;
+    // }
 
 
 
@@ -378,15 +377,15 @@ public class ServiceSettingsService {
         return serviceSettings;
     }
 
-    public InviteSettings formatWorkgroupInviteSettings(WorkgroupRequest request) {
-        // 
-        if (request == null || request.getInviteSettings() == null) {
-            return InviteSettings.builder().build();
-        }
-        //
-        InviteSettings serviceSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
-        //
-        return serviceSettings;
-    }
+    // public InviteSettings formatWorkgroupInviteSettings(WorkgroupRequest request) {
+    //     // 
+    //     if (request == null || request.getInviteSettings() == null) {
+    //         return InviteSettings.builder().build();
+    //     }
+    //     //
+    //     InviteSettings serviceSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
+    //     //
+    //     return serviceSettings;
+    // }
 
 }
