@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:37:26
+ * @LastEditTime: 2025-04-29 22:52:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,17 +35,17 @@ public class FaqRatingRestController extends BaseRestController<FaqRatingRequest
     @Override
     public ResponseEntity<?> queryByOrg(FaqRatingRequest request) {
         
-        Page<FaqRatingResponse> faq_ratings = faqRatingService.queryByOrg(request);
+        Page<FaqRatingResponse> faqRating = faqRatingService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(faq_ratings));
+        return ResponseEntity.ok(JsonResult.success(faqRating));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(FaqRatingRequest request) {
         
-        Page<FaqRatingResponse> faq_ratings = faqRatingService.queryByUser(request);
+        Page<FaqRatingResponse> faqRating = faqRatingService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(faq_ratings));
+        return ResponseEntity.ok(JsonResult.success(faqRating));
     }
 
     @Override
