@@ -21,7 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
@@ -61,7 +61,7 @@ public class TextEntity extends BaseEntity {
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
@@ -93,25 +93,25 @@ public class TextEntity extends BaseEntity {
     @Column(name = "is_llm_qa_deleted")
     private boolean llmQaDeleted = false;
 
-    // 是否开启自动llm split切块
+    // 是否开启自动llm Chunk切块
     @Builder.Default
-    @Column(name = "is_auto_llm_split")
-    private boolean autoLlmSplit = false;
+    @Column(name = "is_auto_llm_Chunk")
+    private boolean autoLlmChunk = false;
 
-    // 是否已经自动llm split切块
+    // 是否已经自动llm Chunk切块
     @Builder.Default
-    @Column(name = "is_llm_splitted")
-    private boolean llmSplitted = false;
+    @Column(name = "is_llm_Chunkted")
+    private boolean llmChunkted = false;
 
-    // is auto delete llm split
+    // is auto delete llm Chunk
     @Builder.Default
-    @Column(name = "is_auto_delete_llm_split")
-    private boolean autoDeleteLlmSplit = false;
+    @Column(name = "is_auto_delete_llm_Chunk")
+    private boolean autoDeleteLlmChunk = false;
 
-    // 是否已经删除llm split切块
+    // 是否已经删除llm Chunk切块
     @Builder.Default
-    @Column(name = "is_llm_split_deleted")
-    private boolean llmSplitDeleted = false;
+    @Column(name = "is_llm_Chunk_deleted")
+    private boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default

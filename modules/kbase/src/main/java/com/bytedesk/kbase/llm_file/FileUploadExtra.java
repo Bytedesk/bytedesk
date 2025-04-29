@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-23 16:59:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:02:46
+ * @LastEditTime: 2025-04-29 16:21:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,7 +33,7 @@ public class FileUploadExtra implements Serializable {
     private String autoGenerateLlmQa;
 
     // 使用 "true" 或 "false" 来表示布尔值
-    private String autoLlmSplit;
+    private String autoLlmChunk;
 
     // 转换为布尔值
     public boolean isAutoGenerateLlmQa() {
@@ -41,8 +41,8 @@ public class FileUploadExtra implements Serializable {
     }
 
     // 转换为布尔值
-    public boolean isAutoLlmSplit() {
-        return Boolean.parseBoolean(autoLlmSplit);
+    public boolean isAutoLlmChunk() {
+        return Boolean.parseBoolean(autoLlmChunk);
     }
 
     // fromJson

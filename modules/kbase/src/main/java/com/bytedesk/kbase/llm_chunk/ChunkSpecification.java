@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SplitSpecification extends BaseSpecification {
+public class ChunkSpecification extends BaseSpecification {
     
-    public static Specification<SplitEntity> search(SplitRequest request) {
+    public static Specification<ChunkEntity> search(ChunkRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

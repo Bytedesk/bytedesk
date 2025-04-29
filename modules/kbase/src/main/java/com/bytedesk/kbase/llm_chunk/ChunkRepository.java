@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-05 16:58:18
+ * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 13:40:08
+ * @LastEditTime: 2025-04-23 09:14:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,17 +13,19 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
-public class SplitPermissions {
+import java.util.List;
+import java.util.Optional;
 
-    public static final String SPLIT_PREFIX = "SPLIT_";
-    // Split permissions
-    public static final String SPLIT_CREATE = "hasAuthority('SPLIT_CREATE')";
-    public static final String SPLIT_READ = "hasAuthority('SPLIT_READ')";
-    public static final String SPLIT_UPDATE = "hasAuthority('SPLIT_UPDATE')";
-    public static final String SPLIT_DELETE = "hasAuthority('SPLIT_DELETE')";
-    public static final String SPLIT_EXPORT = "hasAuthority('SPLIT_EXPORT')";
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-    // 
-    
-    
+public interface ChunkRepository extends JpaRepository<ChunkEntity, Long>, JpaSpecificationExecutor<ChunkEntity> {
+
+    Optional<ChunkEntity> findByUid(String uid);
+
+    Optional<ChunkEntity> findByDocId(String docId);
+
+    // Boolean existsByPlatform(String platform);
+
+    List<ChunkEntity> findByKbase_Uid(String kbUid);
 }

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.llm_chunk.SplitStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,21 +66,21 @@ public class TextRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmQaDeleted = false;
 
-    // 是否开启自动llm split切块
+    // 是否开启自动llm Chunk切块
     @Builder.Default
-    private Boolean autoLlmSplit = false;
+    private Boolean autoLlmChunk = false;
 
-    // 是否已经自动llm split切块
+    // 是否已经自动llm Chunk切块
     @Builder.Default
-    private Boolean llmSplitted = false;
+    private Boolean llmChunkted = false;
 
-    // 是否开启自动删除llm split切块
+    // 是否开启自动删除llm Chunk切块
     @Builder.Default
-    private Boolean autoDeleteLlmSplit = false;
+    private Boolean autoDeleteLlmChunk = false;
 
-    // 是否已经删除llm split切块
+    // 是否已经删除llm Chunk切块
     @Builder.Default
-    private Boolean llmSplitDeleted = false;
+    private Boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default
@@ -92,7 +92,7 @@ public class TextRequest extends BaseRequest {
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     @Builder.Default
-    private String status = SplitStatusEnum.NEW.name();
+    private String status = ChunkStatusEnum.NEW.name();
 
     private String categoryUid; // 所属分类
 

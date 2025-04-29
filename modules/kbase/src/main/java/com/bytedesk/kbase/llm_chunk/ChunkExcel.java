@@ -19,10 +19,10 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import lombok.Data;
 
 /**
- * Split导出Excel实体类
+ * Chunk导出Excel实体类
  */
 @Data
-public class SplitExcel {
+public class ChunkExcel {
 
     @ExcelProperty(value = "名称")
     @ColumnWidth(30)

@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class SplitEventListener {
+public class ChunkEventListener {
 
     // @EventListener
     // public void onFileCreateEvent(FileCreateEvent event) {

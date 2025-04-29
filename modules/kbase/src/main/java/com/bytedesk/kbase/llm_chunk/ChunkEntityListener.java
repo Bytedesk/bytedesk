@@ -18,9 +18,9 @@ import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.llm_chunk.event.SplitCreateEvent;
-import com.bytedesk.kbase.llm_chunk.event.SplitDeleteEvent;
-import com.bytedesk.kbase.llm_chunk.event.SplitUpdateEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -28,29 +28,29 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class SplitEntityListener {
+public class ChunkEntityListener {
 
     @PostPersist
-    public void onPostPersist(SplitEntity split) {
-        log.info("SplitEntityListener onPostPersist: {}", split.getName());
-        SplitEntity clonedSplit = SerializationUtils.clone(split);
+    public void onPostPersist(ChunkEntity chunk) {
+        log.info("ChunkEntityListener onPostPersist: {}", chunk.getName());
+        ChunkEntity clonedChunk = SerializationUtils.clone(chunk);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new SplitCreateEvent(clonedSplit));
+        publisher.publishEvent(new ChunkCreateEvent(clonedChunk));
     }
 
     @PostUpdate
-    public void onPostUpdate(SplitEntity split) {
-        log.info("SplitEntityListener onPostUpdate: {}", split.getName());
-        SplitEntity clonedSplit = SerializationUtils.clone(split);
+    public void onPostUpdate(ChunkEntity chunk) {
+        log.info("ChunkEntityListener onPostUpdate: {}", chunk.getName());
+        ChunkEntity clonedChunk = SerializationUtils.clone(chunk);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (split.isDeleted()) {
-            log.info("SplitEntityListener onPostUpdate: Split is deleted");
-            publisher.publishEvent(new SplitDeleteEvent(clonedSplit));
+        if (chunk.isDeleted()) {
+            log.info("ChunkEntityListener onPostUpdate: Chunk is deleted");
+            publisher.publishEvent(new ChunkDeleteEvent(clonedChunk));
         }else {
-            log.info("SplitEntityListener onPostUpdate: Split is update");
-            publisher.publishEvent(new SplitUpdateEvent(clonedSplit));
+            log.info("ChunkEntityListener onPostUpdate: Chunk is update");
+            publisher.publishEvent(new ChunkUpdateEvent(clonedChunk));
         }   
     }
 }

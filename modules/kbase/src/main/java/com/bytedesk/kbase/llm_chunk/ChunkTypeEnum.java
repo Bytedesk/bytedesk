@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:25:55
+ * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 09:14:53
+ * @LastEditTime: 2025-04-12 14:23:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,19 +13,17 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-public interface SplitRepository extends JpaRepository<SplitEntity, Long>, JpaSpecificationExecutor<SplitEntity> {
-
-    Optional<SplitEntity> findByUid(String uid);
-
-    Optional<SplitEntity> findByDocId(String docId);
-
-    // Boolean existsByPlatform(String platform);
-
-    List<SplitEntity> findByKbase_Uid(String kbUid);
+public enum ChunkTypeEnum {
+    TEXT,
+    FILE,
+    WEBSITE,
+    QA,
+    FAQ,
+    IMAGE,
+    VIDEO,
+    AUDIO,
+    PDF,
+    DOC,
+    EXCEL,
+    PPT
 }
