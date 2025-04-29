@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 11:36:08
+ * @LastEditTime: 2025-04-29 11:30:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.providers.gitee;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
@@ -24,7 +23,6 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
@@ -41,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIGiteeService extends BaseSpringAIService {
 
     @Autowired(required = false)
-    private Optional<OpenAiChatModel> giteeChatModel;
+    private OpenAiChatModel giteeChatModel;
 
     public SpringAIGiteeService() {
         super(); // 调用基类的无参构造函数
@@ -54,21 +52,13 @@ public class SpringAIGiteeService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getModel())) {
-            return null;
-        }
-
-        try {
-            // 创建自定义的选项对象
-            return OpenAiChatOptions.builder()
-                    .model(llm.getModel())
-                    .temperature(llm.getTemperature())
-                    .topP(llm.getTopP())
-                    .build();
-        } catch (Exception e) {
-            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
-            return null;
-        }
+        return super.createDynamicOptions(llm, robotLlm -> 
+            OpenAiChatOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
     }
 
     @Override
@@ -76,7 +66,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
-        if (!giteeChatModel.isPresent()) {
+        if (giteeChatModel == null) {
             sendMessage(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobufReply);
             return;
         }
@@ -89,7 +79,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         }
 
         // 使用同一个ChatModel实例，但传入不同的选项
-        giteeChatModel.get().stream(requestPrompt).subscribe(
+        giteeChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Gitee API response metadata: {}", response.getMetadata());
@@ -113,14 +103,13 @@ public class SpringAIGiteeService extends BaseSpringAIService {
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return giteeChatModel.map(model -> model.call(prompt)).orElse("");
+        return giteeChatModel != null ? giteeChatModel.call(prompt) : "";
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return giteeChatModel.map(model -> model.call(message))
-                    .orElse("Gitee service is not available");
+            return giteeChatModel != null ? giteeChatModel.call(message) : "Gitee service is not available";
         } catch (Exception e) {
             log.error("Gitee API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -131,7 +120,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         RobotLlm llm = robot.getLlm();
 
-        if (!giteeChatModel.isPresent()) {
+        if (giteeChatModel == null) {
             handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
@@ -147,7 +136,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
 
-        giteeChatModel.get().stream(requestPrompt).subscribe(
+        giteeChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -176,12 +165,12 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                 });
     }
 
-    public Optional<OpenAiChatModel> getGiteeChatModel() {
+    public OpenAiChatModel getGiteeChatModel() {
         return giteeChatModel;
     }
 
     public boolean isServiceHealthy() {
-        if (!giteeChatModel.isPresent()) {
+        if (giteeChatModel == null) {
             return false;
         }
 

@@ -56,6 +56,22 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     }
 
     /**
+     * 根据机器人配置创建动态的ZhiPuAiChatOptions
+     * 
+     * @param llm 机器人LLM配置
+     * @return 根据机器人配置创建的选项
+     */
+    private ZhiPuAiChatOptions createDynamicOptions(RobotLlm llm) {
+        return super.createDynamicOptions(llm, robotLlm -> 
+            ZhiPuAiChatOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
+    }
+
+    /**
      * 根据机器人配置创建动态的ZhiPuAiChatModel
      * 
      * @param llm 机器人LLM配置
@@ -68,11 +84,10 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         }
 
         try {
-            ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
-                    .model(llm.getModel())
-                    .temperature(llm.getTemperature()) // 使用Double类型
-                    .topP(llm.getTopP()) // 使用Double类型
-                    .build();
+            ZhiPuAiChatOptions options = createDynamicOptions(llm);
+            if (options == null) {
+                return bytedeskZhipuaiChatModel;
+            }
 
             return new ZhiPuAiChatModel(zhipuaiApi, options);
         } catch (Exception e) {

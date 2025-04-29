@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 11:09:13
+ * @LastEditTime: 2025-04-29 11:26:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.util.StringUtils;
-
 import java.util.List;
 import java.util.Optional;
 import com.bytedesk.ai.robot.RobotLlm;
@@ -56,21 +54,13 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getModel())) {
-            return null;
-        }
-        
-        try {
-            // 创建自定义的选项对象
-            return OpenAiChatOptions.builder()
-                .model(llm.getModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                .build();
-        } catch (Exception e) {
-            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
-            return null;
-        }
+        return super.createDynamicOptions(llm, robotLlm -> 
+            OpenAiChatOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
     }
 
     @Override

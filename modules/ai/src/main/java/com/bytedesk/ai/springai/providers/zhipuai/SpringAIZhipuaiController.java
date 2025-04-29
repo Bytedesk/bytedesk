@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 18:01:56
+ * @LastEditTime: 2025-04-29 11:31:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,7 +55,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/zhipuai")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiController {
 
     private final SpringAIZhipuaiService springAIZhipuaiService;

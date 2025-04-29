@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.providers.deepseek;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
@@ -24,7 +23,6 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
@@ -41,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Autowired(required = false)
-    private Optional<OpenAiChatModel> deepseekChatModel;
+    private OpenAiChatModel deepseekChatModel;
 
     public SpringAIDeepseekService() {
         super(); // 调用基类的无参构造函数
@@ -54,21 +52,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getModel())) {
-            return null;
-        }
-        
-        try {
-            // 创建自定义的选项对象
-            return OpenAiChatOptions.builder()
-                .model(llm.getModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                .build();
-        } catch (Exception e) {
-            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
-            return null;
-        }
+        return super.createDynamicOptions(llm, robotLlm -> 
+            OpenAiChatOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
     }
 
     @Override
@@ -76,7 +66,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
-        if (!deepseekChatModel.isPresent()) {
+        if (deepseekChatModel == null) {
             sendMessage(MessageTypeEnum.ERROR, "Deepseek服务不可用", messageProtobufReply);
             return;
         }
@@ -89,7 +79,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         }
         
         // 使用同一个ChatModel实例，但传入不同的选项
-        deepseekChatModel.get().stream(requestPrompt).subscribe(
+        deepseekChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Deepseek API response metadata: {}", response.getMetadata());
@@ -113,14 +103,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return deepseekChatModel.map(model -> model.call(prompt)).orElse("");
+        return deepseekChatModel != null ? deepseekChatModel.call(prompt) : "";
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return deepseekChatModel.map(model -> model.call(message))
-                    .orElse("Deepseek service is not available");
+            return deepseekChatModel != null ? deepseekChatModel.call(message) : "Deepseek service is not available";
         } catch (Exception e) {
             log.error("Deepseek API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -132,7 +121,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
-        if (!deepseekChatModel.isPresent()) {
+        if (deepseekChatModel == null) {
             handleSseError(new RuntimeException("Deepseek service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
@@ -147,7 +136,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
 
-        deepseekChatModel.get().stream(requestPrompt).subscribe(
+        deepseekChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -176,12 +165,12 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                 });
     }
 
-    public Optional<OpenAiChatModel> getDeepseekChatModel() {
+    public OpenAiChatModel getDeepseekChatModel() {
         return deepseekChatModel;
     }
     
     public boolean isServiceHealthy() {
-        if (!deepseekChatModel.isPresent()) {
+        if (deepseekChatModel == null) {
             return false;
         }
 

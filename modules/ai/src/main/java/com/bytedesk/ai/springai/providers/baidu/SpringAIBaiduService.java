@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-25 11:59:08
+ * @LastEditTime: 2025-04-29 11:26:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.providers.baidu;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
@@ -25,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.util.StringUtils;
-
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -41,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Autowired(required = false)
-    private Optional<OpenAiChatModel> baiduChatModel;
+    private OpenAiChatModel baiduChatModel;
     
     public SpringAIBaiduService() {
         super(); // 调用基类的无参构造函数
@@ -54,21 +51,13 @@ public class SpringAIBaiduService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getModel())) {
-            return null;
-        }
-        
-        try {
-            // 创建自定义的选项对象
-            return OpenAiChatOptions.builder()
-                .model(llm.getModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                .build();
-        } catch (Exception e) {
-            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
-            return null;
-        }
+        return super.createDynamicOptions(llm, robotLlm -> 
+            OpenAiChatOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
     }
 
     @Override
@@ -76,7 +65,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
-        if (!baiduChatModel.isPresent()) {
+        if (baiduChatModel == null) {
             sendMessage(MessageTypeEnum.ERROR, "百度服务不可用", messageProtobufReply);
             return;
         }
@@ -88,7 +77,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
 
-        baiduChatModel.get().stream(requestPrompt).subscribe(
+        baiduChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Baidu API response metadata: {}", response.getMetadata());
@@ -111,14 +100,13 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return baiduChatModel.map(model -> model.call(prompt)).orElse("");
+        return baiduChatModel != null ? baiduChatModel.call(prompt) : "";
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return baiduChatModel.map(model -> model.call(message))
-                    .orElse("Baidu service is not available");
+            return baiduChatModel != null ? baiduChatModel.call(message) : "Baidu service is not available";
         } catch (Exception e) {
             log.error("Baidu API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -129,7 +117,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
     protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         RobotLlm llm = robot.getLlm();
 
-        if (!baiduChatModel.isPresent()) {
+        if (baiduChatModel == null) {
             handleSseError(new RuntimeException("Baidu service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
@@ -143,7 +131,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
 
-        baiduChatModel.get().stream(requestPrompt).subscribe(
+        baiduChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -171,12 +159,12 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                 });
     }
 
-    public Optional<OpenAiChatModel> getBaiduChatModel() {
+    public OpenAiChatModel getBaiduChatModel() {
         return baiduChatModel;
     }
 
     public boolean isServiceHealthy() {
-        if (!baiduChatModel.isPresent()) {
+        if (baiduChatModel == null) {
             return false;
         }
         try {

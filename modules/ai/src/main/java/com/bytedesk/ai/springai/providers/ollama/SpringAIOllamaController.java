@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:39:33
+ * @LastEditTime: 2025-04-29 11:31:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/ollama")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaController {
 
     private final SpringAIOllamaService springAIOllamaService;

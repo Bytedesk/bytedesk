@@ -2,6 +2,7 @@ package com.bytedesk.ai.springai.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotConsts;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
@@ -505,6 +507,28 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
         } catch (Exception e) {
             log.error("Error sending stream end message", e);
+        }
+    }
+    
+    /**
+     * 创建动态的聊天选项（通用方法，使用泛型）
+     * 
+     * @param <T> 选项类型参数
+     * @param llm 机器人LLM配置
+     * @param optionBuilder 选项构建器函数接口
+     * @return 根据机器人配置创建的选项
+     */
+    protected <T> T createDynamicOptions(RobotLlm llm, Function<RobotLlm, T> optionBuilder) {
+        if (llm == null || !StringUtils.hasText(llm.getModel())) {
+            return null;
+        }
+        
+        try {
+            // 使用提供的构建器函数创建选项
+            return optionBuilder.apply(llm);
+        } catch (Exception e) {
+            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
+            return null;
         }
     }
 }

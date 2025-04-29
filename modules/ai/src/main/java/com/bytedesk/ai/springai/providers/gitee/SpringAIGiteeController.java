@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 14:33:55
+ * @LastEditTime: 2025-04-29 11:31:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/gitee")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.gitee.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.gitee.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGiteeController {
 
     private final SpringAIGiteeService springAIGiteeService;

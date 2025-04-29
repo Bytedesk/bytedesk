@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 16:34:56
+ * @LastEditTime: 2025-04-29 11:42:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/volcengine")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.volcengine.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.ai.volcengine.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIVolcengineController {
 
     private final SpringAIVolcengineService springAIVolcengineService;
@@ -69,9 +69,7 @@ public class SpringAIVolcengineController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return springAIVolcengineService.getVolcengineChatModel()
-            .map(model -> model.stream(prompt))
-            .orElse(Flux.empty());
+        return springAIVolcengineService.getVolcengineChatModel().stream(prompt);
     }
 
     /**
