@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 18:01:54
+ * @LastEditTime: 2025-04-29 18:04:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -56,6 +55,7 @@ import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.faq_rating.FaqRatingRestService;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -470,21 +470,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     @Override
     public FaqResponse convertToResponse(FaqEntity entity) {
-        FaqResponse response = modelMapper.map(entity, FaqResponse.class);
-
-        // 处理相关问题，避免循环依赖
-        if (entity.getRelatedFaqs() != null) {
-            List<FaqResponseSimple> simpleFaqs = entity.getRelatedFaqs().stream()
-                    .map(relatedFaq -> FaqResponseSimple.builder()
-                            .uid(relatedFaq.getUid())
-                            .question(relatedFaq.getQuestion())
-                            .answer(relatedFaq.getAnswer())
-                            .build())
-                    .collect(Collectors.toList());
-            response.setRelatedFaqs(simpleFaqs);
-        }
-
-        return response;
+        return KbaseConvertUtils.convertToFaqResponse(entity);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 21:13:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 18:02:26
+ * @LastEditTime: 2025-04-29 18:03:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,11 +57,7 @@ public class KbaseConvertUtils {
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedFaqs() != null) {
             List<FaqResponseSimple> simpleFaqs = entity.getRelatedFaqs().stream()
-                    .map(relatedFaq -> FaqResponseSimple.builder()
-                            .uid(relatedFaq.getUid())
-                            .question(relatedFaq.getQuestion())
-                            .answer(relatedFaq.getAnswer())
-                            .build())
+                    .map(relatedFaq -> convertToFaqResponseSimple(relatedFaq))
                     .collect(Collectors.toList());
             response.setRelatedFaqs(simpleFaqs);
         }
