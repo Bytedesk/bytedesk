@@ -75,21 +75,9 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-
-        // 使用自定义选项处理请求
-        processPromptStreamWithCustomOptions(prompt, messageProtobufReply, llm);
-    }
-
-    /**
-     * 处理带有自定义选项的流式请求
-     * 
-     * @param prompt          提示
-     * @param messageProtobuf 消息对象
-     * @param llm             机器人LLM配置
-     */
-    private void processPromptStreamWithCustomOptions(Prompt prompt, MessageProtobuf messageProtobuf, RobotLlm llm) {
+        
         if (!giteeChatModel.isPresent()) {
-            sendMessage(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobuf);
+            sendMessage(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobufReply);
             return;
         }
 
@@ -110,13 +98,13 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobuf);
+                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Gitee API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobuf);
+                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
