@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 17:59:09
+ * @LastEditTime: 2025-04-29 19:04:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class FaqRatingResponse extends BaseResponse {
 
-     private String messageUid;
+    private String messageUid;
 
     private String threadUid;
 
