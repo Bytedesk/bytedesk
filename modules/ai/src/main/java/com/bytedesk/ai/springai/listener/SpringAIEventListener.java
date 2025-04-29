@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 09:54:45
+ * @LastEditTime: 2025-04-29 12:14:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,7 +66,6 @@ public class SpringAIEventListener {
             fileCreateMap.put(file.getUid(), file);
         } else if (file.isAutoGenerateLlmQa()) {
             // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
-            // faqCreateMap.put(file.getUid(), file);
         }
     }
 
@@ -87,7 +86,6 @@ public class SpringAIEventListener {
             textCreateMap.put(text.getUid(), text);
         } else if (text.isAutoGenerateLlmQa()) {
             // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
-            // faqCreateMap.put(file.getUid(), file);
         }
     }
 
@@ -123,7 +121,6 @@ public class SpringAIEventListener {
             springAiVectorService.readWebsite(website);
         } else if (website.isAutoGenerateLlmQa()) {
             // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
-            // faqCreateMap.put(file.getUid(), file);
         }
     }
 
@@ -142,12 +139,6 @@ public class SpringAIEventListener {
 
         // 批量处理FAQ更新
         processFaqUpdates();
-
-        // 批量处理QA创建
-        // processQaCreations();
-
-        // 批量处理QA更新
-        // processQaUpdates();
 
         // 批量处理Text创建
         processTextCreations();
