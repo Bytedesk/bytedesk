@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 11:31:31
+ * @LastEditTime: 2025-04-29 12:07:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
@@ -68,9 +69,12 @@ public class SpringAIOpenaiController {
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return springAIOpenaiService.getOpenaiChatModel()
-            .map(model -> model.stream(prompt))
-            .orElse(Flux.empty());
+        OpenAiChatModel model = springAIOpenaiService.getChatModel();
+        if (model != null) {
+            return model.stream(prompt);
+        } else {
+            return Flux.empty();
+        }
     }
 
     /**
@@ -113,12 +117,13 @@ public class SpringAIOpenaiController {
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        if (!springAIOpenaiService.getOpenaiChatModel().isPresent()) {
+        OpenAiChatModel model = springAIOpenaiService.getChatModel();
+        if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
         }
 
         try {
-            ChatResponse response = springAIOpenaiService.getOpenaiChatModel().get().call(
+            ChatResponse response = model.call(
                 new Prompt(
                     message,
                     OpenAiChatOptions.builder()

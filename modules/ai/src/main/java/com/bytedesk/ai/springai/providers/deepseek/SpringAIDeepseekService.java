@@ -165,7 +165,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                 });
     }
 
-    public OpenAiChatModel getDeepseekChatModel() {
+    public OpenAiChatModel getChatModel() {
         return deepseekChatModel;
     }
     
