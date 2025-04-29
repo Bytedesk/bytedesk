@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.providers.ollama;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
@@ -42,9 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaService extends BaseSpringAIService {
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("bytedeskOllamaChatModel")
-    private Optional<OllamaChatModel> bytedeskOllamaChatModel;
+    private OllamaChatModel bytedeskOllamaChatModel;
     
     @Autowired
     @Qualifier("bytedeskOllamaApi")
@@ -79,13 +78,13 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     private OllamaChatModel createDynamicChatModel(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getModel())) {
             // 如果没有指定模型或设置，使用默认配置
-            return bytedeskOllamaChatModel.orElse(null);
+            return bytedeskOllamaChatModel;
         }
 
         try {
             OllamaOptions options = createDynamicOptions(llm);
             if (options == null) {
-                return bytedeskOllamaChatModel.orElse(null);
+                return bytedeskOllamaChatModel;
             }
 
             return OllamaChatModel.builder()
@@ -94,7 +93,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     .build();
         } catch (Exception e) {
             log.error("Error creating dynamic chat model for model {}", llm.getModel(), e);
-            return bytedeskOllamaChatModel.orElse(null);
+            return bytedeskOllamaChatModel;
         }
     }
 
@@ -104,7 +103,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例
-        OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel.orElse(null);
+        OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel;
         
         if (chatModel == null) {
             log.info("Ollama API not available");
@@ -142,27 +141,30 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     @Override
     protected String generateFaqPairs(String prompt) {
         // 使用默认模型生成FAQ对
-        return bytedeskOllamaChatModel.map(model -> {
+        if (bytedeskOllamaChatModel != null) {
             try {
-                return model.call(prompt);
+                return bytedeskOllamaChatModel.call(prompt);
             } catch (Exception e) {
                 log.error("Error generating FAQ pairs", e);
                 return "生成FAQ对失败，请稍后重试";
             }
-        }).orElse("");
+        }
+        return "";
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return bytedeskOllamaChatModel.map(model -> {
+            if (bytedeskOllamaChatModel != null) {
                 try {
-                    return model.call(message);
+                    return bytedeskOllamaChatModel.call(message);
                 } catch (Exception e) {
                     log.error("Ollama API sync error", e);
                     return "服务暂时不可用，请稍后重试";
                 }
-            }).orElse("Ollama service is not available");
+            } else {
+                return "Ollama service is not available";
+            }
         } catch (Exception e) {
             log.error("Ollama API sync error", e);
             return "服务暂时不可用，请稍后重试";
@@ -176,7 +178,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例并配置较长的超时时间
-        OllamaChatModel chatModel = bytedeskOllamaChatModel.orElse(null);
+        OllamaChatModel chatModel = bytedeskOllamaChatModel;
         if (chatModel != null && llm != null) {
             chatModel = createDynamicChatModel(llm);
             // 配置更长的超时时间 - 5分钟
@@ -255,7 +257,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     public boolean isServiceHealthy() {
-        if (!bytedeskOllamaChatModel.isPresent()) {
+        if (bytedeskOllamaChatModel == null) {
             return false;
         }
 
@@ -269,7 +271,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
     }
 
-    public Optional<OllamaChatModel> getOllamaChatModel() {
+    public OllamaChatModel getOllamaChatModel() {
         return bytedeskOllamaChatModel;
     }
 }
