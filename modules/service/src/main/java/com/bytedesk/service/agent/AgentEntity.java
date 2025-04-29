@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 12:45:07
+ * @LastEditTime: 2025-04-29 13:52:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.InviteSettings;
+import com.bytedesk.kbase.settings.RateDownSettings;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
@@ -121,6 +122,10 @@ public class AgentEntity extends BaseEntity {
     @Embedded
     @Builder.Default
     private InviteSettings inviteSettings = new InviteSettings();
+
+    @Embedded
+    @Builder.Default
+    private RateDownSettings rateDownSettings = new RateDownSettings();
 
     /**
      * 迁移到 @{QueueEntity}
