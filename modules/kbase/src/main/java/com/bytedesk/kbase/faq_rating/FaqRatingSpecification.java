@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:25:07
+ * @LastEditTime: 2025-04-29 23:17:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,9 @@ public class FaqRatingSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
             //
+            if (StringUtils.hasText(request.getRateDownReason())) {
+                predicates.add(criteriaBuilder.like(root.get("rateDownReason"), "%" + request.getRateDownReason() + "%"));
+            }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
