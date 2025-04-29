@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 09:29:50
+ * @LastEditTime: 2025-04-29 10:39:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,8 +47,6 @@ public class SpringAIOllamaController {
 
     private final SpringAIOllamaService springAIOllamaService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
-    // private final UidUtils uidUtils;
-    // private final ThreadRestService threadRestService;
 
     /**
      * 方式1：同步调用
@@ -153,21 +151,6 @@ public class SpringAIOllamaController {
             return ResponseEntity.ok(JsonResult.error("Failed to check Ollama service: " + e.getMessage()));
         }
     }
-
-    /**
-     * 获取Ollama所有可用的模型列表
-     * http://127.0.0.1:9003/springai/ollama/models
-     */
-    // @GetMapping("/models")
-    // public ResponseEntity<JsonResult<?>> getAvailableModels() {
-    //     try {
-    //         Object models = springAIOllamaService.getAvailableModels();
-    //         return ResponseEntity.ok(JsonResult.success(models));
-    //     } catch (Exception e) {
-    //         log.error("Error retrieving Ollama models", e);
-    //         return ResponseEntity.ok(JsonResult.error("Failed to retrieve Ollama models: " + e.getMessage()));
-    //     }
-    // }
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {

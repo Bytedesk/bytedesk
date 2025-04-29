@@ -270,6 +270,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return "";
         }
         String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
+        // 
         return generateFaqPairs(prompt);
     }
 
