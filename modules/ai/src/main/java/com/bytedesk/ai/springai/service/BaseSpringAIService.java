@@ -83,7 +83,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
-        // 
+        //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
             List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
@@ -108,22 +108,35 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
-        
-        // 如果知识库未启用，直接返回
+
+        // 如果知识库未启用，直接跟据配置的提示词进行回复
         if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
+            String context = "";
+            // TODO: 根据配置，拉取历史聊天记录
+            String history = "";
+            String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
+            // TODO: 返回消息中携带消息搜索结果(来源依据)
+            //
+            List<Message> messages = new ArrayList<>();
+            messages.add(new SystemMessage(prompt));
+            messages.add(new UserMessage(query));
+            log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
+            //
+            Prompt aiPrompt = new Prompt(messages);
+            processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
-        
+
         List<String> searchContentList = new ArrayList<>();
         List<FaqProtobuf> faqProtobufList = new ArrayList<>();
-        
+
         // 根据搜索类型执行相应的搜索
         String searchType = robot.getLlm().getSearchType();
         if (searchType == null) {
             searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
         }
-        
+
         // 执行搜索
         switch (RobotSearchTypeEnum.valueOf(searchType)) {
             case VECTOR:
@@ -141,7 +154,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 executeFulltextSearch(query, robot.getKbUid(), searchContentList, faqProtobufList);
                 break;
         }
-        
+
         // 根据是否启用LLM决定如何处理结果
         if (robot.getLlm().isEnabled()) {
             // 启用大模型
@@ -150,32 +163,34 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 未开启大模型，使用搜索结果直接回复
             processSearchResponse(query, faqProtobufList, robot, messageProtobufQuery, messageProtobufReply, emitter);
         }
-        
+
         log.info("BaseSpringAIService sendSseMessage searchContentList {}", searchContentList);
     }
-    
+
     /**
      * 执行全文搜索
      */
-    private void executeFulltextSearch(String query, String kbUid, List<String> searchContentList, List<FaqProtobuf> faqProtobufList) {
+    private void executeFulltextSearch(String query, String kbUid, List<String> searchContentList,
+            List<FaqProtobuf> faqProtobufList) {
         List<FaqElasticSearchResult> searchResults = faqService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
             FaqElastic faq = withScore.getFaqElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
-            
+
             String formattedFaq = faqProtobuf.toJson();
             searchContentList.add(formattedFaq);
             faqProtobufList.add(faqProtobuf);
         }
     }
-    
+
     /**
      * 执行向量搜索
      */
-    private void executeVectorSearch(String query, String kbUid, List<String> searchContentList, List<FaqProtobuf> faqProtobufList) {
+    private void executeVectorSearch(String query, String kbUid, List<String> searchContentList,
+            List<FaqProtobuf> faqProtobufList) {
         List<String> contentList = springAIVectorService.searchText(query, kbUid);
         searchContentList.addAll(contentList);
-        
+
         for (String content : contentList) {
             FaqProtobuf faqProtobuf = FaqProtobuf.builder()
                     .uid(uidUtils.getUid())
@@ -195,7 +210,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply,
+                    emitter);
             return;
         }
         String context = String.join("\n", searchContentList);
@@ -221,7 +237,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply,
+                    emitter);
             return;
         } else {
             // 搜索到内容，返回搜索内容
@@ -231,20 +248,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     .question(firstFaq.getQuestion())
                     .answer(firstFaq.getAnswer())
                     .build();
-            
+
             // 如果有多个搜索结果，将其余的添加为相关问题
             if (searchContentList.size() > 1) {
                 List<FaqProtobuf> relatedFaqs = new ArrayList<>(searchContentList.subList(1, searchContentList.size()));
                 resultFaq.setRelatedFaqs(relatedFaqs);
             }
-            
+
             // 将处理后的单个FaqProtobuf对象转换为JSON字符串
             String answer = JSON.toJSONString(resultFaq);
-            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply,
+                    emitter);
         }
     }
 
-    private void processAnswerMessage(String answer, MessageTypeEnum type, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    private void processAnswerMessage(String answer, MessageTypeEnum type, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(answer);
@@ -272,7 +291,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return "";
         }
         String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
-        // 
+        //
         return generateFaqPairs(prompt);
     }
 
@@ -359,8 +378,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     /**
      * 发送消息的通用方法
-     * @param type 消息类型
-     * @param content 消息内容
+     * 
+     * @param type                 消息类型
+     * @param content              消息内容
      * @param messageProtobufReply 回复消息对象
      */
     protected void sendMessage(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
@@ -371,6 +391,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     /**
      * 检查SseEmitter是否已完成
+     * 
      * @param emitter SSE发射器
      * @return 如果emitter已完成或关闭返回true，否则返回false
      */
@@ -378,7 +399,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (emitter == null) {
             return true;
         }
-        
+
         try {
             // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
             // 使用一个空注释作为心跳，这不会影响客户端
@@ -393,13 +414,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     /**
      * 处理SSE错误的通用方法
-     * @param error 发生的错误
+     * 
+     * @param error                发生的错误
      * @param messageProtobufQuery 查询消息
      * @param messageProtobufReply 回复消息
-     * @param emitter SSE发射器
+     * @param emitter              SSE发射器
      */
-    protected void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery, 
-                                 MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         try {
             // 检查emitter是否已完成
             if (emitter != null && !isEmitterCompleted(emitter)) {
@@ -408,7 +430,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply);
                 String messageJson = messageProtobufReply.toJson();
-                
+
                 emitter.send(SseEmitter.event()
                         .data(messageJson)
                         .id(messageProtobufReply.getUid())
@@ -435,11 +457,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     /**
      * 发送流式开始消息
+     * 
      * @param messageProtobufReply 回复消息对象
-     * @param emitter SSE发射器
-     * @param initialContent 初始内容，通常为"正在思考中..."
+     * @param emitter              SSE发射器
+     * @param initialContent       初始内容，通常为"正在思考中..."
      */
-    protected void sendStreamStartMessage(MessageProtobuf messageProtobufReply, SseEmitter emitter, String initialContent) {
+    protected void sendStreamStartMessage(MessageProtobuf messageProtobufReply, SseEmitter emitter,
+            String initialContent) {
         try {
             if (!isEmitterCompleted(emitter)) {
                 messageProtobufReply.setType(MessageTypeEnum.STREAM_START);
@@ -457,12 +481,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     /**
      * 发送流式内容消息
+     * 
      * @param messageProtobufQuery 查询消息对象
      * @param messageProtobufReply 回复消息对象
-     * @param emitter SSE发射器
-     * @param content 消息内容
+     * @param emitter              SSE发射器
+     * @param content              消息内容
      */
-    protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, 
+    protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, String content) {
         try {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
@@ -484,17 +509,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     /**
      * 发送流式结束消息
+     * 
      * @param messageProtobufQuery 查询消息对象
      * @param messageProtobufReply 回复消息对象
-     * @param emitter SSE发射器
+     * @param emitter              SSE发射器
      */
-    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, 
+    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
         try {
             if (!isEmitterCompleted(emitter)) {
                 // 发送流结束标记
                 messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
-                messageProtobufReply.setContent(""); 
+                messageProtobufReply.setContent("");
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply);
                 String messageJson = messageProtobufReply.toJson();
@@ -509,12 +535,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
             log.error("Error sending stream end message", e);
         }
     }
-    
+
     /**
      * 创建动态的聊天选项（通用方法，使用泛型）
      * 
-     * @param <T> 选项类型参数
-     * @param llm 机器人LLM配置
+     * @param <T>           选项类型参数
+     * @param llm           机器人LLM配置
      * @param optionBuilder 选项构建器函数接口
      * @return 根据机器人配置创建的选项
      */
@@ -522,7 +548,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (llm == null || !StringUtils.hasText(llm.getModel())) {
             return null;
         }
-        
+
         try {
             // 使用提供的构建器函数创建选项
             return optionBuilder.apply(llm);
