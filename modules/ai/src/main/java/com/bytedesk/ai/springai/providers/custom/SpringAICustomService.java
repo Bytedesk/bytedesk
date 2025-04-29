@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.providers.custom;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
@@ -41,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAICustomService extends BaseSpringAIService {
 
     @Autowired(required = false)
-    private Optional<OpenAiChatModel> customChatModel;
+    private OpenAiChatModel customChatModel;
 
     public SpringAICustomService() {
         super(); // 调用基类的无参构造函数
@@ -76,7 +75,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
-        if (!customChatModel.isPresent()) {
+        if (customChatModel == null) {
             sendMessage(MessageTypeEnum.ERROR, "Custom服务不可用", messageProtobufReply);
             return;
         }
@@ -89,7 +88,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         }
         
         // 使用同一个ChatModel实例，但传入不同的选项
-        customChatModel.get().stream(requestPrompt).subscribe(
+        customChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("Custom API response metadata: {}", response.getMetadata());
@@ -113,14 +112,13 @@ public class SpringAICustomService extends BaseSpringAIService {
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return customChatModel.map(model -> model.call(prompt)).orElse("");
+        return customChatModel != null ? customChatModel.call(prompt) : "";
     }
 
     @Override
     protected String processPromptSync(String message) {
         try {
-            return customChatModel.map(model -> model.call(message))
-                    .orElse("Custom service is not available");
+            return customChatModel != null ? customChatModel.call(message) : "Custom service is not available";
         } catch (Exception e) {
             log.error("Custom API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -132,7 +130,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
-        if (!customChatModel.isPresent()) {
+        if (customChatModel == null) {
             handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
@@ -147,7 +145,7 @@ public class SpringAICustomService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
 
-        customChatModel.get().stream(requestPrompt).subscribe(
+        customChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -176,12 +174,12 @@ public class SpringAICustomService extends BaseSpringAIService {
                 });
     }
 
-    public Optional<OpenAiChatModel> getCustomChatModel() {
+    public OpenAiChatModel getCustomChatModel() {
         return customChatModel;
     }
     
     public boolean isServiceHealthy() {
-        if (!customChatModel.isPresent()) {
+        if (customChatModel == null) {
             return false;
         }
 
