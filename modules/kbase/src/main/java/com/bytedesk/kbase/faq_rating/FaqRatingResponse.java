@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-18 18:09:59
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 16:40:03
+ * @LastEditTime: 2025-04-13 21:09:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,32 +11,24 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.faq_rating;
 
-import java.util.List;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.message.MessageExtra;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 @Data
+@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor
-public class FaqMessageExtra extends MessageExtra {
+// @NoArgsConstructor
+public class FaqRatingResponse extends BaseResponse {
 
-    private static final long serialVersionUID = 1L;
-    // 
-    private String faqUid;
-    private List<FaqResponseSimple> relatedFaqs;
-
-    public static FaqMessageExtra fromJson(String json) {
-        return JSON.parseObject(json, FaqMessageExtra.class);
-    }
+    // private LocalDateTime createdAt;
 }
