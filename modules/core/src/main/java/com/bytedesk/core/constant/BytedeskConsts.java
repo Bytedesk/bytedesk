@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 16:05:19
+ * @LastEditTime: 2025-04-29 09:10:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ public class BytedeskConsts {
     public static final String DEFAULT_KB_TABOO_UID = "df_kb_tb_uid";
     public static final String DEFAULT_KB_LLM_UID = "df_kb_llm_uid";
     public static final String DEFAULT_KB_KEYWORD_UID = "df_kb_kw_uid";
-    public static final String DEFAULT_KB_FAQ_UID = "df_kb_faq_uid";
+    // public static final String DEFAULT_KB_FAQ_UID = "df_kb_faq_uid";
     public static final String DEFAULT_KB_AUTOREPLY_UID = "df_kb_ar_uid";
     public static final String DEFAULT_ROLE_SUPER_UID = "df_role_super_uid";
     public static final String DEFAULT_ROLE_ADMIN_UID = "df_role_admin_uid";

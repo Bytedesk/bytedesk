@@ -49,7 +49,7 @@ public class FaqEntityListener {
             log.info("FaqEntityListener FaqDeleteEvent: {}", faq.getQuestion());
             publisher.publishEvent(new FaqDeleteEvent(clonedFaq));
         } else {
-            log.info("FaqEntityListener FaqUpdateEvent: {}", faq.getQuestion());
+            // log.info("FaqEntityListener FaqUpdateEvent: {}", faq.getQuestion());
             publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
         }
     }

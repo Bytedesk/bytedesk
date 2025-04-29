@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 10:07:38
+ * @LastEditTime: 2025-04-29 09:10:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,7 +67,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .orgUid(orgUid)
                 .build();
         // 写入 faq uid 到 welcomeFaqUids
-        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID);
+        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
         workgroupRequest.getServiceSettings().setWelcomeKbUid(kbUid);
         // if (orgUid.equals(BytedeskConsts.DEFAULT_ORGANIZATION_UID)) {
         // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids

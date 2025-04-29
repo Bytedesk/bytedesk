@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 08:38:49
+ * @LastEditTime: 2025-04-29 09:01:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,7 +88,7 @@ public class FaqEventListener {
     @EventListener
     public void onFaqUpdateDocEvent(FaqUpdateDocEvent event) {
         FaqEntity faq = event.getFaq();
-        log.info("SpringAIEventListener FaqUpdateDocEvent: {}", faq.getQuestion());
+        log.info("FaqEventListener FaqUpdateDocEvent: {}", faq.getQuestion());
         // 更新全文索引
         faqService.indexFaq(faq);
     }
@@ -96,7 +96,7 @@ public class FaqEventListener {
     @EventListener
     public void onFaqDeleteEvent(FaqDeleteEvent event) {
         FaqEntity faq = event.getFaq();
-        log.info("SpringAIEventListener onFaqDeleteEvent: {}", faq.getQuestion());
+        log.info("FaqEventListener onFaqDeleteEvent: {}", faq.getQuestion());
         // 从全文索引中删除
         boolean deleted = faqService.deleteFaq(faq.getUid());
         if (!deleted) {
