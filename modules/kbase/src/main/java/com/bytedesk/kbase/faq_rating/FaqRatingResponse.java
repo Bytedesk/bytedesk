@@ -17,6 +17,7 @@ package com.bytedesk.kbase.faq_rating;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.faq.FaqResponseSimple;
 
 
@@ -54,6 +55,6 @@ public class FaqRatingResponse extends BaseResponse {
     @ManyToOne(fetch = FetchType.LAZY)
     private FaqResponseSimple faq;
 
-    // 评价者信息的JSON表示
-    private String user;
+    // 评价者信息
+    private UserProtobuf user;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 18:04:43
+ * @LastEditTime: 2025-04-29 18:13:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,11 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.utils.KbaseConvertUtils;
+import com.bytedesk.kbase.faq.FaqRepository;
+import com.bytedesk.kbase.faq.FaqEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRatingRequest, FaqRatingResponse> {
 
-    private final FaqRatingRepository messageRatingRepository;
+    private final FaqRatingRepository faqRatingRepository;
+
+    private final FaqRepository faqRepository;
 
     private final ModelMapper modelMapper;
 
@@ -49,7 +55,7 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
     public Page<FaqRatingResponse> queryByOrg(FaqRatingRequest request) {
         Pageable pageable = request.getPageable();
         Specification<FaqRatingEntity> spec = FaqRatingSpecification.search(request);
-        Page<FaqRatingEntity> page = messageRatingRepository.findAll(spec, pageable);
+        Page<FaqRatingEntity> page = faqRatingRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
@@ -67,11 +73,11 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
     @Cacheable(value = "faq_rating", key = "#uid", unless="#result==null")
     @Override
     public Optional<FaqRatingEntity> findByUid(String uid) {
-        return messageRatingRepository.findByUid(uid);
+        return faqRatingRepository.findByUid(uid);
     }
 
     public Boolean existsByUid(String uid) {
-        return messageRatingRepository.existsByUid(uid);
+        return faqRatingRepository.existsByUid(uid);
     }
 
     @Override
@@ -91,6 +97,11 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
             entity.setUid(uidUtils.getUid());
         }
         // 
+        Optional<FaqEntity> faqOptional = faqRepository.findByUid(request.getFaqUid());
+        if (faqOptional.isPresent()) {
+            entity.setFaq(faqOptional.get());
+        }
+        // 
         FaqRatingEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create faq_rating failed");
@@ -100,7 +111,7 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
 
     @Override
     public FaqRatingResponse update(FaqRatingRequest request) {
-        Optional<FaqRatingEntity> optional = messageRatingRepository.findByUid(request.getUid());
+        Optional<FaqRatingEntity> optional = faqRatingRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             FaqRatingEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -120,18 +131,18 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
     @Override
     protected FaqRatingEntity doSave(FaqRatingEntity entity) {
         // log.info("Attempting to save faq_rating: {}", entity.getName());
-        return messageRatingRepository.save(entity);
+        return faqRatingRepository.save(entity);
     }
 
     @Override
     public FaqRatingEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FaqRatingEntity entity) {
         try {
-            Optional<FaqRatingEntity> latest = messageRatingRepository.findByUid(entity.getUid());
+            Optional<FaqRatingEntity> latest = faqRatingRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 FaqRatingEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return messageRatingRepository.save(latestEntity);
+                return faqRatingRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
@@ -142,7 +153,7 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<FaqRatingEntity> optional = messageRatingRepository.findByUid(uid);
+        Optional<FaqRatingEntity> optional = faqRatingRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -162,7 +173,10 @@ public class FaqRatingRestService extends BaseRestService<FaqRatingEntity, FaqRa
     public FaqRatingResponse convertToResponse(FaqRatingEntity entity) {
         FaqRatingResponse response = modelMapper.map(entity, FaqRatingResponse.class);
         response.setFaq(KbaseConvertUtils.convertToFaqResponseSimple(entity.getFaq()));
-
+        // 处理用户信息
+        if (entity.getUser() != null) {
+            response.setUser(UserProtobuf.fromJson(entity.getUser()));
+        }
         return response;
     }
 
