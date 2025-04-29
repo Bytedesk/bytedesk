@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 17:35:33
+ * @LastEditTime: 2025-04-29 18:21:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,33 +81,12 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private Integer downCount = 0;
 
-    // 当用户点踩的时候，是否显示转人工按钮
-    // @Builder.Default
-    // private Boolean downShowTransferToAgentButton = true;
-
     // 会员等级
 	@Builder.Default
 	private Integer vipLevel = 0;
 
-    // 是否有效
-    // @Builder.Default
-    // private Boolean valid = true;
     @Builder.Default
     private Boolean enabled = true;
-
-    // 是否开启自动同步到llm_qa问答
-    // @Builder.Default
-    // private Boolean autoSyncLlmQa = false;
-
-    // // 是否已经同步llm问答
-    // @Builder.Default
-    // private Boolean llmQaSynced = false;
-
-    // // 同步到llm qa kbUid 
-    // private String llmQaKbUid;
-
-    // // 同步到llm qa uid
-    // private String llmQaUid;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
