@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 11:05:54
+ * @LastEditTime: 2025-04-30 12:37:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,9 +45,7 @@ public enum MessageTypeEnum {
     TICKET_SUBMIT, // 工单提交
     TYPING, // 正在输入
     PROCESSING, // 正在处理，等待大模型回复中
-    STREAM, // 流式消息TEXT，大模型回复
-    STREAM_START, // 流式消息开始
-    STREAM_END, // 流式消息结束
+    
     PREVIEW, // 消息预知
     RECALL, // 撤回
     DELIVERED, // 回执: 已送达
@@ -58,8 +56,8 @@ public enum MessageTypeEnum {
     // FAQ, // 点击查看常见问题
     FAQ_QUESTION, // 常见问题问题
     FAQ_ANSWER, // 常见问题答案
-    FAQ_UP, // 常见问题答案评价:UP
-    FAQ_DOWN, // 常见问题答案评价:DOWN
+    // FAQ_UP, // 常见问题答案评价:UP
+    // FAQ_DOWN, // 常见问题答案评价:DOWN
     // QA, // 点击查看问答对
     // QA_QUESTION, // 问答对问题
     // QA_ANSWER, // 问答对答案
@@ -68,8 +66,11 @@ public enum MessageTypeEnum {
     // ROBOT, // 机器人
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
-    ROBOT_UP, // 机器人答案评价:UP
-    ROBOT_DOWN, // 机器人答案评价:DOWN
+    STREAM, // 流式消息TEXT，大模型回复
+    STREAM_START, // 流式消息开始
+    STREAM_END, // 流式消息结束
+    // ROBOT_UP, // 机器人答案评价:UP
+    // ROBOT_DOWN, // 机器人答案评价:DOWN
     RATE, // 访客主动评价
     RATE_INVITE, // 客服邀请评价
     RATE_SUBMIT, // 访客提交评价

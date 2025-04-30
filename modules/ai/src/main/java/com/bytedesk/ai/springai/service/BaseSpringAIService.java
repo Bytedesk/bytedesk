@@ -112,19 +112,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 如果知识库未启用，直接跟据配置的提示词进行回复
         if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
+            // 使用通用方法处理提示词和SSE消息，传入空上下文
             String context = "";
-            // TODO: 根据配置，拉取历史聊天记录
-            String history = "";
-            String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
-            // TODO: 返回消息中携带消息搜索结果(来源依据)
-            //
-            List<Message> messages = new ArrayList<>();
-            messages.add(new SystemMessage(prompt));
-            messages.add(new UserMessage(query));
-            log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
-            //
-            Prompt aiPrompt = new Prompt(messages);
-            processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
@@ -215,6 +205,24 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return;
         }
         String context = String.join("\n", searchContentList);
+        // 使用通用方法处理提示词和SSE消息
+        createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
+    }
+
+    /**
+     * 创建提示词并处理SSE消息的通用方法
+     * 
+     * @param query 用户查询
+     * @param context 上下文信息
+     * @param robot 机器人配置
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param emitter SSE发射器
+     */
+    private void createAndProcessPrompt(String query, String context, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply,
+            SseEmitter emitter) {
         // TODO: 根据配置，拉取历史聊天记录
         String history = "";
         String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
@@ -223,7 +231,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
         messages.add(new UserMessage(query));
-        log.info("BaseSpringAIService sendSseMemberMessage messages {}", messages);
+        log.info("BaseSpringAIService createAndProcessPrompt messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
