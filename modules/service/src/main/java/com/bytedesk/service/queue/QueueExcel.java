@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 21:09:57
+ * @LastEditTime: 2025-04-30 21:38:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,13 +15,18 @@ package com.bytedesk.service.queue;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.bytedesk.core.base.BaseExcel;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+// import lombok.experimental.SuperBuilder;
 
 // https://github.com/alibaba/easyexcel
-// https://easyexcel.opensource.alibaba.com/docs/current/
-@Data
-public class QueueExcel {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+public class QueueExcel extends BaseExcel {
 
     @ExcelProperty(value = "队列名称")
     @ColumnWidth(20)
@@ -44,15 +49,15 @@ public class QueueExcel {
     private String status;
 
     @ExcelProperty(value = "今日请求服务人数")
-    @ColumnWidth(15)
+    @ColumnWidth(25)
     private Integer totalCount;
 
     @ExcelProperty(value = "机器人服务中人次")
-    @ColumnWidth(15)
+    @ColumnWidth(25)
     private Integer robotingCount;
 
     @ExcelProperty(value = "客服离线人次")
-    @ColumnWidth(15)
+    @ColumnWidth(20)
     private Integer offlineCount;
 
     @ExcelProperty(value = "留言数")
@@ -68,11 +73,11 @@ public class QueueExcel {
     private Integer queuingCount;
 
     @ExcelProperty(value = "正在服务人数")
-    @ColumnWidth(15)
+    @ColumnWidth(25)
     private Integer chattingCount;
 
     @ExcelProperty(value = "对话结束人数")
-    @ColumnWidth(15)
+    @ColumnWidth(25)
     private Integer closedCount;
 
 }
