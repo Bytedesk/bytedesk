@@ -63,8 +63,8 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqMessageExtra;
 import com.bytedesk.kbase.faq.FaqRequest;
 import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.faq_rating.FaqRatingRequest;
-import com.bytedesk.kbase.faq_rating.FaqRatingRestService;
+import com.bytedesk.kbase.message_rating.FaqRatingRequest;
+import com.bytedesk.kbase.message_rating.FaqRatingRestService;
 import com.bytedesk.kbase.settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
