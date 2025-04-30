@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:52:59
+ * @LastEditTime: 2025-04-30 15:34:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -218,8 +218,14 @@ public class PageRouteController {
 			"/admin",
 			"/admin/",
 			"/admin/{path:[^\\.]*}",
-			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}" })
-	public String admin(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
+			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}" 
+		})
+	public String admin(
+		// @PathVariable(required = false) String path, 
+		// @PathVariable(required = false) String path2, 
+		// @PathVariable(required = false) String path3
+		) {
 		return "forward:/admin/index.html"; // 默认路径
 	}
 
@@ -232,8 +238,12 @@ public class PageRouteController {
 			"/agent",
 			"/agent/",
 			"/agent/{path:[^\\.]*}",
-			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}" })
-	public String agent(@PathVariable(required = false) String path, @PathVariable(required = false) String path2) {
+			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}"
+		})
+	public String agent(
+		@PathVariable(required = false) String path, 
+		@PathVariable(required = false) String path2
+		) {
 		return "forward:/agent/index.html"; // 默认路径
 	}
 
