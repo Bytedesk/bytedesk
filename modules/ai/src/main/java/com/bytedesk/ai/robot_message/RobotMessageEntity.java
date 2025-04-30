@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 17:22:26
+ * @LastEditTime: 2025-04-30 17:26:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,13 +12,18 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot_message;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.message.AbstractMessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -60,10 +65,6 @@ public class RobotMessageEntity extends AbstractMessageEntity {
     @Column(name = "message_robot", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String robot = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 区分是 rateUp 还是 rateDown、rateFeedback
-    @Builder.Default    
-    private String rateType = MessageStatusEnum.RATE_UP.name();
-
     // 是否未搜索到到答案
     @Builder.Default
     private boolean isUnAnswered = false;
@@ -79,6 +80,19 @@ public class RobotMessageEntity extends AbstractMessageEntity {
 
     @Builder.Default
     private int totalTokens = 0;
+
+    // 区分是 rateUp 还是 rateDown、rateFeedback
+    @Builder.Default    
+    private String rateType = MessageStatusEnum.RATE_UP.name();
+
+    // 点踩的情况下的反馈意见
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> rateDownTagList = new ArrayList<>();
+
+    // 点踩的原因
+    private String rateDownReason;    
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
     public UserProtobuf getUserProtobuf() {

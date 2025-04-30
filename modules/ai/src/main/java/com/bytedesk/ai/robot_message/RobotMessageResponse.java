@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:07:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 10:49:50
+ * @LastEditTime: 2025-04-30 17:27:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,6 +12,8 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot_message;
+
+import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ClientEnum;
@@ -70,4 +72,13 @@ public class RobotMessageResponse extends BaseResponse {
     private Integer completionTokens;
 
     private Integer totalTokens;
+
+    // 区分是 rateUp 还是 rateDown
+    private String rateType;
+    
+    // 点踩的情况下的反馈意见
+    private List<String> rateDownTagList;
+
+    // 点踩的原因
+    private String rateDownReason;
 }
