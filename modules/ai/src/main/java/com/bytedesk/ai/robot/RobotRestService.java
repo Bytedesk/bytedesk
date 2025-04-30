@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:44:12
+ * @LastEditTime: 2025-04-30 11:42:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,10 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -56,7 +60,11 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqEntity;
+import com.bytedesk.kbase.faq.FaqMessageExtra;
+import com.bytedesk.kbase.faq.FaqRequest;
 import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.faq_rating.FaqRatingRequest;
+import com.bytedesk.kbase.faq_rating.FaqRatingRestService;
 import com.bytedesk.kbase.settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
@@ -90,6 +98,10 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     private final Optional<SpringAIVectorStoreService> springAIVectorService;
 
     private final LlmProviderRestService llmProviderRestService;
+
+    private final MessageRestService messageRestService;
+
+    private final FaqRatingRestService faqRatingRestService;
 
     @Override
     public Page<RobotResponse> queryByOrg(RobotRequest request) {
@@ -257,54 +269,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         //
         return ConvertUtils.convertToThreadResponse(savedThread);
     }
-
-
-    // 创建客服助手机器人会话
-    // public ThreadResponse createAssistantThread(ThreadRequest request) {
-    //     UserEntity owner = authService.getUser();
-    //     if (owner == null) {
-    //         throw new RuntimeException("should login first");
-    //     }
-    //     Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(RobotConsts.ROBOT_NAME_AGENT_ASSISTANT,
-    //             owner.getOrgUid());
-    //     if (!robotOptional.isPresent()) {
-    //         throw new RuntimeException("robot not found");
-    //     }
-    //     // org/robot/robotUid/userUid/randomUid
-    //     String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotOptional.get().getUid(), owner.getUid(),
-    //             uidUtils.getUid());
-    //     // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
-    //     if (!request.getForceNew()) {
-    //         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
-    //         if (threadOptional.isPresent()) {
-    //             return threadService.convertToResponse(threadOptional.get());
-    //         }
-    //     }
-    //     //
-    //     RobotEntity robotEntity = robotOptional.get();
-    //     String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
-    //     String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
-    //     // 
-    //     // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
-    //     ThreadEntity thread = ThreadEntity.builder()
-    //             .uid(uidUtils.getUid())
-    //             .topic(topic)
-    //             .type(ThreadTypeEnum.LLM.name())
-    //             .unreadCount(0)
-    //             .user(user)
-    //             .agent(robot)
-    //             .userUid(owner.getUid())
-    //             .owner(owner)
-    //             .orgUid(owner.getOrgUid())
-    //             .build();
-    //     //
-    //     ThreadEntity savedThread = threadService.save(thread);
-    //     if (savedThread == null) {
-    //         throw new RuntimeException("thread save failed");
-    //     }
-    //     return threadService.convertToResponse(savedThread);
-    // }
-
+    
     @Transactional
     @Override
     public RobotResponse update(RobotRequest request) {
@@ -472,14 +437,140 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return convertToResponse(updateRobot);
     }
 
-    @Override
-    public RobotEntity save(RobotEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
+     // rate message extra helpful
+    public MessageResponse rateUp(FaqRequest request) {
+        Optional<MessageEntity> messageOptional = messageRestService.findByUid(request.getMessageUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            message.setStatus(MessageStatusEnum.RATE_UP.name());
+            //
+            MessageEntity savedMessage = messageRestService.save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            // 添加faq的点赞数
+            FaqMessageExtra faqMessageExtra = FaqMessageExtra.fromJson(savedMessage.getExtra());
+            if (faqMessageExtra != null) {
+                // String faqUid = faqMessageExtra.getFaqUid();
+                // Optional<FaqEntity> optionalFaq = findByUid(faqUid);
+                // if (optionalFaq.isPresent()) {
+                //     FaqEntity faqEntity = optionalFaq.get();
+                //     faqEntity.increaseUpCount();
+                //     faqRepository.save(faqEntity);
+                // }
+                // 暂不在faqRating记录rateUp记录
+                // FaqRatingRequest faqRatingRequest = FaqRatingRequest.builder()
+                //         .messageUid(request.getMessageUid())
+                //         .threadUid(request.getThreadUid())
+                //         .rateType(MessageStatusEnum.RATE_UP.name())
+                //         .faqUid(faqUid)
+                //         .build();
+                // faqRatingRestService.create(faqRatingRequest);
+            }
+            return ConvertUtils.convertToMessageResponse(savedMessage);
         }
+        // 
+        return null;
     }
+
+    // rate message extra unhelpful
+    public MessageResponse rateDown(FaqRequest request) {
+        Optional<MessageEntity> optionalMessage = messageRestService.findByUid(request.getMessageUid());
+        if (optionalMessage.isPresent()) {
+            MessageEntity message = optionalMessage.get();
+            message.setStatus(MessageStatusEnum.RATE_DOWN.name());
+            //
+            MessageEntity savedMessage = messageRestService.save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            // 添加faq的点踩数
+            FaqMessageExtra faqMessageExtra = FaqMessageExtra.fromJson(savedMessage.getExtra());
+            if (faqMessageExtra != null) {
+                // String faqUid = faqMessageExtra.getFaqUid();
+                // Optional<FaqEntity> optionalFaq = findByUid(faqUid);
+                // if (optionalFaq.isPresent()) {
+                //     FaqEntity faqEntity = optionalFaq.get();
+                //     faqEntity.increaseDownCount();
+                //     faqRepository.save(faqEntity);
+                // }
+                // 暂不在faqRating记录rateDown记录
+                // FaqRatingRequest faqRatingRequest = FaqRatingRequest.builder()
+                //         .messageUid(request.getMessageUid())
+                //         .threadUid(request.getThreadUid())
+                //         .rateType(MessageStatusEnum.RATE_DOWN.name())
+                //         .faqUid(faqUid)
+                //         .build();
+                // faqRatingRestService.create(faqRatingRequest);
+            }
+            return ConvertUtils.convertToMessageResponse(savedMessage);
+        }
+        return null;
+    }
+
+    // rate message extra feedback
+    public MessageResponse rateFeedback(FaqRequest request) {
+        Optional<MessageEntity> optionalMessage = messageRestService.findByUid(request.getMessageUid());
+        if (optionalMessage.isPresent()) {
+            MessageEntity message = optionalMessage.get();
+            message.setStatus(MessageStatusEnum.RATE_FEEDBACK.name());
+            //
+            MessageEntity savedMessage = messageRestService.save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            // 记录反馈
+            FaqMessageExtra faqMessageExtra = FaqMessageExtra.fromJson(savedMessage.getExtra());
+            if (faqMessageExtra != null) {
+                String faqUid = faqMessageExtra.getFaqUid();
+                // 
+                FaqRatingRequest faqRatingRequest = FaqRatingRequest.builder()
+                        .messageUid(request.getMessageUid())
+                        .threadUid(request.getThreadUid())
+                        .rateType(MessageStatusEnum.RATE_FEEDBACK.name())
+                        .rateDownTagList(request.getRateDownTagList())
+                        .rateDownReason(request.getRateDownReason())
+                        .faqUid(faqUid)
+                        .user(request.getUser())
+                        .orgUid(savedMessage.getOrgUid())
+                        .build();
+                faqRatingRestService.create(faqRatingRequest);
+            }
+            // 
+            return ConvertUtils.convertToMessageResponse(savedMessage);
+        }
+        return null;
+    }
+
+    // rate message transfer
+    public MessageResponse rateTransfer(FaqRequest request) {
+        Optional<MessageEntity> optionalMessage = messageRestService.findByUid(request.getMessageUid());
+        if (optionalMessage.isPresent()) {
+            MessageEntity message = optionalMessage.get();
+            message.setStatus(MessageStatusEnum.RATE_TRANSFER.name());
+            //
+            MessageEntity savedMessage = messageRestService.save(message);
+            if (savedMessage == null) {
+                throw new RuntimeException("Message not saved");
+            }
+            // 记录转人工
+            FaqMessageExtra faqMessageExtra = FaqMessageExtra.fromJson(savedMessage.getExtra());
+            if (faqMessageExtra != null) {
+                String faqUid = faqMessageExtra.getFaqUid();
+                // 
+                FaqRatingRequest faqRatingRequest = FaqRatingRequest.builder()
+                        .messageUid(request.getMessageUid())
+                        .threadUid(request.getThreadUid())
+                        .rateType(MessageStatusEnum.RATE_TRANSFER.name())
+                        .faqUid(faqUid)
+                        .build();
+                faqRatingRestService.create(faqRatingRequest);
+            }
+            return ConvertUtils.convertToMessageResponse(savedMessage);
+        }
+        return null;
+    }
+
 
     @Override
     protected RobotEntity doSave(RobotEntity entity) {
