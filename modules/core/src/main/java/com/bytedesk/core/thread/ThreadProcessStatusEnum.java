@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 18:54:46
+ * @LastEditTime: 2025-04-30 22:25:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,5 +36,44 @@ public enum ThreadProcessStatusEnum {
             }
         }
         throw new IllegalArgumentException("No ThreadStateEnum constant with value: " + value);
+    }
+    
+    /**
+     * 将状态字符串转换为中文显示
+     * @param status 状态字符串
+     * @return 对应的中文名称
+     */
+    public static String toChineseDisplay(String status) {
+        try {
+            ThreadProcessStatusEnum statusEnum = fromValue(status);
+            return statusEnum.toChineseDisplay();
+        } catch (Exception e) {
+            return status;
+        }
+    }
+    
+    /**
+     * 获取当前状态的中文显示
+     * @return 对应的中文名称
+     */
+    public String toChineseDisplay() {
+        switch (this) {
+            case NEW:
+                return "新会话";
+            case ROBOTING:
+                return "机器人接待中";
+            case LLMING:
+                return "大模型对话中";
+            case OFFLINE:
+                return "客服离线";
+            case QUEUING:
+                return "排队中";
+            case CHATTING:
+                return "对话中";
+            case CLOSED:
+                return "已结束";
+            default:
+                return this.name();
+        }
     }
 }

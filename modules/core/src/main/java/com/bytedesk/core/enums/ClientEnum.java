@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 19:23:35
+ * @LastEditTime: 2025-04-30 22:35:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -120,5 +120,178 @@ public enum ClientEnum {
             }
         }
         throw new IllegalArgumentException("No enum constant with value: " + value);
+    }
+    
+    /**
+     * 将客户端类型转换为中文显示
+     * @param client 客户端类型字符串
+     * @return 对应的中文名称
+     */
+    public static String toChineseDisplay(String client) {
+        try {
+            ClientEnum clientEnum = fromValue(client);
+            return clientEnum.toChineseDisplay();
+        } catch (Exception e) {
+            return client;
+        }
+    }
+    
+    /**
+     * 获取当前枚举值的中文显示
+     * @return 对应的中文名称
+     */
+    public String toChineseDisplay() {
+        switch (this) {
+            case SYSTEM:
+                return "系统";
+            case WEB:
+                return "网页";
+            case WEB_PC:
+                return "网页PC端";
+            case WEB_H5:
+                return "网页H5端";
+            case WEB_VISITOR:
+                return "网页访客端";
+            case WEB_ADMIN:
+                return "网页管理端";
+            case IOS:
+                return "iOS";
+            case ANDROID:
+                return "安卓";
+            case ELECTRON:
+                return "桌面应用";
+            case LINUX:
+                return "Linux";
+            case MACOS:
+                return "macOS";
+            case WINDOWS:
+                return "Windows";
+            case FLUTTER:
+                return "Flutter";
+            case FLUTTER_WEB:
+                return "Flutter网页版";
+            case FLUTTER_ANDROID:
+                return "Flutter安卓版";
+            case FLUTTER_IOS:
+                return "Flutter iOS版";
+            case FLUTTER_MACOS:
+                return "Flutter macOS版";
+            case FLUTTER_WINDOWS:
+                return "Flutter Windows版";
+            case FLUTTER_LINUX:
+                return "Flutter Linux版";
+            case UNIAPP:
+                return "UniApp";
+            case UNIAPP_WEB:
+                return "UniApp网页版";
+            case UNIAPP_ANDROID:
+                return "UniApp安卓版";
+            case UNIAPP_IOS:
+                return "UniApp iOS版";
+            case WECHAT:
+                return "微信";
+            case WECHAT_MINI:
+                return "微信小程序";
+            case WECHAT_MP:
+                return "微信公众号";
+            case WECHAT_WORK:
+                return "企业微信";
+            case WECHAT_KEFU:
+                return "微信客服";
+            case WECHAT_CHANNEL:
+                return "微信渠道";
+            case XIAOHONGSHU:
+                return "小红书";
+            case DOUYIN:
+                return "抖音";
+            case KUAISHOU:
+                return "快手";
+            case BILIBILI:
+                return "B站";
+            case WEIBO:
+                return "微博";
+            case ZHIHU:
+                return "知乎";
+            case TOUTIAO:
+                return "头条";
+            case DOUBAN:
+                return "豆瓣";
+            case TAOBAO:
+                return "淘宝";
+            case TMALL:
+                return "天猫";
+            case JD:
+                return "京东";
+            case PINDUODUO:
+                return "拼多多";
+            case MEITUAN:
+                return "美团";
+            case ELEME:
+                return "饿了么";
+            case DIANPING:
+                return "大众点评";
+            case DINGTALK:
+                return "钉钉";
+            case FEISHU:
+                return "飞书";
+            case WECOM:
+                return "企业微信";
+            case EMAIL:
+                return "邮件";
+            case SMS:
+                return "短信";
+            case PHONE:
+                return "电话";
+            case TWITTER:
+                return "Twitter/X";
+            case FACEBOOK:
+                return "Facebook";
+            case INSTAGRAM:
+                return "Instagram";
+            case LINKEDIN:
+                return "LinkedIn";
+            case YOUTUBE:
+                return "YouTube";
+            case TIKTOK:
+                return "TikTok";
+            case PINTEREST:
+                return "Pinterest";
+            case REDDIT:
+                return "Reddit";
+            case SNAPCHAT:
+                return "Snapchat";
+            case WHATSAPP:
+                return "WhatsApp";
+            case TELEGRAM:
+                return "Telegram";
+            case LINE:
+                return "LINE";
+            case KAKAO:
+                return "KakaoTalk";
+            case VIBER:
+                return "Viber";
+            case SIGNAL:
+                return "Signal";
+            case DISCORD:
+                return "Discord";
+            case SLACK:
+                return "Slack";
+            case MESSENGER:
+                return "Facebook Messenger";
+            case AMAZON:
+                return "亚马逊";
+            case EBAY:
+                return "eBay";
+            case SHOPIFY:
+                return "Shopify";
+            case LAZADA:
+                return "来赞达";
+            case SHOPEE:
+                return "虾皮";
+            case TEST:
+                return "测试";
+            default:
+                return this.name();
+        }
     }
 }

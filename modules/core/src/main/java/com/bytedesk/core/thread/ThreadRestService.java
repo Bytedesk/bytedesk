@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 22:11:17
+ * @LastEditTime: 2025-04-30 22:40:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -671,28 +671,39 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
     @Override
     public ThreadExcel convertToExcel(ThreadEntity entity) {
         ThreadExcel excel = modelMapper.map(entity, ThreadExcel.class);
+        excel.setUid(entity.getUid());
         // 
         if (entity.getUser() != null) {
-            UserProtobuf user = JSON.parseObject(entity.getUser(), UserProtobuf.class);
+            UserProtobuf user = UserProtobuf.fromJson(entity.getUser()); // JSON.parseObject(entity.getUser(), UserProtobuf.class);
             excel.setVisitorNickname(user.getNickname());
         }
         // agent
         if (entity.getAgent() != null) {
-            UserProtobuf agent = JSON.parseObject(entity.getAgent(), UserProtobuf.class);
+            UserProtobuf agent = UserProtobuf.fromJson(entity.getAgent()); // JSON.parseObject(entity.getAgent(), UserProtobuf.class);
             excel.setAgentNickname(agent.getNickname());
         }
         // robot
         if (entity.getRobot() != null) {
-            UserProtobuf robot = JSON.parseObject(entity.getRobot(), UserProtobuf.class);
+            UserProtobuf robot = UserProtobuf.fromJson(entity.getRobot()); // JSON.parseObject(entity.getRobot(), UserProtobuf.class);
             excel.setRobotNickname(robot.getNickname());
         }
         if (entity.getWorkgroup() != null) {
-            UserProtobuf workgroup = JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
+            UserProtobuf workgroup =  JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
             excel.setWorkgroupNickname(workgroup.getNickname());
         }
+        
+        // 将client转换为中文
+        if (StringUtils.hasText(entity.getClient())) {
+            excel.setClient(ClientEnum.toChineseDisplay(entity.getClient()));
+        }
+        
+        // 将status转换为中文
+        if (StringUtils.hasText(entity.getStatus())) {
+            excel.setStatus(ThreadProcessStatusEnum.toChineseDisplay(entity.getStatus()));
+        }
+        
         // 
         excel.setCreatedAt(entity.getCreatedAtString());
         return excel;
     }
-
 }
