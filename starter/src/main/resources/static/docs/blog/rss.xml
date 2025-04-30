@@ -4,10 +4,111 @@
         <title>Bytedesk Blog</title>
         <link>https://www.weiyuai.cn/docs/blog</link>
         <description>Bytedesk Blog</description>
-        <lastBuildDate>Tue, 08 Oct 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 30 Apr 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[微语对接大模型Qwen3指南]]></title>
+            <link>https://www.weiyuai.cn/docs/blog/qwen3</link>
+            <guid>https://www.weiyuai.cn/docs/blog/qwen3</guid>
+            <pubDate>Wed, 30 Apr 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[在本篇博客中，我们将介绍如何将微语客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。]]></description>
+            <content:encoded><![CDATA[<p>在本篇博客中，我们将介绍如何将微语客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。</p>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="qwen3大模型介绍">Qwen3大模型介绍<a href="https://www.weiyuai.cn/docs/blog/qwen3#qwen3%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D" class="hash-link" aria-label="Direct link to Qwen3大模型介绍" title="Direct link to Qwen3大模型介绍">​</a></h2>
+<p>通义千问Qwen3是阿里云推出的大型语言模型，具有强大的理解能力和生成能力。Qwen3系列模型在多轮对话、文本生成、问答解析等方面表现出色，非常适合客服场景应用。</p>
+<p>Qwen3是千问系列大语言模型的最新一代，提供了全面的稠密模型和混合专家模型（Mixture-of-Experts，MoE）。您可以访问<a href="https://ollama.com/library/qwen3" target="_blank" rel="noopener noreferrer">Ollama官方库</a>获取更多详细信息。</p>
+<p>目前Qwen3系列提供多种不同参数规模的模型版本，以适应不同的应用场景和硬件环境：</p>
+<ul>
+<li>Qwen3-tools: 针对工具使用进行特别优化的版本</li>
+<li>Qwen3-0.6b: 超轻量版本，适合资源受限场景</li>
+<li>Qwen3-1.8b: 轻量级模型，平衡性能和资源消耗</li>
+<li>Qwen3-4b: 中小型模型，提供更好的理解力</li>
+<li>Qwen3-8b: 中型模型，具有较强的推理能力</li>
+<li>Qwen3-14b: 较大模型，提供优秀的理解和生成能力</li>
+<li>Qwen3-30b: 大型模型，适合复杂任务处理</li>
+<li>Qwen3-32b: 高性能大模型，强大的多任务能力</li>
+<li>Qwen3-234b: 超大规模模型，顶级性能表现</li>
+</ul>
+<p>在本指南中，我们将使用Qwen3-4b版本进行演示，这是一个非常平衡的选择，既能提供良好的对话质量，又不会对普通设备造成过大负担。</p>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="一ollama安装qwen3">一、Ollama安装Qwen3<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%B8%80ollama%E5%AE%89%E8%A3%85qwen3" class="hash-link" aria-label="Direct link to 一、Ollama安装Qwen3" title="Direct link to 一、Ollama安装Qwen3">​</a></h2>
+<p><a href="https://ollama.ai/" target="_blank" rel="noopener noreferrer">Ollama</a>是一个开源的大模型运行框架，可以在本地部署运行多种大型语言模型，包括Qwen3。下面是安装和配置步骤：</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="1-安装ollama">1. 安装Ollama<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E5%AE%89%E8%A3%85ollama" class="hash-link" aria-label="Direct link to 1. 安装Ollama" title="Direct link to 1. 安装Ollama">​</a></h3>
+<p>根据您的操作系统，选择相应的安装方法：</p>
+<p><strong>MacOS</strong>:</p>
+<div class="language-bash codeBlockContainer_L7ux theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_jCTj"><pre tabindex="0" class="prism-code language-bash codeBlock_r3IR thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_mPkQ"><span class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://ollama.ai/install.sh | sh</span><br></span></code></pre><div class="buttonGroup_nEdo"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_uvEQ" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon__41q"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_UAYa"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>Linux</strong>:</p>
+<div class="language-bash codeBlockContainer_L7ux theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_jCTj"><pre tabindex="0" class="prism-code language-bash codeBlock_r3IR thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_mPkQ"><span class="token-line" style="color:#393A34"><span class="token plain">curl -fsSL https://ollama.ai/install.sh | sh</span><br></span></code></pre><div class="buttonGroup_nEdo"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_uvEQ" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon__41q"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_UAYa"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>Windows</strong>:
+从<a href="https://ollama.ai/download" target="_blank" rel="noopener noreferrer">Ollama官网</a>下载并安装Windows版本。</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="2-拉取qwen3模型">2. 拉取Qwen3模型<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E6%8B%89%E5%8F%96qwen3%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="Direct link to 2. 拉取Qwen3模型" title="Direct link to 2. 拉取Qwen3模型">​</a></h3>
+<p>安装完成后，通过命令行拉取Qwen3模型：</p>
+<div class="language-bash codeBlockContainer_L7ux theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_jCTj"><pre tabindex="0" class="prism-code language-bash codeBlock_r3IR thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_mPkQ"><span class="token-line" style="color:#393A34"><span class="token plain"># 拉取Qwen3 4b模型</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama pull qwen3:4b</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># 如果需要更大参数的模型，也可以选择其他版本</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># ollama pull qwen3:8b</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># ollama pull qwen3:14b</span><br></span></code></pre><div class="buttonGroup_nEdo"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_uvEQ" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon__41q"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_UAYa"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="3-验证模型安装">3. 验证模型安装<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9E%8B%E5%AE%89%E8%A3%85" class="hash-link" aria-label="Direct link to 3. 验证模型安装" title="Direct link to 3. 验证模型安装">​</a></h3>
+<p>通过以下命令验证Qwen3模型是否安装成功：</p>
+<div class="language-bash codeBlockContainer_L7ux theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_jCTj"><pre tabindex="0" class="prism-code language-bash codeBlock_r3IR thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_mPkQ"><span class="token-line" style="color:#393A34"><span class="token plain">ollama list</span><br></span></code></pre><div class="buttonGroup_nEdo"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_uvEQ" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon__41q"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_UAYa"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>您应该能看到已下载的qwen3模型列表。</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="4-启动ollama服务">4. 启动Ollama服务<a href="https://www.weiyuai.cn/docs/blog/qwen3#4-%E5%90%AF%E5%8A%A8ollama%E6%9C%8D%E5%8A%A1" class="hash-link" aria-label="Direct link to 4. 启动Ollama服务" title="Direct link to 4. 启动Ollama服务">​</a></h3>
+<p>确保Ollama服务正在运行：</p>
+<div class="language-bash codeBlockContainer_L7ux theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_jCTj"><pre tabindex="0" class="prism-code language-bash codeBlock_r3IR thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_mPkQ"><span class="token-line" style="color:#393A34"><span class="token plain"># 在某些系统上，安装后会自动启动服务</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># 如果没有自动启动，请使用以下命令</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama serve</span><br></span></code></pre><div class="buttonGroup_nEdo"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_uvEQ" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon__41q"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_UAYa"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>默认情况下，Ollama服务会在<code>http://localhost:11434</code>端口运行。</p>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="二在微语管理后台设置qwen3对话模型">二、在微语管理后台设置Qwen3对话模型<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%BA%8C%E5%9C%A8%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E8%AE%BE%E7%BD%AEqwen3%E5%AF%B9%E8%AF%9D%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="Direct link to 二、在微语管理后台设置Qwen3对话模型" title="Direct link to 二、在微语管理后台设置Qwen3对话模型">​</a></h2>
+<p>完成Ollama和Qwen3模型的安装后，我们需要在微语管理后台进行配置：</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="1-登录微语管理后台">1. 登录微语管理后台<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E7%99%BB%E5%BD%95%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0" class="hash-link" aria-label="Direct link to 1. 登录微语管理后台" title="Direct link to 1. 登录微语管理后台">​</a></h3>
+<p>访问您的微语管理后台，输入账号和密码登录系统。</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="2-导航到ai设置">2. 导航到AI设置<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E5%AF%BC%E8%88%AA%E5%88%B0ai%E8%AE%BE%E7%BD%AE" class="hash-link" aria-label="Direct link to 2. 导航到AI设置" title="Direct link to 2. 导航到AI设置">​</a></h3>
+<p>在左侧导航栏中，找到并点击"AI助手"-&gt;"机器人"选项。</p>
+<p><img decoding="async" loading="lazy" alt="导航到AI设置" src="https://www.weiyuai.cn/docs/assets/images/qwen3_1-35b801bc6ec7a2e3840fd179f626456c.png" width="3196" height="1748" class="img_mZKk">
+<em>图1：导航到AI设置</em></p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="3-切换qwen3模型配置">3. 切换Qwen3模型配置<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E5%88%87%E6%8D%A2qwen3%E6%A8%A1%E5%9E%8B%E9%85%8D%E7%BD%AE" class="hash-link" aria-label="Direct link to 3. 切换Qwen3模型配置" title="Direct link to 3. 切换Qwen3模型配置">​</a></h3>
+<p>在AI设置页面中：</p>
+<p><img decoding="async" loading="lazy" alt="切换Qwen3模型配置" src="https://www.weiyuai.cn/docs/assets/images/qwen3_2-b50733fadab34e51db1a4d7d7c1f53f2.png" width="3202" height="1746" class="img_mZKk">
+<em>图2：切换Qwen3模型配置</em></p>
+<ol>
+<li>点击"AI模型选择"按钮</li>
+<li>选择模型类型为"Ollama-&gt;Qwen3"</li>
+<li>确认无误后，点击"确定"按钮</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="三开始使用qwen3进行智能对话">三、开始使用Qwen3进行智能对话<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%B8%89%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8qwen3%E8%BF%9B%E8%A1%8C%E6%99%BA%E8%83%BD%E5%AF%B9%E8%AF%9D" class="hash-link" aria-label="Direct link to 三、开始使用Qwen3进行智能对话" title="Direct link to 三、开始使用Qwen3进行智能对话">​</a></h2>
+<p>配置完成后，您可以开始体验Qwen3赋能的智能客服功能：</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="1-创建知识库可选">1. 创建知识库（可选）<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E5%88%9B%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%AF%E9%80%89" class="hash-link" aria-label="Direct link to 1. 创建知识库（可选）" title="Direct link to 1. 创建知识库（可选）">​</a></h3>
+<p>为了让AI回答更加准确，您可以创建和维护特定领域的知识库：</p>
+<ol>
+<li>导航到"知识库"或"AI训练"模块</li>
+<li>点击"新建知识库"，输入名称和描述</li>
+<li>上传文档或手动添加Q&amp;A对，丰富AI的专业知识</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="2-测试对话效果">2. 测试对话效果<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E6%B5%8B%E8%AF%95%E5%AF%B9%E8%AF%9D%E6%95%88%E6%9E%9C" class="hash-link" aria-label="Direct link to 2. 测试对话效果" title="Direct link to 2. 测试对话效果">​</a></h3>
+<p>您可以通过以下方式测试Qwen3的对话能力：</p>
+<ol>
+<li>在管理后台的"对话测试"功能中，输入问题进行测试</li>
+<li>通过客服端应用，模拟用户提问，验证AI回复效果</li>
+<li>通过访客端，体验实际用户视角下的AI交互</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="3-对话效果展示">3. 对话效果展示<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E5%AF%B9%E8%AF%9D%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA" class="hash-link" aria-label="Direct link to 3. 对话效果展示" title="Direct link to 3. 对话效果展示">​</a></h3>
+<p>以下是一些使用Qwen3进行智能对话的演示截图：</p>
+<p><img decoding="async" loading="lazy" alt="Qwen3对话示例" src="https://www.weiyuai.cn/docs/assets/images/qwen3_3-8ed4ac99e01c12ef0c7a1b457d0e7096.png" width="3206" height="1534" class="img_mZKk">
+<em>图3：Qwen3能够根据上下文提供连贯的多轮对话</em></p>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="四优化和调整">四、优化和调整<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E5%9B%9B%E4%BC%98%E5%8C%96%E5%92%8C%E8%B0%83%E6%95%B4" class="hash-link" aria-label="Direct link to 四、优化和调整" title="Direct link to 四、优化和调整">​</a></h2>
+<p>为了获得最佳的Qwen3对话效果，您可以进行以下优化：</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="1-调整模型参数">1. 调整模型参数<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E8%B0%83%E6%95%B4%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0" class="hash-link" aria-label="Direct link to 1. 调整模型参数" title="Direct link to 1. 调整模型参数">​</a></h3>
+<p>根据实际需求调整模型参数，如温度值、最大token数等，以平衡回答的创造性和精确性。</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="2-优化系统提示词">2. 优化系统提示词<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E4%BC%98%E5%8C%96%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D" class="hash-link" aria-label="Direct link to 2. 优化系统提示词" title="Direct link to 2. 优化系统提示词">​</a></h3>
+<p>系统提示词对AI的行为有重要影响，您可以根据业务场景定制专业的提示词，引导AI表现出理想的对话风格。</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="3-结合人工审核">3. 结合人工审核<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E7%BB%93%E5%90%88%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8" class="hash-link" aria-label="Direct link to 3. 结合人工审核" title="Direct link to 3. 结合人工审核">​</a></h3>
+<p>设置人工干预机制，对AI无法准确回答的问题进行人工接管，并将这些案例记录下来用于进一步训练和优化。</p>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="总结">总结<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E6%80%BB%E7%BB%93" class="hash-link" aria-label="Direct link to 总结" title="Direct link to 总结">​</a></h2>
+<p>通过将微语客服系统与通义千问Qwen3大模型对接，您可以显著提升客服自动化水平和用户体验。本指南详细介绍了从安装Ollama、配置Qwen3模型到实际应用的完整流程。</p>
+<p>随着您不断优化提示词和积累领域知识库，AI助手的表现会越来越符合您的业务需求，为客户提供更加专业、高效的服务体验。</p>
+<p>如有任何问题或需要进一步的技术支持，请随时联系我们的技术团队。</p>
+<hr>
+<p>希望本指南对您成功部署和使用微语+Qwen3智能客服系统有所帮助！</p>]]></content:encoded>
+            <category>Developer</category>
+            <category>Bytedesk</category>
+            <category>AI</category>
+            <category>Qwen3</category>
+            <category>LLM</category>
+        </item>
         <item>
             <title><![CDATA[QR Code Login Implementation Process]]></title>
             <link>https://www.weiyuai.cn/docs/blog/scan-to-login</link>
