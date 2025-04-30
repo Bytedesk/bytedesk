@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 22:54:01
+ * @LastEditTime: 2025-04-30 15:09:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,6 +80,14 @@ public class FaqRequest extends BaseRequest {
     // 点踩次数
     @Builder.Default
     private Integer downCount = 0;
+
+     // 反馈次数
+     @Builder.Default
+     private Integer feedbackCount = 0;
+ 
+     // 转人工次数
+     @Builder.Default
+     private Integer transferCount = 0;
 
     // 会员等级
 	@Builder.Default

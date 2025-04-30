@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:14:29
+ * @LastEditTime: 2025-04-30 15:09:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,21 +67,13 @@ public class FaqResponse extends BaseResponse {
 
     private Integer downCount;
 
-    // private Boolean valid;
+    // 反馈次数
+    private Integer feedbackCount;
+
+    // 转人工次数
+    private Integer transferCount;
+
     private Boolean enabled;
-
-    // // 是否开启自动同步到llm_qa问答
-    // private Boolean autoSyncLlmQa;
-
-    // // 是否已经同步llm问答
-    // private Boolean llmQaSynced;
-
-    // // 同步到llm qa kbUid 
-    // private String llmQaKbUid;
-
-    // // 同步到llm qa uid
-    // private String llmQaUid;
-
 
     private List<String> tagList;
 
