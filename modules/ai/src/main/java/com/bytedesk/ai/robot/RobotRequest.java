@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:43:50
+ * @LastEditTime: 2025-04-30 11:38:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
@@ -46,26 +49,14 @@ public class RobotRequest extends BaseRequest {
     @Builder.Default
     private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
-    // @Builder.Default
-    // private InviteSettings inviteSettings = new InviteSettings();
-
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
-
-    // @Builder.Default
-    // private Boolean flowEnabled = false;
-
-    // @Builder.Default
-    // private RobotFlow flow = new RobotFlow();
 
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_REPLY;
 
     // 机器人分类
     private String categoryUid;
-
-    // @Builder.Default
-    // private Boolean published = false;
 
     // @Builder.Default
     private Boolean kbEnabled;
@@ -78,5 +69,18 @@ public class RobotRequest extends BaseRequest {
 
     // flow uid
     private String flowUid;
+
+
+    // 用于客户端点击uid
+    private String threadUid; // 对应会话
+    // rate message helpful/unhelpful
+    private String messageUid; // 对应消息
+    // 点踩的情况下的反馈意见
+    @Builder.Default
+    private List<String> rateDownTagList = new ArrayList<>();
+    // 点踩的原因
+    private String rateDownReason;
+    // 点踩的用户
+    private String user;
 
 }
