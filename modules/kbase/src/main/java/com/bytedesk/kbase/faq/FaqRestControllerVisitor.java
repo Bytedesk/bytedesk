@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 18:19:30
+ * @LastEditTime: 2025-04-30 12:52:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,41 +67,7 @@ public class FaqRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(faq));
     }
     
-    // rate message helpful
-    @PostMapping("/rate/message/helpful")
-    public ResponseEntity<?> rateMessageHelpful(@RequestBody FaqRequest request) {
-
-        MessageResponse message = faqRestService.rateUp(request);
-
-        return ResponseEntity.ok(JsonResult.success(message));
-    }
-
-    // rate message not helpful
-    @PostMapping("/rate/message/unhelpful")
-    public ResponseEntity<?> rateMessageNotHelpful(@RequestBody FaqRequest request) {
-        
-        MessageResponse message = faqRestService.rateDown(request);
-
-        return ResponseEntity.ok(JsonResult.success(message));
-    }
-
-    // rate message feedback
-    @PostMapping("/rate/message/feedback")
-    public ResponseEntity<?> rateMessageFeedback(@RequestBody FaqRequest request) {
-
-        MessageResponse message = faqRestService.rateFeedback(request);
-
-        return ResponseEntity.ok(JsonResult.success(message));
-    }
-
-    // rate message transfer
-    @PostMapping("/rate/message/transfer")
-    public ResponseEntity<?> rateMessageTransfer(@RequestBody FaqRequest request) {
-
-        MessageResponse message = faqRestService.rateTransfer(request);
-
-        return ResponseEntity.ok(JsonResult.success(message));
-    }
+    
 
 
 }
