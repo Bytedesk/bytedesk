@@ -52,11 +52,11 @@ import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
-import com.bytedesk.kbase.faq_rating.FaqRatingRestService;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.message_rating.FaqRatingRequest;
+import com.bytedesk.kbase.message_rating.FaqRatingRestService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
-import com.bytedesk.kbase.faq_rating.FaqRatingRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
