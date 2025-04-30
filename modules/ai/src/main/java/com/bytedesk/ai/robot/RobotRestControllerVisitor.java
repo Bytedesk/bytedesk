@@ -23,42 +23,5 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class RobotRestControllerVisitor {
 
-    // private final RobotRestService robotRestService;
-
-    // // rate message helpful
-    // @PostMapping("/rate/message/helpful")
-    // public ResponseEntity<?> rateMessageHelpful(@RequestBody FaqRequest request) {
-
-    //     MessageResponse message = robotRestService.rateUp(request);
-
-    //     return ResponseEntity.ok(JsonResult.success(message));
-    // }
-
-    // // rate message not helpful
-    // @PostMapping("/rate/message/unhelpful")
-    // public ResponseEntity<?> rateMessageNotHelpful(@RequestBody FaqRequest request) {
-        
-    //     MessageResponse message = robotRestService.rateDown(request);
-
-    //     return ResponseEntity.ok(JsonResult.success(message));
-    // }
-
-    // // rate message feedback
-    // @PostMapping("/rate/message/feedback")
-    // public ResponseEntity<?> rateMessageFeedback(@RequestBody FaqRequest request) {
-
-    //     MessageResponse message = robotRestService.rateFeedback(request);
-
-    //     return ResponseEntity.ok(JsonResult.success(message));
-    // }
-
-    // // rate message transfer
-    // @PostMapping("/rate/message/transfer")
-    // public ResponseEntity<?> rateMessageTransfer(@RequestBody FaqRequest request) {
-
-    //     MessageResponse message = robotRestService.rateTransfer(request);
-
-    //     return ResponseEntity.ok(JsonResult.success(message));
-    // }
     
 }
