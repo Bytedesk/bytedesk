@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 22:40:59
+ * @LastEditTime: 2025-04-30 22:44:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -674,21 +674,21 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
         excel.setUid(entity.getUid());
         // 
         if (entity.getUser() != null) {
-            UserProtobuf user = UserProtobuf.fromJson(entity.getUser()); // JSON.parseObject(entity.getUser(), UserProtobuf.class);
+            UserProtobuf user = UserProtobuf.fromJson(entity.getUser());
             excel.setVisitorNickname(user.getNickname());
         }
         // agent
         if (entity.getAgent() != null) {
-            UserProtobuf agent = UserProtobuf.fromJson(entity.getAgent()); // JSON.parseObject(entity.getAgent(), UserProtobuf.class);
+            UserProtobuf agent = UserProtobuf.fromJson(entity.getAgent());
             excel.setAgentNickname(agent.getNickname());
         }
         // robot
         if (entity.getRobot() != null) {
-            UserProtobuf robot = UserProtobuf.fromJson(entity.getRobot()); // JSON.parseObject(entity.getRobot(), UserProtobuf.class);
+            UserProtobuf robot = UserProtobuf.fromJson(entity.getRobot());
             excel.setRobotNickname(robot.getNickname());
         }
         if (entity.getWorkgroup() != null) {
-            UserProtobuf workgroup =  JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
+            UserProtobuf workgroup = UserProtobuf.fromJson(entity.getWorkgroup());
             excel.setWorkgroupNickname(workgroup.getNickname());
         }
         
@@ -706,4 +706,6 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
         excel.setCreatedAt(entity.getCreatedAtString());
         return excel;
     }
+
+
 }
