@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 12:43:39
+ * @LastEditTime: 2025-04-30 22:11:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -670,27 +670,29 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
    
     @Override
     public ThreadExcel convertToExcel(ThreadEntity entity) {
-        ThreadExcel threadExcel = modelMapper.map(entity, ThreadExcel.class);
+        ThreadExcel excel = modelMapper.map(entity, ThreadExcel.class);
         // 
         if (entity.getUser() != null) {
             UserProtobuf user = JSON.parseObject(entity.getUser(), UserProtobuf.class);
-            threadExcel.setVisitorNickname(user.getNickname());
+            excel.setVisitorNickname(user.getNickname());
         }
         // agent
         if (entity.getAgent() != null) {
             UserProtobuf agent = JSON.parseObject(entity.getAgent(), UserProtobuf.class);
-            threadExcel.setAgentNickname(agent.getNickname());
+            excel.setAgentNickname(agent.getNickname());
         }
         // robot
         if (entity.getRobot() != null) {
             UserProtobuf robot = JSON.parseObject(entity.getRobot(), UserProtobuf.class);
-            threadExcel.setRobotNickname(robot.getNickname());
+            excel.setRobotNickname(robot.getNickname());
         }
         if (entity.getWorkgroup() != null) {
             UserProtobuf workgroup = JSON.parseObject(entity.getWorkgroup(), UserProtobuf.class);
-            threadExcel.setWorkgroupNickname(workgroup.getNickname());
+            excel.setWorkgroupNickname(workgroup.getNickname());
         }
-        return threadExcel;
+        // 
+        excel.setCreatedAt(entity.getCreatedAtString());
+        return excel;
     }
 
 }

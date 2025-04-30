@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 21:38:31
+ * @LastEditTime: 2025-04-30 21:47:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,9 +36,9 @@ public class QueueExcel extends BaseExcel {
     @ColumnWidth(15)
     private String type;
 
-    @ExcelProperty(value = "队列主题")
-    @ColumnWidth(20)
-    private String topic;
+    // @ExcelProperty(value = "队列主题")
+    // @ColumnWidth(20)
+    // private String topic;
 
     @ExcelProperty(value = "队列日期")
     @ColumnWidth(15)
@@ -62,7 +62,7 @@ public class QueueExcel extends BaseExcel {
 
     @ExcelProperty(value = "留言数")
     @ColumnWidth(15)
-    private Integer leaveMsgCount;
+    private Integer messageLeaveCount;
 
     @ExcelProperty(value = "转人工数")
     @ColumnWidth(15)

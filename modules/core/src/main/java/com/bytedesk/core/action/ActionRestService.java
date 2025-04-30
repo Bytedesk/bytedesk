@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:20:07
+ * @LastEditTime: 2025-04-30 22:02:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -67,8 +67,6 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
 
-    
-
     public ActionResponse create(ActionRequest actionRequest) {
 
         ActionEntity action = modelMapper.map(actionRequest, ActionEntity.class);
@@ -94,16 +92,6 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
-
-
-    public ActionEntity save(ActionEntity action) {
-        try {
-            return doSave(action);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return null;
-    }
     
     @Override
     protected ActionEntity doSave(ActionEntity entity) {
@@ -116,9 +104,6 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         }
         return modelMapper.map(action, ActionResponse.class);
     }
-
-    
-
     
     @Override
     public void deleteByUid(String uid) {
@@ -138,23 +123,11 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
-
-    // public ActionExcel convertToExcel(ActionResponse action) {
-    //     ActionExcel actionExcel = modelMapper.map(action, ActionExcel.class);
-    //     if (action.getUser() != null) {
-    //         actionExcel.setUser(action.getUser().getNickname());
-    //     }
-    //     actionExcel.setCreatedAt(action.getCreatedAt());
-    //     return actionExcel;
-    // }
-
     @Override
     public ActionResponse queryByUid(ActionRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
-
-    
 
     @Override
     public ActionExcel convertToExcel(ActionEntity entity) {
@@ -162,7 +135,7 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         if (entity.getUser() != null) {
             actionExcel.setUser(entity.getUser().getNickname());
         }
-        // actionExcel.setCreatedAt(entity.getCreatedAt());
+        actionExcel.setCreatedAt(entity.getCreatedAtString());
         return actionExcel;
     }
 

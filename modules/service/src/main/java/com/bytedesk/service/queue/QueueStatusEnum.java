@@ -42,4 +42,39 @@ public enum QueueStatusEnum {
         }
         throw new IllegalArgumentException("Invalid queue status: " + value);
     }
-} 
+    
+    /**
+     * 获取枚举类型对应的中文名称
+     * @return 对应的中文名称
+     */
+    public String getChineseName() {
+        switch (this) {
+            case ACTIVE:
+                return "正常";
+            case PAUSED:
+                return "暂停";
+            case CLOSED:
+                return "关闭";
+            case FULL:
+                return "已满";
+            case MAINTENANCE:
+                return "维护中";
+            default:
+                return this.name();
+        }
+    }
+    
+    /**
+     * 根据枚举名称获取对应的中文名称
+     * @param name 枚举名称
+     * @return 对应的中文名称，如果找不到匹配的枚举则返回原始名称
+     */
+    public static String getChineseNameByString(String name) {
+        try {
+            QueueStatusEnum status = QueueStatusEnum.valueOf(name);
+            return status.getChineseName();
+        } catch (IllegalArgumentException e) {
+            return name;
+        }
+    }
+}

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 11:07:08
+ * @LastEditTime: 2025-04-30 22:08:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,11 @@ public class ThreadExcel {
     @ExcelProperty(value = "工作组")
     @ColumnWidth(20)
     private String workgroupNickname;
+
+    // status
+    @ExcelProperty(value = "状态")
+    @ColumnWidth(20)
+    private String status;
 
     // client
     @ExcelProperty(value = "来源")

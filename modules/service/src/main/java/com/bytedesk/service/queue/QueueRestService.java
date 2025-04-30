@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 21:33:55
+ * @LastEditTime: 2025-04-30 21:43:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
@@ -166,7 +167,15 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     public QueueExcel convertToExcel(QueueEntity entity) {
         QueueExcel queueExcel = modelMapper.map(entity, QueueExcel.class);
         queueExcel.setUid(entity.getUid());
+        
+        // 使用ThreadTypeEnum的静态方法将类型转换为中文名称
+        String typeStr = entity.getType();
+        queueExcel.setType(ThreadTypeEnum.getChineseNameByString(typeStr));
+        
+        // 使用QueueStatusEnum的静态方法将状态转换为中文名称
+        String statusStr = entity.getStatus();
+        queueExcel.setStatus(QueueStatusEnum.getChineseNameByString(statusStr));
+        
         return queueExcel;
     }
-
 }
