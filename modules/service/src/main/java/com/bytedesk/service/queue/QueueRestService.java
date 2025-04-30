@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 09:30:28
+ * @LastEditTime: 2025-04-30 21:03:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,7 +113,6 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
             //
             return convertToResponse(save(entity));
         }
-        //
         return create(request);
     }
 
@@ -156,23 +155,16 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
 
     @Override
     public QueueResponse convertToResponse(QueueEntity entity) {
-        // return modelMapper.map(entity, QueueResponse.class);
         return ServiceConvertUtils.convertToQueueResponse(entity);
     }
 
     public Optional<QueueEntity> findLatestByQueueTopicAndDay(String queueTopic, String day) {
         return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(queueTopic, day);
     }
-
-    public QueueExcel convertToExcel(QueueResponse response) {
-        return modelMapper.map(response, QueueExcel.class);
-    }
-
     
     @Override
     public QueueExcel convertToExcel(QueueEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToExcel'");
+        return modelMapper.map(entity, QueueExcel.class);
     }
 
 }
