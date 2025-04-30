@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 14:06:05
+ * @LastEditTime: 2025-04-30 14:12:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -102,10 +102,6 @@ public class RobotLlm {
     @Column(name = "llm_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt = RobotConsts.ROBOT_LLM_DEFAULT_PROMPT;
     
-    // private String prompt = "";
-    // private String promptTemplate =
-    // "请根据上下文信息回答问题：\n\n上下文信息：\n{context}\n\n问题：{question}\n\n答案：";
-
     // 上下文消息数，默认3条。一同传递给大模型
     @Builder.Default
     @Column(name = "llm_context_msg_count")
