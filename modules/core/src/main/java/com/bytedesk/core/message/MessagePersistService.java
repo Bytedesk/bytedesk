@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 16:28:49
+ * @LastEditTime: 2025-04-30 12:35:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -170,14 +170,14 @@ public class MessagePersistService {
         // }
 
         //
-        if (type.equals(MessageTypeEnum.ROBOT_UP)
-                || type.equals(MessageTypeEnum.ROBOT_DOWN)) {
-            // content为邀请评价消息的uid
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithRobotRateMessage(type, messageProtobuf);
-                return true;
-            }
-        }
+        // if (type.equals(MessageTypeEnum.ROBOT_UP)
+        //         || type.equals(MessageTypeEnum.ROBOT_DOWN)) {
+        //     // content为邀请评价消息的uid
+        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
+        //         dealWithRobotRateMessage(type, messageProtobuf);
+        //         return true;
+        //     }
+        // }
 
         //
         if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)
@@ -267,19 +267,19 @@ public class MessagePersistService {
     //     }
     // }
 
-    private void dealWithRobotRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-        // log.info("dealWithRobotRateMessage");
-        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-        if (messageOpt.isPresent()) {
-            MessageEntity messageEntity = messageOpt.get();
-            if (type.equals(MessageTypeEnum.ROBOT_UP)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
-            } else if (type.equals(MessageTypeEnum.ROBOT_DOWN)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
-            }
-            messageRestService.save(messageEntity);
-        }
-    }
+    // private void dealWithRobotRateMessage(MessageTypeEnum type, MessageProtobuf message) {
+    //     // log.info("dealWithRobotRateMessage");
+    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
+    //     if (messageOpt.isPresent()) {
+    //         MessageEntity messageEntity = messageOpt.get();
+    //         if (type.equals(MessageTypeEnum.ROBOT_UP)) {
+    //             messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
+    //         } else if (type.equals(MessageTypeEnum.ROBOT_DOWN)) {
+    //             messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
+    //         }
+    //         messageRestService.save(messageEntity);
+    //     }
+    // }
 
     // 处理转接消息
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
