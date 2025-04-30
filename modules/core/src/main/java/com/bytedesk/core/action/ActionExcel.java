@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 09:44:44
+ * @LastEditTime: 2025-04-30 22:05:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,40 +23,36 @@ import lombok.Data;
 @Data
 public class ActionExcel {
 
-    @ExcelProperty(index = 0, value = "Title")
-    @ColumnWidth(20)
-    private String title;
-
-    @ExcelProperty(index = 1, value = "Action")
-    @ColumnWidth(20)
-    private String action;
-
-    @ExcelProperty(index = 2, value = "Description")
-    @ColumnWidth(20)
-    private String description;
-
-    @ExcelProperty(index = 3, value = "IP")
-    @ColumnWidth(20)
-    private String ip;
-
-    @ExcelProperty(index = 4, value = "IP Location")
-    @ColumnWidth(20)
-    private String ipLocation;
-
-    @ExcelProperty(index = 5, value = "Type")
-    @ColumnWidth(20)
-    private String type;
-
-    @ExcelProperty(index = 6, value = "Extra")
-    @ColumnWidth(20)
-    private String extra;
-
-    @ExcelProperty(index = 7, value = "User")
+    @ExcelProperty("用户")
     @ColumnWidth(20)
     private String user;
 
-    @ExcelProperty(index = 8, value = "Created At")
+    @ExcelProperty("标题")
     @ColumnWidth(20)
+    private String title;
+
+    @ExcelProperty("操作")
+    @ColumnWidth(20)
+    private String action;
+
+    // @ExcelProperty("描述")
+    // @ColumnWidth(20)
+    // private String description;
+
+    @ExcelProperty("IP")
+    @ColumnWidth(20)
+    private String ip;
+
+    @ExcelProperty("IP位置")
+    @ColumnWidth(20)
+    private String ipLocation;
+
+    // @ExcelProperty("类型")
+    // @ColumnWidth(20)
+    // private String type;
+
+    @ExcelProperty("创建时间")
+    @ColumnWidth(25)
     private String createdAt;
     
 }

@@ -59,4 +59,61 @@ public enum ThreadTypeEnum {
         }
         throw new IllegalArgumentException("No enum constant with value " + value);
     }
+    
+    /**
+     * 获取枚举类型对应的中文名称
+     * @return 对应的中文名称
+     */
+    public String getChineseName() {
+        switch (this) {
+            case AGENT:
+                return "一对一客服";
+            case WORKGROUP:
+                return "技能组客服";
+            case ROBOT:
+                return "机器人客服";
+            case MEMBER:
+                return "组织成员对话";
+            case GROUP:
+                return "群组对话";
+            case FEEDBACK:
+                return "意见反馈";
+            case ASSISTANT:
+                return "助理";
+            case CHANNEL:
+                return "渠道对话";
+            case LOCAL:
+                return "本地对话";
+            case FRIEND:
+                return "好友对话";
+            case TICKET:
+                return "工单对话";
+            case KBASE:
+                return "知识库对话";
+            case KBDOC:
+                return "知识库文档对话";
+            case LLM:
+                return "大模型对话";
+            case UNIFIED:
+                return "统一客服入口";
+            case HISTORY:
+                return "历史对话";
+            default:
+                return this.name();
+        }
+    }
+    
+    /**
+     * 根据枚举名称获取对应的中文名称
+     * @param name 枚举名称
+     * @return 对应的中文名称，如果找不到匹配的枚举则返回原始名称
+     */
+    public static String getChineseNameByString(String name) {
+        try {
+            ThreadTypeEnum type = ThreadTypeEnum.valueOf(name);
+            return type.getChineseName();
+        } catch (IllegalArgumentException e) {
+            return name;
+        }
+    }
 }
