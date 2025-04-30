@@ -196,8 +196,8 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
             response,
             threadService,
             ThreadExcel.class,
-            "Thread",
-            "Thread"
+            "会话列表",
+            "thread"
         );
     }
     
