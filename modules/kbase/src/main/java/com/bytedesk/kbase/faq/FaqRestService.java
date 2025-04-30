@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 22:53:18
+ * @LastEditTime: 2025-04-30 12:52:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,9 +54,9 @@ import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
-import com.bytedesk.kbase.message_rating.FaqRatingRequest;
-import com.bytedesk.kbase.message_rating.FaqRatingRestService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
+import com.bytedesk.service.message_rating.FaqRatingRequest;
+import com.bytedesk.service.message_rating.FaqRatingRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,8 +83,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     private final ThreadRestService threadRestService;
 
     private final MessageRestService messageRestService;
-
-    private final FaqRatingRestService faqRatingRestService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
