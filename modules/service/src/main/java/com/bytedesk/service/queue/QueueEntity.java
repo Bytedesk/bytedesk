@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 13:46:34
+ * @LastEditTime: 2025-04-30 21:06:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.service.queue;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
-// import com.bytedesk.service.queue_member.QueueMemberSourceEnum;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
