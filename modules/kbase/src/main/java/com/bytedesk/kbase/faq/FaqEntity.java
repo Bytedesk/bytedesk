@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 13:47:01
+ * @LastEditTime: 2025-04-30 15:07:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,28 +132,18 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     private int downCount = 0;
 
+    // 反馈次数
+    @Builder.Default
+    private int feedbackCount = 0;
+
+    // 转人工次数
+    @Builder.Default
+    private int transferCount = 0;
+
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
     private boolean enabled = true;
-
-    // 是否开启自动同步到llm_qa问答
-    // @Builder.Default
-    // @Column(name = "is_auto_sync_llm_qa")
-    // private boolean autoSyncLlmQa = false;
-
-    // // 是否已经同步llm问答
-    // @Builder.Default
-    // @Column(name = "is_llm_qa_synced")
-    // private boolean llmQaSynced = false;
-
-    // // 同步到llm qa kbUid 
-    // @Column(name = "llm_kb_uid")
-    // private String llmQaKbUid;
-
-    // // 同步到llm qa uid
-    // @Column(name = "llm_qa_uid")
-    // private String llmQaUid;
 
     // 有效开始日期
     @Builder.Default
@@ -199,13 +189,15 @@ public class FaqEntity extends BaseEntity {
         return this.downCount;
     }
 
-    // public void up() {
-    //     this.setUpCount(this.upCount + 1);
-    // }
+    public int increaseFeedbackCount() {
+        this.feedbackCount++;
+        return this.feedbackCount;
+    }
 
-    // public void down() {
-    //     this.setDownCount(this.downCount + 1);
-    // }
+    public int increaseTransferCount() {
+        this.transferCount++;
+        return this.transferCount;
+    }
 
     // set Success
     public FaqEntity setSuccess() {
