@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 11:54:54
+ * @LastEditTime: 2025-04-30 14:25:10
  * @Description: 消息实体抽象基类，用于统一所有消息类型的字段结构
  */
 package com.bytedesk.core.message;
@@ -47,10 +47,12 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
+    // 额外信息，用于存储消息的额外信息
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
+    // 消息来源，用于区分消息是来自web、android还是ios等
     @Builder.Default
     private String client = ClientEnum.WEB.name();
 
