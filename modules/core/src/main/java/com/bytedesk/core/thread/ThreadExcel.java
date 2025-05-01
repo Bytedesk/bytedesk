@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-01 09:10:26
+ * @LastEditTime: 2025-05-01 09:11:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,7 @@ public class ThreadExcel extends BaseExcel {
     private String status;
 
     // client
-    @ExcelProperty(value = "来源")
+    @ExcelProperty(value = "客户端")
     @ColumnWidth(20)
     private String client;
 
