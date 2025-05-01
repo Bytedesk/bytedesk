@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 12:07:18
+ * @LastEditTime: 2025-05-01 09:17:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -194,6 +194,18 @@ public class ThreadSpecification extends BaseSpecification {
             // user 使用 string 存储，此处暂时用like查询
             if (StringUtils.hasText(request.getUserNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));
+            }
+            // agentNickname
+            if (StringUtils.hasText(request.getAgentNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("agent"), "%" + request.getAgentNickname() + "%"));
+            }
+            // robotNickname
+            if (StringUtils.hasText(request.getRobotNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("robot"), "%" + request.getRobotNickname() + "%"));
+            }
+            // workgroupNickname
+            if (StringUtils.hasText(request.getWorkgroupNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("workgroup"), "%" + request.getWorkgroupNickname() + "%"));
             }
             //
             if (StringUtils.hasText(request.getClient())) {
