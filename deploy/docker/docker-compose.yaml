@@ -173,11 +173,11 @@ services:
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
       # ollama
-      # ollama pull qwen2.5:latest
+      # ollama pull qwen3:0.6b
       # ollama pull bge-m3:latest
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
       SPRING_AI_OLLAMA_CHAT_ENABLED: true
-      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen2.5:latest
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen3:0.6b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
       SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
       # 如果主要处理中文内容，推荐使用BGE模型，在中文语义理解上表现更好

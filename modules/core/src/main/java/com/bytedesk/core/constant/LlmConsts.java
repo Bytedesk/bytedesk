@@ -44,7 +44,7 @@ public class LlmConsts {
     // 默认Chat提供商
     public static final String DEFAULT_CHAT_PROVIDER = OLLAMA;
     // 默认Chat模型
-    public static final String DEFAULT_CHAT_MODEL = "qwen2.5:latest";
+    public static final String DEFAULT_CHAT_MODEL = "qwen3:0.6b";
     // 默认Embedding提供商
     public static final String DEFAULT_EMBEDDING_PROVIDER = OLLAMA;
     // 默认Embedding模型
