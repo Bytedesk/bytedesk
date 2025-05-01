@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-01 08:20:55
+ * @LastEditTime: 2025-05-01 09:10:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.thread;
+
+import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -55,9 +57,9 @@ public class ThreadExcel extends BaseExcel {
     @ColumnWidth(20)
     private String client;
 
-    @DateTimeFormat("yyyy年MM月dd日HH时mm分ss秒")
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
-    @ColumnWidth(25)
-    private String createdAt;
+    @ColumnWidth(28)
+    private LocalDateTime createdAt;
 
 }
