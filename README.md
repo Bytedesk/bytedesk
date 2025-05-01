@@ -111,7 +111,7 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 
 ```bash
 # chat model
-ollama pull qwen2.5:latest
+ollama pull qwen3:0.6b
 # embedding model
 ollama pull bge-m3:latest
 # rerank model
@@ -130,7 +130,7 @@ git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker 
 
 ```bash
 # chat model
-docker exec ollama-bytedesk ollama pull qwen2.5:latest
+docker exec ollama-bytedesk ollama pull qwen3:0.6b
 # embedding model
 docker exec ollama-bytedesk ollama pull bge-m3:latest
 # rerank model

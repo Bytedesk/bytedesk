@@ -42,7 +42,7 @@ services:
     volumes:
       - ollama_models:/root/.ollama
     environment:
-      - OLLAMA_MODELS=qwen2.5:latest
+      - OLLAMA_MODELS=qwen3:0.6b
     networks:
       - bytedesk-network
     healthcheck:
