@@ -91,7 +91,7 @@ workgroup_message/
 visitor_message/
 holiday/
 form/
-settings_invite/
-settings_intention/
-settings_ratedown/
-settings_service/
+# settings_invite/
+# settings_intention/
+# settings_ratedown/
+# settings_service/
