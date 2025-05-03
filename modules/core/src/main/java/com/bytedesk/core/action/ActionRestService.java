@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 22:02:53
+ * @LastEditTime: 2025-05-03 10:47:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -107,15 +107,19 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
     
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<ActionEntity> actionOptional = findByUid(uid);
+        if (actionOptional.isPresent()) {
+            ActionEntity action = actionOptional.get();
+            action.setDeleted(true);
+            actionRepository.save(action);
+        }
     }
 
     @Override
     public void delete(ActionRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
+
 
     @Override
     public ActionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ActionEntity entity) {
