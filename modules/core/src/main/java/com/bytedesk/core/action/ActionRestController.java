@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:40:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:00:53
+ * @LastEditTime: 2025-05-03 10:47:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,26 +42,42 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
 
     @Override
     public ResponseEntity<?> queryByUser(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
+        
+        Page<ActionResponse> page = actionRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(ActionRequest request) {
+        
+        ActionResponse action = actionRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(action));
     }
 
     @Override
     public ResponseEntity<?> create(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        ActionResponse action = actionRestService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(action));
     }
 
     @Override
     public ResponseEntity<?> update(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        ActionResponse action = actionRestService.update(request);  
+
+        return ResponseEntity.ok(JsonResult.success(action));
     }
 
     @Override
     public ResponseEntity<?> delete(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        actionRestService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success("ok"));
     }
 
     // https://github.com/alibaba/easyexcel
@@ -79,11 +95,7 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
         );
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     
 }
