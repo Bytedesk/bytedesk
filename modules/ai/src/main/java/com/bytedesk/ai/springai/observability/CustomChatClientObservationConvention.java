@@ -25,6 +25,9 @@ import org.springframework.ai.observation.conventions.AiProvider;
  */
 public class CustomChatClientObservationConvention implements ChatClientObservationConvention {
 
+    // 输出格式的键名常量，替代ChatClientAttributes.OUTPUT_FORMAT.getKey()
+    private static final String OUTPUT_FORMAT_KEY = "spring.ai.chat.client.output.format";
+
     @Override
     public String getName() {
         return "bytedesk.ai.chat.client";
@@ -40,7 +43,7 @@ public class CustomChatClientObservationConvention implements ChatClientObservat
         return KeyValues.of(
                 KeyValue.of("model", getModelInfo(context)),
                 KeyValue.of("provider", getProviderInfo(context)),
-                KeyValue.of("format", context.getFormat() != null ? context.getFormat() : ""),
+                KeyValue.of("format", getFormatFromContext(context)),
                 KeyValue.of("stream", String.valueOf(context.isStream())),
                 KeyValue.of("success", String.valueOf(context.getError() == null))
         );
@@ -53,6 +56,17 @@ public class CustomChatClientObservationConvention implements ChatClientObservat
                 KeyValue.of("operationType", AiOperationType.FRAMEWORK.value()),
                 KeyValue.of("errorMessage", context.getError() != null ? context.getError().getMessage() : "")
         );
+    }
+    
+    // 辅助方法，从上下文中获取格式信息，替代废弃的getFormat()方法和ChatClientAttributes类
+    private String getFormatFromContext(ChatClientObservationContext context) {
+        if (context.getRequest() != null && context.getRequest().context() != null) {
+            Object format = context.getRequest().context().get(OUTPUT_FORMAT_KEY);
+            if (format instanceof String) {
+                return (String) format;
+            }
+        }
+        return "";
     }
     
     // 辅助方法，从上下文中获取模型信息

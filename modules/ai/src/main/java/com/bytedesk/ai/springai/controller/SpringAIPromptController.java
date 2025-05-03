@@ -212,7 +212,11 @@ public class SpringAIPromptController {
 				Generate the filmography for the actor {actor}.
 				{format}
 				""";
-		PromptTemplate promptTemplate = new PromptTemplate(userMessage, Map.of("actor", actor, "format", format));
+		// 使用 builder 模式替换废弃的构造函数
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+				.template(userMessage)
+				.variables(Map.of("actor", actor, "format", format))
+				.build();
 		Prompt prompt = promptTemplate.create();
 
 		String response = bytedeskOllamaChatClient.prompt(prompt)
@@ -249,12 +253,13 @@ public class SpringAIPromptController {
 				{format}
 				"""; // user input with a "format" placeholder.
 		log.info("userInputTemplate: {}", userInputTemplate);
-		// 
+		 // 使用 builder 模式替换废弃的构造函数
 		Prompt prompt = new Prompt(
-				new PromptTemplate(
-						userInputTemplate,
-						Map.of("message", message, "format", outputConverter.getFormat()) // replace the "format"
-				).createMessage());
+				PromptTemplate.builder()
+						.template(userInputTemplate)
+						.variables(Map.of("message", message, "format", outputConverter.getFormat()))
+						.build()
+						.createMessage());
 
 		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
 				.call()
