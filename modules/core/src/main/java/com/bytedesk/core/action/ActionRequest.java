@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
@@ -25,6 +26,7 @@ import lombok.experimental.SuperBuilder;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
+@NoArgsConstructor
 public class ActionRequest extends BaseRequest {
     
     private static final long serialVersionUID = 1L;
@@ -41,12 +43,7 @@ public class ActionRequest extends BaseRequest {
     private String ipLocation;
 
     private String extra;
-    
-    // private ActionTypeEnum type;
-    // private String orgUid;
 
     private String nickname;
 
-    // @Builder.Default
-    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
 }
