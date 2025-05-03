@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -57,7 +58,7 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
     }
 
     @Override
-    public ResponseEntity<?> create(ActionRequest request) {
+    public ResponseEntity<?> create(@RequestBody ActionRequest request) {
         
         ActionResponse action = actionRestService.create(request);
 
@@ -65,7 +66,7 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
     }
 
     @Override
-    public ResponseEntity<?> update(ActionRequest request) {
+    public ResponseEntity<?> update(@RequestBody ActionRequest request) {
         
         ActionResponse action = actionRestService.update(request);  
 
@@ -73,7 +74,7 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
     }
 
     @Override
-    public ResponseEntity<?> delete(ActionRequest request) {
+    public ResponseEntity<?> delete(@RequestBody ActionRequest request) {
         
         actionRestService.delete(request);
 
