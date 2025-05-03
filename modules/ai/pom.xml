@@ -20,7 +20,7 @@
 	<properties>
 		<ollama4j.version>1.0.100</ollama4j.version>
 		<!-- <spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version> -->
-		<spring-ai.version>1.0.0-M7</spring-ai.version>
+		<spring-ai.version>1.0.0-M8</spring-ai.version>
 		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
