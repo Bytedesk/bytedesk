@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-03 10:47:10
+ * @LastEditTime: 2025-05-03 10:56:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.action;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -61,10 +62,10 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(cacheNames = "action", key = "#request.uid", unless = "#result == null")
     @Override
     public Optional<ActionEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return actionRepository.findByUid(uid);
     }
 
     public ActionResponse create(ActionRequest actionRequest) {
@@ -81,7 +82,7 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         }
         ActionEntity savedAction = save(action);
         if (savedAction == null) {
-            // TODO: handle exception
+            throw new RuntimeException("create action failed");
         }
         //
         return convertToResponse(savedAction);
@@ -89,8 +90,15 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
 
     @Override
     public ActionResponse update(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<ActionEntity> actionOptional = findByUid(request.getUid());
+        if (actionOptional.isPresent()) {
+            ActionEntity action = actionOptional.get();
+            modelMapper.map(request, action);
+            // 
+            ActionEntity savedAction = save(action);
+            return convertToResponse(savedAction);
+        }
+        return null;
     }
     
     @Override
@@ -111,7 +119,7 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         if (actionOptional.isPresent()) {
             ActionEntity action = actionOptional.get();
             action.setDeleted(true);
-            actionRepository.save(action);
+            save(action);
         }
     }
 

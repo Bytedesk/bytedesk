@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:40:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-30 16:10:00
+ * @LastEditTime: 2025-05-03 10:57:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,12 @@
  */
 package com.bytedesk.core.action;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ActionRepository extends JpaRepository<ActionEntity, Long>, JpaSpecificationExecutor<ActionEntity> {
 
+    Optional<ActionEntity> findByUid(String uid);
 }
