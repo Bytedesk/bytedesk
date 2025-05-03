@@ -57,7 +57,9 @@ public class SpringAIOllamaConfig {
     @Bean("bytedeskOllamaApi")
     @ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
     OllamaApi bytedeskOllamaApi() {
-        return new OllamaApi(ollamaBaseUrl);
+        return OllamaApi.builder()
+                .baseUrl(ollamaBaseUrl)
+                .build();
     }
 
     @Bean("bytedeskOllamaChatOptions")
