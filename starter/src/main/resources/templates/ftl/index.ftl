@@ -54,7 +54,7 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/service" class="stretched-link" target="_blank">在线客服</a></h5>
-					<span class="mb-0">AI客服助手，AI意图识别，AI智能质检、支持人工坐席兜底，数十项在线客服通用功能。
+					<span class="mb-0">聚合多渠道、多账号，智能路由，AI意图识别，AI智能质检、支持人工坐席兜底，数十项在线客服通用功能。
 						来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
 					</span>
 				</div>
