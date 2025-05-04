@@ -13,14 +13,6 @@
  */
 package com.bytedesk.ai.utils.advisor;
 
-import org.springframework.ai.chat.client.ChatClientRequest;
-import org.springframework.ai.chat.client.ChatClientResponse;
-import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
-import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisorChain;
-import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
-import org.springframework.ai.chat.client.advisor.api.StreamAroundAdvisorChain;
-
-import reactor.core.publisher.Flux;
 
 /**
  * Re-Reading (Re2) Advisor
@@ -28,8 +20,6 @@ import reactor.core.publisher.Flux;
  * https://arxiv.org/pdf/2309.06275
  */
 // public class ReReadingAdvisor implements CallAdvisor, StreamAdvisor {
-
-	
 
 // 	@Override
 // 	public int getOrder() { 

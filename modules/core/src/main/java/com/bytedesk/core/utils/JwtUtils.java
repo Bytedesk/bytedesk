@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:14:22
+ * @LastEditTime: 2025-05-04 16:28:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,6 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson2.JSON;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -50,7 +48,7 @@ public class JwtUtils {
   public String generateJwtToken(String username, String platform) {
     JwtSubject jwtSubject = new JwtSubject(username.toLowerCase(), platform.toLowerCase());
     return Jwts.builder()
-        .subject(JSON.toJSONString(jwtSubject))
+        .subject(jwtSubject.toJson())
         .issuedAt(new Date())
         .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
         // .signWith(key(), SignatureAlgorithm.HS256)
@@ -60,6 +58,7 @@ public class JwtUtils {
 
   public boolean validateJwtToken(String authToken) {
     try {
+      // 这一步会验证token的签名和过期时间，如果token已过期会抛出ExpiredJwtException
       Jwts.parser()
           // .setSigningKey(key())
           .verifyWith(secretKey())
