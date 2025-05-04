@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 13:18:14
+ * @LastEditTime: 2025-05-04 11:36:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadTypeEnum;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse> {
+public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse, QueueMemberExcel> {
 
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;
@@ -46,10 +46,15 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
     private final AuthService authService;
 
     @Override
-    public Page<QueueMemberResponse> queryByOrg(QueueMemberRequest request) {
+    public Page<QueueMemberEntity> queryByOrgEntity(QueueMemberRequest request) {
         Pageable pageable = request.getPageable();
         Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
-        Page<QueueMemberEntity> page = queueMemberRepository.findAll(specification, pageable);
+        return queueMemberRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<QueueMemberResponse> queryByOrg(QueueMemberRequest request) {
+        Page<QueueMemberEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -149,20 +154,35 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
 
     @Override
     public QueueMemberResponse update(QueueMemberRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<QueueMemberEntity> optional = findByUid(request.getUid());
+        if (!optional.isPresent()) {
+            throw new RuntimeException("queue member not found");
+        }
+        QueueMemberEntity entity = optional.get();
+        // 更新实体属性
+        // entity.setQueueNumber(request.getQueueNumber());
+
+        QueueMemberEntity savedCounter = save(entity);
+        if (savedCounter == null) {
+            throw new RuntimeException("save counter failed");
+        }
+        return convertToResponse(savedCounter);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<QueueMemberEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("queue member not found");
+        }
+        QueueMemberEntity entity = optional.get();
+        entity.setDeleted(true);
+        save(entity);
     }
 
     @Override
     public void delete(QueueMemberRequest entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(entity.getUid());
     }
 
     public void deleteAll() {
@@ -186,10 +206,33 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         return response;
     }
 
-    public QueueMemberExcel convertToExcel(QueueMemberResponse response) {
+    /**
+     * 将LocalDateTime转换为易于阅读的字符串格式
+     */
+    private String formatLocalDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        return dateTime.toString().replace("T", " ").split("\\.")[0];
+    }
+    
+    /**
+     * 将Boolean转换为"是"或"否"
+     */
+    private String booleanToString(Boolean value) {
+        if (value == null) {
+            return null;
+        }
+        return value ? "是" : "否";
+    }
+
+    
+
+    @Override
+    public QueueMemberExcel convertToExcel(QueueMemberEntity entity) {
+        QueueMemberResponse response = convertToResponse(entity);
         QueueMemberExcel excel = new QueueMemberExcel();
-        
-        // 基本信息
+           // 基本信息
         if (response.getQueue() != null) {
             excel.setQueueNickname(response.getQueue().getNickname());
         }
@@ -261,25 +304,6 @@ public class QueueMemberRestService extends BaseRestService<QueueMemberEntity, Q
         // excel.setEmotionType(response.getEmotionType());
         
         return excel;
-    }
-    
-    /**
-     * 将LocalDateTime转换为易于阅读的字符串格式
-     */
-    private String formatLocalDateTime(LocalDateTime dateTime) {
-        if (dateTime == null) {
-            return null;
-        }
-        return dateTime.toString().replace("T", " ").split("\\.")[0];
-    }
-    
-    /**
-     * 将Boolean转换为"是"或"否"
-     */
-    private String booleanToString(Boolean value) {
-        if (value == null) {
-            return null;
-        }
-        return value ? "是" : "否";
+
     }
 }
