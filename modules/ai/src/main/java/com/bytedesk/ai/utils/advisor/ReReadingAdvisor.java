@@ -27,29 +27,29 @@ import reactor.core.publisher.Flux;
  * https://docs.spring.io/spring-ai/reference/api/advisors.html#_re_reading_re2_advisor
  * https://arxiv.org/pdf/2309.06275
  */
-public class ReReadingAdvisor implements CallAdvisor, StreamAdvisor {
+// public class ReReadingAdvisor implements CallAdvisor, StreamAdvisor {
 
 	
 
-	@Override
-	public int getOrder() { 
-		return 0;
-	}
+// 	@Override
+// 	public int getOrder() { 
+// 		return 0;
+// 	}
 
-    @Override
-    public String getName() { 
-		return this.getClass().getSimpleName();
-	}
+//     @Override
+//     public String getName() { 
+// 		return this.getClass().getSimpleName();
+// 	}
 
-	@Override
-	public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAroundAdvisorChain chain) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'adviseStream'");
-	}
+// 	@Override
+// 	public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAroundAdvisorChain chain) {
+// 		// TODO Auto-generated method stub
+// 		throw new UnsupportedOperationException("Unimplemented method 'adviseStream'");
+// 	}
 
-	@Override
-	public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAroundAdvisorChain chain) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'adviseCall'");
-	}
-}
+// 	@Override
+// 	public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAroundAdvisorChain chain) {
+// 		// TODO Auto-generated method stub
+// 		throw new UnsupportedOperationException("Unimplemented method 'adviseCall'");
+// 	}
+// }
