@@ -81,14 +81,14 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message, 
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
-        // 创建qaAdvisor
-        var qaAdvisor = new QuestionAnswerAdvisor(
-                this.ollamaRedisVectorStore,
-                SearchRequest.builder()
+        // 创建qaAdvisor - 使用构建器模式替代已弃用的构造函数
+        var qaAdvisor = QuestionAnswerAdvisor.builder(this.ollamaRedisVectorStore)
+                .searchRequest(SearchRequest.builder()
                         .similarityThreshold(0.8d)
                         // .filterExpression(expression)
                         .topK(6)
-                        .build());
+                        .build())
+                .build();
         // 使用chatClient，添加ObservationRegistry
         ChatResponse response = ChatClient.builder(ollamaChatModel.get(), observationRegistry, null)
                 .build()
@@ -111,8 +111,9 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         ChatClient chatClient = ChatClient.builder(ollamaChatModel.get())
-                .defaultAdvisors(new QuestionAnswerAdvisor(ollamaRedisVectorStore,
-                        SearchRequest.builder().build()))
+                .defaultAdvisors(QuestionAnswerAdvisor.builder(ollamaRedisVectorStore)
+                        .searchRequest(SearchRequest.builder().build())
+                        .build())
                 .build();
 
         // Update filter expression at runtime
