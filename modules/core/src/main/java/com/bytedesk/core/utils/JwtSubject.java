@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-13 13:41:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-13 13:41:26
+ * @LastEditTime: 2025-05-04 16:27:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,14 +13,25 @@
  */
 package com.bytedesk.core.utils;
 
+import java.io.Serializable;
+
+import com.alibaba.fastjson2.JSON;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class JwtSubject {
+public class JwtSubject implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     
     private String username;
 
     private String platform;
+
+    // to json
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
 }
