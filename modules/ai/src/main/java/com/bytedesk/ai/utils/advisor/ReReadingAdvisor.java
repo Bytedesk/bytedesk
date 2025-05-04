@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 10:30:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-13 10:31:12
+ * @LastEditTime: 2025-05-04 08:56:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,14 +13,11 @@
  */
 package com.bytedesk.ai.utils.advisor;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
-import org.springframework.ai.chat.client.advisor.api.AdvisedResponse;
-import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisor;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisorChain;
-import org.springframework.ai.chat.client.advisor.api.StreamAroundAdvisor;
+import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
 import org.springframework.ai.chat.client.advisor.api.StreamAroundAdvisorChain;
 
 import reactor.core.publisher.Flux;
@@ -30,31 +27,9 @@ import reactor.core.publisher.Flux;
  * https://docs.spring.io/spring-ai/reference/api/advisors.html#_re_reading_re2_advisor
  * https://arxiv.org/pdf/2309.06275
  */
-public class ReReadingAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
+public class ReReadingAdvisor implements CallAdvisor, StreamAdvisor {
 
-	private AdvisedRequest before(AdvisedRequest advisedRequest) { 
-
-		Map<String, Object> advisedUserParams = new HashMap<>(advisedRequest.userParams());
-		advisedUserParams.put("re2_input_query", advisedRequest.userText());
-
-		return AdvisedRequest.from(advisedRequest)
-			.userText("""
-			    {re2_input_query}
-			    Read the question again: {re2_input_query}
-			    """)
-			.userParams(advisedUserParams)
-			.build();
-	}
-
-	@Override
-	public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) { 
-		return chain.nextAroundCall(this.before(advisedRequest));
-	}
-
-	@Override
-	public Flux<AdvisedResponse> aroundStream(AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) { 
-		return chain.nextAroundStream(this.before(advisedRequest));
-	}
+	
 
 	@Override
 	public int getOrder() { 
@@ -64,5 +39,17 @@ public class ReReadingAdvisor implements CallAroundAdvisor, StreamAroundAdvisor 
     @Override
     public String getName() { 
 		return this.getClass().getSimpleName();
+	}
+
+	@Override
+	public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAroundAdvisorChain chain) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'adviseStream'");
+	}
+
+	@Override
+	public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAroundAdvisorChain chain) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'adviseCall'");
 	}
 }
