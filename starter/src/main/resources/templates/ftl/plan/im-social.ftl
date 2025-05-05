@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>社交IM - 对话即服务 - 企业IM、在线客服、AI客服、知识库AI问答</title>
+	<title>社交IM - 重复工作自动化 - 企业IM、在线客服、AI客服、知识库AI问答</title>
 
 	<#--  Header  -->
 	<#include "/plan/common/header_meta.ftl" />

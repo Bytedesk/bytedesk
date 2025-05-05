@@ -7,7 +7,7 @@
 			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/">
 				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="logo">  -->
-				<h5>微语 - 对话即服务</h5>
+				<h5>微语 - 重复工作自动化</h5>
 				<#--  重复工作自动化/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
 			<!-- Logo END -->
