@@ -57,9 +57,9 @@
                 const config = await response.json();
                 console.log('config:', config?.data);
                 if (config?.data?.custom?.enabled) {
-                    document.title = config?.data?.custom?.name || '微语'
+                    document.title = config?.data?.custom?.name || '全渠道云客服平台'
                 } else {
-                    document.title = '微语'
+                    document.title = '全渠道云客服平台'
                 }
                 // 获取当前语言
                 // const lang = getUrlParam('lang') || 'zh-cn';

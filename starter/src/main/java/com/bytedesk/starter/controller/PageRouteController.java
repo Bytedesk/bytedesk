@@ -39,10 +39,10 @@ public class PageRouteController {
 	 */
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
-		model.addAttribute("title", "微语首页");
-		model.addAttribute("chatUrl", "/chat/home");
-		return "home";
-		// return "quanjing";
+		// model.addAttribute("title", "微语首页");
+		// model.addAttribute("chatUrl", "/chat/home");
+		// return "home";
+		return "quanjing";
 	}
 
 	/**
