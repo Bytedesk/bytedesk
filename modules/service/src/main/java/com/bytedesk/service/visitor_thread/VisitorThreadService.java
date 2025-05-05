@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 18:00:58
+ * @LastEditTime: 2025-05-05 10:52:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -284,7 +284,7 @@ public class VisitorThreadService
                 threadRestService.autoClose(thread);
             }
 
-            // TODO: 查询超时未回复会话, 发送会话超时提醒。
+            // 查询超时未回复会话, 发送会话超时提醒。
             // FIXME: 当前消息会一起推送给访客，去掉
             // UserProtobuf agentProtobuf = thread.getAgentProtobuf();
             // if (agentProtobuf != null && StringUtils.hasText(agentProtobuf.getUid())) {
@@ -293,38 +293,32 @@ public class VisitorThreadService
             //         AgentEntity agent = agentOpt.get();
             //         // 判断是否超时未回复
             //         if (diffInMinutes > agent.getTimeoutRemindTime()) {
-            //             // 发送会话超时提醒
-            //             MessageProtobuf messageProtobuf = MessageUtils.createTimeoutRemindMessage(thread,
-            //                     agent.getTimeoutRemindTip());
-            //             messageSendService.sendProtobufMessage(messageProtobuf);
             //             // 更新会话超时提醒时间
             //             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
             //                     .findByThreadUid(thread.getUid());
             //             if (queueMemberOpt.isPresent()) {
             //                 QueueMemberEntity queueMember = queueMemberOpt.get();
-            //                 // 只设置首次超时时间，后续不再更新
-            //                 if (queueMember.getAgentTimeoutAt() == null) {
-            //                     queueMember.setAgentTimeoutAt(LocalDateTime.now());
-            //                     queueMember.setAgentTimeout(true);
+            //                 // 判断是否首次超时
+            //                 if (!queueMember.isAgentTimeout()) {
+            //                     // 只设置首次超时时间，后续不再更新
+            //                     if (queueMember.getAgentTimeoutAt() == null) {
+            //                         queueMember.setAgentTimeoutAt(LocalDateTime.now());
+            //                         queueMember.setAgentTimeout(true);
+            //                     }
+            //                     // 更新超时次数
+            //                     queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
+            //                     // 保存队列成员信息
+            //                     queueMemberRestService.save(queueMember);
+            //                     // 发送会话超时提醒
+            //                     MessageProtobuf messageProtobuf = MessageUtils.createTimeoutRemindMessage(thread,
+            //                             agent.getTimeoutRemindTip());
+            //                     messageSendService.sendProtobufMessage(messageProtobuf);
             //                 }
-            //                 // 更新超时次数
-            //                 queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
-            //                 // 保存队列成员信息
-            //                 queueMemberRestService.save(queueMember);
             //             }
             //         }
             //     }
             // }
         });
-    }
-
-    @Override
-    public VisitorThreadEntity save(VisitorThreadEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
     }
 
     @Override

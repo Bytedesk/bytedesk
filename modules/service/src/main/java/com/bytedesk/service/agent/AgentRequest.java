@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:16:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:45:20
+ * @LastEditTime: 2025-05-05 10:54:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,8 +83,14 @@ public class AgentRequest extends BaseRequest {
     // @Builder.Default
     // private InviteSettings inviteSettings = new InviteSettings();
 
+    
+
     @Builder.Default
     private Integer maxThreadCount = 10;
+
+    // 是否开启超时提醒
+    @Builder.Default
+    private Boolean timeoutRemindEnabled = false;
 
     @Builder.Default
     private Integer timeoutRemindTime = 5;
