@@ -9,12 +9,12 @@
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh-CN</language>
         <item>
-            <title><![CDATA[全渠道云客服平台对接大模型Qwen3指南]]></title>
+            <title><![CDATA[微语对接大模型Qwen3指南]]></title>
             <link>https://www.weiyuai.cn/docs/zh-CN/blog/qwen3</link>
             <guid>https://www.weiyuai.cn/docs/zh-CN/blog/qwen3</guid>
             <pubDate>Wed, 30 Apr 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[在本篇博客中，我们将介绍如何将全渠道云客服平台客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。]]></description>
-            <content:encoded><![CDATA[<p>在本篇博客中，我们将介绍如何将全渠道云客服平台客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。</p>
+            <description><![CDATA[在本篇博客中，我们将介绍如何将微语客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。]]></description>
+            <content:encoded><![CDATA[<p>在本篇博客中，我们将介绍如何将微语客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。</p>
 <h2 class="anchor anchorWithStickyNavbar_VsMM" id="qwen3大模型介绍">Qwen3大模型介绍<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#qwen3%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D" class="hash-link" aria-label="Qwen3大模型介绍的直接链接" title="Qwen3大模型介绍的直接链接">​</a></h2>
 <p>通义千问Qwen3是阿里云推出的大型语言模型，具有强大的理解能力和生成能力。Qwen3系列模型在多轮对话、文本生成、问答解析等方面表现出色，非常适合客服场景应用。</p>
 <p>Qwen3是千问系列大语言模型的最新一代，提供了全面的稠密模型和混合专家模型（Mixture-of-Experts，MoE）。您可以访问<a href="https://ollama.com/library/qwen3" target="_blank" rel="noopener noreferrer">Ollama官方库</a>获取更多详细信息。</p>
@@ -52,11 +52,11 @@
 <p>确保Ollama服务正在运行：</p>
 <div class="language-bash codeBlockContainer_L7ux theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_jCTj"><pre tabindex="0" class="prism-code language-bash codeBlock_r3IR thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_mPkQ"><span class="token-line" style="color:#393A34"><span class="token plain"># 在某些系统上，安装后会自动启动服务</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># 如果没有自动启动，请使用以下命令</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama serve</span><br></span></code></pre><div class="buttonGroup_nEdo"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_uvEQ" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon__41q"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_UAYa"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <p>默认情况下，Ollama服务会在<code>http://localhost:11434</code>端口运行。</p>
-<h2 class="anchor anchorWithStickyNavbar_VsMM" id="二在全渠道云客服平台管理后台设置qwen3对话模型">二、在全渠道云客服平台管理后台设置Qwen3对话模型<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#%E4%BA%8C%E5%9C%A8%E5%85%A8%E6%B8%A0%E9%81%93%E4%BA%91%E5%AE%A2%E6%9C%8D%E5%B9%B3%E5%8F%B0%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E8%AE%BE%E7%BD%AEqwen3%E5%AF%B9%E8%AF%9D%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="二、在全渠道云客服平台管理后台设置Qwen3对话模型的直接链接" title="二、在全渠道云客服平台管理后台设置Qwen3对话模型的直接链接">​</a></h2>
-<p>完成Ollama和Qwen3模型的安装后，我们需要在全渠道云客服平台管理后台进行配置：</p>
-<h3 class="anchor anchorWithStickyNavbar_VsMM" id="1-登录全渠道云客服平台管理后台">1. 登录全渠道云客服平台管理后台<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#1-%E7%99%BB%E5%BD%95%E5%85%A8%E6%B8%A0%E9%81%93%E4%BA%91%E5%AE%A2%E6%9C%8D%E5%B9%B3%E5%8F%B0%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0" class="hash-link" aria-label="1. 登录全渠道云客服平台管理后台的直接链接" title="1. 登录全渠道云客服平台管理后台的直接链接">​</a></h3>
-<p>访问您的全渠道云客服平台管理后台，输入账号和密码登录系统。</p>
-<h3 class="anchor anchorWithStickyNavbar_VsMM" id="2-导航到ai设置">2. 导航到AI设置<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#2-%E5%AF%BC%E8%88%AA%E5%88%B0ai%E8%AE%BE%E7%BD%AE" class="hash-link" aria-label="2. 导航到AI设置的直接链接" title="2. 导航到AI设置的直接链接">​</a></h3>
+<h2 class="anchor anchorWithStickyNavbar_VsMM" id="二在微语管理后台设置qwen3对话模型">二、在微语管理后台设置Qwen3对话模型<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#%E4%BA%8C%E5%9C%A8%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E8%AE%BE%E7%BD%AEqwen3%E5%AF%B9%E8%AF%9D%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="二、在微语管理后台设置Qwen3对话模型的直接链接" title="二、在微语管理后台设置Qwen3对话模型的直接链接">​</a></h2>
+<p>完成Ollama和Qwen3模型的安装后，我们需要在微语管理后台进行配置：</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="1-登录微语管理后台">1. 登录微语管理后台<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#1-%E7%99%BB%E5%BD%95%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0" class="hash-link" aria-label="1. 登录微语管理后台的直接链接" title="1. 登录微语管理后台的直接链接">​</a></h3>
+<p>访问您的微语管理后台，输入账号和密码登录系统。</p>
+<h3 class="anchor anchorWithStickyNavbar_VsMM" id="2-导航到ai设置">2. 导航到AI设置<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#2-%E5%AF%BC%E8%88%AA%E5%88%B0ai%E8%AE%BE%E7%BD%AE" class="hash-link" aria-label="2. 导航到AI设置的直接链接" title="2. 导航到AI设��置的直接链接">​</a></h3>
 <p>在左侧导航栏中，找到并点击"AI助手"-&gt;"机器人"选项。</p>
 <p><img decoding="async" loading="lazy" alt="导航到AI设置" src="https://www.weiyuai.cn/docs/zh-CN/assets/images/qwen3_1-35b801bc6ec7a2e3840fd179f626456c.png" width="3196" height="1748" class="img_mZKk">
 <em>图1：导航到AI设置</em></p>
@@ -98,11 +98,11 @@
 <h3 class="anchor anchorWithStickyNavbar_VsMM" id="3-结合人工审核">3. 结合人工审核<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#3-%E7%BB%93%E5%90%88%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8" class="hash-link" aria-label="3. 结合人工审核的直接链接" title="3. 结合人工审核的直接链接">​</a></h3>
 <p>设置人工干预机制，对AI无法准确回答的问题进行人工接管，并将这些案例记录下来用于进一步训练和优化。</p>
 <h2 class="anchor anchorWithStickyNavbar_VsMM" id="总结">总结<a href="https://www.weiyuai.cn/docs/zh-CN/blog/qwen3#%E6%80%BB%E7%BB%93" class="hash-link" aria-label="总结的直接链接" title="总结的直接链接">​</a></h2>
-<p>通过将全渠道云客服平台客服系统与通义千问Qwen3大模型对接，您可以显著提升客服自动化水平和用户体验。本指南详细介绍了从安装Ollama、配置Qwen3模型到实际应用的完整流程。</p>
+<p>通过将微语客服系统与通义千问Qwen3大模型对接，您可以显著提升客服自动化水平和用户体验。本指南详细介绍了从安装Ollama、配置Qwen3模型到实际应用的完整流程。</p>
 <p>随着您不断优化提示词和积累领域知识库，AI助手的表现会越来越符合您的业务需求，为客户提供更加专业、高效的服务体验。</p>
 <p>如有任何问题或需要进一步的技术支持，请随时联系我们的技术团队。</p>
 <hr>
-<p>希望本指南对您成功部署和使用全渠道云客服平台+Qwen3智能客服系统有所帮助！</p>]]></content:encoded>
+<p>希望本指南对您成功部署和使用微语+Qwen3智能客服系统有所帮助！</p>]]></content:encoded>
             <category>Developer</category>
             <category>Bytedesk</category>
             <category>AI</category>
