@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:33:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 18:16:12
+ * @LastEditTime: 2025-05-06 12:46:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ public enum MessageStatusEnum {
     LEAVE_MSG_REPLIED, // 留言已回复
     RATE_SUBMIT, // 提交会话评价
     RATE_CANCEL, // 取消会话评价
+    RATE_PENDING, // 未评价
     RATE_UP, // 评价消息up
     RATE_DOWN, // 评价消息down
     RATE_FEEDBACK, // 评价消息feedback
