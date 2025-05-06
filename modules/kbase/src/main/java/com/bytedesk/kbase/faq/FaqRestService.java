@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 17:45:36
+ * @LastEditTime: 2025-05-06 21:45:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -560,14 +560,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .build();
                     // 保存FAQ到数据库
                     create(request);
-                    //
-                    // QaRequest qaRequest = QaRequest.builder()
-                    //         .question(faq.getQuestion())
-                    //         .answer(faq.getAnswer())
-                    //         .kbUid(llmQaKbUid)
-                    //         .orgUid(orgUid)
-                    //         .build();
-                    // qaRestService.create(qaRequest);
                 } else {
                     // log.info("FAQ already exists: {}", faq.getUid());
                 }
@@ -580,57 +572,57 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         }
     }
 
-    @Transactional
-    public void initRelationFaqs(String orgUid, String kbUid) {
-        try {
-            // 加载JSON文件中的FAQ数据
-            FaqConfiguration config = faqJsonLoader.loadFaqs();
+    // @Transactional
+    // public void initRelationFaqs(String orgUid, String kbUid) {
+    //     try {
+    //         // 加载JSON文件中的FAQ数据
+    //         FaqConfiguration config = faqJsonLoader.loadFaqs();
 
-            // 创建5个示例多答案数据
-            List<FaqAnswer> answerList = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
-                FaqAnswer answer = new FaqAnswer();
-                answer.setVipLevel("" + i);
-                answer.setAnswer("VIP " + i + " 专属回答：这是针对不同会员等级的答案示例");
-                answerList.add(answer);
-            }
+    //         // 创建5个示例多答案数据
+    //         List<FaqAnswer> answerList = new ArrayList<>();
+    //         for (int i = 1; i <= 5; i++) {
+    //             FaqAnswer answer = new FaqAnswer();
+    //             answer.setVipLevel("" + i);
+    //             answer.setAnswer("VIP " + i + " 专属回答：这是针对不同会员等级的答案示例");
+    //             answerList.add(answer);
+    //         }
 
-            // 准备5个相关问题的UID列表
-            List<String> relatedFaqUids = new ArrayList<>();
-            for (int i = 5; i < 10; i++) {
-                String relatedUid = Utils.formatUid(orgUid, "faq_00" + i);
-                relatedFaqUids.add(relatedUid);
-            }
+    //         // 准备5个相关问题的UID列表
+    //         List<String> relatedFaqUids = new ArrayList<>();
+    //         for (int i = 5; i < 10; i++) {
+    //             String relatedUid = Utils.formatUid(orgUid, "faq_00" + i);
+    //             relatedFaqUids.add(relatedUid);
+    //         }
 
-            int count = 0;
-            // 遍历并保存每个FAQ
-            for (Faq faq : config.getFaqs()) {
-                String uid = Utils.formatUid(orgUid, faq.getUid());
-                // 构建FAQ请求
-                FaqRequest request = FaqRequest.builder()
-                        .uid(uid)
-                        .question(faq.getQuestion())
-                        .answer(faq.getAnswer())
-                        .type(MessageTypeEnum.TEXT.name())
-                        .enabled(true)
-                        .kbUid(kbUid)
-                        .orgUid(orgUid)
-                        .build();
-                // 为部分FAQ添加多答案和相关问题
-                if (count < 5) {
-                    request.setAnswerList(answerList);
-                    request.setRelatedFaqUids(relatedFaqUids);
-                }
-                update(request);
-                count++;
-            }
+    //         int count = 0;
+    //         // 遍历并保存每个FAQ
+    //         for (Faq faq : config.getFaqs()) {
+    //             String uid = Utils.formatUid(orgUid, faq.getUid());
+    //             // 构建FAQ请求
+    //             FaqRequest request = FaqRequest.builder()
+    //                     .uid(uid)
+    //                     .question(faq.getQuestion())
+    //                     .answer(faq.getAnswer())
+    //                     .type(MessageTypeEnum.TEXT.name())
+    //                     .enabled(true)
+    //                     .kbUid(kbUid)
+    //                     .orgUid(orgUid)
+    //                     .build();
+    //             // 为部分FAQ添加多答案和相关问题
+    //             if (count < 5) {
+    //                 request.setAnswerList(answerList);
+    //                 request.setRelatedFaqUids(relatedFaqUids);
+    //             }
+    //             update(request);
+    //             count++;
+    //         }
 
-            log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
-        } catch (Exception e) {
-            log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to initialize FAQ relations", e);
-        }
-    }
+    //         log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
+    //     } catch (Exception e) {
+    //         log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);
+    //         throw new RuntimeException("Failed to initialize FAQ relations", e);
+    //     }
+    // }
 
     public static MessageEntity getFaqQuestionMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
         // 
