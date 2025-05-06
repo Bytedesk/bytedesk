@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-21 22:26:10
+ * @LastEditTime: 2025-05-06 13:56:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ public class MemberExcel {
     @ColumnWidth(20)
     private String seatNo;
 
-    @ExcelProperty(index = 6, value = "电话")
+    @ExcelProperty(index = 6, value = "分机号")
     @ColumnWidth(20)
     private String telephone;
     
