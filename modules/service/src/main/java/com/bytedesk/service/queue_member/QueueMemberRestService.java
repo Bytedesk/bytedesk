@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 15:32:18
+ * @LastEditTime: 2025-05-06 15:52:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -237,40 +237,20 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
             excel.setClient(ClientEnum.fromValue(response.getThread().getClient()).toChineseDisplay());
         }
         
-        // 排队信息
-        // excel.setQueueNumber(response.getQueueNumber());
-        // excel.setBeforeNumber(0); // 需要计算或者从别处获取
-        // excel.setWaitTime(response.getWaitTime());
-        // excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
-        
-        // 时间处理
-        // excel.setEnqueueTime(formatLocalDateTime(response.getVisitorEnqueueTime()));
-        // excel.setVisitorFirstMessageTime(formatLocalDateTime(response.getVisitorFirstMessageTime()));
-        // excel.setVisitorLastMessageTime(formatLocalDateTime(response.getVisitorLastMessageTime()));
-        // excel.setLeaveTime(formatLocalDateTime(response.getVisitorLeaveTime()));
-        
         // 人工客服相关
-        // excel.setAgentAcceptType(response.getAgentAcceptType());
-        // excel.setAgentAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
-        // excel.setAgentFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
-        // excel.setAgentLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
-        // excel.setCloseTime(formatLocalDateTime(response.getAgentCloseTime()));
-        // excel.setAvgResponseTime(response.getAgentAvgResponseTime());
-        // excel.setMaxResponseTime(response.getAgentMaxResponseTime());
-        // excel.setAgentMessageCount(response.getAgentMessageCount());
-        // excel.setTimeout(booleanToString(response.getAgentTimeout()));
+        if (response.getAgentAcceptType() != null) {
+            excel.setAgentAcceptType(QueueMemberAcceptTypeEnum.fromValue(response.getAgentAcceptType()).toChineseDisplay());
+        } else {
+            excel.setAgentAcceptType(null);
+        }
         excel.setAgentOffline(booleanToString(response.getAgentOffline()));
         
         // 机器人相关
-        // excel.setRobotAcceptType(response.getRobotAcceptType());
-        // excel.setRobotAcceptTime(formatLocalDateTime(response.getRobotAcceptTime()));
-        // excel.setRobotFirstResponseTime(formatLocalDateTime(response.getRobotFirstResponseTime()));
-        // excel.setRobotLastResponseTime(formatLocalDateTime(response.getRobotLastResponseTime()));
-        // excel.setRobotCloseTime(formatLocalDateTime(response.getRobotCloseTime()));
-        // excel.setRobotAvgResponseTime(response.getRobotAvgResponseTime());
-        // excel.setRobotMaxResponseTime(response.getRobotMaxResponseTime());
-        // excel.setRobotMessageCount(response.getRobotMessageCount());
-        // excel.setRobotTimeout(booleanToString(response.getRobotTimeout()));
+        if (response.getRobotAcceptType() != null) {
+            excel.setRobotAcceptType(QueueMemberAcceptTypeEnum.fromValue(response.getRobotAcceptType()).toChineseDisplay());
+        } else {
+            excel.setRobotAcceptType(null);
+        }
         excel.setRobotToAgent(booleanToString(response.getRobotToAgent()));
         
         // 消息统计
