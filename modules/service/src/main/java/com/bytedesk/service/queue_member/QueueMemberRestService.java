@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-04 11:36:20
+ * @LastEditTime: 2025-05-06 14:35:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -231,7 +231,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     @Override
     public QueueMemberExcel convertToExcel(QueueMemberEntity entity) {
         QueueMemberResponse response = convertToResponse(entity);
-        QueueMemberExcel excel = new QueueMemberExcel();
+        // QueueMemberExcel excel = new QueueMemberExcel();
+        QueueMemberExcel excel = modelMapper.map(response, QueueMemberExcel.class);
            // 基本信息
         if (response.getQueue() != null) {
             excel.setQueueNickname(response.getQueue().getNickname());
@@ -241,7 +242,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         if (response.getThread() != null) {
             excel.setVisitorNickname(response.getThread().getUser().getNickname());
             excel.setAgentNickname(response.getThread().getAgentProtobuf().getNickname());
-            excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
+            // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
             excel.setClient(response.getThread().getClient());
         }
         
@@ -271,9 +272,9 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         
         // 机器人相关
         excel.setRobotAcceptType(response.getRobotAcceptType());
-        excel.setRobotAcceptTime(formatLocalDateTime(response.getRobotAcceptTime()));
-        excel.setRobotFirstResponseTime(formatLocalDateTime(response.getRobotFirstResponseTime()));
-        excel.setRobotLastResponseTime(formatLocalDateTime(response.getRobotLastResponseTime()));
+        // excel.setRobotAcceptTime(formatLocalDateTime(response.getRobotAcceptTime()));
+        // excel.setRobotFirstResponseTime(formatLocalDateTime(response.getRobotFirstResponseTime()));
+        // excel.setRobotLastResponseTime(formatLocalDateTime(response.getRobotLastResponseTime()));
         // excel.setRobotCloseTime(formatLocalDateTime(response.getRobotCloseTime()));
         // excel.setRobotAvgResponseTime(response.getRobotAvgResponseTime());
         // excel.setRobotMaxResponseTime(response.getRobotMaxResponseTime());

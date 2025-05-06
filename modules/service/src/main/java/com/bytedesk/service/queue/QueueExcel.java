@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 21:47:55
+ * @LastEditTime: 2025-05-06 14:26:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,11 +28,11 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 public class QueueExcel extends BaseExcel {
 
-    @ExcelProperty(value = "队列名称")
+    @ExcelProperty(value = "监控名称")
     @ColumnWidth(20)
     private String nickname;
 
-    @ExcelProperty(value = "队列类型")
+    @ExcelProperty(value = "监控类型")
     @ColumnWidth(15)
     private String type;
 
@@ -40,23 +40,23 @@ public class QueueExcel extends BaseExcel {
     // @ColumnWidth(20)
     // private String topic;
 
-    @ExcelProperty(value = "队列日期")
+    @ExcelProperty(value = "日期")
     @ColumnWidth(15)
     private String day;
 
-    @ExcelProperty(value = "队列状态")
-    @ColumnWidth(15)
-    private String status;
+    // @ExcelProperty(value = "队列状态")
+    // @ColumnWidth(15)
+    // private String status;
 
-    @ExcelProperty(value = "今日请求服务人数")
+    @ExcelProperty(value = "总请求数")
     @ColumnWidth(25)
     private Integer totalCount;
 
-    @ExcelProperty(value = "机器人服务中人次")
+    @ExcelProperty(value = "机器人对话中")
     @ColumnWidth(25)
     private Integer robotingCount;
 
-    @ExcelProperty(value = "客服离线人次")
+    @ExcelProperty(value = "离线留言")
     @ColumnWidth(20)
     private Integer offlineCount;
 
@@ -68,15 +68,15 @@ public class QueueExcel extends BaseExcel {
     @ColumnWidth(15)
     private Integer robotToAgentCount;
 
-    @ExcelProperty(value = "排队中人数")
+    @ExcelProperty(value = "排队中")
     @ColumnWidth(15)
     private Integer queuingCount;
 
-    @ExcelProperty(value = "正在服务人数")
+    @ExcelProperty(value = "会话中")
     @ColumnWidth(25)
     private Integer chattingCount;
 
-    @ExcelProperty(value = "对话结束人数")
+    @ExcelProperty(value = "已结束")
     @ColumnWidth(25)
     private Integer closedCount;
 
