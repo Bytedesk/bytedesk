@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 14:48:52
+ * @LastEditTime: 2025-05-06 15:18:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -214,42 +214,31 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     //     }
     //     return dateTime.toString().replace("T", " ").split("\\.")[0];
     // }
-    
-    /**
-     * 将Boolean转换为"是"或"否"
-     */
-    private String booleanToString(Boolean value) {
-        if (value == null) {
-            return null;
-        }
-        return value ? "是" : "否";
-    }
-
-    
 
     @Override
     public QueueMemberExcel convertToExcel(QueueMemberEntity entity) {
         QueueMemberResponse response = convertToResponse(entity);
         // QueueMemberExcel excel = new QueueMemberExcel();
         QueueMemberExcel excel = modelMapper.map(response, QueueMemberExcel.class);
-           // 基本信息
-        // if (response.getQueue() != null) {
-        //     excel.setQueueNickname(response.getQueue().getNickname());
-        // }
+        // 基本信息
+        if (response.getQueue() != null) {
+            excel.setQueueNickname(response.getQueue().getNickname());
+        }
         
         // 访客信息
         if (response.getThread() != null) {
             excel.setVisitorNickname(response.getThread().getUser().getNickname());
             excel.setAgentNickname(response.getThread().getAgentProtobuf().getNickname());
             // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
+            excel.setStatus(response.getThread().getStatus());
             excel.setClient(response.getThread().getClient());
         }
         
         // 排队信息
-        excel.setQueueNumber(response.getQueueNumber());
+        // excel.setQueueNumber(response.getQueueNumber());
         // excel.setBeforeNumber(0); // 需要计算或者从别处获取
         // excel.setWaitTime(response.getWaitTime());
-        excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
+        // excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
         
         // 时间处理
         // excel.setEnqueueTime(formatLocalDateTime(response.getVisitorEnqueueTime()));
@@ -258,19 +247,19 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // excel.setLeaveTime(formatLocalDateTime(response.getVisitorLeaveTime()));
         
         // 人工客服相关
-        excel.setAgentAcceptType(response.getAgentAcceptType());
+        // excel.setAgentAcceptType(response.getAgentAcceptType());
         // excel.setAgentAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
         // excel.setAgentFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
         // excel.setAgentLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
         // excel.setCloseTime(formatLocalDateTime(response.getAgentCloseTime()));
         // excel.setAvgResponseTime(response.getAgentAvgResponseTime());
         // excel.setMaxResponseTime(response.getAgentMaxResponseTime());
-        excel.setAgentMessageCount(response.getAgentMessageCount());
+        // excel.setAgentMessageCount(response.getAgentMessageCount());
         // excel.setTimeout(booleanToString(response.getAgentTimeout()));
         // excel.setAgentOffline(booleanToString(response.getAgentOffline()));
         
         // 机器人相关
-        excel.setRobotAcceptType(response.getRobotAcceptType());
+        // excel.setRobotAcceptType(response.getRobotAcceptType());
         // excel.setRobotAcceptTime(formatLocalDateTime(response.getRobotAcceptTime()));
         // excel.setRobotFirstResponseTime(formatLocalDateTime(response.getRobotFirstResponseTime()));
         // excel.setRobotLastResponseTime(formatLocalDateTime(response.getRobotLastResponseTime()));
@@ -282,7 +271,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         excel.setRobotToAgent(booleanToString(response.getRobotToAgent()));
         
         // 消息统计
-        excel.setVisitorMessageCount(response.getVisitorMessageCount());
+        // excel.setVisitorMessageCount(response.getVisitorMessageCount());
         // excel.setSystemMessageCount(response.getSystemMessageCount());
         
         // 评价与服务质量
@@ -293,6 +282,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // excel.setQualityCheckResult(response.getQualityCheckResult());
         
         // 留言与小结
+        excel.setMessageLeave(booleanToString(response.getMessageLeave()));
         // excel.setLeaveMsg(booleanToString(response.getLeaveMsg()));
         // excel.setLeaveMsgAt(formatLocalDateTime(response.getLeaveMsgAt()));
         excel.setSummarized(booleanToString(response.getSummarized()));
@@ -304,6 +294,15 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // excel.setEmotionType(response.getEmotionType());
         
         return excel;
+    }
 
+    /**
+     * 将Boolean转换为"是"或"否"
+     */
+    private String booleanToString(Boolean value) {
+        if (value == null) {
+            return null;
+        }
+        return value ? "是" : "否";
     }
 }
