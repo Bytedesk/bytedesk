@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 15:18:22
+ * @LastEditTime: 2025-05-06 15:32:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,8 +24,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -229,9 +231,10 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         if (response.getThread() != null) {
             excel.setVisitorNickname(response.getThread().getUser().getNickname());
             excel.setAgentNickname(response.getThread().getAgentProtobuf().getNickname());
+            excel.setRobotNickname(response.getThread().getRobot().getNickname());
             // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
-            excel.setStatus(response.getThread().getStatus());
-            excel.setClient(response.getThread().getClient());
+            excel.setStatus(ThreadProcessStatusEnum.fromValue(response.getThread().getStatus()).toChineseDisplay());
+            excel.setClient(ClientEnum.fromValue(response.getThread().getClient()).toChineseDisplay());
         }
         
         // 排队信息
@@ -256,7 +259,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // excel.setMaxResponseTime(response.getAgentMaxResponseTime());
         // excel.setAgentMessageCount(response.getAgentMessageCount());
         // excel.setTimeout(booleanToString(response.getAgentTimeout()));
-        // excel.setAgentOffline(booleanToString(response.getAgentOffline()));
+        excel.setAgentOffline(booleanToString(response.getAgentOffline()));
         
         // 机器人相关
         // excel.setRobotAcceptType(response.getRobotAcceptType());
