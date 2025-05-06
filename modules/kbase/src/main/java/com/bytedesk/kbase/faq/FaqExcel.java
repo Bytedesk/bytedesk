@@ -24,19 +24,19 @@ import lombok.Data;
 @Data
 public class FaqExcel {
 
-    @ExcelProperty(value = "分类")
+    @ExcelProperty(index = 0, value = "分类")
     @ColumnWidth(20)
     private String category;
 
-    @ExcelProperty(value = "类型")
+    @ExcelProperty(index = 1, value = "类型")
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(value = "问题")
+    @ExcelProperty(index = 2, value = "问题")
     @ColumnWidth(20)
     private String question;
 
-    @ExcelProperty(value = "答案")
+    @ExcelProperty(index = 3, value = "答案")
     @ColumnWidth(20)
     private String answer;
 

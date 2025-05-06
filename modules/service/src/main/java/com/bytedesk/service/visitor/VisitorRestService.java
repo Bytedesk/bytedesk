@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 10:37:11
+ * @LastEditTime: 2025-05-06 09:42:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,16 +17,14 @@ import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -40,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRequest, VisitorResponse> {
+public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, VisitorRequest, VisitorResponse, VisitorExcel> {
 
     private final VisitorRepository visitorRepository;
 
@@ -50,11 +48,17 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
 
     private final ThreadRoutingContext csThreadCreationContext;
 
+
     @Override
-    public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
+    public Page<VisitorEntity> queryByOrgEntity(VisitorRequest request) {
         Pageable pageable = request.getPageable();
         Specification<VisitorEntity> spec = VisitorSpecification.search(request);
-        Page<VisitorEntity> page = visitorRepository.findAll(spec, pageable);
+        return visitorRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
+        Page<VisitorEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -178,18 +182,6 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
         return visitorRepository.updateStatusByUid(uid, newStatus);
     }
 
-    @Caching(put = {
-            @CachePut(value = "visitor", key = "#visitor.uid"),
-    })
-    @Override
-    public VisitorEntity save(VisitorEntity visitor) {
-        try {
-            return doSave(visitor);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, visitor);
-        }
-    }
-
     @Override
     protected VisitorEntity doSave(VisitorEntity entity) {
         return visitorRepository.save(entity);
@@ -257,5 +249,11 @@ public class VisitorRestService extends BaseRestService<VisitorEntity, VisitorRe
             return AvatarConsts.getDefaultUniappAvatarUrl();
         }
         return AvatarConsts.getDefaultVisitorAvatarUrl();
+    }
+
+    @Override
+    public VisitorExcel convertToExcel(VisitorEntity entity) {
+        // return VisitorExcelConverter.convert(entity);
+        return modelMapper.map(entity, VisitorExcel.class);
     }
 }
