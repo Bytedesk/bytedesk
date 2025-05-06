@@ -28,11 +28,11 @@ services:
       - redis_data:/data
     networks:
       - bytedesk-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "qfRxz3tVT8Nh", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "redis-cli", "-a", "qfRxz3tVT8Nh", "ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
 
   bytedesk-ollama:
     image: ollama/ollama:latest
@@ -45,11 +45,11 @@ services:
       - OLLAMA_MODELS=qwen3:0.6b
     networks:
       - bytedesk-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
 
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
@@ -74,11 +74,11 @@ services:
       - "19300:9300"
     networks:
       - bytedesk-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
 
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
@@ -87,14 +87,18 @@ services:
     # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
     container_name: bytedesk
     depends_on:
-      bytedesk-mysql:
-        condition: service_healthy
-      bytedesk-redis:
-        condition: service_healthy
-      bytedesk-ollama:
-        condition: service_healthy
-      bytedesk-elasticsearch:
-        condition: service_healthy
+      - bytedesk-mysql
+      - bytedesk-redis
+      - bytedesk-ollama
+      - bytedesk-elasticsearch
+      # bytedesk-mysql:
+      #   condition: service_healthy
+      # bytedesk-redis:
+      #   condition: service_healthy
+      # bytedesk-ollama:
+      #   condition: service_healthy
+      # bytedesk-elasticsearch:
+      #   condition: service_healthy
     environment:
       SERVER_PORT: 9003
       # bytedesk config
