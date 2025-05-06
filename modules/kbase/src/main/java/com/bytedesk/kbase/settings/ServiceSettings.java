@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 10:16:05
+ * @LastEditTime: 2025-05-06 12:20:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -207,11 +207,11 @@ public class ServiceSettings implements Serializable {
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
     // 未知答案固定回复
-    @Builder.Default
-    private boolean showUnknownAnswer = false;
+    // @Builder.Default
+    // private boolean showUnknownAnswer = false;
 
-    @Builder.Default
-    private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
+    // @Builder.Default
+    // private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
 
     // 满足一定触发条件下，机器人支持主动触发某个任务或者回复某些话术。
     // 例如：1、长时间访客无消息，机器人主动发问或者触发任务，主动暖场；

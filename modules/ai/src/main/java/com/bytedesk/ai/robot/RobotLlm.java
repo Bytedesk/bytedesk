@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 14:12:24
+ * @LastEditTime: 2025-05-06 12:20:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.TypeConsts;
 
@@ -106,4 +107,9 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_context_msg_count")
     private int contextMsgCount = 3;
+
+    // 如果未匹配到关键词，默认回复内容
+    @Builder.Default
+    private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+    
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 10:23:20
+ * @LastEditTime: 2025-05-06 12:17:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,7 +97,7 @@ public class I18Consts {
     // public static final String I18N_ROBOT_NAME = I18N_PREFIX + "robot.name"; // 机器人名称
     // public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description"; // 机器人描述
     // public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = I18N_PREFIX + "robot.agent.assistant.nickname"; // 客服助理机器人昵称
-    // public static final String I18N_ROBOT_REPLY = I18N_PREFIX + "robot.reply"; // 机器人回复
+    // public static final String I18N_ROBOT_DEFAULT_REPLY = I18N_PREFIX + "robot.reply"; // 机器人回复
     // public static final String I18N_ROBOT_NO_REPLY = I18N_PREFIX + "robot.noreply"; // 机器人无回复
     // // 角色相关
     // public static final String I18N_ADMIN = I18N_PREFIX + "admin"; // 管理员
@@ -256,8 +256,8 @@ public class I18Consts {
     public static final String I18N_ROBOT_NAME = "默认机器人名称"; // 机器人名称
     public static final String I18N_ROBOT_DESCRIPTION = "默认机器人描述"; // 机器人描述
     public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = "客服助理机器人昵称"; // 客服助理机器人昵称
-    public static final String I18N_ROBOT_REPLY = "机器人回复"; // 机器人回复
-    public static final String I18N_ROBOT_NO_REPLY = "机器人无回复"; // 机器人无回复
+    public static final String I18N_ROBOT_DEFAULT_REPLY = "抱歉，我暂时无法回答这个问题。"; // 机器人回复
+    // public static final String I18N_ROBOT_NO_REPLY = "机器人无回复"; // 机器人无回复
     // 角色相关
     public static final String I18N_ADMIN = "管理员"; // 管理员
     public static final String I18N_ADMIN_DESCRIPTION = "管理员描述"; // 管理员描述

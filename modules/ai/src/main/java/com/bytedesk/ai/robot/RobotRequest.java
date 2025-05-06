@@ -53,7 +53,7 @@ public class RobotRequest extends BaseRequest {
     private RobotLlm llm = new RobotLlm();
 
     @Builder.Default
-    private String defaultReply = I18Consts.I18N_ROBOT_REPLY;
+    private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
     // 机器人分类
     private String categoryUid;

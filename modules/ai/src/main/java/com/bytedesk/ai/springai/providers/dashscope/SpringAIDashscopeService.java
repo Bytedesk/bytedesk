@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 17:56:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 18:27:17
+ * @LastEditTime: 2025-05-06 12:24:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -65,25 +65,25 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         
         // 由于目前没有实现具体的DashScope调用逻辑，仅添加符合新接口的方法签名
-        try {
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            messageProtobufReply.setContent("DashScope服务尚未实现");
-            persistMessage(messageProtobufQuery, messageProtobufReply);
-            String messageJson = messageProtobufReply.toJson();
+        // try {
+        //     messageProtobufReply.setType(MessageTypeEnum.ERROR);
+        //     messageProtobufReply.setContent("DashScope服务尚未实现");
+        //     persistMessage(messageProtobufQuery, messageProtobufReply);
+        //     String messageJson = messageProtobufReply.toJson();
             
-            emitter.send(SseEmitter.event()
-                    .data(messageJson)
-                    .id(messageProtobufReply.getUid())
-                    .name("message"));
-            emitter.complete();
-        } catch (Exception e) {
-            log.error("Error in DashScope SSE", e);
-            try {
-                emitter.completeWithError(e);
-            } catch (Exception ex) {
-                log.error("Failed to complete emitter with error", ex);
-            }
-        }
+        //     emitter.send(SseEmitter.event()
+        //             .data(messageJson)
+        //             .id(messageProtobufReply.getUid())
+        //             .name("message"));
+        //     emitter.complete();
+        // } catch (Exception e) {
+        //     log.error("Error in DashScope SSE", e);
+        //     try {
+        //         emitter.completeWithError(e);
+        //     } catch (Exception ex) {
+        //         log.error("Failed to complete emitter with error", ex);
+        //     }
+        // }
     }
 
 }

@@ -153,11 +153,11 @@ public class ServiceSettingsRequest  implements Serializable {
     private String relatedQuestionGuide = "您是否想问：";
 
     // 未知答案固定回复
-    @Builder.Default
-    private Boolean showUnknownAnswer = false;
+    // @Builder.Default
+    // private Boolean showUnknownAnswer = false;
 
-    @Builder.Default
-    private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
+    // @Builder.Default
+    // private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
 
     // 主动触发设置
     @Builder.Default

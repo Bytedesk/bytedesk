@@ -11,11 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.worktime_setting.event;
+package com.bytedesk.service.worktime.settings.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.service.worktime_setting.WorktimeSettingEntity;
+import com.bytedesk.service.worktime.settings.WorktimeSettingEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

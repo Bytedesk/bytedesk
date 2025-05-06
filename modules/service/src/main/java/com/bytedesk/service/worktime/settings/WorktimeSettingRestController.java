@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.worktime_setting;
+package com.bytedesk.service.worktime.settings;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/agent/status/setting")
+@RequestMapping("/api/v1/worktime/setting")
 @AllArgsConstructor
 public class WorktimeSettingRestController extends BaseRestController<WorktimeSettingRequest> {
 
