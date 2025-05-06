@@ -199,8 +199,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
-            String answer = RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply,
+            String answer = robot.getLlm().getDefaultReply(); //RobotConsts.ROBOT_UNMATCHED;
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
                     emitter);
             return;
         }
@@ -244,8 +244,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
-            String answer = RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply,
+            String answer = robot.getLlm().getDefaultReply(); //RobotConsts.ROBOT_UNMATCHED;
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
                     emitter);
             return;
         } else {
@@ -265,20 +265,20 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
             // 将处理后的单个FaqProtobuf对象转换为JSON字符串
             String answer = JSON.toJSONString(resultFaq);
-            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply,
+            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply, false,
                     emitter);
         }
     }
 
     private void processAnswerMessage(String answer, MessageTypeEnum type, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, Boolean isUnanswered, SseEmitter emitter) {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(answer);
         messageProtobufReply.setClient(ClientEnum.SYSTEM);
         log.info("BaseSpringAIService processAnswerMessage messageProtobufReply {}", messageProtobufReply);
         // 保存消息到数据库
-        persistMessage(messageProtobufQuery, messageProtobufReply);
+        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);
         String messageJson = messageProtobufReply.toJson();
         try {
             // 发送SSE事件
@@ -335,7 +335,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, Boolean isUnanswered) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
@@ -356,8 +356,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 //
                 .user(messageProtobufQuery.getUser().toJson())
                 .robot(messageProtobufReply.getUser().toJson())
-                //
-                .isUnAnswered(messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED))
+                // messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED)
+                .isUnAnswered(isUnanswered)
                 .orgUid(extraObject.getOrgUid())
                 //
                 .build();
@@ -436,7 +436,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 messageProtobufReply.setType(MessageTypeEnum.ERROR);
                 messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
                 // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply);
+                persistMessage(messageProtobufQuery, messageProtobufReply, true);
                 String messageJson = messageProtobufReply.toJson();
 
                 emitter.send(SseEmitter.event()
@@ -449,7 +449,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 // 仍然需要持久化消息
                 messageProtobufReply.setType(MessageTypeEnum.ERROR);
                 messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
-                persistMessage(messageProtobufQuery, messageProtobufReply);
+                persistMessage(messageProtobufQuery, messageProtobufReply, true);
             }
         } catch (Exception e) {
             log.error("Error handling SSE error", e);
@@ -502,7 +502,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 messageProtobufReply.setContent(content);
                 messageProtobufReply.setType(MessageTypeEnum.STREAM);
                 // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply);
+                persistMessage(messageProtobufQuery, messageProtobufReply, false);
                 String messageJson = messageProtobufReply.toJson();
                 // 发送SSE事件
                 emitter.send(SseEmitter.event()
@@ -530,7 +530,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
                 messageProtobufReply.setContent("");
                 // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply);
+                persistMessage(messageProtobufQuery, messageProtobufReply, false);
                 String messageJson = messageProtobufReply.toJson();
                 //
                 emitter.send(SseEmitter.event()

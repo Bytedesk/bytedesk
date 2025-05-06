@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.worktime_setting;
+package com.bytedesk.service.worktime.settings;
 
 import java.util.Optional;
 
