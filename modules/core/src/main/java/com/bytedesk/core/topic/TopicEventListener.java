@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 14:58:27
+ * @LastEditTime: 2025-05-06 18:43:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,8 @@ import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.socket.mqtt.MqttConnectionService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.event.TopicCreateEvent;
 
 import lombok.AllArgsConstructor;
@@ -59,6 +61,13 @@ public class TopicEventListener {
         topicCacheService.pushRequest(request);
     }
     
+     @EventListener
+    public void onThreadCloseEvent(ThreadCloseEvent event) {
+        ThreadEntity thread = event.getThread();
+        log.info("topic onThreadCloseEvent: {}", thread.getUid());
+    }
+
+
     @EventListener
     public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
         // 定时刷新缓存中的topic事件到数据库中
