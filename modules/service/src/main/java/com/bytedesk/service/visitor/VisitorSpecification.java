@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:19:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 23:34:29
+ * @LastEditTime: 2025-05-06 10:42:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,6 +47,10 @@ public class VisitorSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
             }
+            // vipLevel
+            // if (StringUtils.hasText(request.getVipLevel())) {
+            //     predicates.add(criteriaBuilder.equal(root.get("vipLevel"), request.getVipLevel()));
+            // }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

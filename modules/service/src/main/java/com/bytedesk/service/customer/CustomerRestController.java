@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 10:19:30
+ * @LastEditTime: 2025-05-06 10:45:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.black.BlackExcel;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -78,7 +77,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest> 
             request,
             response,
             customerRestService,
-            BlackExcel.class,
+            CustomerExcel.class,
             "客户信息",
             "customer"
         );

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:14:50
+ * @LastEditTime: 2025-05-06 10:47:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,14 +15,17 @@ package com.bytedesk.core.ip.black;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.bytedesk.core.base.BaseExcel;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class IpBlacklistExcel {
+@EqualsAndHashCode(callSuper = true)
+public class IpBlacklistExcel  extends BaseExcel {
 
     @ExcelProperty(index = 0, value = "IP地址")
     @ColumnWidth(20)
