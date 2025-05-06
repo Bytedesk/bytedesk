@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 15:49:32
+ * @LastEditTime: 2025-05-06 14:59:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,38 +54,38 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer beforeNumber = 0;  // 前面排队人数
 
     @Builder.Default
-    private Integer waitTime = 0;  // 等待时间(秒)
+    private Integer waitLength = 0;  // 等待时间(秒)
 
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
 
     @Builder.Default
-    private LocalDateTime enqueueTime = LocalDateTime.now();  // 加入时间
+    private LocalDateTime visitorEnqueueAt = LocalDateTime.now();  // 加入时间
 
-    private LocalDateTime firstMessageTime;  // 访客首次发送消息时间
+    private LocalDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
-    private LocalDateTime lastMessageTime;  // 访客最后发送消息时间
+    private LocalDateTime visitorLastMessageAt;  // 访客最后发送消息时间
 
-    private LocalDateTime leaveTime;  // 离开时间
+    private LocalDateTime visitorLeavedAt;  // 离开时间
 
-    private String acceptType ;  // 接入方式：自动、手动，不设置默认
+    private String agentAcceptType;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime acceptTime;  // 开始服务时间
-
-    @Builder.Default
-    private Boolean firstResponse = false;  // 是否首次响应
-
-    private LocalDateTime firstResponseTime;  // 首次人工响应时间
-
-    private LocalDateTime lastResponseTime;  // 最后响应时间
-
-    private LocalDateTime closeTime;  // 结束时间
+    private LocalDateTime agentAcceptedAt;  // 开始服务时间
 
     @Builder.Default
-    private Integer avgResponseTime = 0;  // 平均响应时间(秒)
+    private Boolean agentFirstResponse = false;  // 是否首次响应
+
+    private LocalDateTime agentFirstResponseAt;  // 首次人工响应时间
+
+    private LocalDateTime agentLastResponseAt;  // 最后响应时间
+
+    private LocalDateTime agentClosedAt;  // 结束时间
+
+    @Builder.Default
+    private Integer agentAvgResponseLength = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private Integer maxResponseTime = 0;  // 最长响应时间(秒)
+    private Integer agentMaxResponseLength = 0;  // 最长响应时间(秒)
 
     @Builder.Default
     private Integer agentMessageCount = 0;  // 客服消息数量
@@ -94,7 +94,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer visitorMessageCount = 0;  // 访客消息数量
 
     @Builder.Default
-    private Boolean timeout = false; // 是否超时
+    private Boolean agentTimeout = false; // 是否超时
 
     // 机器人对话超时时间
     private LocalDateTime robotTimeoutAt;
@@ -105,11 +105,11 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer systemMessageCount = 0;  // 系统消息数量
 
     // 人工对话超时时间
-    private LocalDateTime humanTimeoutAt;
+    private LocalDateTime agentTimeoutAt;
 
 
     @Builder.Default
-    private Integer priority = 0;  // 优先级(0-100)
+    private Integer visitorPriority = 0;  // 优先级(0-100)
 
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
@@ -125,9 +125,9 @@ public class QueueMemberRequest extends BaseRequest {
 
     /// 是否留言
     @Builder.Default
-    private boolean leaveMsg = false;
+    private Boolean messageLeave = false;
 
-    private LocalDateTime leaveMsgAt;  // 留言时间
+    private LocalDateTime messageLeaveAt;  // 留言时间
 
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
@@ -156,7 +156,7 @@ public class QueueMemberRequest extends BaseRequest {
 
     // 处理状态（待处理、已处理、已关闭等）
     @Builder.Default
-    private String summaryStatus = ThreadSummaryStatusEnum.PENDING.name();
+    private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     private String client;  // 客户来源渠道
 
@@ -177,5 +177,5 @@ public class QueueMemberRequest extends BaseRequest {
     private Boolean robotToAgent = false;
 
     // 机器人转人工时间
-    private LocalDateTime robotToAgentTime;
+    private LocalDateTime robotToAgentAt;
 }
