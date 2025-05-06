@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:01:33
+ * @LastEditTime: 2025-05-06 17:45:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.utils.BdFileUtils;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,7 @@ public class FaqEventListener {
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                     EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
-                            UploadTypeEnum.FAQ.name(),
+                            KbaseTypeEnum.LLM.name(),
                             upload.getUid(),
                             upload.getKbUid(),
                             upload.getOrgUid())).sheet().doRead();

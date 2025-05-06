@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 16:13:04
+ * @LastEditTime: 2025-05-06 17:45:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
 
     private final FaqRestService faqService;
 
-    private final String uploadType;
+    private final String kbType;
 
     private final String fileUid;
 
@@ -54,7 +54,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
     @Override
     public void invoke(FaqExcel data, AnalysisContext context) {
         log.info("FaqExcelListener invoke: {}", JSON.toJSONString(data));
-        FaqEntity faq = faqService.convertExcelToFaq(data, uploadType, fileUid, kbUid, orgUid);
+        FaqEntity faq = faqService.convertExcelToFaq(data, kbType, fileUid, kbUid, orgUid);
         if (faq == null) {
             return;
         }
