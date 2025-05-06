@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:33:00
+ * @LastEditTime: 2025-05-06 10:21:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,26 +24,28 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class CustomerRestService extends BaseRestService<CustomerEntity, CustomerRequest, CustomerResponse> {
+public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity, CustomerRequest, CustomerResponse, CustomerExcel> {
     
     private final CustomerRepository customerRepository;
 
     private final ModelMapper modelMapper;
+
+    @Override
+    public Page<CustomerEntity> queryByOrgEntity(CustomerRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<CustomerEntity> spec = CustomerSpecification.search(request);
+        return customerRepository.findAll(spec, pageable);
+    }
     
     @Override
     public Page<CustomerResponse> queryByOrg(CustomerRequest request) {
-        
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<CustomerEntity> spec = CustomerSpecification.search(request);
-        Page<CustomerEntity> page = customerRepository.findAll(spec, pageable);
-        
+        Page<CustomerEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -128,6 +130,9 @@ public class CustomerRestService extends BaseRestService<CustomerEntity, Custome
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-
+    @Override
+    public CustomerExcel convertToExcel(CustomerEntity entity) {
+        return modelMapper.map(entity, CustomerExcel.class);
+    }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:21:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 17:50:18
+ * @LastEditTime: 2025-05-06 10:24:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ public interface BlackRepository extends JpaRepository<BlackEntity, String>, Jpa
 
     Optional<BlackEntity> findFirstByBlackUid(String blackUid);
 
-    List<BlackEntity> findByEndTimeBefore(LocalDateTime endTime);
+    List<BlackEntity> findByEndTimeBeforeAndDeletedFalse(LocalDateTime endTime);
 
     Optional<BlackEntity> findByBlackUidAndOrgUidAndDeletedFalse(String blackUid, String orgUid);
 }
