@@ -29,11 +29,11 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class ThreadExcel extends BaseExcel {
 
-    @ExcelProperty(value = "访客")
+    @ExcelProperty(value = "昵称")
     @ColumnWidth(25)
     private String visitorNickname;
 
-    @ExcelProperty(value = "客服")
+    @ExcelProperty(value = "人工客服")
     @ColumnWidth(20)
     private String agentNickname;
 
