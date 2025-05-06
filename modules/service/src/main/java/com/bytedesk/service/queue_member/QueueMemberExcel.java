@@ -18,17 +18,20 @@ import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.bytedesk.core.base.BaseExcel;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 // https://github.com/alibaba/easyexcel
 // https://easyexcel.opensource.alibaba.com/docs/current/
 @Data
-public class QueueMemberExcel {
+@EqualsAndHashCode(callSuper = true)    
+public class QueueMemberExcel extends BaseExcel {
 
     // 按照前端代码中的列顺序排列
     @ExcelProperty(value = "访客昵称")
-    @ColumnWidth(20)
+    @ColumnWidth(25)
     private String visitorNickname;
 
     @ExcelProperty(value = "序号")
