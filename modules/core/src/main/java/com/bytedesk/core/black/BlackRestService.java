@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:19:14
+ * @LastEditTime: 2025-05-06 10:26:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest, BlackResponse> {
+public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, BlackRequest, BlackResponse, BlackExcel> {
 
     private final BlackRepository repository;
 
@@ -46,10 +46,15 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     private final AuthService authService;
 
     @Override
-    public Page<BlackResponse> queryByOrg(BlackRequest request) {
+    public Page<BlackEntity> queryByOrgEntity(BlackRequest request) {
         Pageable pageable = request.getPageable();
         Specification<BlackEntity> specification = BlackSpecification.search(request);
-        Page<BlackEntity> blacks = repository.findAll(specification, pageable);
+        return repository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<BlackResponse> queryByOrg(BlackRequest request) {
+        Page<BlackEntity> blacks = queryByOrgEntity(request);
         return blacks.map(this::convertToResponse);
     }
 
@@ -71,13 +76,23 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     }
 
     public List<BlackEntity> findByEndTimeBefore(LocalDateTime endTime) {
-        return repository.findByEndTimeBefore(endTime);
+        return repository.findByEndTimeBeforeAndDeletedFalse(endTime);
     }
-
     // 根据黑名单用户uid查询
     @Cacheable(value = "black", key = "#blackUid", unless = "#result == null")
     public Optional<BlackEntity> findByBlackUid(String blackUid) {
         return repository.findFirstByBlackUid(blackUid);
+    }
+
+    @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid", unless = "#result == null")
+    public Optional<BlackEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
+        return repository.findByBlackUidAndOrgUidAndDeletedFalse(visitorUid, orgUid);
+    }
+
+    @Override
+    public BlackResponse queryByUid(BlackRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Override
@@ -108,25 +123,19 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
 
     @Override
     public BlackResponse update(BlackRequest request) {
-
         Optional<BlackEntity> black = findByUid(request.getUid());
         if (black.isPresent()) {
             BlackEntity entity = black.get();
             modelMapper.map(request, entity);
-            return convertToResponse(save(entity));
+            // 
+            BlackEntity savedBlack = save(entity);
+            if (savedBlack == null) {
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
+            }
+            return convertToResponse(savedBlack);
         } else {
             throw new RuntimeException("Black not found");
         }
-    }
-
-    @Override
-    public BlackEntity save(BlackEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override
@@ -138,7 +147,10 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     public void deleteByUid(String uid) {
         Optional<BlackEntity> black = findByUid(uid);
         if (black.isPresent()) {
-            repository.delete(black.get());
+            BlackEntity entity = black.get();
+            entity.setDeleted(true);
+            save(entity);
+            // repository.delete(black.get());
         } else {
             throw new RuntimeException("Black not found");
         }
@@ -159,16 +171,11 @@ public class BlackRestService extends BaseRestService<BlackEntity, BlackRequest,
     public BlackResponse convertToResponse(BlackEntity entity) {
         return modelMapper.map(entity, BlackResponse.class);
     }
-
-    @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid", unless = "#result == null")
-    public Optional<BlackEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
-        return repository.findByBlackUidAndOrgUidAndDeletedFalse(visitorUid, orgUid);
-    }
-
+    
     @Override
-    public BlackResponse queryByUid(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    public BlackExcel convertToExcel(BlackEntity entity) {
+        // return modelMapper.map(entity, BlackExcel.class);
+        return BlackConverter.toExcel(entity);
     }
 
 }

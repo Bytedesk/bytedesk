@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:35:11
+ * @LastEditTime: 2025-05-06 10:21:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,12 +29,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BlackRestController extends BaseRestController<BlackRequest> {
 
-    private final BlackRestService blackService;
+    private final BlackRestService blackRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(BlackRequest request) {
         
-        Page<BlackResponse> page = blackService.queryByOrg(request);
+        Page<BlackResponse> page = blackRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -42,7 +42,7 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
     @Override
     public ResponseEntity<?> queryByUser(BlackRequest request) {
         
-        Page<BlackResponse> page = blackService.queryByUser(request);
+        Page<BlackResponse> page = blackRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -56,7 +56,7 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
     @Override
     public ResponseEntity<?> create(BlackRequest request) {
 
-        BlackResponse response = blackService.create(request);
+        BlackResponse response = blackRestService.create(request);
         
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -64,7 +64,7 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
     @Override
     public ResponseEntity<?> update(BlackRequest request) {
 
-        BlackResponse response = blackService.update(request);
+        BlackResponse response = blackRestService.update(request);
         
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -72,17 +72,22 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
     @Override
     public ResponseEntity<?> delete(BlackRequest request) {
 
-        blackService.delete(request);
+        blackRestService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
     public Object export(BlackRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        return exportTemplate(
+            request,
+            response,
+            blackRestService,
+            BlackExcel.class,
+            "黑名单",
+            "black"
+        );
     }
-
     
 
 }
