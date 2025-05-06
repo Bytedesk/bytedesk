@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 21:43:26
+ * @LastEditTime: 2025-05-06 14:27:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -173,8 +173,8 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
         queueExcel.setType(ThreadTypeEnum.getChineseNameByString(typeStr));
         
         // 使用QueueStatusEnum的静态方法将状态转换为中文名称
-        String statusStr = entity.getStatus();
-        queueExcel.setStatus(QueueStatusEnum.getChineseNameByString(statusStr));
+        // String statusStr = entity.getStatus();
+        // queueExcel.setStatus(QueueStatusEnum.getChineseNameByString(statusStr));
         
         return queueExcel;
     }
