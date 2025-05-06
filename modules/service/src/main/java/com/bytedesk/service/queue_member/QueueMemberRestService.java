@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 14:35:45
+ * @LastEditTime: 2025-05-06 14:48:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -209,12 +208,12 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     /**
      * 将LocalDateTime转换为易于阅读的字符串格式
      */
-    private String formatLocalDateTime(LocalDateTime dateTime) {
-        if (dateTime == null) {
-            return null;
-        }
-        return dateTime.toString().replace("T", " ").split("\\.")[0];
-    }
+    // private String formatLocalDateTime(LocalDateTime dateTime) {
+    //     if (dateTime == null) {
+    //         return null;
+    //     }
+    //     return dateTime.toString().replace("T", " ").split("\\.")[0];
+    // }
     
     /**
      * 将Boolean转换为"是"或"否"
@@ -234,9 +233,9 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // QueueMemberExcel excel = new QueueMemberExcel();
         QueueMemberExcel excel = modelMapper.map(response, QueueMemberExcel.class);
            // 基本信息
-        if (response.getQueue() != null) {
-            excel.setQueueNickname(response.getQueue().getNickname());
-        }
+        // if (response.getQueue() != null) {
+        //     excel.setQueueNickname(response.getQueue().getNickname());
+        // }
         
         // 访客信息
         if (response.getThread() != null) {
@@ -249,20 +248,20 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // 排队信息
         excel.setQueueNumber(response.getQueueNumber());
         // excel.setBeforeNumber(0); // 需要计算或者从别处获取
-        excel.setWaitTime(response.getWaitTime());
+        // excel.setWaitTime(response.getWaitTime());
         excel.setStatus(response.getThread() != null ? response.getThread().getStatus() : null);
         
         // 时间处理
-        excel.setEnqueueTime(formatLocalDateTime(response.getVisitorEnqueueTime()));
-        excel.setVisitorFirstMessageTime(formatLocalDateTime(response.getVisitorFirstMessageTime()));
-        excel.setVisitorLastMessageTime(formatLocalDateTime(response.getVisitorLastMessageTime()));
+        // excel.setEnqueueTime(formatLocalDateTime(response.getVisitorEnqueueTime()));
+        // excel.setVisitorFirstMessageTime(formatLocalDateTime(response.getVisitorFirstMessageTime()));
+        // excel.setVisitorLastMessageTime(formatLocalDateTime(response.getVisitorLastMessageTime()));
         // excel.setLeaveTime(formatLocalDateTime(response.getVisitorLeaveTime()));
         
         // 人工客服相关
         excel.setAgentAcceptType(response.getAgentAcceptType());
-        excel.setAgentAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
-        excel.setAgentFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
-        excel.setAgentLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
+        // excel.setAgentAcceptTime(formatLocalDateTime(response.getAgentAcceptTime()));
+        // excel.setAgentFirstResponseTime(formatLocalDateTime(response.getAgentFirstResponseTime()));
+        // excel.setAgentLastResponseTime(formatLocalDateTime(response.getAgentLastResponseTime()));
         // excel.setCloseTime(formatLocalDateTime(response.getAgentCloseTime()));
         // excel.setAvgResponseTime(response.getAgentAvgResponseTime());
         // excel.setMaxResponseTime(response.getAgentMaxResponseTime());
@@ -294,8 +293,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         // excel.setQualityCheckResult(response.getQualityCheckResult());
         
         // 留言与小结
-        excel.setLeaveMsg(booleanToString(response.getLeaveMsg()));
-        excel.setLeaveMsgAt(formatLocalDateTime(response.getLeaveMsgAt()));
+        // excel.setLeaveMsg(booleanToString(response.getLeaveMsg()));
+        // excel.setLeaveMsgAt(formatLocalDateTime(response.getLeaveMsgAt()));
         excel.setSummarized(booleanToString(response.getSummarized()));
         
         // 交互状态

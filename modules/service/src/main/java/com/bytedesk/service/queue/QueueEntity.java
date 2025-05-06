@@ -267,15 +267,15 @@ public class QueueEntity extends BaseEntity {
                 }
 
                 long totalWaitTime1 = servedMembers1.stream()
-                                .mapToLong(QueueMemberEntity::getWaitTime)
+                                .mapToLong(QueueMemberEntity::getWaitLength)
                                 .sum();
 
                 long totalWaitTime2 = servedMembers2.stream()
-                                .mapToLong(QueueMemberEntity::getWaitTime)
+                                .mapToLong(QueueMemberEntity::getWaitLength)
                                 .sum();
 
                 long totalWaitTime3 = servedMembers3.stream()
-                                .mapToLong(QueueMemberEntity::getWaitTime)
+                                .mapToLong(QueueMemberEntity::getWaitLength)
                                 .sum();
 
                 return (int) ((totalWaitTime1 + totalWaitTime2 + totalWaitTime3) / totalCount);

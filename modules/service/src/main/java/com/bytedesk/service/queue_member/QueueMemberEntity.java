@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 22:56:13
+ * @LastEditTime: 2025-05-06 14:44:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -91,7 +91,7 @@ public class QueueMemberEntity extends BaseEntity {
      * 统计访客消息总数
      */
     @Builder.Default
-    private LocalDateTime visitorEnqueueTime = LocalDateTime.now();  // 加入时间
+    private LocalDateTime visitorEnqueueAt = LocalDateTime.now();  // 加入时间
 
     private LocalDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
@@ -137,10 +137,10 @@ public class QueueMemberEntity extends BaseEntity {
      * 动态更新平均响应时间和最大响应时间
      */
     @Builder.Default
-    private int agentAvgResponseTime = 0;  // 平均响应时间(秒)
+    private int agentAvgResponseLength = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private int agentMaxResponseTime = 0;  // 最长响应时间(秒)
+    private int agentMaxResponseLength = 0;  // 最长响应时间(秒)
 
     @Builder.Default
     private int agentMessageCount = 0;  // 客服消息数量
@@ -179,10 +179,10 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime robotClosedAt;  // 结束时间
 
     @Builder.Default
-    private int robotAvgResponseTime = 0;  // 平均响应时间(秒)
+    private int robotAvgResponseLength = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private int robotMaxResponseTime = 0;  // 最长响应时间(秒)
+    private int robotMaxResponseLength = 0;  // 最长响应时间(秒)
 
     @Builder.Default
     private int robotMessageCount = 0;  // 客服消息数量
@@ -196,11 +196,11 @@ public class QueueMemberEntity extends BaseEntity {
 
     //-------------------------------
 
-    private LocalDateTime systemFirstResponseTime;  // 系统首次响应时间
+    private LocalDateTime systemFirstResponseAt;  // 系统首次响应时间
 
-    private LocalDateTime systemLastResponseTime;  // 系统最后响应时间
+    private LocalDateTime systemLastResponseAt;  // 系统最后响应时间
 
-    private LocalDateTime systemCloseTime;  // 系统结束时间，即：autoCloseTime
+    private LocalDateTime systemCloseAt;  // 系统结束时间，即：autoCloseTime
 
     @Builder.Default
     @Column(name = "is_system_close")
@@ -268,7 +268,7 @@ public class QueueMemberEntity extends BaseEntity {
     private boolean robotToAgent = false;
 
     // 机器人转人工时间
-    private LocalDateTime robotToAgentTime;  // 机器人转人工时间
+    private LocalDateTime robotToAgentAt;  // 机器人转人工时间
 
     // 人工转人工
     @Builder.Default
@@ -284,15 +284,15 @@ public class QueueMemberEntity extends BaseEntity {
     /**
      * 计算等待时间(秒)
      */
-    public long getWaitTime() {
-        if (visitorEnqueueTime == null) return 0;
+    public long getWaitLength() {
+        if (visitorEnqueueAt == null) return 0;
         if (thread.isOffline()) return 0;
         // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
         if (robotAcceptedAt != null) {
-            return Duration.between(visitorEnqueueTime, robotAcceptedAt).getSeconds();
+            return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
         }
-        LocalDateTime endWaitTime = agentAcceptedAt != null ? agentAcceptedAt : LocalDateTime.now();
-        return Duration.between(visitorEnqueueTime, endWaitTime).getSeconds();
+        LocalDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : LocalDateTime.now();
+        return Duration.between(visitorEnqueueAt, endWaitLength).getSeconds();
     }
 
     public void manualAcceptThread() {
@@ -312,7 +312,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     public void transferRobotToAgent() {
         this.robotToAgent = true;
-        this.robotToAgentTime = LocalDateTime.now();
+        this.robotToAgentAt = LocalDateTime.now();
     }
 
 

@@ -52,7 +52,7 @@ public class QueueService {
             .robotQueue(queue)
             .thread(threadEntity)
             .queueNumber(queue.getNextNumber())
-            .visitorEnqueueTime(LocalDateTime.now())
+            .visitorEnqueueAt(LocalDateTime.now())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
@@ -82,7 +82,7 @@ public class QueueService {
             .agentQueue(queue)
             .thread(threadEntity)
             .queueNumber(queue.getNextNumber())
-            .visitorEnqueueTime(LocalDateTime.now())
+            .visitorEnqueueAt(LocalDateTime.now())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
@@ -132,7 +132,7 @@ public class QueueService {
             .workgroupQueue(workgroupQueue)            
             .thread(threadEntity)
             .queueNumber(workgroupQueue.getNextNumber())
-            .visitorEnqueueTime(LocalDateTime.now())
+            .visitorEnqueueAt(LocalDateTime.now())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 

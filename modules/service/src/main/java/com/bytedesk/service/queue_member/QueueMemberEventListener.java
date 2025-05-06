@@ -173,23 +173,23 @@ public class QueueMemberEventListener {
                 
                 // 计算首次响应时间（秒）
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
-                queueMember.setAgentMaxResponseTime((int) responseTimeInSeconds);
-                queueMember.setAgentAvgResponseTime((int) responseTimeInSeconds);
+                queueMember.setAgentMaxResponseLength((int) responseTimeInSeconds);
+                queueMember.setAgentAvgResponseLength((int) responseTimeInSeconds);
             } else if (queueMember.getVisitorLastMessageAt() != null) {
                 // 非首次响应，更新平均和最大响应时间
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
                 
                 // 更新最大响应时间
-                if (responseTimeInSeconds > queueMember.getAgentMaxResponseTime()) {
-                    queueMember.setAgentMaxResponseTime((int) responseTimeInSeconds);
+                if (responseTimeInSeconds > queueMember.getAgentMaxResponseLength()) {
+                    queueMember.setAgentMaxResponseLength((int) responseTimeInSeconds);
                 }
                 
                 // 更新平均响应时间 - 使用累计平均计算方法
                 // (currentAvg * (messageCount-1) + newValue) / messageCount
                 int messageCount = queueMember.getAgentMessageCount();
                 if (messageCount > 1) { // 避免除以零
-                    int currentTotal = queueMember.getAgentAvgResponseTime() * (messageCount - 1);
-                    queueMember.setAgentAvgResponseTime((currentTotal + (int) responseTimeInSeconds) / messageCount);
+                    int currentTotal = queueMember.getAgentAvgResponseLength() * (messageCount - 1);
+                    queueMember.setAgentAvgResponseLength((currentTotal + (int) responseTimeInSeconds) / messageCount);
                 }
             }
             
@@ -200,7 +200,7 @@ public class QueueMemberEventListener {
             queueMemberRestService.save(queueMember);
             log.debug("已更新队列成员客服消息统计: threadUid={}, agentMsgCount={}, avgResponseTime={}s, maxResponseTime={}s", 
                     thread.getUid(), queueMember.getAgentMessageCount(), 
-                    queueMember.getAgentAvgResponseTime(), queueMember.getAgentMaxResponseTime());
+                    queueMember.getAgentAvgResponseLength(), queueMember.getAgentMaxResponseLength());
         } catch (Exception e) {
             log.error("更新客服消息统计时出错: {}", e.getMessage(), e);
         }
@@ -247,18 +247,18 @@ public class QueueMemberEventListener {
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
                 
                 // 更新最大响应时间
-                if (queueMember.getRobotMaxResponseTime() == 0 || 
-                    responseTimeInSeconds > queueMember.getRobotMaxResponseTime()) {
-                    queueMember.setRobotMaxResponseTime((int) responseTimeInSeconds);
+                if (queueMember.getRobotMaxResponseLength() == 0 || 
+                    responseTimeInSeconds > queueMember.getRobotMaxResponseLength()) {
+                    queueMember.setRobotMaxResponseLength((int) responseTimeInSeconds);
                 }
                 
                 // 更新平均响应时间
                 int messageCount = queueMember.getRobotMessageCount();
                 if (messageCount > 1) {
-                    int currentTotal = queueMember.getRobotAvgResponseTime() * (messageCount - 1);
-                    queueMember.setRobotAvgResponseTime((currentTotal + (int) responseTimeInSeconds) / messageCount);
+                    int currentTotal = queueMember.getRobotAvgResponseLength() * (messageCount - 1);
+                    queueMember.setRobotAvgResponseLength((currentTotal + (int) responseTimeInSeconds) / messageCount);
                 } else {
-                    queueMember.setRobotAvgResponseTime((int) responseTimeInSeconds);
+                    queueMember.setRobotAvgResponseLength((int) responseTimeInSeconds);
                 }
             }
             
@@ -266,7 +266,7 @@ public class QueueMemberEventListener {
             queueMemberRestService.save(queueMember);
             log.debug("已更新队列成员机器人消息统计: threadUid={}, robotMsgCount={}, avgResponseTime={}s, maxResponseTime={}s", 
                     thread.getUid(), queueMember.getRobotMessageCount(), 
-                    queueMember.getRobotAvgResponseTime(), queueMember.getRobotMaxResponseTime());
+                    queueMember.getRobotAvgResponseLength(), queueMember.getRobotMaxResponseLength());
         } catch (Exception e) {
             log.error("更新机器人消息统计时出错: {}", e.getMessage(), e);
         }
@@ -301,12 +301,12 @@ public class QueueMemberEventListener {
             queueMember.setSystemMessageCount(queueMember.getSystemMessageCount() + 1);
             
             // 记录首次系统消息时间（如果尚未设置）
-            if (queueMember.getSystemFirstResponseTime() == null) {
-                queueMember.setSystemFirstResponseTime(now);
+            if (queueMember.getSystemFirstResponseAt() == null) {
+                queueMember.setSystemFirstResponseAt(now);
             }
             
             // 更新最后一次系统消息时间
-            queueMember.setSystemLastResponseTime(now);
+            queueMember.setSystemLastResponseAt(now);
             
             // 保存更新
             queueMemberRestService.save(queueMember);
