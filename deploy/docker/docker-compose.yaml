@@ -78,19 +78,9 @@ services:
         condition: service_healthy
     environment:
       SERVER_PORT: 9003
-      # db config
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: r8FqfdbWUaN3
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      # redis config
-      SPRING_DATA_REDIS_HOST: redis-bytedesk
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: qfRxz3tVT8Nh
-      SPRING_DATA_REDIS_DATABASE: 0
       # bytedesk config
       BYTEDESK_DEBUG: true
-      BYTEDESK_EDITION: enterprise
+      BYTEDESK_EDITION: ENTERPRISE
       BYTEDESK_VERSION: 0.7.6
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: false
@@ -132,6 +122,16 @@ services:
       BYTEDESK_JWT_SECRET_KEY: 1dfaf8d004207b628a9a6b859c429f49a9a7ead9fd8161c1e60847aeef06dbd2
       BYTEDESK_JWT_EXPIRATION: 2592000000
       BYTEDESK_JWT_REFRESH_TOKEN_EXPIRATION: 5184000000
+       # db config
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: r8FqfdbWUaN3
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # redis config
+      SPRING_DATA_REDIS_HOST: redis-bytedesk
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: qfRxz3tVT8Nh
+      SPRING_DATA_REDIS_DATABASE: 0
       # Cache config
       BYTEDESK_CACHE_LEVEL: 0
       BYTEDESK_CACHE_PREFIX: bytedeskim
