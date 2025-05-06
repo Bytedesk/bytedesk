@@ -15,14 +15,17 @@ package com.bytedesk.core.black;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.bytedesk.core.base.BaseExcel;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class BlackExcel {
+@EqualsAndHashCode(callSuper = true)
+public class BlackExcel  extends BaseExcel {
 
     @ExcelProperty(index = 0, value = "黑名单用户ID")
     @ColumnWidth(20)

@@ -15,15 +15,18 @@ package com.bytedesk.service.customer;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.bytedesk.core.base.BaseExcel;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 客户信息导出Excel模型
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class CustomerExcel {
+@EqualsAndHashCode(callSuper = true)
+public class CustomerExcel  extends BaseExcel {
 
     @ExcelProperty(index = 0, value = "昵称")
     @ColumnWidth(20)

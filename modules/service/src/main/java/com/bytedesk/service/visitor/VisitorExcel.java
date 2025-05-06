@@ -1,13 +1,13 @@
 /*
- * @Author: jackning 270580156@qq.com
+ * @Author: jackning 270580206@qq.com
  * @Date: 2025-05-06 09:36:34
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 09:39:26
+ * @LastEditors: jackning 270580206@qq.com
+ * @LastEditTime: 2025-05-06 10:43:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
+ *  contact: 270580206@qq.com 
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
@@ -45,7 +45,7 @@ public class VisitorExcel extends BaseExcel {
     // private String device;
     
     @ExcelProperty(value = "手机号")
-    @ColumnWidth(15)
+    @ColumnWidth(20)
     private String mobile;
     
     @ExcelProperty(value = "邮箱")
@@ -57,11 +57,11 @@ public class VisitorExcel extends BaseExcel {
     private String note;
     
     @ExcelProperty(value = "客户端")
-    @ColumnWidth(15)
+    @ColumnWidth(20)
     private String client;
     
     @ExcelProperty(value = "状态")
-    @ColumnWidth(15)
+    @ColumnWidth(20)
     private String status;
     
     // @ExcelProperty(value = "标签")
@@ -81,6 +81,6 @@ public class VisitorExcel extends BaseExcel {
     private String ipLocation;
     
     @ExcelProperty(value = "会员等级")
-    @ColumnWidth(10)
+    @ColumnWidth(20)
     private Integer vipLevel;
 }
