@@ -29,7 +29,6 @@
 
 	<dependencies>
 
-
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-retry -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
