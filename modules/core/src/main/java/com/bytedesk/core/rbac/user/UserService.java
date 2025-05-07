@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 23:13:18
+ * @LastEditTime: 2025-05-07 16:19:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,8 +78,8 @@ public class UserService {
     public UserResponse register(UserRequest request) {
         log.info("register {}", request.toString());
 
-        if (!StringUtils.hasText(request.getEmail()) 
-            && !StringUtils.hasText(request.getMobile())) {
+        if (!StringUtils.hasText(request.getEmail())
+                && !StringUtils.hasText(request.getMobile())) {
             throw new RuntimeException("email or mobile is required..!!");
         }
 
@@ -87,6 +87,7 @@ public class UserService {
                 && existsByEmailAndPlatform(request.getEmail(), request.getPlatform())) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
         }
+
         if (StringUtils.hasText(request.getMobile())
                 && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
@@ -130,9 +131,9 @@ public class UserService {
         user.setEnabled(true);
         //
         user = save(user);
-         // 新注册用户添加role_user
-         addRoleUser(user);
-        
+        // 新注册用户添加role_user
+        addRoleUser(user);
+
         //
         return ConvertUtils.convertToUserResponse(user);
     }
@@ -206,7 +207,7 @@ public class UserService {
     @Transactional
     public UserResponse changePassword(UserRequest request) {
 
-        UserEntity currentUser = authService.getUser(); 
+        UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -233,7 +234,7 @@ public class UserService {
 
     @Transactional
     public UserResponse changeEmail(UserRequest request) {
-        UserEntity currentUser = authService.getUser(); 
+        UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -251,7 +252,7 @@ public class UserService {
             }
             user.setEmailVerified(true);
             user = save(user);
-            // 
+            //
             return ConvertUtils.convertToUserResponse(user);
         } else {
             throw new RuntimeException("User not found..!!");
@@ -260,7 +261,7 @@ public class UserService {
 
     @Transactional
     public UserResponse changeMobile(UserRequest request) {
-        UserEntity currentUser = authService.getUser(); 
+        UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
@@ -289,7 +290,7 @@ public class UserService {
     public UserEntity createUserFromMember(UserRequest request) {
         //
         if (StringUtils.hasText(request.getMobile())
-            && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
+                && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
             Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
             return userOptional.get();
         }
@@ -312,7 +313,7 @@ public class UserService {
                 .mobileVerified(false)
                 .build();
         user.setUid(uidUtils.getUid());
-        // 
+        //
         if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
         } else if (StringUtils.hasText(request.getMobile())) {
@@ -324,14 +325,14 @@ public class UserService {
         } else {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
         }
-        // 
+        //
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());
         if (!orgOptional.isPresent()) {
             throw new RuntimeException("Organization not found..!!");
         } else {
             user.setCurrentOrganization(orgOptional.get());
         }
-        // 
+        //
         return addRoleMember(user);
     }
 
@@ -343,7 +344,7 @@ public class UserService {
 
         // 删除所有角色
         user.removeOrganizationRoles();
-        
+
         // 增加角色，遍历roleUids，逐个添加
         for (String roleUid : roleUids) {
             Optional<RoleEntity> optional = roleService.findByUid(roleUid);
@@ -355,7 +356,7 @@ public class UserService {
                 throw new RuntimeException("Role not found: " + roleUid);
             }
         }
-        
+
         // 使用直接的repository调用而非包装方法
         try {
             return userRepository.save(user);
@@ -374,7 +375,7 @@ public class UserService {
             RoleEntity role = roleOptional.get();
             // ROLE_USER 不需要organization的限制，直接添加到用户角色列表中
             user.getCurrentRoles().add(role);
-            
+
             // 直接保存用户实体
             try {
                 return userRepository.save(user);
@@ -422,7 +423,7 @@ public class UserService {
     public UserEntity removeRoleSuper(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_SUPER);
     }
-    
+
     public UserEntity addRole(UserEntity user, String roleName) {
         Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(roleName);
         if (roleOptional.isPresent()) {
@@ -430,7 +431,7 @@ public class UserService {
             // 重要：不要在这里调用roleService.save(role)
             // 使用已存在的持久化角色实例，避免创建分离状态的实体
             user.addOrganizationRole(role);
-            
+
             // 直接保存用户实体
             try {
                 return userRepository.save(user);
@@ -458,7 +459,7 @@ public class UserService {
             throw new RuntimeException("Role not found..!!");
         }
     }
-    
+
     @Cacheable(value = "user", key = "#email", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
         return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
@@ -487,25 +488,16 @@ public class UserService {
 
     @Cacheable(value = "user:exists", key = "#username", unless = "#result == null")
     public Boolean existsByUsernameAndPlatform(@NonNull String username, @NonNull String platform) {
-        if (!StringUtils.hasText(username)) {
-            return true;
-        }
         return userRepository.existsByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#mobile", unless = "#result == null")
     public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull String platform) {
-        if (!StringUtils.hasText(mobile)) {
-            return true;
-        }
         return userRepository.existsByMobileAndPlatformAndDeletedFalse(mobile, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#email", unless = "#result == null")
     public Boolean existsByEmailAndPlatform(@NonNull String email, @NonNull String platform) {
-        if (!StringUtils.hasText(email)) {
-            return true;
-        }
         return userRepository.existsByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
@@ -519,18 +511,16 @@ public class UserService {
             @CachePut(value = "user", key = "#user.mobile", unless = "#user.mobile == null"),
             @CachePut(value = "user", key = "#user.email", unless = "#user.email == null"),
             @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
-            // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
-            // @CachePut(value = "user:exists", key = "#user.username"),
-            // @CachePut(value = "user:exists", key = "#user.mobile"),
-            // @CachePut(value = "user:exists", key = "#user.email"),
+    // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
+    // @CachePut(value = "user:exists", key = "#user.username"),
+    // @CachePut(value = "user:exists", key = "#user.mobile"),
+    // @CachePut(value = "user:exists", key = "#user.email"),
     })
     public UserEntity save(@NonNull UserEntity user) {
         try {
             return userRepository.save(user);
         } catch (ObjectOptimisticLockingFailureException optimisticLockingFailureException) {
             log.error("User save failed..!!", optimisticLockingFailureException);
-            // retry save
-            // return save(user);
             return userRepository.save(user);
         } catch (Exception e) {
             e.printStackTrace();
