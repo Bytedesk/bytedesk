@@ -6,6 +6,7 @@ import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 // https://ollama4j.github.io/ollama4j/apis-model-management/list-library-models
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jService {
 
     @Autowired
