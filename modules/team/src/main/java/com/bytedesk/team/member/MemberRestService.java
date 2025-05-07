@@ -103,7 +103,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     }
 
     public MemberResponse queryByUserUid(MemberRequest request) {
-        Optional<MemberEntity> memberOptional = findByUserUid(request.getUid());
+        Optional<MemberEntity> memberOptional = findByUserUid(request.getUserUid());
         if (!memberOptional.isPresent()) {
             return null;
         }
