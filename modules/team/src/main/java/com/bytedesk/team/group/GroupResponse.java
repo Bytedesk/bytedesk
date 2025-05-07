@@ -51,8 +51,12 @@ public class GroupResponse extends BaseResponse {
 
     private Boolean isExternal;
 
-    private List<MemberProtobuf> members;
+    // 替代直接返回所有成员列表，增加成员计数
+    private Integer memberCount;
 
+    // 当需要返回部分成员时（如前10个）使用
+    private List<MemberProtobuf> memberPreview;
+    
     private List<UserProtobuf> admins;
 
     // private List<RobotProtobuf> robots;
