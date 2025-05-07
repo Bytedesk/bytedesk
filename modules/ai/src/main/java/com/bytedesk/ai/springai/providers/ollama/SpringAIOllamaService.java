@@ -65,6 +65,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                 .model(robotLlm.getModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
+                .topK(robotLlm.getTopK())
                 .build()
         );
     }

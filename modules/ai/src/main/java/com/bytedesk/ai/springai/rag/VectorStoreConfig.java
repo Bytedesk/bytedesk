@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+// import org.springframework.context.annotation.Primary;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,10 +37,10 @@ public class VectorStoreConfig {
      * Elasticsearch向量存储配置
      * 指定使用zhipuaiEmbeddingModel作为嵌入模型
      */
-    @Bean
-    @Primary
+    @Bean("elasticsearchVectorStore")
+//     @Primary
     @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true")
-    public ElasticsearchVectorStore vectorStore(
+    public ElasticsearchVectorStore elasticsearchVectorStore(
             RestClient restClient, // 修改为org.elasticsearch.client.RestClient
             @Qualifier("bytedeskOllamaEmbeddingModel") EmbeddingModel embeddingModel) {
         
@@ -58,6 +58,7 @@ public class VectorStoreConfig {
         ElasticsearchVectorStoreOptions options = new ElasticsearchVectorStoreOptions();
         options.setIndexName(elasticsearchIndexName);
         options.setDimensions(elasticsearchDimensions);
+        // options.setDimensions(1024); // 固定维度为1536
         
         // 使用正确的builder方法调用，提供必需的RestClient和EmbeddingModel参数
         ElasticsearchVectorStore vectorStore = ElasticsearchVectorStore.builder(restClient, embeddingModel)

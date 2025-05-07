@@ -21,12 +21,10 @@ import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -251,20 +249,20 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         return memberRepository.existsByMobileAndOrgUidAndDeleted(mobile, orgUid, false);
     }
 
-    @Caching(put = {
-            @CachePut(value = "member", key = "#member.uid", unless = "#member.uid == null"),
-            @CachePut(value = "member", key = "#member.mobile", unless = "#member.mobile == null"),
-            @CachePut(value = "member", key = "#member.email", unless = "#member.email == null")
-    })
-    @Override
-    public MemberEntity save(MemberEntity member) {
-        try {
-            return doSave(member);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, member);
-        }
-        return null;
-    }
+    // @Caching(put = {
+    //         @CachePut(value = "member", key = "#member.uid", unless = "#member.uid == null"),
+    //         @CachePut(value = "member", key = "#member.mobile", unless = "#member.mobile == null"),
+    //         @CachePut(value = "member", key = "#member.email", unless = "#member.email == null")
+    // })
+    // @Override
+    // public MemberEntity save(MemberEntity member) {
+    //     try {
+    //         return doSave(member);
+    //     } catch (ObjectOptimisticLockingFailureException e) {
+    //         handleOptimisticLockingFailureException(e, member);
+    //     }
+    //     return null;
+    // }
 
     @Override
     protected MemberEntity doSave(MemberEntity member) {
