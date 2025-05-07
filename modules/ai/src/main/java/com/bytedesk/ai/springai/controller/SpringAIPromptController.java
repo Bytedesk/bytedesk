@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 18:40:15
+ * @LastEditTime: 2025-05-07 11:36:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,7 @@ import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
@@ -68,7 +69,8 @@ public class SpringAIPromptController {
 
 	private final ChatClient bytedeskOllamaChatClient;
 
-	private final ElasticsearchVectorStore vectorStore;
+	@Qualifier("elasticsearchVectorStore")
+	private final ElasticsearchVectorStore elasticsearchVectorStore;
 
 	@Value("classpath:/aidemo/prompts/joke-prompt.st")
 	private Resource jokeResource;
@@ -170,12 +172,12 @@ public class SpringAIPromptController {
 
 		// Step 2 - Create embeddings and save to vector store
 		log.info("Creating Embeddings...");
-		vectorStore.add(documents);
+		elasticsearchVectorStore.add(documents);
 		log.info("Embeddings created.");
 
 		// Step 3 retrieve related documents to query
 		log.info("Retrieving relevant documents");
-		List<Document> similarDocuments = vectorStore.similaritySearch(message);
+		List<Document> similarDocuments = elasticsearchVectorStore.similaritySearch(message);
 		log.info(String.format("Found %s relevant documents.", similarDocuments.size()));
 
 		// Step 4 Embed documents into SystemMessage with the `system-qa.st` prompt
@@ -193,7 +195,6 @@ public class SpringAIPromptController {
 				.chatResponse();
 		log.info("AI responded.");
 
-		// FIXME: [500] Internal Server Error - {"error":{}}
 		return ResponseEntity.ok(JsonResult.success(chatResponse));
 	}
 
@@ -211,6 +212,7 @@ public class SpringAIPromptController {
 		String userMessage = """
 				Generate the filmography for the actor {actor}.
 				{format}
+				/no_think
 				""";
 		// 使用 builder 模式替换废弃的构造函数
 		PromptTemplate promptTemplate = PromptTemplate.builder()
@@ -242,7 +244,6 @@ public class SpringAIPromptController {
 	@GetMapping("/structured")
 	public ResponseEntity<JsonResult<?>> structured(
 			@RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
-
 		 
 		StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
 		String userInputTemplate = """
@@ -251,6 +252,7 @@ public class SpringAIPromptController {
 				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
 				{message}
 				{format}
+				/no_think
 				"""; // user input with a "format" placeholder.
 		log.info("userInputTemplate: {}", userInputTemplate);
 		 // 使用 builder 模式替换废弃的构造函数

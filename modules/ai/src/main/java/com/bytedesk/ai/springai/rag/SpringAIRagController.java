@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 12:26:58
+ * @LastEditTime: 2025-05-07 09:22:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,11 +63,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SpringAIRagController {
 
-    @Qualifier("ollamaRedisVectorStore")
-    private final VectorStore ollamaRedisVectorStore;
+    private final VectorStore vectorStore;
 
-    @Qualifier("ollamaChatModel")
-    private final Optional<OllamaChatModel> ollamaChatModel;
+    @Qualifier("bytedeskOllamaChatModel")
+    private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
 
     private final SpringAIVectorStoreService springAIVectorService;
 
@@ -82,7 +81,7 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         // 创建qaAdvisor - 使用构建器模式替代已弃用的构造函数
-        var qaAdvisor = QuestionAnswerAdvisor.builder(this.ollamaRedisVectorStore)
+        var qaAdvisor = QuestionAnswerAdvisor.builder(this.vectorStore)
                 .searchRequest(SearchRequest.builder()
                         .similarityThreshold(0.8d)
                         // .filterExpression(expression)
@@ -90,7 +89,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
         // 使用chatClient，添加ObservationRegistry
-        ChatResponse response = ChatClient.builder(ollamaChatModel.get(), observationRegistry, null)
+        ChatResponse response = ChatClient.builder(bytedeskOllamaChatModel.get(), observationRegistry, null)
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -110,8 +109,8 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
-        ChatClient chatClient = ChatClient.builder(ollamaChatModel.get())
-                .defaultAdvisors(QuestionAnswerAdvisor.builder(ollamaRedisVectorStore)
+        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel.get())
+                .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(SearchRequest.builder().build())
                         .build())
                 .build();
@@ -137,7 +136,7 @@ public class SpringAIRagController {
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                         .similarityThreshold(0.50)
-                        .vectorStore(ollamaRedisVectorStore)
+                        .vectorStore(vectorStore)
                         .build())
                 // 允许为空
                 // .queryAugmenter(ContextualQueryAugmenter.builder()
@@ -145,7 +144,7 @@ public class SpringAIRagController {
                 // .build())
                 .build();
 
-        String answer = ChatClient.builder(ollamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -166,15 +165,15 @@ public class SpringAIRagController {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
-                        .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
+                        .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
                         .build())
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                         .similarityThreshold(0.50)
-                        .vectorStore(ollamaRedisVectorStore)
+                        .vectorStore(vectorStore)
                         .build())
                 .build();
 
-        String answer = ChatClient.builder(ollamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -209,13 +208,13 @@ public class SpringAIRagController {
         // conversation history and a follow-up query into a standalone query that
         // captures the essence of the conversation.
         CompressionQueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(ollamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -244,13 +243,13 @@ public class SpringAIRagController {
         // to provide better results when querying a target system, such as a vector
         // store or a web search engine.
         QueryTransformer queryTransformer = RewriteQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(ollamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -275,14 +274,14 @@ public class SpringAIRagController {
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
         QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
                 .targetLanguage("english")
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(ollamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -305,14 +304,14 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                .chatClientBuilder(ChatClient.builder(ollamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
                 .numberOfQueries(3)
                 // .includeOriginal(false)
                 .build();
         List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
         // 使用chatClient
-        String answer = ChatClient.builder(ollamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -334,7 +333,7 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
-                .vectorStore(ollamaRedisVectorStore)
+                .vectorStore(vectorStore)
                 .similarityThreshold(0.73)
                 .topK(5)
                 .filterExpression(new FilterExpressionBuilder()
@@ -396,7 +395,7 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> observedChat(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
             
-        ChatClient chatClient = ChatClient.builder(ollamaChatModel.get(), observationRegistry, null)
+        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel.get(), observationRegistry, null)
                 .build();
                 
         ChatResponse response = chatClient.prompt()
