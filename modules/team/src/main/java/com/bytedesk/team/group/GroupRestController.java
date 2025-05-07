@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:35:44
+ * @LastEditTime: 2025-05-07 15:59:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.team.group;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.team.member.MemberProtobuf;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,6 +61,19 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         GroupResponse group = groupRestService.queryByUid(request);
         
         return ResponseEntity.ok(JsonResult.success(group));
+    }
+    
+    /**
+     * 分页查询群组成员
+     * @param request 包含群组uid和分页参数
+     * @return 成员列表分页结果
+     */
+    @GetMapping("/members")
+    public ResponseEntity<?> queryMembers(GroupRequest request) {
+        
+        Page<MemberProtobuf> page = groupRestService.queryGroupMembers(request);
+        
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @ActionAnnotation(title = "群组", action = "新建", description = "create group")

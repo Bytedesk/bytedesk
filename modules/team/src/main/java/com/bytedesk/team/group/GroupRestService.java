@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:35:51
+ * @LastEditTime: 2025-05-07 16:00:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,8 @@ package com.bytedesk.team.group;
 
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberRestService;
+import com.bytedesk.team.member.MemberProtobuf;
 
 import lombok.RequiredArgsConstructor;
 
@@ -202,7 +205,21 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     @Override
     public GroupResponse convertToResponse(GroupEntity entity) {
-        return modelMapper.map(entity, GroupResponse.class);
+        GroupResponse response = modelMapper.map(entity, GroupResponse.class);
+        
+        // 添加成员计数
+        response.setMemberCount(entity.getMembers().size());
+        
+        // 可以选择返回前N个成员作为预览
+        if (entity.getMembers() != null && !entity.getMembers().isEmpty()) {
+            List<MemberProtobuf> memberPreview = entity.getMembers().stream()
+                .limit(10) // 只返回前10个成员作为预览
+                .map(member -> modelMapper.map(member, MemberProtobuf.class))
+                .collect(Collectors.toList());
+            response.setMemberPreview(memberPreview);
+        }
+        
+        return response;
     }
 
     // public GroupExcel convertToExcel(GroupResponse group) {
@@ -238,6 +255,40 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         return excel;
     }
 
-    
+    /**
+     * 分页查询群组成员
+     * @param request 包含群组uid和分页参数的请求
+     * @return 成员列表的分页结果
+     */
+    public Page<MemberProtobuf> queryGroupMembers(GroupRequest request) {
+        // 查找群组
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
+        if (!groupOptional.isPresent()) {
+            throw new RuntimeException("群组不存在: " + request.getUid());
+        }
+        
+        GroupEntity group = groupOptional.get();
+        Pageable pageable = request.getPageable();
+        
+        // 使用Spring Data的分页功能，从集合中获取指定页的数据
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        
+        List<MemberEntity> memberList = group.getMembers();
+        List<MemberProtobuf> content;
+        
+        if (memberList.size() < startItem) {
+            content = List.of();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, memberList.size());
+            content = memberList.subList(startItem, toIndex).stream()
+                    .map(member -> modelMapper.map(member, MemberProtobuf.class))
+                    .collect(Collectors.toList());
+        }
+        
+        return new org.springframework.data.domain.PageImpl<>(
+                content, pageable, memberList.size());
+    }
 
 }

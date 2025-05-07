@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 12:26:47
+ * @LastEditTime: 2025-05-07 15:58:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,10 +33,15 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberRequest extends BaseRequest {
+
+    /**
+     * 群组的uid，用于查询特定群组的成员
+     */
+    private String groupUid;
 
     private String username;
 
@@ -45,6 +50,11 @@ public class MemberRequest extends BaseRequest {
 
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultAvatarUrl();
+
+    /**
+     * 用于筛选成员的关键词，可以是昵称等
+     */
+    private String keyword;
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
