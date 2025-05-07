@@ -389,10 +389,10 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         Optional<MemberEntity> originalMemberOptional = findByUid(originalMemberUid);
         if (originalMemberOptional.isPresent()) {
             UserProtobuf user = UserProtobuf.builder()
+                    .uid(originalMemberOptional.get().getUser().getUid())
                     .nickname(originalMemberOptional.get().getNickname())
                     .avatar(originalMemberOptional.get().getAvatar())
                     .build();
-            user.setUid(originalMemberOptional.get().getUid());
             reverseThread.setUser(JSON.toJSONString(user));
         }
         

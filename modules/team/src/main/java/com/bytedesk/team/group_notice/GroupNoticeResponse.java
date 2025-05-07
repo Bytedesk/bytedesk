@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-02-06 09:55:51
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 13:29:02
+ * @LastEditTime: 2025-03-10 17:57:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,52 +11,34 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.team.group;
+package com.bytedesk.team.group_notice;
 
-import java.util.List;
-
-// import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.team.member.MemberProtobuf;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
+@Builder
 @Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class GroupResponse extends BaseResponse {
+public class GroupNoticeResponse extends BaseResponse {
 
     private String name;
 
-    private String avatar;
-
     private String description;
 
-    private Boolean showTopTip;
+    private String type;
 
-    private String topTip;
+    private String color;
 
-    private GroupTypeEnum type;
+    private Integer order;
 
-    private GroupStatusEnum status;
-
-    private Boolean isExternal;
-
-    private List<MemberProtobuf> members;
-
-    private List<UserProtobuf> admins;
-
-    // private List<RobotProtobuf> robots;
-
-    private UserProtobuf creator;
-
+    // private LocalDateTime createdAt;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 13:37:34
+ * @LastEditTime: 2025-03-08 17:12:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.team.group_invite;
+package com.bytedesk.team.group_notice;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -25,61 +25,61 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/group/invite")
+@RequestMapping("/api/v1/group/notice")
 @AllArgsConstructor
-public class GroupInviteRestController extends BaseRestController<GroupInviteRequest> {
+public class GroupNoticeRestController extends BaseRestController<GroupNoticeRequest> {
 
-    private final GroupInviteRestService groupInviteService;
+    private final GroupNoticeRestService groupNoticeService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(GroupInviteRequest request) {
+    public ResponseEntity<?> queryByOrg(GroupNoticeRequest request) {
         
-        Page<GroupInviteResponse> groupInvites = groupInviteService.queryByOrg(request);
+        Page<GroupNoticeResponse> groupNotices = groupNoticeService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(groupInvites));
+        return ResponseEntity.ok(JsonResult.success(groupNotices));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(GroupInviteRequest request) {
+    public ResponseEntity<?> queryByUser(GroupNoticeRequest request) {
         
-        Page<GroupInviteResponse> groupInvites = groupInviteService.queryByUser(request);
+        Page<GroupNoticeResponse> groupNotices = groupNoticeService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(groupInvites));
+        return ResponseEntity.ok(JsonResult.success(groupNotices));
     }
 
     @Override
-    public ResponseEntity<?> create(GroupInviteRequest request) {
+    public ResponseEntity<?> create(GroupNoticeRequest request) {
         
-        GroupInviteResponse groupInvite = groupInviteService.create(request);
+        GroupNoticeResponse group_notice = groupNoticeService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(groupInvite));
+        return ResponseEntity.ok(JsonResult.success(group_notice));
     }
 
     @Override
-    public ResponseEntity<?> update(GroupInviteRequest request) {
+    public ResponseEntity<?> update(GroupNoticeRequest request) {
         
-        GroupInviteResponse groupInvite = groupInviteService.update(request);
+        GroupNoticeResponse group_notice = groupNoticeService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(groupInvite));
+        return ResponseEntity.ok(JsonResult.success(group_notice));
     }
 
     @Override
-    public ResponseEntity<?> delete(GroupInviteRequest request) {
+    public ResponseEntity<?> delete(GroupNoticeRequest request) {
         
-        groupInviteService.delete(request);
+        groupNoticeService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
-    public Object export(GroupInviteRequest request, HttpServletResponse response) {
+    public Object export(GroupNoticeRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(GroupInviteRequest request) {
+    public ResponseEntity<?> queryByUid(GroupNoticeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
