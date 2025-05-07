@@ -47,11 +47,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EntityListeners({ UserEntityListener.class })
 @Table(name = "bytedesk_core_user", uniqueConstraints = {
-		// num, username, email, mobile is unique combined with platform, not self
-		@UniqueConstraint(columnNames = { "num", "platform" }),
-		@UniqueConstraint(columnNames = { "username", "platform" }),
-		@UniqueConstraint(columnNames = { "email", "platform" }),
-		@UniqueConstraint(columnNames = { "mobile", "platform" }),
+		// num, username, email, mobile is unique combined with platform and is_deleted
+		@UniqueConstraint(columnNames = { "num", "platform", "is_deleted" }),
+		@UniqueConstraint(columnNames = { "username", "platform", "is_deleted" }),
+		@UniqueConstraint(columnNames = { "email", "platform", "is_deleted" }),
+		@UniqueConstraint(columnNames = { "mobile", "platform", "is_deleted" }),
 })
 public class UserEntity extends BaseEntityNoOrg {
 
