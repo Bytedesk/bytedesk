@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 16:50:58
+ * @LastEditTime: 2025-05-07 15:12:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,6 +93,10 @@ public class MessageSpecification extends BaseSpecification {
             // threadUid 替换为 thread.uid
             if (StringUtils.hasText(request.getThreadUid())) {
                 predicates.add(criteriaBuilder.equal(threadJoin.get("uid"), request.getThreadUid()));
+            }
+            // threadType 替换为 thread.type
+            if (StringUtils.hasText(request.getThreadType())) {
+                predicates.add(criteriaBuilder.equal(threadJoin.get("type"), request.getThreadType()));
             }
             // user.nickname
             if (StringUtils.hasText(request.getNickname())) {
