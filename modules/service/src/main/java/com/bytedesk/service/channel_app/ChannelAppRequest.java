@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 12:39:42
+ * @LastEditTime: 2025-05-08 16:00:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,5 +35,13 @@ public class ChannelAppRequest extends BaseRequest {
 
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
+
+    private String appKey;
+
+    private String appPackage;
+
+    // platform 跟 baseEntity 的 platform 冲突了, 所以这里用 appPlatform
+    @Builder.Default
+    private String appPlatform = ChannelAppPlatformEnum.ANDROID.name();
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 15:13:40
+ * @LastEditTime: 2025-05-08 15:57:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.service.channel_app;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -43,7 +42,15 @@ public class ChannelAppEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    private String appKey;
+
+    private String appPackage;
+
+    // platform 跟 baseEntity 的 platform 冲突了, 所以这里用 appPlatform
     @Builder.Default
-    @Column(name = "app_type", nullable = false)
-    private String type = ChannelAppTypeEnum.CUSTOMER.name();
+    private String appPlatform = ChannelAppPlatformEnum.ANDROID.name();
+
+    // @Builder.Default
+    // @Column(name = "app_type", nullable = false)
+    // private String type = ChannelAppTypeEnum.CUSTOMER.name();
 }
