@@ -34,6 +34,13 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-retry</artifactId>
 			<version>${spring-ai.version}</version>
+			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
+			<exclusions>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- rag -->
