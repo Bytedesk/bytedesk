@@ -41,8 +41,8 @@
     </sequenceFlow>
     <endEvent id="end" name="结束"></endEvent>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_groupTicketSimpleProcess">
-    <bpmndi:BPMNPlane bpmnElement="groupTicketSimpleProcess" id="BPMNPlane_groupTicketSimpleProcess">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ticketProcess">
+    <bpmndi:BPMNPlane bpmnElement="ticketProcess" id="BPMNPlane_ticketProcess">
       <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
         <omgdc:Bounds height="30.0" width="30.0" x="130.0" y="315.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>

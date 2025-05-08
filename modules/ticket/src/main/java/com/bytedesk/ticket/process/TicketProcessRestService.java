@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:18:34
+ * @LastEditTime: 2025-05-08 09:31:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -146,18 +146,6 @@ public class TicketProcessRestService
     }
 
     @Override
-    public TicketProcessEntity save(TicketProcessEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        } catch (Exception e) {
-            log.error("Save process failed: {}", e.getMessage());
-            throw new RuntimeException("Save process failed: " + e.getMessage());
-        }
-    }
-
-    @Override
     protected TicketProcessEntity doSave(TicketProcessEntity entity) {
         return processRepository.save(entity);
     }
@@ -216,10 +204,10 @@ public class TicketProcessRestService
         try {
             Resource resource = resourceLoader
                     .getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH);
-            String groupTicketBpmn20Xml = "";
+            String ticketBpmn20Xml = "";
 
             try (InputStream inputStream = resource.getInputStream()) {
-                groupTicketBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                ticketBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             }
 
             // 生成 processUid 并创建流程记录
@@ -227,7 +215,7 @@ public class TicketProcessRestService
             TicketProcessRequest processRequest = TicketProcessRequest.builder()
                     .uid(processUid)
                     .name(TicketConsts.TICKET_PROCESS_NAME)
-                    .content(groupTicketBpmn20Xml)
+                    .content(ticketBpmn20Xml)
                     .type(TicketProcessTypeEnum.TICKET.name())
                     .key(TicketConsts.TICKET_PROCESS_KEY)
                     .description(TicketConsts.TICKET_PROCESS_NAME)
