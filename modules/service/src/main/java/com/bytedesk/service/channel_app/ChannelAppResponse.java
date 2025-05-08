@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.channel_app;
 
-
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
