@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppResponse extends BaseResponse {
+public class ChannelAppResponse extends BaseResponse {
 
     private String name;
 

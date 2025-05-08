@@ -33,9 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppRequest, AppResponse, AppExcel> {
+public class ChannelAppRestService extends BaseRestServiceWithExcel<ChannelAppEntity, ChannelAppRequest, ChannelAppResponse, ChannelAppExcel> {
 
-    private final AppRepository appRepository;
+    private final ChannelAppRepository appRepository;
 
     private final ModelMapper modelMapper;
 
@@ -44,20 +44,20 @@ public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppReque
     private final AuthService authService;
 
     @Override
-    public Page<AppEntity> queryByOrgEntity(AppRequest request) {
+    public Page<ChannelAppEntity> queryByOrgEntity(ChannelAppRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<AppEntity> spec = AppSpecification.search(request);
+        Specification<ChannelAppEntity> spec = ChannelAppSpecification.search(request);
         return appRepository.findAll(spec, pageable);
     }
 
     @Override
-    public Page<AppResponse> queryByOrg(AppRequest request) {
-        Page<AppEntity> page = queryByOrgEntity(request);
+    public Page<ChannelAppResponse> queryByOrg(ChannelAppRequest request) {
+        Page<ChannelAppEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<AppResponse> queryByUser(AppRequest request) {
+    public Page<ChannelAppResponse> queryByUser(ChannelAppRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");
@@ -68,14 +68,14 @@ public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppReque
     }
 
     @Override
-    public AppResponse queryByUid(AppRequest request) {
+    public ChannelAppResponse queryByUid(ChannelAppRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "app", key = "#uid", unless="#result==null")
     @Override
-    public Optional<AppEntity> findByUid(String uid) {
+    public Optional<ChannelAppEntity> findByUid(String uid) {
         return appRepository.findByUid(uid);
     }
 
@@ -84,7 +84,7 @@ public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppReque
     }
 
     @Override
-    public AppResponse create(AppRequest request) {
+    public ChannelAppResponse create(ChannelAppRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -95,12 +95,12 @@ public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppReque
             request.setUserUid(user.getUid());
         }
         // 
-        AppEntity entity = modelMapper.map(request, AppEntity.class);
+        ChannelAppEntity entity = modelMapper.map(request, ChannelAppEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        AppEntity savedEntity = save(entity);
+        ChannelAppEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create app failed");
         }
@@ -108,34 +108,34 @@ public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppReque
     }
 
     @Override
-    public AppResponse update(AppRequest request) {
-        Optional<AppEntity> optional = appRepository.findByUid(request.getUid());
+    public ChannelAppResponse update(ChannelAppRequest request) {
+        Optional<ChannelAppEntity> optional = appRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            AppEntity entity = optional.get();
+            ChannelAppEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            AppEntity savedEntity = save(entity);
+            ChannelAppEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update app failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("App not found");
+            throw new RuntimeException("ChannelApp not found");
         }
     }
 
     @Override
-    protected AppEntity doSave(AppEntity entity) {
+    protected ChannelAppEntity doSave(ChannelAppEntity entity) {
         return appRepository.save(entity);
     }
 
     @Override
-    public AppEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AppEntity entity) {
+    public ChannelAppEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ChannelAppEntity entity) {
         try {
-            Optional<AppEntity> latest = appRepository.findByUid(entity.getUid());
+            Optional<ChannelAppEntity> latest = appRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                AppEntity latestEntity = latest.get();
+                ChannelAppEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
@@ -151,30 +151,30 @@ public class AppRestService extends BaseRestServiceWithExcel<AppEntity, AppReque
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<AppEntity> optional = appRepository.findByUid(uid);
+        Optional<ChannelAppEntity> optional = appRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
             // appRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("App not found");
+            throw new RuntimeException("ChannelApp not found");
         }
     }
 
     @Override
-    public void delete(AppRequest request) {
+    public void delete(ChannelAppRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public AppResponse convertToResponse(AppEntity entity) {
-        return modelMapper.map(entity, AppResponse.class);
+    public ChannelAppResponse convertToResponse(ChannelAppEntity entity) {
+        return modelMapper.map(entity, ChannelAppResponse.class);
     }
 
     @Override
-    public AppExcel convertToExcel(AppEntity entity) {
-        return modelMapper.map(entity, AppExcel.class);
+    public ChannelAppExcel convertToExcel(ChannelAppEntity entity) {
+        return modelMapper.map(entity, ChannelAppExcel.class);
     }
     
     
