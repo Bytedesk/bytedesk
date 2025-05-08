@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-05 10:52:07
+ * @LastEditTime: 2025-05-08 09:15:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +27,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -37,6 +43,9 @@ import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -58,11 +67,11 @@ public class VisitorThreadService
 
     private final UidUtils uidUtils;
 
-    // private final QueueMemberRestService queueMemberRestService;
+    private final QueueMemberRestService queueMemberRestService;
 
-    // private final AgentRestService agentRestService;
+    private final AgentRestService agentRestService;
 
-    // private final IMessageSendService messageSendService;
+    private final IMessageSendService messageSendService;
 
     @Override
     public Page<VisitorThreadResponse> queryByOrg(VisitorThreadRequest request) {
@@ -285,39 +294,38 @@ public class VisitorThreadService
             }
 
             // 查询超时未回复会话, 发送会话超时提醒。
-            // FIXME: 当前消息会一起推送给访客，去掉
-            // UserProtobuf agentProtobuf = thread.getAgentProtobuf();
-            // if (agentProtobuf != null && StringUtils.hasText(agentProtobuf.getUid())) {
-            //     Optional<AgentEntity> agentOpt = agentRestService.findByUid(agentProtobuf.getUid());
-            //     if (agentOpt.isPresent()) {
-            //         AgentEntity agent = agentOpt.get();
-            //         // 判断是否超时未回复
-            //         if (diffInMinutes > agent.getTimeoutRemindTime()) {
-            //             // 更新会话超时提醒时间
-            //             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
-            //                     .findByThreadUid(thread.getUid());
-            //             if (queueMemberOpt.isPresent()) {
-            //                 QueueMemberEntity queueMember = queueMemberOpt.get();
-            //                 // 判断是否首次超时
-            //                 if (!queueMember.isAgentTimeout()) {
-            //                     // 只设置首次超时时间，后续不再更新
-            //                     if (queueMember.getAgentTimeoutAt() == null) {
-            //                         queueMember.setAgentTimeoutAt(LocalDateTime.now());
-            //                         queueMember.setAgentTimeout(true);
-            //                     }
-            //                     // 更新超时次数
-            //                     queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
-            //                     // 保存队列成员信息
-            //                     queueMemberRestService.save(queueMember);
-            //                     // 发送会话超时提醒
-            //                     MessageProtobuf messageProtobuf = MessageUtils.createTimeoutRemindMessage(thread,
-            //                             agent.getTimeoutRemindTip());
-            //                     messageSendService.sendProtobufMessage(messageProtobuf);
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
+            UserProtobuf agentProtobuf = thread.getAgentProtobuf();
+            if (agentProtobuf != null && StringUtils.hasText(agentProtobuf.getUid())) {
+                Optional<AgentEntity> agentOpt = agentRestService.findByUid(agentProtobuf.getUid());
+                if (agentOpt.isPresent()) {
+                    AgentEntity agent = agentOpt.get();
+                    // 判断是否超时未回复
+                    if (diffInMinutes > agent.getTimeoutRemindTime()) {
+                        // 更新会话超时提醒时间
+                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
+                                .findByThreadUid(thread.getUid());
+                        if (queueMemberOpt.isPresent()) {
+                            QueueMemberEntity queueMember = queueMemberOpt.get();
+                            // 判断是否首次超时
+                            if (!queueMember.isAgentTimeout()) {
+                                // 只设置首次超时时间，后续不再更新
+                                if (queueMember.getAgentTimeoutAt() == null) {
+                                    queueMember.setAgentTimeoutAt(LocalDateTime.now());
+                                    queueMember.setAgentTimeout(true);
+                                }
+                                // 更新超时次数
+                                queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
+                                // 保存队列成员信息
+                                queueMemberRestService.save(queueMember);
+                                // 发送会话超时提醒
+                                MessageProtobuf messageProtobuf = MessageUtils.createAgentReplyTimeoutMessage(thread,
+                                        agent.getTimeoutRemindTip());
+                                messageSendService.sendProtobufMessage(messageProtobuf);
+                            }
+                        }
+                    }
+                }
+            }
         });
     }
 
