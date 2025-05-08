@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 12:37:15
+ * @LastEditTime: 2025-05-08 15:12:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     private final TagRestService tagRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "查询组织", description = "query tag by org")
+    @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
     @Override
     public ResponseEntity<?> queryByOrg(TagRequest request) {
         
@@ -44,7 +44,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询用户", description = "query tag by user")
+    @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
     @Override
     public ResponseEntity<?> queryByUser(TagRequest request) {
         

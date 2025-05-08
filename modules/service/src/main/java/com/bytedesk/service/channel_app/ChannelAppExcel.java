@@ -22,7 +22,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class AppExcel {
+public class ChannelAppExcel {
 
     @ExcelProperty(index = 0, value = "Name")
     @ColumnWidth(20)

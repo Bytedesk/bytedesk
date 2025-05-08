@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 12:31:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 12:35:41
+ * @LastEditTime: 2025-05-08 15:14:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,20 +15,20 @@ package com.bytedesk.service.channel_app.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.service.channel_app.AppEntity;
+import com.bytedesk.service.channel_app.ChannelAppEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AppDeleteEvent extends ApplicationEvent {
+public class ChannelAppDeleteEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private AppEntity app;
+    private ChannelAppEntity app;
 
-    public AppDeleteEvent(AppEntity app) {
+    public ChannelAppDeleteEvent(ChannelAppEntity app) {
         super(app);
         this.app = app;
     }

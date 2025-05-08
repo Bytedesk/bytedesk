@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class AppInitializer implements SmartInitializingSingleton {
+public class ChannelAppInitializer implements SmartInitializingSingleton {
 
     // private final AuthorityRestService authorityService;
 
@@ -31,7 +31,7 @@ public class AppInitializer implements SmartInitializingSingleton {
 
     private void initPermissions() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = AppPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = ChannelAppPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

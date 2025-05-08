@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AppSpecification extends BaseSpecification {
+public class ChannelAppSpecification extends BaseSpecification {
     
-    public static Specification<AppEntity> search(AppRequest request) {
+    public static Specification<ChannelAppEntity> search(ChannelAppRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

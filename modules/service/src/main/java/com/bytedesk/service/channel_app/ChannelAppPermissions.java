@@ -15,6 +15,6 @@ package com.bytedesk.service.channel_app;
 
 import com.bytedesk.core.base.BasePermissions;
 
-public class AppPermissions extends BasePermissions {
+public class ChannelAppPermissions extends BasePermissions {
 
 }

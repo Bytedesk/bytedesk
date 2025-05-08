@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:25:55
+ * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:23:20
+ * @LastEditTime: 2025-03-11 08:57:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,16 +13,8 @@
  */
 package com.bytedesk.service.channel_app;
 
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-public interface AppRepository extends JpaRepository<AppEntity, Long>, JpaSpecificationExecutor<AppEntity> {
-
-    Optional<AppEntity> findByUid(String uid);
-
-    Boolean existsByUid(String uid);
-
-    // Boolean existsByPlatform(String platform);
+public enum ChannelAppTypeEnum {
+    THREAD,
+    CUSTOMER,
+    TICKET
 }
