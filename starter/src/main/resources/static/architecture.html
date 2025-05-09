@@ -322,53 +322,69 @@
             margin: 0 auto;
             padding: 20px;
         }
-        .roadmap-quarter {
+        .roadmap-module {
             margin-bottom: 40px;
             padding: 20px;
             background-color: #f8f9fa;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .roadmap-quarter h3 {
+        .roadmap-module h3 {
             color: #2c3e50;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #3498db;
         }
-        .roadmap-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .roadmap-item {
-            flex: 1;
-            min-width: 300px;
+        .roadmap-table {
+            width: 100%;
+            border-collapse: collapse;
             background-color: white;
-            padding: 15px;
             border-radius: 6px;
+            overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .roadmap-item-title {
+        .roadmap-table th {
+            background-color: #eef5fb;
+            color: #2c3e50;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
             font-weight: bold;
-            color: #3498db;
-            margin-bottom: 10px;
-            font-size: 1.1em;
         }
-        .roadmap-item ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        .roadmap-item li {
-            padding: 5px 0;
+        .roadmap-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
             color: #555;
-            position: relative;
-            padding-left: 20px;
         }
-        .roadmap-item li:before {
-            content: "•";
-            color: #3498db;
-            position: absolute;
-            left: 0;
+        .roadmap-table tr:last-child td {
+            border-bottom: none;
+        }
+        .roadmap-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .status-in-progress {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .status-planned {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -742,75 +758,555 @@
         <!-- 产品路线图选项卡 -->
         <div id="roadmap-view" class="tab-content">
             <div class="roadmap-container">
-                <h2>产品路线图-草图-完善中-信息不准确</h2>
+                <h2>产品路线图-草图-完善中-不代表真实状态-20250509</h2>
                 
-                <!-- 2024年Q2 -->
-                <div class="roadmap-quarter">
-                    <h3>2024年Q2</h3>
-                    <div class="roadmap-items">
-                        <div class="roadmap-item">
-                            <div class="roadmap-item-title">AI助手升级</div>
-                            <ul>
-                                <li>支持多轮对话</li>
-                                <li>知识库自动学习</li>
-                                <li>情感分析能力</li>
-                            </ul>
-                        </div>
-                        <div class="roadmap-item">
-                            <div class="roadmap-item-title">多渠道整合</div>
-                            <ul>
-                                <li>WhatsApp集成</li>
-                                <li>Facebook Messenger集成</li>
-                                <li>Instagram集成</li>
-                            </ul>
-                        </div>
-                    </div>
+                <!-- 企业IM -->
+                <div class="roadmap-module">
+                    <h3>企业IM</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>团队内部实时沟通优化</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多端同步消息功能增强</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>企业通讯录管理</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>团队协作工具集成</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>企业文件共享增强</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>自定义聊天记录导出</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>企业群组权限细分</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>视频会议功能整合</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>消息安全与合规增强</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 
-                <!-- 2024年Q3 -->
-                <div class="roadmap-quarter">
-                    <h3>2024年Q3</h3>
-                    <div class="roadmap-items">
-                        <div class="roadmap-item">
-                            <div class="roadmap-item-title">智能工单系统</div>
-                            <ul>
-                                <li>工单自动分类</li>
-                                <li>智能派单</li>
-                                <li>工单优先级预测</li>
-                            </ul>
-                        </div>
-                        <div class="roadmap-item">
-                            <div class="roadmap-item-title">数据分析增强</div>
-                            <ul>
-                                <li>客户行为分析</li>
-                                <li>服务质量分析</li>
-                                <li>预测性分析</li>
-                            </ul>
-                        </div>
-                    </div>
+                <!-- 在线客服 -->
+                <div class="roadmap-module">
+                    <h3>在线客服</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>客户会话自动分配优化</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多渠道接入统一管理</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>客服绩效评估系统升级</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>客户旅程追踪系统</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>满意度评价体系完善</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>会话质检工具增强</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>视频客服功能（一对一通话）</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>屏幕共享与远程协助</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多语言客服支持</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 
-                <!-- 2024年Q4 -->
-                <div class="roadmap-quarter">
-                    <h3>2024年Q4</h3>
-                    <div class="roadmap-items">
-                        <div class="roadmap-item">
-                            <div class="roadmap-item-title">视频客服</div>
-                            <ul>
-                                <li>一对一视频通话</li>
-                                <li>视频会议</li>
-                                <li>屏幕共享</li>
-                            </ul>
-                        </div>
-                        <div class="roadmap-item">
-                            <div class="roadmap-item-title">企业版功能</div>
-                            <ul>
-                                <li>多租户支持</li>
-                                <li>高级权限管理</li>
-                                <li>自定义工作流</li>
-                            </ul>
-                        </div>
-                    </div>
+                <!-- AI Agent -->
+                <div class="roadmap-module">
+                    <h3>AI Agent</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>多轮对话能力增强</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>智能情感识别与回应</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多模态内容理解</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>Agent个性化定制</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>知识库自动学习与优化</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>场景化解决方案</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>复杂业务流程自动化</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多语言AI服务支持</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>AI辅助决策系统</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 知识库/帮助中心 -->
+                <div class="roadmap-module">
+                    <h3>知识库/帮助中心</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>知识内容智能推荐</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>内容创作与审核流程优化</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多格式内容支持</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>智能内容分类与标签</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>知识库使用情况分析</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>SEO优化工具</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>知识图谱可视化</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>内容有效性自动评估</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>AI辅助内容创建</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 客户之声 -->
+                <div class="roadmap-module">
+                    <h3>客户之声</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>多渠道客户反馈采集</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>客户反馈自动分类</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>情感分析与标签提取</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>客户反馈趋势分析</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>问题优先级自动评估</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>客户满意度追踪</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>产品改进建议生成</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>竞品对比分析</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>客户体验指标仪表盘</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 工单系统 -->
+                <div class="roadmap-module">
+                    <h3>工单系统</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>工单自动分类与标签</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>智能工单路由与分配</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>SLA管理与预警</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>工单优先级智能预测</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>关联工单与知识库</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>工单解决方案推荐</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>高级报表与分析</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>自定义工单工作流</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>工单自动化处理规则</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 工作流 -->
+                <div class="roadmap-module">
+                    <h3>工作流</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>可视化工作流设计器</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>标准流程模板库</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>工作流执行监控</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>业务规则引擎集成</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>工作流版本控制</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>条件分支与决策点</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>工作流性能分析</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>跨系统工作流协作</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>AI辅助流程优化</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 项目管理 -->
+                <div class="roadmap-module">
+                    <h3>项目管理</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>敏捷项目看板</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>任务分配与跟踪</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>项目时间线管理</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>项目资源分配</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>里程碑与交付物管理</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>项目报告与分析</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>多项目组合管理</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>项目风险评估</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>团队协作工具集成</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 渠道整合 -->
+                <div class="roadmap-module">
+                    <h3>渠道整合</h3>
+                    <table class="roadmap-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>计划时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WhatsApp集成</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-completed">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>Facebook Messenger集成</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>Instagram集成</td>
+                                <td>2024年Q2</td>
+                                <td><span class="status-in-progress">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>Line/Telegram集成</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>电商平台对接</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>统一消息中心</td>
+                                <td>2024年Q3</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>渠道数据互通与分析</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>自定义渠道接入API</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                            <tr>
+                                <td>全渠道客户视图</td>
+                                <td>2024年Q4</td>
+                                <td><span class="status-planned">开发完成</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
