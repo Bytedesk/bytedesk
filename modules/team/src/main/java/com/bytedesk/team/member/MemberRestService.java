@@ -347,11 +347,6 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         return saveMember;
     }
 
-    @Override
-    public MemberExcel convertToExcel(MemberEntity member) {
-        return modelMapper.map(member, MemberExcel.class);
-    }
-
      /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
     public ThreadEntity createMemberReverseThread(ThreadEntity thread) {
         // 
