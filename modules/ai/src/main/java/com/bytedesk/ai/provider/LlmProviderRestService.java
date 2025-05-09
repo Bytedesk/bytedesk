@@ -48,7 +48,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     public Page<LlmProviderResponse> queryByOrg(LlmProviderRequest request) {
-        Pageable pageable = request.getPageableAsc();
+        Pageable pageable = request.getPageable();
         Specification<LlmProviderEntity> specification = LlmProviderSpecification.search(request);
         Page<LlmProviderEntity> page = repository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
