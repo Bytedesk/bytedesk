@@ -23,31 +23,31 @@ import lombok.Data;
 @Data
 public class MemberExcel {
 
-    @ExcelProperty(index = 0, value = "昵称")
+    @ExcelProperty(value = "昵称")
     @ColumnWidth(20)
     private String nickname;
 
-    @ExcelProperty(index = 1, value = "邮箱")
+    @ExcelProperty(value = "邮箱")
     @ColumnWidth(20)
     private String email;
 
-    @ExcelProperty(index = 2, value = "手机")
+    @ExcelProperty(value = "手机")
     @ColumnWidth(20)
     private String mobile;
 
-    @ExcelProperty(index = 3, value = "工号")
+    @ExcelProperty(value = "工号")
     @ColumnWidth(20)
     private String jobNo;
 
-    @ExcelProperty(index = 4, value = "职位")
+    @ExcelProperty(value = "职位")
     @ColumnWidth(20)
     private String jobTitle;
 
-    @ExcelProperty(index = 5, value = "座位号")
+    @ExcelProperty(value = "座位号")
     @ColumnWidth(20)
     private String seatNo;
 
-    @ExcelProperty(index = 6, value = "分机号")
+    @ExcelProperty(value = "分机号")
     @ColumnWidth(20)
     private String telephone;
     
