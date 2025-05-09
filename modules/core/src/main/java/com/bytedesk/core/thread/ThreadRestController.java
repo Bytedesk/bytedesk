@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:47:21
+ * @LastEditTime: 2025-05-09 12:00:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,19 +31,17 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
-/**
- */
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/thread")
 public class ThreadRestController extends BaseRestController<ThreadRequest> {
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(ThreadRequest request) {
 
-        Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
+        Page<ThreadResponse> threadPage = threadRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
@@ -51,7 +49,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> queryByUser(ThreadRequest request) {
 
-        Page<ThreadResponse> threadPage = threadService.query(request);
+        Page<ThreadResponse> threadPage = threadRestService.query(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
@@ -60,7 +58,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @GetMapping("/query/invite")
     public ResponseEntity<?> queryByThreadInvite(ThreadRequest request) {
 
-        Page<ThreadResponse> threadPage = threadService.queryByOrg(request);
+        Page<ThreadResponse> threadPage = threadRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
@@ -68,7 +66,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByThreadTopic(ThreadRequest request) {
 
-        Optional<ThreadResponse> threadOptional = threadService.queryByTopic(request);
+        Optional<ThreadResponse> threadOptional = threadRestService.queryByTopic(request);
         //
         if (threadOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
@@ -79,7 +77,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> queryByUid(ThreadRequest request) {
 
-        Optional<ThreadResponse> threadOptional = threadService.queryByThreadUid(request);
+        Optional<ThreadResponse> threadOptional = threadRestService.queryByThreadUid(request);
         //
         if (threadOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
@@ -91,7 +89,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = threadService.create(request);
+        ThreadResponse thread = threadRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
@@ -100,7 +98,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadService.update(request);
+        ThreadResponse threadResponse = threadRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -109,7 +107,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/top")
     public ResponseEntity<?> updateTop(@RequestBody ThreadRequest request) {
 
-        ThreadResponse thread = threadService.updateTop(request);
+        ThreadResponse thread = threadRestService.updateTop(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
@@ -118,7 +116,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/star")
     public ResponseEntity<?> updateStar(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadService.updateStar(request);
+        ThreadResponse threadResponse = threadRestService.updateStar(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -127,7 +125,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/mute")
     public ResponseEntity<?> updateMute(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadService.updateMute(request);
+        ThreadResponse threadResponse = threadRestService.updateMute(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -136,7 +134,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/user")
     public ResponseEntity<?> updateUser(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadService.updateUser(request);
+        ThreadResponse threadResponse = threadRestService.updateUser(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -145,7 +143,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/tagList")
     public ResponseEntity<?> updateTagList(@RequestBody ThreadRequest request) {
         
-        ThreadResponse threadResponse = threadService.updateTagList(request);
+        ThreadResponse threadResponse = threadRestService.updateTagList(request);
         
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -153,7 +151,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/unread")
     public ResponseEntity<?> updateUnread(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadService.updateUnread(request);
+        ThreadResponse threadResponse = threadRestService.updateUnread(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -162,7 +160,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/update/unread/count")
     public ResponseEntity<?> updateUnreadCount(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadService.updateUnreadCount(request);
+        ThreadResponse threadResponse = threadRestService.updateUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -173,7 +171,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
 
         request.setAutoClose(false);
         request.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-        ThreadResponse threadResponse = threadService.close(request);
+        ThreadResponse threadResponse = threadRestService.close(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -181,7 +179,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody ThreadRequest request) {
         
-        threadService.delete(request);
+        threadRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete thread success"));
     }
@@ -194,7 +192,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return exportTemplate(
             request,
             response,
-            threadService,
+            threadRestService,
             ThreadExcel.class,
             "会话列表",
             "thread"

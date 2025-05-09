@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 13:18:12
+ * @LastEditTime: 2025-05-09 12:13:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,9 +106,24 @@ public abstract class BaseRequest implements Serializable {
     @Builder.Default
     private boolean exportAll = false;
 
+    // 排序方式，默认按更新时间倒序
+    // updatedAt/createdAt: 'ascend', 'descend'
+    // 其他字段可以根据需要添加
+    @Builder.Default
+    private String sortBy = "updatedAt";
+
+    @Builder.Default
+    private String sortDirection = "descend";
+
     /**
      * 获取分页对象
      * 默认每页10条记录，按更新时间倒序排序
+     * 
+     * @return Pageable 分页对象
+     */
+    /**
+     * 获取分页对象
+     * 根据sortBy和sortDirection设置排序
      * 
      * @return Pageable 分页对象
      */
@@ -117,15 +132,23 @@ public abstract class BaseRequest implements Serializable {
         if (pageSize < 1) {
             pageSize = 10;
         }
-        return PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "updatedAt");
+        
+        Sort.Direction direction = "ascend".equals(sortDirection) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        return PageRequest.of(pageNumber, pageSize, direction, sortBy);
     }
 
+    /**
+     * 获取升序分页对象
+     * 按照sortBy字段升序排序
+     * 
+     * @return Pageable 分页对象
+     */
     public Pageable getPageableAsc() {
         // java.lang.IllegalArgumentException: Page size must not be less than one
         if (pageSize < 1) {
             pageSize = 10;
         }
-        return PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "updatedAt");
+        return PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sortBy);
     }
 
     /**
