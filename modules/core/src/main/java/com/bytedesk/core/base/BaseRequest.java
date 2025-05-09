@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-09 12:13:28
+ * @LastEditTime: 2025-05-09 12:49:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -135,20 +135,6 @@ public abstract class BaseRequest implements Serializable {
         
         Sort.Direction direction = "ascend".equals(sortDirection) ? Sort.Direction.ASC : Sort.Direction.DESC;
         return PageRequest.of(pageNumber, pageSize, direction, sortBy);
-    }
-
-    /**
-     * 获取升序分页对象
-     * 按照sortBy字段升序排序
-     * 
-     * @return Pageable 分页对象
-     */
-    public Pageable getPageableAsc() {
-        // java.lang.IllegalArgumentException: Page size must not be less than one
-        if (pageSize < 1) {
-            pageSize = 10;
-        }
-        return PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, sortBy);
     }
 
     /**
