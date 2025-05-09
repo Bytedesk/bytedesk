@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 10:41:24
+ * @LastEditTime: 2025-05-09 09:39:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,27 +35,6 @@ public class IpRestController {
 
     private final IpService ipService;
 
-    // @PostMapping("/block")
-    // public ResponseEntity<?> blockIp(@RequestBody IpRequest request) {
-    //     ipService.blockIp(request);
-    //     return ResponseEntity.ok(JsonResult.success());
-    // }
-
-    // @PostMapping("/unblock")
-    // public ResponseEntity<?> unblockIp(@RequestBody IpRequest request) {
-    //     return ResponseEntity.ok(JsonResult.success());
-    // }
-
-    // @PostMapping("/white")
-    // public ResponseEntity<?> whiteIp(@RequestBody IpRequest request) {
-    //     return ResponseEntity.ok(JsonResult.success());
-    // }
-
-    // @PostMapping("/unwhite")
-    // public ResponseEntity<?> unwhiteIp(@RequestBody IpRequest request) {
-    //     return ResponseEntity.ok(JsonResult.success());
-    // }
-    
     /**
      * http://127.0.0.1:9003/ip/api/v1/
      *
@@ -70,7 +49,7 @@ public class IpRestController {
      * http://127.0.0.1:9003/ip/api/v1/location
      * https://api.weiyuai.cn/ip/api/v1/location
      * location: "国家|区域|省份|城市|ISP"
-     * location: "中国|0|湖北省|武汉市|联通"
+     * location: "中国|0|湖北省|武汉市|联通"，缺省的地域信息默认是0。
      * 
      * @param request
      * @return
