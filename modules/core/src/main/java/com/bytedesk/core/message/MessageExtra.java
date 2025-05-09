@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-09 09:05:18
+ * @LastEditTime: 2025-05-09 09:24:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseExtra;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,6 +34,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class MessageExtra extends BaseExtra {
 
+    private static final long serialVersionUID = 1L;
+
+    // 是否内部消息
+    // 例如：企业内部员工之间的消息，true: 内部消息，false: 外部消息
+    @Builder.Default
+    private Boolean isInternal = false; // 设置默认值为false
     
     // 企业id
     private String orgUid;
@@ -41,7 +48,6 @@ public class MessageExtra extends BaseExtra {
         return JSON.parseObject(json, MessageExtra.class);
     }
 
-    // toJson
     public String toJson() {
         return JSON.toJSONString(this);
     }

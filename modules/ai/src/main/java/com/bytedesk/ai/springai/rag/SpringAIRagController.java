@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 09:22:29
+ * @LastEditTime: 2025-05-09 09:29:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.rag;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -38,7 +37,7 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,12 +60,12 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/spring/ai/rag")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIRagController {
 
     private final VectorStore vectorStore;
 
-    @Qualifier("bytedeskOllamaChatModel")
-    private final Optional<OllamaChatModel> bytedeskOllamaChatModel;
+    private final OllamaChatModel bytedeskOllamaChatModel;
 
     private final SpringAIVectorStoreService springAIVectorService;
 
@@ -89,7 +88,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
         // 使用chatClient，添加ObservationRegistry
-        ChatResponse response = ChatClient.builder(bytedeskOllamaChatModel.get(), observationRegistry, null)
+        ChatResponse response = ChatClient.builder(bytedeskOllamaChatModel, observationRegistry, null)
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -109,7 +108,7 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
-        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel.get())
+        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel)
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(SearchRequest.builder().build())
                         .build())
@@ -144,7 +143,7 @@ public class SpringAIRagController {
                 // .build())
                 .build();
 
-        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -165,7 +164,7 @@ public class SpringAIRagController {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
-                        .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
+                        .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
                         .build())
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                         .similarityThreshold(0.50)
@@ -173,7 +172,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
 
-        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -208,13 +207,13 @@ public class SpringAIRagController {
         // conversation history and a follow-up query into a standalone query that
         // captures the essence of the conversation.
         CompressionQueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -243,13 +242,13 @@ public class SpringAIRagController {
         // to provide better results when querying a target system, such as a vector
         // store or a web search engine.
         QueryTransformer queryTransformer = RewriteQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -274,14 +273,14 @@ public class SpringAIRagController {
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
         QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
                 .targetLanguage("english")
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -304,14 +303,14 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel.get()).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
                 .numberOfQueries(3)
                 // .includeOriginal(false)
                 .build();
         List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel.get())
+        String answer = ChatClient.builder(bytedeskOllamaChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -395,7 +394,7 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> observedChat(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
             
-        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel.get(), observationRegistry, null)
+        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel, observationRegistry, null)
                 .build();
                 
         ChatResponse response = chatClient.prompt()
