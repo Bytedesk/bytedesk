@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 18:16:53
+ * @LastEditTime: 2025-05-09 09:04:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,40 +92,6 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         return messageRepository.findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(threadUid, type,
                 userUid);
     }
-
-    // // rate message extra helpful
-    // public MessageResponse rateUp(String uid) {
-    //     Optional<MessageEntity> messageOptional = messageRepository.findByUid(uid);
-    //     if (messageOptional.isPresent()) {
-    //         MessageEntity message = messageOptional.get();
-    //         message.setStatus(MessageStatusEnum.RATE_UP.name());
-    //         //
-    //         MessageEntity savedMessage = save(message);
-    //         if (savedMessage == null) {
-    //             throw new RuntimeException("Message not saved");
-    //         }
-    //         //
-    //         return ConvertUtils.convertToMessageResponse(message);
-    //     }
-    //     return null;
-    // }
-
-    // // rate message extra unhelpful
-    // public MessageResponse rateDown(String uid) {
-    //     Optional<MessageEntity> optionalMessage = findByUid(uid);
-    //     if (optionalMessage.isPresent()) {
-    //         MessageEntity message = optionalMessage.get();
-    //         message.setStatus(MessageStatusEnum.RATE_DOWN.name());
-    //         //
-    //         MessageEntity savedMessage = save(message);
-    //         if (savedMessage == null) {
-    //             throw new RuntimeException("Message not saved");
-    //         }
-    //         //
-    //         return ConvertUtils.convertToMessageResponse(message);
-    //     }
-    //     return null;
-    // }
 
     @Override
     public MessageResponse create(MessageRequest request) {

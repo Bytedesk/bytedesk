@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 11:14:22
+ * @LastEditTime: 2025-05-09 08:53:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,20 +83,26 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
 
     @Override
     public ResponseEntity<?> create(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        MessageResponse response = messageRestService.create(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
     public ResponseEntity<?> update(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        MessageResponse response = messageRestService.update(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override
     public ResponseEntity<?> delete(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        messageRestService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
@@ -116,7 +122,6 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         //
         return ResponseEntity.ok(JsonResult.success(json));
     }
-
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
