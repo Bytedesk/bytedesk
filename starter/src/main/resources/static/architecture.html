@@ -315,6 +315,61 @@
         .footer a:hover {
             text-decoration: underline;
         }
+        
+        /* 产品路线图样式 */
+        .roadmap-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .roadmap-quarter {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .roadmap-quarter h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        .roadmap-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .roadmap-item {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .roadmap-item-title {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .roadmap-item ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .roadmap-item li {
+            padding: 5px 0;
+            color: #555;
+            position: relative;
+            padding-left: 20px;
+        }
+        .roadmap-item li:before {
+            content: "•";
+            color: #3498db;
+            position: absolute;
+            left: 0;
+        }
     </style>
 </head>
 <body>
@@ -333,6 +388,7 @@
             <button class="tab-button active" onclick="openTab('layered-view')">分层视图</button>
             <button class="tab-button" onclick="openTab('module-view')">模块视图</button>
             <button class="tab-button" onclick="openTab('frontend-view')">前端技术栈</button>
+            <button class="tab-button" onclick="openTab('roadmap-view')">产品路线图</button>
         </div>
         
         <!-- 分层架构图选项卡 -->
@@ -678,6 +734,82 @@
                         <div class="tech-item util-item">Lint Staged</div>
                         <div class="tech-item util-item">Cross Env</div>
                         <div class="tech-item util-item">MockJS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 产品路线图选项卡 -->
+        <div id="roadmap-view" class="tab-content">
+            <div class="roadmap-container">
+                <h2>产品路线图-草图-完善中-信息不准确</h2>
+                
+                <!-- 2024年Q2 -->
+                <div class="roadmap-quarter">
+                    <h3>2024年Q2</h3>
+                    <div class="roadmap-items">
+                        <div class="roadmap-item">
+                            <div class="roadmap-item-title">AI助手升级</div>
+                            <ul>
+                                <li>支持多轮对话</li>
+                                <li>知识库自动学习</li>
+                                <li>情感分析能力</li>
+                            </ul>
+                        </div>
+                        <div class="roadmap-item">
+                            <div class="roadmap-item-title">多渠道整合</div>
+                            <ul>
+                                <li>WhatsApp集成</li>
+                                <li>Facebook Messenger集成</li>
+                                <li>Instagram集成</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2024年Q3 -->
+                <div class="roadmap-quarter">
+                    <h3>2024年Q3</h3>
+                    <div class="roadmap-items">
+                        <div class="roadmap-item">
+                            <div class="roadmap-item-title">智能工单系统</div>
+                            <ul>
+                                <li>工单自动分类</li>
+                                <li>智能派单</li>
+                                <li>工单优先级预测</li>
+                            </ul>
+                        </div>
+                        <div class="roadmap-item">
+                            <div class="roadmap-item-title">数据分析增强</div>
+                            <ul>
+                                <li>客户行为分析</li>
+                                <li>服务质量分析</li>
+                                <li>预测性分析</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2024年Q4 -->
+                <div class="roadmap-quarter">
+                    <h3>2024年Q4</h3>
+                    <div class="roadmap-items">
+                        <div class="roadmap-item">
+                            <div class="roadmap-item-title">视频客服</div>
+                            <ul>
+                                <li>一对一视频通话</li>
+                                <li>视频会议</li>
+                                <li>屏幕共享</li>
+                            </ul>
+                        </div>
+                        <div class="roadmap-item">
+                            <div class="roadmap-item-title">企业版功能</div>
+                            <ul>
+                                <li>多租户支持</li>
+                                <li>高级权限管理</li>
+                                <li>自定义工作流</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
