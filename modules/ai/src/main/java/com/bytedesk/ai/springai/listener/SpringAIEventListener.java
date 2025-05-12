@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 18:15:43
+ * @LastEditTime: 2025-05-12 21:24:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIEventListener {
 
     private final SpringAIVectorStoreService springAiVectorService;
-    
+
     // 存储收集到的FAQ实体，用于批量处理
     private final ConcurrentHashMap<String, FaqEntity> faqCreateMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, FaqEntity> faqUpdateMap = new ConcurrentHashMap<>();
@@ -81,12 +81,12 @@ public class SpringAIEventListener {
     public void onTextCreateEvent(TextCreateEvent event) {
         TextEntity text = event.getText();
         log.info("SpringAIEventListener onTextCreateEvent: {}", text.getTitle());
-        if (text.isAutoDeleteLlmChunk()) {
-            // 仅当文件需要分割时，才添加到创建缓存中
-            textCreateMap.put(text.getUid(), text);
-        } else if (text.isAutoGenerateLlmQa()) {
-            // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
-        }
+        // if (text.isAutoDeleteLlmChunk()) {
+        // 仅当文件需要分割时，才添加到创建缓存中
+        textCreateMap.put(text.getUid(), text);
+        // } else if (text.isAutoGenerateLlmQa()) {
+        // // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
+        // }
     }
 
     @EventListener
@@ -270,15 +270,19 @@ public class SpringAIEventListener {
     }
 
     // @EventListener
-    // public void onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
-    //     RedisPubsubMessageFile messageFile = event.getMessageFile();
-    //     log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}", messageFile.toString());
+    // public void
+    // onRedisPubsubParseFileSuccessEvent(RedisPubsubParseFileSuccessEvent event) {
+    // RedisPubsubMessageFile messageFile = event.getMessageFile();
+    // log.info("UploadEventListener RedisPubsubParseFileSuccessEvent: {}",
+    // messageFile.toString());
     // }
 
     // @EventListener
-    // public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent event) {
-    //     RedisPubsubMessageFile messageFile = event.getMessageFile();
-    //     log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}", messageFile.toString());
+    // public void onRedisPubsubParseFileErrorEvent(RedisPubsubParseFileErrorEvent
+    // event) {
+    // RedisPubsubMessageFile messageFile = event.getMessageFile();
+    // log.info("UploadEventListener RedisPubsubParseFileErrorEvent: {}",
+    // messageFile.toString());
     // }
 
 }
