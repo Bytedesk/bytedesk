@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 16:26:09
+ * @LastEditTime: 2025-05-12 16:35:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -299,11 +299,6 @@ public class SpringAIVectorStoreService {
 			chunkRestService.create(splitRequest);
 		});
 		// log.info("Parsing document, this will take a while.");
-		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// }
 		//
 		return docList;
 	}
@@ -327,9 +322,9 @@ public class SpringAIVectorStoreService {
 			docIdList.add(doc.getId());
 			// 添加元数据: 知识库kb_uid、启用状态、有效期
 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbase().getUid());
-			// doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
-			// doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			// doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+			doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
+			doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
+			doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
 			// 将doc写入到splitEntity
 			ChunkRequest splitRequest = ChunkRequest.builder()
@@ -353,11 +348,6 @@ public class SpringAIVectorStoreService {
 		textRestService.save(textEntity);
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
-		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// }
 
 		return docList;
 	}
