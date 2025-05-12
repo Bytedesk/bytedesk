@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 15:58:13
+ * @LastEditTime: 2025-05-12 13:43:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,13 +36,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 // @Tag(name = "department - 部门", description = "department apis")
 public class DepartmentRestController extends BaseRestController<DepartmentRequest> {
 
-    private final DepartmentRestService departmentService;
+    private final DepartmentRestService departmentRestService;
 
     // @PreAuthorize("hasAuthority('MEMBER_READ')") // 暂时不加权限
     @Override
     public ResponseEntity<?> queryByOrg(DepartmentRequest request) {
 
-        Page<DepartmentResponse> departmentPage = departmentService.queryByOrg(request);
+        Page<DepartmentResponse> departmentPage = departmentRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
@@ -51,7 +51,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @Override
     public ResponseEntity<?> queryByUser(DepartmentRequest request) {
         
-        Page<DepartmentResponse> departmentPage = departmentService.queryByUser(request);
+        Page<DepartmentResponse> departmentPage = departmentRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
@@ -67,7 +67,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @ActionAnnotation(title = "部门", action = "新建", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest departmentRequest) {
 
-        DepartmentResponse department = departmentService.create(departmentRequest);
+        DepartmentResponse department = departmentRestService.create(departmentRequest);
 
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
@@ -76,7 +76,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @ActionAnnotation(title = "部门", action = "更新", description = "update department")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest departmentRequest) {
 
-        DepartmentResponse department = departmentService.update(departmentRequest);
+        DepartmentResponse department = departmentRestService.update(departmentRequest);
    
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
@@ -86,7 +86,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest departmentRequest) {
 
-        departmentService.delete(departmentRequest);
+        departmentRestService.delete(departmentRequest);
 
         return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
