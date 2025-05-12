@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:45:50
+ * @LastEditTime: 2025-05-12 18:08:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TextExcelListener implements ReadListener<TextExcel> {
 
-    private final TextRestService textService;
+    private final TextRestService textRestService;
 
     private final String kbType;
 
@@ -54,7 +54,7 @@ public class TextExcelListener implements ReadListener<TextExcel> {
     @Override
     public void invoke(TextExcel data, AnalysisContext context) {
         log.info("TextExcelListener invoke: {}", JSON.toJSONString(data));
-        TextEntity text = textService.convertExcelToText(data, kbType, fileUid, kbUid, orgUid);
+        TextEntity text = textRestService.convertExcelToText(data, kbType, fileUid, kbUid, orgUid);
         if (text == null) {
             return;
         }
@@ -87,7 +87,7 @@ public class TextExcelListener implements ReadListener<TextExcel> {
         //     cachedDataList.remove(0);
         // }
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        textService.save(cachedDataList);
+        textRestService.save(cachedDataList);
         log.info("存储数据库成功！");
     }
 

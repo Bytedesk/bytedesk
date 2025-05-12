@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 16:22:38
+ * @LastEditTime: 2025-05-12 18:15:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,7 +80,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onTextCreateEvent(TextCreateEvent event) {
         TextEntity text = event.getText();
-        log.info("SpringAIEventListener onTextCreateEvent: {}", text.getName());
+        log.info("SpringAIEventListener onTextCreateEvent: {}", text.getTitle());
         if (text.isAutoDeleteLlmChunk()) {
             // 仅当文件需要分割时，才添加到创建缓存中
             textCreateMap.put(text.getUid(), text);
@@ -92,7 +92,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onTextUpdateDocEvent(TextUpdateDocEvent event) {
         TextEntity text = event.getText();
-        log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getName());
+        log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getTitle());
         if (!text.isDeleted()) {
             // 将Text实体添加到更新缓存中
             textUpdateMap.put(text.getUid(), text);
@@ -102,7 +102,7 @@ public class SpringAIEventListener {
     @EventListener
     public void onTextDeleteEvent(TextDeleteEvent event) {
         TextEntity text = event.getText();
-        log.info("SpringAIEventListener onTextDeleteEvent: {}", text.getName());
+        log.info("SpringAIEventListener onTextDeleteEvent: {}", text.getTitle());
         // 删除text对应的document，以及redis中缓存的document
         springAiVectorService.deleteDocs(text.getDocIdList());
         // 从缓存中移除
