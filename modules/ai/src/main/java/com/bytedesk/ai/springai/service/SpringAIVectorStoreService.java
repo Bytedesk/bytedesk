@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:35:01
+ * @LastEditTime: 2025-05-12 18:16:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -328,7 +328,7 @@ public class SpringAIVectorStoreService {
 			
 			// 将doc写入到splitEntity
 			ChunkRequest splitRequest = ChunkRequest.builder()
-					.name(textEntity.getName())
+					.name(textEntity.getTitle())
 					.content(doc.getText())
 					.type(ChunkTypeEnum.TEXT.name())
 					.docId(doc.getId())

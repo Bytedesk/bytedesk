@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:57:44
+ * @LastEditTime: 2025-05-12 18:05:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,17 +45,17 @@ public class TextEventListener {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
             if (!BdFileUtils.isExcelFile(fileName)) {
-                log.warn("不是Excel文件，无法导入常见问题: {}", fileName);
+                log.warn("不是Excel文件，无法导入: {}", fileName);
                 return;
             }
-            log.info("TextEventListener FAQ: {}", fileName);
+            log.info("TextEventListener: {}", fileName);
 
-            // 常见问题导入
+            // 导入
             try {
                 Resource resource = uploadRestService.loadAsResource(upload.getFileName());
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
-                    log.info("UploadEventListener loadAsResource: {}", filePath);
+                    log.info("TextEventListener loadAsResource: {}", filePath);
                     // 导入自动回复
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
@@ -66,7 +66,7 @@ public class TextEventListener {
                             upload.getOrgUid())).sheet().doRead();
                 }
             } catch (Exception e) {
-                log.error("TextEventListener UploadEventListener create error: {}", e.getMessage());
+                log.error("TextEventListener create error: {}", e.getMessage());
             }
         }
     }

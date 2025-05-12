@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 10:36:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-28 16:30:10
+ * @LastEditTime: 2025-05-12 18:04:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,7 @@ public enum KbaseTypeEnum {
     NOTEBASE, // 内部知识库
     LLM, // 大模型
     KEYWORD, // 关键词
-    FAQ, // 常见问题
+    // FAQ, // 常见问题，合并到LLM
     QUICKREPLY, // 快捷回复
     AUTOREPLY, // 自动回复
     BLOG, // 博客
