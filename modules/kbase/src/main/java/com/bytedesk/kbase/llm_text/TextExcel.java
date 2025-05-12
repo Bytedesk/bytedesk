@@ -24,6 +24,10 @@ import lombok.Data;
 @Data
 public class TextExcel {
 
+    @ExcelProperty(value = "分类")
+    @ColumnWidth(20)
+    private String category;
+
     @ExcelProperty(value = "标题")
     @ColumnWidth(30)
     private String title;
@@ -32,39 +36,4 @@ public class TextExcel {
     @ColumnWidth(50)
     private String content;
 
-    @ExcelProperty(value = "状态")
-    @ColumnWidth(15)
-    private String status;
-
-    @ExcelProperty(value = "级别")
-    @ColumnWidth(15)
-    private String level;
-
-    @ExcelProperty(value = "平台")
-    @ColumnWidth(15)
-    private String platform;
-
-    @ExcelProperty(value = "分类")
-    @ColumnWidth(20)
-    private String categoryUid;
-
-    @ExcelProperty(value = "知识库")
-    @ColumnWidth(20)
-    private String kbUid;
-
-    @ExcelProperty(value = "用户ID")
-    @ColumnWidth(32)
-    private String userUid;
-
-    @ExcelProperty(value = "文档ID列表")
-    @ColumnWidth(50)
-    private String docIdList;
-
-    @ExcelProperty(value = "创建时间")
-    @ColumnWidth(20)
-    private String createdAt;
-
-    @ExcelProperty(value = "更新时间")
-    @ColumnWidth(20)
-    private String updatedAt;
 }
