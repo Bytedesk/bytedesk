@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 删除UserEntity表中的唯一约束 (专为MySQL优化) -->
+    
+    <!-- MySQL查询所有的约束并尝试删除与num、username、email、mobile相关的唯一约束 -->
+    <changeSet id="drop_user_unique_constraints_mysql" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            -- 获取并存储唯一约束列表
+            SET @constraints = (
+                SELECT GROUP_CONCAT(CONSTRAINT_NAME) 
+                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+                WHERE TABLE_NAME = 'bytedesk_core_user' 
+                AND CONSTRAINT_TYPE = 'UNIQUE'
+            );
+            
+            -- 如果存在约束，则创建并执行DROP语句
+            SET @sql = IF(@constraints IS NOT NULL, 
+                          CONCAT('ALTER TABLE bytedesk_core_user DROP INDEX ', @constraints),
+                          'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
+    </changeSet>
+    
+    <!-- 尝试按照MySQL中可能的约束命名规则删除具体的唯一约束 -->
+    <changeSet id="drop_user_num_constraint" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            SET @constraint_name = (
+                SELECT CONSTRAINT_NAME 
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                WHERE TABLE_NAME = 'bytedesk_core_user' 
+                AND COLUMN_NAME = 'num' 
+                LIMIT 1
+            );
+            
+            SET @sql = IF(@constraint_name IS NOT NULL, 
+                          CONCAT('ALTER TABLE bytedesk_core_user DROP INDEX ', @constraint_name),
+                          'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
+    </changeSet>
+    
+    <changeSet id="drop_user_username_constraint" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            SET @constraint_name = (
+                SELECT CONSTRAINT_NAME 
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                WHERE TABLE_NAME = 'bytedesk_core_user' 
+                AND COLUMN_NAME = 'username' 
+                LIMIT 1
+            );
+            
+            SET @sql = IF(@constraint_name IS NOT NULL, 
+                          CONCAT('ALTER TABLE bytedesk_core_user DROP INDEX ', @constraint_name),
+                          'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
+    </changeSet>
+    
+    <changeSet id="drop_user_email_constraint" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            SET @constraint_name = (
+                SELECT CONSTRAINT_NAME 
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                WHERE TABLE_NAME = 'bytedesk_core_user' 
+                AND COLUMN_NAME = 'email' 
+                LIMIT 1
+            );
+            
+            SET @sql = IF(@constraint_name IS NOT NULL, 
+                          CONCAT('ALTER TABLE bytedesk_core_user DROP INDEX ', @constraint_name),
+                          'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
+    </changeSet>
+    
+    <changeSet id="drop_user_mobile_constraint" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            SET @constraint_name = (
+                SELECT CONSTRAINT_NAME 
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                WHERE TABLE_NAME = 'bytedesk_core_user' 
+                AND COLUMN_NAME = 'mobile' 
+                LIMIT 1
+            );
+            
+            SET @sql = IF(@constraint_name IS NOT NULL, 
+                          CONCAT('ALTER TABLE bytedesk_core_user DROP INDEX ', @constraint_name),
+                          'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
