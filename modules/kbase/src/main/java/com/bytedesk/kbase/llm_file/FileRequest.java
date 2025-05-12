@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 16:20:17
+ * @LastEditTime: 2025-05-12 17:02:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,6 +47,15 @@ public class FileRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
 
+    // 有效开始日期
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
+
+    // 有效结束日期
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+
     // 是否开启自动生成enable_llm_qa问答
     @Builder.Default
     private Boolean autoGenerateLlmQa = false;
@@ -69,7 +78,7 @@ public class FileRequest extends BaseRequest {
 
     // 是否已经自动llm Chunk切块
     @Builder.Default
-    private Boolean llmChunkted = false;
+    private Boolean llmChunked = false;
 
     // 是否开启自动删除llm Chunk切块
     @Builder.Default
@@ -79,14 +88,7 @@ public class FileRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmChunkDeleted = false;
 
-    // 有效开始日期
-    @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
-
-    // 有效结束日期
-    // 当前 + 100 年
-    @Builder.Default
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+    
 
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();

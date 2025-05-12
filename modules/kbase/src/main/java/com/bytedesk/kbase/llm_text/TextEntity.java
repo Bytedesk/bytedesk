@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:49:14
+ * @LastEditTime: 2025-05-12 17:00:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,6 +73,15 @@ public class TextEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
+    // 有效开始日期
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
+
+    // 有效结束日期
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+
     // 是否开启自动生成llm问答
     @Builder.Default
     @Column(name = "is_auto_generate_llm_qa")
@@ -113,15 +122,6 @@ public class TextEntity extends BaseEntity {
     @Column(name = "is_llm_Chunk_deleted")
     private boolean llmChunkDeleted = false;
 
-    // 有效开始日期
-    @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
-
-    // 有效结束日期
-    // 当前 + 100 年
-    @Builder.Default
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
-
     private String categoryUid; // 所属分类
 
     // 替换kbUid为KbaseEntity
@@ -133,7 +133,5 @@ public class TextEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
-
-    
 
 }

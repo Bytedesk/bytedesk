@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:55:02
+ * @LastEditTime: 2025-05-12 17:15:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -157,6 +157,10 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     @Override
     public void delete(TextRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    public void deleteAll(TextRequest request) {
+        List<TextEntity> entities = findByKbUid(request.getOrgUid());
     }
 
     @Override
