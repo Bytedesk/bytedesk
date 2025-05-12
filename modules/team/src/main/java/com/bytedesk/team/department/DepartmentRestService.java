@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 11:40:41
+ * @LastEditTime: 2025-05-12 13:45:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -134,16 +134,6 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
     }
 
     @Override
-    public DepartmentEntity save(DepartmentEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
-    }
-
-    @Override
     protected DepartmentEntity doSave(DepartmentEntity entity) {
         return departmentRepository.save(entity);
     }
@@ -204,6 +194,9 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         if (department.getParent() != null) {
             departmentResponse.setParentUid(department.getParent().getUid());
         }
+        // 计算成员数
+        List<MemberEntity> members = memberRepository.findByDeptUidAndDeletedFalse(department.getUid());
+        departmentResponse.setMemberCount(members.size());
         return departmentResponse;
     }
 
