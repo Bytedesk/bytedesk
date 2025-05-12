@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 15:58:23
+ * @LastEditTime: 2025-05-12 13:34:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,7 +79,7 @@ public class MemberRequest extends BaseRequest {
     private Boolean inviteAccepted;
 
     @Builder.Default
-    private String status = MemberStatusEnum.PENDING.name();
+    private String status = MemberStatusEnum.INVITING.name();
 
     @Builder.Default
 	private Set<String> roleUids = new HashSet<>(); 

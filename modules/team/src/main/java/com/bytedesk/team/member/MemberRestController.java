@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:34:08
+ * @LastEditTime: 2025-05-12 13:09:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.team.member;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -92,7 +93,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         return ResponseEntity.ok(JsonResult.success(member));
     }
 
-    @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
+    // @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
     @ActionAnnotation(title = "成员", action = "更新", description = "update member")
     @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest request) {
@@ -125,4 +126,15 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
             "member"
         );
     }
+
+    // 激活 member, activate member
+    @PostMapping("/activate")
+    @ActionAnnotation(title = "成员", action = "激活", description = "activate member")
+    public ResponseEntity<?> activate(@RequestBody MemberRequest request) {
+        //
+        MemberResponse member = memberRestService.activate(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(member));
+    }
+
 }
