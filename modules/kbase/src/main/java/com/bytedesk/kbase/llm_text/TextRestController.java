@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:47:49
+ * @LastEditTime: 2025-05-12 16:27:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.kbase.llm_text;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +31,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
 
     private final TextRestService textRestService;
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
     public ResponseEntity<?> queryByOrg(TextRequest request) {
         
@@ -41,7 +40,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUser(TextRequest request) {
         
@@ -50,7 +49,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_CREATE')")
+    // @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(TextRequest request) {
         
@@ -59,7 +58,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
+    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(TextRequest request) {
         
@@ -68,7 +67,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    // @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(TextRequest request) {
         
@@ -77,7 +76,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    // @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(TextRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -90,7 +89,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         );
     }
 
-    @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @Override
     public ResponseEntity<?> queryByUid(TextRequest request) {
         // TODO Auto-generated method stub
