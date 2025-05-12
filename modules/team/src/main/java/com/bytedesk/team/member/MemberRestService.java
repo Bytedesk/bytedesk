@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 11:00:47
+ * @LastEditTime: 2025-05-12 11:40:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -214,7 +214,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     }
 
     public void clearDepartmentUid(String deptUid) {
-        List<MemberEntity> members = memberRepository.findByDeptUidAndDeleted(deptUid, false);
+        List<MemberEntity> members = memberRepository.findByDeptUidAndDeletedFalse(deptUid);
         for (MemberEntity member : members) {
             member.setDeptUid(null);
             save(member);
@@ -223,35 +223,35 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
     public Optional<MemberEntity> findByUid(String uid) {
-        return memberRepository.findByUidAndDeleted(uid, false);
+        return memberRepository.findByUid(uid);
     }
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
     public Optional<MemberEntity> findByUserUid(String uid) {
-        return memberRepository.findByUser_UidAndDeleted(uid, false);
+        return memberRepository.findByUser_UidAndDeletedFalse(uid);
     }
 
     @Cacheable(value = "member", key = "#mobile", unless = "#result == null")
     public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
-        return memberRepository.findByMobileAndOrgUidAndDeleted(mobile, orgUid, false);
+        return memberRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
     }
 
     @Cacheable(value = "member", key = "#email", unless = "#result == null")
     public Optional<MemberEntity> findByEmailAndOrgUid(String email, String orgUid) {
-        return memberRepository.findByEmailAndOrgUidAndDeleted(email, orgUid, false);
+        return memberRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
     }
 
     @Cacheable(value = "member", key = "#user.uid", unless = "#result == null")
     public Optional<MemberEntity> findByUserAndOrgUid(UserEntity user, String orgUid) {
-        return memberRepository.findByUserAndOrgUidAndDeleted(user, orgUid, false);
+        return memberRepository.findByUserAndOrgUidAndDeletedFalse(user, orgUid);
     }
 
     public Boolean existsByEmailAndOrgUid(String email, String orgUid) {
-        return memberRepository.existsByEmailAndOrgUidAndDeleted(email, orgUid, false);
+        return memberRepository.existsByEmailAndOrgUidAndDeletedFalse(email, orgUid);
     }
 
     public Boolean existsByMobileAndOrgUid(String mobile, String orgUid) {
-        return memberRepository.existsByMobileAndOrgUidAndDeleted(mobile, orgUid, false);
+        return memberRepository.existsByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
     }
 
     @Override
