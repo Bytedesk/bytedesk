@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 12:00:24
+ * @LastEditTime: 2025-05-12 12:52:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,7 +63,7 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
      */
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
-        log.info("FaqExcelListener doAfterAllAnalysed");
+        log.info("MemberExcelListener doAfterAllAnalysed");
         // 这里也要保存数据，确保最后遗留的数据也存储到数据库
         saveData();
         log.info("所有数据解析完成！");

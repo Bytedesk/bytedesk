@@ -4,25 +4,58 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- 删除现有的唯一约束 -->
-    <changeSet id="drop_existing_unique_constraints_from_member_table" author="jackning" failOnError="false">
-        <!-- 尝试删除可能存在的email约束 -->
-        <preConditions onFail="MARK_RAN">
-            <indexExists indexName="UKt3exr9d3lk5moteer3i5tv6k7"/>
-        </preConditions>
-        <dropUniqueConstraint 
-            tableName="bytedesk_team_member"
-            constraintName="UKt3exr9d3lk5moteer3i5tv6k7"/>
+    <!-- 删除特定的唯一约束: email+org_uid 和 mobile+org_uid -->
+    
+    <!-- 针对email+org_uid的约束处理 -->
+    <changeSet id="drop_email_org_constraint_from_member_table" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            SET @constraint_name = (
+                SELECT tc.CONSTRAINT_NAME
+                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+                JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu1 ON kcu1.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+                JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu2 ON kcu2.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+                WHERE tc.TABLE_NAME = 'bytedesk_team_member'
+                AND tc.CONSTRAINT_TYPE = 'UNIQUE'
+                AND kcu1.COLUMN_NAME = 'email'
+                AND kcu2.COLUMN_NAME = 'org_uid'
+                AND kcu1.TABLE_NAME = 'bytedesk_team_member'
+                LIMIT 1
+            );
+            
+            SET @sql = IF(@constraint_name IS NOT NULL, 
+                        CONCAT('ALTER TABLE bytedesk_team_member DROP INDEX ', @constraint_name),
+                        'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
     </changeSet>
     
-    <changeSet id="drop_mobile_unique_constraint_from_member_table" author="jackning" failOnError="false">
-        <!-- 尝试删除可能存在的mobile约束 -->
-        <preConditions onFail="MARK_RAN">
-            <indexExists indexName="UKi9u5132orjj6pgyrf6wyswp7e"/>
-        </preConditions>
-        <dropUniqueConstraint 
-            tableName="bytedesk_team_member"
-            constraintName="UKi9u5132orjj6pgyrf6wyswp7e"/>
+    <!-- 针对mobile+org_uid的约束处理 -->
+    <changeSet id="drop_mobile_org_constraint_from_member_table" author="jackning" dbms="mysql" failOnError="false">
+        <sql>
+            SET @constraint_name = (
+                SELECT tc.CONSTRAINT_NAME
+                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+                JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu1 ON kcu1.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+                JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu2 ON kcu2.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+                WHERE tc.TABLE_NAME = 'bytedesk_team_member'
+                AND tc.CONSTRAINT_TYPE = 'UNIQUE'
+                AND kcu1.COLUMN_NAME = 'mobile'
+                AND kcu2.COLUMN_NAME = 'org_uid'
+                AND kcu1.TABLE_NAME = 'bytedesk_team_member'
+                LIMIT 1
+            );
+            
+            SET @sql = IF(@constraint_name IS NOT NULL, 
+                        CONCAT('ALTER TABLE bytedesk_team_member DROP INDEX ', @constraint_name),
+                        'SELECT 1');
+            
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 12:10:32
+ * @LastEditTime: 2025-05-12 12:46:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,8 +44,8 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_team_member"
 // 去掉表级别的唯一约束，使用代码级别的唯一约束
 //, uniqueConstraints = {
-//     @UniqueConstraint(columnNames = { "email", "orgUid", "is_deleted" }),
-//     @UniqueConstraint(columnNames = { "mobile", "orgUid", "is_deleted" })
+//     @UniqueConstraint(columnNames = { "email", "org_uid", "is_deleted" }),
+//     @UniqueConstraint(columnNames = { "mobile", "org_uid", "is_deleted" })
 // }
 )
 public class MemberEntity extends BaseEntity {
@@ -85,25 +85,9 @@ public class MemberEntity extends BaseEntity {
 	private Set<String> roleUids = new HashSet<>(); 
 
     // 一个人只能属于一个部门，一个部门可以有多个成员
-    // 
-    // // 关联多个Department
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY)
-    // private Set<DepartmentEntity> departments = new HashSet<>();
     private String deptUid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
-
-     // 添加、移除部门的方法
-    // public void addDepartment(DepartmentEntity department) {
-    //     departments.add(department);
-    //     // department.getMembers().add(this); // 假设Department类中有getMembers()方法返回成员列表
-    // }
-
-    // public void removeDepartment(DepartmentEntity department) {
-    //     departments.remove(department);
-    //     // department.getMembers().remove(this); // 假设Department类中有getMembers()方法返回成员列表
-    // }
 
 }
