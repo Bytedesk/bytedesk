@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:09:43
+ * @LastEditTime: 2025-05-12 16:49:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,7 +50,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_kbase_llm_text")
 public class TextEntity extends BaseEntity {
 
-    private String name;
+    private String title;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
@@ -100,8 +100,8 @@ public class TextEntity extends BaseEntity {
 
     // 是否已经自动llm Chunk切块
     @Builder.Default
-    @Column(name = "is_llm_Chunkted")
-    private boolean llmChunkted = false;
+    @Column(name = "is_llm_Chunked")
+    private boolean llmChunked = false;
 
     // is auto delete llm Chunk
     @Builder.Default
