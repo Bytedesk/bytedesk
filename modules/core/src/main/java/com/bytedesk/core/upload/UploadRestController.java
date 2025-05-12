@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:05:40
+ * @LastEditTime: 2025-05-12 09:31:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,62 +38,76 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/upload")
 public class UploadRestController extends BaseRestController<UploadRequest> {
 
-	private final UploadRestService uploadService;
+	private final UploadRestService uploadRestService;
 	
 	@Override
 	public ResponseEntity<?> queryByOrg(UploadRequest request) {
 
-		Page<UploadResponse> page = uploadService.queryByOrg(request);
+		Page<UploadResponse> page = uploadRestService.queryByOrg(request);
 
-		return ResponseEntity.ok(JsonResult.success("query success", page));
+		return ResponseEntity.ok(JsonResult.success(page));
 	}
 
 	@Override
 	public ResponseEntity<?> queryByUser(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'query'");
+		
+		Page<UploadResponse> page = uploadRestService.queryByUser(request);
+
+		return ResponseEntity.ok(JsonResult.success(page));
 	}
 
 	@Override
 	public ResponseEntity<?> queryByUid(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+		
+		UploadResponse response = uploadRestService.queryByUid(request);
+
+		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
 	@Override
 	public ResponseEntity<?> create(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'create'");
+		
+		UploadResponse response = uploadRestService.create(request);
+
+		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
 	@Override
 	public ResponseEntity<?> update(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'update'");
+		
+		UploadResponse response = uploadRestService.update(request);
+		
+		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
 	@ActionAnnotation(title = "上传", action = "删除", description = "delete upload")
 	@Override
 	public ResponseEntity<?> delete(UploadRequest request) {
 		// 更新数据库
-		uploadService.delete(request);
+		uploadRestService.delete(request);
 		// 删除文件
-		uploadService.deleteFile(request.getFileName());
+		uploadRestService.deleteFile(request.getFileName());
 		
 		return ResponseEntity.ok(JsonResult.success("delete success"));
 	}
 
 	@Override
 	public Object export(UploadRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'export'");
+		return exportTemplate(
+            request,
+            response,
+            uploadRestService,
+            UploadExcel.class,
+            "文件",
+            "file"
+        );
 	}
 
 	@ActionAnnotation(title = "上传", action = "新建", description = "upload File")
 	@PostMapping("/file")
 	public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, UploadRequest request) {
 	
-		UploadResponse response = uploadService.handleFileUpload(file, request);
+		UploadResponse response = uploadRestService.handleFileUpload(file, request);
 		
 		return ResponseEntity.ok(JsonResult.success("upload file success", response));
 	}
