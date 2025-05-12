@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 22:19:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 17:37:27
+ * @LastEditTime: 2025-05-12 17:57:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@ public enum UploadTypeEnum {
     ASSISTANT, // 文档助手，内部文档知识库问答
     HELPCENTER, // 帮助文档
     LLM, // 大模型
-    // LLM_QA, // 大模型问答对
+    LLM_TEXT, // 大模型文件
     LLM_FILE, // 大模型文件
     KEYWORD, // 关键词
     FAQ, // 常见问题
