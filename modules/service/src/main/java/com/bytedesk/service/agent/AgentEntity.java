@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-05 10:53:59
+ * @LastEditTime: 2025-05-12 13:37:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -63,9 +62,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ AgentEntityListener.class })
-@Table(name = "bytedesk_service_agent", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "userUid", "orgUid" })
-})
+@Table(name = "bytedesk_service_agent"
+// , uniqueConstraints = {
+//     @UniqueConstraint(columnNames = { "userUid", "orgUid" })
+// }
+)
 public class AgentEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

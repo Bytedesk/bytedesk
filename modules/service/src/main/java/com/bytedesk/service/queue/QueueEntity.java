@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 21:47:48
+ * @LastEditTime: 2025-05-12 13:38:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,10 +47,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ QueueEntityListener.class })
-@Table(name = "bytedesk_service_queue", uniqueConstraints = {
-                @UniqueConstraint(columnNames = { "queue_topic", "queue_day",
-                                "is_deleted" }, name = "uk_queue_topic_day_deleted")
-})
+@Table(name = "bytedesk_service_queue"
+// , uniqueConstraints = {
+//                 @UniqueConstraint(columnNames = { "queue_topic", "queue_day",
+//                                 "is_deleted" }, name = "uk_queue_topic_day_deleted")
+// }
+)
 public class QueueEntity extends BaseEntity {
 
         private static final long serialVersionUID = 1L;
