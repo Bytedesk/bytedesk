@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:03:27
+ * @LastEditTime: 2025-05-12 11:43:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,8 +42,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EntityListeners({ MemberEntityListener.class })
 @Table(name = "bytedesk_team_member", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "email", "orgUid" }),
-    @UniqueConstraint(columnNames = { "mobile", "orgUid" })
+    @UniqueConstraint(columnNames = { "email", "orgUid", "is_deleted" }),
+    @UniqueConstraint(columnNames = { "mobile", "orgUid", "is_deleted" })
 })
 public class MemberEntity extends BaseEntity {
 

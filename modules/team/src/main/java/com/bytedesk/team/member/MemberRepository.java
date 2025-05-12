@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 13:47:23
+ * @LastEditTime: 2025-05-12 11:40:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,23 +38,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // @PreAuthorize("hasRole('ROLE_USER')")
 public interface MemberRepository extends JpaRepository<MemberEntity, Long>, JpaSpecificationExecutor<MemberEntity> {
 
-    List<MemberEntity> findByDeptUidAndDeleted(String deptUid, Boolean deleted);
-
-    Optional<MemberEntity> findByUidAndDeleted(String uid, Boolean deleted);
-
-    Optional<MemberEntity> findByUser_UidAndDeleted(String uid, Boolean deleted);
-
-    Optional<MemberEntity> findByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
-
-    Optional<MemberEntity> findByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
-
-    Optional<MemberEntity> findByUserAndOrgUidAndDeleted(UserEntity user, String orgUid, Boolean deleted);
-
-    Boolean existsByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
-
-    Boolean existsByMobileAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
-
-    Boolean existsByUid(String uid);
+    List<MemberEntity> findByDeptUidAndDeletedFalse(String deptUid);
 
     Optional<MemberEntity> findByUid(String uid);
+
+    Optional<MemberEntity> findByUser_UidAndDeletedFalse(String uid);
+
+    Optional<MemberEntity> findByMobileAndOrgUidAndDeletedFalse(String mobile, String orgUid);
+
+    Optional<MemberEntity> findByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);
+
+    Optional<MemberEntity> findByUserAndOrgUidAndDeletedFalse(UserEntity user, String orgUid);
+
+    Boolean existsByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);
+
+    Boolean existsByMobileAndOrgUidAndDeletedFalse(String email, String orgUid);
+
+    Boolean existsByUid(String uid);
 }

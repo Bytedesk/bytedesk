@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 11:05:21
+ * @LastEditTime: 2025-05-12 11:40:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -163,7 +163,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             save(department);
             // remove department members
             // memberService.clearDepartmentUid(department.getUid());
-             List<MemberEntity> members = memberRepository.findByDeptUidAndDeleted(department.getUid(), false);
+             List<MemberEntity> members = memberRepository.findByDeptUidAndDeletedFalse(department.getUid());
             for (MemberEntity member : members) {
                 member.setDeptUid(null);
                 memberRepository.save(member);

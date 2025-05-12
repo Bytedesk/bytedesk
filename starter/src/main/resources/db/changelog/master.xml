@@ -4,23 +4,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- <changeSet id="1" author="my_name">
-        <createTable tableName="test_table">
-            <column name="test_id" type="int">
-                <constraints primaryKey="true" />
-            </column>
-            <column name="test_column" type="INT" />
-        </createTable>
-    </changeSet> -->
-    <!--  -->
-    <!-- <include file="db/changelog/migration/_0.0.1_migrate.sql" />  -->
-    <!-- <include file="db/changelog/migration/240621_rename_isautopop.xml" /> -->
-    <!-- <include file="db/changelog/migration/240621-convert-message-type-to-enumstring.xml" /> -->
-    <!-- <include file="db/changelog/migration/240711-create-oauth-table.xml" /> -->
-    <!-- <include file="db/changelog/migration/240713_add_auto_reply_enabled_to_agent_table.xml" /> -->
-    <!-- <include file="db/changelog/migration/240715_add_input_association_to_robot_agent_workgroup_table.xml" /> -->
-    <!-- <include file="db/changelog/migration/240715_add_show_history_to_service_settings_table.xml" /> -->
-    <!-- <include file="db/changelog/migration/240715_add_show_captcha_to_service_settings_table.xml" /> -->
-    <!-- <include file="db/changelog/migration/240715_add_rate_msg_count_to_service_settings_table.xml" /> -->
+    <include file="db/changelog/migration/250512_update_member_table_unique_constraints.xml" />
 
 </databaseChangeLog>
