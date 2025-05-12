@@ -50,9 +50,11 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @EntityListeners({ ThreadEntityListener.class })
-@Table(name = "bytedesk_core_thread", uniqueConstraints = {
+@Table(name = "bytedesk_core_thread"
+// , uniqueConstraints = {
     // @UniqueConstraint(columnNames = {"topic", "owner_id"}) // 同一个用户，针对某service thread 创建多个ticket，并对应多个ticket thread
-})
+// }
+)
 public class ThreadEntity extends AbstractThreadEntity {
 
     private static final long serialVersionUID = 1L;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 11:40:56
+ * @LastEditTime: 2025-05-12 13:10:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -211,6 +211,25 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         }
  
         return convertToResponse(savedMember);
+    }
+
+
+    // activate
+    @Transactional
+    public MemberResponse activate(MemberRequest request) {
+        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
+        if (!memberOptional.isPresent()) {
+            throw new RuntimeException("Failed to find member.");
+        }
+        //
+        MemberEntity member = memberOptional.get();
+        member.setStatus(MemberStatusEnum.ACTIVE.name());
+        // 
+        MemberEntity savedEntity = save(member);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save member.");
+        }
+        return convertToResponse(savedEntity);
     }
 
     public void clearDepartmentUid(String deptUid) {

@@ -37,10 +37,12 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ RoleEntityListener.class })
-@Table(name = "bytedesk_core_role", uniqueConstraints = {
+@Table(name = "bytedesk_core_role"
+// , uniqueConstraints = {
 // @UniqueConstraint(columnNames = { "name", "orgUid" }), // is_deleted=false
 // 时不加限定
-})
+// }
+)
 public class RoleEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
