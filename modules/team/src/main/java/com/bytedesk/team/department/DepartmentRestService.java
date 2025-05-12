@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 13:27:29
+ * @LastEditTime: 2025-05-12 11:05:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.team.department;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -26,7 +27,8 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.team.member.MemberRestService;
+import com.bytedesk.team.member.MemberEntity;
+import com.bytedesk.team.member.MemberRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +44,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     private final UidUtils uidUtils;
 
-    private final MemberRestService memberService;
+    private final MemberRepository memberRepository;
 
     public Page<DepartmentResponse> queryByOrg(DepartmentRequest request) {
         Pageable pageable = request.getPageable();
@@ -59,7 +61,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
     public Optional<DepartmentEntity> findByNameAndOrgUid(String name, String orgUid) {
-        return departmentRepository.findByNameAndOrgUidAndDeleted(name, orgUid, false);
+        return departmentRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
     @Cacheable(value = "department", key = "#uid", unless = "#result == null")
@@ -68,7 +70,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
     }
 
     public Boolean existsByNameAndOrgUid(String name, String orgUid) {
-        return departmentRepository.existsByNameAndOrgUid(name, orgUid);
+        return departmentRepository.existsByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
     public Boolean existsByUid(String uid) {
@@ -94,13 +96,11 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         }
 
         if (StringUtils.hasText(request.getParentUid())) {
-            // log.debug("parent_uid {}", request.getParentUid());
             Optional<DepartmentEntity> parentOptional = departmentRepository.findByUid(request.getParentUid());
             if (parentOptional.isPresent()) {
                 parentOptional.get().addChild(department);
             }
         } else {
-            // log.debug("parent_uid is null");
             department.setParent(null);
         }
         department.setOrgUid(request.getOrgUid());
@@ -162,7 +162,12 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             department.setDeleted(true);
             save(department);
             // remove department members
-            memberService.clearDepartmentUid(department.getUid());
+            // memberService.clearDepartmentUid(department.getUid());
+             List<MemberEntity> members = memberRepository.findByDeptUidAndDeleted(department.getUid(), false);
+            for (MemberEntity member : members) {
+                member.setDeptUid(null);
+                memberRepository.save(member);
+            }
         } else {
             log.error("department not found");
             throw new RuntimeException("department not found");
