@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 16:27:08
+ * @LastEditTime: 2025-05-12 10:24:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -129,29 +129,6 @@ public class MemberEventListener {
         // request.setUserUid(user.getUid());
         topicCacheService.pushRequest(request);
     }
-
-    // @EventListener
-    // public void onMemberUpdateEvent(MemberUpdateEvent event) {
-    // // MemberUpdateEvent memberUpdateEvent = (MemberUpdateEvent)
-    // event.getObject();
-    // log.info("member updated: {}", event);
-    // // TODO: 删除旧的部门主题
-    // }
-
-    // @EventListener
-    // public void onRoleUpdateEvent(GenericApplicationEvent<RoleUpdateEvent> event)
-    // {
-    // RoleUpdateEvent roleUpdateEvent = event.getObject();
-    // RoleEntity roleEntity = roleUpdateEvent.getRoleEntity();
-    // log.info("onRoleUpdateEvent: {}", roleEntity.toString());
-    // // 给member对应的userUid删除/添加角色
-    // // 遍历roleEntity.getMemberUids
-    // if (roleEntity.getLevel().equals(LevelEnum.ORGANIZATION.name())) {
-    // //
-    // } else {
-    // log.info("not support yet");
-    // }
-    // }
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
