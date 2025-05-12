@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 12:57:03
+ * @LastEditTime: 2025-05-12 18:30:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,15 +24,15 @@ import lombok.Data;
 @Data
 public class TextExcel {
 
-    @ExcelProperty(value = "分类")
+    @ExcelProperty(index = 0, value = "分类")
     @ColumnWidth(20)
     private String category;
 
-    @ExcelProperty(value = "标题")
+    @ExcelProperty(index = 1, value = "标题")
     @ColumnWidth(30)
     private String title;
 
-    @ExcelProperty(value = "内容")
+    @ExcelProperty(index = 2, value = "内容")
     @ColumnWidth(50)
     private String content;
 
