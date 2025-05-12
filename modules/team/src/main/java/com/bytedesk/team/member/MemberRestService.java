@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 10:26:40
+ * @LastEditTime: 2025-05-12 11:00:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,6 +45,9 @@ import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.team.department.DepartmentEntity;
+import com.bytedesk.team.department.DepartmentRequest;
+import com.bytedesk.team.department.DepartmentRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
@@ -68,6 +71,8 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     private final AuthService authService;
 
     private final ThreadRestService threadService;
+
+    private final DepartmentRestService departmentRestService;
 
     @Override
     public Page<MemberEntity> queryByOrgEntity(MemberRequest request) {
@@ -284,37 +289,52 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         });
     }
 
-    public MemberEntity convertExcelToMember(MemberExcel memberExcel, String orgUid) {
+    public MemberEntity convertExcelToMember(MemberExcel excel, String orgUid) {
         // 去重
-        if (StringUtils.hasText(memberExcel.getEmail()) && existsByEmailAndOrgUid(memberExcel.getEmail(), orgUid)) {
+        if (StringUtils.hasText(excel.getEmail()) && existsByEmailAndOrgUid(excel.getEmail(), orgUid)) {
             return null;
         }
-        if (StringUtils.hasText(memberExcel.getMobile()) && existsByMobileAndOrgUid(memberExcel.getMobile(), orgUid)) {
+        if (StringUtils.hasText(excel.getMobile()) && existsByMobileAndOrgUid(excel.getMobile(), orgUid)) {
             return null;
         }
         Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
         // 创建member
-        MemberEntity member = modelMapper.map(memberExcel, MemberEntity.class);
+        MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
         member.setRoleUids(roleUids);
+        // 
+        Optional<DepartmentEntity> departmentOptional = departmentRestService.findByNameAndOrgUid(excel.getDepartmentName(), orgUid);
+        if (departmentOptional.isPresent()) {
+            member.setDeptUid(departmentOptional.get().getUid());
+        } else {
+            // 部门不存在，创建部门
+            DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                    .uid(uidUtils.getUid())
+                    .name(excel.getDepartmentName())
+                    .description("Description for " + excel.getDepartmentName())
+                    .orgUid(orgUid)
+                    .build();
+            departmentRestService.create(departmentRequest);
+            member.setDeptUid(departmentRequest.getUid());
+        }
         // 生成user
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = UserRequest.builder().build();
         userRequest.setAvatar(AvatarConsts.getDefaultAvatarUrl());
-        userRequest.setNickname(memberExcel.getNickname());
-        userRequest.setEmail(memberExcel.getEmail());
-        userRequest.setMobile(memberExcel.getMobile());
+        userRequest.setNickname(excel.getNickname());
+        userRequest.setEmail(excel.getEmail());
+        userRequest.setMobile(excel.getMobile());
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(orgUid);
         //
         UserEntity user = null;
-        if (StringUtils.hasText(memberExcel.getMobile())) {
-            user = userService.findByMobileAndPlatform(memberExcel.getMobile(),
+        if (StringUtils.hasText(excel.getMobile())) {
+            user = userService.findByMobileAndPlatform(excel.getMobile(),
                     PlatformEnum.BYTEDESK.name())
                     .orElseGet(() -> userService.createUserFromMember(userRequest));
-        } else if (StringUtils.hasText(memberExcel.getEmail())) {
-            user = userService.findByEmailAndPlatform(memberExcel.getEmail(),
+        } else if (StringUtils.hasText(excel.getEmail())) {
+            user = userService.findByEmailAndPlatform(excel.getEmail(),
                     PlatformEnum.BYTEDESK.name())
                     .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else {
@@ -411,6 +431,15 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
 
     @Override
     public MemberExcel convertToExcel(MemberEntity entity) {
-        return modelMapper.map(entity, MemberExcel.class);
+        MemberExcel excel = modelMapper.map(entity, MemberExcel.class);
+        // 设置部门名称
+        if (entity.getDeptUid() != null) {
+            Optional<DepartmentEntity> departmentOptional = departmentRestService.findByUid(entity.getDeptUid());
+            if (departmentOptional.isPresent()) {
+                excel.setDepartmentName(departmentOptional.get().getName());
+            }
+        }
+        return excel;
     }
+
 }

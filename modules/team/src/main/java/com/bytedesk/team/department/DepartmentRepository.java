@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 12:34:05
+ * @LastEditTime: 2025-05-12 11:01:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,21 +35,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // @RepositoryRestResource(path = "dep")
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long>, JpaSpecificationExecutor<DepartmentEntity> {
 
-    // @SuppressWarnings("unchecked")
-    // @CacheEvict(cacheNames = "userOrgs", key =
-    // "#department.getUser().getUsername()")
-    // @NonNull Department save(@NonNull Department department);
-
-    Optional<DepartmentEntity> findByNameAndOrgUidAndDeleted(String name, String orgUid, boolean deleted);
+    Optional<DepartmentEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
 
     Optional<DepartmentEntity> findByUid(String uid);
 
-    Boolean existsByNameAndOrgUid(String name, String orgUid);
+    Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
 
     Boolean existsByUid(String uid);
-
-    // Page<Department> findByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted, Pageable pageable);
-
-    // List<Department> findAllByOrgUidAndParentAndDeleted(String orgUid, Department parent, boolean deleted);
 
 }
