@@ -68,6 +68,15 @@ public class FileEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private boolean enabled = true;
 
+     // 有效开始日期
+    @Builder.Default
+    private LocalDateTime startDate = LocalDateTime.now();
+
+    // 有效结束日期
+    // 当前 + 100 年
+    @Builder.Default
+    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+
     // 是否开启自动生成llm问答
     @Builder.Default
     @Column(name = "is_auto_generate_llm_qa")
@@ -95,8 +104,8 @@ public class FileEntity extends BaseEntity {
 
     // 是否已经自动llm Chunk切块
     @Builder.Default
-    @Column(name = "is_llm_Chunkted")
-    private boolean llmChunkted = false;
+    @Column(name = "is_llm_Chunked")
+    private boolean llmChunked = false;
 
     // 是否开启自动删除llm Chunk切块
     @Builder.Default
@@ -108,14 +117,7 @@ public class FileEntity extends BaseEntity {
     @Column(name = "is_llm_Chunk_deleted")
     private boolean llmChunkDeleted = false;
 
-    // 有效开始日期
-    @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
-
-    // 有效结束日期
-    // 当前 + 100 年
-    @Builder.Default
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+   
 
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();
