@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-09 10:23:51
+ * @LastEditTime: 2025-05-12 10:26:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -248,21 +248,6 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     public Boolean existsByMobileAndOrgUid(String mobile, String orgUid) {
         return memberRepository.existsByMobileAndOrgUidAndDeleted(mobile, orgUid, false);
     }
-
-    // @Caching(put = {
-    //         @CachePut(value = "member", key = "#member.uid", unless = "#member.uid == null"),
-    //         @CachePut(value = "member", key = "#member.mobile", unless = "#member.mobile == null"),
-    //         @CachePut(value = "member", key = "#member.email", unless = "#member.email == null")
-    // })
-    // @Override
-    // public MemberEntity save(MemberEntity member) {
-    //     try {
-    //         return doSave(member);
-    //     } catch (ObjectOptimisticLockingFailureException e) {
-    //         handleOptimisticLockingFailureException(e, member);
-    //     }
-    //     return null;
-    // }
 
     @Override
     protected MemberEntity doSave(MemberEntity member) {
