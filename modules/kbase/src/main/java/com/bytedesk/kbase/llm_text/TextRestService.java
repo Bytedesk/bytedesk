@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:15:09
+ * @LastEditTime: 2025-05-12 17:50:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,6 +82,11 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         return textRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "text", key = "#kbUid", unless = "#result==null")
+    public List<TextEntity> findByKbUid(String kbUid) {
+        return textRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
     @Override
     public TextResponse create(TextRequest request) {
         // 获取当前登录用户
@@ -125,15 +130,6 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         }
     }
 
-    @Override
-    public TextEntity save(TextEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
     protected TextEntity doSave(TextEntity entity) {
         return textRepository.save(entity);
     }
@@ -161,6 +157,9 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
 
     public void deleteAll(TextRequest request) {
         List<TextEntity> entities = findByKbUid(request.getOrgUid());
+        for (TextEntity entity : entities) {
+            deleteByUid(entity.getUid());
+        }
     }
 
     @Override
