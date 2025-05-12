@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 09:10:36
+ * @LastEditTime: 2025-05-12 15:48:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,6 +69,8 @@ public class MessageSpecification extends BaseSpecification {
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.INVITE_CANCEL.name()));
                     // MESSAGE_TYPE_NOTIFICATION_AGENT_REPLY_TIMEOUT
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.NOTIFICATION_AGENT_REPLY_TIMEOUT.name()));
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.NOTIFICATION_RATE_SUBMITTED.name()));
+                    
                 }
             }
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
