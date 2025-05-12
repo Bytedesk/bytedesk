@@ -24,9 +24,9 @@ import lombok.Data;
 @Data
 public class TextExcel {
 
-    @ExcelProperty(value = "名称")
+    @ExcelProperty(value = "标题")
     @ColumnWidth(30)
-    private String name;
+    private String title;
 
     @ExcelProperty(value = "内容")
     @ColumnWidth(50)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:11:13
+ * @LastEditTime: 2025-05-12 16:48:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,12 +36,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class TextRequest extends BaseRequest {
 
-    private String name;
-
-    // private String content;
-
-    // @Builder.Default
-    // private String type = TextTypeEnum.CUSTOMER.name();
+    private String title;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
@@ -72,7 +67,7 @@ public class TextRequest extends BaseRequest {
 
     // 是否已经自动llm Chunk切块
     @Builder.Default
-    private Boolean llmChunkted = false;
+    private Boolean llmChunked = false;
 
     // 是否开启自动删除llm Chunk切块
     @Builder.Default
