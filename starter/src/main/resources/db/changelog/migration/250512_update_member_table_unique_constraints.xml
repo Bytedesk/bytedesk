@@ -4,21 +4,25 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- 查询数据库中现有的约束并添加新的约束 -->
-    <changeSet id="add_new_unique_constraints_with_is_deleted_for_email" author="jackning" failOnError="false">
-        <!-- 添加新的包含 is_deleted 的唯一约束 -->
-        <addUniqueConstraint 
+    <!-- 删除现有的唯一约束 -->
+    <changeSet id="drop_existing_unique_constraints_from_member_table" author="jackning" failOnError="false">
+        <!-- 尝试删除可能存在的email约束 -->
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="UKt3exr9d3lk5moteer3i5tv6k7"/>
+        </preConditions>
+        <dropUniqueConstraint 
             tableName="bytedesk_team_member"
-            columnNames="email, org_uid, is_deleted"
-            constraintName="UK_email_org_uid_is_deleted"/>
+            constraintName="UKt3exr9d3lk5moteer3i5tv6k7"/>
     </changeSet>
-
-    <changeSet id="add_new_unique_constraints_with_is_deleted_for_mobile" author="jackning" failOnError="false">
-        <!-- 添加新的包含 is_deleted 的唯一约束 -->
-        <addUniqueConstraint 
+    
+    <changeSet id="drop_mobile_unique_constraint_from_member_table" author="jackning" failOnError="false">
+        <!-- 尝试删除可能存在的mobile约束 -->
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="UKi9u5132orjj6pgyrf6wyswp7e"/>
+        </preConditions>
+        <dropUniqueConstraint 
             tableName="bytedesk_team_member"
-            columnNames="mobile, org_uid, is_deleted"
-            constraintName="UK_mobile_org_uid_is_deleted"/>
+            constraintName="UKi9u5132orjj6pgyrf6wyswp7e"/>
     </changeSet>
 
 </databaseChangeLog>

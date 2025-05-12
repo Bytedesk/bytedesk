@@ -26,7 +26,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+// import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -46,13 +46,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ UserEntityListener.class })
-@Table(name = "bytedesk_core_user", uniqueConstraints = {
-		// num, username, email, mobile is unique combined with platform and is_deleted
-		@UniqueConstraint(columnNames = { "num", "platform", "is_deleted" }),
-		@UniqueConstraint(columnNames = { "username", "platform", "is_deleted" }),
-		@UniqueConstraint(columnNames = { "email", "platform", "is_deleted" }),
-		@UniqueConstraint(columnNames = { "mobile", "platform", "is_deleted" }),
-})
+@Table(name = "bytedesk_core_user"
+// 去掉表级别的唯一约束，使用代码级别的唯一约束
+// , uniqueConstraints = {
+// 		@UniqueConstraint(columnNames = { "num", "platform", "is_deleted" }),
+// 		@UniqueConstraint(columnNames = { "username", "platform", "is_deleted" }),
+// 		@UniqueConstraint(columnNames = { "email", "platform", "is_deleted" }),
+// 		@UniqueConstraint(columnNames = { "mobile", "platform", "is_deleted" }),
+// }
+)
 public class UserEntity extends BaseEntityNoOrg {
 
 	private static final long serialVersionUID = 1L;
