@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 12:35:46
+ * @LastEditTime: 2025-05-12 14:58:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -133,14 +133,14 @@ public class MessagePersistService {
         }
 
         //
-        if (type.equals(MessageTypeEnum.RATE_SUBMIT)
-                || type.equals(MessageTypeEnum.RATE_CANCEL)) {
-            // 如果是客服邀请评价/主动评价，则content为邀请/主动评价消息的uid
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithRateMessage(type, messageProtobuf);
-                return true;
-            }
-        }
+        // if (type.equals(MessageTypeEnum.RATE_SUBMIT)
+        //         || type.equals(MessageTypeEnum.RATE_CANCEL)) {
+        //     // 如果是客服邀请评价/主动评价，则content为邀请/主动评价消息的uid
+        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
+        //         dealWithRateMessage(type, messageProtobuf);
+        //         return true;
+        //     }
+        // }
 
         //
         // if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
@@ -224,21 +224,21 @@ public class MessagePersistService {
         messageRestService.deleteByUid(message.getContent());
     }
 
-    private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-        // log.info("dealWithMessageRateSubmit");
-        // 如果是客服邀请评价，则content为邀请评价消息的uid，否则为空
-        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-        if (messageOpt.isPresent()) {
-            MessageEntity messageEntity = messageOpt.get();
-            if (type.equals(MessageTypeEnum.RATE_SUBMIT)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT.name());
-                messageEntity.setContent(message.getExtra());
-            } else if (type.equals(MessageTypeEnum.RATE_CANCEL)) {
-                messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL.name());
-            }
-            messageRestService.save(messageEntity);
-        }
-    }
+    // private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
+    //     // log.info("dealWithMessageRateSubmit");
+    //     // 如果是客服邀请评价，则content为邀请评价消息的uid，否则为空
+    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
+    //     if (messageOpt.isPresent()) {
+    //         MessageEntity messageEntity = messageOpt.get();
+    //         if (type.equals(MessageTypeEnum.RATE_SUBMIT)) {
+    //             messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT.name());
+    //             messageEntity.setContent(message.getExtra());
+    //         } else if (type.equals(MessageTypeEnum.RATE_CANCEL)) {
+    //             messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL.name());
+    //         }
+    //         messageRestService.save(messageEntity);
+    //     }
+    // }
 
     // private void dealWithMessageLeave(MessageTypeEnum type, MessageProtobuf message) {
     //     log.info("dealWithMessageLeave");
