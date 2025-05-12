@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:50:24
+ * @LastEditTime: 2025-05-12 17:54:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,10 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         return textRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
+    public Boolean existsByTitleAndKbUidAndDeletedFalse(String title, String kbUid) {
+        return textRepository.existsByTitleAndKbase_UidAndDeletedFalse(title, kbUid);
+    }
+
     @Override
     public TextResponse create(TextRequest request) {
         // 获取当前登录用户
@@ -144,7 +148,6 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // textRepository.delete(optional.get());
         } else {
             throw new RuntimeException("Text not found");
         }
@@ -199,16 +202,15 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
 
     public TextEntity convertExcelToText(TextExcel excel, String kbType, String fileUid, String kbUid, String orgUid) {
         // return modelMapper.map(excel, Text.class); // String categoryUid,
-        // 检索问题+答案+kbUid+orgUid是否已经存在，如果存在则不创建新的问答对
-        // if (existsByQuestionAndAnswerAndKbUidAndOrgUid(excel.getQuestion(), excel.getAnswer(), kbUid, orgUid)) {
-        //     return null;
-        // }
+        // 检索问题+答案+kbUid是否已经存在，如果存在则不创建
+        if (existsByTitleAndKbUidAndDeletedFalse(excel.getTitle(), kbUid)) {
+            return null;
+        }
 
         TextEntity text = TextEntity.builder().build();
         text.setUid(uidUtils.getUid());
         text.setTitle(excel.getTitle());
         text.setContent(excel.getContent());
-        // text.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         //
         Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {

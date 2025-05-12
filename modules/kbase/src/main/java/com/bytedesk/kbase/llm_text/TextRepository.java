@@ -26,4 +26,6 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
     // Boolean existsByPlatform(String platform);
 
     List<TextEntity> findByKbase_UidAndDeletedFalse(String kbUid);
+
+    Boolean existsByTitleAndKbase_UidAndDeletedFalse(String title, String kbUid);
 }
