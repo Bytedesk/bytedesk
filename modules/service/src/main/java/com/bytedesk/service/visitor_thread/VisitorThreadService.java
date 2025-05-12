@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 09:15:37
+ * @LastEditTime: 2025-05-12 15:20:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -151,8 +151,6 @@ public class VisitorThreadService
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         // 考虑到客服信息发生变化，更新客服信息
-        // String agentString =
-        // ServiceConvertUtils.convertToUserProtobufJSONString(agent);
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         // 访客信息
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
@@ -302,8 +300,7 @@ public class VisitorThreadService
                     // 判断是否超时未回复
                     if (diffInMinutes > agent.getTimeoutRemindTime()) {
                         // 更新会话超时提醒时间
-                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
-                                .findByThreadUid(thread.getUid());
+                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
                         if (queueMemberOpt.isPresent()) {
                             QueueMemberEntity queueMember = queueMemberOpt.get();
                             // 判断是否首次超时
