@@ -33,8 +33,8 @@ public class TextSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             // name
-            if (StringUtils.hasText(request.getName())) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            if (StringUtils.hasText(request.getTitle())) {
+                predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
             // content
             if (StringUtils.hasText(request.getContent())) {

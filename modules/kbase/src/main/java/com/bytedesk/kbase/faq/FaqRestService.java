@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 21:45:14
+ * @LastEditTime: 2025-05-12 16:53:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     private final UidUtils uidUtils;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
     private final FaqJsonLoader faqJsonLoader;
 
@@ -401,7 +401,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     public FaqExcel convertToExcel(FaqEntity faq) {
         FaqExcel excel = modelMapper.map(faq, FaqExcel.class);
         if (StringUtils.hasText(faq.getCategoryUid())) {
-            Optional<CategoryEntity> categoryOptional = categoryService.findByUid(faq.getCategoryUid());
+            Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(faq.getCategoryUid());
             if (categoryOptional.isPresent()) {
                 excel.setCategory(categoryOptional.get().getName());
             } else {
@@ -432,7 +432,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         faq.setAnswer(excel.getAnswer());
         faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         //
-        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             faq.setCategoryUid(categoryOptional.get().getUid());
         } else {
@@ -443,7 +443,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
-            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
             faq.setCategoryUid(categoryResponse.getUid());
         }
         faq.setFileUid(fileUid);

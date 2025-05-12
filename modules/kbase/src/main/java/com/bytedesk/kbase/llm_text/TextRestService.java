@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:49:40
+ * @LastEditTime: 2025-05-12 16:55:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -24,6 +25,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -45,6 +50,8 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     private final AuthService authService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final CategoryRestService categoryRestService;
 
     @Override
     public Page<TextEntity> queryByOrgEntity(TextRequest request) {
@@ -131,6 +138,10 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         return textRepository.save(entity);
     }
 
+    public void save(List<TextEntity> entities) {
+        textRepository.saveAll(entities);
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<TextEntity> optional = textRepository.findByUid(uid);
@@ -181,5 +192,45 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     @Override
     public TextExcel convertToExcel(TextEntity text) {
         return modelMapper.map(text, TextExcel.class);
+    }
+
+    public TextEntity convertExcelToText(TextExcel excel, String kbType, String fileUid, String kbUid, String orgUid) {
+        // return modelMapper.map(excel, Text.class); // String categoryUid,
+        // 检索问题+答案+kbUid+orgUid是否已经存在，如果存在则不创建新的问答对
+        // if (existsByQuestionAndAnswerAndKbUidAndOrgUid(excel.getQuestion(), excel.getAnswer(), kbUid, orgUid)) {
+        //     return null;
+        // }
+
+        TextEntity text = TextEntity.builder().build();
+        text.setUid(uidUtils.getUid());
+        text.setTitle(excel.getTitle());
+        text.setContent(excel.getContent());
+        // text.setType(MessageTypeEnum.fromValue(excel.getType()).name());
+        //
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        if (categoryOptional.isPresent()) {
+            text.setCategoryUid(categoryOptional.get().getUid());
+        } else {
+            // create category
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(excel.getCategory())
+                    .type(kbType)
+                    .kbUid(kbUid)
+                    .orgUid(orgUid)
+                    .build();
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
+            text.setCategoryUid(categoryResponse.getUid());
+        }
+        // text.setFileUid(fileUid);
+        text.setOrgUid(orgUid);
+        //
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
+        if (kbase.isPresent()) {
+            text.setKbase(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
+        //
+        return text;
     }
 }
