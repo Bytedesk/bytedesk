@@ -159,15 +159,14 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     }
 
     public void deleteAll(TextRequest request) {
-        List<TextEntity> entities = findByKbUid(request.getOrgUid());
+        List<TextEntity> entities = findByKbUid(request.getKbUid());
         for (TextEntity entity : entities) {
             deleteByUid(entity.getUid());
         }
     }
 
     @Override
-    public TextEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            TextEntity entity) {
+    public TextEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TextEntity entity) {
         try {
             Optional<TextEntity> latest = textRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -226,7 +225,6 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
             text.setCategoryUid(categoryResponse.getUid());
         }
-        // text.setFileUid(fileUid);
         text.setOrgUid(orgUid);
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);

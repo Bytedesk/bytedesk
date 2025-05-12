@@ -45,37 +45,37 @@ public class TextRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
 
-    // 是否开启自动生成enable_llm_qa问答
-    @Builder.Default
-    private Boolean autoGenerateLlmQa = false;
+    // // 是否开启自动生成enable_llm_qa问答
+    // @Builder.Default
+    // private Boolean autoGenerateLlmQa = false;
 
-    // 是否已经生成llm问答
-    @Builder.Default
-    private Boolean llmQaGenerated = false;
+    // // 是否已经生成llm问答
+    // @Builder.Default
+    // private Boolean llmQaGenerated = false;
 
-    // 是否开启自动删除llm问答
-    @Builder.Default
-    private Boolean autoDeleteLlmQa = false;
+    // // 是否开启自动删除llm问答
+    // @Builder.Default
+    // private Boolean autoDeleteLlmQa = false;
 
-    // 是否已经删除llm问答
-    @Builder.Default
-    private Boolean llmQaDeleted = false;
+    // // 是否已经删除llm问答
+    // @Builder.Default
+    // private Boolean llmQaDeleted = false;
 
-    // 是否开启自动llm Chunk切块
-    @Builder.Default
-    private Boolean autoLlmChunk = false;
+    // // 是否开启自动llm Chunk切块
+    // @Builder.Default
+    // private Boolean autoLlmChunk = false;
 
-    // 是否已经自动llm Chunk切块
-    @Builder.Default
-    private Boolean llmChunked = false;
+    // // 是否已经自动llm Chunk切块
+    // @Builder.Default
+    // private Boolean llmChunked = false;
 
-    // 是否开启自动删除llm Chunk切块
-    @Builder.Default
-    private Boolean autoDeleteLlmChunk = false;
+    // // 是否开启自动删除llm Chunk切块
+    // @Builder.Default
+    // private Boolean autoDeleteLlmChunk = false;
 
-    // 是否已经删除llm Chunk切块
-    @Builder.Default
-    private Boolean llmChunkDeleted = false;
+    // // 是否已经删除llm Chunk切块
+    // @Builder.Default
+    // private Boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default

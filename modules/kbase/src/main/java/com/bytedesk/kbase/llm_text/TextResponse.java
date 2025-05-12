@@ -35,11 +35,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class TextResponse extends BaseResponse {
 
-    private String name;
+    private String title;
 
     private String content;
 
     private List<String> tagList;
+
+    private Boolean enabled;
 
     // 有效开始日期
     private LocalDateTime startDate;
@@ -47,31 +49,29 @@ public class TextResponse extends BaseResponse {
     // 有效结束日期
     private LocalDateTime endDate;
 
-    private Boolean enabled;
+    // // 是否开启自动生成enable_llm_qa问答
+    // private Boolean autoGenerateLlmQa;
 
-    // 是否开启自动生成enable_llm_qa问答
-    private Boolean autoGenerateLlmQa;
+    // // 是否已经生成llm问答
+    // private Boolean llmQaGenerated;
 
-    // 是否已经生成llm问答
-    private Boolean llmQaGenerated;
+    // // 是否开启自动删除llm问答
+    // private Boolean autoDeleteLlmQa;
 
-    // 是否开启自动删除llm问答
-    private Boolean autoDeleteLlmQa;
+    // // 是否已经删除llm问答
+    // private Boolean llmQaDeleted;
 
-    // 是否已经删除llm问答
-    private Boolean llmQaDeleted;
+    // // 是否开启自动llm Chunk切块
+    // private Boolean autoLlmChunk;
 
-    // 是否开启自动llm Chunk切块
-    private Boolean autoLlmChunk;
+    // // 是否已经自动llm Chunk切块
+    // private Boolean llmChunked;
 
-    // 是否已经自动llm Chunk切块
-    private Boolean llmChunkted;
+    // // 是否开启自动删除llm Chunk切块
+    // private Boolean autoDeleteLlmChunk;
 
-    // 是否开启自动删除llm Chunk切块
-    private Boolean autoDeleteLlmChunk;
-
-    // 是否已经删除llm Chunk切块
-    private Boolean llmChunktedDeleted;
+    // // 是否已经删除llm Chunk切块
+    // private Boolean llmChunkedDeleted;
 
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();
