@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 13:56:03
+ * @LastEditTime: 2025-05-12 10:47:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,10 @@ public class MemberExcel {
     @ExcelProperty(value = "职位")
     @ColumnWidth(20)
     private String jobTitle;
+
+    @ExcelProperty(value = "部门")
+    @ColumnWidth(20)
+    private String department;
 
     @ExcelProperty(value = "座位号")
     @ColumnWidth(20)
