@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 09:15:09
+ * @LastEditTime: 2025-05-12 17:49:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,5 +25,5 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
 
     // Boolean existsByPlatform(String platform);
 
-    List<TextEntity> findByKbase_Uid(String kbUid);
+    List<TextEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 }

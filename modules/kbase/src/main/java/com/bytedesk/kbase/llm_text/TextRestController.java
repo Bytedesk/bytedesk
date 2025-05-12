@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:14:29
+ * @LastEditTime: 2025-05-12 17:51:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.kbase.faq.FaqRequest;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -79,11 +78,10 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // deleteAll
     @PostMapping("/deleteAll")
-    public ResponseEntity<?> deleteAll(@RequestBody FaqRequest request) {
+    public ResponseEntity<?> deleteAll(@RequestBody TextRequest request) {
 
-        textRestService.delateAll(request);
+        textRestService.deleteAll(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
