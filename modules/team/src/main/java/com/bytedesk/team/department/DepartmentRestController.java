@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:43:58
+ * @LastEditTime: 2025-05-12 14:26:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,18 +65,18 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
 
     @PreAuthorize("hasAuthority('MEMBER_CREATE')")
     @ActionAnnotation(title = "部门", action = "新建", description = "create department")
-    public ResponseEntity<?> create(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<?> create(@RequestBody DepartmentRequest request) {
 
-        DepartmentResponse department = departmentRestService.create(departmentRequest);
+        DepartmentResponse department = departmentRestService.create(request);
 
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
     @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
     @ActionAnnotation(title = "部门", action = "更新", description = "update department")
-    public ResponseEntity<?> update(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<?> update(@RequestBody DepartmentRequest request) {
 
-        DepartmentResponse department = departmentRestService.update(departmentRequest);
+        DepartmentResponse department = departmentRestService.update(request);
    
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
@@ -84,9 +84,9 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @PreAuthorize("hasAuthority('MEMBER_DELETE')")
     @ActionAnnotation(title = "部门", action = "删除", description = "delete department")
     @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<?> delete(@RequestBody DepartmentRequest request) {
 
-        departmentRestService.delete(departmentRequest);
+        departmentRestService.delete(request);
 
         return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
