@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 14:35:16
+ * @LastEditTime: 2025-05-13 17:45:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -344,7 +344,7 @@ public class SpringAIVectorStoreService {
 			chunkRestService.create(splitRequest);
 		}
 		textEntity.setDocIdList(docIdList);
-		textEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
+		textEntity.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
 		textRestService.save(textEntity);
 		// log.info("Parsing document, this will take a while.");
 		vectorStore.write(docList);
@@ -523,7 +523,7 @@ public class SpringAIVectorStoreService {
 			chunkRestService.create(splitRequest);
 		}
 		file.setDocIdList(docIdList);
-		file.setStatus(ChunkStatusEnum.SUCCESS.name());
+		file.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
 		fileRestService.save(file);
 		// 
 		vectorStore.write(docList);

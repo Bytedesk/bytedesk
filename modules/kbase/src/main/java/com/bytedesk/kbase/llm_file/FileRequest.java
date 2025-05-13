@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:02:23
+ * @LastEditTime: 2025-05-13 17:46:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,7 @@ public class FileRequest extends BaseRequest {
     private String fileName;
 
     private String fileUrl;
+
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
@@ -88,10 +89,11 @@ public class FileRequest extends BaseRequest {
     @Builder.Default
     private Boolean llmChunkDeleted = false;
 
-    
-
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();
+
+    @Builder.Default
+    private String vectorStatus = ChunkStatusEnum.NEW.name();
 
     // 所属分类
     private String categoryUid;
