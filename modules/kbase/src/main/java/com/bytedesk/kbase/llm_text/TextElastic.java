@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 17:09:43
+ * @LastEditTime: 2025-05-13 18:14:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,15 +69,15 @@ public class TextElastic {
     @Field(type = FieldType.Keyword)
     private List<String> docIdList;
 
-    @Field(type = FieldType.Date)
-    private LocalDateTime createdAt;
+    // @Field(type = FieldType.Date)
+    // private LocalDateTime createdAt;
 
-    @Field(type = FieldType.Date)
-    private LocalDateTime updatedAt;
+    // @Field(type = FieldType.Date)
+    // private LocalDateTime updatedAt;
 
-    @Field(type = FieldType.Keyword)
-    private String createdBy;
+    // @Field(type = FieldType.Keyword)
+    // private String createdBy;
 
-    @Field(type = FieldType.Keyword)
-    private String updatedBy;
+    // @Field(type = FieldType.Keyword)
+    // private String updatedBy;
 }
