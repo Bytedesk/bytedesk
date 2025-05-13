@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:14:00
+ * @LastEditTime: 2025-05-13 19:00:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,7 @@ public class TextElastic {
     private String uid;
 
     @Field(type = FieldType.Keyword)
-    private String name;
+    private String title;
 
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String content;

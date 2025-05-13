@@ -121,6 +121,17 @@ public class TextRestController extends BaseRestController<TextRequest> {
     }
 
     // update elasticsearch all index
-    
+    @PostMapping("/updateAllIndex")
+    public ResponseEntity<?> updateAllIndex(@RequestBody TextRequest request) {
+        // textRestService.updateAllIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // update elasticsearch all vector index
+    @PostMapping("/updateAllVectorIndex")
+    public ResponseEntity<?> updateAllVectorIndex(@RequestBody TextRequest request) {
+        // textRestService.updateAllVectorIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
     
 }
