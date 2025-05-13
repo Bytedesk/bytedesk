@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:35:44
+ * @LastEditTime: 2025-05-13 10:55:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,12 +15,10 @@ package com.bytedesk.core.workflow;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,13 +29,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class WorkflowRestController extends BaseRestController<WorkflowRequest> {
 
-    private final WorkflowRestService workflowService;
+    private final WorkflowRestService workflowRestService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(WorkflowRequest request) {
         
-        Page<WorkflowResponse> workflow = workflowService.queryByOrg(request);
+        Page<WorkflowResponse> workflow = workflowRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
@@ -45,7 +43,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @Override
     public ResponseEntity<?> queryByUser(WorkflowRequest request) {
         
-        Page<WorkflowResponse> workflow = workflowService.queryByUser(request);
+        Page<WorkflowResponse> workflow = workflowRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
@@ -53,7 +51,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @Override
     public ResponseEntity<?> create(WorkflowRequest request) {
         
-        WorkflowResponse workflow = workflowService.create(request);
+        WorkflowResponse workflow = workflowRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
@@ -61,7 +59,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @Override
     public ResponseEntity<?> update(WorkflowRequest request) {
         
-        WorkflowResponse workflow = workflowService.update(request);
+        WorkflowResponse workflow = workflowRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
@@ -69,7 +67,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @Override
     public ResponseEntity<?> delete(WorkflowRequest request) {
         
-        workflowService.delete(request);
+        workflowRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
