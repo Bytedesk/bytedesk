@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-21 10:04:54
+ * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:05:48
+ * @LastEditTime: 2025-02-25 10:00:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,25 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.flow;
+package com.bytedesk.core.workflow.event;
 
-import com.bytedesk.core.base.BaseEntity;
+import org.springframework.context.ApplicationEvent;
 
-// import jakarta.persistence.Entity;
+import com.bytedesk.core.workflow.WorkflowEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-// @Entity(name = "bytedesk_ticket_flow")
-public class TicketFlowEntity extends BaseEntity {
-    
-    private String name;
-    private String description;
-    private String status;
-    private String type;
-    private String flow;
-    private String flowType;
-    private String flowStatus;
+@EqualsAndHashCode(callSuper = false)
+public class WorkflowCreateEvent extends ApplicationEvent {
+
+    private static final long serialVersionUID = 1L;
+
+    private WorkflowEntity workflow;
+
+    public WorkflowCreateEvent(WorkflowEntity workflow) {
+        super(workflow);
+        this.workflow = workflow;
+    }
+
 }

@@ -46,7 +46,7 @@ public class FaqEventListener {
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
 
-        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.FAQ.name())) {
+        if (UploadTypeEnum.FAQ.name().equalsIgnoreCase(upload.getType())) {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
             if (!BdFileUtils.isExcelFile(fileName)) {

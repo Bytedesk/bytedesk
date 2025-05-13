@@ -45,7 +45,7 @@ public class AutoReplyFixedEventListener {
             if (resource.exists()) {
                 String filePath = resource.getFile().getAbsolutePath();
                 log.info("UploadEventListener loadAsResource: {}", filePath);
-                if (upload.getType().equalsIgnoreCase(UploadTypeEnum.AUTOREPLY_FIXED.name())) {
+                if (UploadTypeEnum.AUTOREPLY_FIXED.name().equalsIgnoreCase(upload.getType())) {
                     // 导入自动回复
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
