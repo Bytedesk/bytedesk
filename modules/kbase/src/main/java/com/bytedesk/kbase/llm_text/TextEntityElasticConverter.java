@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 18:10:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:07:39
+ * @LastEditTime: 2025-05-13 19:01:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ public class TextEntityElasticConverter {
         
         return TextElastic.builder()
                 .uid(entity.getUid())
-                .name(entity.getTitle())
+                .title(entity.getTitle())
                 .content(entity.getContent())
                 .type(entity.getType())
                 .status(entity.getStatus())

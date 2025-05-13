@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 17:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:46:38
+ * @LastEditTime: 2025-05-13 19:01:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -253,20 +253,20 @@ public class TextElasticService {
                 }
                 
                 // 手动添加名称高亮
-                String name = textElastic.getName();
-                if (name != null && !name.trim().isEmpty() && query != null && !query.isEmpty()) {
+                String title = textElastic.getTitle();
+                if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
-                    if (name.toLowerCase().contains(query.toLowerCase())) {
-                        String highlighted = name.replaceAll(
+                    if (title.toLowerCase().contains(query.toLowerCase())) {
+                        String highlighted = title.replaceAll(
                             "(?i)" + query,
                             "<em>" + query + "</em>"
                         );
                         result.setHighlightedName(highlighted);
                     } else {
-                        result.setHighlightedName(name);
+                        result.setHighlightedName(title);
                     }
-                } else if (name != null) {
-                    result.setHighlightedName(name);
+                } else if (title != null) {
+                    result.setHighlightedName(title);
                 }
                 
                 results.add(result);
@@ -398,20 +398,20 @@ public class TextElasticService {
                 }
                 
                 // 手动添加名称高亮
-                String name = textElastic.getName();
-                if (name != null && !name.trim().isEmpty() && query != null && !query.isEmpty()) {
+                String title = textElastic.getTitle();
+                if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
-                    if (name.toLowerCase().contains(query.toLowerCase())) {
-                        String highlighted = name.replaceAll(
+                    if (title.toLowerCase().contains(query.toLowerCase())) {
+                        String highlighted = title.replaceAll(
                             "(?i)" + query,
                             "<em>" + query + "</em>"
                         );
                         result.setHighlightedName(highlighted);
                     } else {
-                        result.setHighlightedName(name);
+                        result.setHighlightedName(title);
                     }
-                } else if (name != null) {
-                    result.setHighlightedName(name);
+                } else if (title != null) {
+                    result.setHighlightedName(title);
                 }
                 
                 results.add(result);

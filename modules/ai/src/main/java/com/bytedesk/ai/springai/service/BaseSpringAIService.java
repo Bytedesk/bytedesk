@@ -31,10 +31,15 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqElastic;
 import com.bytedesk.kbase.faq.FaqElasticSearchResult;
 import com.bytedesk.kbase.faq.FaqProtobuf;
+import com.bytedesk.kbase.llm_chunk.ChunkElastic;
+import com.bytedesk.kbase.llm_chunk.ChunkElasticSearchResult;
 import com.bytedesk.kbase.llm_chunk.ChunkElasticService;
+import com.bytedesk.kbase.llm_chunk.ChunkProtobuf;
 import com.bytedesk.kbase.faq.FaqElasticService;
+import com.bytedesk.kbase.llm_text.TextElastic;
 import com.bytedesk.kbase.llm_text.TextElasticSearchResult;
 import com.bytedesk.kbase.llm_text.TextElasticService;
+import com.bytedesk.kbase.llm_text.TextProtobuf;
 
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson2.JSON;
@@ -181,7 +186,23 @@ public abstract class BaseSpringAIService implements SpringAIService {
             faqProtobufList.add(faqProtobuf);
         }
         // 
-        // List<TextElasticSearchResult> textResults = textElasticService.searchText(query, kbUid);
+        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null);
+        for (TextElasticSearchResult withScore : textResults) {
+            TextElastic text = withScore.getTextElastic();
+            TextProtobuf textProtobuf = TextProtobuf.fromElastic(text);
+            // 
+            String formattedText = textProtobuf.toJson();
+            searchContentList.add(formattedText);
+        }
+        // 
+        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
+        for (ChunkElasticSearchResult withScore : chunkResults) {
+            ChunkElastic chunk = withScore.getChunkElastic();
+            ChunkProtobuf chunkProtobuf = ChunkProtobuf.fromElastic(chunk);
+            // 
+            String formattedChunk = chunkProtobuf.toJson();
+            searchContentList.add(formattedChunk);
+        }
     }
 
     /**
