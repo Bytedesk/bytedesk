@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-27 10:55:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 12:44:07
+ * @LastEditTime: 2025-05-13 21:55:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +37,33 @@ public class MessageLeaveRestControllerVisitor {
         MessageLeaveResponse response = messageLeaveService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
+    }
 
+    // TODO: 访客端拉取留言列表
+    @PostMapping("/query")
+    public ResponseEntity<?> query(@RequestBody MessageLeaveRequest request) {
+       
+        Page<MessageLeaveResponse> response = messageLeaveService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // TODO: confirm
+    @PostMapping("/confirm")
+    public ResponseEntity<?> confirm(@RequestBody MessageLeaveRequest request) {
+       
+        // MessageLeaveResponse response = messageLeaveService.confirm(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // TODO: reject
+    @PostMapping("/reject")
+    public ResponseEntity<?> reject(@RequestBody MessageLeaveRequest request) {
+       
+        // MessageLeaveResponse response = messageLeaveService.reject(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
     
 }
