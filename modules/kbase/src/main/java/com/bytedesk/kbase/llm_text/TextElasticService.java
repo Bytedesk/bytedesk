@@ -144,12 +144,13 @@ public class TextElasticService {
     /**
      * 搜索Text内容
      * @param query 查询关键词
-     * @param limit 返回结果限制数量
-     * @param orgUid 组织UID
+     * @param kbUid 知识库UID（可选）
+     * @param categoryUid 分类UID（可选）
+     * @param orgUid 组织UID（可选）
      * @return Text搜索结果列表
      */
-    public List<TextElasticSearchResult> searchTexts(String query, int limit, String orgUid) {
-        log.info("搜索Texts: query={}, limit={}, orgUid={}", query, limit, orgUid);
+    public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid) {
+        log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
@@ -163,18 +164,13 @@ public class TextElasticService {
             // 在内容和名称字段中搜索
             MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
                 .query(query)
-                .fields("content^3", "name^2") // 内容字段权重3，名称字段权重2
+                .fields("content^3", "name^2")
                 .fuzziness("AUTO")
                 .build();
             boolQueryBuilder.must(multiMatchQuery._toQuery());
             
             // 添加过滤条件：启用状态
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
-            
-            // 添加组织过滤条件
-            if (orgUid != null && !orgUid.trim().isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
-            }
             
             // 添加时间过滤
             LocalDateTime now = LocalDateTime.now();
@@ -195,10 +191,23 @@ public class TextElasticService {
                 .build();
             boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
             
+            // 添加可选的过滤条件：知识库、分类、组织
+            if (kbUid != null && !kbUid.isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("kbaseUid").value(kbUid).build()._toQuery());
+            }
+            
+            if (categoryUid != null && !categoryUid.isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
+            }
+            
+            if (orgUid != null && !orgUid.trim().isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+            }
+            
             // 构建查询
             NativeQuery searchQuery = NativeQuery.builder()
                 .withQuery(boolQueryBuilder.build()._toQuery())
-                .withMaxResults(limit)
+                .withMaxResults(10)
                 .build();
             
             // 执行搜索
