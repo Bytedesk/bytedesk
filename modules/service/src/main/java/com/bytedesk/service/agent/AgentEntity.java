@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:37:46
+ * @LastEditTime: 2025-05-13 12:46:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -104,11 +104,6 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
 
-    // 一对一人工客服，不支持机器人接待。通过自动回复设置，可以自动回复访客消息
-    // @Embedded
-    // @Builder.Default
-    // private RobotSettings robotSettings = new RobotSettings();
-
     @Embedded
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
@@ -121,27 +116,7 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
 
-    // @Embedded
-    // @Builder.Default
-    // private InviteSettings inviteSettings = new InviteSettings();
-
-    // @Embedded
-    // @Builder.Default
-    // private RateDownSettings rateDownSettings = new RateDownSettings();
-
-    // @Embedded
-    // @Builder.Default
-    // private IntentionSettings intentionSettings = new IntentionSettings();
-
-    /**
-     * 迁移到 @{QueueEntity}
-     * 容易导致不一致，使用实时计算chatting thread数量
-     */
-    // @Builder.Default
-    // private int currentThreadCount = 0;
-
     // 最大同时接待数量
-    // max concurrent chatting thread count
     @Builder.Default
     private int maxThreadCount = 10;
 

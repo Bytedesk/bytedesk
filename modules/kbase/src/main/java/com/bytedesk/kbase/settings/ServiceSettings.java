@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 12:20:11
+ * @LastEditTime: 2025-05-13 12:46:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -140,6 +140,15 @@ public class ServiceSettings implements Serializable {
 
     // 换一换-Faq常见问题知识库
     private String welcomeKbUid;
+
+    // ----------------------------------------------------
+    
+    // // 是否启用workflow
+    // @Builder.Default
+    // private boolean enableWorkflow = false;
+
+    // // 工作流uid
+    // private String workflowUid;
 
     //-----------------------------------------------------------------------------------
 
