@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ChunkEventListener {
 
-    private final ChunkService chunkService;
+    private final ChunkElasticService chunkService;
     
     // Chunk仅用于全文搜索
     @EventListener

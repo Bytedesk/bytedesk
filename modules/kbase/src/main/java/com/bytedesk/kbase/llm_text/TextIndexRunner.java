@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TextIndexRunner implements CommandLineRunner {
 
     @Autowired
-    private TextService textService;
+    private TextElasticService textService;
 
     @Autowired
     private TextRepository textRepository;

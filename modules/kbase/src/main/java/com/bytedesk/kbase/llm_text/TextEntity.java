@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:43:31
+ * @LastEditTime: 2025-05-13 18:40:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,46 +86,6 @@ public class TextEntity extends BaseEntity {
     @Builder.Default
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
-    // // 是否开启自动生成llm问答
-    // @Builder.Default
-    // @Column(name = "is_auto_generate_llm_qa")
-    // private boolean autoGenerateLlmQa = false;
-
-    // // 是否已经生成llm问答
-    // @Builder.Default
-    // @Column(name = "is_llm_qa_generated")
-    // private boolean llmQaGenerated = false;
-
-    // // is auto delete llm qa
-    // @Builder.Default
-    // @Column(name = "is_auto_delete_llm_qa")
-    // private boolean autoDeleteLlmQa = false;
-
-    // // 是否已经删除llm问答
-    // @Builder.Default
-    // @Column(name = "is_llm_qa_deleted")
-    // private boolean llmQaDeleted = false;
-
-    // // 是否开启自动llm Chunk切块
-    // @Builder.Default
-    // @Column(name = "is_auto_llm_Chunk")
-    // private boolean autoLlmChunk = false;
-
-    // // 是否已经自动llm Chunk切块
-    // @Builder.Default
-    // @Column(name = "is_llm_Chunked")
-    // private boolean llmChunked = false;
-
-    // // is auto delete llm Chunk
-    // @Builder.Default
-    // @Column(name = "is_auto_delete_llm_Chunk")
-    // private boolean autoDeleteLlmChunk = false;
-
-    // // 是否已经删除llm Chunk切块
-    // @Builder.Default
-    // @Column(name = "is_llm_Chunk_deleted")
-    // private boolean llmChunkDeleted = false;
-
     private String categoryUid; // 所属分类
 
     // 替换kbUid为KbaseEntity
@@ -138,4 +98,62 @@ public class TextEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
 
+
+    // set Success
+    public TextEntity setSuccess() {
+        this.setStatus(ChunkStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    // set Error
+    public TextEntity setError() {
+        this.setStatus(ChunkStatusEnum.ERROR.name());
+        return this;
+    }
+
+
+    /**
+     * 判断内容是否有变化
+     * 只有当关键内容发生变化时，才会触发更新向量索引
+     * @param request TextRequest 请求对象
+     * @return 如果关键内容有变化返回 true，否则返回 false
+     */
+    public boolean hasChanged(TextRequest request) {
+        // 比较标题是否变化
+        if ((title == null && request.getTitle() != null) ||
+            (title != null && !title.equals(request.getTitle()))) {
+            return true;
+        }
+        
+        // 比较内容是否变化
+        if ((content == null && request.getContent() != null) ||
+            (content != null && request.getContent() != null && !content.equals(request.getContent()))) {
+            return true;
+        }
+        
+        // 比较标签列表是否变化
+        if ((tagList == null && request.getTagList() != null && !request.getTagList().isEmpty()) ||
+            (tagList != null && request.getTagList() == null) ||
+            (tagList != null && request.getTagList() != null && !tagList.equals(request.getTagList()))) {
+            return true;
+        }
+
+        // enabled
+        if (enabled != request.getEnabled()) {
+            return true;
+        }
+        
+        // StartDate
+        if (startDate != null && request.getStartDate() != null && !startDate.equals(request.getStartDate())) {
+            return true;
+        }
+        
+        // EndDate
+        if (endDate != null && request.getEndDate() != null && !endDate.equals(request.getEndDate())) {
+            return true;
+        }
+
+        // 所有字段都没有变化
+        return false;
+    }
 }

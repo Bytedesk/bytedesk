@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 public class FaqRestControllerVisitor {
 
-    private final FaqService faqService;
+    private final FaqElasticService faqService;
 
     private final FaqRestService faqRestService;
 

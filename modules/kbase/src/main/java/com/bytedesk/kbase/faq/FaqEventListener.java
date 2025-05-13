@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class FaqEventListener {
 
-    private final FaqService faqService;
+    private final FaqElasticService faqService;
 
     private final FaqRestService faqRestService;
 

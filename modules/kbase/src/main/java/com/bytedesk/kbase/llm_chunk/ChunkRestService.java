@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:23:32
+ * @LastEditTime: 2025-05-13 18:35:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,9 +28,11 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,8 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     private final AuthService authService;
 
     private final KbaseRestService kbaseRestService;
+    
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     public Page<ChunkEntity> queryByOrgEntity(ChunkRequest request) {
@@ -92,7 +96,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
                 .platform(request.getPlatform())
                 .docId(request.getDocId())
                 .typeUid(request.getTypeUid())
-                .enabled(request.isEnabled())
+                .enabled(request.getEnabled())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .categoryUid(request.getCategoryUid())
@@ -128,18 +132,21 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
         if (optional.isPresent()) {
             ChunkEntity entity = optional.get();
             // modelMapper.map(request, entity);
-            // 判断question/answer/questionList/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
+            // 判断必要的内容是否有变化，如果内容发生变化，发布UpdateDocEvent事件
             if (entity.hasChanged(request)) {
                 // 发布事件，更新文档
-                FaqUpdateDocEvent qaUpdateDocEvent = new FaqUpdateDocEvent(entity);
-                bytedeskEventPublisher.publishEvent(qaUpdateDocEvent);
+                ChunkUpdateDocEvent chunkUpdateDocEvent = new ChunkUpdateDocEvent(entity);
+                bytedeskEventPublisher.publishEvent(chunkUpdateDocEvent);
             }
 
             entity.setName(request.getName());
             entity.setContent(request.getContent());
-            entity.setEnabled(request.isEnabled());
+            entity.setEnabled(request.getEnabled());
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
+            entity.setCategoryUid(request.getCategoryUid());
+            // entity.setType(request.getType());
+
             //
             ChunkEntity savedEntity = save(entity);
             if (savedEntity == null) {

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-05-13 15:16:03
+ * @Date: 2025-05-13 17:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 15:43:22
+ * @LastEditTime: 2025-05-13 18:46:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_chunk;
+package com.bytedesk.kbase.llm_text;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,83 +39,83 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-public class ChunkService {
-        
+public class TextElasticService {
+    
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
     @Autowired
-    private ChunkRestService chunkRestService;
+    private TextRestService textRestService;
     
     /**
-     * 索引Chunk实体到Elasticsearch
-     * @param chunk 要索引的Chunk实体
+     * 索引Text实体到Elasticsearch
+     * @param text 要索引的Text实体
      */
-    public void indexChunk(ChunkEntity chunk) {
+    public void indexText(TextEntity text) {
         // 检查文档是否已存在
-        boolean exists = elasticsearchOperations.exists(chunk.getUid(), ChunkElastic.class);
+        boolean exists = elasticsearchOperations.exists(text.getUid(), TextElastic.class);
         
         if (exists) {
-            log.info("更新已存在的Chunk索引: {}", chunk.getUid());
+            log.info("更新已存在的Text索引: {}", text.getUid());
         } else {
-            log.info("为Chunk创建新索引: {}", chunk.getUid());
+            log.info("为Text创建新索引: {}", text.getUid());
         }
         
         try {
-            // 将ChunkEntity转换为ChunkElastic对象
-            ChunkElastic chunkElastic = ChunkEntityElasticConverter.toElastic(chunk);
+            // 将TextEntity转换为TextElastic对象
+            TextElastic textElastic = TextEntityElasticConverter.toElastic(text);
             
             // 将文档索引到Elasticsearch
-            elasticsearchOperations.save(chunkElastic);
+            elasticsearchOperations.save(textElastic);
             
             if (exists) {
-                log.info("Chunk索引更新成功: {}", chunk.getUid());
+                log.info("Text索引更新成功: {}", text.getUid());
             } else {
-                log.info("Chunk索引创建成功: {}", chunk.getUid());
+                log.info("Text索引创建成功: {}", text.getUid());
             }
 
             // 将索引结果保存到数据库中
-            chunk.setSuccess();
-            chunkRestService.save(chunk);
+            text.setSuccess();
+            textRestService.save(text);
 
         } catch (Exception e) {
-            log.error("索引Chunk时发生错误: {}, 错误消息: {}", chunk.getUid(), e.getMessage(), e);
+            log.error("索引Text时发生错误: {}, 错误消息: {}", text.getUid(), e.getMessage(), e);
         }
     }
     
     /**
-     * 从Elasticsearch中删除Chunk的索引
-     * @param chunkUid 要删除的Chunk的UID
+     * 从Elasticsearch中删除Text的索引
+     * @param textUid 要删除的Text的UID
      * @return 是否删除成功
      */
-    public boolean deleteChunk(String chunkUid) {
-        log.info("从索引中删除Chunk: {}", chunkUid);
+    public boolean deleteText(String textUid) {
+        log.info("从索引中删除Text: {}", textUid);
         
         try {
             // 首先检查文档是否存在
-            boolean exists = elasticsearchOperations.exists(chunkUid, ChunkElastic.class);
+            boolean exists = elasticsearchOperations.exists(textUid, TextElastic.class);
             if (!exists) {
-                log.warn("索引中不存在此Chunk文档: {}", chunkUid);
+                log.warn("索引中不存在此Text文档: {}", textUid);
                 return true; // 文档不存在也视为删除成功
             }
             
             // 删除文档
-            elasticsearchOperations.delete(chunkUid, ChunkElastic.class);
-            log.info("Chunk索引删除成功: {}", chunkUid);
+            elasticsearchOperations.delete(textUid, TextElastic.class);
+            log.info("Text索引删除成功: {}", textUid);
             return true;
         } catch (Exception e) {
-            log.error("删除Chunk索引时发生错误: {}, 错误消息: {}", chunkUid, e.getMessage(), e);
+            log.error("删除Text索引时发生错误: {}, 错误消息: {}", textUid, e.getMessage(), e);
             return false;
         }
     }
     
     /**
-     * 根据知识库UID删除所有相关Chunk索引
+     * 根据知识库UID删除所有相关Text索引
      * @param kbaseUid 知识库UID
      * @return 是否删除成功
      */
     public boolean deleteByKbaseUid(String kbaseUid) {
-        log.info("删除知识库下所有Chunk索引: {}", kbaseUid);
+        log.info("删除知识库下所有Text索引: {}", kbaseUid);
         
         try {
             // 首先创建查询
@@ -130,26 +130,26 @@ public class ChunkService {
             DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
             
             // 执行删除操作并获取响应
-            var response = elasticsearchOperations.delete(deleteQuery, ChunkElastic.class);
+            var response = elasticsearchOperations.delete(deleteQuery, TextElastic.class);
             
             // 记录删除的文档数量
-            log.info("成功删除知识库下的Chunk索引数量: {}", response.getDeleted());
+            log.info("成功删除知识库下的Text索引数量: {}", response.getDeleted());
             return true;
         } catch (Exception e) {
-            log.error("删除知识库下的Chunk索引时发生错误: {}, 错误消息: {}", kbaseUid, e.getMessage(), e);
+            log.error("删除知识库下的Text索引时发生错误: {}, 错误消息: {}", kbaseUid, e.getMessage(), e);
             return false;
         }
     }
 
     /**
-     * 搜索Chunk内容
+     * 搜索Text内容
      * @param query 查询关键词
      * @param limit 返回结果限制数量
      * @param orgUid 组织UID
-     * @return Chunk搜索结果列表
+     * @return Text搜索结果列表
      */
-    public List<ChunkElasticSearchResult> searchChunks(String query, int limit, String orgUid) {
-        log.info("搜索Chunks: query={}, limit={}, orgUid={}", query, limit, orgUid);
+    public List<TextElasticSearchResult> searchTexts(String query, int limit, String orgUid) {
+        log.info("搜索Texts: query={}, limit={}, orgUid={}", query, limit, orgUid);
         
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
@@ -181,82 +181,78 @@ public class ChunkService {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             String nowStr = now.format(formatter);
             
-            // 有效期过滤
+            // 有效期过滤 - 开始日期
             DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
                 .field("startDate")
                 .lte(nowStr)
                 .build();
             boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
             
+            // 有效期过滤 - 结束日期
             DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
                 .field("endDate")
                 .gte(nowStr)
                 .build();
             boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
             
-            // 创建查询对象
-            Query searchQuery = NativeQuery.builder()
-                    .withQuery(boolQueryBuilder.build()._toQuery())
-                    .withMaxResults(limit)
-                    .build();
+            // 构建查询
+            NativeQuery searchQuery = NativeQuery.builder()
+                .withQuery(boolQueryBuilder.build()._toQuery())
+                .withMaxResults(limit)
+                .build();
             
             // 执行搜索
-            SearchHits<ChunkElastic> searchHits = elasticsearchOperations.search(searchQuery, ChunkElastic.class);
+            SearchHits<TextElastic> searchHits = 
+                elasticsearchOperations.search(searchQuery, TextElastic.class);
             log.info("搜索结果数量: {}", searchHits.getTotalHits());
             
-            List<ChunkElasticSearchResult> chunkElasticResultList = new ArrayList<>();
+            List<TextElasticSearchResult> results = new ArrayList<>();
             
             // 处理搜索结果
-            for (SearchHit<ChunkElastic> hit : searchHits) {
-                ChunkElastic chunkElastic = hit.getContent();
+            for (SearchHit<TextElastic> hit : searchHits) {
+                TextElastic textElastic = hit.getContent();
                 float score = hit.getScore();
                 
                 // 创建结果对象
-                ChunkElasticSearchResult result = ChunkElasticSearchResult.builder()
-                    .chunkElastic(chunkElastic)
+                TextElasticSearchResult result = TextElasticSearchResult.builder()
+                    .textElastic(textElastic)
                     .score(score)
                     .build();
                 
                 // 手动添加内容高亮
-                String content = chunkElastic.getContent();
+                String content = textElastic.getContent();
                 if (content != null && !content.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (content.toLowerCase().contains(query.toLowerCase())) {
-                        int startIdx = content.toLowerCase().indexOf(query.toLowerCase());
-                        int endIdx = startIdx + query.length();
+                        int index = content.toLowerCase().indexOf(query.toLowerCase());
+                        int start = Math.max(0, index - 50);
+                        int end = Math.min(content.length(), index + query.length() + 50);
+                        String snippet = content.substring(start, end);
                         
-                        // 为了更好的可读性，提取查询词周围的上下文（前后各100个字符）
-                        int contextStart = Math.max(0, startIdx - 100);
-                        int contextEnd = Math.min(content.length(), endIdx + 100);
-                        String highlightedContent = content.substring(contextStart, startIdx) + 
-                                      "<em>" + content.substring(startIdx, endIdx) + "</em>" +
-                                      content.substring(endIdx, contextEnd);
+                        // 添加高亮标记
+                        String highlighted = snippet.replaceAll(
+                            "(?i)" + query,
+                            "<em>" + query + "</em>"
+                        );
                         
-                        if (contextStart > 0) {
-                            highlightedContent = "..." + highlightedContent;
-                        }
-                        if (contextEnd < content.length()) {
-                            highlightedContent = highlightedContent + "...";
-                        }
-                        
-                        result.setHighlightedContent(highlightedContent);
+                        result.setHighlightedContent(highlighted);
                     } else {
-                        // 如果没有直接匹配，则提取前面一部分内容作为预览
-                        result.setHighlightedContent(content.length() > 200 ? content.substring(0, 200) + "..." : content);
+                        // 如果没有直接匹配，使用前100个字符
+                        result.setHighlightedContent(content.length() > 100 ? 
+                            content.substring(0, 100) + "..." : content);
                     }
                 }
                 
                 // 手动添加名称高亮
-                String name = chunkElastic.getName();
+                String name = textElastic.getName();
                 if (name != null && !name.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (name.toLowerCase().contains(query.toLowerCase())) {
-                        int startIdx = name.toLowerCase().indexOf(query.toLowerCase());
-                        int endIdx = startIdx + query.length();
-                        String highlightedName = name.substring(0, startIdx) + 
-                                  "<em>" + name.substring(startIdx, endIdx) + "</em>" +
-                                  name.substring(endIdx);
-                        result.setHighlightedName(highlightedName);
+                        String highlighted = name.replaceAll(
+                            "(?i)" + query,
+                            "<em>" + query + "</em>"
+                        );
+                        result.setHighlightedName(highlighted);
                     } else {
                         result.setHighlightedName(name);
                     }
@@ -264,12 +260,14 @@ public class ChunkService {
                     result.setHighlightedName(name);
                 }
                 
-                chunkElasticResultList.add(result);
+                results.add(result);
             }
             
-            return chunkElasticResultList;
+            log.info("搜索Text完成，找到{}条结果", results.size());
+            return results;
+            
         } catch (Exception e) {
-            log.error("搜索Chunks时发生错误: {}", e.getMessage(), e);
+            log.error("搜索Text时发生错误: {}", e.getMessage(), e);
             return new ArrayList<>();
         }
     }
@@ -277,11 +275,11 @@ public class ChunkService {
     /**
      * 用户在输入过程中，给出输入联想
      * @param request 请求参数
-     * @return Chunk搜索结果列表
+     * @return Text搜索结果列表
      */
-    public List<ChunkElasticSearchResult> suggestChunks(ChunkRequest request) {
+    public List<TextElasticSearchResult> suggestTexts(TextRequest request) {
         String query = request.getContent();
-        log.info("联想Chunks: {}", query);
+        log.info("联想Texts: {}", query);
         
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
@@ -348,63 +346,58 @@ public class ChunkService {
                     .withQuery(boolQueryBuilder.build()._toQuery())
                     .withMaxResults(10) // 联想默认返回10个结果
                     .build();
-            
+                
             // 执行搜索
-            SearchHits<ChunkElastic> searchHits = elasticsearchOperations.search(searchQuery, ChunkElastic.class);
+            SearchHits<TextElastic> searchHits = 
+                elasticsearchOperations.search(searchQuery, TextElastic.class);
             
-            List<ChunkElasticSearchResult> chunkElasticResultList = new ArrayList<>();
+            List<TextElasticSearchResult> results = new ArrayList<>();
             
             // 处理搜索结果
-            for (SearchHit<ChunkElastic> hit : searchHits) {
-                ChunkElastic chunkElastic = hit.getContent();
+            for (SearchHit<TextElastic> hit : searchHits) {
+                TextElastic textElastic = hit.getContent();
                 float score = hit.getScore();
                 
                 // 创建结果对象
-                ChunkElasticSearchResult result = ChunkElasticSearchResult.builder()
-                    .chunkElastic(chunkElastic)
+                TextElasticSearchResult result = TextElasticSearchResult.builder()
+                    .textElastic(textElastic)
                     .score(score)
                     .build();
                 
                 // 手动添加内容高亮
-                String content = chunkElastic.getContent();
+                String content = textElastic.getContent();
                 if (content != null && !content.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (content.toLowerCase().contains(query.toLowerCase())) {
-                        int startIdx = content.toLowerCase().indexOf(query.toLowerCase());
-                        int endIdx = startIdx + query.length();
+                        int index = content.toLowerCase().indexOf(query.toLowerCase());
+                        int start = Math.max(0, index - 50);
+                        int end = Math.min(content.length(), index + query.length() + 50);
+                        String snippet = content.substring(start, end);
                         
-                        // 为了更好的可读性，提取查询词周围的上下文（前后各50个字符）
-                        int contextStart = Math.max(0, startIdx - 50);
-                        int contextEnd = Math.min(content.length(), endIdx + 50);
-                        String highlightedContent = content.substring(contextStart, startIdx) + 
-                                      "<em>" + content.substring(startIdx, endIdx) + "</em>" +
-                                      content.substring(endIdx, contextEnd);
+                        // 添加高亮标记
+                        String highlighted = snippet.replaceAll(
+                            "(?i)" + query,
+                            "<em>" + query + "</em>"
+                        );
                         
-                        if (contextStart > 0) {
-                            highlightedContent = "..." + highlightedContent;
-                        }
-                        if (contextEnd < content.length()) {
-                            highlightedContent = highlightedContent + "...";
-                        }
-                        
-                        result.setHighlightedContent(highlightedContent);
+                        result.setHighlightedContent(highlighted);
                     } else {
-                        // 如果没有直接匹配，则提取前面一部分内容作为预览
-                        result.setHighlightedContent(content.length() > 100 ? content.substring(0, 100) + "..." : content);
+                        // 如果没有直接匹配，使用前100个字符
+                        result.setHighlightedContent(content.length() > 100 ? 
+                            content.substring(0, 100) + "..." : content);
                     }
                 }
                 
                 // 手动添加名称高亮
-                String name = chunkElastic.getName();
+                String name = textElastic.getName();
                 if (name != null && !name.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (name.toLowerCase().contains(query.toLowerCase())) {
-                        int startIdx = name.toLowerCase().indexOf(query.toLowerCase());
-                        int endIdx = startIdx + query.length();
-                        String highlightedName = name.substring(0, startIdx) + 
-                                  "<em>" + name.substring(startIdx, endIdx) + "</em>" +
-                                  name.substring(endIdx);
-                        result.setHighlightedName(highlightedName);
+                        String highlighted = name.replaceAll(
+                            "(?i)" + query,
+                            "<em>" + query + "</em>"
+                        );
+                        result.setHighlightedName(highlighted);
                     } else {
                         result.setHighlightedName(name);
                     }
@@ -412,12 +405,14 @@ public class ChunkService {
                     result.setHighlightedName(name);
                 }
                 
-                chunkElasticResultList.add(result);
+                results.add(result);
             }
             
-            return chunkElasticResultList;
+            log.info("Text联想完成，找到{}条结果", results.size());
+            return results;
+            
         } catch (Exception e) {
-            log.error("联想Chunks时发生错误: {}", e.getMessage(), e);
+            log.error("Text联想时发生错误: {}", e.getMessage(), e);
             return new ArrayList<>();
         }
     }

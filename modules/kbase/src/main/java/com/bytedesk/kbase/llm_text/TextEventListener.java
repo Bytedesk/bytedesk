@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TextEventListener {
 
     private final TextRestService textRestService;
-    private final TextService textService;
+    private final TextElasticService textService;
     private final UploadRestService uploadRestService;
 
     @EventListener
