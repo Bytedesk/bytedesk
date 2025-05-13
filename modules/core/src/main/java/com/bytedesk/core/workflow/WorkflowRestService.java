@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -42,8 +40,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     public Page<WorkflowResponse> queryByOrg(WorkflowRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<WorkflowEntity> spec = WorkflowSpecification.search(request);
         Page<WorkflowEntity> page = workflowRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -93,16 +90,6 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     }
 
     @Override
-    public WorkflowEntity save(WorkflowEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
-    }
-
-    @Override
     protected WorkflowEntity doSave(WorkflowEntity entity) {
         return workflowRepository.save(entity);
     }
@@ -113,7 +100,6 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // workflowRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("Workflow not found");
