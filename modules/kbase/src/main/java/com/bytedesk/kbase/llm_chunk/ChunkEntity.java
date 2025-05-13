@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 16:19:26
+ * @LastEditTime: 2025-05-13 15:34:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,6 +68,9 @@ public class ChunkEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
+    @Builder.Default
+    private String status = ChunkStatusEnum.NEW.name();
+
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
@@ -94,5 +97,19 @@ public class ChunkEntity extends BaseEntity {
     // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;
+
+
+    // set Success
+    public ChunkEntity setSuccess() {
+        this.setStatus(ChunkStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    // set Error
+    public ChunkEntity setError() {
+        this.setStatus(ChunkStatusEnum.ERROR.name());
+        return this;
+    }
+
 
 }
