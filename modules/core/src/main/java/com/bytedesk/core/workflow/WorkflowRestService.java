@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
 import java.util.Optional;
 
@@ -32,68 +32,68 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class FlowRestService extends BaseRestService<FlowEntity, FlowRequest, FlowResponse> {
+public class WorkflowRestService extends BaseRestService<WorkflowEntity, WorkflowRequest, WorkflowResponse> {
 
-    private final FlowRepository flowRepository;
+    private final WorkflowRepository workflowRepository;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
     @Override
-    public Page<FlowResponse> queryByOrg(FlowRequest request) {
+    public Page<WorkflowResponse> queryByOrg(WorkflowRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
-        Specification<FlowEntity> spec = FlowSpecification.search(request);
-        Page<FlowEntity> page = flowRepository.findAll(spec, pageable);
+        Specification<WorkflowEntity> spec = WorkflowSpecification.search(request);
+        Page<WorkflowEntity> page = workflowRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<FlowResponse> queryByUser(FlowRequest request) {
+    public Page<WorkflowResponse> queryByUser(WorkflowRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "flow", key = "#uid", unless="#result==null")
+    @Cacheable(value = "workflow", key = "#uid", unless="#result==null")
     @Override
-    public Optional<FlowEntity> findByUid(String uid) {
-        return flowRepository.findByUid(uid);
+    public Optional<WorkflowEntity> findByUid(String uid) {
+        return workflowRepository.findByUid(uid);
     }
 
     @Override
-    public FlowResponse create(FlowRequest request) {
+    public WorkflowResponse create(WorkflowRequest request) {
         
-        FlowEntity entity = modelMapper.map(request, FlowEntity.class);
+        WorkflowEntity entity = modelMapper.map(request, WorkflowEntity.class);
         entity.setUid(uidUtils.getUid());
 
-        FlowEntity savedEntity = save(entity);
+        WorkflowEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create flow failed");
+            throw new RuntimeException("Create workflow failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Override
-    public FlowResponse update(FlowRequest request) {
-        Optional<FlowEntity> optional = flowRepository.findByUid(request.getUid());
+    public WorkflowResponse update(WorkflowRequest request) {
+        Optional<WorkflowEntity> optional = workflowRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            FlowEntity entity = optional.get();
+            WorkflowEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            FlowEntity savedEntity = save(entity);
+            WorkflowEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update flow failed");
+                throw new RuntimeException("Update workflow failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Flow not found");
+            throw new RuntimeException("Workflow not found");
         }
     }
 
     @Override
-    public FlowEntity save(FlowEntity entity) {
+    public WorkflowEntity save(WorkflowEntity entity) {
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -103,41 +103,41 @@ public class FlowRestService extends BaseRestService<FlowEntity, FlowRequest, Fl
     }
 
     @Override
-    protected FlowEntity doSave(FlowEntity entity) {
-        return flowRepository.save(entity);
+    protected WorkflowEntity doSave(WorkflowEntity entity) {
+        return workflowRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<FlowEntity> optional = flowRepository.findByUid(uid);
+        Optional<WorkflowEntity> optional = workflowRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // flowRepository.delete(optional.get());
+            // workflowRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Flow not found");
+            throw new RuntimeException("Workflow not found");
         }
     }
 
     @Override
-    public void delete(FlowRequest request) {
+    public void delete(WorkflowRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public FlowEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FlowEntity entity) {
+    public WorkflowEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WorkflowEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public FlowResponse convertToResponse(FlowEntity entity) {
-        return modelMapper.map(entity, FlowResponse.class);
+    public WorkflowResponse convertToResponse(WorkflowEntity entity) {
+        return modelMapper.map(entity, WorkflowResponse.class);
     }
 
     @Override
-    public FlowResponse queryByUid(FlowRequest request) {
+    public WorkflowResponse queryByUid(WorkflowRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

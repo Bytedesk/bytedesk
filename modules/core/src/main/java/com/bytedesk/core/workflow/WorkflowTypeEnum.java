@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-08-01 06:18:10
+ * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:13:40
+ * @LastEditTime: 2025-02-14 17:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,30 +11,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.write.style.ColumnWidth;
-
-import lombok.Data;
-
-/**
- * https://github.com/alibaba/easyexcel
- */
-@Data
-public class FlowExcel {
-
-    @ExcelProperty(index = 0, value = "Name")
-    @ColumnWidth(20)
-    private String name;
-
-    @ExcelProperty(index = 1, value = "Type")
-    @ColumnWidth(20)
-    private String type;
-
-    @ExcelProperty(index = 2, value = "Color")
-    @ColumnWidth(20)
-    private String color;
-
-    
+public enum WorkflowTypeEnum {
+    TICKET,
+    FLOW
 }

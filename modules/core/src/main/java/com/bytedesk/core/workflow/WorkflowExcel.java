@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:12
+ * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-14 17:53:06
+ * @LastEditTime: 2025-03-03 23:13:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,34 +11,30 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
+/**
+ * https://github.com/alibaba/easyexcel
+ */
 @Data
-@Builder
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class FlowResponse extends BaseResponse {
+public class WorkflowExcel {
 
+    @ExcelProperty(index = 0, value = "Name")
+    @ColumnWidth(20)
     private String name;
 
-    // private String key;
+    @ExcelProperty(index = 1, value = "Type")
+    @ColumnWidth(20)
+    private String type;
 
-    private String description;
+    @ExcelProperty(index = 2, value = "Color")
+    @ColumnWidth(20)
+    private String color;
 
-    // private String type;
-
-    // private LocalDateTime createdAt;
-
-    // private LocalDateTime updatedAt;
+    
 }

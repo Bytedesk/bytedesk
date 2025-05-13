@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -27,61 +27,61 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/flow")
+@RequestMapping("/api/v1/workflow")
 @AllArgsConstructor
-public class FlowRestController extends BaseRestController<FlowRequest> {
+public class WorkflowRestController extends BaseRestController<WorkflowRequest> {
 
-    private final FlowRestService flowService;
+    private final WorkflowRestService workflowService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
-    public ResponseEntity<?> queryByOrg(FlowRequest request) {
+    public ResponseEntity<?> queryByOrg(WorkflowRequest request) {
         
-        Page<FlowResponse> flow = flowService.queryByOrg(request);
+        Page<WorkflowResponse> workflow = workflowService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success(flow));
+        return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(FlowRequest request) {
+    public ResponseEntity<?> queryByUser(WorkflowRequest request) {
         
-        Page<FlowResponse> flow = flowService.queryByUser(request);
+        Page<WorkflowResponse> workflow = workflowService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success(flow));
+        return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
     @Override
-    public ResponseEntity<?> create(FlowRequest request) {
+    public ResponseEntity<?> create(WorkflowRequest request) {
         
-        FlowResponse flow = flowService.create(request);
+        WorkflowResponse workflow = workflowService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(flow));
+        return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
     @Override
-    public ResponseEntity<?> update(FlowRequest request) {
+    public ResponseEntity<?> update(WorkflowRequest request) {
         
-        FlowResponse flow = flowService.update(request);
+        WorkflowResponse workflow = workflowService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(flow));
+        return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
     @Override
-    public ResponseEntity<?> delete(FlowRequest request) {
+    public ResponseEntity<?> delete(WorkflowRequest request) {
         
-        flowService.delete(request);
+        workflowService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
-    public Object export(FlowRequest request, HttpServletResponse response) {
+    public Object export(WorkflowRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(FlowRequest request) {
+    public ResponseEntity<?> queryByUid(WorkflowRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }

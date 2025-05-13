@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FlowSpecification extends BaseSpecification {
+public class WorkflowSpecification extends BaseSpecification {
     
-    public static Specification<FlowEntity> search(FlowRequest request) {
+    public static Specification<WorkflowEntity> search(WorkflowRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
