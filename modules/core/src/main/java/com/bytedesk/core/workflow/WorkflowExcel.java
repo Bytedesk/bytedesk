@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:13:40
+ * @LastEditTime: 2025-05-13 11:32:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,9 +32,9 @@ public class WorkflowExcel {
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(index = 2, value = "Color")
+    @ExcelProperty(index = 2, value = "Content")
     @ColumnWidth(20)
-    private String color;
+    private String content;
 
     
 }
