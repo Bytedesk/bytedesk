@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:48:47
+ * @LastEditTime: 2025-05-13 18:34:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,8 @@ import lombok.experimental.SuperBuilder;
 public class TextRequest extends BaseRequest {
 
     private String title;
+    
+    // private String content;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();

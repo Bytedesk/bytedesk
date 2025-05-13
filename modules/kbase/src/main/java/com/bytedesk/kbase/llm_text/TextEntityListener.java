@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:37:19
+ * @LastEditTime: 2025-05-13 18:38:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,7 @@ public class TextEntityListener {
 
     @PostPersist
     public void onPostPersist(TextEntity text) {
-        log.info("TextEntityListener onPostPersist: {}", text.toString());
+        log.info("TextEntityListener onPostPersist: {}", text.getTitle());
         // 
         TextEntity clonedText = SerializationUtils.clone(text);
         // 
@@ -42,7 +42,7 @@ public class TextEntityListener {
 
     @PostUpdate
     public void onPostUpdate(TextEntity text) {
-        log.info("TextEntityListener onPostUpdate: {}", text.toString());
+        log.info("TextEntityListener onPostUpdate: {}", text.getTitle());
         // 
         TextEntity clonedText = SerializationUtils.clone(text);
         // 

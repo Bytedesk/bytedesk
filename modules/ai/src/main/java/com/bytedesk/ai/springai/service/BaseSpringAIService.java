@@ -31,7 +31,10 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqElastic;
 import com.bytedesk.kbase.faq.FaqElasticSearchResult;
 import com.bytedesk.kbase.faq.FaqProtobuf;
-import com.bytedesk.kbase.faq.FaqService;
+import com.bytedesk.kbase.llm_chunk.ChunkElasticService;
+import com.bytedesk.kbase.faq.FaqElasticService;
+import com.bytedesk.kbase.llm_text.TextElasticSearchResult;
+import com.bytedesk.kbase.llm_text.TextElasticService;
 
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson2.JSON;
@@ -43,7 +46,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected SpringAIVectorStoreService springAIVectorService;
 
     @Autowired
-    protected FaqService faqService;
+    protected FaqElasticService faqElasticService;
+
+    @Autowired
+    protected TextElasticService textElasticService;
+
+    @Autowired
+    protected ChunkElasticService chunkElasticService;
 
     @Autowired
     protected IMessageSendService messageSendService;
@@ -162,7 +171,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     private void executeFulltextSearch(String query, String kbUid, List<String> searchContentList,
             List<FaqProtobuf> faqProtobufList) {
-        List<FaqElasticSearchResult> searchResults = faqService.searchFaq(query, kbUid, null, null);
+        List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
             FaqElastic faq = withScore.getFaqElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
@@ -171,6 +180,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchContentList.add(formattedFaq);
             faqProtobufList.add(faqProtobuf);
         }
+        // 
+        // List<TextElasticSearchResult> textResults = textElasticService.searchText(query, kbUid);
     }
 
     /**

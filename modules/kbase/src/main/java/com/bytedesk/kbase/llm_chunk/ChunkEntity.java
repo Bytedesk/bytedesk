@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:47:48
+ * @LastEditTime: 2025-05-13 18:33:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,5 +115,49 @@ public class ChunkEntity extends BaseEntity {
         return this;
     }
 
+    /**
+     * 判断内容是否有变化
+     * 只有当关键内容发生变化时，才会触发更新向量索引
+     * @param request ChunkRequest 请求对象
+     * @return 如果关键内容有变化返回 true，否则返回 false
+     */
+    public boolean hasChanged(ChunkRequest request) {
+        // 比较名称是否变化
+        if ((name == null && request.getName() != null) ||
+            (name != null && !name.equals(request.getName()))) {
+            return true;
+        }
+        
+        // 比较内容是否变化
+        if ((content == null && request.getContent() != null) ||
+            (content != null && request.getContent() != null && !content.equals(request.getContent()))) {
+            return true;
+        }
+        
+        // 比较标签列表是否变化
+        if ((tagList == null && request.getTagList() != null && !request.getTagList().isEmpty()) ||
+            (tagList != null && request.getTagList() == null) ||
+            (tagList != null && request.getTagList() != null && !tagList.equals(request.getTagList()))) {
+            return true;
+        }
+
+        // enabled
+        if (enabled != request.getEnabled()) {
+            return true;
+        }
+        
+        // StartDate
+        if (startDate != null && request.getStartDate() != null && !startDate.equals(request.getStartDate())) {
+            return true;
+        }
+        
+        // EndDate
+        if (endDate != null && request.getEndDate() != null && !endDate.equals(request.getEndDate())) {
+            return true;
+        }
+
+        // 所有字段都没有变化
+        return false;
+    }
 
 }
