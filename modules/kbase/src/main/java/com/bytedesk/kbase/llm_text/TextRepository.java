@@ -28,4 +28,12 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
     List<TextEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 
     Boolean existsByTitleAndKbase_UidAndDeletedFalse(String title, String kbUid);
+    
+    /**
+     * 查找状态为指定值但向量状态不是指定值的Text实体
+     * @param status 状态值
+     * @param vectorStatus 向量状态值 
+     * @return Text实体列表
+     */
+    List<TextEntity> findByStatusAndVectorStatusNot(String status, String vectorStatus);
 }

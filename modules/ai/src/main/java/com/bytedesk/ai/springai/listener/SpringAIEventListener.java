@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-24 09:34:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:51:08
+ * @LastEditTime: 2025-05-13 18:06:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,27 +13,11 @@
  */
 package com.bytedesk.ai.springai.listener;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
+// import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.llm_file.FileEntity;
-import com.bytedesk.kbase.llm_file.event.FileCreateEvent;
-import com.bytedesk.kbase.llm_file.event.FileDeleteEvent;
-import com.bytedesk.kbase.llm_text.TextEntity;
-import com.bytedesk.kbase.llm_text.event.TextCreateEvent;
-import com.bytedesk.kbase.llm_text.event.TextDeleteEvent;
-import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
-import com.bytedesk.kbase.llm_website.WebsiteEntity;
-import com.bytedesk.kbase.llm_website.event.WebsiteCreateEvent;
-import com.bytedesk.kbase.llm_website.event.WebsiteDeleteEvent;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,19 +26,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SpringAIEventListener {
 
-    private final SpringAIVectorStoreService springAiVectorService;
+    // private final SpringAIVectorStoreService springAiVectorService;
 
     // 存储收集到的FAQ实体，用于批量处理
     // private final ConcurrentHashMap<String, FaqEntity> faqCreateMap = new ConcurrentHashMap<>();
     // private final ConcurrentHashMap<String, FaqEntity> faqUpdateMap = new ConcurrentHashMap<>();
 
     // 存储收集到的Text实体，用于批量处理
-    private final ConcurrentHashMap<String, TextEntity> textCreateMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, TextEntity> textUpdateMap = new ConcurrentHashMap<>();
+    // private final ConcurrentHashMap<String, TextEntity> textCreateMap = new ConcurrentHashMap<>();
+    // private final ConcurrentHashMap<String, TextEntity> textUpdateMap = new ConcurrentHashMap<>();
 
     // 存储收集到的File实体，用于批量处理
-    private final ConcurrentHashMap<String, FileEntity> fileCreateMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, FileEntity> fileDeleteMap = new ConcurrentHashMap<>();
+    // private final ConcurrentHashMap<String, FileEntity> fileCreateMap = new ConcurrentHashMap<>();
+    // private final ConcurrentHashMap<String, FileEntity> fileDeleteMap = new ConcurrentHashMap<>();
 
     // @EventListener
     // public void onFileCreateEvent(FileCreateEvent event) {
@@ -77,17 +61,17 @@ public class SpringAIEventListener {
     //     fileDeleteMap.put(file.getUid(), file);
     // }
 
-    @EventListener
-    public void onTextCreateEvent(TextCreateEvent event) {
-        TextEntity text = event.getText();
-        log.info("SpringAIEventListener onTextCreateEvent: {}", text.getTitle());
-        // if (text.isAutoDeleteLlmChunk()) {
-        // 仅当文件需要分割时，才添加到创建缓存中
-        textCreateMap.put(text.getUid(), text);
-        // } else if (text.isAutoGenerateLlmQa()) {
-        // // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
-        // }
-    }
+    // @EventListener
+    // public void onTextCreateEvent(TextCreateEvent event) {
+    //     TextEntity text = event.getText();
+    //     log.info("SpringAIEventListener onTextCreateEvent: {}", text.getTitle());
+    //     // if (text.isAutoDeleteLlmChunk()) {
+    //     // 仅当文件需要分割时，才添加到创建缓存中
+    //     textCreateMap.put(text.getUid(), text);
+    //     // } else if (text.isAutoGenerateLlmQa()) {
+    //     // // TODO: 仅当文件需要生成QA时，才添加到创建缓存中
+    //     // }
+    // }
 
     // @EventListener
     // public void onTextUpdateDocEvent(TextUpdateDocEvent event) {
@@ -141,7 +125,7 @@ public class SpringAIEventListener {
         // processFaqUpdates();
 
         // 批量处理Text创建
-        processTextCreations();
+        // processTextCreations();
 
         // 批量处理Text更新
         // processTextUpdates();
@@ -192,24 +176,24 @@ public class SpringAIEventListener {
     //     }
     // }
 
-    private void processTextCreations() {
-        if (!textCreateMap.isEmpty()) {
-            log.info("处理Text创建: 数量: {}", textCreateMap.size());
-            Set<String> processedKeys = new HashSet<>();
+    // private void processTextCreations() {
+    //     if (!textCreateMap.isEmpty()) {
+    //         log.info("处理Text创建: 数量: {}", textCreateMap.size());
+    //         Set<String> processedKeys = new HashSet<>();
 
-            textCreateMap.forEach((uid, text) -> {
-                try {
-                    springAiVectorService.readText(text);
-                    processedKeys.add(uid);
-                } catch (Exception e) {
-                    log.error("处理Text创建失败: {} - {}", uid, e.getMessage());
-                }
-            });
+    //         textCreateMap.forEach((uid, text) -> {
+    //             try {
+    //                 springAiVectorService.readText(text);
+    //                 processedKeys.add(uid);
+    //             } catch (Exception e) {
+    //                 log.error("处理Text创建失败: {} - {}", uid, e.getMessage());
+    //             }
+    //         });
 
-            // 移除已处理的实体
-            processedKeys.forEach(textCreateMap::remove);
-        }
-    }
+    //         // 移除已处理的实体
+    //         processedKeys.forEach(textCreateMap::remove);
+    //     }
+    // }
 
     // private void processTextUpdates() {
     //     if (!textUpdateMap.isEmpty()) {

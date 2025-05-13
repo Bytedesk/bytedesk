@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:54:37
+ * @LastEditTime: 2025-05-13 18:19:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,9 @@ import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.core.utils.BdFileUtils;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
+import com.bytedesk.kbase.llm_text.event.TextCreateEvent;
+import com.bytedesk.kbase.llm_text.event.TextDeleteEvent;
+import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TextEventListener {
 
     private final TextRestService textRestService;
-
+    private final TextService textService;
     private final UploadRestService uploadRestService;
 
     @EventListener
@@ -70,9 +73,34 @@ public class TextEventListener {
             }
         }
     }
- 
 
+    // Text用于全文搜索
+    @EventListener
+    public void onTextCreateEvent(TextCreateEvent event) {
+        TextEntity text = event.getText();
+        log.info("TextEventListener onTextCreateEvent: {}", text.getTitle());
+        // 进行全文索引
+        textService.indexText(text);
+    }
 
-    
+    @EventListener
+    public void onTextUpdateDocEvent(TextUpdateDocEvent event) {
+        TextEntity text = event.getText();
+        log.info("TextEventListener onTextUpdateDocEvent: {}", text.getTitle());
+        // 更新全文索引
+        textService.indexText(text);
+    }
+
+    @EventListener
+    public void onTextDeleteEvent(TextDeleteEvent event) {
+        TextEntity text = event.getText();
+        log.info("TextEventListener onTextDeleteEvent: {}", text.getTitle());
+        // 从全文索引中删除
+        boolean deleted = textService.deleteText(text.getUid());
+        if (!deleted) {
+            log.warn("从Elasticsearch中删除Text索引失败: {}", text.getUid());
+            // 可以考虑添加重试逻辑或者其他错误处理
+        }
+    }
 }
 
