@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 15:09:05
+ * @LastEditTime: 2025-05-13 17:49:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,6 +65,9 @@ public class FaqRequest extends BaseRequest {
 
     @Builder.Default
     private String status = FaqStatusEnum.NEW.name();
+
+    @Builder.Default
+    private String vectorStatus = ChunkStatusEnum.NEW.name();
 
     // 被展示次数
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 15:34:03
+ * @LastEditTime: 2025-05-13 17:47:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,10 @@ public class ChunkEntity extends BaseEntity {
 
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();
+
+    @Builder.Default
+    @Column(name = "vector_status")
+    private String vectorStatus = ChunkStatusEnum.NEW.name();
 
     // 是否启用，状态：启用/禁用
     @Builder.Default

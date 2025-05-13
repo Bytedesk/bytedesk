@@ -23,6 +23,7 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -108,6 +109,9 @@ public class FaqEntity extends BaseEntity {
 
     @Builder.Default
     private String status = FaqStatusEnum.NEW.name();
+
+    @Builder.Default
+    private String vectorStatus = ChunkStatusEnum.NEW.name();
     /**
      * 标签列表
      */
