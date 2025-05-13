@@ -37,7 +37,7 @@ public class FileEventListener {
     public void onUploadCreateEvent(UploadCreateEvent event) throws IOException {
         UploadEntity upload = event.getUpload();
         // 专门存储大模型上传文件记录
-        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.LLM_FILE.name())) {
+        if (UploadTypeEnum.LLM_FILE.name().equalsIgnoreCase(upload.getType())) {
             log.info("UploadEventListener LLM_FILE: {}", upload.getFileName());
             // 
             UserProtobuf userProtobuf = UserProtobuf.fromJson(upload.getUser());

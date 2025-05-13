@@ -58,7 +58,7 @@ public class QuickReplyEventListener {
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
         
-        if (upload.getType().equalsIgnoreCase(UploadTypeEnum.QUICKREPLY.name())) {
+        if (UploadTypeEnum.QUICKREPLY.name().equalsIgnoreCase(upload.getType())) {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
             if (!BdFileUtils.isExcelFile(fileName)) {
