@@ -195,14 +195,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchContentList.add(formattedText);
         }
         // 
-        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
-        for (ChunkElasticSearchResult withScore : chunkResults) {
-            ChunkElastic chunk = withScore.getChunkElastic();
-            ChunkProtobuf chunkProtobuf = ChunkProtobuf.fromElastic(chunk);
-            // 
-            String formattedChunk = chunkProtobuf.toJson();
-            searchContentList.add(formattedChunk);
-        }
+        // List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
+        // for (ChunkElasticSearchResult withScore : chunkResults) {
+        //     ChunkElastic chunk = withScore.getChunkElastic();
+        //     ChunkProtobuf chunkProtobuf = ChunkProtobuf.fromElastic(chunk);
+        //     // 
+        //     String formattedChunk = chunkProtobuf.toJson();
+        //     searchContentList.add(formattedChunk);
+        // }
     }
 
     /**
