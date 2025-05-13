@@ -11,12 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
-public class FlowPermissions {
+public class WorkflowPermissions {
 
     public static final String FLOW_PREFIX = "FLOW_";
-    // Flow permissions
+    // Workflow permissions
     public static final String FLOW_CREATE = "hasAuthority('FLOW_CREATE')";
     public static final String FLOW_READ = "hasAuthority('FLOW_READ')";
     public static final String FLOW_UPDATE = "hasAuthority('FLOW_UPDATE')";

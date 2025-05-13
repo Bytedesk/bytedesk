@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:14:28
+ * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:46:24
+ * @LastEditTime: 2025-03-20 12:46:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,13 +11,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.TypeConsts;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,27 +21,21 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-@Entity
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_core_flow")
-public class FlowEntity extends BaseEntity {
+public class WorkflowRequest extends BaseRequest {
 
-    @Column(name = "flow_name")
     private String name;
+
+    // private String key;
 
     private String description;
 
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String content;
-
-    // @Builder.Default
-    // @Column(name = "flow_type", nullable = false)
-    // private String type = FlowTypeEnum.TICKET.name();
+    // private String type;
 
     // @Builder.Default
     // private String level = LevelEnum.ORGANIZATION.name();

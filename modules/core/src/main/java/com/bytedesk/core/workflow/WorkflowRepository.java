@@ -11,16 +11,16 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.flow;
+package com.bytedesk.core.workflow;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface FlowRepository extends JpaRepository<FlowEntity, Long>, JpaSpecificationExecutor<FlowEntity> {
+public interface WorkflowRepository extends JpaRepository<WorkflowEntity, Long>, JpaSpecificationExecutor<WorkflowEntity> {
 
-    Optional<FlowEntity> findByUid(String uid);
+    Optional<WorkflowEntity> findByUid(String uid);
 
     // Boolean existsByPlatform(String platform);
 }
