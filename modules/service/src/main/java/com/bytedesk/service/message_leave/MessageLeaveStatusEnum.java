@@ -22,7 +22,10 @@ public enum MessageLeaveStatusEnum {
     ESCALATED("已升级"),
     CLOSED("已关闭"),
     SPAM("垃圾留言"),
-    INVALID("无效留言");
+    INVALID("无效留言"),
+    CONFIRMED("已确认"), // 访客确认留言有效
+    REJECTED("已拒绝"), // 访客拒绝留言有效
+    ;
 
     private final String description;
 
