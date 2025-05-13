@@ -15,6 +15,7 @@ package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -94,5 +95,33 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
             "分词",
             "chunk"
         );
+    }
+
+    // update elasticsearch index
+    @PostMapping("/updateIndex")
+    public ResponseEntity<?> updateIndex(ChunkRequest request) {
+        // chunkRestService.updateIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // update elasticsearch vector index
+    @PostMapping("/updateVectorIndex")
+    public ResponseEntity<?> updateVectorIndex(ChunkRequest request) {
+        // chunkRestService.updateVectorIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // update elasticsearch all index
+    @PostMapping("/updateAllIndex")
+    public ResponseEntity<?> updateAllIndex(ChunkRequest request) {
+        // chunkRestService.updateAllIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // update elasticsearch all vector index
+    @PostMapping("/updateAllVectorIndex")
+    public ResponseEntity<?> updateAllVectorIndex(ChunkRequest request) {
+        // chunkRestService.updateAllVectorIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
     }
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:51:59
+ * @LastEditTime: 2025-05-13 18:56:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,5 +105,22 @@ public class TextRestController extends BaseRestController<TextRequest> {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
+
+    // update elasticsearch index
+    @PostMapping("/updateIndex")
+    public ResponseEntity<?> updateIndex(@RequestBody TextRequest request) {
+        // textRestService.updateIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // update elasticsearch vector index
+    @PostMapping("/updateVectorIndex")
+    public ResponseEntity<?> updateVectorIndex(@RequestBody TextRequest request) {
+        // textRestService.updateVectorIndex(request);
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // update elasticsearch all index
+    
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 09:18:26
+ * @LastEditTime: 2025-05-13 18:54:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -127,6 +127,46 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
             "常见问题",
             "faq"
         );
+    }
+
+    // update elasticsearch index
+    @ActionAnnotation(title = "常见问题", action = "更新索引", description = "update faq index")
+    @PostMapping("/updateIndex")
+    public ResponseEntity<?> updateIndex(@RequestBody FaqRequest request) {
+
+        // faqRestService.updateIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
+    }
+
+    // update elasticsearch vector index
+    @ActionAnnotation(title = "常见问题", action = "更新向量索引", description = "update faq vector index")
+    @PostMapping("/updateVectorIndex")
+    public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
+
+        // faqRestService.updateVectorIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+    }
+
+    // update all elasticsearch index
+    @ActionAnnotation(title = "常见问题", action = "更新所有索引", description = "update all faq index")
+    @PostMapping("/updateAllIndex")
+    public ResponseEntity<?> updateAllIndex(@RequestBody FaqRequest request) {
+
+        // faqRestService.updateAllIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update all index success", request.getUid()));
+    }
+
+    // update all elasticsearch vector index
+    @ActionAnnotation(title = "常见问题", action = "更新所有向量索引", description = "update all faq vector index")
+    @PostMapping("/updateAllVectorIndex")
+    public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {
+
+        // faqRestService.updateAllVectorIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }
 
 }
