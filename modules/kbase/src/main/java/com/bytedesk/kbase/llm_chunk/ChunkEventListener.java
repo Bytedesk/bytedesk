@@ -13,7 +13,12 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +28,37 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ChunkEventListener {
 
- 
+    private final ChunkService chunkService;
+    
+    // Chunk仅用于全文搜索
+    @EventListener
+    public void onChunkCreateEvent(ChunkCreateEvent event) {
+        ChunkEntity chunk = event.getChunk();
+        log.info("ChunkEventListener onChunkCreateEvent: {}", chunk.getName());
+        // 仅做全文索引
+        chunkService.indexChunk(chunk);
+    }
+
+    // Chunk仅用于全文搜索
+    @EventListener
+    public void onChunkUpdateDocEvent(ChunkUpdateDocEvent event) {
+        ChunkEntity chunk = event.getChunk();
+        log.info("ChunkEventListener ChunkUpdateDocEvent: {}", chunk.getName());
+        // 更新全文索引
+        chunkService.indexChunk(chunk);
+    }
+
+    @EventListener
+    public void onChunkDeleteEvent(ChunkDeleteEvent event) {
+        ChunkEntity chunk = event.getChunk();
+        log.info("ChunkEventListener onChunkDeleteEvent: {}", chunk.getName());
+        // 从全文索引中删除
+        boolean deleted = chunkService.deleteChunk(chunk.getUid());
+        if (!deleted) {
+            log.warn("从Elasticsearch中删除Chunk索引失败: {}", chunk.getUid());
+            // 可以考虑添加重试逻辑或者其他错误处理
+        }
+    }
 }
 
 
