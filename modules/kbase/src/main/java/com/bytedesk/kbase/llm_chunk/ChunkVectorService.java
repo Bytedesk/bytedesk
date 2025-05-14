@@ -272,12 +272,32 @@ public class ChunkVectorService {
      */
     private void checkAndDeleteExistingDoc(String id) {
         try {
-            // 查找并删除之前的文档
-            vectorStore.delete(List.of(id));
-            log.debug("已删除旧向量文档: {}", id);
+            // 使用过滤表达式查询已存在的文档
+            FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+            FilterExpressionBuilder.Op idOp = expressionBuilder.eq("id", id);
+            Expression expression = idOp.build();
+            
+            // 构建搜索请求，只查询是否存在，不关心内容
+            SearchRequest searchRequest = SearchRequest.builder()
+                    .query("")
+                    .filterExpression(expression)
+                    .build();
+            
+            List<Document> existingDocs = vectorStore.similaritySearch(searchRequest);
+            
+            // 如果文档存在，则删除
+            if (existingDocs != null && !existingDocs.isEmpty()) {
+                log.info("删除已存在的Chunk向量文档: {}", id);
+                vectorStore.delete(List.of(id));
+            }
         } catch (Exception e) {
-            log.debug("文档不存在或删除失败: {}, 错误: {}", id, e.getMessage());
-            // 忽略错误，继续执行
+            log.warn("检查文档存在性时出错: {}, 错误: {}", id, e.getMessage());
+            // 安全起见，尝试直接删除
+            try {
+                vectorStore.delete(List.of(id));
+            } catch (Exception ex) {
+                log.warn("删除可能存在的文档时出错: {}", ex.getMessage());
+            }
         }
     }
 }
