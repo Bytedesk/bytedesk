@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:13:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:13:56
+ * @LastEditTime: 2025-05-14 14:25:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -66,10 +66,10 @@ public class FaqVector {
     private boolean enabled;
 
     // 向量嵌入存储
-    @Field(type = FieldType.DenseVector, dims = 1536)
+    @Field(type = FieldType.Dense_Vector, dims = 1536)
     private float[] questionEmbedding;
     
-    @Field(type = FieldType.DenseVector, dims = 1536)
+    @Field(type = FieldType.Dense_Vector, dims = 1536)
     private float[] answerEmbedding;
     
     // 文档ID列表（存储在向量库中的ID）

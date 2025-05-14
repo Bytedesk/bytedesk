@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:17:15
+ * @LastEditTime: 2025-05-14 14:27:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.faq;
 
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -44,8 +43,6 @@ public class FaqEventListener {
     private final FaqRestService faqRestService;
 
     private final UploadRestService uploadRestService;
-
-    private final ElasticsearchVectorStore vectorStore;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
