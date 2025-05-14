@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:33:56
+ * @LastEditTime: 2025-05-14 09:53:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,14 +13,20 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.ai.document.Document;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
-import com.bytedesk.kbase.llm_file.FileEntity;
-import com.bytedesk.kbase.llm_file.event.FileCreateEvent;
+import com.bytedesk.kbase.llm_file.FileResponse;
+import com.bytedesk.kbase.llm_file.event.FileChunkEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,19 +36,47 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ChunkEventListener {
 
-    private final ChunkElasticService chunkService;
+    private final ChunkElasticService chunkElasticService;
+
+    private final ChunkRestService chunkRestService;
 
 
     @EventListener
-    public void onFileCreateEvent(FileCreateEvent event) {
-        FileEntity file = event.getFile();
-        log.info("ChunkEventListener onFileCreateEvent: {}", file.getFileName());
+    public void onFileChunkEvent(FileChunkEvent event) {
+        List<Document> documents = event.getDocuments();
+        FileResponse fileResponse = event.getFileResponse();
+        log.info("ChunkEventListener onFileCreateEvent: {}", fileResponse.getFileName());
         // 
         // 继续原有的分割和存储逻辑
-		// var tokenTextSplitter = new TokenTextSplitter();
-		// List<Document> docList = tokenTextSplitter.split(documents);
-		// storeDocuments(docList, file);
+		var tokenTextSplitter = new TokenTextSplitter();
+		List<Document> docList = tokenTextSplitter.split(documents);
+        // 
+		// List<String> docIdList = new ArrayList<>();
+		Iterator<Document> iterator = docList.iterator();
+		while (iterator.hasNext()) {
+			Document doc = iterator.next();
+			log.info("doc id: {}", doc.getId());
+			// docIdList.add(doc.getId());
 
+			ChunkRequest splitRequest = ChunkRequest.builder()
+					.name(fileResponse.getFileName())
+					.content(doc.getText())
+					.type(ChunkTypeEnum.FILE.name())
+					.docId(doc.getId())
+					.typeUid(fileResponse.getUid())
+					.categoryUid(fileResponse.getCategoryUid())
+					.kbUid(fileResponse.getKbase() != null ? fileResponse.getKbase().getUid() : "")
+					.userUid(fileResponse.getUserUid())
+					.orgUid(fileResponse.getOrgUid())
+					.enabled(true) // 使用文件的启用状态，默认为true
+					.startDate(LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
+					.endDate( LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
+					.build();
+			chunkRestService.create(splitRequest);
+		}
+		// fileResponse.setDocIdList(docIdList);
+		// fileResponse.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+		// fileResponseRestService.save(fileResponse);
     }
     
     
@@ -52,7 +86,8 @@ public class ChunkEventListener {
         ChunkEntity chunk = event.getChunk();
         log.info("ChunkEventListener onChunkCreateEvent: {}", chunk.getName());
         // 仅做全文索引
-        chunkService.indexChunk(chunk);
+        chunkElasticService.indexChunk(chunk);
+        // TODO: 进行向量索引
     }
 
     // Chunk仅用于全文搜索
@@ -61,7 +96,8 @@ public class ChunkEventListener {
         ChunkEntity chunk = event.getChunk();
         log.info("ChunkEventListener ChunkUpdateDocEvent: {}", chunk.getName());
         // 更新全文索引
-        chunkService.indexChunk(chunk);
+        chunkElasticService.indexChunk(chunk);
+        // TODO: 更新向量索引
     }
 
     @EventListener
@@ -69,7 +105,7 @@ public class ChunkEventListener {
         ChunkEntity chunk = event.getChunk();
         log.info("ChunkEventListener onChunkDeleteEvent: {}", chunk.getName());
         // 从全文索引中删除
-        boolean deleted = chunkService.deleteChunk(chunk.getUid());
+        boolean deleted = chunkElasticService.deleteChunk(chunk.getUid());
         if (!deleted) {
             log.warn("从Elasticsearch中删除Chunk索引失败: {}", chunk.getUid());
             // 可以考虑添加重试逻辑或者其他错误处理

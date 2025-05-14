@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 08:42:30
+ * @LastEditTime: 2025-05-14 10:00:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.kbase.faq.FaqInitializer;
+import com.bytedesk.kbase.llm_chunk.ChunkInitializer;
 import com.bytedesk.kbase.llm_file.FileInitializer;
 import com.bytedesk.kbase.llm_text.TextInitializer;
 import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
@@ -42,6 +43,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
 
     private final FileInitializer fileInitializer;
 
+    private final ChunkInitializer chunkInitializer;
+
     @Override
     public void afterSingletonsInstantiated() {
         // 初始化权限
@@ -56,6 +59,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         textInitializer.init();
         // 初始化文件
         fileInitializer.init();
+        // 初始化分片
+        chunkInitializer.init();
     }
 
     public void initKbase() {

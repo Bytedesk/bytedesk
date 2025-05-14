@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 16:33:05
+ * @LastEditTime: 2025-05-14 10:01:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,6 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
-import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -87,7 +86,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    private final Optional<SpringAIVectorStoreService> springAIVectorService;
+    // private final Optional<SpringAIVectorStoreService> springAIVectorService;
 
     private final LlmProviderRestService llmProviderRestService;
 
@@ -674,40 +673,40 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     public void initDemoBytedesk() {
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // 首先redis中是否已经初始化此数据，如果没有，继续执行演示数据初始化
-        String isInit = stringRedisTemplate.opsForValue().get(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // // 首先redis中是否已经初始化此数据，如果没有，继续执行演示数据初始化
+        // String isInit = stringRedisTemplate.opsForValue().get(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY);
 
-        if (isInit == null) {
-            String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
-            // 默认使用演示文档内容，填充且只填充超级管理员演示机器人
-            List<FileContent> files = springAIBytedeskService.getAllFiles();
-            // 计数器
-            final int[] count = { 0 };
-            final int MAX_CALLS = 1;
+        // if (isInit == null) {
+        //     String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
+        //     // 默认使用演示文档内容，填充且只填充超级管理员演示机器人
+        //     List<FileContent> files = springAIBytedeskService.getAllFiles();
+        //     // 计数器
+        //     final int[] count = { 0 };
+        //     final int MAX_CALLS = 1;
 
-            // 写入到redis vector 中
-            for (FileContent file : files) {
-                springAIVectorService.ifPresent(service -> {
-                    service.readTextDemo(file.getFilename(), file.getContent(), kbUid, orgUid);
-                });
-                // 只在前两次调用zhipuaiChatService
-                if (count[0] < MAX_CALLS) {
-                    // springAIZhipuaiChatService.ifPresent(service -> {
-                    // String qaPairs = service.generateFaqPairsAsync(file.getContent());
-                    // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
-                    // faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
-                    // count[0]++;
-                    // });
-                }
-            }
-            // 设置redis key 为已初始化
-            stringRedisTemplate.opsForValue().set(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY, "true");
-            // 删除 redis key
-            // redisTemplate.delete(RobotConsts.ROBOT_INIT_DEMO_KEY);
-        } else {
-            log.info("initDemoBytedesk already initialized");
-        }
+        //     // 写入到redis vector 中
+        //     for (FileContent file : files) {
+        //         // springAIVectorService.ifPresent(service -> {
+        //         //     // service.readTextDemo(file.getFilename(), file.getContent(), kbUid, orgUid);
+        //         // });
+        //         // 只在前两次调用zhipuaiChatService
+        //         if (count[0] < MAX_CALLS) {
+        //             // springAIZhipuaiChatService.ifPresent(service -> {
+        //             // String qaPairs = service.generateFaqPairsAsync(file.getContent());
+        //             // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
+        //             // faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
+        //             // count[0]++;
+        //             // });
+        //         }
+        //     }
+        //     // 设置redis key 为已初始化
+        //     stringRedisTemplate.opsForValue().set(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY, "true");
+        //     // 删除 redis key
+        //     // redisTemplate.delete(RobotConsts.ROBOT_INIT_DEMO_KEY);
+        // } else {
+        //     log.info("initDemoBytedesk already initialized");
+        // }
     }
 
     @Override
