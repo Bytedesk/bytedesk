@@ -1,15 +1,15 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:25:45
+ * @Date: 2025-02-22 18:40:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:10:44
+ * @LastEditTime: 2025-05-14 12:22:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
  *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.kbase.llm_chunk;
 
@@ -281,9 +281,12 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
         if (chunk.getFile() != null) {
             excel.setFileName(chunk.getFile().getFileName());
         }
-        if (chunk.getKbase()!= null) {
+        if (chunk.getKbase() != null) {
             excel.setKbaseName(chunk.getKbase().getName());
         }
+        // 将状态和向量状态转换为中文
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(chunk.getStatus()));
+        excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(chunk.getVectorStatus()));
         return excel;
     }
 

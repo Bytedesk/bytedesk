@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:15:15
+ * @LastEditTime: 2025-05-14 12:40:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,7 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -227,6 +228,9 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
         if (file.getKbase()!= null) {
             excel.setKbaseName(file.getKbase().getName());
         }
+        // 将状态和向量状态转换为中文
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(file.getStatus()));
+        excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(file.getVectorStatus()));
         return excel;
     }
 

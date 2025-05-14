@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:16:40
+ * @LastEditTime: 2025-05-14 12:43:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,9 +31,10 @@ public class FileExcel {
     @ColumnWidth(30)
     private String fileName;
 
-    @ExcelProperty(value = "文件内容")
-    @ColumnWidth(50)
-    private String content;
+    // 超出最大表格长度
+    // @ExcelProperty(value = "文件内容")
+    // @ColumnWidth(50)
+    // private String content;
 
     @ExcelProperty(value = "文件URL")
     @ColumnWidth(50)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:14:28
+ * @LastEditTime: 2025-05-14 12:46:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
@@ -236,6 +237,12 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     @Override
     public TextExcel convertToExcel(TextEntity text) {
         TextExcel excel = modelMapper.map(text, TextExcel.class);
+        if (text.getCategoryUid() != null) {
+            Optional<CategoryEntity> category = categoryRestService.findByUid(text.getCategoryUid());
+            if (category.isPresent()) {
+                excel.setCategory(category.get().getName());
+            }
+        }
         if (text.isEnabled()) {
             excel.setEnabled("是");
         } else {
@@ -244,6 +251,9 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         if (text.getKbase()!= null) {
             excel.setKbaseName(text.getKbase().getName());
         }
+        // 将状态和向量状态转换为中文
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(text.getStatus()));
+        excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(text.getVectorStatus()));
         return excel;
     }
 
