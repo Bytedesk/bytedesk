@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:55:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:55:10
+ * @LastEditTime: 2025-05-14 15:56:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,48 +22,30 @@ import lombok.NoArgsConstructor;
 
 /**
  * Chunk向量搜索结果实体类
- * 用于表示向量相似度检索的结果
+ * 用于表示向量相似度检索的结果，参考FaqVectorSearchResult结构
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChunkVectorSearchResult {
+public class ChunkVectorSearchResult implements Serializable {
     
-    // Chunk的唯一标识
-    private String uid;
+    private static final long serialVersionUID = 1L;
     
-    // Chunk名称
-    private String name;
-    
-    // 向量文档内容
-    private String content;
+    // 包含ChunkVector对象
+    private ChunkVector chunkVector;
     
     // 相似度分数
-    @Builder.Default
-    private double score = 0.0;
+    private double score;
     
-    // 知识库UID
-    private String kbUid;
+    // 存储带高亮标记的内容文本
+    private String highlightedContent;
     
-    // 分类UID
-    private String categoryUid;
+    // 存储带高亮标记的名称
+    private String highlightedName;
     
-    // 组织UID
-    private String orgUid;
-    
-    // Chunk类型
-    private String type;
-    
-    // 文档ID
-    private String docId;
-    
-    // 文件UID
-    private String fileUid;
-    
-    // 标签列表
-    @Builder.Default
-    private List<String> tagList = new ArrayList<>();
+    // 向量相似度距离
+    private float distance;
     
     /**
      * 获取内容摘要（限制长度）
@@ -72,9 +53,10 @@ public class ChunkVectorSearchResult {
      * @return 截取后的摘要
      */
     public String getContentSummary(int maxLength) {
-        if (content == null || content.length() <= maxLength) {
-            return content;
+        if (chunkVector == null || chunkVector.getContent() == null || 
+            chunkVector.getContent().length() <= maxLength) {
+            return chunkVector != null ? chunkVector.getContent() : null;
         }
-        return content.substring(0, maxLength) + "...";
+        return chunkVector.getContent().substring(0, maxLength) + "...";
     }
 }

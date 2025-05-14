@@ -31,19 +31,22 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqElastic;
 import com.bytedesk.kbase.faq.FaqElasticSearchResult;
 import com.bytedesk.kbase.faq.FaqProtobuf;
+import com.bytedesk.kbase.faq.FaqVector;
 import com.bytedesk.kbase.faq.FaqVectorSearchResult;
 import com.bytedesk.kbase.faq.FaqVectorService;
 import com.bytedesk.kbase.llm_chunk.ChunkElastic;
 import com.bytedesk.kbase.llm_chunk.ChunkElasticSearchResult;
 import com.bytedesk.kbase.llm_chunk.ChunkElasticService;
-import com.bytedesk.kbase.llm_chunk.ChunkProtobuf;
+import com.bytedesk.kbase.llm_chunk.ChunkVector;
+import com.bytedesk.kbase.llm_chunk.ChunkVectorSearchResult;
 import com.bytedesk.kbase.llm_chunk.ChunkVectorService;
 // import com.bytedesk.kbase.llm_chunk.ChunkProtobuf;
 import com.bytedesk.kbase.faq.FaqElasticService;
 import com.bytedesk.kbase.llm_text.TextElastic;
 import com.bytedesk.kbase.llm_text.TextElasticSearchResult;
 import com.bytedesk.kbase.llm_text.TextElasticService;
-import com.bytedesk.kbase.llm_text.TextProtobuf;
+import com.bytedesk.kbase.llm_text.TextVector;
+import com.bytedesk.kbase.llm_text.TextVectorSearchResult;
 import com.bytedesk.kbase.llm_text.TextVectorService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -111,10 +114,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            List<String> contentList = springAIVectorService.searchText(query, robot.getKbUid());
+            // List<String> contentList = "";// springAIVectorService.searchText(query, robot.getKbUid());
             // TODO: 根据配置，拉取历史聊天记录
             String history = "";
-            String context = String.join("\n", contentList);
+            String context = String.join("\n", "");
             prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
         } else {
             prompt = robot.getLlm().getPrompt();
@@ -143,8 +146,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return;
         }
 
-        List<String> searchContentList = new ArrayList<>();
-        List<FaqProtobuf> faqProtobufList = new ArrayList<>();
+        List<FaqProtobuf> searchResultList = new ArrayList<>();
 
         // 根据搜索类型执行相应的搜索
         String searchType = robot.getLlm().getSearchType();
@@ -156,113 +158,103 @@ public abstract class BaseSpringAIService implements SpringAIService {
         switch (RobotSearchTypeEnum.valueOf(searchType)) {
             case VECTOR:
                 log.info("使用向量搜索");
-                executeVectorSearch(query, robot.getKbUid(), searchContentList, faqProtobufList);
+                executeVectorSearch(query, robot.getKbUid(), searchResultList);
                 break;
             case MIXED:
                 log.info("使用混合搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchContentList, faqProtobufList);
-                executeVectorSearch(query, robot.getKbUid(), searchContentList, faqProtobufList);
+                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                executeVectorSearch(query, robot.getKbUid(), searchResultList);
                 break;
             case FULLTEXT:
             default:
                 log.info("使用全文搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchContentList, faqProtobufList);
+                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
                 break;
         }
 
         // 根据是否启用LLM决定如何处理结果
         if (robot.getLlm().isEnabled()) {
             // 启用大模型
-            processLlmResponse(query, searchContentList, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processLlmResponse(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } else {
             // 未开启大模型，使用搜索结果直接回复
-            processSearchResponse(query, faqProtobufList, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processDirectResponse(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply, emitter);
         }
-
-        log.info("BaseSpringAIService sendSseMessage searchContentList {}", searchContentList);
     }
 
     /**
      * 执行全文搜索
      */
-    private void executeFulltextSearch(String query, String kbUid, List<String> searchContentList,
-            List<FaqProtobuf> faqProtobufList) {
+    private void executeFulltextSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
             FaqElastic faq = withScore.getFaqElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
-
-            String formattedFaq = faqProtobuf.toJson();
-            searchContentList.add(formattedFaq);
-            faqProtobufList.add(faqProtobuf);
+            // 
+            searchResultList.add(faqProtobuf);
         }
         // 
         List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null);
         for (TextElasticSearchResult withScore : textResults) {
             TextElastic text = withScore.getTextElastic();
-            TextProtobuf textProtobuf = TextProtobuf.fromElastic(text);
-            // 
-            String formattedText = textProtobuf.toJson();
-            searchContentList.add(formattedText);
-            // 
             FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
-            faqProtobufList.add(faqProtobuf);
+            // 
+            searchResultList.add(faqProtobuf);
         }
         // 
         List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
         for (ChunkElasticSearchResult withScore : chunkResults) {
             ChunkElastic chunk = withScore.getChunkElastic();
-            ChunkProtobuf chunkProtobuf = ChunkProtobuf.fromElastic(chunk);
-            // 
-            String formattedChunk = chunkProtobuf.toJson();
-            searchContentList.add(formattedChunk);
             // 
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
-            faqProtobufList.add(faqProtobuf);
+            searchResultList.add(faqProtobuf);
         }
     }
 
     /**
      * 执行向量搜索
      */
-    private void executeVectorSearch(String query, String kbUid, List<String> searchContentList,
-            List<FaqProtobuf> faqProtobufList) {
+    private void executeVectorSearch(String query, String kbUid,  List<FaqProtobuf> searchResultList) {
         List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
         for (FaqVectorSearchResult withScore : searchResults) {
-            
+            FaqVector faqVector = withScore.getFaqVector();
+            // 
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
+            searchResultList.add(faqProtobuf);
         }
-        
-
-        // List<String> contentList = springAIVectorService.searchText(query, kbUid);
-        // searchContentList.addAll(contentList);
-
-        // for (String content : contentList) {
-        //     FaqProtobuf faqProtobuf = FaqProtobuf.builder()
-        //             .uid(uidUtils.getUid())
-        //             .question(query)
-        //             .answer(content)
-        //             .build();
-        //     faqProtobufList.add(faqProtobuf);
-        // }
-        
-
-        
+        // 
+        List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null, 5);
+        for (TextVectorSearchResult withScore : textResults) {
+            TextVector textVector = withScore.getTextVector();
+            // 
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
+            searchResultList.add(faqProtobuf);
+        }
+        // 
+        List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null, null, 5);
+        for (ChunkVectorSearchResult withScore : chunkResults) {
+            ChunkVector chunkVector = withScore.getChunkVector();
+            // 
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
+            searchResultList.add(faqProtobuf);
+        }
     }
 
-    private void processLlmResponse(String query, List<String> searchContentList, RobotProtobuf robot,
+    private void processLlmResponse(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
-        log.info("BaseSpringAIService processLlmResponse searchContentList {}", searchContentList);
+        log.info("BaseSpringAIService processLlmResponse searchContentList {}", searchResultList.size());
         //
-        if (searchContentList.isEmpty()) {
+        if (searchResultList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = robot.getLlm().getDefaultReply(); //RobotConsts.ROBOT_UNMATCHED;
             processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
                     emitter);
             return;
         }
-        String context = String.join("\n", searchContentList);
+        // 
+        String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
         // 使用通用方法处理提示词和SSE消息
         createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
@@ -295,7 +287,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
-    private void processSearchResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
+    /**
+     * 直接返回搜索结果，不经过大模型
+     */
+    private void processDirectResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         log.info("BaseSpringAIService processSearchResponse searchContentList {}", searchContentList);

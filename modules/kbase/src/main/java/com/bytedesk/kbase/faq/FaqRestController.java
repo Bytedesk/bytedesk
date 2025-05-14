@@ -36,6 +36,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     private final FaqRestService faqRestService;
 
     private final FaqElasticService faqElasticService;
+    
+    private final FaqVectorService faqVectorService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -146,7 +148,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
 
-        faqElasticService.updateVectorIndex(request);
+        faqVectorService.updateVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
@@ -166,7 +168,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {
 
-        faqElasticService.updateAllVectorIndex(request);
+        faqVectorService.updateAllVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }

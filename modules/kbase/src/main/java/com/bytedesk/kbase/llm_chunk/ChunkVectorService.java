@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:55:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:55:10
+ * @LastEditTime: 2025-05-14 16:04:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -194,15 +194,29 @@ public class ChunkVectorService {
     /**
      * 向量相似度搜索
      * @param query 查询文本
-     * @param limit 返回结果限制数量
      * @param kbUid 知识库UID (可选)
      * @param categoryUid 分类UID (可选)
      * @param orgUid 组织UID (可选)
+     * @param limit 返回结果数量限制
+     * @return 搜索结果列表
+     */
+    public List<ChunkVectorSearchResult> searchChunkVector(String query, String kbUid, String categoryUid, String orgUid, int limit) {
+        // 默认相似度阈值设为0.0，表示返回所有结果
+        return searchChunkVector(query, kbUid, categoryUid, orgUid, limit, 0.0);
+    }
+    
+    /**
+     * 向量相似度搜索（带相似度阈值参数）
+     * @param query 查询文本
+     * @param kbUid 知识库UID (可选)
+     * @param categoryUid 分类UID (可选)
+     * @param orgUid 组织UID (可选)
+     * @param limit 返回结果数量限制
      * @param similarity 相似度阈值 (0-1)
      * @return 搜索结果列表
      */
-    public List<ChunkVectorSearchResult> searchChunkVector(String query, int limit, String kbUid, String categoryUid, String orgUid, double similarity) {
-        log.info("向量搜索chunk: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
+    public List<ChunkVectorSearchResult> searchChunkVector(String query, String kbUid, String categoryUid, String orgUid, int limit, double similarity) {
+        log.info("向量搜索chunk: query={}, kbUid={}, categoryUid={}, orgUid={}, limit={}, similarity={}", query, kbUid, categoryUid, orgUid, limit, similarity);
         
         List<ChunkVectorSearchResult> results = new ArrayList<>();
         
@@ -249,25 +263,49 @@ public class ChunkVectorService {
             for (Document doc : documents) {
                 Map<String, Object> metadata = doc.getMetadata();
                 
-                // 创建搜索结果对象，使用getOrDefault保证安全获取元数据值
-                ChunkVectorSearchResult result = ChunkVectorSearchResult.builder()
-                    .uid((String) metadata.getOrDefault("uid", ""))
-                    .name((String) metadata.getOrDefault("name", ""))
-                    .content(doc.getText())
-                    .score(doc.getScore())
-                    .kbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""))
-                    .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
-                    .orgUid((String) metadata.getOrDefault("orgUid", ""))
-                    .type((String) metadata.getOrDefault("type", ""))
-                    .docId((String) metadata.getOrDefault("docId", ""))
-                    .fileUid((String) metadata.getOrDefault("fileUid", ""))
-                    .build();
+                // 从元数据中提取值，使用getOrDefault保证安全获取
+                String uid = (String) metadata.getOrDefault("uid", "");
+                String name = (String) metadata.getOrDefault("name", "");
+                String content = doc.getText();
+                String type = (String) metadata.getOrDefault("type", "");
+                String kbaseUid = (String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, "");
+                String catUid = (String) metadata.getOrDefault("categoryUid", "");
+                String organization = (String) metadata.getOrDefault("orgUid", "");
+                String document = (String) metadata.getOrDefault("docId", "");
+                String file = (String) metadata.getOrDefault("fileUid", "");
+                boolean enabled = Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true"));
                 
                 // 处理标签
+                List<String> tagsList = new ArrayList<>();
                 String tagsStr = (String) metadata.getOrDefault("tags", "");
                 if (tagsStr != null && !tagsStr.isEmpty()) {
-                    result.setTagList(List.of(tagsStr.split(",")));
+                    tagsList = List.of(tagsStr.split(","));
                 }
+                
+                // 创建ChunkVector对象
+                ChunkVector chunkVector = ChunkVector.builder()
+                    .uid(uid)
+                    .name(name)
+                    .content(content)
+                    .type(type)
+                    .kbUid(kbaseUid)
+                    .categoryUid(catUid)
+                    .orgUid(organization)
+                    .docId(document)
+                    .fileUid(file)
+                    .enabled(enabled)
+                    .tagList(tagsList)
+                    .build();
+                
+                // 创建搜索结果对象
+                ChunkVectorSearchResult result = ChunkVectorSearchResult.builder()
+                    .chunkVector(chunkVector)
+                    .score(doc.getScore())
+                    // 以下是新增字段，初始化为默认值，可后续根据需要设置
+                    .highlightedContent(content) // 默认使用原始内容，可稍后应用高亮处理
+                    .highlightedName(name) // 默认使用原始名称，可稍后应用高亮处理
+                    .distance((float) (1.0 - doc.getScore())) // 将相似度转换为距离
+                    .build();
                 
                 results.add(result);
             }
@@ -280,21 +318,7 @@ public class ChunkVectorService {
         
         return results;
     }
-    
-    /**
-     * 向量相似度搜索 (兼容旧版本，不包括orgUid参数)
-     * @param query 查询文本
-     * @param limit 返回结果限制数量
-     * @param kbUid 知识库UID (可选)
-     * @param categoryUid 分类UID (可选)
-     * @param similarity 相似度阈值 (0-1)
-     * @return 搜索结果列表
-     */
-    public List<ChunkVectorSearchResult> searchChunkVector(String query, int limit, String kbUid, String categoryUid, double similarity) {
-        // 调用新版本，传递null作为orgUid
-        return searchChunkVector(query, limit, kbUid, categoryUid, null, similarity);
-    }
-    
+
     /**
      * 检查并删除已存在的文档
      * @param id 文档ID
