@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:35:32
+ * @LastEditTime: 2025-05-14 08:50:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -257,4 +258,29 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         //
         return text;
     }
+
+
+    public void initText(String kbUid, String orgUid) {
+        if (textRepository.count() > 0) {
+            return;
+        }
+
+        TextEntity text = TextEntity.builder()
+                .uid(uidUtils.getUid())
+                .title("初始化文本")
+                .content("初始化文本内容")
+                .enabled(true)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(1))
+                .build();
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
+        if (kbase.isPresent()) {
+            text.setKbase(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
+        text.setOrgUid(orgUid);
+        save(text);
+    }
+
 }

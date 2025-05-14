@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:37:11
+ * @LastEditTime: 2025-05-14 08:51:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_file;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -194,6 +195,31 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     @Override
     public FileExcel convertToExcel(FileEntity file) {
         return modelMapper.map(file, FileExcel.class);
+    }
+
+    public void initFile(String kbUid, String orgUid) {
+        if (fileRepository.count() > 0) {
+            return;
+        }
+
+        FileEntity entity = FileEntity.builder()
+                .uid(uidUtils.getUid())
+                .fileName("文件")
+                .fileUrl("https://www.bytedesk.com")
+                .content("文件内容")
+                .enabled(true)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(1))
+                .orgUid(orgUid)
+                .build();
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
+        if (kbase.isPresent()) {
+            entity.setKbase(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
+        //
+        save(entity);
     }
 
 }
