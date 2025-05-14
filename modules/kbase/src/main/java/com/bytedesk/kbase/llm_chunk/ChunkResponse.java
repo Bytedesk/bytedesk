@@ -56,13 +56,13 @@ public class ChunkResponse extends BaseResponse {
 
     private Boolean enabled;
 
-    // 合并fileEntity/textEntity/qaEntity/websiteEntity 的 uid
-    // private String typeUid;
-
     // 所属分类
     private String categoryUid;
 
     // kbaseEntity 的 uid
     private String kbUid;
+
+    // fileEntity 的 uid
+    private String fileUid;
 
 }
