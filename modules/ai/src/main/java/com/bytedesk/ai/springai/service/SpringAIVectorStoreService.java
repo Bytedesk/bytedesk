@@ -20,12 +20,12 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.TextReader;
-import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
-import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
-import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
-import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
-import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
-import org.springframework.ai.reader.tika.TikaDocumentReader;
+// import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
+// import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
+// import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+// import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
+// import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
+// import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
@@ -85,137 +85,137 @@ public class SpringAIVectorStoreService {
 	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
 	 */
-	public void readChunkWriteToVectorStore(@NonNull FileEntity file) {
-		String fileUrl = file.getFileUrl();
-		log.info("Loading document from URL: {}", fileUrl);
-		Assert.hasText(fileUrl, "File URL must not be empty");
-		Assert.isTrue(fileUrl.startsWith("http"), String.format("File URL must start with http, got %s", fileUrl));
+	// public void readChunkWriteToVectorStore(@NonNull FileEntity file) {
+	// 	String fileUrl = file.getFileUrl();
+	// 	log.info("Loading document from URL: {}", fileUrl);
+	// 	Assert.hasText(fileUrl, "File URL must not be empty");
+	// 	Assert.isTrue(fileUrl.startsWith("http"), String.format("File URL must start with http, got %s", fileUrl));
 
-		String filePathList[] = fileUrl.split("/");
-		String fileName = filePathList[filePathList.length - 1];
-		log.info("fileName {}", fileName);
+	// 	String filePathList[] = fileUrl.split("/");
+	// 	String fileName = filePathList[filePathList.length - 1];
+	// 	log.info("fileName {}", fileName);
 
-		if (fileName.toLowerCase().endsWith(".pdf")) {
-			readPdfPage(fileName, file);
-		} else if (fileName.toLowerCase().endsWith(".json")) {
-			readJson(fileName, file);
-		} else if (fileName.toLowerCase().endsWith(".txt")) {
-			readTxt(fileName, file);
-		} else if (fileName.toLowerCase().endsWith(".md")) {
-			readMarkdown(fileName, file);
-		} else {
-			readByTika(fileName, file);
-		}
-	}
+	// 	if (fileName.toLowerCase().endsWith(".pdf")) {
+	// 		readPdfPage(fileName, file);
+	// 	} else if (fileName.toLowerCase().endsWith(".json")) {
+	// 		readJson(fileName, file);
+	// 	} else if (fileName.toLowerCase().endsWith(".txt")) {
+	// 		readTxt(fileName, file);
+	// 	} else if (fileName.toLowerCase().endsWith(".md")) {
+	// 		readMarkdown(fileName, file);
+	// 	} else {
+	// 		readByTika(fileName, file);
+	// 	}
+	// }
 
-	public void readPdfPage(String fileName, FileEntity file) {
-		log.info("Loading document from pdfPage: {}", fileName);
-		Assert.hasText(fileName, "File name must not be empty");
-		Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
+	// public void readPdfPage(String fileName, FileEntity file) {
+	// 	log.info("Loading document from pdfPage: {}", fileName);
+	// 	Assert.hasText(fileName, "File name must not be empty");
+	// 	Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
 
-		Resource resource = uploadRestService.loadAsResource(fileName);
+	// 	Resource resource = uploadRestService.loadAsResource(fileName);
 
-		PdfDocumentReaderConfig pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder()
-				.withPageTopMargin(0)
-				.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
-						.withNumberOfTopTextLinesToDelete(0)
-						.build())
-				.withPagesPerDocument(1)
-				.build();
-		PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource, pdfDocumentReaderConfig);
+	// 	PdfDocumentReaderConfig pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder()
+	// 			.withPageTopMargin(0)
+	// 			.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
+	// 					.withNumberOfTopTextLinesToDelete(0)
+	// 					.build())
+	// 			.withPagesPerDocument(1)
+	// 			.build();
+	// 	PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource, pdfDocumentReaderConfig);
 
-		// 读取所有文档
-		List<Document> documents = pdfReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		file.setContent(contentBuilder.toString());
+	// 	// 读取所有文档
+	// 	List<Document> documents = pdfReader.read();
+	// 	// 提取文本内容
+	// 	StringBuilder contentBuilder = new StringBuilder();
+	// 	for (Document doc : documents) {
+	// 		contentBuilder.append(doc.getText()).append("\n");
+	// 	}
+	// 	// 保存文本内容到file
+	// 	file.setContent(contentBuilder.toString());
 
-		// 继续原有的分割和存储逻辑
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(documents);
-		storeDocuments(docList, file);
-	}
+	// 	// 继续原有的分割和存储逻辑
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(documents);
+	// 	storeDocuments(docList, file);
+	// }
 
-	public void readPdfParagraph(String fileName, FileEntity file) {
-		log.info("Loading document from pdfParagraph: {}", fileName);
-		Assert.hasText(fileName, "File name must not be empty");
-		Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
+	// public void readPdfParagraph(String fileName, FileEntity file) {
+	// 	log.info("Loading document from pdfParagraph: {}", fileName);
+	// 	Assert.hasText(fileName, "File name must not be empty");
+	// 	Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
 
-		Resource resource = uploadRestService.loadAsResource(fileName);
-		ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(
-				resource,
-				PdfDocumentReaderConfig.builder()
-						.withPageTopMargin(0)
-						.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
-								.withNumberOfTopTextLinesToDelete(0)
-								.build())
-						.withPagesPerDocument(1)
-						.build());
-		// 读取所有文档
-		List<Document> documents = pdfReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		file.setContent(contentBuilder.toString());
+	// 	Resource resource = uploadRestService.loadAsResource(fileName);
+	// 	ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(
+	// 			resource,
+	// 			PdfDocumentReaderConfig.builder()
+	// 					.withPageTopMargin(0)
+	// 					.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
+	// 							.withNumberOfTopTextLinesToDelete(0)
+	// 							.build())
+	// 					.withPagesPerDocument(1)
+	// 					.build());
+	// 	// 读取所有文档
+	// 	List<Document> documents = pdfReader.read();
+	// 	// 提取文本内容
+	// 	StringBuilder contentBuilder = new StringBuilder();
+	// 	for (Document doc : documents) {
+	// 		contentBuilder.append(doc.getText()).append("\n");
+	// 	}
+	// 	// 保存文本内容到file
+	// 	file.setContent(contentBuilder.toString());
 
-		// 继续原有的分割和存储逻辑
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(documents);
-		storeDocuments(docList, file);
-	}
+	// 	// 继续原有的分割和存储逻辑
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(documents);
+	// 	storeDocuments(docList, file);
+	// }
 
-	public void readJson(String fileName, FileEntity file) {
-		log.info("Loading document from json: {}", fileName);
-		Assert.hasText(fileName, "File name must not be empty");
-		Assert.isTrue(fileName.endsWith(".json"), String.format("File must end with .json, got %s", fileName));
+	// public void readJson(String fileName, FileEntity file) {
+	// 	log.info("Loading document from json: {}", fileName);
+	// 	Assert.hasText(fileName, "File name must not be empty");
+	// 	Assert.isTrue(fileName.endsWith(".json"), String.format("File must end with .json, got %s", fileName));
 
-		Resource resource = uploadRestService.loadAsResource(fileName);
-		JsonReader jsonReader = new JsonReader(resource, "description");
+	// 	Resource resource = uploadRestService.loadAsResource(fileName);
+	// 	JsonReader jsonReader = new JsonReader(resource, "description");
 
-		// 读取所有文档
-		List<Document> documents = jsonReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		file.setContent(contentBuilder.toString());
+	// 	// 读取所有文档
+	// 	List<Document> documents = jsonReader.read();
+	// 	// 提取文本内容
+	// 	StringBuilder contentBuilder = new StringBuilder();
+	// 	for (Document doc : documents) {
+	// 		contentBuilder.append(doc.getText()).append("\n");
+	// 	}
+	// 	// 保存文本内容到file
+	// 	file.setContent(contentBuilder.toString());
 
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(documents);
-		storeDocuments(docList, file);
-	}
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(documents);
+	// 	storeDocuments(docList, file);
+	// }
 
-	// 使用spring ai markdown reader
-	public void readMarkdown(String fileName, FileEntity file) {
-		log.info("Loading document from markdown: {}", fileName);
-		Assert.hasText(fileName, "File name must not be empty");
-		Assert.isTrue(fileName.endsWith(".md"), String.format("File must end with .md, got %s", fileName));
+	// // 使用spring ai markdown reader
+	// public void readMarkdown(String fileName, FileEntity file) {
+	// 	log.info("Loading document from markdown: {}", fileName);
+	// 	Assert.hasText(fileName, "File name must not be empty");
+	// 	Assert.isTrue(fileName.endsWith(".md"), String.format("File must end with .md, got %s", fileName));
 
-		Resource resource = uploadRestService.loadAsResource(fileName);
-		MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource,
-				MarkdownDocumentReaderConfig.builder().build());
-		List<Document> documents = markdownReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		file.setContent(contentBuilder.toString());
+	// 	Resource resource = uploadRestService.loadAsResource(fileName);
+	// 	MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource,
+	// 			MarkdownDocumentReaderConfig.builder().build());
+	// 	List<Document> documents = markdownReader.read();
+	// 	// 提取文本内容
+	// 	StringBuilder contentBuilder = new StringBuilder();
+	// 	for (Document doc : documents) {
+	// 		contentBuilder.append(doc.getText()).append("\n");
+	// 	}
+	// 	// 保存文本内容到file
+	// 	file.setContent(contentBuilder.toString());
 
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(documents);
-		storeDocuments(docList, file);
-	}
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(documents);
+	// 	storeDocuments(docList, file);
+	// }
 
 	public void readTxt(String fileName, FileEntity file) {
 		log.info("Loading document from txt: {}", fileName);

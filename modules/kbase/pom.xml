@@ -19,6 +19,38 @@
 	</properties>
 
 	<dependencies>
+
+
+		<!-- reader -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-pdf-document-reader</artifactId>
+			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
+			<exclusions>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-markdown-document-reader</artifactId>
+		</dependency>
+		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
+		<!-- https://tika.apache.org/2.9.0/formats.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-tika-document-reader</artifactId>
+		</dependency>
+
+		<!-- //////////////////////////////////////////////////////////////// -->
 		
 		<dependency>
 			<groupId>com.bytedesk</groupId>
@@ -38,9 +70,55 @@
 
 	</dependencies>
 
+	<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<build>
 		<plugins>
 		</plugins>
 	</build>
+
+	<repositories>
+		<!-- https://java2ai.com/docs/dev/get-started/ -->
+		<!-- <repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository> -->
+		<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
+		<!-- https://repo.spring.io/ui/native/snapshot/org/springframework/ai/ -->
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>https://repo.spring.io/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<name>Central Portal Snapshots</name>
+			<id>central-portal-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 </project>
