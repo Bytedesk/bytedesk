@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:45:46
+ * @LastEditTime: 2025-05-14 09:27:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,29 +57,29 @@ public class FileResponse extends BaseResponse {
 
     private Boolean enabled;
 
-    // 是否开启自动生成enable_llm_qa问答
-    private Boolean autoGenerateLlmQa;
+    // // 是否开启自动生成enable_llm_qa问答
+    // private Boolean autoGenerateLlmQa;
 
-    // 是否已经生成llm问答
-    private Boolean llmQaGenerated;
+    // // 是否已经生成llm问答
+    // private Boolean llmQaGenerated;
 
-    // 是否开启自动删除llm问答
-    private Boolean autoDeleteLlmQa;
+    // // 是否开启自动删除llm问答
+    // private Boolean autoDeleteLlmQa;
 
-    // 是否已经删除llm问答
-    private Boolean llmQaDeleted;
+    // // 是否已经删除llm问答
+    // private Boolean llmQaDeleted;
 
-    // 是否开启自动llm split切块
-    private Boolean autoLlmSplit;
+    // // 是否开启自动llm split切块
+    // private Boolean autoLlmSplit;
 
-    // 是否已经自动llm split切块
-    private Boolean llmSplitted;
+    // // 是否已经自动llm split切块
+    // private Boolean llmSplitted;
 
-    // 是否开启自动删除llm split切块
-    private Boolean autoDeleteLlmSplit;
+    // // 是否开启自动删除llm split切块
+    // private Boolean autoDeleteLlmSplit;
 
-    // 是否已经删除llm split切块
-    private Boolean llmSplittedDeleted;
+    // // 是否已经删除llm split切块
+    // private Boolean llmSplittedDeleted;
 
     private String categoryUid; // 所属分类
 

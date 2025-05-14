@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:45:22
+ * @LastEditTime: 2025-05-14 09:14:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,50 +13,17 @@
  */
 package com.bytedesk.ai.springai.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.reader.ExtractedTextFormatter;
-import org.springframework.ai.reader.JsonReader;
-import org.springframework.ai.reader.TextReader;
-// import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
-// import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
-// import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
-// import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
-// import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
-// import org.springframework.ai.reader.tika.TikaDocumentReader;
-import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.core.io.Resource;
-import org.springframework.lang.NonNull;
+// import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponentsBuilder;
-import java.net.URI;
 import java.util.Map;
-import java.util.HashMap;
-import java.time.LocalDateTime;
-
-import com.bytedesk.ai.utils.reader.WebDocumentReader;
-import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.kbase.config.KbaseConst;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqRestService;
-import com.bytedesk.kbase.llm_chunk.ChunkRequest;
-import com.bytedesk.kbase.llm_chunk.ChunkRestService;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
-import com.bytedesk.kbase.llm_chunk.ChunkTypeEnum;
-import com.bytedesk.kbase.llm_file.FileEntity;
-import com.bytedesk.kbase.llm_file.FileRestService;
-import com.bytedesk.kbase.llm_text.TextEntity;
-import com.bytedesk.kbase.llm_text.TextRestService;
-import com.bytedesk.kbase.llm_website.WebsiteEntity;
-import com.bytedesk.kbase.llm_website.WebsiteRestService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,477 +37,294 @@ public class SpringAIVectorStoreService {
 	// private RedisVectorStore vectorStore;
 	private ElasticsearchVectorStore vectorStore;
 
-	private final FileRestService fileRestService;
+	// private final FileRestService fileRestService;
 
-	private final TextRestService textRestService;
+	// private final TextRestService textRestService;
 
-	private final ChunkRestService chunkRestService;
+	// private final ChunkRestService chunkRestService;
 
-	private final WebsiteRestService websiteRestService;
+	// private final WebsiteRestService websiteRestService;
 
-	private final FaqRestService faqRestService;
+	// private final FaqRestService faqRestService;
 
-	private final UploadRestService uploadRestService;
+	// private final UploadRestService uploadRestService;
 
-	/**
-	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
-	 */
-	// public void readChunkWriteToVectorStore(@NonNull FileEntity file) {
-	// 	String fileUrl = file.getFileUrl();
-	// 	log.info("Loading document from URL: {}", fileUrl);
-	// 	Assert.hasText(fileUrl, "File URL must not be empty");
-	// 	Assert.isTrue(fileUrl.startsWith("http"), String.format("File URL must start with http, got %s", fileUrl));
-
-	// 	String filePathList[] = fileUrl.split("/");
-	// 	String fileName = filePathList[filePathList.length - 1];
-	// 	log.info("fileName {}", fileName);
-
-	// 	if (fileName.toLowerCase().endsWith(".pdf")) {
-	// 		readPdfPage(fileName, file);
-	// 	} else if (fileName.toLowerCase().endsWith(".json")) {
-	// 		readJson(fileName, file);
-	// 	} else if (fileName.toLowerCase().endsWith(".txt")) {
-	// 		readTxt(fileName, file);
-	// 	} else if (fileName.toLowerCase().endsWith(".md")) {
-	// 		readMarkdown(fileName, file);
-	// 	} else {
-	// 		readByTika(fileName, file);
-	// 	}
-	// }
-
-	// public void readPdfPage(String fileName, FileEntity file) {
-	// 	log.info("Loading document from pdfPage: {}", fileName);
-	// 	Assert.hasText(fileName, "File name must not be empty");
-	// 	Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
-
-	// 	Resource resource = uploadRestService.loadAsResource(fileName);
-
-	// 	PdfDocumentReaderConfig pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder()
-	// 			.withPageTopMargin(0)
-	// 			.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
-	// 					.withNumberOfTopTextLinesToDelete(0)
-	// 					.build())
-	// 			.withPagesPerDocument(1)
-	// 			.build();
-	// 	PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource, pdfDocumentReaderConfig);
-
-	// 	// 读取所有文档
-	// 	List<Document> documents = pdfReader.read();
-	// 	// 提取文本内容
-	// 	StringBuilder contentBuilder = new StringBuilder();
-	// 	for (Document doc : documents) {
-	// 		contentBuilder.append(doc.getText()).append("\n");
-	// 	}
-	// 	// 保存文本内容到file
-	// 	file.setContent(contentBuilder.toString());
-
-	// 	// 继续原有的分割和存储逻辑
-	// 	var tokenTextSplitter = new TokenTextSplitter();
-	// 	List<Document> docList = tokenTextSplitter.split(documents);
-	// 	storeDocuments(docList, file);
-	// }
-
-	// public void readPdfParagraph(String fileName, FileEntity file) {
-	// 	log.info("Loading document from pdfParagraph: {}", fileName);
-	// 	Assert.hasText(fileName, "File name must not be empty");
-	// 	Assert.isTrue(fileName.endsWith(".pdf"), String.format("File must end with .pdf, got %s", fileName));
-
-	// 	Resource resource = uploadRestService.loadAsResource(fileName);
-	// 	ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(
-	// 			resource,
-	// 			PdfDocumentReaderConfig.builder()
-	// 					.withPageTopMargin(0)
-	// 					.withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
-	// 							.withNumberOfTopTextLinesToDelete(0)
-	// 							.build())
-	// 					.withPagesPerDocument(1)
-	// 					.build());
-	// 	// 读取所有文档
-	// 	List<Document> documents = pdfReader.read();
-	// 	// 提取文本内容
-	// 	StringBuilder contentBuilder = new StringBuilder();
-	// 	for (Document doc : documents) {
-	// 		contentBuilder.append(doc.getText()).append("\n");
-	// 	}
-	// 	// 保存文本内容到file
-	// 	file.setContent(contentBuilder.toString());
-
-	// 	// 继续原有的分割和存储逻辑
-	// 	var tokenTextSplitter = new TokenTextSplitter();
-	// 	List<Document> docList = tokenTextSplitter.split(documents);
-	// 	storeDocuments(docList, file);
-	// }
-
-	// public void readJson(String fileName, FileEntity file) {
-	// 	log.info("Loading document from json: {}", fileName);
-	// 	Assert.hasText(fileName, "File name must not be empty");
-	// 	Assert.isTrue(fileName.endsWith(".json"), String.format("File must end with .json, got %s", fileName));
-
-	// 	Resource resource = uploadRestService.loadAsResource(fileName);
-	// 	JsonReader jsonReader = new JsonReader(resource, "description");
-
-	// 	// 读取所有文档
-	// 	List<Document> documents = jsonReader.read();
-	// 	// 提取文本内容
-	// 	StringBuilder contentBuilder = new StringBuilder();
-	// 	for (Document doc : documents) {
-	// 		contentBuilder.append(doc.getText()).append("\n");
-	// 	}
-	// 	// 保存文本内容到file
-	// 	file.setContent(contentBuilder.toString());
-
-	// 	var tokenTextSplitter = new TokenTextSplitter();
-	// 	List<Document> docList = tokenTextSplitter.split(documents);
-	// 	storeDocuments(docList, file);
-	// }
-
-	// // 使用spring ai markdown reader
-	// public void readMarkdown(String fileName, FileEntity file) {
-	// 	log.info("Loading document from markdown: {}", fileName);
-	// 	Assert.hasText(fileName, "File name must not be empty");
-	// 	Assert.isTrue(fileName.endsWith(".md"), String.format("File must end with .md, got %s", fileName));
-
-	// 	Resource resource = uploadRestService.loadAsResource(fileName);
-	// 	MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource,
-	// 			MarkdownDocumentReaderConfig.builder().build());
-	// 	List<Document> documents = markdownReader.read();
-	// 	// 提取文本内容
-	// 	StringBuilder contentBuilder = new StringBuilder();
-	// 	for (Document doc : documents) {
-	// 		contentBuilder.append(doc.getText()).append("\n");
-	// 	}
-	// 	// 保存文本内容到file
-	// 	file.setContent(contentBuilder.toString());
-
-	// 	var tokenTextSplitter = new TokenTextSplitter();
-	// 	List<Document> docList = tokenTextSplitter.split(documents);
-	// 	storeDocuments(docList, file);
-	// }
-
-	public void readTxt(String fileName, FileEntity file) {
-		log.info("Loading document from txt: {}", fileName);
-		Assert.hasText(fileName, "File name must not be empty");
-		Assert.isTrue(fileName.endsWith(".txt"), String.format("File must end with .txt, got %s", fileName));
-
-		Resource resource = uploadRestService.loadAsResource(fileName);
-		TextReader textReader = new TextReader(resource);
-		textReader.getCustomMetadata().put("filename", fileName);
-
-		// 读取所有文档
-		List<Document> documents = textReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		file.setContent(contentBuilder.toString());
-
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(documents);
-		storeDocuments(docList, file);
-	}
-
-	// https://tika.apache.org/2.9.0/formats.html
-	// PDF, DOC/DOCX, PPT/PPTX, and HTML
-	public void readByTika(String fileName, FileEntity file) {
-		log.info("Loading document from tika: {}", fileName);
-		Assert.hasText(fileName, "File name must not be empty");
-		Assert.notNull(file, "FileEntity must not be null");
-
-		Resource resource = uploadRestService.loadAsResource(fileName);
-		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
-
-		// 读取所有文档
-		List<Document> documents = tikaDocumentReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		file.setContent(contentBuilder.toString());
-
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(documents);
-		storeDocuments(docList, file);
-	}
-
+	
 	// string content 转换成 List<Document> documents
-	@Transactional
-	public List<Document> readTextDemo(String name, String content, String kbUid, String orgUid) {
-		log.info("Converting string content to documents");
-		Assert.hasText(content, "Content must not be empty");
-		// 创建Document对象
-		Document document = new Document(content);
-		// 使用TokenTextSplitter分割文本
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(List.of(document));
-		// 添加元数据: 文件file_uid, 知识库kb_uid
-		docList.forEach(doc -> {
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
-			// 添加元数据: 启用状态和有效期，对于简单文本，默认启用且无有效期限制
-			doc.getMetadata().put("enabled", "true");
-			doc.getMetadata().put("startDate", LocalDateTime.now().toString());
-			doc.getMetadata().put("endDate", LocalDateTime.now().plusYears(100).toString());
+	// @Transactional
+	// public List<Document> readTextDemo(String name, String content, String kbUid, String orgUid) {
+	// 	log.info("Converting string content to documents");
+	// 	Assert.hasText(content, "Content must not be empty");
+	// 	// 创建Document对象
+	// 	Document document = new Document(content);
+	// 	// 使用TokenTextSplitter分割文本
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(List.of(document));
+	// 	// 添加元数据: 文件file_uid, 知识库kb_uid
+	// 	docList.forEach(doc -> {
+	// 		doc.getMetadata().put(KbaseConst.KBASE_KB_UID, kbUid);
+	// 		// 添加元数据: 启用状态和有效期，对于简单文本，默认启用且无有效期限制
+	// 		doc.getMetadata().put("enabled", "true");
+	// 		doc.getMetadata().put("startDate", LocalDateTime.now().toString());
+	// 		doc.getMetadata().put("endDate", LocalDateTime.now().plusYears(100).toString());
 			
-			// 将doc写入到splitEntity
-			ChunkRequest splitRequest = ChunkRequest.builder()
-					.name(name)
-					.content(doc.getText())
-					.type(ChunkTypeEnum.TEXT.name())
-					.docId(doc.getId())
-					.kbUid(kbUid)
-					.orgUid(orgUid)
-					.enabled(true) // 默认启用
-					.startDate(LocalDateTime.now()) // 默认从现在开始
-					.endDate(LocalDateTime.now().plusYears(100)) // 默认有效期100年
-					.build();
-			chunkRestService.create(splitRequest);
-		});
-		// log.info("Parsing document, this will take a while.");
-		//
-		return docList;
-	}
+	// 		// 将doc写入到splitEntity
+	// 		ChunkRequest splitRequest = ChunkRequest.builder()
+	// 				.name(name)
+	// 				.content(doc.getText())
+	// 				.type(ChunkTypeEnum.TEXT.name())
+	// 				.docId(doc.getId())
+	// 				.kbUid(kbUid)
+	// 				.orgUid(orgUid)
+	// 				.enabled(true) // 默认启用
+	// 				.startDate(LocalDateTime.now()) // 默认从现在开始
+	// 				.endDate(LocalDateTime.now().plusYears(100)) // 默认有效期100年
+	// 				.build();
+	// 		chunkRestService.create(splitRequest);
+	// 	});
+	// 	// log.info("Parsing document, this will take a while.");
+	// 	//
+	// 	return docList;
+	// }
 
 	// 使用reader直接将content字符串，转换成 List<Document> documents
-	@Transactional
-	public List<Document> readText(TextEntity textEntity) {
-		log.info("Converting string content to documents");
-		Assert.notNull(textEntity, "TextEntity must not be null");
-		Assert.hasText(textEntity.getContent(), "Content must not be empty");
-		// 创建Document对象
-		Document document = new Document(textEntity.getContent());
-		// 使用TokenTextSplitter分割文本
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(List.of(document));
-		List<String> docIdList = new ArrayList<>();
-		Iterator<Document> iterator = docList.iterator();
-		while (iterator.hasNext()) {
-			Document doc = iterator.next();
-			// log.info("doc id: {}", doc.getId());
-			docIdList.add(doc.getId());
-			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbase().getUid());
-			doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
-			doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+	// @Transactional
+	// public List<Document> readText(TextEntity textEntity) {
+	// 	log.info("Converting string content to documents");
+	// 	Assert.notNull(textEntity, "TextEntity must not be null");
+	// 	Assert.hasText(textEntity.getContent(), "Content must not be empty");
+	// 	// 创建Document对象
+	// 	Document document = new Document(textEntity.getContent());
+	// 	// 使用TokenTextSplitter分割文本
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(List.of(document));
+	// 	List<String> docIdList = new ArrayList<>();
+	// 	Iterator<Document> iterator = docList.iterator();
+	// 	while (iterator.hasNext()) {
+	// 		Document doc = iterator.next();
+	// 		// log.info("doc id: {}", doc.getId());
+	// 		docIdList.add(doc.getId());
+	// 		// 添加元数据: 知识库kb_uid、启用状态、有效期
+	// 		doc.getMetadata().put(KbaseConst.KBASE_KB_UID, textEntity.getKbase().getUid());
+	// 		doc.getMetadata().put("enabled", String.valueOf(textEntity.isEnabled()));
+	// 		doc.getMetadata().put("startDate", textEntity.getStartDate() != null ? textEntity.getStartDate().toString() : LocalDateTime.now().toString());
+	// 		doc.getMetadata().put("endDate", textEntity.getEndDate() != null ? textEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
-			// 将doc写入到splitEntity
-			ChunkRequest splitRequest = ChunkRequest.builder()
-					.name(textEntity.getTitle())
-					.content(doc.getText())
-					.type(ChunkTypeEnum.TEXT.name())
-					.docId(doc.getId())
-					.typeUid(textEntity.getUid())
-					.categoryUid(textEntity.getCategoryUid())
-					.kbUid(textEntity.getKbase().getUid())
-					.userUid(textEntity.getUserUid())
-					.orgUid(textEntity.getOrgUid())
-					.enabled(textEntity.isEnabled())
-					.startDate(textEntity.getStartDate())
-					.endDate(textEntity.getEndDate())
-					.build();
-			chunkRestService.create(splitRequest);
-		}
-		textEntity.setDocIdList(docIdList);
-		textEntity.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-		textRestService.save(textEntity);
-		// log.info("Parsing document, this will take a while.");
-		vectorStore.write(docList);
+	// 		// 将doc写入到splitEntity
+	// 		ChunkRequest splitRequest = ChunkRequest.builder()
+	// 				.name(textEntity.getTitle())
+	// 				.content(doc.getText())
+	// 				.type(ChunkTypeEnum.TEXT.name())
+	// 				.docId(doc.getId())
+	// 				.typeUid(textEntity.getUid())
+	// 				.categoryUid(textEntity.getCategoryUid())
+	// 				.kbUid(textEntity.getKbase().getUid())
+	// 				.userUid(textEntity.getUserUid())
+	// 				.orgUid(textEntity.getOrgUid())
+	// 				.enabled(textEntity.isEnabled())
+	// 				.startDate(textEntity.getStartDate())
+	// 				.endDate(textEntity.getEndDate())
+	// 				.build();
+	// 		chunkRestService.create(splitRequest);
+	// 	}
+	// 	textEntity.setDocIdList(docIdList);
+	// 	textEntity.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+	// 	textRestService.save(textEntity);
+	// 	// log.info("Parsing document, this will take a while.");
+	// 	vectorStore.write(docList);
 
-		return docList;
-	}
+	// 	return docList;
+	// }
 
 	// 使用reader直接将qaEntity字符串，转换成 List<Document> documents
-	@Transactional
-	public List<Document> readFaq(FaqEntity faqEntity) {
-		log.info("Converting string content to documents");
-		Assert.notNull(faqEntity, "FaqEntity must not be null");
-		//
-		String content = faqEntity.toJson(); 
-		//fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
-		// 创建Document对象
-		Document document = new Document(content);
-		// 使用TokenTextSplitter分割文本
-		var tokenTextSplitter = new TokenTextSplitter();
-		List<Document> docList = tokenTextSplitter.split(List.of(document));
-		List<String> docIdList = new ArrayList<>();
-		Iterator<Document> iterator = docList.iterator();
-		while (iterator.hasNext()) {
-			Document doc = iterator.next();
-			log.info("faq doc id: {}", doc.getId());
-			docIdList.add(doc.getId());
-			// 添加元数据: 知识库kb_uid、启用状态、有效期
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, faqEntity.getKbase().getUid());
-			// doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
-			// doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
-			// doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+	// @Transactional
+	// public List<Document> readFaq(FaqEntity faqEntity) {
+	// 	log.info("Converting string content to documents");
+	// 	Assert.notNull(faqEntity, "FaqEntity must not be null");
+	// 	//
+	// 	String content = faqEntity.toJson(); 
+	// 	//fqaEntity.getQuestion() + "\n" + fqaEntity.getAnswer();
+	// 	// 创建Document对象
+	// 	Document document = new Document(content);
+	// 	// 使用TokenTextSplitter分割文本
+	// 	var tokenTextSplitter = new TokenTextSplitter();
+	// 	List<Document> docList = tokenTextSplitter.split(List.of(document));
+	// 	List<String> docIdList = new ArrayList<>();
+	// 	Iterator<Document> iterator = docList.iterator();
+	// 	while (iterator.hasNext()) {
+	// 		Document doc = iterator.next();
+	// 		log.info("faq doc id: {}", doc.getId());
+	// 		docIdList.add(doc.getId());
+	// 		// 添加元数据: 知识库kb_uid、启用状态、有效期
+	// 		doc.getMetadata().put(KbaseConst.KBASE_KB_UID, faqEntity.getKbase().getUid());
+	// 		// doc.getMetadata().put("enabled", String.valueOf(fqaEntity.isEnabled()));
+	// 		// doc.getMetadata().put("startDate", fqaEntity.getStartDate() != null ? fqaEntity.getStartDate().toString() : LocalDateTime.now().toString());
+	// 		// doc.getMetadata().put("endDate", fqaEntity.getEndDate() != null ? fqaEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 			
-			// 将doc写入到splitEntity
-			ChunkRequest splitRequest = ChunkRequest.builder()
-					.name(faqEntity.getQuestion())
-					.content(doc.getText())
-					.type(ChunkTypeEnum.FAQ.name())
-					.docId(doc.getId())
-					.typeUid(faqEntity.getUid())
-					.categoryUid(faqEntity.getCategoryUid())
-					.kbUid(faqEntity.getKbase().getUid())
-					.userUid(faqEntity.getUserUid())
-					.orgUid(faqEntity.getOrgUid())
-					.enabled(faqEntity.isEnabled())
-					.startDate(faqEntity.getStartDate() != null ? faqEntity.getStartDate() : LocalDateTime.now())
-					.endDate(faqEntity.getEndDate() != null ? faqEntity.getEndDate() : LocalDateTime.now().plusYears(100))
-					.build();
-			chunkRestService.create(splitRequest);
-		}
-		faqEntity.setDocIdList(docIdList);
-		faqEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
-		faqRestService.save(faqEntity);
-		// log.info("Parsing document, this will take a while.");
-		vectorStore.write(docList);
-		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// }
-		return docList;
-	}
+	// 		// 将doc写入到splitEntity
+	// 		ChunkRequest splitRequest = ChunkRequest.builder()
+	// 				.name(faqEntity.getQuestion())
+	// 				.content(doc.getText())
+	// 				.type(ChunkTypeEnum.FAQ.name())
+	// 				.docId(doc.getId())
+	// 				.typeUid(faqEntity.getUid())
+	// 				.categoryUid(faqEntity.getCategoryUid())
+	// 				.kbUid(faqEntity.getKbase().getUid())
+	// 				.userUid(faqEntity.getUserUid())
+	// 				.orgUid(faqEntity.getOrgUid())
+	// 				.enabled(faqEntity.isEnabled())
+	// 				.startDate(faqEntity.getStartDate() != null ? faqEntity.getStartDate() : LocalDateTime.now())
+	// 				.endDate(faqEntity.getEndDate() != null ? faqEntity.getEndDate() : LocalDateTime.now().plusYears(100))
+	// 				.build();
+	// 		chunkRestService.create(splitRequest);
+	// 	}
+	// 	faqEntity.setDocIdList(docIdList);
+	// 	faqEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
+	// 	faqRestService.save(faqEntity);
+	// 	// log.info("Parsing document, this will take a while.");
+	// 	vectorStore.write(docList);
+	// 	// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+	// 	// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+	// 	// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+	// 	// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+	// 	// }
+	// 	return docList;
+	// }
 
 	// 抓取website
-	@Transactional
-	public List<Document> readWebsite(WebsiteEntity websiteEntity) {
-		log.info("Loading document from website: {}", websiteEntity.getUrl());
-		Assert.notNull(websiteEntity, "WebsiteEntity must not be null");
-		Assert.hasText(websiteEntity.getUrl(), "URL must not be empty");
-		Assert.isTrue(websiteEntity.getUrl().startsWith("http"),
-				String.format("URL must start with http, got %s", websiteEntity.getUrl()));
-		//
-		try {
-			// 构建URI
-			URI uri = UriComponentsBuilder.fromUriString(websiteEntity.getUrl()).build().toUri();
-			// 创建元数据
-			Map<String, String> metadata = new HashMap<>();
-			metadata.put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbase().getUid());
-			metadata.put("source_url", websiteEntity.getUrl());
-			// 创建WebDocumentReader
-			WebDocumentReader webReader = new WebDocumentReader(uri, metadata);
-			// 读取网页内容
-			List<Document> documents = webReader.read();
-			// 使用TokenTextSplitter分割文本
-			var tokenTextSplitter = new TokenTextSplitter();
-			List<Document> docList = tokenTextSplitter.split(documents);
-			List<String> docIdList = new ArrayList<>();
-			Iterator<Document> iterator = docList.iterator();
-			while (iterator.hasNext()) {
-				Document doc = iterator.next();
-				log.info("doc id: {}", doc.getId());
-				docIdList.add(doc.getId());
-				// 添加元数据: 知识库kb_uid、启用状态、有效期
-				doc.getMetadata().put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbase().getUid());
-				doc.getMetadata().put("enabled", String.valueOf(websiteEntity.isEnabled()));
-				doc.getMetadata().put("startDate", websiteEntity.getStartDate() != null ? websiteEntity.getStartDate().toString() : LocalDateTime.now().toString());
-				doc.getMetadata().put("endDate", websiteEntity.getEndDate() != null ? websiteEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+	// @Transactional
+	// public List<Document> readWebsite(WebsiteEntity websiteEntity) {
+	// 	log.info("Loading document from website: {}", websiteEntity.getUrl());
+	// 	Assert.notNull(websiteEntity, "WebsiteEntity must not be null");
+	// 	Assert.hasText(websiteEntity.getUrl(), "URL must not be empty");
+	// 	Assert.isTrue(websiteEntity.getUrl().startsWith("http"),
+	// 			String.format("URL must start with http, got %s", websiteEntity.getUrl()));
+	// 	//
+	// 	try {
+	// 		// 构建URI
+	// 		URI uri = UriComponentsBuilder.fromUriString(websiteEntity.getUrl()).build().toUri();
+	// 		// 创建元数据
+	// 		Map<String, String> metadata = new HashMap<>();
+	// 		metadata.put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbase().getUid());
+	// 		metadata.put("source_url", websiteEntity.getUrl());
+	// 		// 创建WebDocumentReader
+	// 		WebDocumentReader webReader = new WebDocumentReader(uri, metadata);
+	// 		// 读取网页内容
+	// 		List<Document> documents = webReader.read();
+	// 		// 使用TokenTextSplitter分割文本
+	// 		var tokenTextSplitter = new TokenTextSplitter();
+	// 		List<Document> docList = tokenTextSplitter.split(documents);
+	// 		List<String> docIdList = new ArrayList<>();
+	// 		Iterator<Document> iterator = docList.iterator();
+	// 		while (iterator.hasNext()) {
+	// 			Document doc = iterator.next();
+	// 			log.info("doc id: {}", doc.getId());
+	// 			docIdList.add(doc.getId());
+	// 			// 添加元数据: 知识库kb_uid、启用状态、有效期
+	// 			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, websiteEntity.getKbase().getUid());
+	// 			doc.getMetadata().put("enabled", String.valueOf(websiteEntity.isEnabled()));
+	// 			doc.getMetadata().put("startDate", websiteEntity.getStartDate() != null ? websiteEntity.getStartDate().toString() : LocalDateTime.now().toString());
+	// 			doc.getMetadata().put("endDate", websiteEntity.getEndDate() != null ? websiteEntity.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
 				
-				// 将doc写入到splitEntity
-				ChunkRequest splitRequest = ChunkRequest.builder()
-						.name(websiteEntity.getName())
-						.content(doc.getText())
-						.type(ChunkTypeEnum.WEBSITE.name())
-						.docId(doc.getId())
-						.typeUid(websiteEntity.getUid())
-						.categoryUid(websiteEntity.getCategoryUid())
-						.kbUid(websiteEntity.getKbase().getUid())
-						.userUid(websiteEntity.getUserUid())
-						.orgUid(websiteEntity.getOrgUid())
-						.enabled(websiteEntity.isEnabled())
-						.startDate(websiteEntity.getStartDate())
-						.endDate(websiteEntity.getEndDate())
-						.build();
-				chunkRestService.create(splitRequest);
-			}
-			// 如果需要存储到向量数据库
-			// if (websiteEntity.getKbase().getUid() != null) {
-			// 	bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-			// 	log.info("Website content stored in vector store for kbUid: {}", websiteEntity.getKbase().getUid());
-			// }
-			//
-			websiteEntity.setDocIdList(docIdList);
-			websiteEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
-			websiteRestService.save(websiteEntity);
-			// log.info("Parsing document, this will take a while.");
-			vectorStore.write(docList);
-			// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-			// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-			// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-			// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-			// }
+	// 			// 将doc写入到splitEntity
+	// 			ChunkRequest splitRequest = ChunkRequest.builder()
+	// 					.name(websiteEntity.getName())
+	// 					.content(doc.getText())
+	// 					.type(ChunkTypeEnum.WEBSITE.name())
+	// 					.docId(doc.getId())
+	// 					.typeUid(websiteEntity.getUid())
+	// 					.categoryUid(websiteEntity.getCategoryUid())
+	// 					.kbUid(websiteEntity.getKbase().getUid())
+	// 					.userUid(websiteEntity.getUserUid())
+	// 					.orgUid(websiteEntity.getOrgUid())
+	// 					.enabled(websiteEntity.isEnabled())
+	// 					.startDate(websiteEntity.getStartDate())
+	// 					.endDate(websiteEntity.getEndDate())
+	// 					.build();
+	// 			chunkRestService.create(splitRequest);
+	// 		}
+	// 		// 如果需要存储到向量数据库
+	// 		// if (websiteEntity.getKbase().getUid() != null) {
+	// 		// 	bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+	// 		// 	log.info("Website content stored in vector store for kbUid: {}", websiteEntity.getKbase().getUid());
+	// 		// }
+	// 		//
+	// 		websiteEntity.setDocIdList(docIdList);
+	// 		websiteEntity.setStatus(ChunkStatusEnum.SUCCESS.name());
+	// 		websiteRestService.save(websiteEntity);
+	// 		// log.info("Parsing document, this will take a while.");
+	// 		vectorStore.write(docList);
+	// 		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+	// 		// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+	// 		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+	// 		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+	// 		// }
 
-			return docList;
+	// 		return docList;
 
-		} catch (Exception e) {
-			log.error("Error reading website content: {}", e.getMessage());
-			throw new RuntimeException("Failed to read website content: " + e.getMessage(), e);
-		}
-	}
+	// 	} catch (Exception e) {
+	// 		log.error("Error reading website content: {}", e.getMessage());
+	// 		throw new RuntimeException("Failed to read website content: " + e.getMessage(), e);
+	// 	}
+	// }
 
 	// 存储到vector store
-	@Transactional
-	private void storeDocuments(List<Document> docList, FileEntity file) {
-		Assert.notNull(docList, "Document list must not be null");
-		Assert.notNull(file, "FileEntity must not be null");
-		Assert.notNull(file.getUid(), "File UID must not be null");
-		Assert.notNull(file.getKbase().getUid(), "Knowledge base UID must not be null");
-		// 
-		log.info("Parsing document, this will take a while. docList.size={}", docList.size());
-		List<String> docIdList = new ArrayList<>();
-		Iterator<Document> iterator = docList.iterator();
-		while (iterator.hasNext()) {
-			Document doc = iterator.next();
-			log.info("doc id: {}", doc.getId());
-			docIdList.add(doc.getId());
-			doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
-			doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbase().getUid());
-			// 添加元数据: 启用状态和有效期，使用FileEntity中的字段
-			// doc.getMetadata().put("enabled", String.valueOf(file.isEnabled()));
-			// doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
-			// doc.getMetadata().put("endDate", file.getEndDate() != null ? file.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
-			// 
-			ChunkRequest splitRequest = ChunkRequest.builder()
-					.name(file.getFileName())
-					.content(doc.getText())
-					.type(ChunkTypeEnum.FILE.name())
-					.docId(doc.getId())
-					.typeUid(file.getUid())
-					.categoryUid(file.getCategoryUid())
-					.kbUid(file.getKbase().getUid())
-					.userUid(file.getUserUid())
-					.orgUid(file.getOrgUid())
-					.enabled(file.isEnabled()) // 使用文件的启用状态，默认为true
-					.startDate(file.getStartDate() != null ? file.getStartDate() : LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
-					.endDate(file.getEndDate() != null ? file.getEndDate() : LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
-					.build();
-			chunkRestService.create(splitRequest);
-		}
-		file.setDocIdList(docIdList);
-		file.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-		fileRestService.save(file);
-		// 
-		vectorStore.write(docList);
-		// 
-		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
-		// 	try {
-		// 		redisVectorStore.write(docList);
-		// 		log.info("Successfully stored documents in vector store");
-		// 	} catch (Exception e) {
-		// 		log.error("Failed to store documents in vector store: {}", e.getMessage());
-		// 	}
-		// });
-		// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
-		// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
-		// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
-		// }
-	}
+	// @Transactional
+	// private void storeDocuments(List<Document> docList, FileEntity file) {
+	// 	Assert.notNull(docList, "Document list must not be null");
+	// 	Assert.notNull(file, "FileEntity must not be null");
+	// 	Assert.notNull(file.getUid(), "File UID must not be null");
+	// 	Assert.notNull(file.getKbase().getUid(), "Knowledge base UID must not be null");
+	// 	// 
+	// 	log.info("Parsing document, this will take a while. docList.size={}", docList.size());
+	// 	List<String> docIdList = new ArrayList<>();
+	// 	Iterator<Document> iterator = docList.iterator();
+	// 	while (iterator.hasNext()) {
+	// 		Document doc = iterator.next();
+	// 		log.info("doc id: {}", doc.getId());
+	// 		docIdList.add(doc.getId());
+	// 		doc.getMetadata().put(KbaseConst.KBASE_FILE_UID, file.getUid());
+	// 		doc.getMetadata().put(KbaseConst.KBASE_KB_UID, file.getKbase().getUid());
+	// 		// 添加元数据: 启用状态和有效期，使用FileEntity中的字段
+	// 		// doc.getMetadata().put("enabled", String.valueOf(file.isEnabled()));
+	// 		// doc.getMetadata().put("startDate", file.getStartDate() != null ? file.getStartDate().toString() : LocalDateTime.now().toString());
+	// 		// doc.getMetadata().put("endDate", file.getEndDate() != null ? file.getEndDate().toString() : LocalDateTime.now().plusYears(100).toString());
+	// 		// 
+	// 		ChunkRequest splitRequest = ChunkRequest.builder()
+	// 				.name(file.getFileName())
+	// 				.content(doc.getText())
+	// 				.type(ChunkTypeEnum.FILE.name())
+	// 				.docId(doc.getId())
+	// 				.typeUid(file.getUid())
+	// 				.categoryUid(file.getCategoryUid())
+	// 				.kbUid(file.getKbase().getUid())
+	// 				.userUid(file.getUserUid())
+	// 				.orgUid(file.getOrgUid())
+	// 				.enabled(file.isEnabled()) // 使用文件的启用状态，默认为true
+	// 				.startDate(file.getStartDate() != null ? file.getStartDate() : LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
+	// 				.endDate(file.getEndDate() != null ? file.getEndDate() : LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
+	// 				.build();
+	// 		chunkRestService.create(splitRequest);
+	// 	}
+	// 	file.setDocIdList(docIdList);
+	// 	file.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+	// 	fileRestService.save(file);
+	// 	// 
+	// 	vectorStore.write(docList);
+	// 	// 
+	// 	// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> {
+	// 	// 	try {
+	// 	// 		redisVectorStore.write(docList);
+	// 	// 		log.info("Successfully stored documents in vector store");
+	// 	// 	} catch (Exception e) {
+	// 	// 		log.error("Failed to store documents in vector store: {}", e.getMessage());
+	// 	// 	}
+	// 	// });
+	// 	// // 当二者都启用的情况下，优先使用ollama，否则使用zhipuai
+	// 	// if (!bytedeskOllamaRedisVectorStore.isPresent()) {
+	// 	// 	bytedeskZhipuaiRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.write(docList));
+	// 	// }
+	// }
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
@@ -696,7 +480,7 @@ public class SpringAIVectorStoreService {
 	public void deleteDocs(List<String> docIdList) {
 		Assert.notEmpty(docIdList, "Document ID list must not be empty");
 		// 删除splitEntity
-		chunkRestService.deleteByDocList(docIdList);
+		// chunkRestService.deleteByDocList(docIdList);
 		// 删除向量存储中的文档
 		vectorStore.delete(docIdList);
 		// bytedeskOllamaRedisVectorStore.ifPresent(redisVectorStore -> redisVectorStore.delete(docIdList));

@@ -27,6 +27,7 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
+			<version>${spring-ai.version}</version>
 			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
 			<exclusions>
 				<exclusion>
@@ -40,6 +41,7 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-markdown-document-reader</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency>
 		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
 		<!-- https://tika.apache.org/2.9.0/formats.html -->
@@ -48,6 +50,7 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-tika-document-reader</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency>
 
 		<!-- //////////////////////////////////////////////////////////////// -->

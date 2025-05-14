@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 15:22:42
+ * @LastEditTime: 2025-05-14 09:33:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
+import com.bytedesk.kbase.llm_file.FileEntity;
+import com.bytedesk.kbase.llm_file.event.FileCreateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,20 @@ import lombok.extern.slf4j.Slf4j;
 public class ChunkEventListener {
 
     private final ChunkElasticService chunkService;
+
+
+    @EventListener
+    public void onFileCreateEvent(FileCreateEvent event) {
+        FileEntity file = event.getFile();
+        log.info("ChunkEventListener onFileCreateEvent: {}", file.getFileName());
+        // 
+        // 继续原有的分割和存储逻辑
+		// var tokenTextSplitter = new TokenTextSplitter();
+		// List<Document> docList = tokenTextSplitter.split(documents);
+		// storeDocuments(docList, file);
+
+    }
+    
     
     // Chunk仅用于全文搜索
     @EventListener
