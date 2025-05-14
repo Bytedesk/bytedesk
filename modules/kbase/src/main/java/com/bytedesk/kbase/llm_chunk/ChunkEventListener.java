@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 10:54:42
+ * @LastEditTime: 2025-05-14 10:56:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,7 +63,7 @@ public class ChunkEventListener {
 			Document doc = iterator.next();
 			log.info("doc id: {}", doc.getId());
 			docIdList.add(doc.getId());
-
+            // 
 			ChunkRequest splitRequest = ChunkRequest.builder()
 					.name(fileResponse.getFileName())
 					.content(doc.getText())

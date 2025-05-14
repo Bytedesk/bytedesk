@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:57:32
+ * @LastEditTime: 2025-05-14 11:06:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -227,6 +227,17 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     @Override
     public void delete(ChunkRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    // deleteAll
+    public void deleteAll(ChunkRequest request) {
+        List<ChunkEntity> chunks = chunkRepository.findByOrgUid(request.getOrgUid());
+        if (chunks != null && !chunks.isEmpty()) {
+            for (ChunkEntity chunk : chunks) {
+                chunk.setDeleted(true);
+                save(chunk);
+            }
+        }
     }
 
     @Override

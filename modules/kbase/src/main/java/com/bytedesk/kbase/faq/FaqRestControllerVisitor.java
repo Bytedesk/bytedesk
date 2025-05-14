@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-13 11:16:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 12:54:41
+ * @LastEditTime: 2025-05-14 11:01:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 public class FaqRestControllerVisitor {
 
-    private final FaqElasticService faqService;
+    private final FaqElasticService faqElasticService;
 
     private final FaqRestService faqRestService;
 
@@ -39,7 +39,7 @@ public class FaqRestControllerVisitor {
     @GetMapping("/suggest")
     public ResponseEntity<?> suggest(FaqRequest request) {
 
-        List<FaqElasticSearchResult> suggestList = faqService.suggestFaq(request);
+        List<FaqElasticSearchResult> suggestList = faqElasticService.suggestFaq(request);
 
         return ResponseEntity.ok(JsonResult.success(suggestList));
     }
