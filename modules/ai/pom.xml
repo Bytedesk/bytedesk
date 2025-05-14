@@ -20,7 +20,6 @@
 	<properties>
 		<ollama4j.version>1.0.100</ollama4j.version>
 		<!-- <spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version> -->
-		<spring-ai.version>1.0.0-M8</spring-ai.version>
 		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
@@ -81,35 +80,7 @@
 		</dependency>
 
 
-		<!-- reader -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pdf-document-reader</artifactId>
-			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
-			<exclusions>
-				<exclusion>
-					<groupId>io.swagger.core.v3</groupId>
-					<artifactId>swagger-annotations</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-markdown-document-reader</artifactId>
-		</dependency>
-		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
-		<!-- https://tika.apache.org/2.9.0/formats.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-tika-document-reader</artifactId>
-		</dependency>
-
+		
 		<!-- vector store -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
 		<!--
