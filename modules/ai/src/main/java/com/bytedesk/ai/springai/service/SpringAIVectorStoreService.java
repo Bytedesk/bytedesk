@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 13:56:44
+ * @LastEditTime: 2025-05-14 14:11:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,8 +33,8 @@ import org.springframework.util.Assert;
 @RequiredArgsConstructor
 public class SpringAIVectorStoreService {
 
-	// private RedisVectorStore vectorStore;
-	private ElasticsearchVectorStore vectorStore;
+	// private final RedisVectorStore vectorStore;
+	private final ElasticsearchVectorStore vectorStore;
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
