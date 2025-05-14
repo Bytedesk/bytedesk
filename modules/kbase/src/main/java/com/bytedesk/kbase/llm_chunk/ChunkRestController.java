@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -32,6 +33,8 @@ import lombok.AllArgsConstructor;
 public class ChunkRestController extends BaseRestController<ChunkRequest> {
 
     private final ChunkRestService chunkRestService;
+    
+    private final ChunkElasticService chunkElasticService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -117,30 +120,42 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     }
 
     // update elasticsearch index
+    @ActionAnnotation(title = "文件分块", action = "更新索引", description = "update chunk index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody ChunkRequest request) {
-        // chunkRestService.updateIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
+
+        chunkElasticService.updateIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
     // update elasticsearch vector index
+    @ActionAnnotation(title = "文件分块", action = "更新向量索引", description = "update chunk vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody ChunkRequest request) {
-        // chunkRestService.updateVectorIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
+
+        chunkElasticService.updateVectorIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
 
     // update elasticsearch all index
+    @ActionAnnotation(title = "文件分块", action = "更新所有索引", description = "update all chunk index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody ChunkRequest request) {
-        // chunkRestService.updateAllIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
+
+        chunkElasticService.updateAllIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update all index success", request.getKbUid()));
     }
 
     // update elasticsearch all vector index
+    @ActionAnnotation(title = "文件分块", action = "更新所有向量索引", description = "update all chunk vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ChunkRequest request) {
-        // chunkRestService.updateAllVectorIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
+
+        chunkElasticService.updateAllVectorIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
     }
 }

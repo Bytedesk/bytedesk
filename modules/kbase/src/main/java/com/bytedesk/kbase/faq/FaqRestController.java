@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:54:30
+ * @LastEditTime: 2025-05-14 13:32:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,8 @@ import lombok.AllArgsConstructor;
 public class FaqRestController extends BaseRestController<FaqRequest> {
 
     private final FaqRestService faqRestService;
+
+    private final FaqElasticService faqElasticService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -134,7 +136,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody FaqRequest request) {
 
-        // faqRestService.updateIndex(request);
+        faqElasticService.updateIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
@@ -144,7 +146,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
 
-        // faqRestService.updateVectorIndex(request);
+        faqElasticService.updateVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
@@ -154,7 +156,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody FaqRequest request) {
 
-        // faqRestService.updateAllIndex(request);
+        faqElasticService.updateAllIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update all index success", request.getUid()));
     }
@@ -164,7 +166,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {
 
-        // faqRestService.updateAllVectorIndex(request);
+        faqElasticService.updateAllVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }

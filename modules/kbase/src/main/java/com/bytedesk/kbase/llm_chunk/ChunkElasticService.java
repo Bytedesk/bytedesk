@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -46,6 +47,47 @@ public class ChunkElasticService {
 
     @Autowired
     private ChunkRestService chunkRestService;
+    
+    // update elasticsearch index
+    public void updateIndex(ChunkRequest request) {
+        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUid(request.getUid());
+        if (chunkOpt.isPresent()) {
+            ChunkEntity chunk = chunkOpt.get();
+            indexChunk(chunk);
+        } else {
+            throw new IllegalArgumentException("Chunk not found with UID: " + request.getUid());
+        }
+    }
+
+    // update elasticsearch vector index
+    public void updateVectorIndex(ChunkRequest request) {
+        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUid(request.getUid());
+        if (chunkOpt.isPresent()) {
+            // TODO: Implement vector indexing logic here
+            log.info("Vector index functionality not implemented yet for Chunk: {}", request.getUid());
+        } else {
+            throw new IllegalArgumentException("Chunk not found with UID: " + request.getUid());
+        }
+    }
+
+    // update all elasticsearch index
+    public void updateAllIndex(ChunkRequest request) {
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
+        chunkList.forEach(chunk -> {
+            indexChunk(chunk);
+        });
+        log.info("Updated elasticsearch index for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
+    }
+
+    // update all elasticsearch vector index
+    public void updateAllVectorIndex(ChunkRequest request) {
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
+        chunkList.forEach(chunk -> {
+            // TODO: Implement vector indexing logic here
+            log.info("Vector index functionality not implemented yet for Chunk: {}", chunk.getUid());
+        });
+        log.info("Vector indexing requested for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
+    }
     
     /**
      * 索引Chunk实体到Elasticsearch
