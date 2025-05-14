@@ -564,6 +564,38 @@
             "type": "CHAT"
         }
     ],
+    "openrouter": [
+        {
+            "name": "google/gemma-2-9b-it:free",
+            "nickname": "Google: Gemma 2 9B",
+            "description": "Google Gemma 2 9B指令微调模型，平衡性能和资源消耗",
+            "type": "CHAT"
+        },
+        {
+            "name": "microsoft/phi-3-mini-128k-instruct:free",
+            "nickname": "Phi-3 Mini 128K Instruct",
+            "description": "Microsoft的Phi-3 Mini模型，支持128K上下文的轻量级选择",
+            "type": "CHAT"
+        },
+        {
+            "name": "microsoft/phi-3-medium-128k-instruct:free",
+            "nickname": "Phi-3 Medium 128K Instruct",
+            "description": "Microsoft的Phi-3 Medium模型，支持128K上下文的中型选择",
+            "type": "CHAT"
+        },
+        {
+            "name": "meta-llama/llama-3-8b-instruct:free",
+            "nickname": "Meta: Llama 3 8B Instruct",
+            "description": "Meta的Llama 3 8B指令微调模型，高效开源选择",
+            "type": "CHAT"
+        },
+        {
+            "name": "mistralai/mistral-7b-instruct:free",
+            "nickname": "Mistral: Mistral 7B Instruct",
+            "description": "Mistral AI的7B指令微调模型，高性能开源选择",
+            "type": "CHAT"
+        }
+    ],
     "gemini": [
         {
             "name": "gemini-1.5-flash",
@@ -733,38 +765,6 @@
             "name": "aihubmix-Llama-3-70B-Instruct",
             "nickname": "Llama 3 70B Instruct",
             "description": "AIHubMix提供的Meta Llama 3 70B指令微调版本，强大的开源模型",
-            "type": "CHAT"
-        }
-    ],
-    "openrouter": [
-        {
-            "name": "google/gemma-2-9b-it:free",
-            "nickname": "Google: Gemma 2 9B",
-            "description": "Google Gemma 2 9B指令微调模型，平衡性能和资源消耗",
-            "type": "CHAT"
-        },
-        {
-            "name": "microsoft/phi-3-mini-128k-instruct:free",
-            "nickname": "Phi-3 Mini 128K Instruct",
-            "description": "Microsoft的Phi-3 Mini模型，支持128K上下文的轻量级选择",
-            "type": "CHAT"
-        },
-        {
-            "name": "microsoft/phi-3-medium-128k-instruct:free",
-            "nickname": "Phi-3 Medium 128K Instruct",
-            "description": "Microsoft的Phi-3 Medium模型，支持128K上下文的中型选择",
-            "type": "CHAT"
-        },
-        {
-            "name": "meta-llama/llama-3-8b-instruct:free",
-            "nickname": "Meta: Llama 3 8B Instruct",
-            "description": "Meta的Llama 3 8B指令微调模型，高效开源选择",
-            "type": "CHAT"
-        },
-        {
-            "name": "mistralai/mistral-7b-instruct:free",
-            "nickname": "Mistral: Mistral 7B Instruct",
-            "description": "Mistral AI的7B指令微调模型，高性能开源选择",
             "type": "CHAT"
         }
     ],

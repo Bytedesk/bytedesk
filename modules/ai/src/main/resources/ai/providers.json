@@ -62,6 +62,20 @@
         "webUrl": "https://console.volcengine.com/ark/",
         "status": "PRODUCTION"
     },
+    "openai": {
+        "nickname": "OpenAI",
+        "logo": "openai.png",
+        "apiUrl": "https://api.openai.com",
+        "webUrl": "https://openai.com/",
+        "status": "PRODUCTION"
+    },
+    "openrouter": {
+        "nickname": "OpenRouter",
+        "logo": "openrouter.png",
+        "apiUrl": "https://openrouter.ai/api/v1/",
+        "webUrl": "https://openrouter.ai/",
+        "status": "PRODUCTION"
+    },
     "xinghuo": {
         "nickname": "讯飞星火",
         "logo": "xinghuo.png",
@@ -104,13 +118,6 @@
         "webUrl": "https://platform.stepfun.com/",
         "status": "DEVELOPMENT"
     },
-    "openrouter": {
-        "nickname": "OpenRouter",
-        "logo": "openrouter.png",
-        "apiUrl": "https://openrouter.ai/api/v1/",
-        "webUrl": "https://openrouter.ai/",
-        "status": "DEVELOPMENT"
-    },
     "groq": {
         "nickname": "Groq",
         "logo": "groq.png",
@@ -123,13 +130,6 @@
         "logo": "anthropic.jpeg",
         "apiUrl": "https://api.anthropic.com/",
         "webUrl": "https://anthropic.com/",
-        "status": "DEVELOPMENT"
-    },
-    "openai": {
-        "nickname": "OpenAI",
-        "logo": "openai.png",
-        "apiUrl": "https://api.openai.com",
-        "webUrl": "https://openai.com/",
         "status": "DEVELOPMENT"
     },
     "gemini": {

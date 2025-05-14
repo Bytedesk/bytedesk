@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 15:10:08
+ * @LastEditTime: 2025-05-14 16:33:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,9 +60,20 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             if (!llmProviderService.existsByNameAndLevel(providerName, level)) {
                 String orgUid = ""; // 平台版本暂时不支持组织
                 llmProviderService.createFromProviderJson(providerName, providerJson, level, orgUid);
+            } else {
+                // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
+                Optional<LlmProviderEntity> providerOptional = llmProviderService.findByName(providerName, level);
+                if (providerOptional.isPresent()) {
+                    LlmProviderEntity providerEntity = providerOptional.get();
+                    String status = providerJson.getStatus();
+                    if (!providerEntity.getStatus().equals(status)) {
+                        providerEntity.setStatus(status);
+                        llmProviderService.save(providerEntity);
+                    }
+                }
             }
         }
-        // 
+        //
         Map<String, List<ModelJson>> modelJsonMap = llmModelJsonService.loadModels();
         for (Map.Entry<String, List<ModelJson>> entry : modelJsonMap.entrySet()) {
             String providerName = entry.getKey();
@@ -79,7 +90,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                 }
             }
         }
-        // 
+        //
         // init super admin providers, models will be created in LlmModelEventListener
         level = LevelEnum.ORGANIZATION.name();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
@@ -87,13 +98,21 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             ProviderJson providerJson = entry.getValue();
             // log.info("initialize provider {}", providerName);
             String status = providerJson.getStatus();
-            if (status.equals(LlmProviderStatusEnum.PRODUCTION.name())) {
-                if (!llmProviderService.existsByNameAndLevel(providerName, level)) {
+            if (LlmProviderStatusEnum.PRODUCTION.name().equalsIgnoreCase(status)) {
+                if (!llmProviderService.existsByNameAndLevelAndStatus(providerName, level, status)) {
                     String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
                     llmProviderService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                } else {
+                    // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
+                    Optional<LlmProviderEntity> providerOptional = llmProviderService.findByName(providerName, level);
+                    if (providerOptional.isPresent()) {
+                        LlmProviderEntity providerEntity = providerOptional.get();
+                        providerEntity.setStatus(status);
+                        llmProviderService.save(providerEntity);
+                    }
                 }
             }
         }
     }
-    
+
 }
