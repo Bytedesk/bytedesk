@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 13:45:44
+ * @LastEditTime: 2025-05-14 14:17:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
+import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -38,9 +39,13 @@ public class FaqEventListener {
 
     private final FaqElasticService faqService;
 
+    private final FaqVectorService faqVectorService;
+
     private final FaqRestService faqRestService;
 
     private final UploadRestService uploadRestService;
+
+    private final ElasticsearchVectorStore vectorStore;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -80,29 +85,54 @@ public class FaqEventListener {
     public void onFaqCreateEvent(FaqCreateEvent event) {
         FaqEntity faq = event.getFaq();
         log.info("FaqEventListener onFaqCreateEvent: {}", faq.getQuestion());
-        // 仅做全文索引
+        
+        // 全文索引
         faqService.indexFaq(faq);
-        // TODO: 向量索引
+        
+        // 向量索引
+        try {
+            faqVectorService.indexFaqVector(faq);
+        } catch (Exception e) {
+            log.error("FAQ向量索引创建失败: {}, 错误: {}", faq.getQuestion(), e.getMessage());
+        }
     }
 
-    // Faq仅用于全文搜索
+    // Faq用于全文搜索和向量搜索
     @EventListener
     public void onFaqUpdateDocEvent(FaqUpdateDocEvent event) {
         FaqEntity faq = event.getFaq();
         log.info("FaqEventListener FaqUpdateDocEvent: {}", faq.getQuestion());
+        
         // 更新全文索引
         faqService.indexFaq(faq);
-        // TODO: 向量索引
+        
+        // 更新向量索引
+        try {
+            // 先删除旧的向量索引
+            faqVectorService.deleteFaqVector(faq);
+            // 再创建新的向量索引
+            faqVectorService.indexFaqVector(faq);
+        } catch (Exception e) {
+            log.error("FAQ向量索引更新失败: {}, 错误: {}", faq.getQuestion(), e.getMessage());
+        }
     }
 
     @EventListener
     public void onFaqDeleteEvent(FaqDeleteEvent event) {
         FaqEntity faq = event.getFaq();
         log.info("FaqEventListener onFaqDeleteEvent: {}", faq.getQuestion());
+        
         // 从全文索引中删除
         boolean deleted = faqService.deleteFaq(faq.getUid());
         if (!deleted) {
-            log.warn("从Elasticsearch中删除QA索引失败: {}", faq.getUid());
+            log.warn("从Elasticsearch中删除FAQ全文索引失败: {}", faq.getUid());
+            // 可以考虑添加重试逻辑或者其他错误处理
+        }
+        
+        // 从向量索引中删除
+        boolean vectorDeleted = faqVectorService.deleteFaqVector(faq);
+        if (!vectorDeleted) {
+            log.warn("从向量存储中删除FAQ索引失败: {}", faq.getUid());
             // 可以考虑添加重试逻辑或者其他错误处理
         }
     }

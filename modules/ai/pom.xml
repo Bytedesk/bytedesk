@@ -82,7 +82,6 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-
 		<!-- vector store -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
 		<!--
