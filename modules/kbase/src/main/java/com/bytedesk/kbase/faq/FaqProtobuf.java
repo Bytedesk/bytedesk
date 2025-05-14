@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-24 13:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 10:43:02
+ * @LastEditTime: 2025-05-14 15:34:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,6 +59,15 @@ public class FaqProtobuf implements Serializable {
                 .type(FaqProtobufTypeEnum.FAQ.name())
                 .build();
     }
+
+    // public static FaqProtobuf fromVector(FaqVectorSearchResult faq) {
+    //     return FaqProtobuf.builder()
+    //             .uid(faq.getUid())
+    //             .question(faq.getQuestion())
+    //             .answer(faq.getContent())
+    //             .type(FaqProtobufTypeEnum.FAQ.name())
+    //             .build();
+    // }
 
     public static FaqProtobuf fromText(TextElastic text) {
         return FaqProtobuf.builder()

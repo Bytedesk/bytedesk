@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-27 21:27:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:11:19
+ * @LastEditTime: 2025-05-14 15:25:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,20 +13,9 @@
  */
 package com.bytedesk.ai.springai.service;
 
-import java.util.List;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
-import org.springframework.ai.vectorstore.filter.Filter.Expression;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.Map;
-import com.bytedesk.kbase.config.KbaseConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.util.Assert;
 
 @Slf4j
 @Service
@@ -34,20 +23,20 @@ import org.springframework.util.Assert;
 public class SpringAIVectorStoreService {
 
 	// private final RedisVectorStore vectorStore;
-	private final ElasticsearchVectorStore vectorStore;
+	// private final ElasticsearchVectorStore vectorStore;
 
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs.html
 	// https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
-	public List<String> searchText(String query, String kbUid) {
-		Assert.hasText(query, "Search query must not be empty");
-		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
+	// public List<String> searchText(String query, String kbUid) {
+	// 	Assert.hasText(query, "Search query must not be empty");
+	// 	Assert.hasText(kbUid, "Knowledge base UID must not be empty");
 
-		log.info("searchText kbUid {}, query: {}", kbUid, query);
+	// 	log.info("searchText kbUid {}, query: {}", kbUid, query);
 		
-		// 构建过滤表达式，只搜索启用状态为true的内容和特定知识库
-		FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
-		Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
-		log.info("expression: {}", expression.toString());
+	// 	// 构建过滤表达式，只搜索启用状态为true的内容和特定知识库
+	// 	FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+	// 	Expression expression = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid).build();
+	// 	log.info("expression: {}", expression.toString());
 		
 		// 首先创建知识库过滤条件
 		// FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
@@ -68,10 +57,10 @@ public class SpringAIVectorStoreService {
 		// Expression expression = finalOp.build();
 		// log.info("expression: {}", expression.toString());
 
-		SearchRequest searchRequest = SearchRequest.builder()
-				.query(query)
-				.filterExpression(expression)
-				.build();
+		// SearchRequest searchRequest = SearchRequest.builder()
+		// 		.query(query)
+		// 		.filterExpression(expression)
+		// 		.build();
 				
 		// 首先尝试使用bytedeskOllamaRedisVectorStore
 		// List<Document> similarDocuments = bytedeskOllamaRedisVectorStore
@@ -82,8 +71,8 @@ public class SpringAIVectorStoreService {
 		// 					.map(redisVectorStore -> redisVectorStore.similaritySearch(searchRequest))
 		// 					.orElse(List.of());
 		// 		});
-		List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
-		List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
+		// List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+		// List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		
 		// 获取当前时间，用于内存中过滤日期
 		// LocalDateTime currentTime = LocalDateTime.now();
@@ -124,9 +113,9 @@ public class SpringAIVectorStoreService {
 		// 		.toList();
 				
 		// List<String> contentList = dateFilteredDocuments.stream().map(Document::getText).toList();
-		log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
-		return contentList;
-	}
+	// 	log.info("kbUid {}, query: {} , contentList.size: {}", kbUid, query, contentList.size());
+	// 	return contentList;
+	// }
 
 	/**
 	 * 更新向量存储中的文档内容
@@ -134,32 +123,32 @@ public class SpringAIVectorStoreService {
 	 * @param docId   文档ID
 	 * @param content 新的文档内容
 	 */
-	@Transactional
-	public void updateDoc(String docId, String content, String kbUid) {
-		Assert.hasText(docId, "Document ID must not be empty");
-		Assert.hasText(content, "Content must not be empty");
-		Assert.hasText(kbUid, "Knowledge base UID must not be empty");
-		log.info("updateDoc docId: {}, content: {}", docId, content);
+	// @Transactional
+	// public void updateDoc(String docId, String content, String kbUid) {
+	// 	Assert.hasText(docId, "Document ID must not be empty");
+	// 	Assert.hasText(content, "Content must not be empty");
+	// 	Assert.hasText(kbUid, "Knowledge base UID must not be empty");
+	// 	log.info("updateDoc docId: {}, content: {}", docId, content);
 
-		// 创建新的Document对象
-		Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
-		// 更新向量存储
-		vectorStore.delete(List.of(docId)); // 先删除旧的
-		vectorStore.add(List.of(document)); // 再添加新的
+	// 	// 创建新的Document对象
+	// 	Document document = new Document(docId, content, Map.of(KbaseConst.KBASE_KB_UID, kbUid));
+	// 	// 更新向量存储
+	// 	vectorStore.delete(List.of(docId)); // 先删除旧的
+	// 	vectorStore.add(List.of(document)); // 再添加新的
 
-	}
+	// }
 
 	// 删除一个docId
-	public void deleteDoc(String docId) {
-		Assert.hasText(docId, "Document ID must not be empty");
-		deleteDocs(List.of(docId));
-	}
+	// public void deleteDoc(String docId) {
+	// 	Assert.hasText(docId, "Document ID must not be empty");
+	// 	deleteDocs(List.of(docId));
+	// }
 
-	@Transactional
-	public void deleteDocs(List<String> docIdList) {
-		Assert.notEmpty(docIdList, "Document ID list must not be empty");
-		// 删除向量存储中的文档
-		vectorStore.delete(docIdList);
-	}
+	// @Transactional
+	// public void deleteDocs(List<String> docIdList) {
+	// 	Assert.notEmpty(docIdList, "Document ID list must not be empty");
+	// 	// 删除向量存储中的文档
+	// 	vectorStore.delete(docIdList);
+	// }
 
 }

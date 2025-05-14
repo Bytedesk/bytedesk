@@ -16,6 +16,7 @@ package com.bytedesk.kbase.llm_chunk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -117,12 +118,14 @@ public class ChunkVectorService {
         
         try {
             // 获取Chunk实体
-            ChunkEntity chunk = chunkRestService.findByUid(request.getUid());
+            Optional<ChunkEntity> chunkOpt = chunkRestService.findByUid(request.getUid());
             
-            if (chunk == null) {
+            if (!chunkOpt.isPresent()) {
                 log.error("找不到要更新的chunk: {}", request.getUid());
                 return;
             }
+            
+            ChunkEntity chunk = chunkOpt.get();
             
             // 检查是否有内容变化
             if (chunk.hasChanged(request)) {
@@ -194,64 +197,76 @@ public class ChunkVectorService {
      * @param limit 返回结果限制数量
      * @param kbUid 知识库UID (可选)
      * @param categoryUid 分类UID (可选)
+     * @param orgUid 组织UID (可选)
      * @param similarity 相似度阈值 (0-1)
      * @return 搜索结果列表
      */
-    public List<ChunkVectorSearchResult> searchChunkVector(String query, int limit, String kbUid, String categoryUid, double similarity) {
-        log.info("向量搜索chunk: query={}, kbUid={}, categoryUid={}", query, kbUid, categoryUid);
+    public List<ChunkVectorSearchResult> searchChunkVector(String query, int limit, String kbUid, String categoryUid, String orgUid, double similarity) {
+        log.info("向量搜索chunk: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         List<ChunkVectorSearchResult> results = new ArrayList<>();
         
         try {
-            // 构建过滤条件
-            FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder()
-                .eq("enabled", "true");
-                
-            // 如果指定了知识库，添加过滤条件
+            // 创建过滤表达式构建器
+            FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+            
+            // 构建查询条件
+            FilterExpressionBuilder.Op enabledOp = expressionBuilder.eq("enabled", "true");
+            
+            // 添加可选的过滤条件
+            FilterExpressionBuilder.Op finalOp = enabledOp;
+            
             if (kbUid != null && !kbUid.isEmpty()) {
-                filterBuilder = filterBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
+                FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
+                finalOp = expressionBuilder.and(finalOp, kbUidOp);
             }
             
-            // 如果指定了分类，添加过滤条件
             if (categoryUid != null && !categoryUid.isEmpty()) {
-                filterBuilder = filterBuilder.eq("categoryUid", categoryUid);
+                FilterExpressionBuilder.Op categoryUidOp = expressionBuilder.eq("categoryUid", categoryUid);
+                finalOp = expressionBuilder.and(finalOp, categoryUidOp);
             }
             
-            Expression filter = filterBuilder.build();
+            if (orgUid != null && !orgUid.isEmpty()) {
+                FilterExpressionBuilder.Op orgUidOp = expressionBuilder.eq("orgUid", orgUid);
+                finalOp = expressionBuilder.and(finalOp, orgUidOp);
+            }
             
-            // 创建搜索请求
-            SearchRequest searchRequest = SearchRequest.defaults()
-                .withQuery(query)
-                .withTopK(limit)
-                .withSimilarityThreshold((float) similarity)
-                .withFilter(filter);
+            // 构建最终的过滤表达式
+            Expression expression = finalOp.build();
             
-            // 执行搜索
-            List<Document> documents = vectorStore.search(searchRequest);
+            // 构建搜索请求
+            SearchRequest searchRequest = SearchRequest.builder()
+                    .query(query)
+                    .filterExpression(expression)
+                    .topK(limit) // 限制返回的结果数量
+                    .similarityThreshold((float) similarity) // 设置相似度阈值
+                    .build();
+            
+            // 执行相似度搜索
+            List<Document> documents = vectorStore.similaritySearch(searchRequest);
             
             // 处理结果
             for (Document doc : documents) {
                 Map<String, Object> metadata = doc.getMetadata();
-                String content = doc.getContent();
                 
-                // 创建搜索结果对象
+                // 创建搜索结果对象，使用getOrDefault保证安全获取元数据值
                 ChunkVectorSearchResult result = ChunkVectorSearchResult.builder()
-                    .uid((String) metadata.get("uid"))
-                    .name((String) metadata.get("name"))
-                    .content(content)
+                    .uid((String) metadata.getOrDefault("uid", ""))
+                    .name((String) metadata.getOrDefault("name", ""))
+                    .content(doc.getText())
                     .score(doc.getScore())
-                    .kbUid((String) metadata.get(KbaseConst.KBASE_KB_UID))
-                    .categoryUid((String) metadata.get("categoryUid"))
-                    .orgUid((String) metadata.get("orgUid"))
-                    .type((String) metadata.get("type"))
-                    .docId((String) metadata.get("docId"))
-                    .fileUid((String) metadata.get("fileUid"))
+                    .kbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""))
+                    .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
+                    .orgUid((String) metadata.getOrDefault("orgUid", ""))
+                    .type((String) metadata.getOrDefault("type", ""))
+                    .docId((String) metadata.getOrDefault("docId", ""))
+                    .fileUid((String) metadata.getOrDefault("fileUid", ""))
                     .build();
                 
                 // 处理标签
-                String tagString = (String) metadata.get("tags");
-                if (tagString != null && !tagString.isEmpty()) {
-                    result.setTagList(List.of(tagString.split(",")));
+                String tagsStr = (String) metadata.getOrDefault("tags", "");
+                if (tagsStr != null && !tagsStr.isEmpty()) {
+                    result.setTagList(List.of(tagsStr.split(",")));
                 }
                 
                 results.add(result);
@@ -264,6 +279,20 @@ public class ChunkVectorService {
         }
         
         return results;
+    }
+    
+    /**
+     * 向量相似度搜索 (兼容旧版本，不包括orgUid参数)
+     * @param query 查询文本
+     * @param limit 返回结果限制数量
+     * @param kbUid 知识库UID (可选)
+     * @param categoryUid 分类UID (可选)
+     * @param similarity 相似度阈值 (0-1)
+     * @return 搜索结果列表
+     */
+    public List<ChunkVectorSearchResult> searchChunkVector(String query, int limit, String kbUid, String categoryUid, double similarity) {
+        // 调用新版本，传递null作为orgUid
+        return searchChunkVector(query, limit, kbUid, categoryUid, null, similarity);
     }
     
     /**

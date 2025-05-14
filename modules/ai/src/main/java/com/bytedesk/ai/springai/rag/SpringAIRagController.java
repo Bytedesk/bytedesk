@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.ai.springai.service.SpringAIVectorStoreService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -67,7 +66,7 @@ public class SpringAIRagController {
 
     private final OllamaChatModel bytedeskOllamaChatModel;
 
-    private final SpringAIVectorStoreService springAIVectorService;
+//     private final SpringAIVectorStoreService springAIVectorService;
 
     private final ObservationRegistry observationRegistry;
 
@@ -383,9 +382,9 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", required = true) String kbUid) {
 
         log.info("搜索向量数据，query: {}, kbUid: {}", query, kbUid);
-        List<String> results = springAIVectorService.searchText(query, kbUid);
+        // List<String> results = springAIVectorService.searchText(query, kbUid);
 
-        return ResponseEntity.ok(JsonResult.success(results));
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     // 添加一个新的端点，展示如何使用带观察功能的ChatClient
