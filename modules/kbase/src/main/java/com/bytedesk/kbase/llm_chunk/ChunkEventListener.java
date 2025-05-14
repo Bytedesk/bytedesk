@@ -69,7 +69,7 @@ public class ChunkEventListener {
 					.content(doc.getText())
 					.type(ChunkTypeEnum.FILE.name())
 					.docId(doc.getId())
-					.typeUid(fileResponse.getUid())
+					.fileUid(fileResponse.getUid())
 					.categoryUid(fileResponse.getCategoryUid())
 					.kbUid(fileResponse.getKbase() != null ? fileResponse.getKbase().getUid() : "")
 					.userUid(fileResponse.getUserUid())

@@ -198,7 +198,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             if (savedEntity == null) {
                 throw new RuntimeException("Enable text failed");
             }
-            return convertToResponse();
+            return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Text not found");
         }
