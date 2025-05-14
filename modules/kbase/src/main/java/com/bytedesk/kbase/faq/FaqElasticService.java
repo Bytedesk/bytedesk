@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 16:46:39
+ * @LastEditTime: 2025-05-14 17:12:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,17 +67,17 @@ public class FaqElasticService {
     }
     
     /**
-     * 索引QA实体到Elasticsearch
-     * @param faq 要索引的QA实体
+     * 索引FAQ实体到Elasticsearch
+     * @param faq 要索引的FAQ实体
      */
     public void indexFaq(FaqEntity faq) {
         // 检查文档是否已存在
         boolean exists = elasticsearchOperations.exists(faq.getUid(), FaqElastic.class);
         
         if (exists) {
-            log.info("更新已存在的QA索引: {}", faq.getUid());
+            log.info("更新已存在的FAQ索引: {}", faq.getUid());
         } else {
-            log.info("为QA创建新索引: {}", faq.getUid());
+            log.info("为FAQ创建新索引: {}", faq.getUid());
         }
         
         try {
@@ -88,9 +88,9 @@ public class FaqElasticService {
             elasticsearchOperations.save(faqElastic);
             
             if (exists) {
-                log.info("QA索引更新成功: {}", faq.getUid());
+                log.info("FAQ索引更新成功: {}", faq.getUid());
             } else {
-                log.info("QA索引创建成功: {}", faq.getUid());
+                log.info("FAQ索引创建成功: {}", faq.getUid());
             }
 
             // 将索引结果保存到数据库中
@@ -98,23 +98,23 @@ public class FaqElasticService {
             faqRestService.save(faq);
 
         } catch (Exception e) {
-            log.error("索引QA时发生错误: {}, 错误消息: {}", faq.getUid(), e.getMessage(), e);
+            log.error("索引FAQ时发生错误: {}, 错误消息: {}", faq.getUid(), e.getMessage(), e);
         }
     }
     
     /**
-     * 从Elasticsearch中删除QA的索引
-     * @param faqUid 要删除的QA的UID
+     * 从Elasticsearch中删除FAQ的索引
+     * @param faqUid 要删除的FAQ的UID
      * @return 是否删除成功
      */
     public boolean deleteFaq(String faqUid) {
-        log.info("从索引中删除QA: {}", faqUid);
+        log.info("从索引中删除FAQ: {}", faqUid);
         
         try {
             // 首先检查文档是否存在
             boolean exists = elasticsearchOperations.exists(faqUid, FaqElastic.class);
             if (!exists) {
-                log.warn("索引中不存在此QA文档: {}", faqUid);
+                log.warn("索引中不存在此FAQ文档: {}", faqUid);
                 return true; // 文档不存在也视为删除成功
             }
             
@@ -134,20 +134,20 @@ public class FaqElasticService {
             
             // 检查删除结果
             if (deletedCount > 0) {
-                log.info("成功删除QA索引: {}, 删除文档数: {}", faqUid, deletedCount);
+                log.info("成功删除FAQ索引: {}, 删除文档数: {}", faqUid, deletedCount);
                 return true;
             } else {
-                log.warn("删除QA索引操作没有匹配到文档: {}", faqUid);
+                log.warn("删除FAQ索引操作没有匹配到文档: {}", faqUid);
                 return false;
             }
         } catch (Exception e) {
-            log.error("删除QA索引时发生错误: {}, 错误消息: {}", faqUid, e.getMessage(), e);
+            log.error("删除FAQ索引时发生错误: {}, 错误消息: {}", faqUid, e.getMessage(), e);
             return false;
         }
     }
     
     /**
-     * 搜索QA内容
+     * 搜索FAQ内容
      * @param query 搜索关键词
      * @param kbUid 知识库UID（可选）
      * @param categoryUid 分类UID（可选）
@@ -155,7 +155,7 @@ public class FaqElasticService {
      * @return 带权重的搜索结果列表和元数据
      */
     public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid) {
-        log.info("全文搜索QA: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
+        log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         // 构建查询条件
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -230,7 +230,7 @@ public class FaqElasticService {
 
     // 用户在输入过程中，给出输入联想
     public List<FaqElasticSearchResult> suggestFaq(FaqRequest request) {
-        log.info("QA输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}", 
+        log.info("FAQ输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}", 
             request.getQuestion(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
         
         String query = request.getQuestion();
