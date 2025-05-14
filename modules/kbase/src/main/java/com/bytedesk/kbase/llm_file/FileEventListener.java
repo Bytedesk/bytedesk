@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 08:53:11
+ * @LastEditTime: 2025-05-14 09:30:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 public class FileEventListener {
 
     private final FileRestService fileRestService;
+
+    private final FileChunkService fileChunkService;
     
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -39,14 +41,16 @@ public class FileEventListener {
             log.info("UploadEventListener LLM_FILE: {}", upload.getFileName());
             // 
             UserProtobuf userProtobuf = UserProtobuf.fromJson(upload.getUser());
-            FileUploadExtra extra = FileUploadExtra.fromJson(upload.getExtra());
+            // FileUploadExtra extra = FileUploadExtra.fromJson(upload.getExtra());
+            String content = fileChunkService.parseFileContent(upload);
             // 转换为 fileEntity，并保存
             FileRequest fileRequest = FileRequest.builder()
                 .uploadUid(upload.getUid())
                 .fileName(upload.getFileName())
                 .fileUrl(upload.getFileUrl())
-                .autoGenerateLlmQa(extra.isAutoGenerateLlmQa())
-                .autoLlmChunk(extra.isAutoLlmChunk())
+                .content(content)
+                // .autoGenerateLlmQa(extra.isAutoGenerateLlmQa())
+                // .autoLlmChunk(extra.isAutoLlmChunk())
                 .categoryUid(upload.getCategoryUid())
                 .kbUid(upload.getKbUid())
                 .userUid(userProtobuf.getUid())
