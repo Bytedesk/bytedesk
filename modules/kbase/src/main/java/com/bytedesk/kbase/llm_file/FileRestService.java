@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:13:23
+ * @LastEditTime: 2025-05-14 12:15:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -125,15 +125,6 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     }
 
     @Override
-    public FileEntity save(FileEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
     protected FileEntity doSave(FileEntity entity) {
         return fileRepository.save(entity);
     }
@@ -227,7 +218,16 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
 
     @Override
     public FileExcel convertToExcel(FileEntity file) {
-        return modelMapper.map(file, FileExcel.class);
+        FileExcel excel = modelMapper.map(file, FileExcel.class);
+        if (file.isEnabled()) {
+            excel.setEnabled("是");
+        } else {
+            excel.setEnabled("否");
+        }
+        if (file.getKbase()!= null) {
+            excel.setKbaseName(file.getKbase().getName());
+        }
+        return excel;
     }
 
     public void initFile(String kbUid, String orgUid) {

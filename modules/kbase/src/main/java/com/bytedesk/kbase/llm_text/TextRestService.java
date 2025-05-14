@@ -235,7 +235,16 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
 
     @Override
     public TextExcel convertToExcel(TextEntity text) {
-        return modelMapper.map(text, TextExcel.class);
+        TextExcel excel = modelMapper.map(text, TextExcel.class);
+        if (text.isEnabled()) {
+            excel.setEnabled("是");
+        } else {
+            excel.setEnabled("否");
+        }
+        if (text.getKbase()!= null) {
+            excel.setKbaseName(text.getKbase().getName());
+        }
+        return excel;
     }
 
     public TextEntity convertExcelToText(TextExcel excel, String kbType, String fileUid, String kbUid, String orgUid) {

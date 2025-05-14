@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 17:06:29
+ * @LastEditTime: 2025-05-14 12:17:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,10 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
+import java.time.LocalDateTime;
+
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import lombok.Data;
@@ -32,43 +35,42 @@ public class ChunkExcel {
     @ColumnWidth(50)
     private String content;
 
-    @ExcelProperty(value = "类型")
+    @ExcelProperty(value = "状态")
     @ColumnWidth(15)
-    private String type;
+    private String status;
 
-    @ExcelProperty(value = "级别")
+    @ExcelProperty(value = "向量状态")
     @ColumnWidth(15)
-    private String level;
+    private String vectorStatus;
 
-    @ExcelProperty(value = "平台")
-    @ColumnWidth(15)
-    private String platform;
-
-    @ExcelProperty(value = "文档ID")
-    @ColumnWidth(32)
-    private String docId;
-
-    @ExcelProperty(value = "类型UID")
-    @ColumnWidth(32)
-    private String typeUid;
-
-    @ExcelProperty(value = "分类")
+    @ExcelProperty(value = "标签")
     @ColumnWidth(20)
-    private String categoryUid;
+    private String tagList;
+
+    @ExcelProperty(value = "是否启用")   
+    @ColumnWidth(20)
+    private String enabled;
+
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "有效开始日期")
+    @ColumnWidth(25)
+    private LocalDateTime startDate;
+
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "有效结束日期")
+    @ColumnWidth(25)
+    private LocalDateTime endDate;
+
+    @ExcelProperty(value = "文件名称")
+    @ColumnWidth(20)
+    private String fileName;
 
     @ExcelProperty(value = "知识库")
     @ColumnWidth(20)
-    private String kbUid;
+    private String kbaseName;
 
-    @ExcelProperty(value = "用户ID")
-    @ColumnWidth(32)
-    private String userUid;
-
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
-    @ColumnWidth(20)
-    private String createdAt;
-
-    @ExcelProperty(value = "更新时间")
-    @ColumnWidth(20)
-    private String updatedAt;
+    @ColumnWidth(25)
+    private LocalDateTime createdAt;
 }

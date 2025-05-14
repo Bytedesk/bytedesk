@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:33:01
+ * @LastEditTime: 2025-05-14 12:10:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -272,7 +272,19 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
 
     @Override
     public ChunkExcel convertToExcel(ChunkEntity chunk) {
-        return modelMapper.map(chunk, ChunkExcel.class);
+        ChunkExcel excel = modelMapper.map(chunk, ChunkExcel.class);
+        if (chunk.isEnabled()) {
+            excel.setEnabled("是");
+        } else {
+            excel.setEnabled("否");
+        }
+        if (chunk.getFile() != null) {
+            excel.setFileName(chunk.getFile().getFileName());
+        }
+        if (chunk.getKbase()!= null) {
+            excel.setKbaseName(chunk.getKbase().getName());
+        }
+        return excel;
     }
 
     public void initChunk(String kbUid, String orgUid) {
