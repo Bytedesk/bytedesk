@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:53:13
+ * @LastEditTime: 2025-05-14 10:54:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,10 @@
 package com.bytedesk.kbase.llm_chunk;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -25,7 +27,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
+import com.bytedesk.kbase.llm_file.FileEntity;
 import com.bytedesk.kbase.llm_file.FileResponse;
+import com.bytedesk.kbase.llm_file.FileRestService;
 import com.bytedesk.kbase.llm_file.event.FileChunkEvent;
 
 import lombok.AllArgsConstructor;
@@ -40,6 +44,8 @@ public class ChunkEventListener {
 
     private final ChunkRestService chunkRestService;
 
+    private final FileRestService fileRestService;
+
 
     @EventListener
     public void onFileChunkEvent(FileChunkEvent event) {
@@ -51,12 +57,12 @@ public class ChunkEventListener {
 		var tokenTextSplitter = new TokenTextSplitter();
 		List<Document> docList = tokenTextSplitter.split(documents);
         // 
-		// List<String> docIdList = new ArrayList<>();
+		List<String> docIdList = new ArrayList<>();
 		Iterator<Document> iterator = docList.iterator();
 		while (iterator.hasNext()) {
 			Document doc = iterator.next();
 			log.info("doc id: {}", doc.getId());
-			// docIdList.add(doc.getId());
+			docIdList.add(doc.getId());
 
 			ChunkRequest splitRequest = ChunkRequest.builder()
 					.name(fileResponse.getFileName())
@@ -70,13 +76,19 @@ public class ChunkEventListener {
 					.orgUid(fileResponse.getOrgUid())
 					.enabled(true) // 使用文件的启用状态，默认为true
 					.startDate(LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
-					.endDate( LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
+					.endDate(LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
 					.build();
 			chunkRestService.create(splitRequest);
 		}
-		// fileResponse.setDocIdList(docIdList);
-		// fileResponse.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-		// fileResponseRestService.save(fileResponse);
+        Optional<FileEntity> fileEntity = fileRestService.findByUid(fileResponse.getUid());
+        if (fileEntity.isPresent()) {
+            FileEntity file = fileEntity.get();
+            file.setSuccess();
+            file.setDocIdList(docIdList);
+            fileRestService.save(file);
+        } else {
+            log.warn("文件实体不存在: {}", fileResponse.getUid());
+        }
     }
     
     
