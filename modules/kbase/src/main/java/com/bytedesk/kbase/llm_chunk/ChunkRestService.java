@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:12:02
+ * @LastEditTime: 2025-05-14 11:33:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,8 @@ import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
+import com.bytedesk.kbase.llm_file.FileEntity;
+import com.bytedesk.kbase.llm_file.FileRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,8 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     private final AuthService authService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final FileRestService fileRestService;
     
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
@@ -121,6 +125,13 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
         } else {
             throw new RuntimeException("kbaseUid not found");
         }
+        // 
+        Optional<FileEntity> file = fileRestService.findByUid(request.getFileUid());
+        if (file.isPresent()) {
+            entity.setFile(file.get());
+        } else {
+            throw new RuntimeException("fileUid not found");
+        }
         //
         ChunkEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -178,7 +189,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
                 latestEntity.setName(entity.getName());
                 latestEntity.setContent(entity.getContent());
                 latestEntity.setType(entity.getType());
-                latestEntity.setTypeUid(entity.getTypeUid());
+                // latestEntity.setTypeUid(entity.getTypeUid());
                 latestEntity.setLevel(entity.getLevel());
                 latestEntity.setPlatform(entity.getPlatform());
                 latestEntity.setEnabled(entity.isEnabled());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:10:28
+ * @LastEditTime: 2025-05-14 11:17:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_website;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -68,6 +69,11 @@ public class WebsiteRestService
         return websiteRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "website", key = "#kbUid", unless = "#result==null")
+    public List<WebsiteEntity> findByKbUid(String kbUid) {
+        return websiteRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
     @Override
     public WebsiteResponse create(WebsiteRequest request) {
 
@@ -103,15 +109,6 @@ public class WebsiteRestService
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Website not found");
-        }
-    }
-
-    @Override
-    public WebsiteEntity save(WebsiteEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
         }
     }
 
@@ -160,6 +157,32 @@ public class WebsiteRestService
     @Override
     public void delete(WebsiteRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    // deleteAll
+    public void deleteAll(WebsiteRequest request) {
+        List<WebsiteEntity> websites = findByKbUid(request.getKbUid());
+        for (WebsiteEntity website : websites) {
+            website.setDeleted(true);
+            save(website);
+        }
+    }
+
+    // enable/disable website
+    public WebsiteResponse enable(WebsiteRequest request) {
+        Optional<WebsiteEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            WebsiteEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            // 
+            WebsiteEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update website failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Website not found");
+        }
     }
 
     @Override

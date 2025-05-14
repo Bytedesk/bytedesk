@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:33:53
+ * @LastEditTime: 2025-05-14 11:30:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.llm_file.FileEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -92,9 +93,6 @@ public class ChunkEntity extends BaseEntity {
     // 对应 拆分 document 的 id
     private String docId;
 
-    // 合并fileEntity/textEntity/qaEntity/websiteEntity 的 uid
-    private String typeUid;
-
     // 所属分类
     private String categoryUid;
 
@@ -102,6 +100,8 @@ public class ChunkEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private FileEntity file;
 
     // set Success
     public ChunkEntity setSuccess() {

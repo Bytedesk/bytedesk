@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:48:56
+ * @LastEditTime: 2025-05-14 11:15:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,8 @@ package com.bytedesk.kbase.llm_website;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,6 +75,26 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
 
         return ResponseEntity.ok(JsonResult.success());
     }
+
+    // deleteAll
+    @PostMapping("/deleteAll")
+    public ResponseEntity<?> deleteAll(@RequestBody WebsiteRequest request) {
+
+        websiteRestService.deleteAll(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // enable/disable website
+    @PostMapping("/enable")
+    public ResponseEntity<?> enable(@RequestBody WebsiteRequest request) {
+
+        WebsiteResponse website = websiteRestService.enable(request);
+        
+        return ResponseEntity.ok(JsonResult.success(website));
+    }
+
+    
 
     @Override
     public Object export(WebsiteRequest request, HttpServletResponse response) {

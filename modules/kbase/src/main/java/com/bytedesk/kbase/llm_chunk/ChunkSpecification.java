@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:03:00
+ * @LastEditTime: 2025-05-14 11:33:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,9 +57,9 @@ public class ChunkSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("docId"), request.getDocId()));
             }
             // typeUid
-            if (StringUtils.hasText(request.getTypeUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("typeUid"), request.getTypeUid()));
-            }
+            // if (StringUtils.hasText(request.getTypeUid())) {
+            //     predicates.add(criteriaBuilder.equal(root.get("typeUid"), request.getTypeUid()));
+            // }
             // categoryUid
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));

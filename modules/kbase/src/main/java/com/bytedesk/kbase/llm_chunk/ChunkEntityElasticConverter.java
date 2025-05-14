@@ -42,7 +42,7 @@ public class ChunkEntityElasticConverter {
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
                 .docId(entity.getDocId())
-                .typeUid(entity.getTypeUid())
+                .fileUid(entity.getFile() != null ? entity.getFile().getUid() : null)
                 .categoryUid(entity.getCategoryUid())
                 .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
                 // .createdAt(entity.getCreatedAt())
