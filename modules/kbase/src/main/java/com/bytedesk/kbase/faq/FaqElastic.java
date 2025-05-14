@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:00:04
+ * @LastEditTime: 2025-05-14 10:16:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,11 +69,11 @@ public class FaqElastic {
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime endDate;
     
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime createdAt;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private LocalDateTime createdAt;
     
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime updatedAt;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private LocalDateTime updatedAt;
     
     @Field(type = FieldType.Integer)
     private int viewCount;
@@ -106,8 +106,8 @@ public class FaqElastic {
             .enabled(faq.isEnabled())
             .startDate(faq.getStartDate())
             .endDate(faq.getEndDate())
-            .createdAt(faq.getCreatedAt())
-            .updatedAt(faq.getUpdatedAt())
+            // .createdAt(faq.getCreatedAt())
+            // .updatedAt(faq.getUpdatedAt())
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())

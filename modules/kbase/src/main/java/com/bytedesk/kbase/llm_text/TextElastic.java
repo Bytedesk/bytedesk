@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 19:00:43
+ * @LastEditTime: 2025-05-14 10:16:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -54,11 +55,19 @@ public class TextElastic {
     @Field(type = FieldType.Boolean)
     private boolean enabled;
 
-    @Field(type = FieldType.Date)
+     // startDate
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime startDate;
 
-    @Field(type = FieldType.Date)
+    // endDate
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime endDate;
+    
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private LocalDateTime createdAt;
+    
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private LocalDateTime updatedAt;
 
     @Field(type = FieldType.Keyword)
     private String categoryUid;
@@ -80,4 +89,6 @@ public class TextElastic {
 
     // @Field(type = FieldType.Keyword)
     // private String updatedBy;
+
+
 }
