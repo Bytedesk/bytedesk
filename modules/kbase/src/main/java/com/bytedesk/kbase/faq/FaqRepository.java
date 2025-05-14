@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 17:03:11
+ * @LastEditTime: 2025-05-14 11:10:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
 
     Boolean existsByUid(String uid);
 
-    List<FaqEntity> findByKbase_Uid(String kbUid);
+    List<FaqEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 
     // auto complete, 根据问题关键字查询
     List<FaqEntity> findByQuestionContains(String question);

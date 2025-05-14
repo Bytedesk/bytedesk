@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 11:51:28
+ * @LastEditTime: 2025-05-14 11:12:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,8 @@ package com.bytedesk.kbase.llm_file;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,6 +73,24 @@ public class FileRestController extends BaseRestController<FileRequest> {
         fileRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // deleteAll
+    @PostMapping("/deleteAll")
+    public ResponseEntity<?> deleteAll(@RequestBody FileRequest request) {
+
+        fileRestService.deleteAll(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // enable/disable file
+    @PostMapping("/enable")
+    public ResponseEntity<?> enable(@RequestBody FileRequest request) {
+
+        FileResponse file = fileRestService.enable(request);
+        
+        return ResponseEntity.ok(JsonResult.success(file));
     }
 
     @Override

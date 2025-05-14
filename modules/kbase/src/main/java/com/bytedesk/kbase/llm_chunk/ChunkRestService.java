@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:06:27
+ * @LastEditTime: 2025-05-14 11:12:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,6 +85,12 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
         return chunkRepository.findByUid(uid);
     }
 
+    // findByKbUid
+    @Cacheable(value = "chunk", key = "#kbUid", unless = "#result==null")
+    public List<ChunkEntity> findByKbUid(String kbUid) {
+        return chunkRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
     @Override
     public ChunkResponse create(ChunkRequest request) {
         // log.info("ChunkRestService create: {}", request);
@@ -155,16 +161,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
             throw new RuntimeException("Chunk not found");
         }
     }
-
-    @Override
-    public ChunkEntity save(ChunkEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
+    
     protected ChunkEntity doSave(ChunkEntity entity) {
         return chunkRepository.save(entity);
     }
@@ -231,12 +228,29 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
 
     // deleteAll
     public void deleteAll(ChunkRequest request) {
-        List<ChunkEntity> chunks = chunkRepository.findByOrgUid(request.getOrgUid());
+        List<ChunkEntity> chunks = findByKbUid(request.getKbUid());
         if (chunks != null && !chunks.isEmpty()) {
             for (ChunkEntity chunk : chunks) {
                 chunk.setDeleted(true);
                 save(chunk);
             }
+        }
+    }
+
+    // enable
+    public ChunkResponse enable(ChunkRequest request) {
+        Optional<ChunkEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            ChunkEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            // 
+            ChunkEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update chunk failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Chunk not found");
         }
     }
 
