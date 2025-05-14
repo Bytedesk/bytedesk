@@ -14,8 +14,6 @@
 package com.bytedesk.kbase.llm_text;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,93 +32,20 @@ public class TextVectorSearchResult implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
+    // 包含Text向量数据
     private TextVector textVector;
     
     // 相似度分数
     @Builder.Default
-    private double score = 0.0;
+    private float score = 0.0f;
     
-    /**
-     * 获取去除标题的纯内容部分
-     * @return 内容部分（去除标题）
-     */
-    public String getPureContent() {
-        if (textVector == null || textVector.getContent() == null || 
-            textVector.getContent().isEmpty() || !textVector.getContent().contains("\n\n")) {
-            return textVector != null ? textVector.getContent() : "";
-        }
-        
-        // 以双换行符分割，获取内容部分（忽略标题）
-        String[] parts = textVector.getContent().split("\n\n", 2);
-        return parts.length > 1 ? parts[1] : textVector.getContent();
-    }
+    // 存储带高亮标记的内容文本
+    private String highlightedContent;
     
-    /**
-     * 获取内容摘要（限制长度）
-     * @param maxLength 摘要最大长度
-     * @return 截取后的摘要
-     */
-    public String getContentSummary(int maxLength) {
-        String pureContent = getPureContent();
-        if (pureContent == null || pureContent.length() <= maxLength) {
-            return pureContent;
-        }
-        return pureContent.substring(0, maxLength) + "...";
-    }
+    // 存储带高亮标记的标题
+    private String highlightedTitle;
     
-    /**
-     * 便捷方法：获取文本标题
-     */
-    public String getTitle() {
-        return textVector != null ? textVector.getTitle() : null;
-    }
+    // 向量相似度距离
+    private float distance;
     
-    /**
-     * 便捷方法：获取文本内容
-     */
-    public String getContent() {
-        return textVector != null ? textVector.getContent() : null;
-    }
-    
-    /**
-     * 便捷方法：获取文本唯一标识
-     */
-    public String getUid() {
-        return textVector != null ? textVector.getUid() : null;
-    }
-    
-    /**
-     * 便捷方法：获取知识库UID
-     */
-    public String getKbUid() {
-        return textVector != null ? textVector.getKbUid() : null;
-    }
-    
-    /**
-     * 便捷方法：获取分类UID
-     */
-    public String getCategoryUid() {
-        return textVector != null ? textVector.getCategoryUid() : null;
-    }
-    
-    /**
-     * 便捷方法：获取组织UID
-     */
-    public String getOrgUid() {
-        return textVector != null ? textVector.getOrgUid() : null;
-    }
-    
-    /**
-     * 便捷方法：获取文本类型
-     */
-    public String getType() {
-        return textVector != null ? textVector.getType() : null;
-    }
-    
-    /**
-     * 便捷方法：获取标签列表
-     */
-    public List<String> getTagList() {
-        return textVector != null ? textVector.getTagList() : new ArrayList<>();
-    }
 }

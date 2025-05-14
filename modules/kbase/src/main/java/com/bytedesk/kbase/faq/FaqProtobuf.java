@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-24 13:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 15:34:50
+ * @LastEditTime: 2025-05-14 16:01:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,9 @@ import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.kbase.llm_chunk.ChunkElastic;
+import com.bytedesk.kbase.llm_chunk.ChunkVector;
 import com.bytedesk.kbase.llm_text.TextElastic;
+import com.bytedesk.kbase.llm_text.TextVector;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,17 +62,27 @@ public class FaqProtobuf implements Serializable {
                 .build();
     }
 
-    // public static FaqProtobuf fromVector(FaqVectorSearchResult faq) {
-    //     return FaqProtobuf.builder()
-    //             .uid(faq.getUid())
-    //             .question(faq.getQuestion())
-    //             .answer(faq.getContent())
-    //             .type(FaqProtobufTypeEnum.FAQ.name())
-    //             .build();
-    // }
+    public static FaqProtobuf fromFaqVector(FaqVector faq) {
+        return FaqProtobuf.builder()
+                .uid(faq.getUid())
+                .question(faq.getQuestion())
+                .answer(faq.getAnswer())
+                .type(FaqProtobufTypeEnum.FAQ.name())
+                .build();
+    }
 
     public static FaqProtobuf fromText(TextElastic text) {
         return FaqProtobuf.builder()
+                .uid(text.getUid())
+                .question(text.getTitle())
+                .answer(text.getContent())
+                .type(FaqProtobufTypeEnum.TEXT.name())
+                .build();
+    }
+
+    // from text vector
+    public static FaqProtobuf fromTextVector(TextVector text) {
+    	return FaqProtobuf.builder()
                 .uid(text.getUid())
                 .question(text.getTitle())
                 .answer(text.getContent())
@@ -85,6 +97,16 @@ public class FaqProtobuf implements Serializable {
                .answer(chunk.getContent())
                .type(FaqProtobufTypeEnum.CHUNK.name())
                .build();
+    }
+
+    // from chunk vector
+    public static FaqProtobuf fromChunkVector(ChunkVector chunk) {
+    	return FaqProtobuf.builder()
+                .uid(chunk.getUid())
+                .question(chunk.getName())
+                .answer(chunk.getContent())
+                .type(FaqProtobufTypeEnum.CHUNK.name())
+                .build();
     }
     
     public String toJson() {
