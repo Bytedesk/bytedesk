@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:25:19
+ * @LastEditTime: 2025-05-14 12:40:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,6 +53,7 @@ import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -417,6 +418,9 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         } else {
             excel.setEnabled("否");
         }
+        // 将状态和向量状态转换为中文
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(faq.getStatus()));
+        excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(faq.getVectorStatus()));
         return excel;
     }
 
