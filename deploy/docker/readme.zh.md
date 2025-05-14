@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 10:52:25
+ * @LastEditTime: 2025-05-14 17:22:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
 -->
 # docker
 
-## docker compose
+## 微语启动
 
 ```bash
 # https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker
@@ -24,9 +24,12 @@ cd bytedesk/deploy/docker
 # 配置环境变量，根据需要修改
 cp .env.example .env
 # 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
+# 同时启动mysql,redis,elasticsearch依赖和微语
 docker compose -p bytedesk -f docker-compose.yaml up -d
-# 内含ollama
+# 同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# 仅启动mysql、redis、elasticsearch依赖，不启动微语
+docker compose -p bytedesk -f docker-compose-middleware.yaml up -d
 # 拉取ollama模型
 docker exec ollama-bytedesk ollama pull deepseek-r1:1.5b
 # 停止
