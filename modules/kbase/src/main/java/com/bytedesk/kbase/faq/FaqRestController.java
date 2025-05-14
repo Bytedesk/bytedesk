@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 13:32:44
+ * @LastEditTime: 2025-05-14 16:17:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     private final FaqRestService faqRestService;
 
     private final FaqElasticService faqElasticService;
-    
+
     private final FaqVectorService faqVectorService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")

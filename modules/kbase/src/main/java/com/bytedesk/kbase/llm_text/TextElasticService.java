@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 17:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 19:01:01
+ * @LastEditTime: 2025-05-14 16:20:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -60,17 +60,6 @@ public class TextElasticService {
         }
     }
 
-    // update elasticsearch vector index
-    public void updateVectorIndex(TextRequest request) {
-        Optional<TextEntity> textOpt = textRestService.findByUid(request.getUid());
-        if (textOpt.isPresent()) {
-            // TODO: Implement vector indexing logic here
-            log.info("Vector index functionality not implemented yet for Text: {}", request.getUid());
-        } else {
-            throw new IllegalArgumentException("Text not found with UID: " + request.getUid());
-        }
-    }
-
     // update all elasticsearch index
     public void updateAllIndex(TextRequest request) {
         List<TextEntity> textList = textRestService.findByKbUid(request.getKbUid());
@@ -80,15 +69,6 @@ public class TextElasticService {
         log.info("Updated elasticsearch index for {} texts from knowledge base: {}", textList.size(), request.getKbUid());
     }
 
-    // update all elasticsearch vector index
-    public void updateAllVectorIndex(TextRequest request) {
-        List<TextEntity> textList = textRestService.findByKbUid(request.getKbUid());
-        textList.forEach(text -> {
-            // TODO: Implement vector indexing logic here
-            log.info("Vector index functionality not implemented yet for Text: {}", text.getUid());
-        });
-        log.info("Vector indexing requested for {} texts from knowledge base: {}", textList.size(), request.getKbUid());
-    }
     
     /**
      * 索引Text实体到Elasticsearch

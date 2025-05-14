@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 15:16:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:46:52
+ * @LastEditTime: 2025-05-14 16:19:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,16 +59,7 @@ public class ChunkElasticService {
         }
     }
 
-    // update elasticsearch vector index
-    public void updateVectorIndex(ChunkRequest request) {
-        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUid(request.getUid());
-        if (chunkOpt.isPresent()) {
-            // TODO: Implement vector indexing logic here
-            log.info("Vector index functionality not implemented yet for Chunk: {}", request.getUid());
-        } else {
-            throw new IllegalArgumentException("Chunk not found with UID: " + request.getUid());
-        }
-    }
+    
 
     // update all elasticsearch index
     public void updateAllIndex(ChunkRequest request) {
@@ -79,15 +70,6 @@ public class ChunkElasticService {
         log.info("Updated elasticsearch index for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
     }
 
-    // update all elasticsearch vector index
-    public void updateAllVectorIndex(ChunkRequest request) {
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
-        chunkList.forEach(chunk -> {
-            // TODO: Implement vector indexing logic here
-            log.info("Vector index functionality not implemented yet for Chunk: {}", chunk.getUid());
-        });
-        log.info("Vector indexing requested for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
-    }
     
     /**
      * 索引Chunk实体到Elasticsearch

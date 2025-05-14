@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:55:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 16:04:01
+ * @LastEditTime: 2025-05-14 16:21:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,6 +48,8 @@ public class ChunkVectorService {
     
     @Qualifier("bytedeskOllamaEmbeddingModel") 
     private final EmbeddingModel embeddingModel;
+
+    
     
     /**
      * 将chunk内容添加到向量存储中
@@ -169,6 +171,16 @@ public class ChunkVectorService {
             log.error("更新Chunk向量索引失败: {}, 错误: {}", request.getName(), e.getMessage());
             throw e;
         }
+    }
+    
+    // update all elasticsearch vector index
+    public void updateAllVectorIndex(ChunkRequest request) {
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
+        chunkList.forEach(chunk -> {
+            // TODO: Implement vector indexing logic here
+            log.info("Vector index functionality not implemented yet for Chunk: {}", chunk.getUid());
+        });
+        log.info("Vector indexing requested for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
     }
     
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:20:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:26:37
+ * @LastEditTime: 2025-05-14 16:21:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,7 @@ public class FaqVectorService {
     private final ElasticsearchVectorStore vectorStore;
     
     private final FaqRestService faqRestService;
-    
+
     @Qualifier("bytedeskOllamaEmbeddingModel") 
     private final EmbeddingModel embeddingModel;
     

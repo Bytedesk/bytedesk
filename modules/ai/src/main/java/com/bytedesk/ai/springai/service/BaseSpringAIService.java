@@ -40,7 +40,6 @@ import com.bytedesk.kbase.llm_chunk.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.ChunkVector;
 import com.bytedesk.kbase.llm_chunk.ChunkVectorSearchResult;
 import com.bytedesk.kbase.llm_chunk.ChunkVectorService;
-// import com.bytedesk.kbase.llm_chunk.ChunkProtobuf;
 import com.bytedesk.kbase.faq.FaqElasticService;
 import com.bytedesk.kbase.llm_text.TextElastic;
 import com.bytedesk.kbase.llm_text.TextElasticSearchResult;
@@ -50,7 +49,6 @@ import com.bytedesk.kbase.llm_text.TextVectorSearchResult;
 import com.bytedesk.kbase.llm_text.TextVectorService;
 
 import lombok.extern.slf4j.Slf4j;
-import com.alibaba.fastjson2.JSON;
 
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
@@ -304,20 +302,15 @@ public abstract class BaseSpringAIService implements SpringAIService {
         } else {
             // 搜索到内容，返回搜索内容
             FaqProtobuf firstFaq = searchContentList.get(0);
-            FaqProtobuf resultFaq = FaqProtobuf.builder()
-                    .uid(firstFaq.getUid())
-                    .question(firstFaq.getQuestion())
-                    .answer(firstFaq.getAnswer())
-                    .build();
 
             // 如果有多个搜索结果，将其余的添加为相关问题
             if (searchContentList.size() > 1) {
                 List<FaqProtobuf> relatedFaqs = new ArrayList<>(searchContentList.subList(1, searchContentList.size()));
-                resultFaq.setRelatedFaqs(relatedFaqs);
+                firstFaq.setRelatedFaqs(relatedFaqs);
             }
 
             // 将处理后的单个FaqProtobuf对象转换为JSON字符串
-            String answer = JSON.toJSONString(resultFaq);
+            String answer = firstFaq.toJson();
             processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply, false,
                     emitter);
         }
