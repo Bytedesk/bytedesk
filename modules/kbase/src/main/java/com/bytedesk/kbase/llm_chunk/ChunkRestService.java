@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:35:57
+ * @LastEditTime: 2025-05-14 09:57:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,16 +92,13 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
                 .uid(uidUtils.getUid())
                 .name(request.getName())
                 .content(request.getContent())
-                .type(request.getType())
-                .level(request.getLevel())
-                .platform(request.getPlatform())
+                // .type(request.getType())
                 .docId(request.getDocId())
-                .typeUid(request.getTypeUid())
+                // .typeUid(request.getTypeUid())
                 .enabled(request.getEnabled())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .categoryUid(request.getCategoryUid())
-                // .kbUid(request.getKbUid())
                 .orgUid(request.getOrgUid())
                 .build();
         //
@@ -239,5 +237,29 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     @Override
     public ChunkExcel convertToExcel(ChunkEntity chunk) {
         return modelMapper.map(chunk, ChunkExcel.class);
+    }
+
+    public void initChunk(String kbUid, String orgUid) {
+        if (chunkRepository.count() > 0) {
+            return;
+        }
+        //
+        ChunkEntity chunk = ChunkEntity.builder()
+                .uid(uidUtils.getUid())
+                .name("测试chunk")
+                .content("测试chunk内容")
+                .enabled(true)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(1))
+                .orgUid(orgUid)
+                .build();
+        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
+        if (kbase.isPresent()) {
+            chunk.setKbase(kbase.get());
+        } else {
+            throw new RuntimeException("kbaseUid not found");
+        }
+        //
+        save(chunk);
     }
 }

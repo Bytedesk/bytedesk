@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 09:08:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:31:16
+ * @LastEditTime: 2025-05-14 09:37:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class FileChunkService {
     /**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
 	 */
-	public String parseFileContent(UploadEntity upload) {
+	public List<Document> parseFileContent(UploadEntity upload) {
 		String fileUrl = upload.getFileUrl();
 		log.info("Loading document from URL: {}", fileUrl);
 		Assert.hasText(fileUrl, "File URL must not be empty");
@@ -70,7 +70,7 @@ public class FileChunkService {
 		}
 	}
 
-	public String readPdfPage(Resource resource) {
+	public List<Document> readPdfPage(Resource resource) {
         // 
 		PdfDocumentReaderConfig pdfDocumentReaderConfig = PdfDocumentReaderConfig.builder()
 				.withPageTopMargin(0)
@@ -81,16 +81,17 @@ public class FileChunkService {
 				.build();
 		PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource, pdfDocumentReaderConfig);
 
+		return pdfReader.read();
 		// 读取所有文档
-		List<Document> documents = pdfReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
+		// List<Document> documents = pdfReader.read();
+		// // 提取文本内容
+		// StringBuilder contentBuilder = new StringBuilder();
+		// for (Document doc : documents) {
+		// 	contentBuilder.append(doc.getText()).append("\n");
+		// }
 		// 保存文本内容到file
 		// upload.setContent(contentBuilder.toString());
-        return contentBuilder.toString();
+        // return contentBuilder.toString();
 
 		// 继续原有的分割和存储逻辑
 		// var tokenTextSplitter = new TokenTextSplitter();
@@ -98,7 +99,7 @@ public class FileChunkService {
 		// storeDocuments(docList, file);
 	}
 
-	public String readPdfParagraph(Resource resource) {
+	public List<Document> readPdfParagraph(Resource resource) {
 		// log.info("Loading document from pdfParagraph: {}", fileName);
 
 		ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(
@@ -110,16 +111,18 @@ public class FileChunkService {
 								.build())
 						.withPagesPerDocument(1)
 						.build());
+
+		return pdfReader.read();
 		// 读取所有文档
-		List<Document> documents = pdfReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		// upload.setContent(contentBuilder.toString());
-        return contentBuilder.toString();
+		// List<Document> documents = pdfReader.read();
+		// // 提取文本内容
+		// StringBuilder contentBuilder = new StringBuilder();
+		// for (Document doc : documents) {
+		// 	contentBuilder.append(doc.getText()).append("\n");
+		// }
+		// // 保存文本内容到file
+		// // upload.setContent(contentBuilder.toString());
+        // return contentBuilder.toString();
 
 		// 继续原有的分割和存储逻辑
 		// var tokenTextSplitter = new TokenTextSplitter();
@@ -127,7 +130,7 @@ public class FileChunkService {
 		// storeDocuments(docList, file);
 	}
 
-	public String readJson(Resource resource) {
+	public List<Document> readJson(Resource resource) {
 		// log.info("Loading document from json: {}", fileName);
 		// Assert.hasText(fileName, "File name must not be empty");
 		// Assert.isTrue(fileName.endsWith(".json"), String.format("File must end with .json, got %s", fileName));
@@ -135,16 +138,17 @@ public class FileChunkService {
 		// Resource resource = uploadRestService.loadAsResource(fileName);
 		JsonReader jsonReader = new JsonReader(resource, "description");
 
+		return jsonReader.read();
 		// 读取所有文档
-		List<Document> documents = jsonReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		// upload.setContent(contentBuilder.toString());
-        return contentBuilder.toString();
+		// List<Document> documents = jsonReader.read();
+		// // 提取文本内容
+		// StringBuilder contentBuilder = new StringBuilder();
+		// for (Document doc : documents) {
+		// 	contentBuilder.append(doc.getText()).append("\n");
+		// }
+		// // 保存文本内容到file
+		// // upload.setContent(contentBuilder.toString());
+        // return contentBuilder.toString();
 
 		// var tokenTextSplitter = new TokenTextSplitter();
 		// List<Document> docList = tokenTextSplitter.split(documents);
@@ -152,7 +156,7 @@ public class FileChunkService {
 	}
 
 	// 使用spring ai markdown reader
-	public String readMarkdown(Resource resource) {
+	public List<Document> readMarkdown(Resource resource) {
 		// log.info("Loading document from markdown: {}", fileName);
 		// Assert.hasText(fileName, "File name must not be empty");
 		// Assert.isTrue(fileName.endsWith(".md"), String.format("File must end with .md, got %s", fileName));
@@ -160,22 +164,24 @@ public class FileChunkService {
 		// Resource resource = uploadRestService.loadAsResource(fileName);
 		MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(resource,
 				MarkdownDocumentReaderConfig.builder().build());
-		List<Document> documents = markdownReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		// upload.setContent(contentBuilder.toString());
-        return contentBuilder.toString();
+
+		return markdownReader.read();
+		// List<Document> documents = markdownReader.read();
+		// // 提取文本内容
+		// StringBuilder contentBuilder = new StringBuilder();
+		// for (Document doc : documents) {
+		// 	contentBuilder.append(doc.getText()).append("\n");
+		// }
+		// // 保存文本内容到file
+		// // upload.setContent(contentBuilder.toString());
+        // return contentBuilder.toString();
 
 		// var tokenTextSplitter = new TokenTextSplitter();
 		// List<Document> docList = tokenTextSplitter.split(documents);
 		// storeDocuments(docList, file);
 	}
 
-	public String readTxt(Resource resource) {
+	public List<Document> readTxt(Resource resource) {
 		// log.info("Loading document from txt: {}", fileName);
 		// Assert.hasText(fileName, "File name must not be empty");
 		// Assert.isTrue(fileName.endsWith(".txt"), String.format("File must end with .txt, got %s", fileName));
@@ -184,16 +190,17 @@ public class FileChunkService {
 		TextReader textReader = new TextReader(resource);
 		// textReader.getCustomMetadata().put("filename", fileName);
 
+		return textReader.read();
 		// 读取所有文档
-		List<Document> documents = textReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		// upload.setContent(contentBuilder.toString());
-        return contentBuilder.toString();
+		// List<Document> documents = textReader.read();
+		// // 提取文本内容
+		// StringBuilder contentBuilder = new StringBuilder();
+		// for (Document doc : documents) {
+		// 	contentBuilder.append(doc.getText()).append("\n");
+		// }
+		// // 保存文本内容到file
+		// // upload.setContent(contentBuilder.toString());
+        // return contentBuilder.toString();
 
 		// var tokenTextSplitter = new TokenTextSplitter();
 		// List<Document> docList = tokenTextSplitter.split(documents);
@@ -202,7 +209,7 @@ public class FileChunkService {
 
 	// https://tika.apache.org/2.9.0/formats.html
 	// PDF, DOC/DOCX, PPT/PPTX, and HTML
-	public String readByTika(Resource resource) {
+	public List<Document> readByTika(Resource resource) {
 		// log.info("Loading document from tika: {}", fileName);
 		// Assert.hasText(fileName, "File name must not be empty");
 		// Assert.notNull(file, "FileEntity must not be null");
@@ -210,16 +217,17 @@ public class FileChunkService {
 		// Resource resource = uploadRestService.loadAsResource(fileName);
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
 
+		return tikaDocumentReader.read();
 		// 读取所有文档
-		List<Document> documents = tikaDocumentReader.read();
-		// 提取文本内容
-		StringBuilder contentBuilder = new StringBuilder();
-		for (Document doc : documents) {
-			contentBuilder.append(doc.getText()).append("\n");
-		}
-		// 保存文本内容到file
-		// upload.setContent(contentBuilder.toString());
-        return contentBuilder.toString();
+		// List<Document> documents = tikaDocumentReader.read();
+		// // 提取文本内容
+		// StringBuilder contentBuilder = new StringBuilder();
+		// for (Document doc : documents) {
+		// 	contentBuilder.append(doc.getText()).append("\n");
+		// }
+		// // 保存文本内容到file
+		// // upload.setContent(contentBuilder.toString());
+        // return contentBuilder.toString();
 
 		// var tokenTextSplitter = new TokenTextSplitter();
 		// List<Document> docList = tokenTextSplitter.split(documents);
