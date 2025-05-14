@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 11:08:00
+ * @LastEditTime: 2025-05-14 17:24:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,12 @@ cd bytedesk/deploy/docker
 # configure environment variables, modify as needed
 cp .env.example .env
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
+# start mysql, redis, elasticsearch dependencies and weiyu
 docker compose -p bytedesk -f docker-compose.yaml up -d
-# with ollama
+# start mysql, redis, ollama, elasticsearch dependencies and weiyu, with ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# start middleware container, including rabbitmq and redis，without weiyu
+docker compose -p bytedesk -f docker-compose-middleware.yaml up -d
 # stop container
 docker compose -p bytedesk -f docker-compose.yaml stop
 # stop ollama

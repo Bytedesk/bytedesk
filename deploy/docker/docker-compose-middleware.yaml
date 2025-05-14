@@ -11,11 +11,6 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - bytedesk-network
-    # healthcheck:
-    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
 
   bytedesk-redis:
     image: redis/redis-stack-server:latest
@@ -80,89 +75,6 @@ services:
       timeout: 10s
       retries: 5
 
-
-  # Chroma 向量数据库
-  # bytedesk-chroma:
-  #   image: ghcr.io/chroma-core/chroma:latest
-  #   container_name: chroma-bytedesk
-  #   ports:
-  #     - "18000:8000"
-  #   volumes:
-  #     - chroma_data:/chroma/chroma
-  #   environment:
-  #     - CHROMA_SERVER_CORS_ALLOW_ORIGINS=*
-  #     - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.basic.BasicAuthCredentialsProvider
-  #     - CHROMA_SERVER_AUTH_CREDENTIALS_FILE=/chroma/chroma_users.json
-  #     - PERSIST_DIRECTORY=/chroma/chroma
-  #   networks:
-  #     - bytedesk-network
-
-  # Weaviate 向量数据库
-  # bytedesk-weaviate:
-  #   image: semitechnologies/weaviate:1.24.5
-  #   container_name: weaviate-bytedesk
-  #   ports:
-  #     - "18080:8080"
-  #   environment:
-  #     - QUERY_DEFAULTS_LIMIT=25
-  #     - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
-  #     - PERSISTENCE_DATA_PATH=/var/lib/weaviate
-  #     - DEFAULT_VECTORIZER_MODULE=none
-  #     - CLUSTER_HOSTNAME=node1
-  #   volumes:
-  #     - weaviate_data:/var/lib/weaviate
-  #   networks:
-  #     - bytedesk-network
-
-  # Milvus 向量数据库
-  # bytedesk-milvus:
-  #   image: milvusdb/milvus:v2.3.7
-  #   container_name: milvus-bytedesk
-  #   command: ["milvus", "run", "standalone"]
-  #   environment:
-  #     - ETCD_ENDPOINTS=etcd:2379
-  #     - MINIO_ADDRESS=minio:9000
-  #   volumes:
-  #     - milvus_data:/var/lib/milvus
-  #   ports:
-  #     - "19530:19530"
-  #     - "19531:9091"
-  #   networks:
-  #     - bytedesk-network
-  #   depends_on:
-  #     - bytedesk-etcd
-  #     - bytedesk-minio
-
-  # bytedesk-etcd:
-  #   image: quay.io/coreos/etcd:v3.5.5
-  #   container_name: etcd-bytedesk
-  #   environment:
-  #     - ETCD_AUTO_COMPACTION_MODE=revision
-  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
-  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
-  #     - ETCD_SNAPSHOT_COUNT=50000
-  #   volumes:
-  #     - etcd_data:/etcd
-  #   command:
-  #     - /usr/local/bin/etcd
-  #     - --advertise-client-urls=http://etcd:2379
-  #     - --listen-client-urls=http://0.0.0.0:2379
-  #     - --data-dir=/etcd
-  #   networks:
-  #     - bytedesk-network
-
-  # bytedesk-minio:
-  #   image: minio/minio:RELEASE.2023-03-20T20-16-18Z
-  #   container_name: minio-bytedesk
-  #   environment:
-  #     - MINIO_ACCESS_KEY=minioadmin
-  #     - MINIO_SECRET_KEY=minioadmin
-  #   volumes:
-  #     - minio_data:/minio_data
-  #   command: minio server /minio_data
-  #   networks:
-  #     - bytedesk-network
-
 volumes:
   mysql_data:
     name: bytedesk_mysql_data
@@ -170,26 +82,8 @@ volumes:
     name: bytedesk_redis_data
   ollama_models:
     name: bytedesk_ollama_models
-  prometheus_data:
-    name: bytedesk_prometheus_data
-  grafana_data:
-    name: bytedesk_grafana_data
-  ldap_data:
-    name: bytedesk_ldap_data
-  ldap_config:
-    name: bytedesk_ldap_config
-  # chroma_data:
-  #   name: bytedesk_chroma_data
   elasticsearch_data:
     name: bytedesk_elasticsearch_data
-  # weaviate_data:
-  #   name: bytedesk_weaviate_data
-  # milvus_data:
-  #   name: bytedesk_milvus_data
-  # etcd_data:
-  #   name: bytedesk_etcd_data
-  # minio_data:
-  #   name: bytedesk_minio_data
 
 networks:
   bytedesk-network:
