@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 17:22:14
+ * @LastEditTime: 2025-05-14 18:19:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,12 @@ docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 # 仅启动mysql、redis、elasticsearch依赖，不启动微语
 docker compose -p bytedesk -f docker-compose-middleware.yaml up -d
 # 拉取ollama模型
-docker exec ollama-bytedesk ollama pull deepseek-r1:1.5b
+# 对话模型
+docker exec ollama-bytedesk ollama pull qwen3:0.6b
+# 嵌入模型
+docker exec ollama-bytedesk ollama pull bge-m3:latest
+# 重新排序Rerank模型
+docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # 停止
 docker compose -p bytedesk -f docker-compose.yaml stop
 # 停止，内含ollama

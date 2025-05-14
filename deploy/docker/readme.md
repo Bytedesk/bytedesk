@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 17:24:28
+ * @LastEditTime: 2025-05-14 18:19:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,12 @@ docker compose -p bytedesk -f docker-compose.yaml up -d
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 # start middleware container, including rabbitmq and redis，without weiyu
 docker compose -p bytedesk -f docker-compose-middleware.yaml up -d
+# chat model
+docker exec ollama-bytedesk ollama pull qwen3:0.6b
+# embedding model
+docker exec ollama-bytedesk ollama pull bge-m3:latest
+# rerank model
+docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # stop container
 docker compose -p bytedesk -f docker-compose.yaml stop
 # stop ollama
