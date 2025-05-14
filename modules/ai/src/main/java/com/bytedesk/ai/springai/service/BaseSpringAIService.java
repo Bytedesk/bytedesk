@@ -194,6 +194,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 
             String formattedText = textProtobuf.toJson();
             searchContentList.add(formattedText);
+            // 
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
+            faqProtobufList.add(faqProtobuf);
         }
         // 
         List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
@@ -203,6 +206,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 
             String formattedChunk = chunkProtobuf.toJson();
             searchContentList.add(formattedChunk);
+            // 
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
+            faqProtobufList.add(faqProtobuf);
         }
     }
 

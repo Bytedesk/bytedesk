@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-24 13:33:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 08:48:34
+ * @LastEditTime: 2025-05-14 10:43:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.kbase.llm_chunk.ChunkElastic;
+import com.bytedesk.kbase.llm_text.TextElastic;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +42,8 @@ public class FaqProtobuf implements Serializable {
 
     private String answer;
 
+    private String type;
+
     @Builder.Default
     private List<FaqProtobuf> relatedFaqs = new ArrayList<>();
 
@@ -52,7 +56,26 @@ public class FaqProtobuf implements Serializable {
                 .uid(faq.getUid())
                 .question(faq.getQuestion())
                 .answer(faq.getAnswer())
+                .type(FaqProtobufTypeEnum.FAQ.name())
                 .build();
+    }
+
+    public static FaqProtobuf fromText(TextElastic text) {
+        return FaqProtobuf.builder()
+                .uid(text.getUid())
+                .question(text.getTitle())
+                .answer(text.getContent())
+                .type(FaqProtobufTypeEnum.TEXT.name())
+                .build();
+    }
+
+    public static FaqProtobuf fromChunk(ChunkElastic chunk) {
+        return FaqProtobuf.builder()
+               .uid(chunk.getUid())
+               .question(chunk.getName())
+               .answer(chunk.getContent())
+               .type(FaqProtobufTypeEnum.CHUNK.name())
+               .build();
     }
     
     public String toJson() {
