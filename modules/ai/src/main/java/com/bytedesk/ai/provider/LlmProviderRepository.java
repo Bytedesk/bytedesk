@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 13:24:38
+ * @LastEditTime: 2025-05-14 16:33:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,8 @@ public interface LlmProviderRepository extends JpaRepository<LlmProviderEntity, 
     Optional<LlmProviderEntity> findByNameAndLevelAndOrgUidAndDeletedFalse(String name, String level, String orgUid);
     
     Boolean existsByNameAndLevel(String name, String level);
+
+    Boolean existsByNameAndLevelAndStatus(String name, String level, String status);
 
     Boolean existsByNameAndLevelAndOrgUidAndDeletedFalse(String name, String level, String orgUid);
 

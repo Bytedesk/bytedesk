@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 15:09:39
+ * @LastEditTime: 2025-05-14 16:34:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,10 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     public Boolean existsByNameAndLevel(String name, String level) {
         return repository.existsByNameAndLevel(name, level);
+    }
+
+    public Boolean existsByNameAndLevelAndStatus(String name, String level, String status) {
+        return repository.existsByNameAndLevelAndStatus(name, level, status);
     }
 
     public Boolean existsByNameAndLevelAndOrgUid(String name, String level, String orgUid) {
