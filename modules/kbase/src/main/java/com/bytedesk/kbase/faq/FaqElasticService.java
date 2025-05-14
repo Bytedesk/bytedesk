@@ -57,28 +57,13 @@ public class FaqElasticService {
             throw new IllegalArgumentException("FAQ not found with UID: " + request.getUid());
         }
     }
-
-    // update elasticsearch vector index
-    public void updateVectorIndex(FaqRequest request) {
-        Optional<FaqEntity> faqOpt = faqRestService.findByUid(request.getUid());
-        if (faqOpt.isPresent()) {
-            // TODO: Implement vector indexing logic here
-        }
-    }
+    
 
     // update all elasticsearch index
     public void updateAllIndex(FaqRequest request) {
         List<FaqEntity> faqList = faqRestService.findByKbUid(request.getKbUid());
         faqList.forEach(faq -> {
             indexFaq(faq); 
-        });
-    }
-
-    // update all elasticsearch vector index
-    public void updateAllVectorIndex(FaqRequest request) {
-        List<FaqEntity> faqList = faqRestService.findByKbUid(request.getKbUid());
-        faqList.forEach(faq -> {
-            // TODO: Implement vector indexing logic here
         });
     }
     

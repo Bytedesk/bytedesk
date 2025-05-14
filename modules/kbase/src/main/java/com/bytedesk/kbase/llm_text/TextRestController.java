@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:14:13
+ * @LastEditTime: 2025-05-14 16:20:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,8 @@ public class TextRestController extends BaseRestController<TextRequest> {
     private final TextRestService textRestService;
 
     private final TextElasticService textElasticService;
+
+    private final TextVectorService textVectorService;
 
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @Override
@@ -133,7 +135,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody TextRequest request) {
 
-        textElasticService.updateVectorIndex(request);
+        textVectorService.updateVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
@@ -153,7 +155,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody TextRequest request) {
 
-        textElasticService.updateAllVectorIndex(request);
+        textVectorService.updateAllVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
     }

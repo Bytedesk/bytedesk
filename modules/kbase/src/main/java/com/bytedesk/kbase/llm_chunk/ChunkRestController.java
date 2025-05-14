@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:53:17
+ * @LastEditTime: 2025-05-14 16:19:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,8 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     private final ChunkRestService chunkRestService;
     
     private final ChunkElasticService chunkElasticService;
+
+    private final ChunkVectorService chunkVectorService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -134,7 +136,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody ChunkRequest request) {
 
-        chunkElasticService.updateVectorIndex(request);
+        chunkVectorService.updateVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
@@ -154,7 +156,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ChunkRequest request) {
 
-        chunkElasticService.updateAllVectorIndex(request);
+        chunkVectorService.updateAllVectorIndex(request);
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
     }
