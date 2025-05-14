@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-01 14:15:27
+ * @LastEditTime: 2025-05-14 12:17:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,44 +40,44 @@ public class FaqExcel {
     @ColumnWidth(20)
     private String answer;
 
-    // tagList
+    @ExcelProperty(value = "状态")
+    @ColumnWidth(15)
+    private String status;
+
+    @ExcelProperty(value = "向量状态")
+    @ColumnWidth(15)
+    private String vectorStatus;
+
     @ExcelProperty(value = "标签")
     @ColumnWidth(20)
     private String tagList;
 
-    // clickCount
     @ExcelProperty(value = "点击次数")
     @ColumnWidth(20)
     private int clickCount;
 
-    // upCount
     @ExcelProperty(value = "点赞次数")
     @ColumnWidth(20)
     private int upCount;
 
-    // downCount
     @ExcelProperty(value = "点踩次数")
     @ColumnWidth(20)
     private int downCount;
 
-    // enabled
     @ExcelProperty(value = "是否启用")   
     @ColumnWidth(20)
     private String enabled;
 
-    // startDate
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "有效开始日期")
     @ColumnWidth(25)
     private LocalDateTime startDate;
 
-    // endDate
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "有效结束日期")
     @ColumnWidth(25)
     private LocalDateTime endDate;
 
-    // answerList
     @ExcelProperty(value = "扩展问答")
     @ColumnWidth(20)
     private String answerList;

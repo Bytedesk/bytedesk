@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-22 22:12:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:07:15
+ * @LastEditTime: 2025-05-14 12:16:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,10 @@
  */
 package com.bytedesk.kbase.llm_file;
 
+import java.time.LocalDateTime;
+
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import lombok.Data;
@@ -40,31 +43,34 @@ public class FileExcel {
     @ColumnWidth(15)
     private String status;
 
-    // @ExcelProperty(value = "分类")
-    // @ColumnWidth(20)
-    // private String categoryUid;
+    @ExcelProperty(value = "向量状态")
+    @ColumnWidth(15)
+    private String vectorStatus;
 
-    // @ExcelProperty(value = "知识库")
-    // @ColumnWidth(20)
-    // private String kbUid;
+   @ExcelProperty(value = "标签")
+    @ColumnWidth(20)
+    private String tagList;
 
-    // @ExcelProperty(value = "上传ID")
-    // @ColumnWidth(32)
-    // private String uploadUid;
+    @ExcelProperty(value = "是否启用")   
+    @ColumnWidth(20)
+    private String enabled;
 
-    // @ExcelProperty(value = "用户ID")
-    // @ColumnWidth(32)
-    // private String userUid;
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "有效开始日期")
+    @ColumnWidth(25)
+    private LocalDateTime startDate;
 
-    // @ExcelProperty(value = "文档ID列表")
-    // @ColumnWidth(50)
-    // private String docIdList;
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "有效结束日期")
+    @ColumnWidth(25)
+    private LocalDateTime endDate;
 
+    @ExcelProperty(value = "知识库")
+    @ColumnWidth(20)
+    private String kbaseName;
+
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
-    @ColumnWidth(20)
-    private String createdAt;
-
-    @ExcelProperty(value = "更新时间")
-    @ColumnWidth(20)
-    private String updatedAt;
+    @ColumnWidth(25)
+    private LocalDateTime createdAt;
 }
