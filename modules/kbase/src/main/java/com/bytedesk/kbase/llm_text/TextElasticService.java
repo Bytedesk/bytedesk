@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -157,6 +158,9 @@ public class TextElasticService {
         }
         
         try {
+            // 转义正则表达式特殊字符
+            query = Pattern.quote(query);
+
             // 构建查询条件
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
             
@@ -238,9 +242,10 @@ public class TextElasticService {
                         int end = Math.min(content.length(), index + query.length() + 50);
                         String snippet = content.substring(start, end);
                         
-                        // 添加高亮标记
+                        // 添加高亮标记 - 对特殊正则表达式字符进行转义
+                        String queryEscaped = Pattern.quote(query);
                         String highlighted = snippet.replaceAll(
-                            "(?i)" + query,
+                            "(?i)" + queryEscaped,
                             "<em>" + query + "</em>"
                         );
                         
@@ -257,8 +262,9 @@ public class TextElasticService {
                 if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (title.toLowerCase().contains(query.toLowerCase())) {
+                        String queryEscaped = Pattern.quote(query);
                         String highlighted = title.replaceAll(
-                            "(?i)" + query,
+                            "(?i)" + queryEscaped,
                             "<em>" + query + "</em>"
                         );
                         result.setHighlightedName(highlighted);
@@ -295,6 +301,9 @@ public class TextElasticService {
         }
         
         try {
+            // 转义正则表达式特殊字符
+            query = Pattern.quote(query);
+
             // 构建查询条件
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
             
@@ -383,9 +392,10 @@ public class TextElasticService {
                         int end = Math.min(content.length(), index + query.length() + 50);
                         String snippet = content.substring(start, end);
                         
-                        // 添加高亮标记
+                        // 添加高亮标记 - 对特殊正则表达式字符进行转义
+                        String queryEscaped = Pattern.quote(query);
                         String highlighted = snippet.replaceAll(
-                            "(?i)" + query,
+                            "(?i)" + queryEscaped,
                             "<em>" + query + "</em>"
                         );
                         
@@ -402,8 +412,9 @@ public class TextElasticService {
                 if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (title.toLowerCase().contains(query.toLowerCase())) {
+                        String queryEscaped = Pattern.quote(query);
                         String highlighted = title.replaceAll(
-                            "(?i)" + query,
+                            "(?i)" + queryEscaped,
                             "<em>" + query + "</em>"
                         );
                         result.setHighlightedName(highlighted);
