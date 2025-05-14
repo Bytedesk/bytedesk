@@ -83,6 +83,15 @@
 		</dependency>
 
 
+		<!-- vector store -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-elasticsearch -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
 
 		<!-- mcp -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
