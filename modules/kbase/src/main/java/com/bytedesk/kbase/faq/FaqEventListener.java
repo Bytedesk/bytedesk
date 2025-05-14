@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 17:45:06
+ * @LastEditTime: 2025-05-14 13:45:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,6 @@ public class FaqEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
-
         if (UploadTypeEnum.FAQ.name().equalsIgnoreCase(upload.getType())) {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
@@ -83,6 +82,7 @@ public class FaqEventListener {
         log.info("FaqEventListener onFaqCreateEvent: {}", faq.getQuestion());
         // 仅做全文索引
         faqService.indexFaq(faq);
+        // TODO: 向量索引
     }
 
     // Faq仅用于全文搜索
@@ -92,6 +92,7 @@ public class FaqEventListener {
         log.info("FaqEventListener FaqUpdateDocEvent: {}", faq.getQuestion());
         // 更新全文索引
         faqService.indexFaq(faq);
+        // TODO: 向量索引
     }
 
     @EventListener

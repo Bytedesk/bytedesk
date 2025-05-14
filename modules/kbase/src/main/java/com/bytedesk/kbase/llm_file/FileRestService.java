@@ -29,9 +29,11 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.llm_file.event.FileUpdateDocEvent;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -49,6 +51,8 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     private final KbaseRestService kbaseRestService;
 
     private final UploadRestService uploadRestService;
+    
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     public Page<FileEntity> queryByOrgEntity(FileRequest request) {
@@ -113,6 +117,14 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
         Optional<FileEntity> optional = fileRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             FileEntity entity = optional.get();
+            
+            // 判断文件内容是否有变化，如果有变化，发布UpdateDocEvent事件
+            if (entity.hasChanged(request)) {
+                // 发布事件，更新文档
+                FileUpdateDocEvent fileUpdateDocEvent = new FileUpdateDocEvent(entity);
+                bytedeskEventPublisher.publishEvent(fileUpdateDocEvent);
+            }
+            
             // modelMapper.map(request, entity);
             entity.setFileName(request.getFileName());
             entity.setContent(request.getContent());

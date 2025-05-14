@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,47 @@ public class TextElasticService {
 
     @Autowired
     private TextRestService textRestService;
+    
+    // update elasticsearch index
+    public void updateIndex(TextRequest request) {
+        Optional<TextEntity> textOpt = textRestService.findByUid(request.getUid());
+        if (textOpt.isPresent()) {
+            TextEntity text = textOpt.get();
+            indexText(text);
+        } else {
+            throw new IllegalArgumentException("Text not found with UID: " + request.getUid());
+        }
+    }
+
+    // update elasticsearch vector index
+    public void updateVectorIndex(TextRequest request) {
+        Optional<TextEntity> textOpt = textRestService.findByUid(request.getUid());
+        if (textOpt.isPresent()) {
+            // TODO: Implement vector indexing logic here
+            log.info("Vector index functionality not implemented yet for Text: {}", request.getUid());
+        } else {
+            throw new IllegalArgumentException("Text not found with UID: " + request.getUid());
+        }
+    }
+
+    // update all elasticsearch index
+    public void updateAllIndex(TextRequest request) {
+        List<TextEntity> textList = textRestService.findByKbUid(request.getKbUid());
+        textList.forEach(text -> {
+            indexText(text);
+        });
+        log.info("Updated elasticsearch index for {} texts from knowledge base: {}", textList.size(), request.getKbUid());
+    }
+
+    // update all elasticsearch vector index
+    public void updateAllVectorIndex(TextRequest request) {
+        List<TextEntity> textList = textRestService.findByKbUid(request.getKbUid());
+        textList.forEach(text -> {
+            // TODO: Implement vector indexing logic here
+            log.info("Vector index functionality not implemented yet for Text: {}", text.getUid());
+        });
+        log.info("Vector indexing requested for {} texts from knowledge base: {}", textList.size(), request.getKbUid());
+    }
     
     /**
      * 索引Text实体到Elasticsearch

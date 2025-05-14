@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:47:08
+ * @LastEditTime: 2025-05-14 13:37:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -31,6 +31,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,13 +40,47 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FaqElasticService {
         
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchOperations elasticsearchOperations;
 
-    @Autowired
-    private FaqRestService faqRestService;
+    private final FaqRestService faqRestService;
+
+    // update elasticsearch index
+    public void updateIndex(FaqRequest request) {
+        Optional<FaqEntity> faqOpt = faqRestService.findByUid(request.getUid());
+        if (faqOpt.isPresent()) {
+            FaqEntity faq = faqOpt.get();
+            indexFaq(faq);
+        } else {
+            throw new IllegalArgumentException("FAQ not found with UID: " + request.getUid());
+        }
+    }
+
+    // update elasticsearch vector index
+    public void updateVectorIndex(FaqRequest request) {
+        Optional<FaqEntity> faqOpt = faqRestService.findByUid(request.getUid());
+        if (faqOpt.isPresent()) {
+            // TODO: Implement vector indexing logic here
+        }
+    }
+
+    // update all elasticsearch index
+    public void updateAllIndex(FaqRequest request) {
+        List<FaqEntity> faqList = faqRestService.findByKbUid(request.getKbUid());
+        faqList.forEach(faq -> {
+            indexFaq(faq); 
+        });
+    }
+
+    // update all elasticsearch vector index
+    public void updateAllVectorIndex(FaqRequest request) {
+        List<FaqEntity> faqList = faqRestService.findByKbUid(request.getKbUid());
+        faqList.forEach(faq -> {
+            // TODO: Implement vector indexing logic here
+        });
+    }
     
     /**
      * 索引QA实体到Elasticsearch
