@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:27:17
+ * @LastEditTime: 2025-05-14 10:54:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -117,8 +117,6 @@ public class FileEntity extends BaseEntity {
     // @Column(name = "is_llm_Chunk_deleted")
     // private boolean llmChunkDeleted = false;
 
-   
-
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();
 
@@ -142,4 +140,17 @@ public class FileEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
+
+
+    // set Success
+    public FileEntity setSuccess() {
+        this.setStatus(ChunkStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    // set Error
+    public FileEntity setError() {
+        this.setStatus(ChunkStatusEnum.ERROR.name());
+        return this;
+    }
 }
