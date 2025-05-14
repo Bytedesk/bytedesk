@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 10:01:19
+ * @LastEditTime: 2025-05-14 10:04:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,14 +20,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.demo.bytedesk.SpringAIBytedeskService;
-import com.bytedesk.ai.demo.utils.FileContent;
+// import com.bytedesk.ai.demo.utils.FileContent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
@@ -82,11 +80,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
     private final CategoryRestService categoryService;
 
-    private final SpringAIBytedeskService springAIBytedeskService;
+    // private final SpringAIBytedeskService springAIBytedeskService;
 
-    private final StringRedisTemplate stringRedisTemplate;
-
-    // private final Optional<SpringAIVectorStoreService> springAIVectorService;
+    // private final StringRedisTemplate stringRedisTemplate;
 
     private final LlmProviderRestService llmProviderRestService;
 
