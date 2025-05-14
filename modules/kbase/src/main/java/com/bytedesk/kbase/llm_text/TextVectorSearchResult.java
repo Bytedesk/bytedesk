@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,49 +30,29 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextVectorSearchResult {
+public class TextVectorSearchResult implements Serializable {
     
-    // 文本的唯一标识
-    private String uid;
+    private static final long serialVersionUID = 1L;
     
-    // 文本标题
-    private String title;
-    
-    // 向量文档内容
-    private String content;
+    private TextVector textVector;
     
     // 相似度分数
     @Builder.Default
     private double score = 0.0;
-    
-    // 知识库UID
-    private String kbUid;
-    
-    // 分类UID
-    private String categoryUid;
-    
-    // 组织UID
-    private String orgUid;
-    
-    // 文本类型
-    private String type;
-    
-    // 标签列表
-    @Builder.Default
-    private List<String> tagList = new ArrayList<>();
     
     /**
      * 获取去除标题的纯内容部分
      * @return 内容部分（去除标题）
      */
     public String getPureContent() {
-        if (content == null || content.isEmpty() || !content.contains("\n\n")) {
-            return content;
+        if (textVector == null || textVector.getContent() == null || 
+            textVector.getContent().isEmpty() || !textVector.getContent().contains("\n\n")) {
+            return textVector != null ? textVector.getContent() : "";
         }
         
         // 以双换行符分割，获取内容部分（忽略标题）
-        String[] parts = content.split("\n\n", 2);
-        return parts.length > 1 ? parts[1] : content;
+        String[] parts = textVector.getContent().split("\n\n", 2);
+        return parts.length > 1 ? parts[1] : textVector.getContent();
     }
     
     /**
@@ -85,5 +66,61 @@ public class TextVectorSearchResult {
             return pureContent;
         }
         return pureContent.substring(0, maxLength) + "...";
+    }
+    
+    /**
+     * 便捷方法：获取文本标题
+     */
+    public String getTitle() {
+        return textVector != null ? textVector.getTitle() : null;
+    }
+    
+    /**
+     * 便捷方法：获取文本内容
+     */
+    public String getContent() {
+        return textVector != null ? textVector.getContent() : null;
+    }
+    
+    /**
+     * 便捷方法：获取文本唯一标识
+     */
+    public String getUid() {
+        return textVector != null ? textVector.getUid() : null;
+    }
+    
+    /**
+     * 便捷方法：获取知识库UID
+     */
+    public String getKbUid() {
+        return textVector != null ? textVector.getKbUid() : null;
+    }
+    
+    /**
+     * 便捷方法：获取分类UID
+     */
+    public String getCategoryUid() {
+        return textVector != null ? textVector.getCategoryUid() : null;
+    }
+    
+    /**
+     * 便捷方法：获取组织UID
+     */
+    public String getOrgUid() {
+        return textVector != null ? textVector.getOrgUid() : null;
+    }
+    
+    /**
+     * 便捷方法：获取文本类型
+     */
+    public String getType() {
+        return textVector != null ? textVector.getType() : null;
+    }
+    
+    /**
+     * 便捷方法：获取标签列表
+     */
+    public List<String> getTagList() {
+        return textVector != null ? textVector.getTagList() : new ArrayList<>();
     }
 }

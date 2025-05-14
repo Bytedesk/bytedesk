@@ -232,30 +232,85 @@ public class FaqVectorService {
         List<FaqVectorSearchResult> resultList = new ArrayList<>();
         
         for (Document doc : similarDocuments) {
-            FaqVectorSearchResult result = new FaqVectorSearchResult();
-            
-            // 设置基本属性
+            // 从文档中提取元数据
             Map<String, Object> metadata = doc.getMetadata();
-            result.setUid((String) metadata.getOrDefault("uid", ""));
-            result.setQuestion((String) metadata.getOrDefault("question", ""));
-            result.setContent(doc.getText());
-            result.setScore(doc.getScore());
+            String uid = (String) metadata.getOrDefault("uid", "");
             
-            // 从元数据中提取其他属性
-            result.setKbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""));
-            result.setCategoryUid((String) metadata.getOrDefault("categoryUid", ""));
-            result.setOrgUid((String) metadata.getOrDefault("orgUid", ""));
-            
-            // 从标签字符串还原为列表
-            String tagsStr = (String) metadata.getOrDefault("tags", "");
-            if (tagsStr != null && !tagsStr.isEmpty()) {
-                result.setTagList(List.of(tagsStr.split(",")));
+            // 1. 通过UID查找对应的FAQ实体，以便获取完整信息
+            Optional<FaqEntity> faqEntityOpt = faqRestService.findByUid(uid);
+            if (faqEntityOpt.isPresent()) {
+                FaqEntity faqEntity = faqEntityOpt.get();
+                
+                // 2. 将FaqEntity转换为FaqVector
+                FaqVector faqVector = FaqVector.fromFaqEntity(faqEntity);
+                
+                // 3. 创建搜索结果对象
+                FaqVectorSearchResult result = FaqVectorSearchResult.builder()
+                    .faqVector(faqVector)
+                    .score(doc.getScore().floatValue())
+                    .highlightedQuestion(faqVector.getQuestion()) // 如果需要高亮可以在这里处理
+                    .distance((float) (1.0 - doc.getScore().doubleValue())) // 将相似度转换为距离，距离 = 1 - 相似度
+                    .build();
+                
+                resultList.add(result);
+            } else {
+                // 如果找不到对应的FAQ实体，尝试从文档元数据构建一个简化的FaqVector
+                FaqVector simpleFaqVector = createSimpleFaqVectorFromDocument(doc);
+                
+                FaqVectorSearchResult result = FaqVectorSearchResult.builder()
+                    .faqVector(simpleFaqVector)
+                    .score(doc.getScore().floatValue())
+                    .highlightedQuestion((String) metadata.getOrDefault("question", ""))
+                    .distance((float) (1.0 - doc.getScore().doubleValue())) // 同上
+                    .build();
+                
+                resultList.add(result);
             }
-            
-            resultList.add(result);
         }
         
         return resultList;
+    }
+    
+    /**
+     * 从文档创建简化版的FaqVector对象
+     * 用于在找不到对应的FAQ实体时提供基础信息
+     * @param doc 文档对象
+     * @return 简化的FaqVector对象
+     */
+    private FaqVector createSimpleFaqVectorFromDocument(Document doc) {
+        Map<String, Object> metadata = doc.getMetadata();
+        
+        // 提取元数据
+        String uid = (String) metadata.getOrDefault("uid", "");
+        String question = (String) metadata.getOrDefault("question", "");
+        String content = doc.getText();
+        String answer = "";
+        
+        // 从内容中提取答案（通常问题和答案用换行符分隔）
+        if (content != null && content.contains("\n")) {
+            String[] parts = content.split("\n", 2);
+            answer = parts.length > 1 ? parts[1] : "";
+        }
+        
+        // 处理标签
+        String tagsStr = (String) metadata.getOrDefault("tags", "");
+        List<String> tagList = new ArrayList<>();
+        if (tagsStr != null && !tagsStr.isEmpty()) {
+            tagList = List.of(tagsStr.split(","));
+        }
+        
+        // 创建FaqVector对象
+        return FaqVector.builder()
+            .uid(uid)
+            .question(question)
+            .answer(answer)
+            .questionList(new ArrayList<>()) // 空列表，因为文档中可能没有这个信息
+            .tagList(tagList)
+            .orgUid((String) metadata.getOrDefault("orgUid", ""))
+            .kbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""))
+            .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
+            .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
+            .build();
     }
     
     /**

@@ -234,26 +234,40 @@ public class TextVectorService {
         List<TextVectorSearchResult> resultList = new ArrayList<>();
         
         for (Document doc : similarDocuments) {
-            TextVectorSearchResult result = new TextVectorSearchResult();
-            
-            // 设置基本属性
+            // 从文档元数据构建 TextVector 对象
             Map<String, Object> metadata = doc.getMetadata();
-            result.setUid((String) metadata.getOrDefault("uid", ""));
-            result.setTitle((String) metadata.getOrDefault("title", ""));
-            result.setContent(doc.getText());
-            result.setScore(doc.getScore());
-            
-            // 从元数据中提取其他属性
-            result.setKbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""));
-            result.setCategoryUid((String) metadata.getOrDefault("categoryUid", ""));
-            result.setOrgUid((String) metadata.getOrDefault("orgUid", ""));
-            result.setType((String) metadata.getOrDefault("type", ""));
+            String docUid = (String) metadata.getOrDefault("uid", "");
+            String docTitle = (String) metadata.getOrDefault("title", "");
+            String docContent = doc.getText();
+            String docType = (String) metadata.getOrDefault("type", "");
+            String docKbUid = (String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, "");
+            String docCategoryUid = (String) metadata.getOrDefault("categoryUid", "");
+            String docOrgUid = (String) metadata.getOrDefault("orgUid", "");
             
             // 从标签字符串还原为列表
             String tagsStr = (String) metadata.getOrDefault("tags", "");
+            List<String> tagList = new ArrayList<>();
             if (tagsStr != null && !tagsStr.isEmpty()) {
-                result.setTagList(List.of(tagsStr.split(",")));
+                tagList = List.of(tagsStr.split(","));
             }
+            
+            // 构建 TextVector 对象
+            TextVector textVector = TextVector.builder()
+                .uid(docUid)
+                .title(docTitle)
+                .content(docContent)
+                .type(docType)
+                .kbUid(docKbUid)
+                .categoryUid(docCategoryUid)
+                .orgUid(docOrgUid)
+                .tagList(tagList)
+                .build();
+            
+            // 构建搜索结果对象
+            TextVectorSearchResult result = TextVectorSearchResult.builder()
+                .textVector(textVector)
+                .score(doc.getScore())
+                .build();
             
             resultList.add(result);
         }

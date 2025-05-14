@@ -31,16 +31,20 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.faq.FaqElastic;
 import com.bytedesk.kbase.faq.FaqElasticSearchResult;
 import com.bytedesk.kbase.faq.FaqProtobuf;
+import com.bytedesk.kbase.faq.FaqVectorSearchResult;
+import com.bytedesk.kbase.faq.FaqVectorService;
 import com.bytedesk.kbase.llm_chunk.ChunkElastic;
 import com.bytedesk.kbase.llm_chunk.ChunkElasticSearchResult;
 import com.bytedesk.kbase.llm_chunk.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.ChunkProtobuf;
+import com.bytedesk.kbase.llm_chunk.ChunkVectorService;
 // import com.bytedesk.kbase.llm_chunk.ChunkProtobuf;
 import com.bytedesk.kbase.faq.FaqElasticService;
 import com.bytedesk.kbase.llm_text.TextElastic;
 import com.bytedesk.kbase.llm_text.TextElasticSearchResult;
 import com.bytedesk.kbase.llm_text.TextElasticService;
 import com.bytedesk.kbase.llm_text.TextProtobuf;
+import com.bytedesk.kbase.llm_text.TextVectorService;
 
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson2.JSON;
@@ -49,16 +53,22 @@ import com.alibaba.fastjson2.JSON;
 public abstract class BaseSpringAIService implements SpringAIService {
 
     @Autowired
-    protected SpringAIVectorStoreService springAIVectorService;
+    protected FaqElasticService faqElasticService;
 
     @Autowired
-    protected FaqElasticService faqElasticService;
+    protected FaqVectorService faqVectorService;
 
     @Autowired
     protected TextElasticService textElasticService;
 
     @Autowired
+    protected TextVectorService textVectorService;
+
+    @Autowired
     protected ChunkElasticService chunkElasticService;
+
+    @Autowired
+    protected ChunkVectorService chunkVectorService;
 
     @Autowired
     protected IMessageSendService messageSendService;
@@ -88,7 +98,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // 可以保留一个带参数的构造函数用于单元测试或特殊情况
     protected BaseSpringAIService(SpringAIVectorStoreService springAIVectorService,
             IMessageSendService messageSendService) {
-        this.springAIVectorService = springAIVectorService;
+        // this.springAIVectorService = springAIVectorService;
         this.messageSendService = messageSendService;
     }
 
@@ -217,17 +227,26 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     private void executeVectorSearch(String query, String kbUid, List<String> searchContentList,
             List<FaqProtobuf> faqProtobufList) {
-        List<String> contentList = springAIVectorService.searchText(query, kbUid);
-        searchContentList.addAll(contentList);
-
-        for (String content : contentList) {
-            FaqProtobuf faqProtobuf = FaqProtobuf.builder()
-                    .uid(uidUtils.getUid())
-                    .question(query)
-                    .answer(content)
-                    .build();
-            faqProtobufList.add(faqProtobuf);
+        List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
+        for (FaqVectorSearchResult withScore : searchResults) {
+            
         }
+        
+
+        // List<String> contentList = springAIVectorService.searchText(query, kbUid);
+        // searchContentList.addAll(contentList);
+
+        // for (String content : contentList) {
+        //     FaqProtobuf faqProtobuf = FaqProtobuf.builder()
+        //             .uid(uidUtils.getUid())
+        //             .question(query)
+        //             .answer(content)
+        //             .build();
+        //     faqProtobufList.add(faqProtobuf);
+        // }
+        
+
+        
     }
 
     private void processLlmResponse(String query, List<String> searchContentList, RobotProtobuf robot,
