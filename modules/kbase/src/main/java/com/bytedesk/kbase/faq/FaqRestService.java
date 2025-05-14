@@ -172,7 +172,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     @Cacheable(value = "faq", key = "#kbUid", unless = "#result == null")
     public List<FaqEntity> findByKbUid(String kbUid) {
-        return faqRepository.findByKbase_Uid(kbUid);
+        return faqRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
     @Cacheable(value = "faq", key = "#question", unless = "#result == null")

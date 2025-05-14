@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:06:09
+ * @LastEditTime: 2025-05-14 11:11:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,9 +88,18 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(ChunkRequest request) {
 
-        chunkRestService.delateAll(request);
-        
+        chunkRestService.deleteAll(request);
+
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // enable/disable chunk
+    @PostMapping("/enable")
+    public ResponseEntity<?> enable(ChunkRequest request) {
+
+        ChunkResponse chunk = chunkRestService.enable(request);
+
+        return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
     // @PreAuthorize("hasAuthority('KBASE_EXPORT')")

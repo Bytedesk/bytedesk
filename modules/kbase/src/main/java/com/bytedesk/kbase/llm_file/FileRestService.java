@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:54:54
+ * @LastEditTime: 2025-05-14 11:13:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_file;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -71,6 +72,11 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     @Override
     public Optional<FileEntity> findByUid(String uid) {
         return fileRepository.findByUid(uid);
+    }
+
+    @Cacheable(value = "file", key = "#kbUid", unless = "#result==null")
+    public List<FileEntity> findByKbUid(String kbUid) {
+        return fileRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
     @Override
@@ -181,6 +187,34 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     @Override
     public void delete(FileRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    // deleteAll
+    public void deleteAll(FileRequest request) {
+        List<FileEntity> files = findByKbUid(request.getKbUid());
+        if (files != null && !files.isEmpty()) {
+            for (FileEntity file : files) {
+                file.setDeleted(true);
+                save(file);
+            }
+        }
+    }
+
+    // enable/disable file
+    public FileResponse enable(FileRequest request) { 
+        Optional<FileEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            FileEntity entity = optional.get();
+            entity.setEnabled(request.getEnabled());
+            // 
+            FileEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Enable/Disable file failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("File not found");
+        }
     }
 
     @Override
