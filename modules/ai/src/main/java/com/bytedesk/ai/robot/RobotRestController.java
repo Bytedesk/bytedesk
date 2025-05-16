@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 13:03:51
+ * @LastEditTime: 2025-05-16 09:52:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
 
-// import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,13 +36,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 // @Tag(name = "robot", description = "robot description")
 public class RobotRestController extends BaseRestController<RobotRequest> {
 
-    private final RobotRestService robotService;
+    private final RobotRestService robotRestService;
 
     // @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
-        Page<RobotResponse> page = robotService.queryByOrg(request);
+        Page<RobotResponse> page = robotRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -52,7 +51,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @Override
     public ResponseEntity<?> queryByUser(RobotRequest request) {
         
-        Page<RobotResponse> page = robotService.queryByUser(request);
+        Page<RobotResponse> page = robotRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -61,7 +60,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @Override
     public ResponseEntity<?> queryByUid(RobotRequest request) {
 
-        RobotResponse robot = robotService.queryByUid(request.getUid());
+        RobotResponse robot = robotRestService.queryByUid(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success(robot));
     }
@@ -71,7 +70,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
 
-        RobotResponse robot = robotService.create(request);
+        RobotResponse robot = robotRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(robot));
     }
@@ -82,7 +81,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/create/llm/thread")
     public ResponseEntity<?> createLlmThread(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = robotService.createLlmThread(request);
+        ThreadResponse thread = robotRestService.createLlmThread(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
@@ -92,7 +91,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/update/llm/thread")
     public ResponseEntity<?> updateLlmThread(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = robotService.updateLlmThread(request);
+        ThreadResponse thread = robotRestService.updateLlmThread(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }
@@ -103,7 +102,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/create/prompt")
     public ResponseEntity<?> createPromptRobot(@RequestBody RobotRequest request) {
         //
-        RobotResponse robot = robotService.createPromptRobot(request);
+        RobotResponse robot = robotRestService.createPromptRobot(request);
 
         return ResponseEntity.ok(JsonResult.success(robot));
     }
@@ -113,7 +112,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody RobotRequest request) {
 
-        RobotResponse robotResponse = robotService.update(request);
+        RobotResponse robotResponse = robotRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
@@ -124,7 +123,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody RobotRequest request) {
 
-        RobotResponse robotResponse = robotService.updateAvatar(request);
+        RobotResponse robotResponse = robotRestService.updateAvatar(request);
         
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
@@ -136,7 +135,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/update/prompt")
     public ResponseEntity<?> updatePromptRobot(@RequestBody RobotRequest request) {
 
-        RobotResponse robotResponse = robotService.updatePromptRobot(request);
+        RobotResponse robotResponse = robotRestService.updatePromptRobot(request);
 
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
@@ -147,7 +146,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PostMapping("/update/kbUid")
     public ResponseEntity<?> updateKbUid(@RequestBody RobotRequest request) {
         
-        RobotResponse robotResponse = robotService.updateKbUid(request);
+        RobotResponse robotResponse = robotRestService.updateKbUid(request);
 
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
@@ -157,7 +156,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
         
-        robotService.delete(request);
+        robotRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success(request));
     }
