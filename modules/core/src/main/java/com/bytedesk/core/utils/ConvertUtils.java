@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 16:53:08
+ * @LastEditTime: 2025-05-16 18:25:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -112,23 +112,23 @@ public class ConvertUtils {
         // threadResponse.setAgent(agent);
         // }
         // agent
-        if (thread.getAgent() != null) {
-            UserProtobuf agent = UserProtobuf.fromJson(thread.getAgent());
-            threadResponse.setAgentProtobuf(agent);
-        }
+        // if (thread.getAgent() != null) {
+        //     UserProtobuf agent = UserProtobuf.fromJson(thread.getAgent());
+        //     threadResponse.setAgentProtobuf(agent);
+        // }
         if (thread.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
             threadResponse.setUser(user);
         }
         // robot
-        if (thread.getRobot() != null) {
-            UserProtobuf robot = UserProtobuf.fromJson(thread.getRobot());
-            threadResponse.setRobotProtobuf(robot);
-        }
-        if (thread.getWorkgroup() != null) {
-            UserProtobuf workgroup = UserProtobuf.fromJson(thread.getWorkgroup());
-            threadResponse.setWorkgroup(workgroup);
-        }
+        // if (thread.getRobot() != null) {
+        //     UserProtobuf robot = UserProtobuf.fromJson(thread.getRobot());
+        //     threadResponse.setRobotProtobuf(robot);
+        // }
+        // if (thread.getWorkgroup() != null) {
+        //     UserProtobuf workgroup = UserProtobuf.fromJson(thread.getWorkgroup());
+        //     threadResponse.setWorkgroup(workgroup);
+        // }
         if (thread.getInvites() != null) {
             // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
             for (String invite : thread.getInvites()) {
