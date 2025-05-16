@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 15:52:33
+ * @LastEditTime: 2025-05-16 16:50:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -231,7 +231,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         if (response.getThread() != null) {
             excel.setVisitorNickname(response.getThread().getUser().getNickname());
             excel.setAgentNickname(response.getThread().getAgentProtobuf().getNickname());
-            excel.setRobotNickname(response.getThread().getRobot().getNickname());
+            excel.setRobotNickname(response.getThread().getRobotProtobuf().getNickname());
             // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
             excel.setStatus(ThreadProcessStatusEnum.fromValue(response.getThread().getStatus()).toChineseDisplay());
             excel.setClient(ClientEnum.fromValue(response.getThread().getClient()).toChineseDisplay());
