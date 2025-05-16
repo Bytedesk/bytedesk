@@ -63,10 +63,4 @@ public class PushEntity extends BaseEntity {
 
     @Builder.Default
     private String client = ClientEnum.WEB.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
-
-    // 修改邮箱、手机号需要记录用户uid和组织uid
-    // private String userUid;
 }

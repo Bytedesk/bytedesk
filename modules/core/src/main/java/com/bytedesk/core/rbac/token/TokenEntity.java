@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:25:40
+ * @LastEditTime: 2025-05-16 10:20:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,12 +11,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.token;
+package com.bytedesk.core.rbac.token;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.enums.ClientEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -56,8 +57,9 @@ public class TokenEntity extends BaseEntity {
 
     private String refreshToken;
 
+    @Builder.Default
     @Column(name = "token_type")
-    private String type;
+    private String type = TokenTypeEnum.LOGIN.name();
 
     private LocalDateTime expiresAt;
 
@@ -65,24 +67,11 @@ public class TokenEntity extends BaseEntity {
     @Column(name = "is_revoked")
     private boolean revoked = false;
 
-    // user, no need map, just uid
-    // @NotBlank
-    // @Column(nullable = false)
-    // private String userUid;
-
-    // current auth clientIds
-    // @Builder.Default
-    // @Convert(converter = StringSetConverter.class)
-    // private Set<String> clientIds = new HashSet<>();
-
-    // 生成token
-    public String generateToken() {
-        return UUID.randomUUID().toString();
-    }
+    @Builder.Default
+    private String client = ClientEnum.WEB.name();
 
     // 验证token是否有效
     public boolean isValid() {
-        // return !revoked && expiresAt.after(LocalDateTime.now());
         return !revoked && expiresAt.isAfter(LocalDateTime.now());
     }
 
