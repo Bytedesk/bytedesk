@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-01 09:17:17
+ * @LastEditTime: 2025-05-16 16:20:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,9 +55,6 @@ public class ThreadRequest extends BaseRequest {
     @Builder.Default
     private Boolean unread = false;
 
-    // @Builder.Default
-    // private Integer queueNumber = 0;
-
     @Builder.Default
     private Integer unreadCount = 0;
 
@@ -75,10 +72,6 @@ public class ThreadRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean autoClose = false;
-
-    // 是否机器人
-    // @Builder.Default
-    // private Boolean robot = false;
 
     // 备注
     private String note;
@@ -144,8 +137,9 @@ public class ThreadRequest extends BaseRequest {
     // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
     private String agent;
 
-    private String workgroup;
+    private String robot;
 
+    private String workgroup;
 
     // 流程实例ID
     private String processInstanceId;

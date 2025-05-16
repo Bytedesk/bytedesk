@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 10:12:20
+ * @LastEditTime: 2025-05-16 16:23:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -167,7 +167,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (owner == null) {
             throw new RuntimeException("should login first");
         }
-        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getAgent()); 
+        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getRobot()); 
         String robotUid = robotProtobuf.getUid();
         if (!StringUtils.hasText(robotUid)) {
             throw new RuntimeException("robotUid is required");
