@@ -112,6 +112,8 @@ public class ThreadResponse extends BaseResponse {
 
     private UserProtobuf robot;
 
+    private UserProtobuf robotProtobuf;
+
     private UserProtobuf workgroup;
 
     // 流程实例ID
