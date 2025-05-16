@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 16:59:26
+ * @LastEditTime: 2025-05-16 18:24:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -109,15 +109,32 @@ public class ThreadResponse extends BaseResponse {
     private String agent;
 
     // private UserProtobuf agentProtobuf;
-    private UserProtobuf getAgentPr
+    public UserProtobuf getAgentProtobuf() {
+        if (agent == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(agent);
+    }
 
     private String robot;
 
-    private UserProtobuf robotProtobuf;
+    // private UserProtobuf robotProtobuf;
+    public UserProtobuf getRobotProtobuf() {
+        if (robot == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(robot);
+    }
 
-    private UserProtobuf workgroup;
+    private String workgroup;
 
-    private UserProtobuf workgroupProtobuf;
+    // private UserProtobuf workgroupProtobuf;
+    public UserProtobuf getWorkgroupProtobuf() {
+        if (workgroup == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(workgroup);
+    }
 
     // 流程实例ID
     private String processInstanceId;
