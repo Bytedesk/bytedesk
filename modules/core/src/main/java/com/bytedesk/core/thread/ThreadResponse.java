@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:49:31
+ * @LastEditTime: 2025-05-16 16:59:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,7 +108,8 @@ public class ThreadResponse extends BaseResponse {
     // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
     private String agent;
 
-    private UserProtobuf agentProtobuf;
+    // private UserProtobuf agentProtobuf;
+    private UserProtobuf getAgentPr
 
     private String robot;
 
