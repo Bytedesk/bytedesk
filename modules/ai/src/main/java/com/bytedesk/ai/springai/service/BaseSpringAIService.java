@@ -22,9 +22,11 @@ import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -89,6 +91,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired
     protected RobotMessageCache robotMessageCache;
 
+    @Autowired
+    protected MessageRestService messageRestService;
+
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
@@ -112,11 +117,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         String prompt = "";
         if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            // List<String> contentList = "";// springAIVectorService.searchText(query, robot.getKbUid());
-            // TODO: 根据配置，拉取历史聊天记录
-            String history = "";
             String context = String.join("\n", "");
-            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
+            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
         } else {
             prompt = robot.getLlm().getPrompt();
         }
@@ -271,17 +273,42 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
-        // TODO: 根据配置，拉取历史聊天记录
-        
 
-        String history = "";
-        String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
-        // TODO: 返回消息中携带消息搜索结果(来源依据)
+        String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
         //
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
         messages.add(new UserMessage(query));
         log.info("BaseSpringAIService createAndProcessPrompt messages {}", messages);
+
+        // 根据配置，拉取历史聊天记录        
+        if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0) {
+            // 从缓存中获取最近的消息
+            String threadTopic = messageProtobufQuery.getThread().getTopic();
+            int limit = robot.getLlm().getContextMsgCount();
+            List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
+            for (MessageEntity messageEntity : recentMessages) {
+                // 将消息添加到消息列表
+                if (messageEntity.isFromVisitor() 
+                    || messageEntity.isFromUser() 
+                    || messageEntity.isFromMember()) {
+                    // 访客消息
+                    messages.add(new UserMessage(messageEntity.getContent()));
+                } else if (messageEntity.isFromRobot()) {
+                    // 机器人消息
+                    messages.add(new SystemMessage(messageEntity.getContent()));
+                } else if (messageEntity.isFromAgent()) {
+                    // 客服消息
+                    messages.add(new SystemMessage(messageEntity.getContent()));
+                } else if (messageEntity.isFromSystem()) {
+                    // 系统消息
+                    messages.add(new SystemMessage(messageEntity.getContent()));
+                } else {
+                    // 其他类型的消息
+                    messages.add(new SystemMessage(messageEntity.getContent()));
+                }
+            }
+        }
         //
         Prompt aiPrompt = new Prompt(messages);
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
@@ -410,13 +437,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 //
                 .build();
         robotMessageCache.pushRequest(robotMessage);
-
     }
 
-    public String buildKbPrompt(String systemPrompt, String query, String history, String context) {
+    public String buildKbPrompt(String systemPrompt, String query, String context) {
         return systemPrompt + "\n" +
-                "用户查询: " + query + "\n" +
-                "历史聊天记录: " + history + "\n" +
+                "用户提问: " + query + "\n" +
                 "搜索结果: " + context;
     }
 

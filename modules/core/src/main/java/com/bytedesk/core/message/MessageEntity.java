@@ -61,6 +61,18 @@ public class MessageEntity extends AbstractMessageEntity {
         return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.VISITOR.name());
     }
 
+    public boolean isFromUser() {
+        // 忽略大小写，判断是否包含"type":"user"字段
+        // return user.toLowerCase().contains("\"type\":\"user\"");
+        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.USER.name());
+    }
+
+    public boolean isFromMember() {
+        // 忽略大小写，判断是否包含"type":"member"字段
+        // return user.toLowerCase().contains("\"type\":\"member\"");
+        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.MEMBER.name());
+    }
+
     // 是否系统消息
     public boolean isFromSystem() {
         // 忽略大小写，判断是否包含"type":"system"字段

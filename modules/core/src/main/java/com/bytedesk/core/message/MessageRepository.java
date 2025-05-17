@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 18:41:48
+ * @LastEditTime: 2025-05-17 14:48:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,11 +37,14 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
     Optional<MessageEntity> findTransferMessage(
             @Param("type") String type, 
             @Param("messageUid") String messageUid
-        //     @Param("status") String status
             );
 
     // 根据thread.uid查询最新一条消息
     Optional<MessageEntity> findFirstByThread_UidOrderByCreatedAtDesc(@Param("threadUid") String threadUid);
+
+    // 根据threadTopic查询最新n条消息
+    @Query("SELECT m FROM MessageEntity m WHERE m.thread.topic = :threadTopic ORDER BY m.createdAt DESC")
+    List<MessageEntity> findLatestByThreadTopicOrderByCreatedAtDesc(@Param("threadTopic") String threadTopic, org.springframework.data.domain.Pageable pageable);
 
     // thread.uid + type + user contains uid
     Optional<MessageEntity> findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(
