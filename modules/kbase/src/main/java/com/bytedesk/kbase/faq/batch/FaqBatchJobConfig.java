@@ -21,6 +21,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -72,9 +73,21 @@ public class FaqBatchJobConfig {
     }
     
     /**
+     * 配置默认的Resource bean
+     * 这个是一个占位符资源，实际使用时会被替换
+     */
+    @Bean
+    public Resource defaultExcelResource() {
+        // 提供一个默认的资源路径，可以根据实际情况调整
+        // 这里假设在classpath下有一个templates目录，里面有一个空的模板文件
+        // 如果没有这个文件，在运行时会尝试找到它并报错，但应用程序会正常启动
+        return new ClassPathResource("templates/faq_template.xlsx");
+    }
+    
+    /**
      * 配置FAQ Excel读取器
      * 
-     * @param resource Excel文件资源
+     * @param resource Excel文件资源，如果不手动指定，则使用defaultExcelResource
      * @return 配置好的Excel读取器
      */
     @Bean
