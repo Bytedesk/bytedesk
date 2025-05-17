@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 09:39:41
+ * @LastEditTime: 2025-05-17 10:38:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.faq.mq;
 
 import java.util.Optional;
 import java.util.Random;
@@ -20,6 +20,10 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.kbase.faq.FaqEntity;
+import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.faq.elastic.FaqElasticService;
+import com.bytedesk.kbase.faq.vector.FaqVectorService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

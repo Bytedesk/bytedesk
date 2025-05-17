@@ -16,6 +16,8 @@ package com.bytedesk.kbase.faq;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.kbase.faq.elastic.FaqElasticSearchResult;
+import com.bytedesk.kbase.faq.elastic.FaqElasticService;
 
 import lombok.AllArgsConstructor;
 

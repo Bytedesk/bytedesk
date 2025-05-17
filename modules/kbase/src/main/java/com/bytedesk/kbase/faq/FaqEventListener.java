@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 09:14:03
+ * @LastEditTime: 2025-05-17 10:35:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.utils.BdFileUtils;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
+import com.bytedesk.kbase.faq.mq.FaqMessageService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
@@ -35,10 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class FaqEventListener {
-
-    // private final FaqElasticService faqService;
-
-    // private final FaqVectorService faqVectorService;
 
     private final FaqRestService faqRestService;
 

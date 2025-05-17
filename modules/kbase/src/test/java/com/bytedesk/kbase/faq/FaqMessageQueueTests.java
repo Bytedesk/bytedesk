@@ -19,6 +19,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.bytedesk.kbase.faq.elastic.FaqElasticService;
+import com.bytedesk.kbase.faq.mq.FaqIndexConsumer;
+import com.bytedesk.kbase.faq.mq.FaqIndexMessage;
+import com.bytedesk.kbase.faq.mq.FaqMessageService;
+import com.bytedesk.kbase.faq.vector.FaqVectorService;
+
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import lombok.extern.slf4j.Slf4j;

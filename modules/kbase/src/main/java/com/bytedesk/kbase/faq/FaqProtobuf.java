@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.kbase.faq.elastic.FaqElastic;
+import com.bytedesk.kbase.faq.vector.FaqVector;
 import com.bytedesk.kbase.llm_chunk.ChunkElastic;
 import com.bytedesk.kbase.llm_chunk.ChunkVector;
 import com.bytedesk.kbase.llm_text.TextElastic;
