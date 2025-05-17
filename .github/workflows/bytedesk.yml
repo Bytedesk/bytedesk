@@ -84,3 +84,40 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest
             registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:${{ steps.version.outputs.VERSION }}
           platforms: linux/amd64,linux/arm64
+          
+      # 准备 weiyu-server.zip 文件
+      - name: Prepare weiyu-server.zip
+        run: |
+          # 确保目标目录存在
+          mkdir -p deploy/server
+          
+          # 复制打包好的jar到deploy/server目录
+          cp starter/target/bytedesk-starter.jar deploy/server/
+          
+          # 创建zip包
+          cd deploy
+          zip -r weiyu-server.zip server/*
+          cd ..
+          
+      # 将weiyu-server.zip上传到GitHub Release
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: deploy/weiyu-server.zip
+          name: ByteDesk v${{ steps.version.outputs.VERSION }}
+          body: |
+            ByteDesk 版本 ${{ steps.version.outputs.VERSION }} 发布
+            
+            ## 下载
+            - [weiyu-server.zip](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/weiyu-server.zip)
+            
+            ## Docker 镜像
+            ```
+            docker pull bytedesk/bytedesk-ce:${{ steps.version.outputs.VERSION }}
+            ```
+            或者
+            ```
+            docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:${{ steps.version.outputs.VERSION }}
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
