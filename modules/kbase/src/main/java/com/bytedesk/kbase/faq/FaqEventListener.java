@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.faq;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -23,25 +24,26 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.core.utils.BdFileUtils;
+import com.bytedesk.kbase.faq.batch.FaqBatchService;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.faq.mq.FaqMessageService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FaqEventListener {
 
     private final FaqRestService faqRestService;
-
     private final UploadRestService uploadRestService;
-    
     private final FaqMessageService faqMessageService;
+    private final FaqBatchService faqBatchService;
+    private final Environment environment;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -55,23 +57,36 @@ public class FaqEventListener {
             }
             log.info("FaqEventListener FAQ: {}", fileName);
 
-            // 常见问题导入
             try {
                 Resource resource = uploadRestService.loadAsResource(upload.getFileName());
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("UploadEventListener loadAsResource: {}", filePath);
-                    // 导入自动回复
-                    // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
-                    // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
-                    EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
-                            KbaseTypeEnum.LLM.name(),
-                            upload.getUid(),
-                            upload.getKbUid(),
-                            upload.getOrgUid())).sheet().doRead();
+                    
+                    // 获取导入方式配置，默认使用Spring Batch
+                    boolean useSpringBatch = environment.getProperty("bytedesk.faq.use-spring-batch", Boolean.class, true);
+                    
+                    if (useSpringBatch) {
+                        // 使用Spring Batch进行批量导入
+                        log.info("使用Spring Batch导入FAQ: {}", filePath);
+                        faqBatchService.importFaqFromExcel(
+                                filePath,
+                                KbaseTypeEnum.LLM.name(),
+                                upload.getUid(),
+                                upload.getKbUid(),
+                                upload.getOrgUid());
+                    } else {
+                        // 使用原有的EasyExcel直接导入方式
+                        log.info("使用EasyExcel直接导入FAQ: {}", filePath);
+                        EasyExcel.read(filePath, FaqExcel.class, new FaqExcelListener(faqRestService,
+                                KbaseTypeEnum.LLM.name(),
+                                upload.getUid(),
+                                upload.getKbUid(),
+                                upload.getOrgUid())).sheet().doRead();
+                    }
                 }
             } catch (Exception e) {
-                log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage());
+                log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage(), e);
             }
         }
     }
