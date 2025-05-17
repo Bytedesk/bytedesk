@@ -168,6 +168,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             throw new RuntimeException("should login first");
         }
         RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getRobot()); 
+        if (robotProtobuf == null) {
+            throw new RuntimeException("robot is required");
+        }
         String robotUid = robotProtobuf.getUid();
         if (!StringUtils.hasText(robotUid)) {
             throw new RuntimeException("robotUid is required");
