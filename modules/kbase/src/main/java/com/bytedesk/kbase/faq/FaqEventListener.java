@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 16:33:09
+ * @LastEditTime: 2025-05-17 17:05:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,13 +68,30 @@ public class FaqEventListener {
                     
                     if (useSpringBatch) {
                         // 使用Spring Batch进行批量导入
-                        log.info("使用Spring Batch导入FAQ: {}", filePath);
-                        faqBatchService.importFaqFromExcel(
+                        // log.info("使用Spring Batch导入FAQ: {}", filePath);
+                        // try {
+                            // 使用Spring Batch进行批量导入
+                            log.info("使用Spring Batch导入FAQ: {}", filePath);
+                            faqBatchService.importFaqFromExcel(
                                 filePath,
                                 KbaseTypeEnum.LLM.name(),
                                 upload.getUid(),
                                 upload.getKbUid(),
                                 upload.getOrgUid());
+                        // } catch (Exception batchError) {
+                        //     // 捕获Spring Batch错误，自动回退到EasyExcel
+                        //     log.warn("Spring Batch导入失败，回退到EasyExcel: {}", batchError.getMessage(), batchError.fillInStackTrace());
+                        //     // 使用原有的EasyExcel直接导入方式
+                        //     log.info("回退使用EasyExcel导入FAQ: {}", filePath);
+                        //     EasyExcel.read(filePath, 
+                        //         FaqExcel.class, 
+                        //             new FaqExcelListener(faqRestService,
+                        //             KbaseTypeEnum.LLM.name(),
+                        //             upload.getUid(),
+                        //             upload.getKbUid(),
+                        //             upload.getOrgUid())
+                        //     ).sheet().doRead();
+                        // }
                     } else {
                         // 使用原有的EasyExcel直接导入方式
                         log.info("使用EasyExcel直接导入FAQ: {}", filePath);
