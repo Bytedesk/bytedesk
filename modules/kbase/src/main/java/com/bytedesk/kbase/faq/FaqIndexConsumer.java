@@ -40,11 +40,14 @@ public class FaqIndexConsumer {
 
     /**
      * 处理FAQ索引队列中的消息
+     * 使用客户端确认模式，只有成功处理后才确认消息
      * 
+     * @param jmsMessage JMS原始消息
      * @param message FAQ索引消息
      */
-    @JmsListener(destination = "bytedesk.faq.index", containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
-    public void processIndexMessage(FaqIndexMessage message) {
+    @JmsListener(destination = JmsArtemisConstants.QUEUE_FAQ_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
+    public void processIndexMessage(jakarta.jms.Message jmsMessage, FaqIndexMessage message) {
+        boolean success = false;
         try {
             log.debug("接收到FAQ索引请求: {}", message.getFaqUid());
             
@@ -56,6 +59,8 @@ public class FaqIndexConsumer {
             Optional<FaqEntity> optionalFaq = faqRestService.findByUid(message.getFaqUid());
             if (!optionalFaq.isPresent()) {
                 log.warn("无法找到要索引的FAQ: {}", message.getFaqUid());
+                // 消息处理完成，但没有找到实体，也认为是成功的（避免重复处理已删除的实体）
+                success = true;
                 return;
             }
             
@@ -68,15 +73,31 @@ public class FaqIndexConsumer {
                 handleIndexOperation(faq, message);
             }
             
+            // 成功处理消息
+            success = true;
+            
         } catch (Exception e) {
             log.error("处理FAQ索引消息时出错: {}", e.getMessage(), e);
-        }
+            success = false; // 发生异常，处理失败
+        } finally {
+            // 只有成功处理消息后才确认
+            if (success) {
+                acknowledgeMessage(jmsMessage);
+            } else {
+                log.warn("FAQ索引消息处理失败，不确认消息，等待重新处理: {}", message.getFaqUid());
+            }
     }
     
     /**
      * 处理索引操作
+     * 如果索引操作失败，将抛出异常以便于消息重试
      */
     private void handleIndexOperation(FaqEntity faq, FaqIndexMessage message) {
+        boolean elasticSuccess = true;
+        boolean vectorSuccess = true;
+        Exception elasticException = null;
+        Exception vectorException = null;
+        
         // 执行全文索引
         if (message.isUpdateElasticIndex()) {
             try {
@@ -84,6 +105,8 @@ public class FaqIndexConsumer {
                 faqElasticService.indexFaq(faq);
             } catch (Exception e) {
                 log.error("FAQ全文索引创建失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
+                elasticSuccess = false;
+                elasticException = e;
             }
         }
         
@@ -97,7 +120,27 @@ public class FaqIndexConsumer {
                 faqVectorService.indexFaqVector(faq);
             } catch (Exception e) {
                 log.error("FAQ向量索引创建失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
+                vectorSuccess = false;
+                vectorException = e;
             }
+        }
+        
+        // 如果有任何索引失败，抛出异常以便于消息重试
+        if (!elasticSuccess || !vectorSuccess) {
+            StringBuilder errorMessage = new StringBuilder("FAQ索引失败: ");
+            if (!elasticSuccess) {
+                errorMessage.append("全文索引错误");
+            }
+            if (!vectorSuccess) {
+                if (!elasticSuccess) {
+                    errorMessage.append(" 和 ");
+                }
+                errorMessage.append("向量索引错误");
+            }
+            
+            // 抛出异常，阻止消息确认，系统将重新投递消息
+            throw new RuntimeException(errorMessage.toString(), 
+                    !elasticSuccess ? elasticException : vectorException);
         }
     }
     
@@ -115,6 +158,7 @@ public class FaqIndexConsumer {
                 }
             } catch (Exception e) {
                 log.error("从全文索引中删除FAQ失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
+                throw new RuntimeException("全文索引删除失败", e); // 抛出异常以便于消息重试
             }
         }
         
@@ -128,7 +172,25 @@ public class FaqIndexConsumer {
                 }
             } catch (Exception e) {
                 log.error("从向量索引中删除FAQ失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
+                throw new RuntimeException("向量索引删除失败", e); // 抛出异常以便于消息重试
             }
+        }
+    }
+    
+    /**
+     * 安全地确认消息
+     * 只有在消息处理成功后才调用此方法
+     *
+     * @param message JMS消息
+     */
+    private void acknowledgeMessage(jakarta.jms.Message message) {
+        try {
+            if (message != null) {
+                message.acknowledge();
+                log.debug("消息已确认");
+            }
+        } catch (jakarta.jms.JMSException e) {
+            log.error("确认消息失败: {}", e.getMessage(), e);
         }
     }
 }

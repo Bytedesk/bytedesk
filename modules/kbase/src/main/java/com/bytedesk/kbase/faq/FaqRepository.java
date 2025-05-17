@@ -32,4 +32,12 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
     
     Boolean existsByQuestionAndAnswerAndKbase_UidAndOrgUidAndDeletedFalse(String question, String answer, String kbUid, String orgUid);
 
+    /**
+     * 获取随机FAQ，用于测试
+     * 
+     * @param limit 限制返回的数量
+     * @return 随机FAQ列表
+     */
+    @org.springframework.data.jpa.repository.Query(value = "SELECT * FROM faq WHERE deleted = false ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<FaqEntity> findRandomFaq(@org.springframework.data.repository.query.Param("limit") int limit);
 }
