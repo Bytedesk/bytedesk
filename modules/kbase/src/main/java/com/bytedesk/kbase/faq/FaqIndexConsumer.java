@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 10:10:00
+ * @LastEditTime: 2025-05-17 09:39:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,6 +86,7 @@ public class FaqIndexConsumer {
             } else {
                 log.warn("FAQ索引消息处理失败，不确认消息，等待重新处理: {}", message.getFaqUid());
             }
+        }
     }
     
     /**

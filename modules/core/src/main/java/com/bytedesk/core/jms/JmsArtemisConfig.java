@@ -65,6 +65,8 @@ public class JmsArtemisConfig {
 		// You could still override some settings if necessary.
 		factory.setPubSubDomain(true);
 		// factory.setConcurrency("3-10");
+		// 设置确认模式为客户端确认，确保消息处理成功后才被确认
+		factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
 		// 设置错误处理器
         factory.setErrorHandler(jmsErrorHandler);
 		return factory;
