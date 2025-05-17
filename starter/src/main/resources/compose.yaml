@@ -74,7 +74,7 @@ services:
     networks:
       - bytedesk-network
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8161/console/jolokia/read/org.apache.activemq.artemis:broker=\"0.0.0.0\""]
+      test: ["CMD", "curl", "--fail", "-u", "admin:admin", "http://localhost:8161/console/jolokia/"]
       interval: 30s
       timeout: 10s
       retries: 5

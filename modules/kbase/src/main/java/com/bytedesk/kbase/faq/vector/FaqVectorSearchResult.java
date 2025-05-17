@@ -10,7 +10,7 @@
  *  contact: 270580156@qq.com 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.faq;
+package com.bytedesk.kbase.faq.vector;
 
 import java.io.Serializable;
 

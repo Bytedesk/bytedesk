@@ -33,6 +33,33 @@ services:
     #   interval: 10s
     #   timeout: 5s
     #   retries: 5
+      
+  # ActiveMQ Artemis 消息队列
+  # http://localhost:18161/console，使用 admin/admin 作为登录凭据
+  bytedesk-artemis:
+    image: apache/activemq-artemis:latest
+    container_name: artemis-bytedesk
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+      - ANONYMOUS_LOGIN=false
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - "16161:61616"   # JMS
+      - "16162:61617"   # AMQP
+      - "18161:8161"     # Web Console
+      - "15672:5672"     # AMQP
+      - "16163:61613"   # STOMP
+      - "11883:1883"     # MQTT
+    volumes:
+      - artemis_data:/var/lib/artemis/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "-u", "admin:admin", "http://localhost:8161/console/jolokia/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
@@ -73,11 +100,14 @@ services:
       - bytedesk-mysql
       - bytedesk-redis
       - bytedesk-elasticsearch
+      - bytedesk-artemis
       # bytedesk-mysql:
       #   condition: service_healthy
       # bytedesk-redis:
       #   condition: service_healthy
       # bytedesk-elasticsearch:
+      #   condition: service_healthy
+      # bytedesk-artemis:
       #   condition: service_healthy
     environment:
       SERVER_PORT: 9003
@@ -340,6 +370,8 @@ volumes:
     name: bytedesk_elasticsearch_data
   upload_data:
     name: bytedesk_upload_data
+  artemis_data:
+    name: bytedesk_artemis_data
 
 networks:
   bytedesk-network:
