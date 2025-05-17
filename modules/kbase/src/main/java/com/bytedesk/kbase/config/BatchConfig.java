@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 18:00:00
+ * @LastEditTime: 2025-05-17 16:15:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.support.DatabaseType;
@@ -71,10 +71,11 @@ public class BatchConfig {
     /**
      * 配置JobLauncher
      * JobLauncher用于启动Job
+     * Spring Boot 3.4.4 中使用TaskExecutorJobLauncher替代SimpleJobLauncher
      */
     @Bean
     public JobLauncher jobLauncher() throws Exception {
-        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
         jobLauncher.setJobRepository(jobRepository());
         jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
         jobLauncher.afterPropertiesSet();
