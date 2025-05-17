@@ -110,7 +110,8 @@ public class SpringAIToolsController {
 
         Method method = ReflectionUtils.findMethod(DateTimeTools.class, "getCurrentDateTimeMethodToolCallback");
         ToolCallback toolCallback = MethodToolCallback.builder()
-                .toolDefinition(ToolDefinition.builder(method)
+                .toolDefinition(ToolDefinition.builder()
+                        .name("getCurrentDateTimeMethodToolCallback")
                         .description("Get the current date and time in the user's timezone")
                         .build())
                 .toolMethod(method)
