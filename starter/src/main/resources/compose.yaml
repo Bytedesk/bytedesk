@@ -34,6 +34,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # http://127.0.0.1:21434
   bytedesk-ollama:
     image: ollama/ollama:latest
     container_name: ollama-bytedesk
@@ -47,6 +48,33 @@ services:
       - bytedesk-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ActiveMQ Artemis 消息队列
+  # http://localhost:18161/console，使用 admin/admin 作为登录凭据
+  bytedesk-artemis:
+    image: apache/activemq-artemis:latest
+    container_name: artemis-bytedesk
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+      - ANONYMOUS_LOGIN=false
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - "16161:61616"   # JMS
+      - "16162:61617"   # AMQP
+      - "18161:8161"     # Web Console
+      - "15672:5672"     # AMQP
+      - "16163:61613"   # STOMP
+      - "11883:1883"     # MQTT
+    volumes:
+      - artemis_data:/var/lib/artemis/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8161/console/jolokia/read/org.apache.activemq.artemis:broker=\"0.0.0.0\""]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -252,6 +280,8 @@ volumes:
   #   name: bytedesk_chroma_data
   elasticsearch_data:
     name: bytedesk_elasticsearch_data
+  artemis_data:
+    name: bytedesk_artemis_data
   # weaviate_data:
   #   name: bytedesk_weaviate_data
   # milvus_data:
