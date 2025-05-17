@@ -75,4 +75,8 @@ public class UserProtobuf implements Serializable {
                 .type(UserTypeEnum.SYSTEM.name())
                 .build();
     }
+
+    public static UserProtobuf fromEntity(UserEntity user) {
+        return user.toProtobuf();
+    }
 }

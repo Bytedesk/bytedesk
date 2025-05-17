@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 10:02:18
+ * @LastEditTime: 2025-05-17 14:41:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,9 +90,12 @@ public class RobotService {
         Assert.notNull(thread.getRobot(), "thread agent is null, threadTopic:" + threadTopic);
         // 
         RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
+        if (robot == null) {
+            throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
+        }
         log.info("processSseMemberMessage thread reply");
         //
-        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
                 messageProtobufQuery);
         // 处理LLM消息
         processLlmMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
@@ -126,9 +129,12 @@ public class RobotService {
         Assert.notNull(thread.getRobot(), "thread agent is null, threadTopic:" + threadTopic);
         //
         RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
+        if (robot == null) {
+            throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
+        }
         log.info("processSseVisitorMessage thread reply");
         // 机器人回复访客消息
-        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(thread, threadProtobuf, robot,
+        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
                 messageProtobufQuery);
         
         // 处理LLM消息
