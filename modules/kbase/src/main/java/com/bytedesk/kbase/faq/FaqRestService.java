@@ -706,4 +706,22 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         return message;
     }
 
+    /**
+     * 获取一个随机FAQ，用于测试
+     * 
+     * @return 随机FAQ的Optional包装
+     */
+    public Optional<FaqEntity> findRandomFaq() {
+        try {
+            // 获取系统中任意一个FAQ
+            List<FaqEntity> randomFaqs = faqRepository.findRandomFaq(1);
+            if (randomFaqs != null && !randomFaqs.isEmpty()) {
+                return Optional.of(randomFaqs.get(0));
+            }
+        } catch (Exception e) {
+            log.error("获取随机FAQ时出错: {}", e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
 }
