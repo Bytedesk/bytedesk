@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:50:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 10:50:00
+ * @LastEditTime: 2025-05-17 15:58:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.kbase.faq.batch.FaqExcelReader;
-import com.bytedesk.kbase.faq.batch.FaqItemProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,9 +101,8 @@ public class FaqBatchService {
      * 
      * @param jobExecutionId 作业执行ID
      * @return 作业执行实例
-     * @throws Exception 查询过程中的异常
      */
-    public JobExecution getJobExecution(Long jobExecutionId) throws Exception {
-        return jobRepository.getJobExecution(jobExecutionId);
+    public JobExecution getJobExecution(Long jobExecutionId) {
+        return jobExplorer.getJobExecution(jobExecutionId);
     }
 }
