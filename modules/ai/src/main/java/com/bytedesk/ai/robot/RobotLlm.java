@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 12:20:34
+ * @LastEditTime: 2025-05-17 15:22:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,10 +103,10 @@ public class RobotLlm {
     @Column(name = "llm_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt = RobotConsts.ROBOT_LLM_DEFAULT_PROMPT;
     
-    // 上下文消息数，默认3条。一同传递给大模型
+    // 上下文消息数，默认0条。一同传递给大模型
     @Builder.Default
     @Column(name = "llm_context_msg_count")
-    private int contextMsgCount = 3;
+    private int contextMsgCount = 0;
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
