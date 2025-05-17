@@ -86,11 +86,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest</artifactId>
-            <scope>provided</scope>
-        </dependency> -->
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-artemis</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

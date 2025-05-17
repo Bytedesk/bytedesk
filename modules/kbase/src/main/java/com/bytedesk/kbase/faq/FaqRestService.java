@@ -331,6 +331,14 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             FaqEntity entity) {
         try {
             log.warn("处理乐观锁冲突: {}", entity.getUid());
+            
+            // 引入随机延迟，避免并发冲突
+            try {
+                Thread.sleep(100 + (long)(Math.random() * 400)); // 100-500ms随机延迟
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            
             // 重新获取最新版本的实体
             Optional<FaqEntity> latest = faqRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -359,7 +367,14 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 latestEntity.setDocIdList(entity.getDocIdList());
                 latestEntity.setStatus(entity.getStatus());
 
-                return faqRepository.save(latestEntity);
+                // 尝试保存，可能会再次失败
+                try {
+                    return faqRepository.save(latestEntity);
+                } catch (ObjectOptimisticLockingFailureException retryException) {
+                    // 如果再次失败，记录日志并抛出异常
+                    log.error("重试处理乐观锁冲突仍然失败: {}", entity.getUid());
+                    throw retryException;
+                }
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
