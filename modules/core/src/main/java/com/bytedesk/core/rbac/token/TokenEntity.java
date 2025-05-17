@@ -70,6 +70,9 @@ public class TokenEntity extends BaseEntity {
     @Builder.Default
     private String client = ClientEnum.WEB.name();
 
+    // 设备信息，比如安卓手机信息、苹果手机信息等
+    private String device;
+
     // 验证token是否有效
     public boolean isValid() {
         return !revoked && expiresAt.isAfter(LocalDateTime.now());
