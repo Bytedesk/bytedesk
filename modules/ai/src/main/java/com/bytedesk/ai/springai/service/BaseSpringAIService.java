@@ -272,6 +272,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
         // TODO: 根据配置，拉取历史聊天记录
+        
+
         String history = "";
         String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, history, context);
         // TODO: 返回消息中携带消息搜索结果(来源依据)
