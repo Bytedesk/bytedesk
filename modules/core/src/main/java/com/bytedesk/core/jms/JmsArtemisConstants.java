@@ -33,4 +33,6 @@ public class JmsArtemisConstants {
 
     public static final String TOPIC_TEST_NAME = TOPIC_PREFIX + "test";
 
+    // FAQ索引队列
+    public static final String QUEUE_FAQ_INDEX = QUEUE_PREFIX + "faq.index";
 }
