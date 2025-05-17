@@ -279,8 +279,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(prompt));
         messages.add(new UserMessage(query));
-        log.info("BaseSpringAIService createAndProcessPrompt messages {}", messages);
-
         // 根据配置，拉取历史聊天记录        
         if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0) {
             // 从缓存中获取最近的消息
@@ -309,6 +307,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 }
             }
         }
+        log.info("BaseSpringAIService createAndProcessPrompt messages {}", messages);
         //
         Prompt aiPrompt = new Prompt(messages);
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
