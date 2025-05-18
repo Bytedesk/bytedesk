@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:47:31
+ * @LastEditTime: 2025-05-18 10:52:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -136,7 +136,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
 
     // updateAvatar
     // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改头像，不需要权限限制
-    @ActionAnnotation(title = "客服", action = "updateAvatar", description = "update agent avatar")
+    @ActionAnnotation(title = "客服", action = "更新头像", description = "update agent avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody AgentRequest request) {
 
@@ -146,7 +146,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改在线状态，不需要权限限制
-    @ActionAnnotation(title = "客服", action = "updateStatus", description = "update agent status")
+    @ActionAnnotation(title = "客服", action = "更新状态", description = "update agent status")
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody AgentRequest request) {
 
@@ -156,7 +156,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     }
 
     // @PreAuthorize("hasAuthority('AGENT_UPDATE')") // 客服自己修改自动回复，不需要权限限制
-    @ActionAnnotation(title = "客服", action = "updateAutoReply", description = "update agent autoreply")
+    @ActionAnnotation(title = "客服", action = "更新自动回复", description = "update agent autoreply")
     @PostMapping("/update/autoreply")
     public ResponseEntity<?> updateAutoReply(@RequestBody AgentRequest request) {
 
