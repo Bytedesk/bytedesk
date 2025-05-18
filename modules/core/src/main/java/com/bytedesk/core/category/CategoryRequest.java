@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:44:45
+ * @LastEditTime: 2025-05-18 10:57:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,15 +38,7 @@ public class CategoryRequest extends BaseRequest {
 
     @Builder.Default
     private Integer order = 0;
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // // 需要前端传递字符串的情况下，使用string类型
-    // @NotBlank
-    // @Builder.Default
-    // private String platform = BytedeskConsts.PLATFORM_BYTEDESK;
-
+    
     // 父类uid
     private String parentUid;
 
@@ -56,6 +48,4 @@ public class CategoryRequest extends BaseRequest {
     // knowledge base uid
     private String kbUid;
 
-    // 用户uid
-    // private String userUid;
 }
