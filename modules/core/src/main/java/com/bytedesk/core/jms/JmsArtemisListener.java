@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:57:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 16:48:46
+ * @LastEditTime: 2025-05-18 08:50:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,10 +16,7 @@ package com.bytedesk.core.jms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-// import com.bytedesk.core.annotation.TabooJsonFilter;
-// import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-// import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.jms.JMSException;
@@ -57,13 +54,13 @@ public class JmsArtemisListener {
 	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
 	public void receiveTopicMessage(String json, jakarta.jms.Message message) throws JMSException {
 		try {
-			// log.info("jms receiveTopicMessage string {}", json);
+			log.info("JmsArtemisListener receiveTopicMessage string {}", json);
 			BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
 			bytedeskEventPublisher.publishMessageJsonEvent(json);
 			// 处理成功后，显式确认消息已被消费
 			message.acknowledge();
 		} catch (Exception e) {
-			log.error("处理Topic消息失败: {}", e.getMessage(), e);
+			log.error("JmsArtemisListener 处理Topic消息失败: {}", e.getMessage(), e);
 			throw e; // 重新抛出异常，让错误处理器处理
 		}
 	}
