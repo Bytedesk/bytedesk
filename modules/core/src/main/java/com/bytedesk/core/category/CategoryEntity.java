@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-03 18:13:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:44:36
+ * @LastEditTime: 2025-05-18 11:01:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,21 +68,11 @@ public class CategoryEntity extends BaseEntity {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CategoryEntity> children = new ArrayList<>();
 
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
-
     // knowledge base uid
     private String kbUid;
 
-    // 用户uid
-    // private String userUid;
-
-    @Builder.Default
-    @Column(name = "post_count")
-    private Integer postCount = 0;
+    // @Builder.Default
+    // private Integer postCount = 0;
 
     public void addChild(CategoryEntity child) {
         children.add(child);

@@ -18,9 +18,6 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>, JpaSpecificationExecutor<CategoryEntity> {
     Optional<CategoryEntity> findByUid(String uid);
@@ -40,13 +37,13 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>,
 
     Boolean existsByUid(String uid);
     
-    @Modifying
-    @Transactional
-    @Query("UPDATE CategoryEntity c SET c.postCount = c.postCount + 1 WHERE c.id = ?1")
-    void incrementPostCount(Long categoryId);
+    // @Modifying
+    // @Transactional
+    // @Query("UPDATE CategoryEntity c SET c.postCount = c.postCount + 1 WHERE c.id = ?1")
+    // void incrementPostCount(Long categoryId);
     
-    @Modifying
-    @Transactional
-    @Query("UPDATE CategoryEntity c SET c.postCount = c.postCount - 1 WHERE c.id = ?1")
-    void decrementPostCount(Long categoryId);
+    // @Modifying
+    // @Transactional
+    // @Query("UPDATE CategoryEntity c SET c.postCount = c.postCount - 1 WHERE c.id = ?1")
+    // void decrementPostCount(Long categoryId);
 }

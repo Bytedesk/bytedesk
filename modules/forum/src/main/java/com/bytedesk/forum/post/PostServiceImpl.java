@@ -31,7 +31,7 @@ public class PostServiceImpl implements PostService {
         post.setCategory(category);
         
         PostEntity savedPost = postRepository.save(post);
-        categoryRepository.incrementPostCount(category.getId());
+        // categoryRepository.incrementPostCount(category.getId());
         
         return savedPost;
     }
@@ -57,7 +57,7 @@ public class PostServiceImpl implements PostService {
             
         post.setStatus("deleted");
         postRepository.save(post);
-        categoryRepository.decrementPostCount(post.getCategory().getId());
+        // categoryRepository.decrementPostCount(post.getCategory().getId());
     }
 
     @Override

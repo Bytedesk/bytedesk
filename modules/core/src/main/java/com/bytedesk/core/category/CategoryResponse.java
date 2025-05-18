@@ -51,4 +51,7 @@ public class CategoryResponse extends BaseResponse {
 
     // 用户uid
     private String userUid;
+
+    // member count of this category
+    private Integer memberCount;
 }
