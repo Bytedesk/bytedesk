@@ -115,18 +115,28 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
         //
-        String prompt = "";
-        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            String context = String.join("\n", "");
-            prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
-        } else {
-            prompt = robot.getLlm().getPrompt();
-        }
-        //
+        // 获取系统提示词
+        String systemPrompt = robot.getLlm().getPrompt();
+        
+        // 初始化消息列表
         List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(prompt));
+        
+        // 添加系统提示词
+        messages.add(new SystemMessage(systemPrompt));
+        
+        // 如果知识库启用，添加上下文信息
+        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
+            // 这里可以添加知识库相关上下文
+            String context = "";
+            if (StringUtils.hasText(context)) {
+                messages.add(new SystemMessage("搜索结果: " + context));
+            }
+        }
+        
+        // 添加用户查询
         messages.add(new UserMessage(query));
-        //
+        
+        // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
         processPrompt(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
     }
@@ -190,22 +200,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
         for (FaqElasticSearchResult withScore : searchResults) {
             FaqElastic faq = withScore.getFaqElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
-            // 
+            //
             searchResultList.add(faqProtobuf);
         }
-        // 
+        //
         List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null);
         for (TextElasticSearchResult withScore : textResults) {
             TextElastic text = withScore.getTextElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
-            // 
+            //
             searchResultList.add(faqProtobuf);
         }
-        // 
+        //
         List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
         for (ChunkElasticSearchResult withScore : chunkResults) {
             ChunkElastic chunk = withScore.getChunkElastic();
-            // 
+            //
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
             searchResultList.add(faqProtobuf);
         }
@@ -214,27 +224,27 @@ public abstract class BaseSpringAIService implements SpringAIService {
     /**
      * 执行向量搜索
      */
-    private void executeVectorSearch(String query, String kbUid,  List<FaqProtobuf> searchResultList) {
+    private void executeVectorSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
         for (FaqVectorSearchResult withScore : searchResults) {
             FaqVector faqVector = withScore.getFaqVector();
-            // 
+            //
             FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
             searchResultList.add(faqProtobuf);
         }
-        // 
+        //
         List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null, 5);
         for (TextVectorSearchResult withScore : textResults) {
             TextVector textVector = withScore.getTextVector();
-            // 
+            //
             FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
             searchResultList.add(faqProtobuf);
         }
-        // 
+        //
         List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null, null, 5);
         for (ChunkVectorSearchResult withScore : chunkResults) {
             ChunkVector chunkVector = withScore.getChunkVector();
-            // 
+            //
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
             searchResultList.add(faqProtobuf);
         }
@@ -248,12 +258,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         if (searchResultList.isEmpty()) {
             // 直接返回未找到相关问题答案
-            String answer = robot.getLlm().getDefaultReply(); //RobotConsts.ROBOT_UNMATCHED;
+            String answer = robot.getLlm().getDefaultReply(); // RobotConsts.ROBOT_UNMATCHED;
             processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
                     emitter);
             return;
         }
-        // 
+        //
         String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
         // 使用通用方法处理提示词和SSE消息
         createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
@@ -262,56 +272,70 @@ public abstract class BaseSpringAIService implements SpringAIService {
     /**
      * 创建提示词并处理SSE消息的通用方法
      * 
-     * @param query 用户查询
-     * @param context 上下文信息
-     * @param robot 机器人配置
+     * @param query                用户查询
+     * @param context              上下文信息
+     * @param robot                机器人配置
      * @param messageProtobufQuery 查询消息
      * @param messageProtobufReply 回复消息
-     * @param emitter SSE发射器
+     * @param emitter              SSE发射器
      */
     private void createAndProcessPrompt(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
 
-        String prompt = buildKbPrompt(robot.getLlm().getPrompt(), query, context);
-        //
+        // 创建系统提示信息，包含知识库上下文
+        String systemPrompt = robot.getLlm().getPrompt();
+        
+        // 初始化消息列表
         List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(prompt));
-        messages.add(new UserMessage(query));
-        // 根据配置，拉取历史聊天记录        
+        
+        // 1. 先添加系统消息（不包含用户当前查询）
+        messages.add(new SystemMessage(systemPrompt));
+        
+        // 2. 根据配置，拉取并添加历史聊天记录
         if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0) {
-            // 从缓存中获取最近的消息
             String threadTopic = messageProtobufQuery.getThread().getTopic();
             int limit = robot.getLlm().getContextMsgCount();
             List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
-            for (MessageEntity messageEntity : recentMessages) {
-                // messageEntity.getContent()中有可能包含 <think>xxxx</think>，需要将其替换掉
-                String content = "";
+            
+            if (!recentMessages.isEmpty()) {
+                log.info("添加 {} 条历史聊天记录", recentMessages.size());
+                
+                for (MessageEntity messageEntity : recentMessages) {
+                    // 处理消息内容，移除<think>标签
+                    String content = messageEntity.getContent();
+                    if (content != null && content.contains("<think>")) {
+                        log.debug("替换前的内容: {}", content);
+                        content = content.replaceAll("(?s)<think>.*?</think>", "");
+                        log.debug("替换后的内容: {}", content);
+                    }
 
-                // 将消息添加到消息列表
-                if (messageEntity.isFromVisitor() 
-                    || messageEntity.isFromUser() 
-                    || messageEntity.isFromMember()) {
-                    // 访客消息
-                    messages.add(new UserMessage(messageEntity.getContent()));
-                } else if (messageEntity.isFromRobot()) {
-                    // 机器人消息
-                    messages.add(new SystemMessage(messageEntity.getContent()));
-                } else if (messageEntity.isFromAgent()) {
-                    // 客服消息
-                    messages.add(new SystemMessage(messageEntity.getContent()));
-                } else if (messageEntity.isFromSystem()) {
-                    // 系统消息
-                    messages.add(new SystemMessage(messageEntity.getContent()));
-                } else {
-                    // 其他类型的消息
-                    messages.add(new SystemMessage(messageEntity.getContent()));
+                    // 根据消息来源添加不同类型的消息
+                    if (messageEntity.isFromVisitor() 
+                            || messageEntity.isFromUser()
+                            || messageEntity.isFromMember()) {
+                        messages.add(new UserMessage(content));
+                    } else {
+                        // 机器人、客服、系统等其他消息统一使用SystemMessage
+                        messages.add(new SystemMessage(content));
+                    }
                 }
             }
         }
+        
+        // 3. 添加当前查询的上下文信息
+        if (StringUtils.hasText(context)) {
+            messages.add(new SystemMessage("搜索结果: " + context));
+        }
+        
+        // 4. 最后添加当前用户查询
+        messages.add(new UserMessage(query));
+        
+        // 记录消息，用于调试
         log.info("BaseSpringAIService createAndProcessPrompt messages {}", messages);
-        //
+        
+        // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
         processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
@@ -326,7 +350,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
-            String answer = robot.getLlm().getDefaultReply(); //RobotConsts.ROBOT_UNMATCHED;
+            String answer = robot.getLlm().getDefaultReply(); // RobotConsts.ROBOT_UNMATCHED;
             processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
                     emitter);
             return;
@@ -342,7 +366,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
             // 将处理后的单个FaqProtobuf对象转换为JSON字符串
             String answer = firstFaq.toJson();
-            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply, false,
+            processAnswerMessage(answer, MessageTypeEnum.FAQ_ANSWER, robot, messageProtobufQuery, messageProtobufReply,
+                    false,
                     emitter);
         }
     }
@@ -412,7 +437,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, Boolean isUnanswered) {
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            Boolean isUnanswered) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
@@ -439,12 +465,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 //
                 .build();
         robotMessageCache.pushRequest(robotMessage);
-    }
-
-    public String buildKbPrompt(String systemPrompt, String query, String context) {
-        return systemPrompt + "\n" +
-                "用户提问: " + query + "\n" +
-                "搜索结果: " + context;
     }
 
     // 抽象方法，由具体实现类提供
