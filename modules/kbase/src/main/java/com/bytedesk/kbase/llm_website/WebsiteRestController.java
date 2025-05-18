@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 11:15:09
+ * @LastEditTime: 2025-05-18 10:12:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,14 +15,12 @@ package com.bytedesk.kbase.llm_website;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +33,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
 
     private final WebsiteRestService websiteRestService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(WebsiteRequest request) {
         
@@ -93,8 +91,6 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         
         return ResponseEntity.ok(JsonResult.success(website));
     }
-
-    
 
     @Override
     public Object export(WebsiteRequest request, HttpServletResponse response) {
