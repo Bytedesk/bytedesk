@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:44:29
+ * @LastEditTime: 2025-05-18 10:26:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,44 +84,44 @@ public class WebsiteEntity extends BaseEntity {
     private boolean enabled = true;
 
     // 是否开启自动生成llm问答
-    @Builder.Default
-    @Column(name = "is_auto_generate_llm_qa")
-    private boolean autoGenerateLlmQa = false;
+    // @Builder.Default
+    // @Column(name = "is_auto_generate_llm_qa")
+    // private boolean autoGenerateLlmQa = false;
 
-    // 是否已经生成llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa_generated")
-    private boolean llmQaGenerated = false;
+    // // 是否已经生成llm问答
+    // @Builder.Default
+    // @Column(name = "is_llm_qa_generated")
+    // private boolean llmQaGenerated = false;
 
-    // is auto delete llm qa
-    @Builder.Default
-    @Column(name = "is_auto_delete_llm_qa")
-    private boolean autoDeleteLlmQa = false;
+    // // is auto delete llm qa
+    // @Builder.Default
+    // @Column(name = "is_auto_delete_llm_qa")
+    // private boolean autoDeleteLlmQa = false;
 
-    // 是否已经删除llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa_deleted")
-    private boolean llmQaDeleted = false;
+    // // 是否已经删除llm问答
+    // @Builder.Default
+    // @Column(name = "is_llm_qa_deleted")
+    // private boolean llmQaDeleted = false;
 
-    // 是否开启自动llm Chunk切块
-    @Builder.Default
-    @Column(name = "is_auto_llm_Chunk")
-    private boolean autoLlmChunk = false;
+    // // 是否开启自动llm Chunk切块
+    // @Builder.Default
+    // @Column(name = "is_auto_llm_Chunk")
+    // private boolean autoLlmChunk = false;
 
-    // 是否已经自动llm Chunk切块
-    @Builder.Default
-    @Column(name = "is_llm_Chunkted")
-    private boolean llmChunkted = false;
+    // // 是否已经自动llm Chunk切块
+    // @Builder.Default
+    // @Column(name = "is_llm_Chunkted")
+    // private boolean llmChunkted = false;
 
     // is auto delete llm Chunk
-    @Builder.Default
-    @Column(name = "is_auto_delete_llm_Chunk")
-    private boolean autoDeleteLlmChunk = false;
+    // @Builder.Default
+    // @Column(name = "is_auto_delete_llm_Chunk")
+    // private boolean autoDeleteLlmChunk = false;
 
     // 是否已经删除llm Chunk切块
-    @Builder.Default
-    @Column(name = "is_llm_Chunk_deleted")
-    private boolean llmChunkDeleted = false;
+    // @Builder.Default
+    // @Column(name = "is_llm_Chunk_deleted")
+    // private boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default
