@@ -286,6 +286,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             int limit = robot.getLlm().getContextMsgCount();
             List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
             for (MessageEntity messageEntity : recentMessages) {
+                // messageEntity.getContent()中有可能包含 <think>xxxx</think>，需要将其替换掉
+                String content = "";
+
                 // 将消息添加到消息列表
                 if (messageEntity.isFromVisitor() 
                     || messageEntity.isFromUser() 
