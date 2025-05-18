@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:11:27
+ * @LastEditTime: 2025-05-18 10:50:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +41,12 @@ public class WebsiteRequest extends BaseRequest {
     private String url;
 
     private String description;
+
+    @Builder.Default
+    private String status = ChunkStatusEnum.NEW.name();
+
+    @Builder.Default
+    private String vectorStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
