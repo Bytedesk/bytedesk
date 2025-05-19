@@ -38,9 +38,9 @@ docker exec ollama-bytedesk ollama pull bge-m3:latest
 # 重新排序Rerank模型
 docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # 停止
-docker compose -p bytedesk -f docker-compose.yaml stop
+docker compose -p bytedesk -f docker-compose.yaml down
 # 停止，内含ollama
-docker compose -p bytedesk -f docker-compose-ollama.yaml stop
+docker compose -p bytedesk -f docker-compose-ollama.yaml down
 ```
 
 ## 故障排除
