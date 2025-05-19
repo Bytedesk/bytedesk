@@ -19,6 +19,12 @@ on:
   push:
     tags:
       - 'v*' # 在推送的标签以"v"开头时执行
+
+# 添加权限配置，确保有足够权限创建release
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest # 运行环境
