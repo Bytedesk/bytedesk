@@ -34,15 +34,17 @@ public class CustomErrorController implements ErrorController {
         if (status != null) {
             int statusCode = Integer.valueOf(status.toString());
             if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                return "/error/404.html"; // 返回自定义的404页面视图名称
+                return "error/404"; // 返回自定义的404页面视图名称，不要加.html扩展名
+            } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
+                return "error/403"; // 返回403错误页面
             }
         }
-        return "/error"; // 返回默认的错误页面视图名称
+        return "error/error"; // 返回默认的错误页面视图名称，不要加.html扩展名
     }
 
     public String getErrorPath() {
         log.info("getErrorPath");
-        return "/error/404.html"; // 定义错误页面的路径
+        return "/error"; // 定义错误处理的路径
     }
     
 }
