@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 15:20:26
+ * @LastEditTime: 2025-05-19 12:07:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -110,9 +110,42 @@ public class VisitorThreadService
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+        
+        // 处理微信相关额外信息
         if (visitorRequest.isWeChat()) {
-            extra = visitorRequest.getWeChatThreadExtra();
+            String weChatExtra = visitorRequest.getWeChatThreadExtra();
+            
+            // 如果是企业微信客服，需要特殊处理
+            if (ClientEnum.WECHAT_WORK.name().equals(visitorRequest.getClient()) && StringUtils.hasText(weChatExtra)) {
+                // 创建新的extra JSON对象
+                JSONObject extraJson = new JSONObject();
+                
+                // // 获取原始的服务配置
+                // ServiceSettingsResponseVisitor settings = workgroup.getServiceSettings();
+                // if (settings != null) {
+                //     // 将服务配置转换为JSON并合并
+                //     String settingsJson = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(settings);
+                //     if (StringUtils.hasText(settingsJson)) {
+                //         try {
+                //             JSONObject settingsObject = JSON.parseObject(settingsJson);
+                //             extraJson.putAll(settingsObject);
+                //         } catch (Exception e) {
+                //             log.warn("解析服务配置JSON时出错: {}", e.getMessage());
+                //         }
+                //     }
+                // }
+                
+                // 将企业微信配置放入extra中的weChatWorkExtra字段
+                extraJson.put("weChatWorkExtra", weChatExtra);
+                extra = extraJson.toJSONString();
+                
+                log.info("企业微信客服创建线程：设置weChatWorkExtra字段: {}", weChatExtra);
+            } else {
+                // 普通微信，直接设置
+                extra = weChatExtra;
+            }
         }
+        
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
