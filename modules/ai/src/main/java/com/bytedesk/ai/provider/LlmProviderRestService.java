@@ -77,8 +77,8 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     }
 
     @Cacheable(value = "provider", key = "#name-#level", unless = "#result == null")
-    public Optional<LlmProviderEntity> findByName(String name, String level) {
-        return repository.findByNameAndLevel(name, level);
+    public List<LlmProviderEntity> findByName(String name, String level) {
+        return repository.findByNameAndLevelAndDeletedFalse(name, level);
     }
 
     public List<LlmProviderEntity> findByStatusAndLevelAndDeletedFalse(String status, String level) {
@@ -86,11 +86,11 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     }
 
     public Boolean existsByNameAndLevel(String name, String level) {
-        return repository.existsByNameAndLevel(name, level);
+        return repository.existsByNameAndLevelAndDeletedFalse(name, level);
     }
 
     public Boolean existsByNameAndLevelAndStatus(String name, String level, String status) {
-        return repository.existsByNameAndLevelAndStatus(name, level, status);
+        return repository.existsByNameAndLevelAndStatusAndDeletedFalse(name, level, status);
     }
 
     public Boolean existsByNameAndLevelAndOrgUid(String name, String level, String orgUid) {

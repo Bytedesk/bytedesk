@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 16:33:51
+ * @LastEditTime: 2025-05-19 14:57:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.ai.provider;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
@@ -62,9 +61,9 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                 llmProviderService.createFromProviderJson(providerName, providerJson, level, orgUid);
             } else {
                 // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
-                Optional<LlmProviderEntity> providerOptional = llmProviderService.findByName(providerName, level);
-                if (providerOptional.isPresent()) {
-                    LlmProviderEntity providerEntity = providerOptional.get();
+                List<LlmProviderEntity> providerList = llmProviderService.findByName(providerName, level);
+                if (!providerList.isEmpty()) {
+                    LlmProviderEntity providerEntity = providerList.get(0);
                     String status = providerJson.getStatus();
                     if (!providerEntity.getStatus().equals(status)) {
                         providerEntity.setStatus(status);
@@ -77,9 +76,10 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
         Map<String, List<ModelJson>> modelJsonMap = llmModelJsonService.loadModels();
         for (Map.Entry<String, List<ModelJson>> entry : modelJsonMap.entrySet()) {
             String providerName = entry.getKey();
-            Optional<LlmProviderEntity> provider = llmProviderService.findByName(providerName, level);
-            if (provider.isPresent()) {
-                String providerUid = provider.get().getUid();
+            List<LlmProviderEntity> providerList = llmProviderService.findByName(providerName, level);
+            if (!providerList.isEmpty()) {
+                LlmProviderEntity provider = providerList.get(0);
+                String providerUid = provider.getUid();
                 // log.warn("provider exists {} {} ", providerName, providerUid);
                 List<ModelJson> modelJsons = entry.getValue();
                 for (ModelJson modelJson : modelJsons) {
@@ -104,9 +104,9 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                     llmProviderService.createFromProviderJson(providerName, providerJson, level, orgUid);
                 } else {
                     // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
-                    Optional<LlmProviderEntity> providerOptional = llmProviderService.findByName(providerName, level);
-                    if (providerOptional.isPresent()) {
-                        LlmProviderEntity providerEntity = providerOptional.get();
+                    List<LlmProviderEntity> providerList = llmProviderService.findByName(providerName, level);
+                    if (!providerList.isEmpty()) {
+                        LlmProviderEntity providerEntity = providerList.get(0);
                         providerEntity.setStatus(status);
                         llmProviderService.save(providerEntity);
                     }

@@ -14,7 +14,6 @@
 package com.bytedesk.ai.model;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -44,9 +43,10 @@ public class LlmModelEventListener {
             return;
         }
         // 
-        Optional<LlmProviderEntity> llmProviderPlatform = llmProviderRestService.findByName(lpmEntity.getName(), LevelEnum.PLATFORM.name());
-        if (llmProviderPlatform.isPresent()) {
-            List<LlmModelEntity> llmModelEntitiesPlatform = llmModelRestService.findByProviderUid(llmProviderPlatform.get().getUid());
+        List<LlmProviderEntity> llmProviderPlatformList = llmProviderRestService.findByName(lpmEntity.getName(), LevelEnum.PLATFORM.name());
+        if (!llmProviderPlatformList.isEmpty()) {
+            LlmProviderEntity llmProviderPlatform = llmProviderPlatformList.get(0);
+            List<LlmModelEntity> llmModelEntitiesPlatform = llmModelRestService.findByProviderUid(llmProviderPlatform.getUid());
             for (LlmModelEntity llmModel : llmModelEntitiesPlatform) {
                 // 
                 LlmModelRequest request = LlmModelRequest.builder()
