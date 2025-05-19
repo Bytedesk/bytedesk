@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 18:06:51
+ * @LastEditTime: 2025-05-19 20:26:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.faq;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +23,6 @@ import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.core.utils.BdFileUtils;
-import com.bytedesk.kbase.faq.batch.FaqBatchService;
 import com.bytedesk.kbase.faq.event.FaqCreateEvent;
 import com.bytedesk.kbase.faq.event.FaqDeleteEvent;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
@@ -42,8 +40,8 @@ public class FaqEventListener {
     private final FaqRestService faqRestService;
     private final UploadRestService uploadRestService;
     private final FaqMessageService faqMessageService;
-    private final FaqBatchService faqBatchService;
-    private final Environment environment;
+    // private final FaqBatchService faqBatchService;
+    // private final Environment environment;
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -64,21 +62,19 @@ public class FaqEventListener {
                     log.info("UploadEventListener loadAsResource: {}", filePath);
 
                     // 获取导入方式配置，默认使用Spring Batch
-                    boolean useSpringBatch = environment.getProperty("bytedesk.faq.use-spring-batch", Boolean.class,
-                            true);
-
-                    if (useSpringBatch) {
-                        // 使用Spring Batch进行批量导入
-                        // log.info("使用Spring Batch导入FAQ: {}", filePath);
-                        // 使用Spring Batch进行批量导入
-                        log.info("使用Spring Batch导入FAQ: {}", filePath);
-                        faqBatchService.importFaqFromExcel(
-                                filePath,
-                                KbaseTypeEnum.LLM.name(),
-                                upload.getUid(),
-                                upload.getKbUid(),
-                                upload.getOrgUid());
-                    } else {
+                    // boolean useSpringBatch = environment.getProperty("bytedesk.faq.use-spring-batch", Boolean.class, false);
+                    // if (useSpringBatch) {
+                    //     // 使用Spring Batch进行批量导入
+                    //     // log.info("使用Spring Batch导入FAQ: {}", filePath);
+                    //     // 使用Spring Batch进行批量导入
+                    //     log.info("使用Spring Batch导入FAQ: {}", filePath);
+                    //     faqBatchService.importFaqFromExcel(
+                    //             filePath,
+                    //             KbaseTypeEnum.LLM.name(),
+                    //             upload.getUid(),
+                    //             upload.getKbUid(),
+                    //             upload.getOrgUid());
+                    // } else {
                         // 使用原有的EasyExcel直接导入方式
                         log.info("使用EasyExcel直接导入FAQ: {}", filePath);
                         EasyExcel.read(filePath,
@@ -89,7 +85,7 @@ public class FaqEventListener {
                                         upload.getKbUid(),
                                         upload.getOrgUid()))
                                 .sheet().doRead();
-                    }
+                    // }
                 }
             } catch (Exception e) {
                 log.error("FaqEventListener UploadEventListener create error: {}", e.getMessage(), e);
