@@ -1,4 +1,4 @@
 @NonNullApi
-package com.bytedesk.core.rbac.role;
+package com.bytedesk.core.socket.stomp;
 
 import org.springframework.lang.NonNullApi;
