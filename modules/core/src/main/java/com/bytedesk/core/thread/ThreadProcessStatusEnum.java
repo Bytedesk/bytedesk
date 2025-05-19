@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 22:25:17
+ * @LastEditTime: 2025-05-19 10:28:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,12 @@
  */
 package com.bytedesk.core.thread;
 
-// process status
 // 默认New，判断是否Offline, 如果是，直接Closed
 // 如果不是，判断是否需要排队，如果是，则直接Queuing
 // 如果不需要排队，则直接Chatting
 // Chatting结束后，直接Closed
 public enum ThreadProcessStatusEnum {
-    NEW, // 新会话
+    NEW, // 新会话，待处理
     ROBOTING, // 机器人接待中，外部会话
     LLMING, // 大模型对话中，内部会话
     OFFLINE, // 客服离线
