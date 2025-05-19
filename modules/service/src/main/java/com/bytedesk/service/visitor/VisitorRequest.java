@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 11:38:33
+ * @LastEditTime: 2025-05-19 13:24:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.service.visitor;
 
 import java.util.List;
 import java.util.ArrayList;
-
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ClientEnum;
@@ -107,6 +106,16 @@ public class VisitorRequest extends BaseRequest {
 		// 忽略大小写
 		return this.client.toLowerCase().contains(ClientEnum.WECHAT.name().toLowerCase());
 	}
+	
+	/**
+	 * 判断是否为企业微信客户端
+	 * @return true 如果为企业微信客户端，否则为 false
+	 */
+	public Boolean isWeChatWork() {
+		// 忽略大小写
+		return this.client.toLowerCase().contains(ClientEnum.WECHAT_WORK.name().toLowerCase());
+	}
+
 
 	public ThreadTypeEnum formatType() {
 		int typeInt;
