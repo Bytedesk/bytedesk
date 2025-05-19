@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 15:42:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 17:05:10
+ * @LastEditTime: 2025-05-19 18:06:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,47 +62,33 @@ public class FaqEventListener {
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("UploadEventListener loadAsResource: {}", filePath);
-                    
+
                     // 获取导入方式配置，默认使用Spring Batch
-                    boolean useSpringBatch = environment.getProperty("bytedesk.faq.use-spring-batch", Boolean.class, true);
-                    
+                    boolean useSpringBatch = environment.getProperty("bytedesk.faq.use-spring-batch", Boolean.class,
+                            true);
+
                     if (useSpringBatch) {
                         // 使用Spring Batch进行批量导入
                         // log.info("使用Spring Batch导入FAQ: {}", filePath);
-                        // try {
-                            // 使用Spring Batch进行批量导入
-                            log.info("使用Spring Batch导入FAQ: {}", filePath);
-                            faqBatchService.importFaqFromExcel(
+                        // 使用Spring Batch进行批量导入
+                        log.info("使用Spring Batch导入FAQ: {}", filePath);
+                        faqBatchService.importFaqFromExcel(
                                 filePath,
                                 KbaseTypeEnum.LLM.name(),
                                 upload.getUid(),
                                 upload.getKbUid(),
                                 upload.getOrgUid());
-                        // } catch (Exception batchError) {
-                        //     // 捕获Spring Batch错误，自动回退到EasyExcel
-                        //     log.warn("Spring Batch导入失败，回退到EasyExcel: {}", batchError.getMessage(), batchError.fillInStackTrace());
-                        //     // 使用原有的EasyExcel直接导入方式
-                        //     log.info("回退使用EasyExcel导入FAQ: {}", filePath);
-                        //     EasyExcel.read(filePath, 
-                        //         FaqExcel.class, 
-                        //             new FaqExcelListener(faqRestService,
-                        //             KbaseTypeEnum.LLM.name(),
-                        //             upload.getUid(),
-                        //             upload.getKbUid(),
-                        //             upload.getOrgUid())
-                        //     ).sheet().doRead();
-                        // }
                     } else {
                         // 使用原有的EasyExcel直接导入方式
                         log.info("使用EasyExcel直接导入FAQ: {}", filePath);
-                        EasyExcel.read(filePath, 
-                            FaqExcel.class, 
+                        EasyExcel.read(filePath,
+                                FaqExcel.class,
                                 new FaqExcelListener(faqRestService,
-                                KbaseTypeEnum.LLM.name(),
-                                upload.getUid(),
-                                upload.getKbUid(),
-                                upload.getOrgUid())
-                        ).sheet().doRead();
+                                        KbaseTypeEnum.LLM.name(),
+                                        upload.getUid(),
+                                        upload.getKbUid(),
+                                        upload.getOrgUid()))
+                                .sheet().doRead();
                     }
                 }
             } catch (Exception e) {
@@ -116,7 +102,7 @@ public class FaqEventListener {
     public void onFaqCreateEvent(FaqCreateEvent event) {
         FaqEntity faq = event.getFaq();
         log.info("FaqEventListener onFaqCreateEvent: {}", faq.getQuestion());
-        
+
         // 使用消息队列异步处理索引，避免乐观锁冲突
         faqMessageService.sendToIndexQueue(faq.getUid());
     }
@@ -126,7 +112,7 @@ public class FaqEventListener {
     public void onFaqUpdateDocEvent(FaqUpdateDocEvent event) {
         FaqEntity faq = event.getFaq();
         log.info("FaqEventListener FaqUpdateDocEvent: {}", faq.getQuestion());
-        
+
         // 使用消息队列异步处理索引更新
         faqMessageService.sendToIndexQueue(faq.getUid());
     }
@@ -135,7 +121,7 @@ public class FaqEventListener {
     public void onFaqDeleteEvent(FaqDeleteEvent event) {
         FaqEntity faq = event.getFaq();
         log.info("FaqEventListener onFaqDeleteEvent: {}", faq.getQuestion());
-        
+
         // 删除操作通过消息队列异步处理
         faqMessageService.sendToDeleteQueue(faq.getUid());
     }

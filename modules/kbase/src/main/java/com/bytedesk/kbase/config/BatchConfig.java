@@ -24,6 +24,7 @@ import org.springframework.batch.support.DatabaseType;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -43,6 +44,9 @@ public class BatchConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
     
+    @Value("${spring.batch.database-type:MYSQL}")
+    private String databaseType;
+    
     /**
      * 配置JobRepository
      * JobRepository用于存储和管理批处理元数据（如作业状态、步骤执行情况等）
@@ -60,8 +64,15 @@ public class BatchConfig {
         DataFieldMaxValueIncrementerFactory incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
         factoryBean.setIncrementerFactory(incrementerFactory);
         
-        // 根据数据库类型设置
-        factoryBean.setDatabaseType(DatabaseType.MYSQL.getProductName());
+        // 根据配置的数据库类型设置
+        try {
+            DatabaseType dbType = DatabaseType.valueOf(databaseType);
+            factoryBean.setDatabaseType(dbType.getProductName());
+        } catch (IllegalArgumentException e) {
+            // 如果无法解析配置的数据库类型，使用默认的MYSQL类型并记录警告
+            factoryBean.setDatabaseType(DatabaseType.MYSQL.getProductName());
+            System.out.println("警告: 无法识别配置的数据库类型 '" + databaseType + "', 使用默认的MySQL类型");
+        }
         
         // 确保所有属性设置完成后调用初始化方法
         factoryBean.afterPropertiesSet();
