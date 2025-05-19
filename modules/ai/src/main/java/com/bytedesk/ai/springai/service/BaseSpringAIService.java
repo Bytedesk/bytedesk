@@ -475,6 +475,48 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected abstract void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter);
+            
+    @Override
+    public String sendSyncMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        Assert.hasText(query, "Query must not be empty");
+        Assert.notNull(robot, "Robot must not be null");
+        Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
+        Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
+        
+        try {
+            // 获取系统提示词
+            String systemPrompt = robot.getLlm().getPrompt();
+            String prompt = systemPrompt + "\n\n用户问题：" + query;
+            
+            // 调用同步处理方法
+            String response = processPromptSync(prompt);
+            
+            // 设置回复内容和类型
+            messageProtobufReply.setContent(response);
+            messageProtobufReply.setType(MessageTypeEnum.TEXT);
+            
+            // 保存消息
+            persistMessage(messageProtobufQuery, messageProtobufReply, false);
+            
+            // 发送消息
+            messageSendService.sendProtobufMessage(messageProtobufReply);
+            
+            return response;
+        } catch (Exception e) {
+            log.error("Error in sendSyncMessage", e);
+            String errorMessage = "服务暂时不可用，请稍后重试";
+            messageProtobufReply.setContent(errorMessage);
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            
+            // 保存错误消息
+            persistMessage(messageProtobufQuery, messageProtobufReply, true);
+            
+            // 发送错误消息
+            messageSendService.sendProtobufMessage(messageProtobufReply);
+            
+            return errorMessage;
+        }
+    }
 
     // 抽象方法，由具体实现类提供
     protected abstract String generateFaqPairs(String prompt);

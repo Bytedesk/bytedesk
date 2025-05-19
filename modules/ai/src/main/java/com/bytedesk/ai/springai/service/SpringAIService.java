@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 12:21:47
+ * @LastEditTime: 2025-05-19 12:40:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,9 +39,7 @@ public interface SpringAIService {
      */
     void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,  MessageProtobuf messageProtobufReply, SseEmitter emitter);
 
-    // 给访客使用
-    // void sendSseVisitorMessage(String query, RobotEntity robot, MessageProtobuf messageProtobuf, SseEmitter emitter);
-    
+
     /**
      * 异步生成FAQ对
      * @param chunk 文本块
@@ -54,6 +52,16 @@ public interface SpringAIService {
      * @param chunk 文本块
      */
     void generateFaqPairsSync(String chunk);
+
+    /**
+     * 发送同步消息并返回回复内容
+     * @param query 用户查询
+     * @param robot 机器人实体
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @return 回复内容
+     */
+    String sendSyncMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply);
 
     // void persistMessage(String messageJson);
     void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, Boolean isUnanswered);
