@@ -13,23 +13,13 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
-import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
-import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
-import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
-import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
-import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
-import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
-import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
-import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
-import com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuaiService;
+import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
@@ -46,16 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RobotService {
 
-    private final Optional<SpringAIDeepseekService> springAIDeepseekService;
-    private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
-    private final Optional<SpringAIDashscopeService> springAIDashscopeService;
-    private final Optional<SpringAIOllamaService> springAIOllamaService;
-    private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
-    private final Optional<SpringAIGiteeService> springAIGiteeService;
-    private final Optional<SpringAITencentService> springAITencentService;
-    private final Optional<SpringAIBaiduService> springAIBaiduService;
-    private final Optional<SpringAIVolcengineService> springAIVolcengineService;
-
+    private final SpringAIServiceRegistry springAIServiceRegistry;
     private final ThreadRestService threadRestService;
     private final MessageService messageService;
 
@@ -167,67 +148,26 @@ public class RobotService {
     private void processLlmMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         
-        if (robot.getLlm() == null) {
-            springAIZhipuaiService
-                    .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                            messageProtobufReply, emitter));
-            return;
+        // 获取提供商名称，默认为智谱AI
+        String provider = LlmConsts.ZHIPU;
+        if (robot.getLlm() != null) {
+            provider = robot.getLlm().getProvider().toLowerCase();
         }
-
-        String provider = robot.getLlm().getProvider();
-        switch (provider.toLowerCase()) {
-            case LlmConsts.OLLAMA:
-                springAIOllamaService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.DEEPSEEK:
-                springAIDeepseekService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.DASHSCOPE:
-                springAIDashscopeService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.ZHIPU:
-                springAIZhipuaiService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.SILICONFLOW:
-                springAISiliconFlowService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.GITEE:
-                springAIGiteeService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.TENCENT:
-                springAITencentService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.BAIDU:
-                springAIBaiduService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            case LlmConsts.VOLCENGINE:
-                springAIVolcengineService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
-            default:
-                // 默认使用智谱AI
-                springAIZhipuaiService
-                        .ifPresent(service -> service.sendSseMessage(query, robot, messageProtobufQuery,
-                                messageProtobufReply, emitter));
-                break;
+        
+        try {
+            // 使用SpringAIServiceRegistry获取对应的服务
+            springAIServiceRegistry.getServiceByProviderName(provider)
+                .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        } catch (IllegalArgumentException e) {
+            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmConsts.ZHIPU);
+            // 如果找不到指定的提供商，尝试使用默认的智谱AI
+            try {
+                springAIServiceRegistry.getServiceByProviderName(LlmConsts.ZHIPU)
+                    .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            } catch (Exception ex) {
+                log.error("使用默认AI服务提供商失败", ex);
+                throw new RuntimeException("无法处理AI消息，所有提供商服务均不可用");
+            }
         }
     }
-
 }
