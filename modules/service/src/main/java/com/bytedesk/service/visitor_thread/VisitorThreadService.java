@@ -30,9 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
@@ -109,7 +111,7 @@ public class VisitorThreadService
         String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         if (visitorRequest.isWeChat()) {
-            extra = visitorRequest.getThreadExtra();
+            extra = visitorRequest.getWeChatThreadExtra();
         }
         //
         ThreadEntity thread = ThreadEntity.builder()
@@ -134,7 +136,30 @@ public class VisitorThreadService
             WorkgroupEntity workgroup) {
         //
         if (visitorRequest.isWeChat()) {
-            thread.setExtra(visitorRequest.getThreadExtra());
+            String weChatExtra = visitorRequest.getWeChatThreadExtra();
+            
+            // 如果是企业微信客服，需要特殊处理
+            if (ClientEnum.WECHAT_WORK.name().equals(visitorRequest.getClient()) && StringUtils.hasText(weChatExtra)) {
+                // 获取原始的extra
+                String originalExtra = thread.getExtra();
+                JSONObject extraJson = null;
+                
+                // 解析原始extra
+                if (StringUtils.hasText(originalExtra)) {
+                    extraJson = JSON.parseObject(originalExtra);
+                } else {
+                    extraJson = new JSONObject();
+                }
+                
+                // 将企业微信配置放入extra中的weChatWorkExtra字段
+                extraJson.put("weChatWorkExtra", weChatExtra);
+                thread.setExtra(extraJson.toJSONString());
+                
+                log.info("企业微信客服线程：设置weChatWorkExtra字段: {}", weChatExtra);
+            } else {
+                // 普通微信，直接设置
+                thread.setExtra(weChatExtra);
+            }
         } else {
             String extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());

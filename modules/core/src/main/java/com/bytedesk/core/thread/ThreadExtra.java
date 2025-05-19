@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 08:11:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 13:39:35
+ * @LastEditTime: 2025-05-19 11:57:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,13 +16,12 @@ package com.bytedesk.core.thread;
 import java.io.Serializable;
 
 import lombok.Data;
-import lombok.Builder;
-// import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 // @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)

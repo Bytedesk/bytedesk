@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:18:40
+ * @LastEditTime: 2025-05-19 11:38:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,8 +100,9 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Integer vipLevel = 0;
 
-	// wechat mp extra
-	private String threadExtra;
+	// wechat extra
+	private String weChatThreadExtra;
+	
 	public Boolean isWeChat() {
 		// 忽略大小写
 		return this.client.toLowerCase().contains(ClientEnum.WECHAT.name().toLowerCase());
