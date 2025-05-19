@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 16:05:45
+ * @LastEditTime: 2025-05-19 11:16:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,7 +15,6 @@
 package com.bytedesk.core.message;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 
 import jakarta.persistence.*;
@@ -49,50 +48,32 @@ public class MessageEntity extends AbstractMessageEntity {
 
     // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
     public boolean isFromRobot() {
-        // 忽略大小写，判断是否包含"type":"robot"字段
-        // return user.toLowerCase().contains("\"type\":\"robot\"");
-        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.ROBOT.name());
+        return getUserProtobuf().isFromRobot();
     }
 
     // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
     public boolean isFromVisitor() {
-        // 忽略大小写，判断是否包含"type":"visitor"字段
-        // return user.toLowerCase().contains("\"type\":\"visitor\"");
-        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.VISITOR.name());
+        return getUserProtobuf().isFromVisitor();
     }
 
     public boolean isFromUser() {
-        // 忽略大小写，判断是否包含"type":"user"字段
-        // return user.toLowerCase().contains("\"type\":\"user\"");
-        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.USER.name());
+        return getUserProtobuf().isFromUser();
     }
 
     public boolean isFromMember() {
-        // 忽略大小写，判断是否包含"type":"member"字段
-        // return user.toLowerCase().contains("\"type\":\"member\"");
-        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.MEMBER.name());
+        return getUserProtobuf().isFromMember();
     }
 
     // 是否系统消息
     public boolean isFromSystem() {
-        // 忽略大小写，判断是否包含"type":"system"字段
-        // return user.toLowerCase().contains("\"type\":\"system\"");
-        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.SYSTEM.name());
+        return getUserProtobuf().isFromSystem();
     }
 
     // 是否客服消息
     public boolean isFromAgent() {
-        // 忽略大小写，判断是否包含"type":"agent"字段
-        // return user.toLowerCase().contains("\"type\":\"agent\"");
-        return getUserProtobuf().getType().equalsIgnoreCase(UserTypeEnum.AGENT.name());
+        return getUserProtobuf().isFromAgent();
     }
 
-    // isHelpful, 解析 MessageExtra 字段，
-    // public String helpful() {
-    //     MessageExtra messageExtra = MessageExtra.fromJson(getExtra());
-    //     return messageExtra.getHelpful();
-    // }
-    
     /**
      * 重写toString方法避免循环引用
      */

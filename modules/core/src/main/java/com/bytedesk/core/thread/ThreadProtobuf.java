@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 11:01:25
+ * @LastEditTime: 2025-05-19 11:18:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,6 +54,14 @@ public class ThreadProtobuf implements Serializable {
 
     public String toJson() {
         return JSON.toJSONString(this);
+    }
+
+    public Boolean isCustomerService() {
+        return ThreadTypeEnum.AGENT.equals(type) || ThreadTypeEnum.WORKGROUP.equals(type);
+    }
+
+    public Boolean isMember() {
+    	return ThreadTypeEnum.MEMBER.equals(type);
     }
 
     // public static ThreadProtobuf fromEntity(ThreadEntity thread) {

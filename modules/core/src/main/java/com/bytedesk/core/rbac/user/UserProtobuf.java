@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 11:58:34
+ * @LastEditTime: 2025-05-19 11:14:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,4 +79,33 @@ public class UserProtobuf implements Serializable {
     public static UserProtobuf fromEntity(UserEntity user) {
         return user.toProtobuf();
     }
+
+    // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
+    public Boolean isFromRobot() {
+        return getType().equalsIgnoreCase(UserTypeEnum.ROBOT.name());
+    }
+
+    // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
+    public Boolean isFromVisitor() {
+        return getType().equalsIgnoreCase(UserTypeEnum.VISITOR.name());
+    }
+
+    public Boolean isFromUser() {
+        return getType().equalsIgnoreCase(UserTypeEnum.USER.name());
+    }
+
+    public Boolean isFromMember() {
+        return getType().equalsIgnoreCase(UserTypeEnum.MEMBER.name());
+    }
+
+    // 是否系统消息
+    public Boolean isFromSystem() {
+        return getType().equalsIgnoreCase(UserTypeEnum.SYSTEM.name());
+    }
+
+    // 是否客服消息
+    public Boolean isFromAgent() {
+        return getType().equalsIgnoreCase(UserTypeEnum.AGENT.name());
+    }
+
 }
