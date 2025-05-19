@@ -41,15 +41,12 @@ public class MessageResponse extends BaseResponse {
 	private static final long serialVersionUID = 1L;
 
 	private String type;
-	// private MessageTypeEnum type;
 
 	private String content;
 
 	private String status;
-	// private MessageStatusEnum status;
 
 	private String client;
-	// private ClientEnum client;
 
     private ThreadResponse thread;
 
