@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 17:12:42
+ * @LastEditTime: 2025-05-20 11:09:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -167,7 +167,7 @@ public class FaqElasticService {
         // 关键词查询 - 在question和answer字段中搜索
         MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
             .query(query)
-            .fields("question^3", "answer", "questionList^2", "tagList^1.5") // 字段权重
+            .fields("question^3", "answer", "similarQuestions^2", "tagList^1.5") // 字段权重
             .build();
         boolQueryBuilder.must(multiMatchQuery._toQuery());
         
@@ -258,7 +258,7 @@ public class FaqElasticService {
             
         // 也在问题列表中查找
         boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
-            .field("questionList")
+            .field("similarQuestions")
             .query(query)
             .boost(2.0f)
             .build()._toQuery());
@@ -307,7 +307,7 @@ public class FaqElasticService {
         // 使用NativeQuery而不是直接处理高亮
         NativeQuery searchQuery = NativeQuery.builder()
             .withQuery(boolQueryBuilder.build()._toQuery())
-            .withFields("question", "questionList", "tagList") // 指定需要返回的字段
+            .withFields("question", "similarQuestions", "tagList") // 指定需要返回的字段
             .withMaxResults(10) // 限制结果数量
             .build();
         

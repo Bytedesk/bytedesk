@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:13:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 10:37:57
+ * @LastEditTime: 2025-05-20 11:08:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class FaqVector {
     private String answer;
     
     @Field(type = FieldType.Text)
-    private List<String> questionList;
+    private List<String> similarQuestions;
     
     @Field(type = FieldType.Keyword)
     private List<String> tagList;
@@ -113,7 +113,7 @@ public class FaqVector {
             .uid(faq.getUid())
             .question(faq.getQuestion())
             .answer(faq.getAnswer())
-            .questionList(faq.getQuestionList())
+            .similarQuestions(faq.getSimilarQuestions())
             .tagList(faq.getTagList())
             .orgUid(faq.getOrgUid())
             .kbUid(kbUid)

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-18 09:15:20
+ * @LastEditTime: 2025-05-20 11:07:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,7 +65,7 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> questionList = new ArrayList<>();
+    private List<String> similarQuestions = new ArrayList<>();
 
     // 答案格式类型
     // 暂时忽略掉，因为答案里面可以同时包含：文本、图片、附件等
@@ -301,9 +301,9 @@ public class FaqEntity extends BaseEntity {
         }
         
         // 比较问题列表是否变化
-        if ((questionList == null && request.getQuestionList() != null && !request.getQuestionList().isEmpty()) ||
-            (questionList != null && request.getQuestionList() == null) ||
-            (questionList != null && request.getQuestionList() != null && !questionList.equals(request.getQuestionList()))) {
+        if ((similarQuestions == null && request.getSimilarQuestions() != null && !request.getSimilarQuestions().isEmpty()) ||
+            (similarQuestions != null && request.getSimilarQuestions() == null) ||
+            (similarQuestions != null && request.getSimilarQuestions() != null && !similarQuestions.equals(request.getSimilarQuestions()))) {
             return true;
         }
         
