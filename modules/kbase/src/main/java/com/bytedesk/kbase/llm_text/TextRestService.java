@@ -129,7 +129,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         if (optional.isPresent()) {
             TextEntity entity = optional.get();
             // modelMapper.map(request, entity);
-            // 判断question/answer/questionList/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
+            // 判断question/answer/similarQuestions/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
             if (entity.hasChanged(request)) {
                 // 发布事件，更新文档
                 TextUpdateDocEvent textUpdateDocEvent = new TextUpdateDocEvent(entity);

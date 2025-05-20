@@ -252,7 +252,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
             // 
-            // 判断question/answer/questionList/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
+            // 判断question/answer/similarQuestions/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
             if (entity.hasChanged(request)) {
                 // 发布事件，更新文档
                 FaqUpdateDocEvent qaUpdateDocEvent = new FaqUpdateDocEvent(entity);
@@ -260,7 +260,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             }
             // 设置属性
             entity.setQuestion(request.getQuestion());
-            entity.setQuestionList(request.getQuestionList());
+            entity.setSimilarQuestions(request.getSimilarQuestions());
             entity.setAnswer(request.getAnswer());
             entity.setAnswerHtml(request.getAnswerHtml());
             entity.setAnswerMarkdown(request.getAnswerMarkdown());
