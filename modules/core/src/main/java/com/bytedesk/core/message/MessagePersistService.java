@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 14:58:32
+ * @LastEditTime: 2025-05-20 13:25:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,7 +56,7 @@ public class MessagePersistService {
         String uid = messageProtobuf.getUid();
         if (messageRestService.existsByUid(uid)) {
             // 流式消息单独处理下
-            if (type.equals(MessageTypeEnum.STREAM)) {
+            if (MessageTypeEnum.STREAM.equals(type)) {
                 // 更新消息内容
                 Optional<MessageEntity> message = messageRestService.findByUid(uid);
                 if (message.isPresent()) {
@@ -72,7 +72,7 @@ public class MessagePersistService {
         }
         //
         MessageEntity message = modelMapper.map(messageProtobuf, MessageEntity.class);
-        if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
+        if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
         Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
@@ -103,38 +103,38 @@ public class MessagePersistService {
         // log.info("dealWithMessageNotification: {}, {}", type, content);
 
         // 正在输入/消息预知 - 不保存
-        if (type.equals(MessageTypeEnum.TYPING)
-                || type.equals(MessageTypeEnum.PROCESSING)
-                || type.equals(MessageTypeEnum.PREVIEW)) {
+        if (MessageTypeEnum.TYPING.equals(type)
+                || MessageTypeEnum.PROCESSING.equals(type)
+                || MessageTypeEnum.PREVIEW.equals(type)) {
             return true;
         }
 
         // 继续会话 - 不保存
-        if (type.equals(MessageTypeEnum.CONTINUE)) {
+        if (MessageTypeEnum.CONTINUE.equals(type)) {
             return true;
         }
 
         // 消息撤回 - 从数据库中删除
-        if (type.equals(MessageTypeEnum.RECALL)) {
+        if (MessageTypeEnum.RECALL.equals(type)) {
             dealWithMessageRecall(messageProtobuf);
             return true;
         }
 
         // 消息送达回执 - 处理
-        if (type.equals(MessageTypeEnum.DELIVERED)) {
+        if (MessageTypeEnum.DELIVERED.equals(type)) {
             dealWithMessageReceipt(type, messageProtobuf);
             return true;
         }
 
         // 消息已读回执 - 处理
-        if (type.equals(MessageTypeEnum.READ)) {
+        if (MessageTypeEnum.READ.equals(type)) {
             dealWithMessageReceipt(type, messageProtobuf);
             return true;
         }
 
         //
-        // if (type.equals(MessageTypeEnum.RATE_SUBMIT)
-        //         || type.equals(MessageTypeEnum.RATE_CANCEL)) {
+        // if (MessageTypeEnum.RATE_SUBMIT.equals(type)
+        //         || MessageTypeEnum.RATE_CANCEL.equals(type)) {
         //     // 如果是客服邀请评价/主动评价，则content为邀请/主动评价消息的uid
         //     if (StringUtils.hasText(messageProtobuf.getContent())) {
         //         dealWithRateMessage(type, messageProtobuf);
@@ -143,7 +143,7 @@ public class MessagePersistService {
         // }
 
         //
-        // if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
+        // if (MessageTypeEnum.LEAVE_MSG_SUBMIT.equals(type)) {
         //     // content为留言提示消息的uid
         //     if (StringUtils.hasText(messageProtobuf.getContent())) {
         //         dealWithMessageLeave(type, messageProtobuf);
@@ -154,8 +154,8 @@ public class MessagePersistService {
         // FAQ
 
         //
-        // if (type.equals(MessageTypeEnum.FAQ_UP)
-        //         || type.equals(MessageTypeEnum.FAQ_DOWN)) {
+        // if (MessageTypeEnum.FAQ_UP.equals(type)
+        //         || MessageTypeEnum.FAQ_DOWN.equals(type)) {
         //     // content为被评价的faq消息的uid
         //     if (StringUtils.hasText(messageProtobuf.getContent())) {
         //         dealWithFaqRateMessage(type, messageProtobuf);
@@ -164,14 +164,14 @@ public class MessagePersistService {
         // }
 
         // QA
-        // if (type.equals(MessageTypeEnum.QA)) {
+        // if (MessageTypeEnum.QA.equals(type)) {
         //     dealWithQaMessage(messageProtobuf);
         //     return true;
         // }
 
         //
-        // if (type.equals(MessageTypeEnum.ROBOT_UP)
-        //         || type.equals(MessageTypeEnum.ROBOT_DOWN)) {
+        // if (MessageTypeEnum.ROBOT_UP.equals(type)
+        //         || MessageTypeEnum.ROBOT_DOWN.equals(type)) {
         //     // content为邀请评价消息的uid
         //     if (StringUtils.hasText(messageProtobuf.getContent())) {
         //         dealWithRobotRateMessage(type, messageProtobuf);
@@ -180,8 +180,8 @@ public class MessagePersistService {
         // }
 
         //
-        if (type.equals(MessageTypeEnum.TRANSFER_ACCEPT)
-                || type.equals(MessageTypeEnum.TRANSFER_REJECT)) {
+        if (MessageTypeEnum.TRANSFER_ACCEPT.equals(type)
+                || MessageTypeEnum.TRANSFER_REJECT.equals(type)) {
             // content为转接消息的uid
             if (StringUtils.hasText(messageProtobuf.getContent())) {
                 dealWithTransferMessage(type, messageProtobuf);
@@ -189,8 +189,8 @@ public class MessagePersistService {
             }
         }
 
-        if (type.equals(MessageTypeEnum.INVITE_ACCEPT)
-                || type.equals(MessageTypeEnum.INVITE_REJECT)) {
+        if (MessageTypeEnum.INVITE_ACCEPT.equals(type)
+                || MessageTypeEnum.INVITE_REJECT.equals(type)) {
             if (StringUtils.hasText(messageProtobuf.getContent())) {
                 dealWithInviteMessage(type, messageProtobuf);
                 return true;
@@ -208,9 +208,9 @@ public class MessagePersistService {
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
         if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ.name()) {
             MessageEntity messageEntity = messageOpt.get();
-            if (type.equals(MessageTypeEnum.READ)) {
+            if (MessageTypeEnum.READ.equals(type)) {
                 messageEntity.setStatus(MessageStatusEnum.READ.name());
-            } else if (type.equals(MessageTypeEnum.DELIVERED)) {
+            } else if (MessageTypeEnum.DELIVERED.equals(type)) {
                 messageEntity.setStatus(MessageStatusEnum.DELIVERED.name());
             }
             messageRestService.save(messageEntity);
@@ -230,10 +230,10 @@ public class MessagePersistService {
     //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
     //     if (messageOpt.isPresent()) {
     //         MessageEntity messageEntity = messageOpt.get();
-    //         if (type.equals(MessageTypeEnum.RATE_SUBMIT)) {
+    //         if (MessageTypeEnum.RATE_SUBMIT.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT.name());
     //             messageEntity.setContent(message.getExtra());
-    //         } else if (type.equals(MessageTypeEnum.RATE_CANCEL)) {
+    //         } else if (MessageTypeEnum.RATE_CANCEL.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL.name());
     //         }
     //         messageRestService.save(messageEntity);
@@ -245,7 +245,7 @@ public class MessagePersistService {
     //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
     //     if (messageOpt.isPresent()) {
     //         MessageEntity messageEntity = messageOpt.get();
-    //         if (type.equals(MessageTypeEnum.LEAVE_MSG_SUBMIT)) {
+    //         if (MessageTypeEnum.LEAVE_MSG_SUBMIT.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
     //             messageEntity.setContent(message.getExtra());
     //             messageRestService.save(messageEntity);
@@ -258,9 +258,9 @@ public class MessagePersistService {
     //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
     //     if (messageOpt.isPresent()) {
     //         MessageEntity messageEntity = messageOpt.get();
-    //         if (type.equals(MessageTypeEnum.FAQ_UP)) {
+    //         if (MessageTypeEnum.FAQ_UP.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
-    //         } else if (type.equals(MessageTypeEnum.FAQ_DOWN)) {
+    //         } else if (MessageTypeEnum.FAQ_DOWN.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
     //         }
     //         messageRestService.save(messageEntity);
@@ -272,9 +272,9 @@ public class MessagePersistService {
     //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
     //     if (messageOpt.isPresent()) {
     //         MessageEntity messageEntity = messageOpt.get();
-    //         if (type.equals(MessageTypeEnum.ROBOT_UP)) {
+    //         if (MessageTypeEnum.ROBOT_UP.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
-    //         } else if (type.equals(MessageTypeEnum.ROBOT_DOWN)) {
+    //         } else if (MessageTypeEnum.ROBOT_DOWN.equals(type)) {
     //             messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
     //         }
     //         messageRestService.save(messageEntity);

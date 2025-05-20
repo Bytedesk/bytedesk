@@ -104,6 +104,11 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         // return messageEntities.stream().map(MessageProtobuf::convertToProtobuf).collect(Collectors.toList());
     }
 
+    @Cacheable(value = "message", key = "#uid", unless = "#result == null")
+    public Boolean isMessageExists(String uid) {
+        return messageRepository.existsByUid(uid);
+    }
+
     @Override
     public MessageResponse create(MessageRequest request) {
         // TODO Auto-generated method stub
