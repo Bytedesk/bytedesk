@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 14:41:08
+ * @LastEditTime: 2025-05-20 15:03:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -117,7 +117,6 @@ public class RobotService {
         // 机器人回复访客消息
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
                 messageProtobufQuery);
-        
         // 处理LLM消息
         processLlmMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
