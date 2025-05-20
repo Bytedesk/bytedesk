@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 16:02:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-17 21:40:00
+ * @LastEditTime: 2025-05-20 13:05:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,6 @@
 package com.bytedesk.core.message;
 
 import java.io.IOException;
-// import java.util.Date;
 import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
