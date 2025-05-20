@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 09:26:05
+ * @LastEditTime: 2025-05-20 15:54:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,10 +41,18 @@ public class LlmConsts {
     public static final String GEMINI = "gemini";
     public static final String AIHUBMIX = "aihubmix";
 
-    // 默认Chat提供商
+    // 默认文字对话模型提供商
     public static final String DEFAULT_CHAT_PROVIDER = OLLAMA;
-    // 默认Chat模型
+    // 默认文字对话模型
     public static final String DEFAULT_CHAT_MODEL = "qwen3:0.6b";
+    // 默认Vision提供商
+    public static final String DEFAULT_VISION_PROVIDER = OLLAMA;
+    // 默认Vision模型
+    public static final String DEFAULT_VISION_MODEL = "llava:latest";
+    // 默认Speech提供商
+    public static final String DEFAULT_SPEECH_PROVIDER = OLLAMA;
+    // 默认Speech模型
+    public static final String DEFAULT_SPEECH_MODEL = "mxbai-tts:latest";
     // 默认Embedding提供商
     public static final String DEFAULT_EMBEDDING_PROVIDER = OLLAMA;
     // 默认Embedding模型

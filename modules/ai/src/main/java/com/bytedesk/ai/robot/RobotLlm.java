@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 15:22:57
+ * @LastEditTime: 2025-05-20 15:52:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,15 +42,47 @@ public class RobotLlm {
     @Column(name = "is_stream_enabled")
     private boolean streamEnabled = true;
 
-    // chat model provider
+    // 文字对话模型提供商
     @Builder.Default
-    @Column(name = "llm_provider")
+    @Column(name = "llm_text_provider")
     private String provider = LlmConsts.DEFAULT_CHAT_PROVIDER;
     
     // chat model name
     @Builder.Default
-    @Column(name = "llm_model")
+    @Column(name = "llm_text_model")
     private String model = LlmConsts.DEFAULT_CHAT_MODEL; 
+
+    // 视觉模型
+    // 启用vision
+    @Builder.Default
+    @Column(name = "is_vision_enabled")
+    private boolean visionEnabled = false;
+
+    // 视觉模型提供商
+    @Builder.Default
+    @Column(name = "llm_vision_provider")
+    private String visionProvider = LlmConsts.DEFAULT_VISION_PROVIDER;
+
+    // 视觉模型名称
+    @Builder.Default
+    @Column(name = "llm_vision_model")
+    private String visionModel = LlmConsts.DEFAULT_VISION_MODEL;
+
+    // 语音模型
+    // 启用speech
+    @Builder.Default
+    @Column(name = "is_speech_enabled")
+    private boolean speechEnabled = false;
+
+    // 语音模型提供商
+    @Builder.Default
+    @Column(name = "llm_speech_provider")
+    private String speechProvider = LlmConsts.DEFAULT_SPEECH_PROVIDER;
+
+    // 语音模型名称
+    @Builder.Default
+    @Column(name = "llm_speech_model")
+    private String speechModel = LlmConsts.DEFAULT_SPEECH_MODEL;
 
     // 启用rerank
     @Builder.Default
@@ -59,17 +91,17 @@ public class RobotLlm {
 
     // rerank model provider
     @Builder.Default
-    @Column(name = "rerank_provider")
+    @Column(name = "llm_rerank_provider")
     private String rerankProvider = LlmConsts.DEFAULT_RERANK_PROVIDER;
 
     // rerank model name
     @Builder.Default
-    @Column(name = "rerank_model")
+    @Column(name = "ll_rerank_model")
     private String rerankModel = LlmConsts.DEFAULT_RERANK_MODEL;
 
     // search type
     @Builder.Default
-    @Column(name = "search_type")
+    @Column(name = "llm_search_type")
     private String searchType = RobotSearchTypeEnum.FULLTEXT.name();
 
     // 迁移到kbase
