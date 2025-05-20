@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-28 17:56:26
+ * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 12:24:18
+ * @LastEditTime: 2025-04-22 11:58:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,77 +13,173 @@
  */
 package com.bytedesk.ai.springai.providers.dashscope;
 
+import java.util.List;
+
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.ai.robot.RobotProtobuf;
+
 import lombok.extern.slf4j.Slf4j;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeService extends BaseSpringAIService {
 
-    private final Counter aiRequestCounter;
+    @Autowired(required = false)
+    private OpenAiChatModel dashscopeChatModel;
 
-    public SpringAIDashscopeService(MeterRegistry registry) {
+    public SpringAIDashscopeService() {
         super(); // 调用基类的无参构造函数
+    }
 
-        // 初始化监控指标
-        this.aiRequestCounter = Counter.builder("bytedesk.ai.dashscope.requests")
-                .description("Number of DashScope AI requests")
-                .register(registry);
+    /**
+     * 根据机器人配置创建动态的OpenAiChatOptions
+     * 
+     * @param llm 机器人LLM配置
+     * @return 根据机器人配置创建的选项
+     */
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+        return super.createDynamicOptions(llm, robotLlm -> 
+            OpenAiChatOptions.builder()
+                .model(robotLlm.getModel())
+                .temperature(robotLlm.getTemperature())
+                .topP(robotLlm.getTopP())
+                .build()
+        );
     }
 
     @Override
     protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        aiRequestCounter.increment();
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
+        
+        if (dashscopeChatModel == null) {
+            sendMessage(MessageTypeEnum.ERROR, "Dashscope服务不可用", messageProtobufReply);
+            return;
+        }
+        
+        // 如果有自定义选项，创建新的Prompt
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+        
+        // 使用同一个ChatModel实例，但传入不同的选项
+        dashscopeChatModel.stream(requestPrompt).subscribe(
+                response -> {
+                    if (response != null) {
+                        log.info("Dashscope API response metadata: {}", response.getMetadata());
+                        List<Generation> generations = response.getResults();
+                        for (Generation generation : generations) {
+                            AssistantMessage assistantMessage = generation.getOutput();
+                            String textContent = assistantMessage.getText();
 
-        // 由于目前没有实现具体的DashScope调用逻辑，仅添加符合新接口的方法签名
-        // 实际实现需要根据DashScope API进行适配
-        sendMessage(MessageTypeEnum.ERROR, "DashScope服务尚未实现", messageProtobufReply);
+                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                        }
+                    }
+                },
+                error -> {
+                    log.error("Dashscope API error: ", error);
+                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                },
+                () -> {
+                    log.info("Chat stream completed");
+                });
     }
 
     @Override
     protected String generateFaqPairs(String prompt) {
-        return "";
+        return dashscopeChatModel != null ? dashscopeChatModel.call(prompt) : "";
     }
 
     @Override
     protected String processPromptSync(String message) {
-        return "";
+        try {
+            return dashscopeChatModel != null ? dashscopeChatModel.call(message) : "Dashscope service is not available";
+        } catch (Exception e) {
+            log.error("Dashscope API sync error: ", e);
+            return "服务暂时不可用，请稍后重试";
+        }
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        
-        // 由于目前没有实现具体的DashScope调用逻辑，仅添加符合新接口的方法签名
-        // try {
-        //     messageProtobufReply.setType(MessageTypeEnum.ERROR);
-        //     messageProtobufReply.setContent("DashScope服务尚未实现");
-        //     persistMessage(messageProtobufQuery, messageProtobufReply);
-        //     String messageJson = messageProtobufReply.toJson();
-            
-        //     emitter.send(SseEmitter.event()
-        //             .data(messageJson)
-        //             .id(messageProtobufReply.getUid())
-        //             .name("message"));
-        //     emitter.complete();
-        // } catch (Exception e) {
-        //     log.error("Error in DashScope SSE", e);
-        //     try {
-        //         emitter.completeWithError(e);
-        //     } catch (Exception ex) {
-        //         log.error("Failed to complete emitter with error", ex);
-        //     }
-        // }
+    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
+
+        if (dashscopeChatModel == null) {
+            handleSseError(new RuntimeException("Dashscope service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
+
+        // 发送起始消息
+        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+
+        // 如果有自定义选项，创建新的Prompt
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+
+        dashscopeChatModel.stream(requestPrompt).subscribe(
+                response -> {
+                    try {
+                        if (response != null) {
+                            List<Generation> generations = response.getResults();
+                            for (Generation generation : generations) {
+                                AssistantMessage assistantMessage = generation.getOutput();
+                                String textContent = assistantMessage.getText();
+                                log.info("Dashscope API response metadata: {}, text {}",
+                                        response.getMetadata(), textContent);
+                                
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("Error sending SSE event", e);
+                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                    }
+                },
+                error -> {
+                    log.error("Dashscope API SSE error: ", error);
+                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                },
+                () -> {
+                    log.info("Dashscope API SSE complete");
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
+                });
     }
 
+    public OpenAiChatModel getChatModel() {
+        return dashscopeChatModel;
+    }
+    
+    public boolean isServiceHealthy() {
+        if (dashscopeChatModel == null) {
+            return false;
+        }
+
+        try {
+            String response = processPromptSync("test");
+            return !response.contains("不可用") && !response.equals("Dashscope service is not available");
+        } catch (Exception e) {
+            log.error("Error checking Dashscope service health", e);
+            return false;
+        }
+    }
 }
