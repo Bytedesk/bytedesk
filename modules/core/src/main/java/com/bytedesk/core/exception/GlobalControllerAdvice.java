@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-29 13:53:06
+ * @LastEditTime: 2025-05-20 09:59:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,7 +115,7 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         // 方便测试，打印异常堆栈信息
         e.printStackTrace();
-        log.error("not handled exception:", e.getMessage());
+        log.error("not handled exception 1:", e.getMessage());
         // e.printStackTrace();
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
@@ -175,8 +175,8 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(value = NullPointerException.class)
     public ResponseEntity<?> handleNullPointerException(NullPointerException ex) {
-        log.error("not handled exception:", ex);
-        // ex.printStackTrace();
+        log.error("not handled exception 2:", ex);
+        ex.printStackTrace();
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_NULL_POINTER_EXCEPTION));
     }
 
@@ -216,7 +216,8 @@ public class GlobalControllerAdvice {
     // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleException(Exception e) {
         // if (bytedeskProperties.getDebug()) {
-        log.error("not handled exception:", e);
+        log.error("not handled exception 3:", e);
+        e.printStackTrace();
         // }
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR));
     }
