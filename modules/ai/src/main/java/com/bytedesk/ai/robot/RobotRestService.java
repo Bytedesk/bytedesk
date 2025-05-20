@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 16:23:38
+ * @LastEditTime: 2025-05-20 13:55:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,10 +79,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     private final RobotJsonLoader robotJsonLoader;
 
     private final CategoryRestService categoryService;
-
-    // private final SpringAIBytedeskService springAIBytedeskService;
-
-    // private final StringRedisTemplate stringRedisTemplate;
 
     private final LlmProviderRestService llmProviderRestService;
 
