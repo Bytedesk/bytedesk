@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:34:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 23:32:44
+ * @LastEditTime: 2025-05-20 07:37:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,13 +15,11 @@ package com.bytedesk.kbase.taboo_message;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -33,7 +31,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
 
     private final TabooMessageRestService tabooMessageService;
 
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(TabooMessageRequest request) {
         
@@ -54,18 +52,18 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
     @Override
     public ResponseEntity<?> create(TabooMessageRequest request) {
         
-        TabooMessageResponse taboo_message = tabooMessageService.create(request);
+        TabooMessageResponse tabooMessage = tabooMessageService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(taboo_message));
+        return ResponseEntity.ok(JsonResult.success(tabooMessage));
     }
 
     @ActionAnnotation(title = "taboo_message", action = "更新", description = "update taboo_message")
     @Override
     public ResponseEntity<?> update(TabooMessageRequest request) {
         
-        TabooMessageResponse taboo_message = tabooMessageService.update(request);
+        TabooMessageResponse tabooMessage = tabooMessageService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(taboo_message));
+        return ResponseEntity.ok(JsonResult.success(tabooMessage));
     }
 
     @ActionAnnotation(title = "taboo_message", action = "删除", description = "delete taboo_message")
