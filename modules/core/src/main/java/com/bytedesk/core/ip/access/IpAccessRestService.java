@@ -81,9 +81,10 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 LocalDateTime oneMinuteAgo = now.minusMinutes(1);
                 
                 // 获取最近一分钟的访问记录
-                IpAccessEntity access = ipAccessRepository.findFirstByIpAndEndpointAndAccessTimeAfter(ip, endpoint, oneMinuteAgo);
+                Optional<IpAccessEntity> accessOptional = ipAccessRepository.findFirstByIpAndEndpointAndAccessTimeAfter(ip, endpoint, oneMinuteAgo);
                 // 如果访问记录不存在，则创建新的访问记录
-                if (access == null) {
+                IpAccessEntity access;
+                if (accessOptional.isEmpty()) {
                     String ipLocation = ipService.getIpLocation(ip);
                     // 
                     access = new IpAccessEntity();
@@ -95,6 +96,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                     access.setAccessTime(now);
                     access.setAccessCount(1);
                 } else {
+                    access = accessOptional.get();
                     access.setAccessCount(access.getAccessCount() + 1);
                 }
                 access.setLastAccessTime(now);
