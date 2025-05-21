@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 17:02:23
+ * @LastEditTime: 2025-05-21 17:24:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 
-import com.bytedesk.ai.robot.RobotRequest;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -119,12 +118,10 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
     
-    
     @PostMapping("/{id}/comments")
     public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
         return ticketRestService.addComment(id, comment);
     }
-    
     
     @PostMapping("/{id}/attachments")
     public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
@@ -149,11 +146,11 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
 
     // 智能填写工单
     @PostMapping("/auto/fill/ticket")
-    public ResponseEntity<?> autoFillTicket(@RequestBody RobotRequest request) {
+    public ResponseEntity<?> autoFillTicket(@RequestBody TicketRequest request) {
         //
-        // RobotRequest robotRequest = robotAgentService.autoFillTicket(request);
+        TicketRequest ticketRequest = ticketRestService.autoFillTicket(request);
 
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(ticketRequest));
     }
 
     /**

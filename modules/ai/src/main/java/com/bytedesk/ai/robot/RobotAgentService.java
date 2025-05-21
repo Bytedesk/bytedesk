@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-21 14:23:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 17:03:42
+ * @LastEditTime: 2025-05-21 17:21:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,6 +12,8 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,13 @@ public class RobotAgentService {
     private final RobotRestService robotRestService;
 
     public RobotRequest autoFillTicket(RobotRequest request) {
+        String name = RobotConsts.ROBOT_NAME_TICKET_GENERATE;
+        String orgUid = request.getOrgUid();
+        Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
+        if (robotOptional.isPresent()) {
+            // 
+
+        }
         return request;
     }
 
