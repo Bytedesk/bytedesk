@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-20 16:28:00
+ * @LastEditTime: 2025-05-21 11:54:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,35 +54,35 @@ public class RobotLlm {
 
     // 视觉模型
     // 启用vision
-    // @Builder.Default
-    // @Column(name = "is_vision_enabled")
-    // private boolean visionEnabled = false;
+    @Builder.Default
+    @Column(name = "is_vision_enabled")
+    private boolean visionEnabled = false;
 
-    // // 视觉模型提供商
-    // @Builder.Default
-    // @Column(name = "llm_vision_provider")
-    // private String visionProvider = LlmConsts.DEFAULT_VISION_PROVIDER;
+    // 视觉模型提供商
+    @Builder.Default
+    @Column(name = "llm_vision_provider")
+    private String visionProvider = LlmConsts.DEFAULT_VISION_PROVIDER;
 
-    // // 视觉模型名称
-    // @Builder.Default
-    // @Column(name = "llm_vision_model")
-    // private String visionModel = LlmConsts.DEFAULT_VISION_MODEL;
+    // 视觉模型名称
+    @Builder.Default
+    @Column(name = "llm_vision_model")
+    private String visionModel = LlmConsts.DEFAULT_VISION_MODEL;
 
-    // // 语音模型
-    // // 启用speech
-    // @Builder.Default
-    // @Column(name = "is_speech_enabled")
-    // private boolean speechEnabled = false;
+    // 语音模型
+    // 启用speech
+    @Builder.Default
+    @Column(name = "is_speech_enabled")
+    private boolean speechEnabled = false;
 
-    // // 语音模型提供商
-    // @Builder.Default
-    // @Column(name = "llm_speech_provider")
-    // private String speechProvider = LlmConsts.DEFAULT_SPEECH_PROVIDER;
+    // 语音模型提供商
+    @Builder.Default
+    @Column(name = "llm_speech_provider")
+    private String speechProvider = LlmConsts.DEFAULT_SPEECH_PROVIDER;
 
-    // // 语音模型名称
-    // @Builder.Default
-    // @Column(name = "llm_speech_model")
-    // private String speechModel = LlmConsts.DEFAULT_SPEECH_MODEL;
+    // 语音模型名称
+    @Builder.Default
+    @Column(name = "llm_speech_model")
+    private String speechModel = LlmConsts.DEFAULT_SPEECH_MODEL;
 
     // 启用rerank
     @Builder.Default
