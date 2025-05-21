@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 08:12:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-29 17:20:33
+ * @LastEditTime: 2025-05-21 15:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,14 +32,14 @@ public class JedisProperties {
 
     private String host;
     
-    private Integer port;
+    private int port;
 
     private String password;
 
-    private Integer database;
+    private int database;
     // 
-    private Integer timeout;
-    private Integer soTimeout = Protocol.DEFAULT_TIMEOUT;
+    private int timeout;
+    private int soTimeout = Protocol.DEFAULT_TIMEOUT;
     private String clientName;
     private Boolean ssl;
     // private SSLSocketFactory sslSocketFactory;
