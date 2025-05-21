@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:10:21
+ * @LastEditTime: 2025-05-21 16:28:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -134,10 +134,10 @@ public class UserDetailsImpl implements UserDetails {
                 user.getCountry(),
                 user.getSex(),
                 // 
-                user.getEnabled(),
-                user.getSuperUser(),
-                user.getEmailVerified(),
-                user.getMobileVerified(),
+                user.isEnabled(),
+                user.isSuperUser(),
+                user.isEmailVerified(),
+                user.isMobileVerified(),
                 user.getPlatform(),
                 user.getOrgUid(),
                 user.getCreatedAt(),

@@ -146,7 +146,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
                 RobotMessageEntity latestEntity = latest.get();
                 // 合并需要保留的数据
        
-                // latestEntity.setDeleted(entity.getDeleted());
+                // latestEntity.setDeleted(entity.isDeleted());
                 return robotMessageRepository.save(latestEntity);
             }
         } catch (Exception ex) {

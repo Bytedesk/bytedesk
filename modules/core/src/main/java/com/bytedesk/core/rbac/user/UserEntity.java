@@ -98,19 +98,19 @@ public class UserEntity extends BaseEntityNoOrg {
 
 	@Builder.Default
 	@Column(name = "is_enabled")
-	private Boolean enabled = true;
+	private boolean enabled = true;
 
 	@Builder.Default
 	@Column(name = "is_super")
-	private Boolean superUser = false;
+	private boolean superUser = false;
 
 	@Builder.Default
 	@Column(name = "is_email_verified")
-	private Boolean emailVerified = false;
+	private boolean emailVerified = false;
 
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
-	private Boolean mobileVerified = false;
+	private boolean mobileVerified = false;
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@ManyToOne(fetch = FetchType.LAZY)

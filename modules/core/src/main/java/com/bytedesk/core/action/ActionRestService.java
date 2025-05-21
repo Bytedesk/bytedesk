@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-03 11:35:51
+ * @LastEditTime: 2025-05-21 16:20:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,9 +69,8 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
     }
 
     public ActionResponse create(ActionRequest actionRequest) {
-
         ActionEntity action = modelMapper.map(actionRequest, ActionEntity.class);
-        action.setUid(uidUtils.getCacheSerialUid());
+        action.setUid(uidUtils.getUid());
         //
         UserEntity user = authService.getUser();
         if (user != null) {
@@ -124,7 +123,6 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
     public void delete(ActionRequest entity) {
         deleteByUid(entity.getUid());
     }
-
 
     @Override
     public ActionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ActionEntity entity) {

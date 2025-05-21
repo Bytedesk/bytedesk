@@ -49,7 +49,7 @@ public class WebsiteEntityListener {
         WebsiteEntity clonedWebsite = SerializationUtils.clone(website);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (website.getDeleted()) {
+        if (website.isDeleted()) {
             publisher.publishEvent(new WebsiteDeleteEvent(clonedWebsite));
         } else {
             publisher.publishEvent(new WebsiteUpdateEvent(clonedWebsite));
