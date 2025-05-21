@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 09:52:22
+ * @LastEditTime: 2025-05-21 11:45:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -164,8 +164,14 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @PreAuthorize("hasAuthority('ROBOT_EXPORT')")
     @Override
     public Object export(RobotRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        return exportTemplate(
+            request,
+            response,
+            robotRestService,
+            RobotExcel.class,
+            "提示词",
+            "prompt"
+        );
     }
     
 }
