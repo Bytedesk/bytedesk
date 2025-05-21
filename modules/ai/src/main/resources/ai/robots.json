@@ -1034,6 +1034,29 @@
           "description": "創建一個文本分類機器人"
         }
       }
+    },
+    {
+      "uid": "48",
+      "name": "faq_similar_questions",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "FAQ Similar Questions Generator",
+          "prompt": "Generate multiple similar questions for the given FAQ question to improve search coverage. The questions should vary in phrasing, word order, and expression style, but maintain the same semantic meaning. Please generate at least 5 different ways to ask the same question.\n\nOriginal question: {question}\n\nPlease output only the list of similar questions in JSON format as an array of strings without explanations.",
+          "description": "Create a bot that generates similar question variations for FAQs to improve search and matching"
+        },
+        "zh_cn": {
+          "nickname": "FAQ相似问题生成器",
+          "prompt": "为给定的FAQ问题生成多个相似问题，以提高搜索覆盖率。这些问题在措辞、词序和表达方式上应有所不同，但保持相同的语义。请生成至少5种不同方式来提问相同的问题。\n\n原始问题：{question}\n\n请仅以JSON格式输出相似问题列表，作为字符串数组，不要包含解释说明。",
+          "description": "创建一个为FAQ生成相似问题变体的机器人，以改进搜索和匹配效果"
+        },
+        "zh_tw": {
+          "nickname": "FAQ相似問題生成器",
+          "prompt": "為給定的FAQ問題生成多個相似問題，以提高搜索覆蓋率。這些問題在措辭、詞序和表達方式上應有所不同，但保持相同的語義。請生成至少5種不同方式來提問相同的問題。\n\n原始問題：{question}\n\n請僅以JSON格式輸出相似問題列表，作為字符串數組，不要包含解釋說明。",
+          "description": "創建一個為FAQ生成相似問題變體的機器人，以改進搜索和匹配效果"
+        }
+      }
     }
   ]
 }
