@@ -38,7 +38,7 @@ public class MqttSession implements Serializable {
     // FIXME: 序列化出错, 导致会话只能存储在内存，无法存储到redis
     private Channel channel;
 
-    private boolean cleanSession;
+    private Boolean cleanSession;
 
     // private MqttWillMessage willMessage;
 

@@ -62,10 +62,10 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    private boolean forceValidateEmail = false;
+    private Boolean forceValidateEmail = false;
 
     @Builder.Default
-    private boolean forceValidateMobile = false;
+    private Boolean forceValidateMobile = false;
     
     // TODO: Identity Verification 实名认证
 

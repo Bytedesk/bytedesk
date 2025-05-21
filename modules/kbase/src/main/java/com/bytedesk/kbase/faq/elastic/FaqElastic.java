@@ -61,7 +61,7 @@ public class FaqElastic {
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
-    private boolean enabled;
+    private Boolean enabled;
 
     // startDate
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
@@ -105,7 +105,7 @@ public class FaqElastic {
             .orgUid(faq.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
-            .enabled(faq.isEnabled())
+            .enabled(faq.getEnabled())
             .startDate(faq.getStartDate())
             .endDate(faq.getEndDate())
             // .createdAt(faq.getCreatedAt())

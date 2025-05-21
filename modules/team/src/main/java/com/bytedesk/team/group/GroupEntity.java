@@ -57,7 +57,7 @@ public class GroupEntity extends BaseEntity {
 
     // 是否显示顶部通知提示
     @Builder.Default
-    private boolean showTopTip = false;
+    private Boolean showTopTip = false;
 
     // 通知栏提示
     @Builder.Default
@@ -65,7 +65,8 @@ public class GroupEntity extends BaseEntity {
 
     // 是否外部群
     @Builder.Default
-    private boolean isExternal = false;
+    @Column(name = "is_external")
+    private Boolean external = false;
 
     @Builder.Default
     @Column(name = "group_type", nullable = false)
@@ -140,13 +141,13 @@ public class GroupEntity extends BaseEntity {
     }
 
     // 检查用户是否是群成员
-    public boolean isMember(UserEntity user) {
+    public Boolean isMember(UserEntity user) {
         return members.stream()
             .anyMatch(member -> member.getUser().equals(user));
     }
 
     // 检查用户是否是管理员
-    public boolean isAdmin(UserEntity user) {
+    public Boolean isAdmin(UserEntity user) {
         return admins.contains(user);
     }
 

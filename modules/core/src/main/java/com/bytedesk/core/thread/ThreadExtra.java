@@ -29,5 +29,5 @@ public class ThreadExtra implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    // private boolean isOffline; // 标记此会话是否曾经处于离线状态
+    // private Boolean isOffline; // 标记此会话是否曾经处于离线状态
 }

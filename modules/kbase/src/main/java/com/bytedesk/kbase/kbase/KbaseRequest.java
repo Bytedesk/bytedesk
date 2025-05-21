@@ -152,7 +152,7 @@ public class KbaseRequest extends BaseRequest {
     private String embeddingModel = LlmConsts.DEFAULT_EMBEDDING_MODEL;
 
     @Builder.Default
-    private boolean showChat = false;
+    private Boolean showChat = false;
 
     @Builder.Default
     private Boolean published = true;

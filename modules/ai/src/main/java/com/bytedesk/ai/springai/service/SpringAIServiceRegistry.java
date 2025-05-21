@@ -106,7 +106,7 @@ public class SpringAIServiceRegistry {
      * @param providerName 提供商名称
      * @return 如果提供商可用返回true，否则返回false
      */
-    public boolean isServiceAvailable(String providerName) {
+    public Boolean isServiceAvailable(String providerName) {
         return serviceRegistry.containsKey(providerName);
     }
 }

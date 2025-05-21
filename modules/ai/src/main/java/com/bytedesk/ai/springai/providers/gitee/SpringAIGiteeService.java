@@ -169,7 +169,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         return giteeChatModel;
     }
 
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (giteeChatModel == null) {
             return false;
         }

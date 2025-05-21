@@ -146,7 +146,7 @@ public class FaqEntity extends BaseEntity {
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     // 有效开始日期
     @Builder.Default
@@ -273,7 +273,7 @@ public class FaqEntity extends BaseEntity {
      * @param tag 要检查的标签
      * @return 如果包含该标签则返回true
      */
-    public boolean hasTag(String tag) {
+    public Boolean hasTag(String tag) {
         return tag != null && tagList.contains(tag.trim());
     }
 
@@ -287,7 +287,7 @@ public class FaqEntity extends BaseEntity {
      * @param request QaRequest 请求
      * @return 如果问题或答案有变化返回 true，否则返回 false
      */
-    public boolean hasChanged(FaqRequest request) {
+    public Boolean hasChanged(FaqRequest request) {
         // 比较问题是否变化
         if ((question == null && request.getQuestion() != null) ||
             (question != null && !question.equals(request.getQuestion()))) {

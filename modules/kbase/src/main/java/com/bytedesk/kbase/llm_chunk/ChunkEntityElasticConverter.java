@@ -38,7 +38,7 @@ public class ChunkEntityElasticConverter {
                 .content(entity.getContent())
                 .type(entity.getType())
                 .tagList(entity.getTagList())
-                .enabled(entity.isEnabled())
+                .enabled(entity.getEnabled())
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
                 .docId(entity.getDocId())

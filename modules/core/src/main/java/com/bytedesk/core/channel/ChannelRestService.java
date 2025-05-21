@@ -61,7 +61,7 @@ public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRe
         return channelRepository.findByUid(uid);
     }
 
-    public boolean existsByUid(String uid) {
+    public Boolean existsByUid(String uid) {
         return channelRepository.existsByUid(uid);
     }
 

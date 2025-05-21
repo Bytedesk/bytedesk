@@ -64,7 +64,7 @@ public class QuickReplyEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     @Builder.Default
     @Column(name = "reply_type", nullable = false)
@@ -73,12 +73,12 @@ public class QuickReplyEntity extends BaseEntity {
     // 是否开启自动同步到llm_qa问答
     @Builder.Default
     @Column(name = "is_auto_sync_llm_qa")
-    private boolean autoSyncLlmQa = false;
+    private Boolean autoSyncLlmQa = false;
 
     // 是否已经同步llm问答
     @Builder.Default
     @Column(name = "is_llm_qa_synced")
-    private boolean llmQaSynced = false;
+    private Boolean llmQaSynced = false;
 
     // 同步到llm qa kbUid 
     @Column(name = "llm_kb_uid")

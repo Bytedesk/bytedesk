@@ -119,7 +119,7 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime agentAcceptedAt;  // 开始服务时间
 
     @Builder.Default
-    private boolean agentFirstResponse = false;  // 人工客服是否首次响应
+    private Boolean agentFirstResponse = false;  // 人工客服是否首次响应
 
     private LocalDateTime agentFirstResponseAt;  // 首次响应时间
 
@@ -129,7 +129,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_agent_close")
-    private boolean agentClose = false;  // 是否客服手动结束
+    private Boolean agentClose = false;  // 是否客服手动结束
 
     /**
      * 响应时间计算：
@@ -149,7 +149,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_agent_timeout")
-    private boolean agentTimeout = false; // 是否超时
+    private Boolean agentTimeout = false; // 是否超时
 
     // agent timeout count
     @Builder.Default
@@ -158,7 +158,7 @@ public class QueueMemberEntity extends BaseEntity {
     // 人工是否离线
     @Builder.Default
     @Column(name = "is_agent_offline")
-    private boolean agentOffline = false;
+    private Boolean agentOffline = false;
 
     /**
      * robot 
@@ -170,7 +170,7 @@ public class QueueMemberEntity extends BaseEntity {
     
     @Builder.Default
     @Column(name = "is_robot_first_response")
-    private boolean robotFirstResponse = false;  // 机器人客服是否首次响应
+    private Boolean robotFirstResponse = false;  // 机器人客服是否首次响应
 
     private LocalDateTime robotFirstResponseAt;  // 首次响应时间
 
@@ -192,7 +192,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_robot_timeout")
-    private boolean robotTimeout = false; // 是否超时
+    private Boolean robotTimeout = false; // 是否超时
 
     //-------------------------------
 
@@ -204,7 +204,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_system_close")
-    private boolean systemClose = false;  // 是否系统自动结束
+    private Boolean systemClose = false;  // 是否系统自动结束
 
     @Builder.Default
     private Integer systemMessageCount = 0;  // 系统消息数量
@@ -213,7 +213,7 @@ public class QueueMemberEntity extends BaseEntity {
     // 是否被评价
     @Builder.Default
     @Column(name = "is_rated")
-    private boolean rated = false;
+    private Boolean rated = false;
 
     // 评分时间
     private LocalDateTime rateAt;  // 评分时间
@@ -221,12 +221,12 @@ public class QueueMemberEntity extends BaseEntity {
     // 是否已解决
     @Builder.Default
     @Column(name = "is_resolved")
-    private boolean resolved = false;
+    private Boolean resolved = false;
 
     // 是否留言
     @Builder.Default
     @Column(name = "is_message_leave")
-    private boolean messageLeave = false;
+    private Boolean messageLeave = false;
 
     private LocalDateTime messageLeaveAt;  // 留言时间
 
@@ -234,7 +234,7 @@ public class QueueMemberEntity extends BaseEntity {
     // 是否已经小结
     @Builder.Default
     @Column(name = "is_summarized")
-    private boolean summarized = false;
+    private Boolean summarized = false;
     
     // resolved status
     @Builder.Default
@@ -245,7 +245,7 @@ public class QueueMemberEntity extends BaseEntity {
     // 是否已经质检
     @Builder.Default
     @Column(name = "is_quality_checked")
-    private boolean qualityChecked = false;
+    private Boolean qualityChecked = false;
 
     // 质检结果
     @Builder.Default
@@ -265,7 +265,7 @@ public class QueueMemberEntity extends BaseEntity {
     // 机器人转人工
     @Builder.Default
     @Column(name = "thread_robot_to_agent", nullable = false)
-    private boolean robotToAgent = false;
+    private Boolean robotToAgent = false;
 
     // 机器人转人工时间
     private LocalDateTime robotToAgentAt;  // 机器人转人工时间
@@ -317,7 +317,7 @@ public class QueueMemberEntity extends BaseEntity {
 
 
     // 
-    // public boolean isRobotToAgent() {
+    // public Boolean isRobotToAgent() {
     //     return !ThreadTransferStatusEnum.NONE.name().equals(robotToAgentStatus);
     // }
 
@@ -331,7 +331,7 @@ public class QueueMemberEntity extends BaseEntity {
     /**
      * 检查是否曾经是离线状态
      */
-    // public boolean wasOffline() {
+    // public Boolean wasOffline() {
     //     // return this.wasOffline || (thread != null && thread.isOffline());
     //     return this.wasOffline || (thread != null && thread.isOffline());
     // }

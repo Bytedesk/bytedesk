@@ -41,7 +41,7 @@ public class NamingThreadFactory implements ThreadFactory {
     /**
      * Is daemon thread
      */
-    private boolean daemon;
+    private Boolean daemon;
     /**
      * UncaughtExceptionHandler
      */
@@ -146,7 +146,7 @@ public class NamingThreadFactory implements ThreadFactory {
         this.name = name;
     }
 
-    public boolean isDaemon() {
+    public Boolean isDaemon() {
         return daemon;
     }
 

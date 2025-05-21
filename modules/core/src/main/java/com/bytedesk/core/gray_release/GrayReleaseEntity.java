@@ -36,7 +36,7 @@ public class GrayReleaseEntity extends BaseEntity {
     // 功能开关
     @Builder.Default
     @Column(name = "gray_release_enabled")
-    private boolean enableGrayRelease = false; // 是否启用灰度发布
+    private Boolean enableGrayRelease = false; // 是否启用灰度发布
 
     // 功能列表 - JSON格式存储
     @Builder.Default
@@ -72,7 +72,7 @@ public class GrayReleaseEntity extends BaseEntity {
      * @param feature 功能名称
      * @return 是否可以使用该功能
      */
-    public boolean isUserInGrayRelease(String userUid, String feature) {
+    public Boolean isUserInGrayRelease(String userUid, String feature) {
         // 1. 检查灰度发布是否启用
         if (!enableGrayRelease) {
             return true; // 未启用灰度发布，所有用户都可以使用
@@ -104,16 +104,16 @@ public class GrayReleaseEntity extends BaseEntity {
     /**
      * 检查功能是否在灰度列表中
      */
-    private boolean hasFeature(String feature) {
+    private Boolean hasFeature(String feature) {
         List<Feature> featureList = JSON.parseArray(features, Feature.class);
         return featureList.stream()
-                .anyMatch(f -> f.getName().equals(feature) && f.isEnabled());
+                .anyMatch(f -> f.getName().equals(feature) && f.getEnabled());
     }
 
     /**
      * 检查用户是否在白名单中
      */
-    private boolean isUserInWhitelist(String userUid) {
+    private Boolean isUserInWhitelist(String userUid) {
         List<String> whitelist = JSON.parseArray(whitelistUsers, String.class);
         return whitelist.contains(userUid);
     }
@@ -121,7 +121,7 @@ public class GrayReleaseEntity extends BaseEntity {
     /**
      * 根据用户ID判断是否在灰度比例内
      */
-    private boolean isUserInPercentage(String userUid) {
+    private Boolean isUserInPercentage(String userUid) {
         if (grayReleasePercentage >= 100)
             return true;
         if (grayReleasePercentage <= 0)
@@ -160,7 +160,7 @@ public class GrayReleaseEntity extends BaseEntity {
     @AllArgsConstructor
     public static class Feature {
         private String name;
-        private boolean enabled;
+        private Boolean enabled;
         private String description;
     }
 }

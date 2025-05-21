@@ -139,7 +139,7 @@ public class ChannelAppRestService extends BaseRestServiceWithExcel<ChannelAppEn
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
+                // latestEntity.setDeleted(entity.getDeleted());
                 return appRepository.save(latestEntity);
             }
         } catch (Exception ex) {

@@ -34,7 +34,7 @@ package com.bytedesk.ai.settings;
 // public class RobotServiceSettingsResponse extends ServiceSettingsResponse {
 
 //     // 是否允许转人工
-//     private boolean allowTransferToAgent;
+//     private Boolean allowTransferToAgent;
 
 //     // 限制仅允许：workgroup、appointed
 //     private ThreadTypeEnum transferType;

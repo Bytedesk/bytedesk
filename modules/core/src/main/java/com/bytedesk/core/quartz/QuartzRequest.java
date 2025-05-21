@@ -52,11 +52,11 @@ public class QuartzRequest extends BaseRequest {
     private String cronExpression;
 
     //
-    private boolean durable;
+    private Boolean durable;
 
-    private boolean nonconcurrent;
+    private Boolean nonconcurrent;
 
-    private boolean updateData;
+    private Boolean updateData;
 
 
     // triggers

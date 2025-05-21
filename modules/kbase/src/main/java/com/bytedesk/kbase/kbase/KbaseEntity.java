@@ -107,12 +107,12 @@ public class KbaseEntity extends BaseEntity {
     // 是否收藏
     @Builder.Default
     @Column(name = "is_favorite")
-    private boolean favorite = false;
+    private Boolean favorite = false;
 
     // 是否公开: 内部知识库可设置为公开，外部知识库可设置为不公开
     @Builder.Default
     @Column(name = "is_public")
-    private boolean isPublic = false;
+    private Boolean isPublic = false;
 
     /**
      * 知识库描述
@@ -162,10 +162,10 @@ public class KbaseEntity extends BaseEntity {
     private String embeddingModel = LlmConsts.DEFAULT_EMBEDDING_MODEL; //"embedding-v2";
 
     @Builder.Default
-    private boolean showChat = false;
+    private Boolean showChat = false;
 
     @Builder.Default
-    private boolean published = true;
+    private Boolean published = true;
 
     // 某人工客服快捷回复知识库
     private String agentUid;

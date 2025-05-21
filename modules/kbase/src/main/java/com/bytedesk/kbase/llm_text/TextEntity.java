@@ -75,7 +75,7 @@ public class TextEntity extends BaseEntity {
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     // 有效开始日期
     @Builder.Default
@@ -118,7 +118,7 @@ public class TextEntity extends BaseEntity {
      * @param request TextRequest 请求对象
      * @return 如果关键内容有变化返回 true，否则返回 false
      */
-    public boolean hasChanged(TextRequest request) {
+    public Boolean hasChanged(TextRequest request) {
         // 比较标题是否变化
         if ((title == null && request.getTitle() != null) ||
             (title != null && !title.equals(request.getTitle()))) {

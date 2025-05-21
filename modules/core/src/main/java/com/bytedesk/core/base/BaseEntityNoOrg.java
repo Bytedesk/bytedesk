@@ -95,7 +95,7 @@ public abstract class BaseEntityNoOrg implements Serializable {
 	 */
 	@Builder.Default
 	@Column(name = "is_deleted")
-	private boolean deleted = false;
+	private Boolean deleted = false;
 
     // platform: 只有超级管理员才有权限
     // organization: 管理员才有权限

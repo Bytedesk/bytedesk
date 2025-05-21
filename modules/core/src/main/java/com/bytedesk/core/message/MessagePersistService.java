@@ -98,7 +98,7 @@ public class MessagePersistService {
     }
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false
-    private boolean dealWithMessageNotification(@NonNull MessageTypeEnum type, MessageProtobuf messageProtobuf) {
+    private Boolean dealWithMessageNotification(@NonNull MessageTypeEnum type, MessageProtobuf messageProtobuf) {
         // String content = messageProtobuf.getContent();
         // log.info("dealWithMessageNotification: {}, {}", type, content);
 

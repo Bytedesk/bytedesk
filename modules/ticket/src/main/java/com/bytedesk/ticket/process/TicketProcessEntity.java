@@ -58,7 +58,7 @@ public class TicketProcessEntity extends BaseEntity {
     // 是否已部署流程
     @Builder.Default
     @Column(name = "is_deployed")
-    private boolean deployed = false;
+    private Boolean deployed = false;
 
     // 部署id
     private String deploymentId;

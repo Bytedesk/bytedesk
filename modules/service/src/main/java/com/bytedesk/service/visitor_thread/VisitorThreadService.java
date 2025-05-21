@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 13:11:29
+ * @LastEditTime: 2025-05-21 15:28:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -330,7 +330,7 @@ public class VisitorThreadService
                         if (queueMemberOpt.isPresent()) {
                             QueueMemberEntity queueMember = queueMemberOpt.get();
                             // 判断是否首次超时
-                            if (!queueMember.isAgentTimeout()) {
+                            if (!queueMember.getAgentTimeout()) {
                                 // 只设置首次超时时间，后续不再更新
                                 if (queueMember.getAgentTimeoutAt() == null) {
                                     queueMember.setAgentTimeoutAt(LocalDateTime.now());

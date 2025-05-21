@@ -111,7 +111,7 @@ public class TextElasticService {
      * @param textUid 要删除的Text的UID
      * @return 是否删除成功
      */
-    public boolean deleteText(String textUid) {
+    public Boolean deleteText(String textUid) {
         log.info("从索引中删除Text: {}", textUid);
         
         try {
@@ -137,7 +137,7 @@ public class TextElasticService {
      * @param kbaseUid 知识库UID
      * @return 是否删除成功
      */
-    public boolean deleteByKbaseUid(String kbaseUid) {
+    public Boolean deleteByKbaseUid(String kbaseUid) {
         log.info("删除知识库下所有Text索引: {}", kbaseUid);
         
         try {

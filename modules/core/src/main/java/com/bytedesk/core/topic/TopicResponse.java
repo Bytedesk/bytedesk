@@ -43,9 +43,9 @@ public class TopicResponse extends BaseResponse {
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
     // private Integer qos;
 
-    // private boolean subscribed;
+    // private Boolean subscribed;
 
-    // private boolean wildcard;
+    // private Boolean wildcard;
 
     /**
      * current online clientIds

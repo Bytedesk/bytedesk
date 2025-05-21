@@ -53,7 +53,7 @@ public class WorktimeSettingEntity extends BaseEntity {
 
     // 工作时间设置是否启用
     @Builder.Default
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     // 默认工作时间列表（周一至周五 9:00-18:00）
     @Builder.Default
@@ -72,15 +72,15 @@ public class WorktimeSettingEntity extends BaseEntity {
 
     // 非工作时间是否启用机器人
     @Builder.Default
-    private boolean nonWorktimeRobotEnabled = true;
+    private Boolean nonWorktimeRobotEnabled = true;
 
     // 非工作时间是否启用留言功能
     @Builder.Default
-    private boolean nonWorktimeLeaveMessageEnabled = true;
+    private Boolean nonWorktimeLeaveMessageEnabled = true;
 
     // 工作时间通知设置
     @Builder.Default
-    private boolean worktimeNotificationEnabled = false;
+    private Boolean worktimeNotificationEnabled = false;
 
     // 工作时间通知方式（邮件、短信、企业微信等）
     @Builder.Default
@@ -95,7 +95,7 @@ public class WorktimeSettingEntity extends BaseEntity {
      * 
      * @return true 如果当前时间在工作时间内，false 如果不在
      */
-    public boolean isInWorktime() {
+    public Boolean isInWorktime() {
         LocalDate today = LocalDate.now();
         
         // 1. 检查是否是节假日
@@ -116,7 +116,7 @@ public class WorktimeSettingEntity extends BaseEntity {
     /**
      * 检查当前时间是否在特殊工作时间内
      */
-    private boolean isInSpecialWorktime() {
+    private Boolean isInSpecialWorktime() {
         if (specialWorktimes == null || specialWorktimes.isEmpty()) {
             return false;
         }
@@ -127,7 +127,7 @@ public class WorktimeSettingEntity extends BaseEntity {
     /**
      * 检查当前时间是否在正常工作时间内
      */
-    private boolean isInRegularWorktime() {
+    private Boolean isInRegularWorktime() {
         if (regularWorktimes == null || regularWorktimes.isEmpty()) {
             return false;
         }

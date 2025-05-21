@@ -126,7 +126,7 @@ public class ThreadInviteServiceDelegate implements JavaDelegate {
     /**
      * 发送邀请通知
      */
-    // private boolean sendInvitation(DelegateExecution execution, String fromAgentUid, String toAgentUid) {
+    // private Boolean sendInvitation(DelegateExecution execution, String fromAgentUid, String toAgentUid) {
     //     // TODO: 实际项目中，这里应该实现发送邀请通知的逻辑
         
     //     String threadUid = (String) execution.getVariable("threadUid");
@@ -249,12 +249,12 @@ public class ThreadInviteServiceDelegate implements JavaDelegate {
      * 内部类：邀请响应
      */
     // private static class InvitationResponse {
-    //     private boolean accepted;
+    //     private Boolean accepted;
     //     private String responseMessage;
     //     private String declineReason;
     //     private Date estimatedJoinTime;
         
-    //     public boolean isAccepted() {
+    //     public Boolean isAccepted() {
     //         return accepted;
     //     }
         

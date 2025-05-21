@@ -64,7 +64,7 @@ public class BlackEntity extends BaseEntity {
 
     // 是否封禁ip
     @Builder.Default
-    private boolean blockIp = false;
+    private Boolean blockIp = false;
 
     // // 执行拉黑的用户uid
     // @Column(nullable = false)

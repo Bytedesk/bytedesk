@@ -67,7 +67,7 @@ public class Connect {
 
         // 
         final String clientId = mqttConnectMessage.payload().clientIdentifier();
-        final boolean isCleanSession = mqttConnectMessage.variableHeader().isCleanSession();
+        final Boolean isCleanSession = mqttConnectMessage.variableHeader().isCleanSession();
         // clientId为空或null的情况, 这里要求客户端必须提供clientId, 不管cleanSession是否为1, 此处没有参考标准协议实现
         if (!StringUtils.hasText(clientId)) {
             final MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
@@ -101,7 +101,7 @@ public class Connect {
             if (sessionStore != null) {
                 // FIXME: java.lang.NullPointerException: null
                 final Channel previous = sessionStore.getChannel();
-                final Boolean cleanSession = sessionStore.isCleanSession();
+                final Boolean cleanSession = sessionStore.getCleanSession();
                 // 一个账号可以同时登录多个不同客户端，但同一个客户端同时仅能够登录一个，
                 // 多余需要踢掉线（不同终端后不会互踢，但是两个相同终端（例如两个 iOS 端登录）会互踢。）
                 if (cleanSession.booleanValue()) {

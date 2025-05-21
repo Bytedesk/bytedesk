@@ -45,7 +45,7 @@ public class ChunkEntityListener {
         ChunkEntity clonedChunk = SerializationUtils.clone(chunk);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (chunk.isDeleted()) {
+        if (chunk.getDeleted()) {
             log.info("ChunkEntityListener onPostUpdate: Chunk is deleted");
             publisher.publishEvent(new ChunkDeleteEvent(clonedChunk));
         }else {

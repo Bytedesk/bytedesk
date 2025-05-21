@@ -65,7 +65,7 @@ public class TokenEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_revoked")
-    private boolean revoked = false;
+    private Boolean revoked = false;
 
     @Builder.Default
     private String client = ClientEnum.WEB.name();
@@ -74,7 +74,7 @@ public class TokenEntity extends BaseEntity {
     private String device;
 
     // 验证token是否有效
-    public boolean isValid() {
+    public Boolean isValid() {
         return !revoked && expiresAt.isAfter(LocalDateTime.now());
     }
 

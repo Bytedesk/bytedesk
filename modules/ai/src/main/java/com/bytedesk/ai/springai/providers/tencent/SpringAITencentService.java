@@ -168,7 +168,7 @@ public class SpringAITencentService extends BaseSpringAIService {
         return tencentChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (tencentChatModel == null) {
             return false;
         }

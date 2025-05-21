@@ -48,7 +48,7 @@ public class UploadEventListener {
     //     UploadEntity upload = event.getUpload();
     //     log.info("UploadEventListener update: {}", upload.toString());
     //     // 后台删除文件记录
-    //     if (upload.isDeleted()) {
+    //     if (upload.getDeleted()) {
     //         // 通知python ai模块处理
     //         // redisPubsubService.sendDeleteFileMessage(upload.getUid(), upload.getDocIdList());
     //         // 删除redis中缓存的document

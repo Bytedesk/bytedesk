@@ -61,14 +61,14 @@ public class RatedownSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_default_template")
-    private boolean defaultTemplate = false;
+    private Boolean defaultTemplate = false;
     
     /**
      * 是否启用点踩功能
      */
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     /**
      * 点踩选项
@@ -99,7 +99,7 @@ public class RatedownSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "allow_custom_feedback")
-    private boolean allowCustomFeedback = true;
+    private Boolean allowCustomFeedback = true;
     
     /**
      * 自定义文本反馈的最大字符限制
@@ -113,14 +113,14 @@ public class RatedownSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "require_followup")
-    private boolean requireFollowup = false;
+    private Boolean requireFollowup = false;
     
     /**
      * 点踩后是否显示感谢消息
      */
     @Builder.Default
     @Column(name = "show_thank_you_message")
-    private boolean showThankYouMessage = true;
+    private Boolean showThankYouMessage = true;
     
     /**
      * 感谢消息内容
@@ -134,19 +134,19 @@ public class RatedownSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "trigger_satisfaction_survey")
-    private boolean triggerSatisfactionSurvey = false;
+    private Boolean triggerSatisfactionSurvey = false;
     
     /**
      * 是否记录点踩的会话到质检系统
      */
     @Builder.Default
     @Column(name = "mark_for_quality_inspection")
-    private boolean markForQualityInspection = true;
+    private Boolean markForQualityInspection = true;
     
     /**
      * 点踩后是否尝试转人工客服
      */
     @Builder.Default
     @Column(name = "offer_human_agent")
-    private boolean offerHumanAgent = true;
+    private Boolean offerHumanAgent = true;
 }

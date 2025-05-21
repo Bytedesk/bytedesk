@@ -74,7 +74,7 @@ public class ChunkVectorService {
                 KbaseConst.KBASE_KB_UID, chunk.getKbase() != null ? chunk.getKbase().getUid() : "",
                 "categoryUid", chunk.getCategoryUid() != null ? chunk.getCategoryUid() : "",
                 "orgUid", chunk.getOrgUid(),
-                "enabled", Boolean.toString(chunk.isEnabled()),
+                "enabled", Boolean.toString(chunk.getEnabled()),
                 "tags", tags,
                 "type", chunk.getType(),
                 "docId", chunk.getDocId() != null ? chunk.getDocId() : "",

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 13:37:30
+ * @LastEditTime: 2025-05-21 15:19:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ public class WebsiteEntityListener {
         WebsiteEntity clonedWebsite = SerializationUtils.clone(website);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (website.isDeleted()) {
+        if (website.getDeleted()) {
             publisher.publishEvent(new WebsiteDeleteEvent(clonedWebsite));
         } else {
             publisher.publishEvent(new WebsiteUpdateEvent(clonedWebsite));

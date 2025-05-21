@@ -51,7 +51,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     private final UidUtils uidUtils;
     
-    public boolean isIpBlocked(String ip) {
+    public Boolean isIpBlocked(String ip) {
         // 检查是否在白名单中
         if (whitelistRepository.existsByIp(ip)) {
             return false;

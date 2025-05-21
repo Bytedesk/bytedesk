@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 14:01:25
+ * @LastEditTime: 2025-05-21 15:28:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class VisitorThreadEventListener {
         log.info("visitor onThreadCloseEvent: {}", thread.getUid());
         String topic = thread.getTopic();
         String content = "会话已结束";
-        if (thread.isAutoClose()) {
+        if (thread.getAutoClose()) {
             // 自动关闭会话
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
@@ -77,7 +77,7 @@ public class VisitorThreadEventListener {
                 queueMember.setSystemCloseAt(LocalDateTime.now());
                 queueMember.setSystemClose(true);
                 queueMemberRestService.save(queueMember);
-                if (queueMember.isAgentOffline()) {
+                if (queueMember.getAgentOffline()) {
                     // 客服离线，自动关闭会话，不发送自动关闭消息
                     return;
                 }
@@ -143,7 +143,7 @@ public class VisitorThreadEventListener {
         }
 
         // 发送消息
-        MessageProtobuf messageProtobuf = thread.isAutoClose()
+        MessageProtobuf messageProtobuf = thread.getAutoClose()
                 ? MessageUtils.createAutoCloseMessage(thread, content)
                 : MessageUtils.createAgentCloseMessage(thread, content);
         messageSendService.sendProtobufMessage(messageProtobuf);
@@ -172,7 +172,7 @@ public class VisitorThreadEventListener {
                 Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
                 if (workgroupOptional.isPresent()) {
                     WorkgroupEntity workgroup = workgroupOptional.get();
-                    if (workgroup.getServiceSettings().isEnableProactiveTrigger()
+                    if (workgroup.getServiceSettings().getEnableProactiveTrigger()
                             && diffInSeconds > workgroup.getServiceSettings().getNoResponseTimeout()) {
                         // 触发自动回复
                         log.info("visitor_thread quartz one min event thread: " + thread.getUid()
@@ -187,7 +187,7 @@ public class VisitorThreadEventListener {
                 Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
                 if (agentOptional.isPresent()) {
                     AgentEntity agent = agentOptional.get();
-                    if (agent.getServiceSettings().isEnableProactiveTrigger()
+                    if (agent.getServiceSettings().getEnableProactiveTrigger()
                             && diffInSeconds > agent.getServiceSettings().getNoResponseTimeout()) {
                         // 触发自动回复
                         log.info("visitor_thread quartz one min event thread: " + thread.getUid()
@@ -202,7 +202,7 @@ public class VisitorThreadEventListener {
                 Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
                 if (robotOptional.isPresent()) {
                     RobotEntity robot = robotOptional.get();
-                    if (robot.getServiceSettings().isEnableProactiveTrigger()
+                    if (robot.getServiceSettings().getEnableProactiveTrigger()
                             && diffInSeconds > robot.getServiceSettings().getNoResponseTimeout()) {
                         // 触发自动回复
                         log.info("visitor_thread quartz one min event thread: " + thread.getUid()

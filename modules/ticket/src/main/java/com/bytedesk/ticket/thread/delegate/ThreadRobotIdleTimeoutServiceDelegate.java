@@ -74,7 +74,7 @@ public class ThreadRobotIdleTimeoutServiceDelegate implements JavaDelegate {
      * @param execution 流程执行上下文
      * @return 如果真的超时，返回true；否则返回false
      */
-    private boolean isReallyTimedOut(DelegateExecution execution) {
+    private Boolean isReallyTimedOut(DelegateExecution execution) {
         try {
             // 获取设置的超时时间
             Integer idleTimeout = (Integer) execution.getVariable(ThreadConsts.THREAD_VARIABLE_ROBOT_IDLE_TIMEOUT);

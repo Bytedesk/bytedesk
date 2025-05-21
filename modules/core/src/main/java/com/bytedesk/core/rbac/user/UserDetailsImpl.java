@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 09:57:06
+ * @LastEditTime: 2025-05-21 15:10:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,10 +45,10 @@ public class UserDetailsImpl implements UserDetails {
     private String country;
     private String sex;
     // 
-    private boolean enabled;
-    private boolean superUser;
-    private boolean emailVerified;
-    private boolean mobileVerified;
+    private Boolean enabled;
+    private Boolean superUser;
+    private Boolean emailVerified;
+    private Boolean mobileVerified;
     private String platform;
     // 
     private String orgUid;
@@ -73,10 +73,10 @@ public class UserDetailsImpl implements UserDetails {
             String country,
             String sex,
             // 
-            boolean enabled,
-            boolean superUser,
-            boolean emailVerified,
-            boolean mobileVerified,
+            Boolean enabled,
+            Boolean superUser,
+            Boolean emailVerified,
+            Boolean mobileVerified,
             String platform,
             String orgUid,
             LocalDateTime createdAt,
@@ -134,10 +134,10 @@ public class UserDetailsImpl implements UserDetails {
                 user.getCountry(),
                 user.getSex(),
                 // 
-                user.isEnabled(),
-                user.isSuperUser(),
-                user.isEmailVerified(),
-                user.isMobileVerified(),
+                user.getEnabled(),
+                user.getSuperUser(),
+                user.getEmailVerified(),
+                user.getMobileVerified(),
                 user.getPlatform(),
                 user.getOrgUid(),
                 user.getCreatedAt(),

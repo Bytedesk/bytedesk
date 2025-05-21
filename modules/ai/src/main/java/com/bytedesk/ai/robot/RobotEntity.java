@@ -95,21 +95,21 @@ public class RobotEntity extends BaseEntity {
     // stream, 使用流式返回
     @Builder.Default
     @Column(name = "is_stream")
-    private boolean stream = true;
+    private Boolean stream = true;
 
     // @Builder.Default
-    // private boolean published = false;
+    // private Boolean published = false;
 
     @Builder.Default
     @Column(name = "is_kb_enabled")
-    private boolean kbEnabled = false;
+    private Boolean kbEnabled = false;
 
     private String kbUid; // 对应知识库
 
     // flow enabled
     @Builder.Default
     @Column(name = "is_flow_enabled")
-    private boolean flowEnabled = false;
+    private Boolean flowEnabled = false;
 
     // flow uid
     private String flowUid;
@@ -119,7 +119,7 @@ public class RobotEntity extends BaseEntity {
     // 是否是系统自带
     @Builder.Default
     @Column(name = "is_system")
-    private boolean system = false;
+    private Boolean system = false;
 
     // 邀请设置
     @ManyToOne(fetch = FetchType.LAZY)

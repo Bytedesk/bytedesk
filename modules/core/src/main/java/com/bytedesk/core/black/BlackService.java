@@ -28,7 +28,7 @@ public class BlackService {
 
     private final BlackRestService blackRestService;
 
-    public boolean isBlackList(String visitorUid, String orgUid) {
+    public Boolean isBlackList(String visitorUid, String orgUid) {
         Optional<BlackEntity> blackOpt = blackRestService.findByVisitorUidAndOrgUid(visitorUid, orgUid);
         if (blackOpt.isPresent()) {
             BlackEntity black = blackOpt.get();
@@ -40,7 +40,7 @@ public class BlackService {
     }
     
     // 检查黑名单
-    public boolean isBlackList(MessageProtobuf messageProtobuf) {
+    public Boolean isBlackList(MessageProtobuf messageProtobuf) {
         // String uid = messageProtobuf.getUser().getUid();
         String userUid = messageProtobuf.getUser().getUid();
         if (userUid == null) {

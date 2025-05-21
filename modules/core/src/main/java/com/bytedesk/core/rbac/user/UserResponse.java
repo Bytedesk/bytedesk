@@ -51,7 +51,7 @@ public class UserResponse extends BaseResponse {
     //
     private Sex sex;
     private Boolean enabled;
-    private boolean superUser;
+    private Boolean superUser;
     private Boolean emailVerified;
     private Boolean mobileVerified;
     //

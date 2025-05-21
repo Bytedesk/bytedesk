@@ -79,7 +79,7 @@ public class ChunkEntity extends BaseEntity {
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     // 有效开始日期
     @Builder.Default
@@ -121,7 +121,7 @@ public class ChunkEntity extends BaseEntity {
      * @param request ChunkRequest 请求对象
      * @return 如果关键内容有变化返回 true，否则返回 false
      */
-    public boolean hasChanged(ChunkRequest request) {
+    public Boolean hasChanged(ChunkRequest request) {
         // 比较名称是否变化
         if ((name == null && request.getName() != null) ||
             (name != null && !name.equals(request.getName()))) {

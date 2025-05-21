@@ -193,7 +193,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         Optional<TextEntity> optional = textRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             TextEntity entity = optional.get();
-            entity.setEnabled(entity.isEnabled());
+            entity.setEnabled(entity.getEnabled());
             // 
             TextEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -214,7 +214,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
                 // 合并需要保留的数据
                 latestEntity.setTitle(entity.getTitle());
                 latestEntity.setContent(entity.getContent());
-                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setEnabled(entity.getEnabled());
                 latestEntity.setType(entity.getType());
 
                 // 文档ID列表和状态
@@ -243,7 +243,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
                 excel.setCategory(category.get().getName());
             }
         }
-        if (text.isEnabled()) {
+        if (text.getEnabled()) {
             excel.setEnabled("是");
         } else {
             excel.setEnabled("否");

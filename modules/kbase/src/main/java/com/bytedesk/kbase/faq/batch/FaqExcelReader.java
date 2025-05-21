@@ -40,7 +40,7 @@ public class FaqExcelReader implements ItemReader<FaqExcel> {
 
     private Resource resource;
     private Queue<FaqExcel> items;
-    private boolean initialized = false;
+    private Boolean initialized = false;
 
     public void setResource(Resource resource) {
         this.resource = resource;

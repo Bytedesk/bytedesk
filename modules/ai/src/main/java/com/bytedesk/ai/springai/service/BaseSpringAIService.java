@@ -183,7 +183,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         // 根据是否启用LLM决定如何处理结果
-        if (robot.getLlm().isEnabled()) {
+        if (robot.getLlm().getEnabled()) {
             // 启用大模型
             processLlmResponse(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } else {

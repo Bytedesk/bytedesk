@@ -163,7 +163,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         return baiduChatModel;
     }
 
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (baiduChatModel == null) {
             return false;
         }

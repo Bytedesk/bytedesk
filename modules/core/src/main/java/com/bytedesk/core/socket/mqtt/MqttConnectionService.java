@@ -48,7 +48,7 @@ public class MqttConnectionService {
         stringRedisTemplate.opsForZSet().remove(RedisConsts.CONNECTED_MQTT_CLIENT_IDS, clientId);
     }
 
-    public boolean isConnected(String clientId) {
+    public Boolean isConnected(String clientId) {
         if (!StringUtils.hasText(clientId)) {
             return false;
         }

@@ -59,13 +59,13 @@ public class MailReceiverConfig {
     private String mailPassword;
 
     @Value("${bytedesk.mail.receiver.ssl-enable:true}")
-    private boolean sslEnable;
+    private Boolean sslEnable;
 
     @Value("${bytedesk.mail.receiver.poll-interval:60000}")
     private long pollInterval;
 
     @Value("${bytedesk.mail.receiver.delete-after-receive:false}")
-    private boolean deleteAfterReceive;
+    private Boolean deleteAfterReceive;
     
     @Autowired
     private EmailReceiveService emailReceiveService;

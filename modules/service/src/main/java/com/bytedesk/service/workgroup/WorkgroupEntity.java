@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:46:07
+ * @LastEditTime: 2025-05-21 15:26:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -144,7 +144,7 @@ public class WorkgroupEntity extends BaseEntity {
     /**
      * 检查是否超载
      */
-    public boolean isOverloaded() {
+    public Boolean isOverloaded() {
         // 1. 检查总会话数是否超限
         // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
         //     return true;
@@ -224,11 +224,11 @@ public class WorkgroupEntity extends BaseEntity {
     //     return assignedAgent;
     // }
 
-    public boolean isConnected() {
+    public Boolean isConnected() {
         if (this.agents == null || this.agents.isEmpty()) {
             return false;
         }
-        return this.agents.stream().anyMatch(agent -> agent.isConnected());
+        return this.agents.stream().anyMatch(agent -> agent.getConnected());
     }
 
     public UserProtobuf toUserProtobuf() {
@@ -246,7 +246,7 @@ public class WorkgroupEntity extends BaseEntity {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
         }
-        return this.agents.stream().filter(agent -> agent.isConnected()).count();
+        return this.agents.stream().filter(agent -> agent.getConnected()).count();
     }
 
     // agent available count

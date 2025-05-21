@@ -41,7 +41,7 @@ public class TicketProcessResponse extends BaseResponse {
     private String content;
 
     // 是否已部署流程
-    private boolean deployed;
+    private Boolean deployed;
 
     // 部署id
     private String deploymentId;

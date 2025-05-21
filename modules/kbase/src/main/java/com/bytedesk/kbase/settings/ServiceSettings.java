@@ -54,12 +54,12 @@ public class ServiceSettings implements Serializable {
 
     @NotBlank
     @Builder.Default
-    private boolean autoPopup = false;
+    private Boolean autoPopup = false;
 
     // 顶部提示开关
     @NotBlank
     @Builder.Default
-    private boolean showTopTip = false;
+    private Boolean showTopTip = false;
     
     @NotBlank
     @Builder.Default
@@ -73,12 +73,12 @@ public class ServiceSettings implements Serializable {
     // show rate btn on chat toolbar
     @NotBlank
     @Builder.Default
-    private boolean showRateBtn = false;
+    private Boolean showRateBtn = false;
 
     // 关闭会话时自动发送满意度评价
     @NotBlank
     @Builder.Default
-    private boolean autoInviteRate = false;
+    private Boolean autoInviteRate = false;
 
     // invite rate tip
     @Builder.Default
@@ -106,7 +106,7 @@ public class ServiceSettings implements Serializable {
     // TODO: 自定义询前表单字段
     @NotBlank
     @Builder.Default
-    private boolean showPreForm = false;
+    private Boolean showPreForm = false;
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -117,17 +117,17 @@ public class ServiceSettings implements Serializable {
     // show history message or not
     @NotBlank
     @Builder.Default
-    private boolean showHistory = false;
+    private Boolean showHistory = false;
 
     // 输入联想开关
     @NotBlank
     @Builder.Default
-    private boolean showInputAssociation = false;
+    private Boolean showInputAssociation = false;
 
     // 防骚扰验证开关，TODO: 自定义验证规则: 1. 访问频率 2. 发消息时间间隔
     @NotBlank
     @Builder.Default
-    private boolean showCaptcha = false;
+    private Boolean showCaptcha = false;
 
     @NotBlank
     @Builder.Default
@@ -145,7 +145,7 @@ public class ServiceSettings implements Serializable {
     
     // // 是否启用workflow
     // @Builder.Default
-    // private boolean enableWorkflow = false;
+    // private Boolean enableWorkflow = false;
 
     // // 工作流uid
     // private String workflowUid;
@@ -167,18 +167,18 @@ public class ServiceSettings implements Serializable {
 
     // 桌面版聊天窗口右侧iframe
     @Builder.Default
-    private boolean showRightIframe = false;
+    private Boolean showRightIframe = false;
 
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
 
     // 是否显示预搜索
     @Builder.Default
-    private boolean showPreSearch = true;
+    private Boolean showPreSearch = true;
 
     // 常见问题
     @Builder.Default
-    private boolean showFaqs = false;
+    private Boolean showFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> faqs = new ArrayList<>();
@@ -187,7 +187,7 @@ public class ServiceSettings implements Serializable {
 
     // 快捷按钮
     @Builder.Default
-    private boolean showQuickFaqs = false;
+    private Boolean showQuickFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> quickFaqs = new ArrayList<>();
@@ -196,28 +196,28 @@ public class ServiceSettings implements Serializable {
 
     // 猜你想问
     @Builder.Default
-    private boolean showGuessFaqs = false;
+    private Boolean showGuessFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> guessFaqs = new ArrayList<>();
 
     // 热门问题
     @Builder.Default
-    private boolean showHotFaqs = false;
+    private Boolean showHotFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> hotFaqs = new ArrayList<>();
 
     // 快捷功能
     @Builder.Default
-    private boolean showShortcutFaqs = false;
+    private Boolean showShortcutFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
     // 未知答案固定回复
     // @Builder.Default
-    // private boolean showUnknownAnswer = false;
+    // private Boolean showUnknownAnswer = false;
 
     // @Builder.Default
     // private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
@@ -228,7 +228,7 @@ public class ServiceSettings implements Serializable {
 
     // 主动触发设置
     @Builder.Default
-    private boolean enableProactiveTrigger = false;  // 是否启用主动触发
+    private Boolean enableProactiveTrigger = false;  // 是否启用主动触发
 
     @Builder.Default
     private Integer noResponseTimeout = 300;  // 访客无响应超时时间(秒)，默认5分钟
@@ -256,7 +256,7 @@ public class ServiceSettings implements Serializable {
 
     @NotBlank
     @Builder.Default
-    private boolean showLogo = true;
+    private Boolean showLogo = true;
 
     // validate until date, when expire the service will be disabled
     private Date validateUntil;

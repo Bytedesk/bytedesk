@@ -76,7 +76,7 @@ public class FaqVectorService {
                 KbaseConst.KBASE_KB_UID, faq.getKbase() != null ? faq.getKbase().getUid() : "",
                 "categoryUid", faq.getCategoryUid() != null ? faq.getCategoryUid() : "",
                 "orgUid", faq.getOrgUid(),
-                "enabled", Boolean.toString(faq.isEnabled()),
+                "enabled", Boolean.toString(faq.getEnabled()),
                 "tags", tags
             );
             
@@ -158,7 +158,7 @@ public class FaqVectorService {
      * @param faq 要删除的FAQ实体
      * @return 是否删除成功
      */
-    public boolean deleteFaqVector(FaqEntity faq) {
+    public Boolean deleteFaqVector(FaqEntity faq) {
         log.info("从向量索引中删除FAQ: {}", faq.getQuestion());
         
         try {

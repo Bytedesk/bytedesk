@@ -66,55 +66,55 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     @Column(name = "is_top")
     @Builder.Default
-    private boolean top = false;
+    private Boolean top = false;
 
     @Column(name = "is_published")
     @Builder.Default
-    private boolean published = false;
+    private Boolean published = false;
 
     @Column(name = "is_markdown")
     @Builder.Default
-    private boolean markdown = false;
+    private Boolean markdown = false;
 
     // 是否开启自动生成llm问答
     @Builder.Default
     @Column(name = "is_auto_generate_llm_qa")
-    private boolean autoGenerateLlmQa = false;
+    private Boolean autoGenerateLlmQa = false;
 
     // 是否已经生成llm问答
     @Builder.Default
     @Column(name = "is_llm_qa_generated")
-    private boolean llmQaGenerated = false;
+    private Boolean llmQaGenerated = false;
 
     // is auto delete llm qa
     @Builder.Default
     @Column(name = "is_auto_delete_llm_qa")
-    private boolean autoDeleteLlmQa = false;
+    private Boolean autoDeleteLlmQa = false;
 
     // 是否已经删除llm问答
     @Builder.Default
     @Column(name = "is_llm_qa_deleted")
-    private boolean llmQaDeleted = false;
+    private Boolean llmQaDeleted = false;
 
     // 是否开启自动llm split切块
     @Builder.Default
     @Column(name = "is_auto_llm_split")
-    private boolean autoLlmSplit = false;
+    private Boolean autoLlmSplit = false;
 
     // 是否已经自动llm split切块
     @Builder.Default
     @Column(name = "is_llm_splitted")
-    private boolean llmSplitted = false;
+    private Boolean llmSplitted = false;
 
     // is auto delete llm split
     @Builder.Default
     @Column(name = "is_auto_delete_llm_split")
-    private boolean autoDeleteLlmSplit = false;
+    private Boolean autoDeleteLlmSplit = false;
 
     // 是否已经删除llm split切块
     @Builder.Default
     @Column(name = "is_llm_split_deleted")
-    private boolean llmSplitDeleted = false;
+    private Boolean llmSplitDeleted = false;
 
     @Builder.Default
     private Integer readCount = 0;
@@ -138,7 +138,7 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     // 是否需要审核
     @Column(name = "need_audit")
     @Builder.Default
-    private boolean needAudit = false;
+    private Boolean needAudit = false;
 
     // 审核状态 - 具体枚举值由子类定义
     @Column(name = "audit_status")
@@ -157,7 +157,7 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     // 是否需要密码访问
     @Column(name = "is_password_protected")
     @Builder.Default
-    private boolean isPasswordProtected = false;
+    private Boolean isPasswordProtected = false;
 
     private String password;
 

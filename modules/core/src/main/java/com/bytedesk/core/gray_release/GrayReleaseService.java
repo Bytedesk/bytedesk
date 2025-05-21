@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 11:07:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:45:10
+ * @LastEditTime: 2025-05-21 15:08:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -82,7 +82,7 @@ public class GrayReleaseService {
     /**
      * 检查用户是否在灰度范围内
      */
-    public boolean isUserInGrayRelease(String userUid, String feature) {
+    public Boolean isUserInGrayRelease(String userUid, String feature) {
         // TODO: 实现检查逻辑
         return true;
     }
@@ -265,12 +265,12 @@ public class GrayReleaseService {
     /**
      * 检查用户是否可以使用某个功能
      */
-    public boolean canUserAccessFeature(String userUid, String feature) {
+    public Boolean canUserAccessFeature(String userUid, String feature) {
         Assert.hasText(userUid, "UserUid must not be empty");
         Assert.hasText(feature, "Feature must not be empty");
 
         GrayReleaseStatus status = getFeatureStatus(feature);
-        if (status == null || !status.isEnabled()) {
+        if (status == null || !status.getEnabled()) {
             return false;
         }
 
@@ -300,7 +300,7 @@ public class GrayReleaseService {
     /**
      * 根据用户ID和灰度比例判断用户是否在灰度范围内
      */
-    private boolean isUserInPercentage(String userUid, int percentage) {
+    private Boolean isUserInPercentage(String userUid, int percentage) {
         if (percentage >= 100) return true;
         if (percentage <= 0) return false;
 

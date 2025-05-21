@@ -38,13 +38,13 @@ public class RobotSettings  implements Serializable {
 
     // 开启机器人之后，robot字段为必填
     @Builder.Default
-    private boolean defaultRobot = false;
+    private Boolean defaultRobot = false;
     
     @Builder.Default
-    private boolean offlineRobot = false;
+    private Boolean offlineRobot = false;
 
     @Builder.Default
-    private boolean nonWorktimeRobot = false;
+    private Boolean nonWorktimeRobot = false;
     
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotEntity robot;

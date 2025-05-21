@@ -96,7 +96,7 @@ public abstract class BaseEntity implements Serializable {
     // soft delete
 	@Builder.Default
 	@Column(name = "is_deleted")
-	private boolean deleted = false;
+	private Boolean deleted = false;
 
     // organization uid
     private String orgUid;

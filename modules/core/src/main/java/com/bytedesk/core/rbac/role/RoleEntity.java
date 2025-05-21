@@ -60,7 +60,7 @@ public class RoleEntity extends BaseEntity {
 	// 是否是系统角色
 	@Builder.Default
 	@Column(name = "is_system", nullable = false)
-	private boolean system = false;
+	private Boolean system = false;
 
 	@Builder.Default
 	@ManyToMany

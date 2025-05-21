@@ -45,7 +45,7 @@ public class GrayReleaseMetrics extends BaseEntity {
     private String feature;      // 功能代码
 
     @Column(nullable = false)
-    private boolean success;     // 是否成功
+    private Boolean success;     // 是否成功
 
     @Column(nullable = false)
     private LocalDateTime timestamp;  // 记录时间

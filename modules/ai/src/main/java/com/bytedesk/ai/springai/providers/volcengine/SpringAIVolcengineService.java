@@ -167,7 +167,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         return volcengineChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (volcengineChatModel == null) {
             return false;
         }

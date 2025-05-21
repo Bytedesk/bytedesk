@@ -57,7 +57,7 @@ public class UidProperties {
     /**
      * 是否容忍时钟回拨, 默认:true
      */
-    private boolean enableBackward = true;
+    private Boolean enableBackward = true;
 
     /**
      * 时钟回拨最长容忍时间（秒）

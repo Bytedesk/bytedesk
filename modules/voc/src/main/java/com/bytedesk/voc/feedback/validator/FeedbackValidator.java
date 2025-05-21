@@ -29,11 +29,11 @@ public class FeedbackValidator {
         }
     }
     
-    private boolean isValidType(String type) {
+    private Boolean isValidType(String type) {
         return type != null && type.matches("^(bug|suggestion|complaint|feature|other)$");
     }
     
-    private boolean containsSensitiveWords(String content) {
+    private Boolean containsSensitiveWords(String content) {
         // TODO: 实现敏感词检查
         return false;
     }

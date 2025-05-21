@@ -47,30 +47,30 @@ public class MessageEntity extends AbstractMessageEntity {
     }
 
     // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
-    public boolean isFromRobot() {
+    public Boolean isFromRobot() {
         return getUserProtobuf().isFromRobot();
     }
 
     // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
-    public boolean isFromVisitor() {
+    public Boolean isFromVisitor() {
         return getUserProtobuf().isFromVisitor();
     }
 
-    public boolean isFromUser() {
+    public Boolean isFromUser() {
         return getUserProtobuf().isFromUser();
     }
 
-    public boolean isFromMember() {
+    public Boolean isFromMember() {
         return getUserProtobuf().isFromMember();
     }
 
     // 是否系统消息
-    public boolean isFromSystem() {
+    public Boolean isFromSystem() {
         return getUserProtobuf().isFromSystem();
     }
 
     // 是否客服消息
-    public boolean isFromAgent() {
+    public Boolean isFromAgent() {
         return getUserProtobuf().isFromAgent();
     }
 

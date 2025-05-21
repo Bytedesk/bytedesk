@@ -46,9 +46,9 @@ public class TopicRequest extends BaseRequest {
     // @Builder.Default
     // private Integer qos = 1;
 
-    // private boolean subscribed;
+    // private Boolean subscribed;
 
-    // private boolean wildcard;
+    // private Boolean wildcard;
 
     /**
      * current online clientIds

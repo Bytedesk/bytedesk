@@ -68,7 +68,7 @@ public class FeatureService {
     }
 
     
-    public boolean isFeatureEnabled(String code) {
+    public Boolean isFeatureEnabled(String code) {
         FeatureEntity feature = featureRepository.findByCode(code);
         return feature != null && feature.getEnabled();
     }

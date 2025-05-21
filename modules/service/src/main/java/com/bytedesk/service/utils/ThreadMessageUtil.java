@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 13:51:01
+ * @LastEditTime: 2025-05-21 15:27:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -218,7 +218,7 @@ public class ThreadMessageUtil {
 
     // 检查无响应触发
     public static void checkNoResponse(String userUid, long lastActiveTime, ServiceSettings settings) {
-        if (!settings.isEnableProactiveTrigger()) {
+        if (!settings.getEnableProactiveTrigger()) {
             return;
         }
 

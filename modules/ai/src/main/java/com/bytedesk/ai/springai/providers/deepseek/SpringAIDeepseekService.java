@@ -169,7 +169,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         return deepseekChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (deepseekChatModel == null) {
             return false;
         }

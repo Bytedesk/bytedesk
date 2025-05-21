@@ -80,47 +80,47 @@ public class WebsiteEntity extends BaseEntity {
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     // 是否开启自动生成llm问答
     // @Builder.Default
     // @Column(name = "is_auto_generate_llm_qa")
-    // private boolean autoGenerateLlmQa = false;
+    // private Boolean autoGenerateLlmQa = false;
 
     // // 是否已经生成llm问答
     // @Builder.Default
     // @Column(name = "is_llm_qa_generated")
-    // private boolean llmQaGenerated = false;
+    // private Boolean llmQaGenerated = false;
 
     // // is auto delete llm qa
     // @Builder.Default
     // @Column(name = "is_auto_delete_llm_qa")
-    // private boolean autoDeleteLlmQa = false;
+    // private Boolean autoDeleteLlmQa = false;
 
     // // 是否已经删除llm问答
     // @Builder.Default
     // @Column(name = "is_llm_qa_deleted")
-    // private boolean llmQaDeleted = false;
+    // private Boolean llmQaDeleted = false;
 
     // // 是否开启自动llm Chunk切块
     // @Builder.Default
     // @Column(name = "is_auto_llm_Chunk")
-    // private boolean autoLlmChunk = false;
+    // private Boolean autoLlmChunk = false;
 
     // // 是否已经自动llm Chunk切块
     // @Builder.Default
     // @Column(name = "is_llm_Chunkted")
-    // private boolean llmChunkted = false;
+    // private Boolean llmChunkted = false;
 
     // is auto delete llm Chunk
     // @Builder.Default
     // @Column(name = "is_auto_delete_llm_Chunk")
-    // private boolean autoDeleteLlmChunk = false;
+    // private Boolean autoDeleteLlmChunk = false;
 
     // 是否已经删除llm Chunk切块
     // @Builder.Default
     // @Column(name = "is_llm_Chunk_deleted")
-    // private boolean llmChunkDeleted = false;
+    // private Boolean llmChunkDeleted = false;
 
     // 有效开始日期
     @Builder.Default

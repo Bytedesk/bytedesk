@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:05:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 21:01:17
+ * @LastEditTime: 2025-05-21 15:24:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class AutoReplyKeywordRequest extends BaseRequest {
     private Boolean enabled;
 
     @Builder.Default
-    private Boolean isTransfer = false; // 是否转人工
+    private Boolean transfer = false; // 是否转人工
     
     private String categoryUid;
     

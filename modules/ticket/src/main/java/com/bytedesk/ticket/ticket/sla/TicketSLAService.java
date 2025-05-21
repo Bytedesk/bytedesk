@@ -54,7 +54,7 @@ public class TicketSLAService {
     /**
      * 检查工单是否违反 SLA
      */
-    public boolean isSLABreached(TicketEntity ticket) {
+    public Boolean isSLABreached(TicketEntity ticket) {
         Map<String, Object> sla = determineSLA(ticket.getCategoryUid(), ticket.getPriority());
         
         LocalDateTime now = LocalDateTime.now();

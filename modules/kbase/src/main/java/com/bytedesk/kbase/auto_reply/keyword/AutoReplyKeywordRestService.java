@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:37:26
+ * @LastEditTime: 2025-05-21 15:25:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -219,7 +219,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     public AutoReplyKeywordResponse convertToResponse(AutoReplyKeywordEntity entity) {
         AutoReplyKeywordResponse keywordResponse = modelMapper.map(entity, AutoReplyKeywordResponse.class);
         // 没有自动转换？手动转换
-        keywordResponse.setIsTransfer(entity.isTransfer());
+        keywordResponse.setTransfer(entity.getTransfer());
         return keywordResponse;
     }
 

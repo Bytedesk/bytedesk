@@ -84,7 +84,7 @@ public class ThreadSatisfactionServiceDelegate implements JavaDelegate {
     /**
      * 发送满意度调查
      */
-    // private boolean sendSatisfactionSurvey(String threadUid, String userUid, String agentUid) {
+    // private Boolean sendSatisfactionSurvey(String threadUid, String userUid, String agentUid) {
     //     // TODO: 实际项目中，这里应该实现发送满意度调查的逻辑
     //     log.info("Sending satisfaction survey for thread: {}, visitor: {}", threadUid, userUid);
         

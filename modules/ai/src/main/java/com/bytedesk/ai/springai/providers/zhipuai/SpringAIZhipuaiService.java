@@ -192,7 +192,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         return bytedeskZhipuaiChatModel.call(prompt);
     }
 
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         try {
             // 发送一个简单的测试请求来检测服务是否响应
             String response = processPromptSync("test");

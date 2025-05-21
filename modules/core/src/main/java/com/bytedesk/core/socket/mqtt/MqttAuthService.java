@@ -27,7 +27,7 @@ public class MqttAuthService {
 
     // private final UserService userService;
 
-    public boolean checkValid(String username, String password) {
+    public Boolean checkValid(String username, String password) {
         // 客户端使用accessToken作为password传递，避免客户端存储密码
         String accessToken = password;
         log.debug("auth username {}, accessToken {}", username, accessToken);

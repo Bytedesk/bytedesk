@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 10:27:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 12:39:24
+ * @LastEditTime: 2025-05-21 15:17:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -96,7 +96,7 @@ public class ServiceTrigger {
         /**
          * 验证触发条件是否有效
          */
-        public boolean isValid() {
+        public Boolean isValid() {
             if (type == null) {
                 return false;
             }
@@ -121,7 +121,7 @@ public class ServiceTrigger {
     /**
      * 验证整个触发配置是否有效
      */
-    public boolean isValid() {
+    public Boolean isValid() {
         if (conditions == null || conditions.isEmpty()) {
             return false;
         }
@@ -136,9 +136,9 @@ public class ServiceTrigger {
      * @param condition 触发条件
      * @return 是否可以触发
      */
-    public boolean canTrigger(String userUid, ServiceSettings settings, TriggerCondition condition) {
+    public Boolean canTrigger(String userUid, ServiceSettings settings, TriggerCondition condition) {
         // 1. 检查基本开关
-        if (!settings.isEnableProactiveTrigger()) {
+        if (!settings.getEnableProactiveTrigger()) {
             return false;
         }
 

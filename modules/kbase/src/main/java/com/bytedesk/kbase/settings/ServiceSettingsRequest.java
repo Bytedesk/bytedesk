@@ -80,7 +80,7 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showInputAssociation = false;
 
     @Builder.Default
-    private boolean showCaptcha = false;
+    private Boolean showCaptcha = false;
 
     @Builder.Default
     private String welcomeTip = I18Consts.I18N_WELCOME_TIP;

@@ -39,7 +39,7 @@ public class MessageLeaveSettingsResponse  implements Serializable {
 
     // 留言开关
     @Builder.Default
-    private boolean messageLeaveEnabled = true;
+    private Boolean messageLeaveEnabled = true;
 
     @Builder.Default
     private String messageLeaveTip = I18Consts.I18N_LEAVEMSG_TIP;

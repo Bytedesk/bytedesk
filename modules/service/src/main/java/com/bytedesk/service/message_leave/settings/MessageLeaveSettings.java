@@ -44,7 +44,7 @@ public class MessageLeaveSettings implements Serializable {
     // 留言开关
     @Builder.Default
     @Column(name = "is_leave_msg_enabled")
-    private boolean messageLeaveEnabled = true;
+    private Boolean messageLeaveEnabled = true;
 
     @NotBlank
     @Builder.Default
@@ -89,7 +89,7 @@ public class MessageLeaveSettings implements Serializable {
     // TODO: 通知：邮箱、企业微信、钉钉、飞书、短信等
 
     //
-    public boolean isInServiceTime() {
+    public Boolean isInServiceTime() {
         if (worktimes == null || worktimes.isEmpty()) {
             return true;
         }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-15 09:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 09:43:37
+ * @LastEditTime: 2025-05-21 15:08:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,7 +45,7 @@ public class NoticeEntityListener {
         NoticeEntity clonedNoticeEntity = SerializationUtils.clone(noticeEntity);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (clonedNoticeEntity.isDeleted()) {
+        if (clonedNoticeEntity.getDeleted()) {
             bytedeskEventPublisher.publishEvent(new NoticeDeleteEvent(this, clonedNoticeEntity));
         } else {
             bytedeskEventPublisher.publishEvent(new NoticeUpdateEvent(this, clonedNoticeEntity));

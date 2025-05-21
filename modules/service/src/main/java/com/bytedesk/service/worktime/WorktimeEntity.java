@@ -51,7 +51,7 @@ public class WorktimeEntity extends BaseEntity {
     /**
      * 检查当前时间是否在工作时间内
      */
-    public boolean isWorkTime() {
+    public Boolean isWorkTime() {
         // 1. 检查是否是工作日
         int dayOfWeek = LocalDate.now().getDayOfWeek().getValue();
         if (!workDays.contains(String.valueOf(dayOfWeek))) {

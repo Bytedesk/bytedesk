@@ -92,7 +92,7 @@ public class GrayReleaseStrategy {
     /**
      * 检查是否可以启动灰度发布
      */
-    public boolean canStartRollout(GrayReleaseFeature feature) {
+    public Boolean canStartRollout(GrayReleaseFeature feature) {
         LocalDateTime end = LocalDateTime.now();
         LocalDateTime start = end.minusDays(1);
         

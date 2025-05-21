@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 07:29:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 18:58:42
+ * @LastEditTime: 2025-05-21 15:24:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,7 @@ public class AutoReplyKeywordEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
@@ -78,7 +78,8 @@ public class AutoReplyKeywordEntity extends BaseEntity {
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
-    private boolean isTransfer = false; // 是否是 转人工 关键词
+    @Column(name = "is_transfer")
+    private Boolean transfer = false; // 是否是 转人工 关键词
 
     // 回复次数
     @Builder.Default

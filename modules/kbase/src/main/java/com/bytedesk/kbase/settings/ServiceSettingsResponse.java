@@ -65,7 +65,7 @@ public class ServiceSettingsResponse implements Serializable {
     // 输入联想开关
     private Boolean showInputAssociation;
 
-    private boolean showCaptcha;
+    private Boolean showCaptcha;
 
     private String welcomeTip;
 

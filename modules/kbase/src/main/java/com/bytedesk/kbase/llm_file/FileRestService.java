@@ -164,7 +164,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
                 latestEntity.setTagList(entity.getTagList());
                 latestEntity.setFileUrl(entity.getFileUrl());
                 latestEntity.setContent(entity.getContent());
-                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setEnabled(entity.getEnabled());
                 latestEntity.setStartDate(entity.getStartDate());
                 latestEntity.setEndDate(entity.getEndDate());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
@@ -241,7 +241,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     @Override
     public FileExcel convertToExcel(FileEntity file) {
         FileExcel excel = modelMapper.map(file, FileExcel.class);
-        if (file.isEnabled()) {
+        if (file.getEnabled()) {
             excel.setEnabled("是");
         } else {
             excel.setEnabled("否");
