@@ -605,6 +605,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
                         .level(level)
                         .orgUid(orgUid)
                         .llm(llm)
+                        .system(true)
                         .build();
                 // 
                 save(robot);
