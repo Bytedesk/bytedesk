@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 12:18:03
+ * @LastEditTime: 2025-05-21 14:08:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ public class RobotConsts {
   public static final String ROBOT_NAME_SEMANTIC_ANALYSIS = "semantic_analysis"; // 语义分析
   public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition"; // 实体识别
   public static final String ROBOT_NAME_SENTIMENT_ANALYSIS = "sentiment_analysis"; // 情感分析
-  public static final String ROBOT_NAME_SESSION_CLASSIFICATION = "session_classification"; // 会话分类
+  public static final String ROBOT_NAME_THREAD_CLASSIFICATION = "thread_classification"; // 会话分类
   public static final String ROBOT_NAME_GENERATE_TICKET = "generate_ticket"; // 生成工单
   public static final String ROBOT_NAME_CUSTOMER_SERVICE_EXPERT = "customer_service_expert"; // 客服专家
   public static final String ROBOT_NAME_GENERATE_FAQ = "generate_faq"; // 生成FAQ
