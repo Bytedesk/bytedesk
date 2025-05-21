@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:09:02
+ * @LastEditTime: 2025-05-21 11:49:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.core.tag;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import lombok.Data;
@@ -36,5 +37,14 @@ public class TagExcel {
     @ColumnWidth(20)
     private String color;
 
-    
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "创建时间")
+    @ColumnWidth(20)
+    private String createdAt;
+
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "修改时间")
+    @ColumnWidth(20)
+    private String updatedAt;
+
 }

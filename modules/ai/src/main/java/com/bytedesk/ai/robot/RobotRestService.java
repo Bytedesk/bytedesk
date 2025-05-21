@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 11:19:08
+ * @LastEditTime: 2025-05-21 11:48:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
@@ -61,7 +61,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest, RobotResponse> {
+public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
 
     private final RobotRepository robotRepository;
 
@@ -82,10 +82,15 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     private final LlmProviderRestService llmProviderRestService;
 
     @Override
-    public Page<RobotResponse> queryByOrg(RobotRequest request) {
+    public Page<RobotEntity> queryByOrgEntity(RobotRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<RobotEntity> specification = RobotSpecification.search(request);
-        Page<RobotEntity> page = robotRepository.findAll(specification, pageable);
+        Specification<RobotEntity> spec = RobotSpecification.search(request);
+        return robotRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<RobotResponse> queryByOrg(RobotRequest request) {
+        Page<RobotEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
@@ -98,6 +103,12 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         request.setUserUid(user.getUid());
         //
         return queryByOrg(request);
+    }
+
+    @Override
+    public RobotResponse queryByUid(RobotRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
@@ -541,8 +552,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         List<Robot> robots = config.getRobots();
         for (Robot robotJson : robots) {
             // 使用name代替uid，方便查询和创建机器人
-            String uid = robotJson.getName();
-            if (StringUtils.hasText(uid) && !existsByUid(uid)) {
+            String name = robotJson.getName();
+            Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(name, orgUid);
+            if (!robotOptional.isPresent()) {
                 String categoryUid = null;
                 Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
                         robotJson.getCategory(), CategoryTypeEnum.ROBOT.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
@@ -576,7 +588,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
 
                 // Create RobotEntity with data from both Robot and LocaleData
                 RobotEntity robot = RobotEntity.builder()
-                        .uid(uid)
+                        .uid(uidUtils.getUid())
                         .name(robotJson.getName())
                         .nickname(localeData.getNickname())
                         .avatar(AvatarConsts.getDefaultRobotAvatar())
@@ -690,10 +702,11 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         // }
     }
 
+    
+
     @Override
-    public RobotResponse queryByUid(RobotRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    public RobotExcel convertToExcel(RobotEntity entity) {
+        return modelMapper.map(entity, RobotExcel.class);
     }
 
 }
