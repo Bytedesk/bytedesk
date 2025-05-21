@@ -72,7 +72,7 @@ public class RobotRequest extends BaseRequest {
 
     // 是否是系统自带
     @Builder.Default
-    private Boolean fromSystem = false;
+    private Boolean system = false;
 
     // 用于客户端点击uid
     private String threadUid; // 对应会话

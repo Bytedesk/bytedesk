@@ -118,8 +118,8 @@ public class RobotEntity extends BaseEntity {
 
     // 是否是系统自带
     @Builder.Default
-    @Column(name = "is_from_system")
-    private boolean fromSystem = false;
+    @Column(name = "is_system")
+    private boolean system = false;
 
     // 邀请设置
     @ManyToOne(fetch = FetchType.LAZY)
