@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 11:48:31
+ * @LastEditTime: 2025-05-21 12:21:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -437,6 +437,10 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         }
     }
 
+    public void save(List<RobotEntity> entities) {
+        robotRepository.saveAll(entities);
+    }
+
     @Override
     public RobotEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, RobotEntity entity) {
         try {
@@ -480,8 +484,8 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     public void initDefaultRobot(String orgUid, String uid) {
         // 为每个组织创建一个机器人
         createDefaultRobot(orgUid, uid);
-        // 为每个组织创建一个空白智能体
-        createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.ROBOT_NAME_VOID_AGENT));
+        // 为每个组织创建一个空白智能体，已经在 initRobotJson 中创建
+        // createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.ROBOT_NAME_VOID_AGENT));
     }
 
     // 创建一个机器人
@@ -702,11 +706,30 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         // }
     }
 
-    
-
     @Override
     public RobotExcel convertToExcel(RobotEntity entity) {
         return modelMapper.map(entity, RobotExcel.class);
+    }
+
+    public RobotEntity convertExcelToRobot(RobotExcel excel, String kbType, String fileUid, String kbUid, String orgUid) {
+
+        RobotEntity robot = modelMapper.map(excel, RobotEntity.class);
+        robot.setUid(uidUtils.getUid());
+        robot.setType(RobotTypeEnum.LLM.name());
+        robot.setAvatar(AvatarConsts.getDefaultRobotAvatar());
+        robot.setOrgUid(orgUid);
+        robot.setKbEnabled(true);
+        robot.setKbUid(kbUid);
+        // 设置默认的服务设置
+        ServiceSettings serviceSettings = ServiceSettings.builder()
+                .showFaqs(true)
+                .showQuickFaqs(true)
+                .showGuessFaqs(true)
+                .showHotFaqs(true)
+                .showShortcutFaqs(true)
+                .build();
+        robot.setServiceSettings(serviceSettings);
+        return robot;
     }
 
 }

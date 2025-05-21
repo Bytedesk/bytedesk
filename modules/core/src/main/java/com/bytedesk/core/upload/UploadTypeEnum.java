@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 22:19:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 11:55:49
+ * @LastEditTime: 2025-05-21 12:17:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ public enum UploadTypeEnum {
     QUICKREPLY, // 快捷回复
     AUTOREPLY_FIXED, // 自动回复固定
     AUTOREPLY_KEYWORD, // 自动回复关键词
+    PROMPT, // 提示词
     BLOG, // 博客
     EMAIL, // 邮件
     TABOO, // 敏感词
