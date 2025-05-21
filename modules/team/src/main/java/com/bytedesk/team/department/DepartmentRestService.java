@@ -189,7 +189,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     public DepartmentResponse convertToResponse(DepartmentEntity department) {
         // 过滤掉department.children中deleted为true的元素
-        department.getChildren().removeIf(child -> child.getDeleted());
+        department.getChildren().removeIf(child -> child.isDeleted());
         DepartmentResponse departmentResponse = modelMapper.map(department, DepartmentResponse.class);
         if (department.getParent() != null) {
             departmentResponse.setParentUid(department.getParent().getUid());

@@ -34,7 +34,7 @@ public class FileEntityListener {
         FileEntity clonedFile = SerializationUtils.clone(file);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (file.getDeleted()) {
+        if (file.isDeleted()) {
             publisher.publishEvent(new FileDeleteEvent(clonedFile));
         } else {
             publisher.publishEvent(new FileUpdateEvent(clonedFile));

@@ -47,7 +47,7 @@ public class TextEntityListener {
         TextEntity clonedText = SerializationUtils.clone(text);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (text.getDeleted()) {
+        if (text.isDeleted()) {
             publisher.publishEvent(new TextDeleteEvent(clonedText));
         } else {
             publisher.publishEvent(new TextUpdateEvent(clonedText));

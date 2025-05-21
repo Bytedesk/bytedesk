@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2021-02-24 15:52:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-04-07 15:40:50
+ * @LastEditTime: 2025-05-21 16:08:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,17 +32,17 @@ public class UidProperties {
     /**
      * 时间增量值占用位数。当前时间相对于时间基点的增量值，单位为秒
      */
-    private Integer timeBits = 30;
+    private int timeBits = 30;
 
     /**
      * 工作机器ID占用的位数
      */
-    private Integer workerBits = 16;
+    private int workerBits = 16;
 
     /**
      * 序列号占用的位数
      */
-    private Integer seqBits = 7;
+    private int seqBits = 7;
 
     /**
      * 时间基点. 例如 2019-02-20 (毫秒: 1550592000000)
@@ -57,7 +57,7 @@ public class UidProperties {
     /**
      * 是否容忍时钟回拨, 默认:true
      */
-    private Boolean enableBackward = true;
+    private boolean enableBackward = true;
 
     /**
      * 时钟回拨最长容忍时间（秒）
