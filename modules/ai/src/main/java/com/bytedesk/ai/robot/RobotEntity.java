@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:36:50
+ * @LastEditTime: 2025-05-21 13:20:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,6 +115,11 @@ public class RobotEntity extends BaseEntity {
     private String flowUid;
 
     private String categoryUid; // 机器人分类
+
+    // 是否是系统自带
+    @Builder.Default
+    @Column(name = "is_from_system")
+    private boolean fromSystem = false;
 
     // 邀请设置
     @ManyToOne(fetch = FetchType.LAZY)

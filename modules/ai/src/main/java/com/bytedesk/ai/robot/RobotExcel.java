@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.robot;
 
+import java.time.LocalDateTime;
+
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
@@ -38,10 +40,10 @@ public class RobotExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(index = 3, value = "创建时间")
     @ColumnWidth(20)
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(index = 4, value = "修改时间")
     @ColumnWidth(20)
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 }
