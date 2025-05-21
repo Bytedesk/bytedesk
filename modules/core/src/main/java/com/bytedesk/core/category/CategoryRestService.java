@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:19:25
+ * @LastEditTime: 2025-05-21 11:09:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,9 +21,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -84,11 +82,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         }
         request.setUserUid(authUser.getUid());
         // 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<CategoryEntity> specs = CategorySpecification.search(request);
-        Page<CategoryEntity> page = categoryRepository.findAll(specs, pageable);
-        return page.map(this::convertToResponse);
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "category", key = "#uid", unless = "#result == null")

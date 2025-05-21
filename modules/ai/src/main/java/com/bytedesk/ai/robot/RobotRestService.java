@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 10:42:58
+ * @LastEditTime: 2025-05-21 11:14:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -536,7 +536,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         return convertToResponse(updatedRobot);
     }
 
-    public void initRobotJson(String level) {
+    public void initRobotJson(String level, String orgUid) {
         RobotConfiguration config = robotJsonLoader.loadRobots();
         List<Robot> robots = config.getRobots();
         for (Robot robotJson : robots) {
@@ -553,6 +553,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                             .level(level)
                             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                             .type(CategoryTypeEnum.ROBOT.name())
+                            .orgUid(orgUid)
                             .build();
                     CategoryResponse categoryResponse = categoryService.create(categoryRequest);
                     if (categoryResponse != null) {
@@ -583,6 +584,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                         .type(robotJson.getType())
                         .categoryUid(categoryUid)
                         .level(level)
+                        .orgUid(orgUid)
                         .llm(llm)
                         .build();
                 // 
