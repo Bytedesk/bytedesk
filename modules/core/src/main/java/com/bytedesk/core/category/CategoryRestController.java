@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:35:18
+ * @LastEditTime: 2025-05-21 11:09:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,12 +30,12 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/category")
 public class CategoryRestController extends BaseRestController<CategoryRequest> {
     
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
     
     @Override
     public ResponseEntity<?> queryByOrg(CategoryRequest request) {
         
-        Page<CategoryResponse> page = categoryService.queryByOrg(request);
+        Page<CategoryResponse> page = categoryRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -43,7 +43,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
     @Override
     public ResponseEntity<?> queryByUser(CategoryRequest request) {
         
-        Page<CategoryResponse> page = categoryService.queryByUser(request);
+        Page<CategoryResponse> page = categoryRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -51,7 +51,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
     @Override
     public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
         
-        CategoryResponse response = categoryService.create(request);
+        CategoryResponse response = categoryRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -59,7 +59,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
     @Override
     public ResponseEntity<?> update(@RequestBody CategoryRequest request) {
         
-        CategoryResponse response = categoryService.update(request);
+        CategoryResponse response = categoryRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -67,7 +67,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
     @Override
     public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
         
-        categoryService.delete(request);
+        categoryRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
