@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 13:23:30
+ * @LastEditTime: 2025-05-21 09:52:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -128,13 +128,13 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
             // modelMapper.map(request, entity);
             entity.setFileName(request.getFileName());
             entity.setContent(request.getContent());
-            entity.setTagList(request.getTagList());
-            entity.setFileUrl(request.getFileUrl());
-            entity.setContent(request.getContent());
-            entity.setEnabled(request.getEnabled());
-            entity.setStartDate(request.getStartDate());
-            entity.setEndDate(request.getEndDate());
-            entity.setCategoryUid(request.getCategoryUid());
+            // entity.setTagList(request.getTagList());
+            // entity.setFileUrl(request.getFileUrl());
+            // entity.setContent(request.getContent());
+            // entity.setEnabled(request.getEnabled());
+            // entity.setStartDate(request.getStartDate());
+            // entity.setEndDate(request.getEndDate());
+            // entity.setCategoryUid(request.getCategoryUid());
             //
             FileEntity savedEntity = save(entity);
             if (savedEntity == null) {
