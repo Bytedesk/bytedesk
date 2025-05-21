@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 17:23:02
+ * @LastEditTime: 2025-05-21 17:47:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotRequest;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryRequest;
@@ -317,34 +316,6 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
         return threadRestService.save(thread);
     }
 
-    // @Transactional
-    // public void assignTicket(Long ticketId, AgentEntity assignee) {
-    //     // UserEntity user = authService.getUser();
-    //     // if (user == null) {
-    //     // throw new RuntimeException("user not found");
-    //     // }
-    //     // String userId = user.getUid();
-    //     // 检查用户是否是主管
-    //     // if (!identityService.isUserInGroup(userId, "supervisors")) {
-    //     // throw new AccessDeniedException("Only supervisors can assign tickets");
-    //     // }
-    //     // 分配工单...
-    //     TicketEntity ticket = findTicketById(ticketId);
-    //     UserProtobuf assigneeProtobuf = UserProtobuf.builder()
-    //             .uid(assignee.getUid())
-    //             .nickname(assignee.getNickname())
-    //             .avatar(assignee.getAvatar())
-    //             .type(UserTypeEnum.AGENT.name())
-    //             .build();
-    //     // assigneeProtobuf.setUid(assignee.getUid());
-    //     // assigneeProtobuf.setType(UserTypeEnum.AGENT.name());
-    //     ticket.setAssignee(assigneeProtobuf.toJson());
-    //     ticket.setStatus("处理中");
-    //     ticket.setUpdatedAt(LocalDateTime.now());
-    //     // 更新流程变量
-    //     taskService.complete(getTaskIdByTicketId(ticketId), Map.of("assignee", assignee));
-    // }
-
     @Transactional
     public void verifyTicket(Long ticketId, boolean approved) {
         taskService.complete(getTaskIdByTicketId(ticketId),
@@ -352,12 +323,12 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     }
 
     @Transactional
-    public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentDTO) {
+    public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentRequest) {
         TicketEntity ticket = findTicketById(ticketId);
 
         TicketCommentEntity comment = new TicketCommentEntity();
         comment.setTicket(ticket);
-        comment.setContent(commentDTO.getContent());
+        comment.setContent(commentRequest.getContent());
         // comment.setAuthor(commentDTO.getAuthor());
 
         return commentRepository.save(comment);

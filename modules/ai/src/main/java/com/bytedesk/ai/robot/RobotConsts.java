@@ -85,6 +85,7 @@ public class RobotConsts {
   public static final String ROBOT_NAME_KEYWORD_EXTRACTION = "keyword_extraction"; // 关键词短语提取
   public static final String ROBOT_NAME_TEXT_CORRECTION = "text_correction"; // 文本纠错
   public static final String ROBOT_NAME_TEXT_CLASSIFICATION = "text_classification"; // 文本分类
+  public static final String ROBOT_NAME_FAQ_SIMILAR_QUESTIONS = "faq_similar_questions"; // FAQ相似问题生成
   //
   public static final String ROBOT_LLM_DEFAULT_PROMPT = """
       角色：资深客服专家;
