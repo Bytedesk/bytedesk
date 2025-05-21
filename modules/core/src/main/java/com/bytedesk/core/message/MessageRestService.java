@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 15:01:10
+ * @LastEditTime: 2025-05-21 12:59:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,6 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, MessageRequest, MessageResponse, MessageExcel> {
 
     private final MessageRepository messageRepository;
+
+    private final ModelMapper modelMapper;
 
     private final AuthService authService;
 
@@ -174,11 +177,10 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
     
     @Override
     public MessageExcel convertToExcel(MessageEntity entity) {
-        MessageExcel messageExcel = new MessageExcel();
+        MessageExcel messageExcel = modelMapper.map(entity, MessageExcel.class);
         messageExcel.setType(MessageTypeConverter.convertToChineseType(entity.getType()));
         messageExcel.setContent(entity.getContent());
         messageExcel.setSender(entity.getUserProtobuf().getNickname());
-        messageExcel.setCreatedAt(entity.getCreatedAtString());
         return messageExcel;
     }
 

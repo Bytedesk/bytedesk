@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 12:49:42
+ * @LastEditTime: 2025-05-21 13:15:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,7 +138,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     public RobotResponse create(RobotRequest request) {
         // 如果uid不为空，判断是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-            return convertToResponse(findByUid(request.getUid()).get());
+            throw new RuntimeException("robot " + request.getUid() + " already exists");
         }
         //
         RobotEntity robot = RobotEntity.builder().build();
@@ -153,7 +153,12 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         robot.setOrgUid(request.getOrgUid());
         // robot.setKbEnabled(request.getKbEnabled());
         // robot.setKbUid(request.getKbUid());
-        //
+        
+        // 设置llm相关属性
+        if (request.getLlm() != null) {
+            robot.setLlm(request.getLlm());
+        }
+        
         // Set common settings
         setRobotSettings(robot, request);
         //
@@ -276,6 +281,11 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         // robot.setDefaultReply(request.getDefaultReply());
         robot.setKbEnabled(request.getKbEnabled());
         robot.setKbUid(request.getKbUid());
+        
+        // 设置llm相关属性
+        if (request.getLlm() != null) {
+            robot.setLlm(request.getLlm());
+        }
         //
         // Set common settings
         setRobotSettings(robot, request);
@@ -628,6 +638,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         //
         RobotEntity robot = robotOptional.get();
         // robot = modelMapper.map(request, RobotEntity.class);
+        robot.setName(request.getName());
         robot.setNickname(request.getNickname());
         robot.setAvatar(request.getAvatar());
         robot.setDescription(request.getDescription());
@@ -701,7 +712,9 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
 
     @Override
     public RobotExcel convertToExcel(RobotEntity entity) {
-        return modelMapper.map(entity, RobotExcel.class);
+        RobotExcel robotExcel = modelMapper.map(entity, RobotExcel.class);
+        robotExcel.setPrompt(entity.getLlm().getPrompt());
+        return robotExcel;
     }
 
     public RobotEntity convertExcelToRobot(RobotExcel excel, String kbType, String fileUid, String kbUid, String orgUid) {
