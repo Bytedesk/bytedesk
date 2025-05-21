@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 12:21:48
+ * @LastEditTime: 2025-05-21 12:22:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class RobotEventListener {
         // 为新创建组织创建一个默认机器人
         String robotUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
         robotRestService.initDefaultRobot(orgUid, robotUid);
-        // 
+        //
         String level = LevelEnum.ORGANIZATION.name();
         // 导入组织智能体
         robotRestService.initRobotJson(level, orgUid);
@@ -64,7 +64,7 @@ public class RobotEventListener {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
             if (!BdFileUtils.isExcelFile(fileName)) {
-                log.warn("不是Excel文件，无法导入常见问题: {}", fileName);
+                log.warn("不是Excel文件，无法导入提示词: {}", fileName);
                 return;
             }
             log.info("RobotEventListener Robot: {}", fileName);
@@ -75,17 +75,16 @@ public class RobotEventListener {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("RobotEventListener loadAsResource: {}", filePath);
 
-                        // 使用原有的EasyExcel直接导入方式
-                        log.info("使用EasyExcel直接导入Robot: {}", filePath);
-                        EasyExcel.read(filePath,
-                                RobotExcel.class,
-                                new RobotExcelListener(robotRestService,
-                                        KbaseTypeEnum.LLM.name(),
-                                        upload.getUid(),
-                                        upload.getKbUid(),
-                                        upload.getOrgUid()))
-                                .sheet().doRead();
-                    // }
+                    // 使用原有的EasyExcel直接导入方式
+                    log.info("使用EasyExcel直接导入提示词: {}", filePath);
+                    EasyExcel.read(filePath,
+                            RobotExcel.class,
+                            new RobotExcelListener(robotRestService,
+                                    KbaseTypeEnum.LLM.name(),
+                                    upload.getUid(),
+                                    upload.getKbUid(),
+                                    upload.getOrgUid()))
+                            .sheet().doRead();
                 }
             } catch (Exception e) {
                 log.error("RobotEventListener UploadEventListener create error: {}", e.getMessage(), e);
