@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-20 13:55:59
+ * @LastEditTime: 2025-05-21 10:42:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,6 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -469,7 +468,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     // 初始化
     public void initDefaultRobot(String orgUid, String uid) {
         // 为每个组织创建一个机器人
-        createDefaultRobot(orgUid, uid); // Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID)
+        createDefaultRobot(orgUid, uid);
         // 为每个组织创建一个空白智能体
         createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid, RobotConsts.ROBOT_NAME_VOID_AGENT));
     }
@@ -510,10 +509,10 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
     }
 
     // 创建一个空白智能体
-    public RobotResponse createDefaultPromptRobot(String orgUid, String uid) {
+    public RobotResponse createDefaultPromptRobot(String orgUid, String robotUid) {
         // 判断uid是否已经存在
-        if (StringUtils.hasText(uid) && existsByUid(uid)) {
-            return convertToResponse(findByUid(uid).get());
+        if (StringUtils.hasText(robotUid) && existsByUid(robotUid)) {
+            return convertToResponse(findByUid(robotUid).get());
         }
         // Create RobotLlm with prompt from locale data
         RobotLlm llm = RobotLlm.builder()
@@ -521,7 +520,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 .build();
         //
         RobotEntity robot = RobotEntity.builder()
-                .uid(uid)
+                .uid(robotUid)
                 .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
                 .nickname("空白智能体")
                 .type(RobotTypeEnum.LLM.name())
@@ -534,13 +533,10 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
         if (updatedRobot == null) {
             throw new RuntimeException("save robot failed");
         }
-
         return convertToResponse(updatedRobot);
     }
 
-    public void initRobotJson() {
-        //
-        String level = LevelEnum.PLATFORM.name();
+    public void initRobotJson(String level) {
         RobotConfiguration config = robotJsonLoader.loadRobots();
         List<Robot> robots = config.getRobots();
         for (Robot robotJson : robots) {
@@ -549,8 +545,7 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             if (StringUtils.hasText(uid) && !existsByUid(uid)) {
                 String categoryUid = null;
                 Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndTypeAndLevelAndPlatform(
-                        robotJson.getCategory(),
-                        CategoryTypeEnum.ROBOT.name(), level, BytedeskConsts.PLATFORM_BYTEDESK);
+                        robotJson.getCategory(), CategoryTypeEnum.ROBOT.name(), level, BytedeskConsts.PLATFORM_BYTEDESK);
                 if (!categoryOptional.isPresent()) {
                     CategoryRequest categoryRequest = CategoryRequest.builder()
                             .name(robotJson.getCategory())
@@ -568,11 +563,6 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                 } else {
                     categoryUid = categoryOptional.get().getUid();
                 }
-                //
-                // 判断uid是否已经存在
-                // if (StringUtils.hasText(uid) && existsByUid(uid)) {
-                //     return;
-                // }
                 // Get locale data (default to zh_cn if available, fallback to en)
                 RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null
                         ? robotJson.getI18n().getZh_cn()
@@ -594,14 +584,9 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
                         .categoryUid(categoryUid)
                         .level(level)
                         .llm(llm)
-                        // .published(true)
                         .build();
-
-                // RobotEntity savedRobot =
+                // 
                 save(robot);
-                // if (savedRobot == null) {
-                // throw new RuntimeException("create robot failed");
-                // }
             }
         }
     }

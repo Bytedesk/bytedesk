@@ -15,7 +15,6 @@ package com.bytedesk.ai.robot;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -50,8 +49,6 @@ public class RobotJsonLoader {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RobotConfiguration {
-        private String version;
-        private Map<String, String> categories;
         private List<Robot> robots;
     }
 
