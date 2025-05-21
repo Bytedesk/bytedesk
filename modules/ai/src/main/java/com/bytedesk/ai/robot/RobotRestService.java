@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 12:21:12
+ * @LastEditTime: 2025-05-21 12:49:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,12 +105,6 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return queryByOrg(request);
     }
 
-    @Override
-    public RobotResponse queryByUid(RobotRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
     @Override
     public Optional<RobotEntity> findByUid(String uid) {
@@ -123,16 +117,19 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return robotRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
+    @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
     public Boolean existsByUid(String uid) {
         return robotRepository.existsByUidAndDeleted(uid, false);
     }
 
-    public RobotResponse queryByUid(String uid) {
-        Optional<RobotEntity> robotOptional = robotRepository.findByUid(uid);
+    @Cacheable(value = "robot", key = "#name + '_' + #uid", unless = "#result == null")
+    @Override
+    public RobotResponse queryByUid(RobotRequest request) {
+        Optional<RobotEntity> robotOptional = robotRepository.findByUid(request.getUid());
         if (robotOptional.isPresent()) {
             return convertToResponse(robotOptional.get());
         } else {
-            throw new RuntimeException("robot not found by uid: " + uid);
+            throw new RuntimeException("robot not found by uid: " + request.getUid());
         }
     }
 
@@ -152,10 +149,10 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         }
         robot.setName(request.getName());
         robot.setNickname(request.getNickname());
-        robot.setType(request.getType());
+        // robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
-        robot.setKbEnabled(request.getKbEnabled());
-        robot.setKbUid(request.getKbUid());
+        // robot.setKbEnabled(request.getKbEnabled());
+        // robot.setKbUid(request.getKbUid());
         //
         // Set common settings
         setRobotSettings(robot, request);
@@ -430,11 +427,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
 
     @Override
     protected RobotEntity doSave(RobotEntity entity) {
-        try {
-            return robotRepository.save(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            throw e; // 重新抛出异常以触发重试机制
-        }
+        return robotRepository.save(entity);
     }
 
     public void save(List<RobotEntity> entities) {
