@@ -144,7 +144,7 @@ public class DefaultUidGenerator implements UidGeneratorService, InitializingBea
         // Clock moved backwards, refuse to generate uid
         if (currentSecond < lastSecond) {
             long refusedSeconds = lastSecond - currentSecond;
-            if (uidProperties.isEnableBackward()) {
+            if (uidProperties.getEnableBackward()) {
                 if (refusedSeconds <= uidProperties.getMaxBackwardSeconds()) {
                     log.error("Clock moved backwards. wait for %d seconds", refusedSeconds);
                     while (currentSecond < lastSecond) {

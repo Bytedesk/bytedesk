@@ -39,7 +39,7 @@ public class MqttSessionService {
         return clientIdSessionMap.get(clientId);
     }
 
-    public boolean containsKey(String clientId) {
+    public Boolean containsKey(String clientId) {
         return clientIdSessionMap.containsKey(clientId);
     }
 

@@ -85,32 +85,32 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     // 置顶
     @Builder.Default
     @Column(name = "is_top")
-    private boolean top = false;
+    private Boolean top = false;
 
     // 未读
     @Builder.Default
     @Column(name = "is_unread")
-    private boolean unread = false;
+    private Boolean unread = false;
 
     // 免打扰
     @Builder.Default
     @Column(name = "is_mute")
-    private boolean mute = false;
+    private Boolean mute = false;
 
     // 不在会话列表显示
     @Builder.Default
     @Column(name = "is_hide")
-    private boolean hide = false;
+    private Boolean hide = false;
     
     // 类似微信折叠会话
     @Builder.Default
     @Column(name = "is_folded")
-    private boolean folded = false;
+    private Boolean folded = false;
 
     // 自动关闭
     @Builder.Default
     @Column(name = "is_auto_close")
-    private boolean autoClose = false;
+    private Boolean autoClose = false;
 
     // 备注
     @Column(name = "thread_note")

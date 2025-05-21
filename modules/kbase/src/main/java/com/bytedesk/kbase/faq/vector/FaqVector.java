@@ -66,7 +66,7 @@ public class FaqVector {
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
-    private boolean enabled;
+    private Boolean enabled;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -118,7 +118,7 @@ public class FaqVector {
             .orgUid(faq.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
-            .enabled(faq.isEnabled())
+            .enabled(faq.getEnabled())
             .startDate(faq.getStartDate())
             .endDate(faq.getEndDate())
             .viewCount(faq.getViewCount())

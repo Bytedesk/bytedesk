@@ -75,7 +75,7 @@ public class IntentionCategory {
      * 是否需要转人工
      */
     @Builder.Default
-    private boolean requiresHumanTransfer = false;
+    private Boolean requiresHumanTransfer = false;
     
     /**
      * 意图触发次数统计

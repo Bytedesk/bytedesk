@@ -28,7 +28,7 @@ public class PushFilterService {
     private static final long VALIDATE_CODE_SEND_INTERVAL = 10 * 60 * 1000; // 10分钟
 
     // 检查是否可以发送验证码
-    public boolean canSendCode(String ip) {
+    public Boolean canSendCode(String ip) {
         AtomicLong lastSentTime = ipLastSentTimeCache.getOrDefault(ip, new AtomicLong(0));
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastSentTime.get()) >= VALIDATE_CODE_SEND_INTERVAL;

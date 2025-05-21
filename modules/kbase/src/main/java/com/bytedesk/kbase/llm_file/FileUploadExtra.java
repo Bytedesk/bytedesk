@@ -36,12 +36,12 @@ public class FileUploadExtra implements Serializable {
     private String autoLlmChunk;
 
     // 转换为布尔值
-    public boolean isAutoGenerateLlmQa() {
+    public Boolean isAutoGenerateLlmQa() {
         return Boolean.parseBoolean(autoGenerateLlmQa);
     }
 
     // 转换为布尔值
-    public boolean isAutoLlmChunk() {
+    public Boolean isAutoLlmChunk() {
         return Boolean.parseBoolean(autoLlmChunk);
     }
 

@@ -112,7 +112,7 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
     /**
      * 确定是否需要升级处理
      */
-    // private boolean determineIfNeedEscalation(DelegateExecution execution) {
+    // private Boolean determineIfNeedEscalation(DelegateExecution execution) {
     //     // TODO: 实际项目中，根据业务规则确定
         
     //     // 例如，检查是否是首次超时，或者SLA级别

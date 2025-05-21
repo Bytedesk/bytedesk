@@ -257,7 +257,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
     }
 
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (bytedeskOllamaChatModel == null) {
             return false;
         }

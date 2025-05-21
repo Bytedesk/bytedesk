@@ -54,7 +54,7 @@ public class IntentionResult {
      * 是否需要澄清
      */
     @Builder.Default
-    private boolean needClarification = false;
+    private Boolean needClarification = false;
     
     /**
      * 推荐的澄清问题
@@ -80,19 +80,19 @@ public class IntentionResult {
      * 是否建议转人工
      */
     @Builder.Default
-    private boolean suggestHumanTransfer = false;
+    private Boolean suggestHumanTransfer = false;
     
     /**
      * 意图是否确定
      * 当主意图置信度高于阈值时为true
      */
     @Builder.Default
-    private boolean isConfident = true;
+    private Boolean isConfident = true;
     
     /**
      * 意图是否改变
      * 与上一次检测结果相比是否改变
      */
     @Builder.Default
-    private boolean isIntentionChanged = false;
+    private Boolean isIntentionChanged = false;
 }

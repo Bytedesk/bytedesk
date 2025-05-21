@@ -148,7 +148,7 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         });
     }
 
-    public boolean existsByUid(String uid) {
+    public Boolean existsByUid(String uid) {
         return messageRepository.existsByUid(uid);
     }
 

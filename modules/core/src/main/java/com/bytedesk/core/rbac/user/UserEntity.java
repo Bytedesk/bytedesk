@@ -98,19 +98,19 @@ public class UserEntity extends BaseEntityNoOrg {
 
 	@Builder.Default
 	@Column(name = "is_enabled")
-	private boolean enabled = true;
+	private Boolean enabled = true;
 
 	@Builder.Default
 	@Column(name = "is_super")
-	private boolean superUser = false;
+	private Boolean superUser = false;
 
 	@Builder.Default
 	@Column(name = "is_email_verified")
-	private boolean emailVerified = false;
+	private Boolean emailVerified = false;
 
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
-	private boolean mobileVerified = false;
+	private Boolean mobileVerified = false;
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -163,7 +163,7 @@ public class UserEntity extends BaseEntityNoOrg {
         Long roleId = role.getId();
         
         // 4. 处理UserOrganizationRoleEntity中的角色集合
-        boolean roleExists = uor.getRoles().stream()
+        Boolean roleExists = uor.getRoles().stream()
             .anyMatch(r -> r.getId() != null && r.getId().equals(roleId));
         
         if (!roleExists) {
@@ -172,7 +172,7 @@ public class UserEntity extends BaseEntityNoOrg {
         }
         
         // 5. 处理currentRoles集合
-        boolean currentRoleExists = currentRoles.stream()
+        Boolean currentRoleExists = currentRoles.stream()
             .anyMatch(r -> r.getId() != null && r.getId().equals(roleId));
             
         if (!currentRoleExists) {
@@ -191,7 +191,7 @@ public class UserEntity extends BaseEntityNoOrg {
 	}
 
 	// 判断organization是否包含role
-	public boolean containsRole(RoleEntity role) {
+	public Boolean containsRole(RoleEntity role) {
 		OrganizationEntity organization = this.currentOrganization;
 		if (organization == null) {
 			return false;

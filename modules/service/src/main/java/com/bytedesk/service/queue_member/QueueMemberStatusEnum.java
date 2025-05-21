@@ -38,7 +38,7 @@ package com.bytedesk.service.queue_member;
 //     /**
 //      * 检查是否是结束状态
 //      */
-//     public boolean isEndStatus() {
+//     public Boolean isEndStatus() {
 //         return this == COMPLETED || this == ABANDONED || 
 //                this == TIMEOUT || this == REJECTED;
 //     }

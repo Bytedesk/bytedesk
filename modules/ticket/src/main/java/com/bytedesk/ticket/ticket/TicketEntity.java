@@ -107,7 +107,7 @@ public class TicketEntity extends BaseEntity {
     // 是否评价
     @Builder.Default
     @Column(name = "is_rated")
-    private boolean rated = false;
+    private Boolean rated = false;
 
     // 满意度评价
     @Builder.Default
@@ -116,7 +116,7 @@ public class TicketEntity extends BaseEntity {
     // 客户验证
     @Builder.Default
     @Column(name = "is_verified")
-    private boolean verified = false;
+    private Boolean verified = false;
 
     // 解决时间
     private LocalDateTime resolvedTime;

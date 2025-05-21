@@ -45,13 +45,13 @@ public class SpringAIOllamaConfig {
     private String ollamaChatOptionsModel;
 
     @Value("${spring.ai.ollama.chat.options.numa:false}")
-    private boolean ollamaChatOptionsNuma;
+    private Boolean ollamaChatOptionsNuma;
 
     @Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")
     private String ollamaEmbeddingOptionsModel;
 
     @Value("${spring.ai.ollama.service.auto-check:true}")
-    private boolean autoCheckService;
+    private Boolean autoCheckService;
 
     @Bean("bytedeskOllamaApi")
     OllamaApi bytedeskOllamaApi() {

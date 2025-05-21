@@ -24,7 +24,7 @@ public class GrayReleaseStatus {
     private String feature;           // 功能代码
 
     @Column(name = "gray_enabled")
-    private boolean enabled;          // 是否启用
+    private Boolean enabled;          // 是否启用
 
     @Column(name = "gray_percentage")
     private Integer percentage;           // 灰度比例
@@ -59,7 +59,7 @@ public class GrayReleaseStatus {
     /**
      * 检查是否可以继续放量
      */
-    public boolean canIncreaseRollout() {
+    public Boolean canIncreaseRollout() {
         return STATUS_ACTIVE.equals(status) && 
                percentage < 100 && 
                successRate >= 0.95;
@@ -68,7 +68,7 @@ public class GrayReleaseStatus {
     /**
      * 检查是否需要暂停放量
      */
-    public boolean shouldPauseRollout() {
+    public Boolean shouldPauseRollout() {
         return STATUS_ACTIVE.equals(status) && 
                failureRate >= 0.20;
     }

@@ -112,7 +112,7 @@ public class ChunkElasticService {
      * @param chunkUid 要删除的Chunk的UID
      * @return 是否删除成功
      */
-    public boolean deleteChunk(String chunkUid) {
+    public Boolean deleteChunk(String chunkUid) {
         log.info("从索引中删除Chunk: {}", chunkUid);
         
         try {
@@ -138,7 +138,7 @@ public class ChunkElasticService {
      * @param kbaseUid 知识库UID
      * @return 是否删除成功
      */
-    public boolean deleteByKbaseUid(String kbaseUid) {
+    public Boolean deleteByKbaseUid(String kbaseUid) {
         log.info("删除知识库下所有Chunk索引: {}", kbaseUid);
         
         try {

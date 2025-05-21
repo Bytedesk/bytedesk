@@ -59,15 +59,15 @@ public class QuartzEntity extends BaseEntity {
     //
     @Builder.Default
     @Column(name = "is_durable")
-    private boolean durable = true;
+    private Boolean durable = true;
 
     @Builder.Default
     @Column(name = "is_nonconcurrent")
-    private boolean nonconcurrent = true;
+    private Boolean nonconcurrent = true;
 
     @Builder.Default
     @Column(name = "is_update_data")
-    private boolean updateData = false;
+    private Boolean updateData = false;
 
     // triggers
     @Column(nullable = false)

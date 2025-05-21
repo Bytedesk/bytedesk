@@ -193,16 +193,16 @@ public class IntentionDetectionServiceImpl implements IntentionDetectionService 
             return false;
         }
         
-        // ThreadEntity thread = threadOptional.get();
+        ThreadEntity thread = threadOptional.get();
         // String previousIntention = thread.getIntention();
         
-        // // 记录意图转换
+        // 记录意图转换
         // recordIntentionTransition(threadId, previousIntention, intention, 
         //         0.0, confidence, "手动设置", "MANUAL");
         
-        // // 更新会话意图
+        // 更新会话意图
         // thread.setIntention(intention);
-        // threadRepository.save(thread);
+        threadRepository.save(thread);
         
         return true;
     }

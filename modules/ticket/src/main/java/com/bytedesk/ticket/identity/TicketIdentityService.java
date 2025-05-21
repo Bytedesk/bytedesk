@@ -143,7 +143,7 @@ public class TicketIdentityService {
     /**
      * 检查用户是否在指定组中
      */
-    public boolean isUserInGroup(String userId, String groupId) {
+    public Boolean isUserInGroup(String userId, String groupId) {
         return identityService.createGroupQuery()
             .groupId(groupId)
             .groupMember(userId)
@@ -177,7 +177,7 @@ public class TicketIdentityService {
     /**
      * 检查用户认证状态
      */
-    public boolean checkAuthentication(String userId) {
+    public Boolean checkAuthentication(String userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
             return false;
@@ -231,7 +231,7 @@ public class TicketIdentityService {
     /**
      * 检查用户是否有指定权限
      */
-    public boolean hasPrivilege(String userId, String privilegeName) {
+    public Boolean hasPrivilege(String userId, String privilegeName) {
         return identityService.createPrivilegeQuery()
             .userId(userId)
             .privilegeName(privilegeName)
@@ -324,7 +324,7 @@ public class TicketIdentityService {
     /**
      * LDAP认证
      */
-    public boolean authenticate(String userId, String password) {
+    public Boolean authenticate(String userId, String password) {
         // return ldapIdentityService.checkPassword(userId, password);
         return true;
     }

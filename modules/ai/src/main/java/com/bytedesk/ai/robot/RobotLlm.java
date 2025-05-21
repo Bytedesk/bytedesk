@@ -35,12 +35,12 @@ public class RobotLlm {
     // 默认启用llm问答
     @Builder.Default
     @Column(name = "is_llm_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     // stream流式输出
     @Builder.Default
     @Column(name = "is_stream_enabled")
-    private boolean streamEnabled = true;
+    private Boolean streamEnabled = true;
 
     // 文字对话模型提供商
     @Builder.Default
@@ -56,7 +56,7 @@ public class RobotLlm {
     // 启用vision
     @Builder.Default
     @Column(name = "is_vision_enabled")
-    private boolean visionEnabled = false;
+    private Boolean visionEnabled = false;
 
     // 视觉模型提供商
     @Builder.Default
@@ -72,7 +72,7 @@ public class RobotLlm {
     // 启用speech
     @Builder.Default
     @Column(name = "is_speech_enabled")
-    private boolean speechEnabled = false;
+    private Boolean speechEnabled = false;
 
     // 语音模型提供商
     @Builder.Default

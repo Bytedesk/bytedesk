@@ -41,7 +41,7 @@ public class JedisProperties {
     private Integer timeout;
     private Integer soTimeout = Protocol.DEFAULT_TIMEOUT;
     private String clientName;
-    private boolean ssl;
+    private Boolean ssl;
     // private SSLSocketFactory sslSocketFactory;
     private SSLParameters sslParameters;
     private HostnameVerifier hostnameVerifier;

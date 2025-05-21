@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-18 10:12:48
+ * @LastEditTime: 2025-05-21 15:20:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -127,7 +127,7 @@ public class WebsiteRestService
                 latestEntity.setUrl(entity.getUrl());
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setContent(entity.getContent());
-                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setEnabled(entity.getEnabled());
 
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());

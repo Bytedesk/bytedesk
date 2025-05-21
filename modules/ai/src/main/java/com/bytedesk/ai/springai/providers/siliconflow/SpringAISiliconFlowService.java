@@ -173,7 +173,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         return siliconFlowChatModel;
     }
 
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (!siliconFlowChatModel.isPresent()) {
             return false;
         }

@@ -66,7 +66,7 @@ public class FileEntity extends BaseEntity {
     // 是否启用，状态：启用/禁用
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
      // 有效开始日期
     @Builder.Default
@@ -118,7 +118,7 @@ public class FileEntity extends BaseEntity {
      * @param request FileRequest 请求
      * @return 如果文件内容或属性有变化返回 true，否则返回 false
      */
-    public boolean hasChanged(FileRequest request) {
+    public Boolean hasChanged(FileRequest request) {
         // 比较文件名是否变化
         if ((fileName == null && request.getFileName() != null) ||
             (fileName != null && !fileName.equals(request.getFileName()))) {

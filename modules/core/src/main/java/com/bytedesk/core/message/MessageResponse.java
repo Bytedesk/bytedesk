@@ -56,19 +56,19 @@ public class MessageResponse extends BaseResponse {
     private String extra;
 
     // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
-    public boolean isRobot() {
+    public Boolean isRobot() {
         // 忽略大小写
         return user.getType().toLowerCase().contains("robot");
     }
 
     // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
-    public boolean isVisitor() {
+    public Boolean isVisitor() {
         // 忽略大小写
         return user.getType().toLowerCase().contains("visitor");
     }
 
     // 是否系统消息
-    public boolean isSystem() {
+    public Boolean isSystem() {
         // 忽略大小写
         return user.getType().toLowerCase().contains("system");
     }

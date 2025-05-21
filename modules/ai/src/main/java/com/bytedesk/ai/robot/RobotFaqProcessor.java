@@ -127,7 +127,7 @@ package com.bytedesk.ai.robot;
 //         return faqs;
 //     }
 
-//     private boolean updateRobotWithFaqs(RobotEntity robot, List<FaqEntity> faqs) {
+//     private Boolean updateRobotWithFaqs(RobotEntity robot, List<FaqEntity> faqs) {
 //         boolean updated = false;
 //         for (FaqEntity faq : faqs) {
 //             if (robot.getServiceSettings().getHotFaqs().size() < 5) {

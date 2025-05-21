@@ -63,7 +63,7 @@ public class TextVector {
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
-    private boolean enabled;
+    private Boolean enabled;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -109,7 +109,7 @@ public class TextVector {
             .orgUid(text.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(text.getCategoryUid())
-            .enabled(text.isEnabled())
+            .enabled(text.getEnabled())
             .startDate(text.getStartDate())
             .endDate(text.getEndDate())
             .status(text.getStatus())

@@ -348,7 +348,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 latestEntity.setAnswer(entity.getAnswer());
                 latestEntity.setAnswerList(entity.getAnswerList());
                 latestEntity.setType(entity.getType());
-                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setEnabled(entity.getEnabled());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
                 // latestEntity.setKbUid(entity.getKbUid());
 
@@ -429,7 +429,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             excel.setCategory("未分类");
         }
         excel.setAnswerList(JSON.toJSONString(faq.getAnswerList()));
-        if (faq.isEnabled()) {
+        if (faq.getEnabled()) {
             excel.setEnabled("是");
         } else {
             excel.setEnabled("否");

@@ -12,7 +12,7 @@ public class LdapUserService {
     @Autowired
     private LdapTemplate ldapTemplate;
 
-    public boolean authenticate(String username, String password) {
+    public Boolean authenticate(String username, String password) {
         Filter filter = new EqualsFilter("uid", username);
         return ldapTemplate.authenticate("", filter.encode(), password);
     }

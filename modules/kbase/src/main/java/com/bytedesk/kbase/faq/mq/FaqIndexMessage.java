@@ -45,10 +45,10 @@ public class FaqIndexMessage implements Serializable {
     /**
      * 是否需要更新全文索引
      */
-    private boolean updateElasticIndex;
+    private Boolean updateElasticIndex;
     
     /**
      * 是否需要更新向量索引
      */
-    private boolean updateVectorIndex;
+    private Boolean updateVectorIndex;
 }

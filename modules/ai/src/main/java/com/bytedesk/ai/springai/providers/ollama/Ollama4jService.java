@@ -80,7 +80,7 @@ public class Ollama4jService {
      * @param modelName 模型名称
      * @return 如果模型存在返回true，否则返回false
      */
-    public boolean isModelExists(String modelName) {
+    public Boolean isModelExists(String modelName) {
         try {
             bytedeskOllamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
             return true;
@@ -106,7 +106,7 @@ public class Ollama4jService {
     }
 
     // 检查Ollama4j是否可用
-    public boolean isOllama4jReachable() {
+    public Boolean isOllama4jReachable() {
         try {
             return ollama4jApi.ping();
         } catch (Exception e) {

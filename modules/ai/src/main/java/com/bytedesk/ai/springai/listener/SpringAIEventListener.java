@@ -77,7 +77,7 @@ public class SpringAIEventListener {
     // public void onTextUpdateDocEvent(TextUpdateDocEvent event) {
     //     TextEntity text = event.getText();
     //     log.info("SpringAIEventListener onTextUpdateEvent: {}", text.getTitle());
-    //     if (!text.isDeleted()) {
+    //     if (!text.getDeleted()) {
     //         // 将Text实体添加到更新缓存中
     //         textUpdateMap.put(text.getUid(), text);
     //     }

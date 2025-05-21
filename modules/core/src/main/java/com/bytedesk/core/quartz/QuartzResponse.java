@@ -45,11 +45,11 @@ public class QuartzResponse extends BaseResponse {
     private String cronExpression;
 
     //
-    private boolean durable;
+    private Boolean durable;
 
-    private boolean nonconcurrent;
+    private Boolean nonconcurrent;
 
-    private boolean updateData;
+    private Boolean updateData;
 
     // triggers
     private String triggerName;// 执行时间

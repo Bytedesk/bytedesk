@@ -123,7 +123,7 @@ public class BufferPaddingExecutor {
      *
      * @return
      */
-    public boolean isRunning() {
+    public Boolean isRunning() {
         return running.get();
     }
 

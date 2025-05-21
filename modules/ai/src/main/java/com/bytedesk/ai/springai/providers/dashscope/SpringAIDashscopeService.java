@@ -169,7 +169,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         return dashscopeChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (dashscopeChatModel == null) {
             return false;
         }

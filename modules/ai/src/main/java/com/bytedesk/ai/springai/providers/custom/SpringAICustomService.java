@@ -178,7 +178,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         return customChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (customChatModel == null) {
             return false;
         }

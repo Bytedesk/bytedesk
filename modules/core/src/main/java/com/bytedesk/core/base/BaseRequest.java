@@ -100,11 +100,11 @@ public abstract class BaseRequest implements Serializable {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private boolean isSuperUser = false;
+    private Boolean isSuperUser = false;
 
     // 导出全部数据，默认false
     @Builder.Default
-    private boolean exportAll = false;
+    private Boolean exportAll = false;
 
     // 排序方式，默认按更新时间倒序
     // updatedAt/createdAt: 'ascend', 'descend'

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 14:38:42
+ * @LastEditTime: 2025-05-21 15:30:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -167,7 +167,7 @@ public class QueueMemberEventListener {
             queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
             
             // 如果是首次响应，记录首次响应时间
-            if (!queueMember.isAgentFirstResponse() && queueMember.getVisitorLastMessageAt() != null) {
+            if (!queueMember.getAgentFirstResponse() && queueMember.getVisitorLastMessageAt() != null) {
                 queueMember.setAgentFirstResponse(true);
                 queueMember.setAgentFirstResponseAt(now);
                 

@@ -63,7 +63,7 @@ public class ChunkVector {
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
-    private boolean enabled;
+    private Boolean enabled;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -116,7 +116,7 @@ public class ChunkVector {
             .orgUid(chunk.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(chunk.getCategoryUid())
-            .enabled(chunk.isEnabled())
+            .enabled(chunk.getEnabled())
             .docId(chunk.getDocId())
             .fileUid(fileUid)
             .startDate(chunk.getStartDate())

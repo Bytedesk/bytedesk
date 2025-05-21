@@ -166,7 +166,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
         return openaiChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (openaiChatModel == null) {
             return false;
         }

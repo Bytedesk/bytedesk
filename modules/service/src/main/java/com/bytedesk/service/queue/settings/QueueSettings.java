@@ -39,7 +39,7 @@ public class QueueSettings implements Serializable {
     // 当排队人数超过指定值时，自动分配机器人
     // 仅适用于workgroup，对一对一人工客服无效
     @Builder.Default
-    private boolean queueRobot = false;
+    private Boolean queueRobot = false;
 
     @Builder.Default
     private Integer maxWaiting = 10000; // 最大等待人数

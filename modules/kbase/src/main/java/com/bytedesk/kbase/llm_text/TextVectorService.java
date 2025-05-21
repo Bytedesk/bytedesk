@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:45:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 16:22:01
+ * @LastEditTime: 2025-05-21 15:20:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,7 @@ public class TextVectorService {
                 KbaseConst.KBASE_KB_UID, text.getKbase() != null ? text.getKbase().getUid() : "",
                 "categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "",
                 "orgUid", text.getOrgUid(),
-                "enabled", Boolean.toString(text.isEnabled()),
+                "enabled", Boolean.toString(text.getEnabled()),
                 "tags", tags,
                 "type", text.getType()
             );
@@ -157,7 +157,7 @@ public class TextVectorService {
      * @param text 要删除的文本实体
      * @return 是否删除成功
      */
-    public boolean deleteTextVector(TextEntity text) {
+    public Boolean deleteTextVector(TextEntity text) {
         log.info("从向量索引中删除文本: {}", text.getTitle());
         
         try {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 10:38:26
+ * @LastEditTime: 2025-05-21 15:23:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -131,7 +131,7 @@ public class FaqIndexConsumer {
         boolean vectorSuccess = true;
         
         // 执行全文索引 - 独立事务
-        if (message.isUpdateElasticIndex()) {
+        if (message.getUpdateElasticIndex()) {
             try {
                 log.debug("为FAQ创建全文索引: {}", faq.getUid());
                 // 在单独的事务中处理全文索引
@@ -145,7 +145,7 @@ public class FaqIndexConsumer {
         }
         
         // 执行向量索引 - 独立事务
-        if (message.isUpdateVectorIndex()) {
+        if (message.getUpdateVectorIndex()) {
             try {
                 log.debug("为FAQ创建向量索引: {}", faq.getUid());
                 // 在单独的事务中处理向量索引
@@ -216,7 +216,7 @@ public class FaqIndexConsumer {
      * 在完全独立事务中删除向量索引
      */
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public boolean deleteFaqVector(FaqEntity faq) {
+    public Boolean deleteFaqVector(FaqEntity faq) {
         try {
             log.debug("在完全独立事务中删除向量索引: {}", faq.getUid());
             return faqVectorService.deleteFaqVector(faq);
@@ -230,7 +230,7 @@ public class FaqIndexConsumer {
      * 在完全独立事务中创建向量索引
      */
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public boolean indexFaqVector(FaqEntity faq) {
+    public Boolean indexFaqVector(FaqEntity faq) {
         try {
             log.debug("在完全独立事务中创建向量索引: {}", faq.getUid());
             faqVectorService.indexFaqVector(faq);
@@ -250,7 +250,7 @@ public class FaqIndexConsumer {
         boolean vectorSuccess = true;
         
         // 从全文索引中删除 - 独立事务
-        if (message.isUpdateElasticIndex()) {
+        if (message.getUpdateElasticIndex()) {
             try {
                 log.debug("从全文索引中删除FAQ: {}", faq.getUid());
                 // 在单独的事务中处理
@@ -266,7 +266,7 @@ public class FaqIndexConsumer {
         }
         
         // 从向量索引中删除 - 独立事务
-        if (message.isUpdateVectorIndex()) {
+        if (message.getUpdateVectorIndex()) {
             try {
                 log.debug("从向量索引中删除FAQ: {}", faq.getUid());
                 // 在单独的事务中处理
@@ -308,7 +308,7 @@ public class FaqIndexConsumer {
      * 在单独事务中处理全文索引删除
      */
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public boolean processElasticDelete(String faqUid) {
+    public Boolean processElasticDelete(String faqUid) {
         log.debug("在独立事务中处理全文索引删除: {}", faqUid);
         return faqElasticService.deleteFaq(faqUid);
     }
@@ -317,7 +317,7 @@ public class FaqIndexConsumer {
      * 在单独事务中处理向量索引删除
      */
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public boolean processVectorDelete(FaqEntity faq) {
+    public Boolean processVectorDelete(FaqEntity faq) {
         log.debug("在独立事务中处理向量索引删除: {}", faq.getUid());
         return faqVectorService.deleteFaqVector(faq);
     }

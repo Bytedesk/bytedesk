@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-06 12:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 10:11:10
+ * @LastEditTime: 2025-05-21 15:08:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ public class BlackConverter {
         excel.setBlackNickname(response.getBlackNickname());
         excel.setBlackAvatar(response.getBlackAvatar());
         excel.setReason(response.getReason());
-        excel.setBlockIp(response.isBlockIp() ? "是" : "否");
+        excel.setBlockIp(response.getBlockIp() ? "是" : "否");
         excel.setUserUid(response.getUserUid());
         excel.setUserNickname(response.getUserNickname());
         excel.setStartTime(response.getStartTime() != null ? response.getStartTime().format(DATE_FORMATTER) : "");

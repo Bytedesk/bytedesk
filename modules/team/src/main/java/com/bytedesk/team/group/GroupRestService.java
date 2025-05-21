@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 16:00:08
+ * @LastEditTime: 2025-05-21 15:15:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -239,7 +239,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         excel.setDescription(group.getDescription());
         excel.setType(group.getType());
         excel.setStatus(group.getStatus());
-        excel.setIsExternal(group.isExternal());
+        excel.setIsExternal(group.getExternal());
         excel.setCreator(group.getCreator() != null ? group.getCreator().getNickname() : "");
         excel.setMemberCount(group.getMembers().size());
         excel.setAdminCount(group.getAdmins().size());
@@ -247,7 +247,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         excel.setNeedApproval(group.getNeedApproval());
         excel.setAllowInvite(group.getAllowInvite());
         excel.setMuteAll(group.getMuteAll());
-        excel.setShowTopTip(group.isShowTopTip());
+        excel.setShowTopTip(group.getShowTopTip());
         excel.setTopTip(group.getTopTip());
         excel.setCreatedAt(group.getCreatedAt().toString());
         excel.setUpdatedAt(group.getUpdatedAt().toString());

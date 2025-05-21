@@ -166,7 +166,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
         return openrouterChatModel;
     }
     
-    public boolean isServiceHealthy() {
+    public Boolean isServiceHealthy() {
         if (openrouterChatModel == null) {
             return false;
         }

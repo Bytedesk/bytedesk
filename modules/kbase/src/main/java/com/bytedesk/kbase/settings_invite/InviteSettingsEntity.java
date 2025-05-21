@@ -61,14 +61,14 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_default_template")
-    private boolean defaultTemplate = false;
+    private Boolean defaultTemplate = false;
 
     /**
      * 是否显示邀请
      */
     @Builder.Default
     @Column(name = "is_invite_show")
-    private boolean show = false;
+    private Boolean show = false;
     
     /**
      * 邀请文本
@@ -96,7 +96,7 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_invite_loop")
-    private boolean loop = false;
+    private Boolean loop = false;
     
     /**
      * 循环延迟时间,单位:毫秒 
@@ -137,7 +137,7 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_targeted_invite")
-    private boolean targetedInvite = false;
+    private Boolean targetedInvite = false;
     
     /**
      * 定向邀请页面URL匹配模式
@@ -153,7 +153,7 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_smart_trigger")
-    private boolean smartTrigger = false;
+    private Boolean smartTrigger = false;
     
     /**
      * 页面停留时间触发，单位:秒
@@ -169,7 +169,7 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_scroll_trigger")
-    private boolean scrollTrigger = false;
+    private Boolean scrollTrigger = false;
     
     /**
      * 页面滚动触发百分比 (0-100)
@@ -184,14 +184,14 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_exit_intent_trigger")
-    private boolean exitIntentTrigger = false;
+    private Boolean exitIntentTrigger = false;
     
     /**
      * 访客来源触发 - 基于访客来源启用邀请
      */
     @Builder.Default
     @Column(name = "is_referrer_trigger")
-    private boolean referrerTrigger = false;
+    private Boolean referrerTrigger = false;
     
     /**
      * 来源URL匹配模式，如搜索引擎、社交媒体等
@@ -216,7 +216,7 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_visitor_segmentation")
-    private boolean visitorSegmentation = false;
+    private Boolean visitorSegmentation = false;
     
     /**
      * 新访客专属邀请消息
@@ -261,5 +261,5 @@ public class InviteSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_ab_testing")
-    private boolean abTesting = false;
+    private Boolean abTesting = false;
 }

@@ -192,7 +192,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
                 // latestEntity.setTypeUid(entity.getTypeUid());
                 latestEntity.setLevel(entity.getLevel());
                 latestEntity.setPlatform(entity.getPlatform());
-                latestEntity.setEnabled(entity.isEnabled());
+                latestEntity.setEnabled(entity.getEnabled());
                 latestEntity.setStartDate(entity.getStartDate());
                 latestEntity.setEndDate(entity.getEndDate());
 
@@ -273,7 +273,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     @Override
     public ChunkExcel convertToExcel(ChunkEntity chunk) {
         ChunkExcel excel = modelMapper.map(chunk, ChunkExcel.class);
-        if (chunk.isEnabled()) {
+        if (chunk.getEnabled()) {
             excel.setEnabled("是");
         } else {
             excel.setEnabled("否");

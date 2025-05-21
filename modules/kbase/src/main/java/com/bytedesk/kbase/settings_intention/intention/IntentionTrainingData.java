@@ -43,7 +43,7 @@ public class IntentionTrainingData {
      * 是否为真实客户对话数据
      */
     @Builder.Default
-    private boolean isRealData = false;
+    private Boolean isRealData = false;
     
     /**
      * 上下文消息列表

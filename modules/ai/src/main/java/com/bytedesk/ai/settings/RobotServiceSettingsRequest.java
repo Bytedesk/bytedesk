@@ -35,7 +35,7 @@ package com.bytedesk.ai.settings;
 
 //     // 是否允许转人工
 //     @Builder.Default
-//     private boolean allowTransferToAgent = true;
+//     private Boolean allowTransferToAgent = true;
 
 //     // 限制仅允许：workgroup、agent
 //     @Builder.Default

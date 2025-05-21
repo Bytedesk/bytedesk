@@ -70,7 +70,7 @@ public class TopicEntity extends BaseEntityNoOrg {
 
     // @Builder.Default
     // @Column(name = "is_subscribed")
-    // private boolean subscribed = false;
+    // private Boolean subscribed = false;
 
     /**
      * topic通配符说明：
@@ -79,7 +79,7 @@ public class TopicEntity extends BaseEntityNoOrg {
      */
     // @Builder.Default
     // @Column(name = "is_wildcard")
-    // private boolean wildcard = false;
+    // private Boolean wildcard = false;
 
     /**
      * current online clientIds

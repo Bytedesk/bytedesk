@@ -124,15 +124,15 @@ public class QueueEntity extends BaseEntity {
          */
         public int getOfflineCount() {
                 int count1 = (int) agentQueueMembers.stream()
-                                .filter(member -> (member.getThread() != null && member.isAgentOffline()))
+                                .filter(member -> (member.getThread() != null && member.getAgentOffline()))
                                 .count();
 
                 int count2 = (int) robotQueueMembers.stream()
-                                .filter(member -> (member.getThread() != null && member.isAgentOffline()))
+                                .filter(member -> (member.getThread() != null && member.getAgentOffline()))
                                 .count();
 
                 int count3 = (int) workgroupQueueMembers.stream()
-                                .filter(member -> (member.getThread() != null && member.isAgentOffline()))
+                                .filter(member -> (member.getThread() != null && member.getAgentOffline()))
                                 .count();
 
                 return count1 + count2 + count3;
@@ -141,15 +141,15 @@ public class QueueEntity extends BaseEntity {
         // messageLeaveCount
         public int getMessageLeaveCount() {
                 int count1 = (int) agentQueueMembers.stream()
-                                .filter(member -> (member.isMessageLeave()))
+                                .filter(member -> (member.getMessageLeave()))
                                 .count();
 
                 int count2 = (int) robotQueueMembers.stream()
-                                .filter(member -> (member.isMessageLeave()))
+                                .filter(member -> (member.getMessageLeave()))
                                 .count();
 
                 int count3 = (int) workgroupQueueMembers.stream()
-                                .filter(member -> (member.isMessageLeave()))
+                                .filter(member -> (member.getMessageLeave()))
                                 .count();
 
                 return count1 + count2 + count3;
@@ -158,15 +158,15 @@ public class QueueEntity extends BaseEntity {
         // robotToAgentCount
         public int getRobotToAgentCount() {
                 int count1 = (int) agentQueueMembers.stream()
-                                .filter(member -> member.isRobotToAgent())
+                                .filter(member -> member.getRobotToAgent())
                                 .count();
 
                 int count2 = (int) robotQueueMembers.stream()
-                                .filter(member -> member.isRobotToAgent())
+                                .filter(member -> member.getRobotToAgent())
                                 .count();
 
                 int count3 = (int) workgroupQueueMembers.stream()
-                                .filter(member -> member.isRobotToAgent())
+                                .filter(member -> member.getRobotToAgent())
                                 .count();
 
                 return count1 + count2 + count3;
@@ -351,7 +351,7 @@ public class QueueEntity extends BaseEntity {
         /**
          * 检查是否可以加入队列
          */
-        public boolean canEnqueue() {
+        public Boolean canEnqueue() {
                 return status.equals(QueueStatusEnum.ACTIVE.name());
         }
 

@@ -62,7 +62,7 @@ public class IntentionSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "is_default_template")
-    private boolean defaultTemplate = false;
+    private Boolean defaultTemplate = false;
 
     /**
      * 意图分类选项
@@ -148,7 +148,7 @@ public class IntentionSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "enable_intention_tracking")
-    private boolean enableIntentionTracking = true;
+    private Boolean enableIntentionTracking = true;
     
     /**
      * 意图转换阈值，当新意图的置信度超过此阈值时才会转换当前意图

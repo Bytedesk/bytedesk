@@ -133,7 +133,7 @@ public class ThreadTransferToAgentService {
      * @param thread  会话线程
      * @return 如果是访客消息返回true，否则返回false
      */
-    private boolean isVisitorMessage(MessageEntity message, ThreadEntity thread) {
+    private Boolean isVisitorMessage(MessageEntity message, ThreadEntity thread) {
         // 判断消息发送者是否为访客
         // 这里需要根据实际的消息类型和用户角色判断逻辑进行调整
 
@@ -157,7 +157,7 @@ public class ThreadTransferToAgentService {
      * @param content 消息内容
      * @return 如果包含转人工关键词返回true，否则返回false
      */
-    private boolean checkTransferRequest(String content) {
+    private Boolean checkTransferRequest(String content) {
         String normalizedContent = content.trim().toLowerCase();
         for (String keyword : TRANSFER_KEYWORDS) {
             if (normalizedContent.contains(keyword)) {

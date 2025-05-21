@@ -138,7 +138,7 @@ public class TicketEventListener {
         log.info("TicketEventListener handleTicketUpdateEvent: {}", event);
         TicketEntity ticket = event.getTicket();
         // 判断是否删除
-        if (ticket.isDeleted()) {
+        if (ticket.getDeleted()) {
             // 同步更新流程实例
             ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                     .processInstanceId(ticket.getProcessInstanceId())

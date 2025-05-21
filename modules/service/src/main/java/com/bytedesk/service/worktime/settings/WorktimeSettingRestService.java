@@ -139,7 +139,7 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExcel<Worktim
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
+                // latestEntity.setDeleted(entity.getDeleted());
                 return tagRepository.save(latestEntity);
             }
         } catch (Exception ex) {

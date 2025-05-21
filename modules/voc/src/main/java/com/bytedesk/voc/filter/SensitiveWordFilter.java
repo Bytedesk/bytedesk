@@ -50,7 +50,7 @@ public class SensitiveWordFilter {
         }
     }
     
-    public boolean containsSensitiveWords(String text) {
+    public Boolean containsSensitiveWords(String text) {
         if (text == null || text.isEmpty()) {
             return false;
         }

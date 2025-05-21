@@ -67,7 +67,7 @@ public class RobotMessageEntity extends AbstractMessageEntity {
 
     // 是否未搜索到到答案
     @Builder.Default
-    private boolean isUnAnswered = false;
+    private Boolean isUnAnswered = false;
 
     /**
      * @{org.springframework.ai.chat.metadata.Usage}

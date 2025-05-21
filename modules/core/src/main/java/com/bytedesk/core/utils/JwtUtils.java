@@ -56,7 +56,7 @@ public class JwtUtils {
         .compact();
   }
 
-  public boolean validateJwtToken(String authToken) {
+  public Boolean validateJwtToken(String authToken) {
     try {
       // 这一步会验证token的签名和过期时间，如果token已过期会抛出ExpiredJwtException
       Jwts.parser()

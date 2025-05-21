@@ -60,7 +60,7 @@ public class AutoReplyFixedEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_enabled")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)

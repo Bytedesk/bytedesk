@@ -53,7 +53,7 @@ public class TextElastic {
     private List<String> tagList;
 
     @Field(type = FieldType.Boolean)
-    private boolean enabled;
+    private Boolean enabled;
 
      // startDate
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)

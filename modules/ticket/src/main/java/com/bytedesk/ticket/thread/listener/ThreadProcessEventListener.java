@@ -374,7 +374,7 @@ public class ThreadProcessEventListener {
      * @param processInstanceId 流程实例ID
      * @return 如果流程实例仍然活跃，则返回true；否则返回false
      */
-    private boolean checkProcessInstanceActive(String processInstanceId) {
+    private Boolean checkProcessInstanceActive(String processInstanceId) {
         try {
             // 尝试查询流程实例
             ProcessInstance instance = runtimeService.createProcessInstanceQuery()

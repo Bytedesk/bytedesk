@@ -139,7 +139,7 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
+                // latestEntity.setDeleted(entity.getDeleted());
                 return tagRepository.save(latestEntity);
             }
         } catch (Exception ex) {

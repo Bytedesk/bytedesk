@@ -111,7 +111,7 @@ public class FaqElasticService {
      * @param faqUid 要删除的FAQ的UID
      * @return 是否删除成功
      */
-    public boolean deleteFaq(String faqUid) {
+    public Boolean deleteFaq(String faqUid) {
         log.info("从索引中删除FAQ: {}", faqUid);
         
         try {

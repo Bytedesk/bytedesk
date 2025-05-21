@@ -18,12 +18,12 @@ public class VocConfig {
     private Integer maxRepliesPerFeedback = 100; // 每个反馈最大回复数
     
     // 通知相关配置
-    private boolean emailNotification = true;  // 是否开启邮件通知
+    private Boolean emailNotification = true;  // 是否开启邮件通知
     private String notificationEmail;          // 通知邮箱
     private List<String> adminEmails;         // 管理员邮箱列表
     
     // 审核相关配置
-    private boolean requireApproval = false;   // 是否需要审核
-    private boolean filterSensitiveWords = true; // 是否过滤敏感词
+    private Boolean requireApproval = false;   // 是否需要审核
+    private Boolean filterSensitiveWords = true; // 是否过滤敏感词
     private String sensitiveWordsFile;         // 敏感词文件路径
 } 

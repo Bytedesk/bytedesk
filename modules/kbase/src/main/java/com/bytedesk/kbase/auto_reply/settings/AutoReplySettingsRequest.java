@@ -39,7 +39,7 @@ public class AutoReplySettingsRequest implements Serializable {
     // 自动回复开关
     @Builder.Default
     @Column(name = "is_autoreply_enabled")
-    private boolean autoReplyEnabled = false;
+    private Boolean autoReplyEnabled = false;
 
     // 自动回复类型
     @Builder.Default

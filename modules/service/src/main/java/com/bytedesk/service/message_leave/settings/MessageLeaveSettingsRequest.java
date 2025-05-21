@@ -38,7 +38,7 @@ public class MessageLeaveSettingsRequest  implements Serializable {
     
     // 留言开关
     @Builder.Default
-    private boolean messageLeaveEnabled = true;
+    private Boolean messageLeaveEnabled = true;
 
     @NotBlank
     @Builder.Default

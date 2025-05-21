@@ -45,7 +45,7 @@ public class FaqEntityListener {
         FaqEntity clonedFaq = SerializationUtils.clone(faq);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        if (faq.isDeleted()) {
+        if (faq.getDeleted()) {
             log.info("FaqEntityListener FaqDeleteEvent: {}", faq.getQuestion());
             publisher.publishEvent(new FaqDeleteEvent(clonedFaq));
         } else {
