@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 11:20:45
+ * @LastEditTime: 2025-05-21 08:48:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         return null;
                 }
                 request.setUserUid(user.getUid());
-                // 
+                //
                 return queryByOrg(request);
         }
 
@@ -108,8 +108,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
                         return convertToResponse(findByUid(request.getUid()).get());
                 }
-                if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
-                        throw new RuntimeException("role " + request.getName() + " already exists");
+                if (StringUtils.hasText(request.getOrgUid())) {
+                        if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
+                                throw new RuntimeException("role " + request.getName() + " already exists");
+                        }
                 }
                 UserEntity user = authService.getUser();
                 if (user != null) {
