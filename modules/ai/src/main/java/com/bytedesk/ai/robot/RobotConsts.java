@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 14:24:20
+ * @LastEditTime: 2025-05-21 17:15:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,9 +46,12 @@ public class RobotConsts {
   public static final String ROBOT_NAME_EMOTION_ANALYSIS = "emotion_analysis"; // 情绪分析
   public static final String ROBOT_NAME_ROBOT_INSPECTION = "robot_inspection"; // 机器人质检
   public static final String ROBOT_NAME_AGENT_INSPECTION = "agent_inspection"; // 客服质检
+//   
   public static final String ROBOT_NAME_TICKET_ASSISTANT = "ticket_assistant"; // 工单助手
   public static final String ROBOT_NAME_TICKET_SOLUTION_RECOMMENDATION = "ticket_solution_recommendation"; // 工单解决方案推荐
   public static final String ROBOT_NAME_TICKET_SUMMARY = "ticket_summary"; // 工单小结
+  public static final String ROBOT_NAME_TICKET_GENERATE = "ticket_generate"; // 生成工单
+//   
   public static final String ROBOT_NAME_VISITOR_PORTRAIT = "visitor_portrait"; // 访客画像
   public static final String ROBOT_NAME_VISITOR_INVITATION = "visitor_invitation"; // 接客助手
   public static final String ROBOT_NAME_VISITOR_RECOMMENDATION = "visitor_recommendation"; // 导购助手
@@ -62,7 +65,6 @@ public class RobotConsts {
   public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition"; // 实体识别
   public static final String ROBOT_NAME_SENTIMENT_ANALYSIS = "sentiment_analysis"; // 情感分析
   public static final String ROBOT_NAME_THREAD_CLASSIFICATION = "thread_classification"; // 会话分类
-  public static final String ROBOT_NAME_GENERATE_TICKET = "generate_ticket"; // 生成工单
   public static final String ROBOT_NAME_CUSTOMER_SERVICE_EXPERT = "customer_service_expert"; // 客服专家
   public static final String ROBOT_NAME_GENERATE_FAQ = "generate_faq"; // 生成FAQ
   public static final String ROBOT_NAME_GENERATE_WECHAT_ARTICLE = "generate_wechat_article"; // 生成公众号文章

@@ -34,7 +34,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
 
     private final AuthorityRestService authorityService;
 
-    private final RobotRepository robotRepository;
+    // private final RobotRepository robotRepository;
     
     @Override
     public void afterSingletonsInstantiated() {
@@ -44,10 +44,10 @@ public class RobotInitializer implements SmartInitializingSingleton {
     
     public void init() {
         log.info("Initializing robot data...");
-        if (robotRepository.count() > 0) {
-            log.info("Robot data already initialized.");
-            return;
-        }
+        // if (robotRepository.count() > 0) {
+        //     log.info("Robot data already initialized.");
+        //     return;
+        // }
 
         String level = LevelEnum.PLATFORM.name();
         // 导入平台智能体

@@ -192,17 +192,17 @@
       "i18n": {
         "en": {
           "nickname": "Ticket Assistant",
-          "prompt": "Extract ticket information from conversation records and automatically fill in the ticket form.",
+          "prompt": "Ask Questions if you have any questions about the current ticket.",
           "description": "Create a ticket assistant bot"
         },
         "zh_cn": {
           "nickname": "工单助手",
-          "prompt": "从会话记录中提取工单信息，自动填写工单表单。",
+          "prompt": "如果对当前工单有什么疑问，可以随时问当前机器人。",
           "description": "创建一个工单助手机器人"
         },
         "zh_tw": {
           "nickname": "工單助手",
-          "prompt": "從會話記錄中提取工單信息，自動填寫工單表單。",
+          "prompt": "如果对当前工单有什么疑问，可以随时问当前机器人。",
           "description": "創建一個工單助手機器人"
         }
       }
@@ -577,24 +577,24 @@
     },
     {
       "uid": "27",
-      "name": "generate_ticket",
+      "name": "ticket_generate",
       "type": "LLM",
-      "category": "i18n.module.service",
+      "category": "i18n.module.ticket",
       "i18n": {
         "en": {
-          "nickname": "Generate Ticket",
+          "nickname": "Ticket Generation",
           "prompt": "When a ticket needs to be submitted for follow-up service based on the current conversation, one-click extraction of relevant content from the conversation according to the required ticket fields, such as customer name, related orders, contact information, ticket content, etc. Can also suggest ticket priority through visitor emotion recognition.",
           "description": "Create a ticket generation bot"
         },
         "zh_cn": {
-          "nickname": "生成工单",
+          "nickname": "工单生成",
           "prompt": "根据当前会话，如果需要提交工单跟进后续服务时，可以根据工单所需的字段，一键提取会话中的关联内容，如客户名字、关联订单、联系方式、工单内容等，还可以通过识别访客情绪，建议工单的优先级。",
-          "description": "创建一个生成工单机器人"
+          "description": "创建一个智能填写工单机器人"
         },
         "zh_tw": {
-          "nickname": "生成工單",
+          "nickname": "工單生成",
           "prompt": "根據當前會話，如果需要提交工單跟進後續服務時，可以根據工單所需的字段，一鍵提取會話中的關聯內容，如客戶名字、關聯訂單、聯繫方式、工單內容等，還可以通過識別訪客情緒，建議工單的優先級。",
-          "description": "創建一個生成工單機器人"
+          "description": "創建一個智能填写工單機器人"
         }
       }
     },

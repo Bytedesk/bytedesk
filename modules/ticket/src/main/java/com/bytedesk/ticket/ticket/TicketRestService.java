@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 22:12:56
+ * @LastEditTime: 2025-05-21 17:23:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.bytedesk.ai.robot.RobotConsts;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRequest;
+import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
@@ -89,6 +93,8 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final CategoryRestService categoryService;
+
+    private final RobotRestService robotRestService;
 
     @Override
     public Page<TicketEntity> queryByOrgEntity(TicketRequest request) {
@@ -462,6 +468,18 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     @Override
     public TicketExcel convertToExcel(TicketEntity entity) {
         return modelMapper.map(entity, TicketExcel.class);
+    }
+
+    public TicketRequest autoFillTicket(TicketRequest request) {
+        String name = RobotConsts.ROBOT_NAME_TICKET_GENERATE;
+        String orgUid = request.getOrgUid();
+        Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
+        if (robotOptional.isPresent()) {
+            // 
+
+        }
+
+        return request;
     }
 
 }
