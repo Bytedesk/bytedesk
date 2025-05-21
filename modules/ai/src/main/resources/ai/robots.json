@@ -531,14 +531,14 @@
     },
     {
       "uid": "25",
-      "name": "session_summary",
+      "name": "thread_summary",
       "type": "LLM",
       "category": "i18n.module.service",
       "i18n": {
         "en": {
-          "nickname": "Session Summary",
-          "prompt": "Extract summary information from conversation records and quickly generate conversation summaries after the session ends, including customer issues and solutions. Support manual review and further editing.",
-          "description": "Create a session summary bot"
+          "nickname": "Thread Summary",
+          "prompt": "Extract summary information from conversation records and quickly generate conversation summaries after the thread ends, including customer issues and solutions. Support manual review and further editing.",
+          "description": "Create a thread summary bot"
         },
         "zh_cn": {
           "nickname": "会话摘要",
