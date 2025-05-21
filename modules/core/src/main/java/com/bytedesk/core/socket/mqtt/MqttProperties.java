@@ -29,21 +29,21 @@ public class MqttProperties {
 
     private String host = "0.0.0.0";
 
-    // private int port = 9883;
-    // private int tslPort = 9884;
+    // private Integer port = 9883;
+    // private Integer tslPort = 9884;
 
-    private int websocketPort = 9885;
+    private Integer websocketPort = 9885;
     
-    // private int websocketTlsPort = 9886;
+    // private Integer websocketTlsPort = 9886;
     // private String sslCertPath = "";
     // private String sslKeyPath = "";
 
     private String leakDetectorLevel = "SIMPLE";
 
-    private int parentEventLoopGroupThreadCount = 1;
+    private Integer parentEventLoopGroupThreadCount = 1;
 
-    private int childEventLoopGroupThreadCount = 8;
+    private Integer childEventLoopGroupThreadCount = 8;
 
-    private int maxPayloadSize = 10240;
+    private Integer maxPayloadSize = 10240;
 
 }

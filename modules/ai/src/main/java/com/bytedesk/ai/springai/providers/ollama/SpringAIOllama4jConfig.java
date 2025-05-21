@@ -32,7 +32,7 @@ public class SpringAIOllama4jConfig {
     private String ollamaBaseUrl;
 
     @Value("${spring.ai.ollama.request-timeout-seconds:120}")
-    private int ollamaRequestTimeoutSeconds;
+    private Integer ollamaRequestTimeoutSeconds;
 
     @Bean(name = "ollama4jApi")
     OllamaAPI getOllamaAPI() {

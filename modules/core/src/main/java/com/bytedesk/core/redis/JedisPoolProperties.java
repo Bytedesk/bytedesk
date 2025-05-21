@@ -25,10 +25,10 @@ public class JedisPoolProperties {
     
     public static final String CONFIG_PREFIX = "bytedesk.redis.pool-config";
 
-    private int maxIdle;
+    private Integer maxIdle;
 
-    private int maxTotal;
+    private Integer maxTotal;
 
-    private int minIdle;
+    private Integer minIdle;
     // private long maxWaitMillis;
 }

@@ -35,7 +35,7 @@ public class BitsAllocator {
     /**
      * Bits for [sign-> second-> workId-> sequence]
      */
-    private int signBits = 1;
+    private Integer signBits = 1;
     private final int timestampBits;
     private final int workerIdBits;
     private final int sequenceBits;

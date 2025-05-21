@@ -47,7 +47,7 @@ public class MailReceiverConfig {
     private String mailHost;
 
     @Value("${bytedesk.mail.receiver.port}")
-    private int mailPort;
+    private Integer mailPort;
 
     @Value("${bytedesk.mail.receiver.protocol}")
     private String mailProtocol;

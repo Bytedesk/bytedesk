@@ -53,6 +53,6 @@ public class GroupNoticeEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "group_notice_order", nullable = false)
-    private int order = 0;
+    private Integer order = 0;
 
 }

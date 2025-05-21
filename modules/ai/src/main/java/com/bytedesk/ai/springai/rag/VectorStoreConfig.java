@@ -23,7 +23,7 @@ public class VectorStoreConfig {
     private String elasticsearchIndexName;
 
     @Value("${spring.ai.vectorstore.elasticsearch.dimensions}")
-    private int elasticsearchDimensions;
+    private Integer elasticsearchDimensions;
 
     // @Autowired
     // private JedisProperties jedisProperties;

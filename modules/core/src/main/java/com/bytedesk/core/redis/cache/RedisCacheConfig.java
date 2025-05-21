@@ -56,10 +56,10 @@ public class RedisCacheConfig implements CachingConfigurer {
     // private RedisConnectionFactory redisConnectionFactory;
 
     // @Value("${cache.caffeine.maximumSize}")
-    // private int maximumSize;
+    // private Integer maximumSize;
 
     // @Value("${cache.caffeine.expireAfterWriteSeconds}")
-    // private int expireAfterWriteSeconds;
+    // private Integer expireAfterWriteSeconds;
 
     // @Value("${spring.cache.redis.time-to-live}")
     // private long redisTimeToLiveSeconds;

@@ -69,7 +69,7 @@ public class AutoReplyFixedEntity extends BaseEntity {
 
     // 回复次数
     @Builder.Default
-    private int replyCount = 0;
+    private Integer replyCount = 0;
 
     // 有效开始日期
     private LocalDateTime startDate;

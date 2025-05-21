@@ -13,9 +13,9 @@ import lombok.Data;
 public class VocConfig {
     
     // 反馈相关配置
-    private int maxFeedbackLength = 5000;  // 反馈内容最大长度
-    private int maxReplyLength = 1000;     // 回复内容最大长度
-    private int maxRepliesPerFeedback = 100; // 每个反馈最大回复数
+    private Integer maxFeedbackLength = 5000;  // 反馈内容最大长度
+    private Integer maxReplyLength = 1000;     // 回复内容最大长度
+    private Integer maxRepliesPerFeedback = 100; // 每个反馈最大回复数
     
     // 通知相关配置
     private boolean emailNotification = true;  // 是否开启邮件通知

@@ -73,13 +73,13 @@ public class RobotMessageEntity extends AbstractMessageEntity {
      * @{org.springframework.ai.chat.metadata.Usage}
      */
     @Builder.Default
-    private int promptTokens = 0;
+    private Integer promptTokens = 0;
 
     @Builder.Default
-    private int completionTokens = 0;
+    private Integer completionTokens = 0;
 
     @Builder.Default
-    private int totalTokens = 0;
+    private Integer totalTokens = 0;
 
     // 区分是 rateUp 还是 rateDown、rateFeedback
     @Builder.Default    

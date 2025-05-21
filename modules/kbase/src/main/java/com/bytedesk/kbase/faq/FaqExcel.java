@@ -54,15 +54,15 @@ public class FaqExcel {
 
     @ExcelProperty(value = "点击次数")
     @ColumnWidth(20)
-    private int clickCount;
+    private Integer clickCount;
 
     @ExcelProperty(value = "点赞次数")
     @ColumnWidth(20)
-    private int upCount;
+    private Integer upCount;
 
     @ExcelProperty(value = "点踩次数")
     @ColumnWidth(20)
-    private int downCount;
+    private Integer downCount;
 
     @ExcelProperty(value = "是否启用")   
     @ColumnWidth(20)

@@ -117,10 +117,10 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     private boolean llmSplitDeleted = false;
 
     @Builder.Default
-    private int readCount = 0;
+    private Integer readCount = 0;
 
     @Builder.Default
-    private int likeCount = 0;
+    private Integer likeCount = 0;
 
     // 状态 - 具体枚举值由子类定义
     private String status;

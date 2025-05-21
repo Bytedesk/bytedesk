@@ -36,7 +36,7 @@ public class JsonResult<T> implements Serializable {
     // 建议使用message而不是msg，因为它更清晰地表达了字段的用途，并且与类中其他字段（如code和data）的命名风格保持一致
     private String message;
 
-    private int code;
+    private Integer code;
 
     private T data;
 

@@ -63,7 +63,7 @@ public class RatedownSettingsResponse extends BaseResponse {
     /**
      * 每次点踩允许选择的最大标签数量
      */
-    private int maxTagSelection;
+    private Integer maxTagSelection;
     
     /**
      * 是否允许用户输入自定义文本反馈
@@ -73,7 +73,7 @@ public class RatedownSettingsResponse extends BaseResponse {
     /**
      * 自定义文本反馈的最大字符限制
      */
-    private int maxFeedbackLength;
+    private Integer maxFeedbackLength;
     
     /**
      * 是否需要客服后续跟进点踩反馈

@@ -262,7 +262,7 @@ public class BytedeskProperties {
         private Boolean enabled;
         private List<String> nodes = new ArrayList<>();
         private String host = "230.0.0.0";
-        private int port = 6781;
+        private Integer port = 6781;
     }
 
     @Data

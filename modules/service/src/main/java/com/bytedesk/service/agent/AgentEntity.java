@@ -118,7 +118,7 @@ public class AgentEntity extends BaseEntity {
 
     // 最大同时接待数量
     @Builder.Default
-    private int maxThreadCount = 10;
+    private Integer maxThreadCount = 10;
 
     // 是否开启超时提醒
     @Builder.Default
@@ -127,7 +127,7 @@ public class AgentEntity extends BaseEntity {
     // 超时提醒时间：分钟
     // 当客服超过这个时间没有接待新的会话时，会提醒客服
     @Builder.Default
-    private int timeoutRemindTime = 5;
+    private Integer timeoutRemindTime = 5;
 
     // 超时提醒提示
     @Builder.Default

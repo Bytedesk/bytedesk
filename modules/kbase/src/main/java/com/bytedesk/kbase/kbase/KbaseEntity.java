@@ -98,11 +98,11 @@ public class KbaseEntity extends BaseEntity {
 
     // 成员数量
     @Builder.Default
-    private int memberCount = 0;
+    private Integer memberCount = 0;
 
     // 文章数量
     @Builder.Default
-    private int articleCount = 0;
+    private Integer articleCount = 0;
 
     // 是否收藏
     @Builder.Default

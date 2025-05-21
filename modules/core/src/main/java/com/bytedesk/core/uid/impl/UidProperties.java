@@ -32,17 +32,17 @@ public class UidProperties {
     /**
      * 时间增量值占用位数。当前时间相对于时间基点的增量值，单位为秒
      */
-    private int timeBits = 30;
+    private Integer timeBits = 30;
 
     /**
      * 工作机器ID占用的位数
      */
-    private int workerBits = 16;
+    private Integer workerBits = 16;
 
     /**
      * 序列号占用的位数
      */
-    private int seqBits = 7;
+    private Integer seqBits = 7;
 
     /**
      * 时间基点. 例如 2019-02-20 (毫秒: 1550592000000)

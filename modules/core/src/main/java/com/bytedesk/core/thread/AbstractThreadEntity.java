@@ -75,12 +75,12 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // 
     @Builder.Default
-    private int unreadCount = 1;
+    private Integer unreadCount = 1;
 
     // 星标
     @Builder.Default
     @Column(name = "thread_star")
-    private int star = 0;
+    private Integer star = 0;
 
     // 置顶
     @Builder.Default

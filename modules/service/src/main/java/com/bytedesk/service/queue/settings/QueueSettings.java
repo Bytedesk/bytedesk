@@ -42,10 +42,10 @@ public class QueueSettings implements Serializable {
     private boolean queueRobot = false;
 
     @Builder.Default
-    private int maxWaiting = 10000; // 最大等待人数
+    private Integer maxWaiting = 10000; // 最大等待人数
 
     @Builder.Default
-    private int maxWaitTime = 24 * 60 * 60; // 最大等待时间(秒)
+    private Integer maxWaitTime = 24 * 60 * 60; // 最大等待时间(秒)
     
     @NotBlank
     @Builder.Default

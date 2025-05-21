@@ -86,7 +86,7 @@ public class CustomChatClientObservationConvention implements ChatClientObservat
     }
     
     // 辅助方法，获取消息数量
-    private int getMessageCount(ChatClientObservationContext context) {
+    private Integer getMessageCount(ChatClientObservationContext context) {
         // 修复getPrompt()方法未定义的问题
         try {
             if (context.getRequest() != null) {

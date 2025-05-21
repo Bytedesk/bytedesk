@@ -92,7 +92,7 @@ public class RatedownSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "max_ratedownSetting_selection")
-    private int maxTagSelection = 3;
+    private Integer maxTagSelection = 3;
     
     /**
      * 是否允许用户输入自定义文本反馈
@@ -106,7 +106,7 @@ public class RatedownSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "max_feedback_length")
-    private int maxFeedbackLength = 200;
+    private Integer maxFeedbackLength = 200;
     
     /**
      * 是否需要客服后续跟进点踩反馈

@@ -78,7 +78,7 @@ public abstract class BaseEntityNoOrg implements Serializable {
     
     // 乐观锁版本字段，每次更新时版本号加1
     @Version
-    private int version;
+    private Integer version;
     
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
