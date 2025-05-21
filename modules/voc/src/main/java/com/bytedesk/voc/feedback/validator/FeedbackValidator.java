@@ -24,7 +24,7 @@ public class FeedbackValidator {
         }
         
         // 检查敏感词
-        if (vocConfig.isFilterSensitiveWords() && containsSensitiveWords(request.getContent())) {
+        if (vocConfig.getFilterSensitiveWords() && containsSensitiveWords(request.getContent())) {
             throw new FeedbackValidationException("Content contains sensitive words");
         }
     }
