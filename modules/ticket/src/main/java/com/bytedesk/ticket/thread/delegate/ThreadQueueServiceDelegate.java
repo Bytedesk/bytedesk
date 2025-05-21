@@ -86,7 +86,7 @@ public class ThreadQueueServiceDelegate implements JavaDelegate {
     /**
      * 模拟排队位置计算
      */
-    // private int simulateQueuePosition() {
+    // private Integer simulateQueuePosition() {
     //     // 模拟随机的排队位置(1-10)
     //     return (int) (Math.random() * 10) + 1;
     // }
@@ -94,7 +94,7 @@ public class ThreadQueueServiceDelegate implements JavaDelegate {
     /**
      * 估计等待时间(秒)
      */
-    // private int calculateEstimatedWaitTime(int queuePosition) {
+    // private Integer calculateEstimatedWaitTime(int queuePosition) {
     //     // 假设每个位置平均等待30秒
     //     return queuePosition * 30;
     // }

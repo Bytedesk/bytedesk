@@ -88,16 +88,16 @@ public class FaqVector {
     
     // 统计数据
     @Field(type = FieldType.Integer)
-    private int viewCount;
+    private Integer viewCount;
     
     @Field(type = FieldType.Integer)
-    private int clickCount;
+    private Integer clickCount;
     
     @Field(type = FieldType.Integer)
-    private int upCount;
+    private Integer upCount;
     
     @Field(type = FieldType.Integer)
-    private int downCount;
+    private Integer downCount;
     
     /**
      * 从FaqEntity创建FaqVector实体的静态方法

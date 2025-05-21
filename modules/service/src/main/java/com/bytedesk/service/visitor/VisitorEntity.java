@@ -100,6 +100,6 @@ public class VisitorEntity extends BaseEntity {
 
 	// 会员等级
 	@Builder.Default
-	private int vipLevel = 0;
+	private Integer vipLevel = 0;
 	
 }

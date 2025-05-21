@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 13:20:03
+ * @LastEditTime: 2025-05-21 14:49:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,7 +74,7 @@ public class RobotEntity extends BaseEntity {
 
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
-
+    
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();

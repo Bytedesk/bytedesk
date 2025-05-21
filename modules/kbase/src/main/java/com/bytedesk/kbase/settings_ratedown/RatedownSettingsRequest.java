@@ -76,7 +76,7 @@ public class RatedownSettingsRequest extends BaseRequest {
      * 每次点踩允许选择的最大标签数量
      */
     @Builder.Default
-    private int maxTagSelection = 3;
+    private Integer maxTagSelection = 3;
     
     /**
      * 是否允许用户输入自定义文本反馈
@@ -88,7 +88,7 @@ public class RatedownSettingsRequest extends BaseRequest {
      * 自定义文本反馈的最大字符限制
      */
     @Builder.Default
-    private int maxFeedbackLength = 200;
+    private Integer maxFeedbackLength = 200;
     
     /**
      * 是否需要客服后续跟进点踩反馈

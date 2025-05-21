@@ -79,7 +79,7 @@ public abstract class BaseEntity implements Serializable {
     
     // 乐观锁版本字段，每次更新时版本号加1
     @Version
-    private int version;
+    private Integer version;
     
     // 在配置文件中存储时区信息，TODO: 应用层处理时区转换？
     // 数据库DDL中： created_at timestamp(6) without time zone,

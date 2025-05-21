@@ -27,7 +27,7 @@ public class GrayReleaseStatus {
     private boolean enabled;          // 是否启用
 
     @Column(name = "gray_percentage")
-    private int percentage;           // 灰度比例
+    private Integer percentage;           // 灰度比例
 
     @Column(name = "gray_status")
     private String status;            // 状态：pending/active/paused/completed

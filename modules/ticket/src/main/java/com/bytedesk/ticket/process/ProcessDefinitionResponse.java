@@ -32,7 +32,7 @@ public class ProcessDefinitionResponse implements Serializable {
     private String key;
     private String name;
     private String description;
-    private int version;
+    private Integer version;
     private String deploymentId;
     private String tenantId;
 }

@@ -7,7 +7,7 @@ public enum TicketRatingEnum {
     UNSATISFIED(2), // 不满意
     BAD(1); // 非常不满意
 
-    private int value;
+    private Integer value;
 
     TicketRatingEnum(int value) {
         this.value = value;

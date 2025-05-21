@@ -53,5 +53,5 @@ public class TagEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "tag_order", nullable = false)
-    private int order = 0;
+    private Integer order = 0;
 }

@@ -74,7 +74,7 @@ public class IntentionResult {
     /**
      * 意图优先级
      */
-    private int priority;
+    private Integer priority;
     
     /**
      * 是否建议转人工

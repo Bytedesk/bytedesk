@@ -57,7 +57,7 @@ public class CategoryEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "category_order", nullable = false)
-    private int order = 0;
+    private Integer order = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")

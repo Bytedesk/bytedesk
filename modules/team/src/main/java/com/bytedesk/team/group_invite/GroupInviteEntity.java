@@ -53,7 +53,7 @@ public class GroupInviteEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "group_invite_order", nullable = false)
-    private int order = 0;
+    private Integer order = 0;
 
     // @Builder.Default
     // private String level = LevelEnum.ORGANIZATION.name();

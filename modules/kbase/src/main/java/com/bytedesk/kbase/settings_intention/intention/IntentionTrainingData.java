@@ -80,7 +80,7 @@ public class IntentionTrainingData {
      * 数据质量评分（1-5）
      */
     @Builder.Default
-    private int qualityScore = 5;
+    private Integer qualityScore = 5;
     
     /**
      * 创建时间戳

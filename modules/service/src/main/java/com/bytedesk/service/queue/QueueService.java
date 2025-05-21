@@ -247,7 +247,7 @@ public class QueueService {
     //     // queueRepository.save(queue);
     // }
 
-    // private int calculateAverageWaitTime(String queueUid) {
+    // private Integer calculateAverageWaitTime(String queueUid) {
     //     Double avgWaitTime = queueMemberRepository.calculateAverageWaitTime(queueUid);
     //     return avgWaitTime != null ? avgWaitTime.intValue() : 0;
     // }

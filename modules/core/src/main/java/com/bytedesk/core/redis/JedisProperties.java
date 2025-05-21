@@ -32,14 +32,14 @@ public class JedisProperties {
 
     private String host;
     
-    private int port;
+    private Integer port;
 
     private String password;
 
-    private int database;
+    private Integer database;
     // 
-    private int timeout;
-    private int soTimeout = Protocol.DEFAULT_TIMEOUT;
+    private Integer timeout;
+    private Integer soTimeout = Protocol.DEFAULT_TIMEOUT;
     private String clientName;
     private boolean ssl;
     // private SSLSocketFactory sslSocketFactory;

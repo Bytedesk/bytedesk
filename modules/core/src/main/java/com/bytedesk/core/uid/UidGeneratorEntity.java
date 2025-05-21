@@ -59,7 +59,7 @@ public class UidGeneratorEntity extends BaseEntity {
      * type of {@link WorkerNodeType}
      */
     @Column(name = "generator_type")
-    private int type;
+    private Integer type;
 
     /**
      * Worker launch date, default now

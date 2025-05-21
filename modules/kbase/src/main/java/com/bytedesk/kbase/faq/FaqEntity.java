@@ -121,27 +121,27 @@ public class FaqEntity extends BaseEntity {
 
     // 被展示次数
     @Builder.Default
-    private int viewCount = 0;
+    private Integer viewCount = 0;
 
     // 被点击次数
     @Builder.Default
-    private int clickCount = 0;
+    private Integer clickCount = 0;
 
     // 点赞次数
     @Builder.Default
-    private int upCount = 0;
+    private Integer upCount = 0;
 
     // 点踩次数
     @Builder.Default
-    private int downCount = 0;
+    private Integer downCount = 0;
 
     // 反馈次数
     @Builder.Default
-    private int feedbackCount = 0;
+    private Integer feedbackCount = 0;
 
     // 转人工次数
     @Builder.Default
-    private int transferCount = 0;
+    private Integer transferCount = 0;
 
     // 是否启用，状态：启用/禁用
     @Builder.Default

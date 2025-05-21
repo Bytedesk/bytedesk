@@ -38,5 +38,5 @@ public class TicketMessageEntity extends BaseEntity {
     // private String description;
 
     // private TicketMessageStatusEnum status;
-    // private int retryCount;
+    // private Integer retryCount;
 }

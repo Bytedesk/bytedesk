@@ -51,7 +51,7 @@ public class GrayReleaseEntity extends BaseEntity {
     // 灰度比例
     @Builder.Default
     @Column(name = "gray_release_percentage")
-    private int grayReleasePercentage = 0; // 灰度发布比例，0-100
+    private Integer grayReleasePercentage = 0; // 灰度发布比例，0-100
 
     // 灰度时间
     @Column(name = "gray_release_start_time")

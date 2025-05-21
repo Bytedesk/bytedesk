@@ -87,11 +87,11 @@ public class ServiceSettings implements Serializable {
     // 自定义评价最低消息数量，未达到最低对话消息数，禁止评价
     @NotBlank
     @Builder.Default
-    private int rateMsgCount = 3;
+    private Integer rateMsgCount = 3;
 
     // 5星评分、10星评分
     // @Builder.Default
-    // private int rateStarCount = 5;
+    // private Integer rateStarCount = 5;
 
     // 评价选择按钮文字
     // @Builder.Default
@@ -231,17 +231,17 @@ public class ServiceSettings implements Serializable {
     private boolean enableProactiveTrigger = false;  // 是否启用主动触发
 
     @Builder.Default
-    private int noResponseTimeout = 300;  // 访客无响应超时时间(秒)，默认5分钟
+    private Integer noResponseTimeout = 300;  // 访客无响应超时时间(秒)，默认5分钟
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String proactiveMessage = "您好，看起来您有一段时间没有互动了。请问还需要帮助吗？";  // 主动发送的消息内容
 
     @Builder.Default
-    private int maxProactiveCount = 3;  // 最大主动触发次数，防止打扰用户
+    private Integer maxProactiveCount = 3;  // 最大主动触发次数，防止打扰用户
 
     @Builder.Default
-    private int proactiveInterval = 600;  // 两次主动触发的最小间隔(秒)，默认10分钟
+    private Integer proactiveInterval = 600;  // 两次主动触发的最小间隔(秒)，默认10分钟
 
     /**
      * @see ServiceTrigger

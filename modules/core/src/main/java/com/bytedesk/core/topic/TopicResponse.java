@@ -41,7 +41,7 @@ public class TopicResponse extends BaseResponse {
     private Set<String> monitorTopics = new HashSet<>();
 
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
-    // private int qos;
+    // private Integer qos;
 
     // private boolean subscribed;
 

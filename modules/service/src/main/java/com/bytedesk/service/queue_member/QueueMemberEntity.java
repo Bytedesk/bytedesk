@@ -82,7 +82,7 @@ public class QueueMemberEntity extends BaseEntity {
     private ThreadEntity thread;
 
     @Builder.Default
-    private int queueNumber = 0;  // 排队号码
+    private Integer queueNumber = 0;  // 排队号码
 
     /**
      * 访客消息统计：
@@ -98,12 +98,12 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime visitorLastMessageAt;  // 访客最后发送消息时间
 
     @Builder.Default
-    private int visitorMessageCount = 0;  // 访客消息数量
+    private Integer visitorMessageCount = 0;  // 访客消息数量
 
     private LocalDateTime visitorLeavedAt;  // 离开时间
 
     @Builder.Default
-    private int visitorPriority = 0;  // 优先级(0-100)
+    private Integer visitorPriority = 0;  // 优先级(0-100)
 
     /**
      * 客服消息统计：
@@ -137,13 +137,13 @@ public class QueueMemberEntity extends BaseEntity {
      * 动态更新平均响应时间和最大响应时间
      */
     @Builder.Default
-    private int agentAvgResponseLength = 0;  // 平均响应时间(秒)
+    private Integer agentAvgResponseLength = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private int agentMaxResponseLength = 0;  // 最长响应时间(秒)
+    private Integer agentMaxResponseLength = 0;  // 最长响应时间(秒)
 
     @Builder.Default
-    private int agentMessageCount = 0;  // 客服消息数量
+    private Integer agentMessageCount = 0;  // 客服消息数量
 
     private LocalDateTime agentTimeoutAt; // 人工对话超时时间
 
@@ -153,7 +153,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     // agent timeout count
     @Builder.Default
-    private int agentTimeoutCount = 0;  // 超时次数
+    private Integer agentTimeoutCount = 0;  // 超时次数
 
     // 人工是否离线
     @Builder.Default
@@ -179,13 +179,13 @@ public class QueueMemberEntity extends BaseEntity {
     private LocalDateTime robotClosedAt;  // 结束时间
 
     @Builder.Default
-    private int robotAvgResponseLength = 0;  // 平均响应时间(秒)
+    private Integer robotAvgResponseLength = 0;  // 平均响应时间(秒)
     
     @Builder.Default
-    private int robotMaxResponseLength = 0;  // 最长响应时间(秒)
+    private Integer robotMaxResponseLength = 0;  // 最长响应时间(秒)
 
     @Builder.Default
-    private int robotMessageCount = 0;  // 客服消息数量
+    private Integer robotMessageCount = 0;  // 客服消息数量
 
     // 机器人对话超时时间
     private LocalDateTime robotTimeoutAt;
@@ -207,7 +207,7 @@ public class QueueMemberEntity extends BaseEntity {
     private boolean systemClose = false;  // 是否系统自动结束
 
     @Builder.Default
-    private int systemMessageCount = 0;  // 系统消息数量
+    private Integer systemMessageCount = 0;  // 系统消息数量
 
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价

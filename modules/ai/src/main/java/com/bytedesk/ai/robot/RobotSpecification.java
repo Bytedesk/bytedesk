@@ -40,17 +40,17 @@ public class RobotSpecification extends BaseSpecification {
             //     criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid())
             // ));
             // name
-            // if (StringUtils.hasText(request.getName())) {
-            //     predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
-            // }
+            if (StringUtils.hasText(request.getName())) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            }
             // nickname
             if (StringUtils.hasText(request.getNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
             }
-            // // description
-            // if (StringUtils.hasText(request.getDescription())) {
-            //     predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
-            // }
+            // description
+            if (StringUtils.hasText(request.getDescription())) {
+                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
             // 
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
@@ -71,6 +71,10 @@ public class RobotSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            // 方便前端搜索
+            if (StringUtils.hasText(request.getPrompt())) {
+                predicates.add(criteriaBuilder.like(root.get("prompt"), "%" + request.getPrompt() + "%"));
             }
             // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

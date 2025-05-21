@@ -44,6 +44,6 @@ public class IpAccessEntity extends BaseEntity {
     private String params; // 访问的参数
 
     private LocalDateTime accessTime;
-    private int accessCount; // 访问次数
+    private Integer accessCount; // 访问次数
     private LocalDateTime lastAccessTime;
 } 

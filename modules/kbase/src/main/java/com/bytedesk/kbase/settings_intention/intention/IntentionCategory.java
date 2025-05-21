@@ -57,7 +57,7 @@ public class IntentionCategory {
      * 意图优先级，数字越小优先级越高
      */
     @Builder.Default
-    private int priority = 0;
+    private Integer priority = 0;
     
     /**
      * 默认回复模板
@@ -81,7 +81,7 @@ public class IntentionCategory {
      * 意图触发次数统计
      */
     @Builder.Default
-    private int triggerCount = 0;
+    private Integer triggerCount = 0;
     
     /**
      * 意图满意度评分（平均值）

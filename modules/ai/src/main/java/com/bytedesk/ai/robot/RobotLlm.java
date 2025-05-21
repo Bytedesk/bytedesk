@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 11:54:01
+ * @LastEditTime: 2025-05-21 14:58:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,7 +87,7 @@ public class RobotLlm {
     // 启用rerank
     @Builder.Default
     @Column(name = "is_rerank_enabled")
-    private boolean rerankEnabled = false;
+    private Boolean rerankEnabled = false;
 
     // rerank model provider
     @Builder.Default
@@ -116,7 +116,7 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "llm_top_k")
-    private int topK = 3;
+    private Integer topK = 3;
 
     @Builder.Default
     @Column(name = "llm_score_threshold")
@@ -138,7 +138,7 @@ public class RobotLlm {
     // 上下文消息数，默认0条。一同传递给大模型
     @Builder.Default
     @Column(name = "llm_context_msg_count")
-    private int contextMsgCount = 0;
+    private Integer contextMsgCount = 0;
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default

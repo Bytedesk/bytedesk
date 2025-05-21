@@ -111,7 +111,7 @@ public class TicketEntity extends BaseEntity {
 
     // 满意度评价
     @Builder.Default
-    private int rating = TicketRatingEnum.GOOD.getValue();
+    private Integer rating = TicketRatingEnum.GOOD.getValue();
 
     // 客户验证
     @Builder.Default

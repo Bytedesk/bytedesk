@@ -49,6 +49,9 @@ public class RobotRequest extends BaseRequest {
     @Builder.Default
     private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
 
+    // 方便前端搜索
+    private String prompt;
+
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
 

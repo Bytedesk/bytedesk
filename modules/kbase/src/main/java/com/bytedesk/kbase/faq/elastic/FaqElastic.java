@@ -78,16 +78,16 @@ public class FaqElastic {
     // private LocalDateTime updatedAt;
     
     @Field(type = FieldType.Integer)
-    private int viewCount;
+    private Integer viewCount;
     
     @Field(type = FieldType.Integer)
-    private int clickCount;
+    private Integer clickCount;
     
     @Field(type = FieldType.Integer)
-    private int upCount;
+    private Integer upCount;
     
     @Field(type = FieldType.Integer)
-    private int downCount;
+    private Integer downCount;
     
     // 从FaqEntity创建FaqElastic的静态方法
     public static FaqElastic fromFaqEntity(FaqEntity faq) {

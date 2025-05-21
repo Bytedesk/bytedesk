@@ -35,9 +35,9 @@ public class QueueSettingsRequest implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    private int maxWaiting; // 最大等待人数
+    private Integer maxWaiting; // 最大等待人数
 
-    private int maxWaitTime; // 最大等待时间(秒)
+    private Integer maxWaitTime; // 最大等待时间(秒)
     
     @NotBlank
     @Builder.Default

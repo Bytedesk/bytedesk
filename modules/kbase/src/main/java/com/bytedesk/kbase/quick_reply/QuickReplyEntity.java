@@ -90,7 +90,7 @@ public class QuickReplyEntity extends BaseEntity {
 
     // 被点击次数
     @Builder.Default
-    private int clickCount = 0;
+    private Integer clickCount = 0;
 
     // 有效开始日期
     private LocalDateTime startDate;
