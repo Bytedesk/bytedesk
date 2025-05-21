@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 11:14:19
+ * @LastEditTime: 2025-05-21 11:19:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -544,8 +544,8 @@ public class RobotRestService extends BaseRestService<RobotEntity, RobotRequest,
             String uid = robotJson.getName();
             if (StringUtils.hasText(uid) && !existsByUid(uid)) {
                 String categoryUid = null;
-                Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndTypeAndLevelAndPlatform(
-                        robotJson.getCategory(), CategoryTypeEnum.ROBOT.name(), level, BytedeskConsts.PLATFORM_BYTEDESK);
+                Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
+                        robotJson.getCategory(), CategoryTypeEnum.ROBOT.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
                 if (!categoryOptional.isPresent()) {
                     CategoryRequest categoryRequest = CategoryRequest.builder()
                             .name(robotJson.getCategory())
