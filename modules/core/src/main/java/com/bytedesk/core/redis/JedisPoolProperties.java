@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-23 11:25:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 08:45:01
+ * @LastEditTime: 2025-05-21 15:55:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,10 +25,10 @@ public class JedisPoolProperties {
     
     public static final String CONFIG_PREFIX = "bytedesk.redis.pool-config";
 
-    private Integer maxIdle;
+    private int maxIdle;
 
-    private Integer maxTotal;
+    private int maxTotal;
 
-    private Integer minIdle;
+    private int minIdle;
     // private long maxWaitMillis;
 }
