@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-21 14:23:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 07:34:36
+ * @LastEditTime: 2025-05-23 07:49:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,10 @@ public class RobotAgentService {
         String orgUid = request.getOrgUid();
         Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
         if (robotOptional.isPresent()) {
-            // 
+            RobotLlm llm = robotOptional.get().getLlm();
+            String prompt = llm.getPrompt();
+            String query = request.getContent();
+            // String response = llm.getProvider().generateText(prompt, query);
 
         }
 

@@ -484,24 +484,149 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         
         try {
-            // 获取系统提示词
-            String systemPrompt = robot.getLlm().getPrompt();
-            String prompt = systemPrompt + "\n\n用户问题：" + query;
+            // 如果知识库未启用，直接跟据配置的提示词进行回复
+            if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
+                log.info("知识库未启用或未指定知识库UID");
+                // 使用原有方法处理
+                String systemPrompt = robot.getLlm().getPrompt();
+                String prompt = systemPrompt + "\n\n用户问题：" + query;
+                
+                // 调用同步处理方法
+                String response = processPromptSync(prompt);
+                
+                // 设置回复内容和类型
+                messageProtobufReply.setContent(response);
+                messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                
+                // 保存消息
+                persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                
+                // 发送消息
+                messageSendService.sendProtobufMessage(messageProtobufReply);
+                
+                return response;
+            }
             
-            // 调用同步处理方法
-            String response = processPromptSync(prompt);
+            // 创建搜索结果列表
+            List<FaqProtobuf> searchResultList = new ArrayList<>();
             
-            // 设置回复内容和类型
-            messageProtobufReply.setContent(response);
-            messageProtobufReply.setType(MessageTypeEnum.TEXT);
+            // 根据搜索类型执行相应的搜索
+            String searchType = robot.getLlm().getSearchType();
+            if (searchType == null) {
+                searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
+            }
             
-            // 保存消息
-            persistMessage(messageProtobufQuery, messageProtobufReply, false);
+            // 执行搜索
+            switch (RobotSearchTypeEnum.valueOf(searchType)) {
+                case VECTOR:
+                    log.info("使用向量搜索");
+                    executeVectorSearch(query, robot.getKbUid(), searchResultList);
+                    break;
+                case MIXED:
+                    log.info("使用混合搜索");
+                    executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                    executeVectorSearch(query, robot.getKbUid(), searchResultList);
+                    break;
+                case FULLTEXT:
+                default:
+                    log.info("使用全文搜索");
+                    executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                    break;
+            }
             
-            // 发送消息
-            messageSendService.sendProtobufMessage(messageProtobufReply);
-            
-            return response;
+            // 根据是否启用LLM决定如何处理结果
+            if (robot.getLlm().getEnabled()) {
+                // 启用大模型，组合搜索结果和提示词
+                if (searchResultList.isEmpty()) {
+                    // 未找到相关知识，使用默认回复
+                    String answer = robot.getLlm().getDefaultReply();
+                    
+                    messageProtobufReply.setContent(answer);
+                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    
+                    // 保存错误消息（标记为未回答成功）
+                    persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                    
+                    // 发送消息
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    
+                    return answer;
+                } else {
+                    // 构建带有搜索结果上下文的提示
+                    String systemPrompt = robot.getLlm().getPrompt();
+                    String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+                    
+                    // 构建消息列表
+                    List<Message> messages = new ArrayList<>();
+                    messages.add(new SystemMessage(systemPrompt));
+                    
+                    // 添加搜索结果作为上下文
+                    if (StringUtils.hasText(context)) {
+                        messages.add(new SystemMessage("搜索结果: " + context));
+                    }
+                    
+                    // 添加用户查询
+                    messages.add(new UserMessage(query));
+                    
+                    // 创建提示
+                    Prompt aiPrompt = new Prompt(messages);
+                    
+                    // 处理提示，获取回复
+                    String response = processPromptSync(aiPrompt.toString());
+                    
+                    // 设置回复内容和类型
+                    messageProtobufReply.setContent(response);
+                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    
+                    // 保存消息
+                    persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                    
+                    // 发送消息
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    
+                    return response;
+                }
+            } else {
+                // 不启用大模型，直接返回搜索结果
+                if (searchResultList.isEmpty()) {
+                    // 未找到相关知识，使用默认回复
+                    String answer = robot.getLlm().getDefaultReply();
+                    
+                    messageProtobufReply.setContent(answer);
+                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    
+                    // 保存错误消息（标记为未回答成功）
+                    persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                    
+                    // 发送消息
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    
+                    return answer;
+                } else {
+                    // 搜索到内容，返回搜索内容
+                    FaqProtobuf firstFaq = searchResultList.get(0);
+                    
+                    // 如果有多个搜索结果，将其余的添加为相关问题
+                    if (searchResultList.size() > 1) {
+                        List<FaqProtobuf> relatedFaqs = new ArrayList<>(searchResultList.subList(1, searchResultList.size()));
+                        firstFaq.setRelatedFaqs(relatedFaqs);
+                    }
+                    
+                    // 将处理后的单个FaqProtobuf对象转换为JSON字符串
+                    String answer = firstFaq.toJson();
+                    
+                    messageProtobufReply.setContent(answer);
+                    messageProtobufReply.setType(MessageTypeEnum.FAQ_ANSWER);
+                    
+                    // 保存消息
+                    persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                    
+                    // 发送消息
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    
+                    return answer;
+                }
+            }
         } catch (Exception e) {
             log.error("Error in sendSyncMessage", e);
             String errorMessage = "服务暂时不可用，请稍后重试";

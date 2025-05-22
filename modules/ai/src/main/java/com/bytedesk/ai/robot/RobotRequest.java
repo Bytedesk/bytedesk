@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:45:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 13:21:00
+ * @LastEditTime: 2025-05-23 07:47:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,6 +51,9 @@ public class RobotRequest extends BaseRequest {
 
     // 方便前端搜索
     private String prompt;
+
+    // 使用基类中content，可能是用户输入问题：question，也可能是会话内容，或者是工单内容，或者是消息内容
+    // private String content;
 
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
