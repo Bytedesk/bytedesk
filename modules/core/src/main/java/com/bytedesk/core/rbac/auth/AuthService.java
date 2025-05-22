@@ -14,6 +14,8 @@
  */
 package com.bytedesk.core.rbac.auth;
 
+import java.time.LocalDateTime;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +26,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.rbac.token.TokenRequest;
 import com.bytedesk.core.rbac.token.TokenRestService;
+import com.bytedesk.core.rbac.token.TokenTypeEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
@@ -127,12 +131,20 @@ public class AuthService {
             device = "Unknown Device";
         }
         
-        tokenRestService.createLoginToken(
-            userDetails.getUid(), 
-            accessToken, 
-            client, 
-            device
-        );
+        // 使用create接口创建保存token
+        TokenRequest tokenRequest = TokenRequest.builder()
+            .name("Login Token")
+            .description("User login authentication token")
+            .accessToken(accessToken)
+            .type(TokenTypeEnum.LOGIN.name())
+            .expiresAt(LocalDateTime.now().plusHours(24)) // 默认24小时过期
+            .revoked(false)
+            .client(client)
+            .device(device)
+            .userUid(userDetails.getUid())
+            .build();
+        
+        tokenRestService.create(tokenRequest);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)

@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.auth;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.bytedesk.core.rbac.token.TokenEntity;
+import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.utils.JwtUtils;
 
 @Slf4j
@@ -41,6 +44,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   @Autowired
   private AuthService authService;
 
+  @Autowired
+  private TokenRestService tokenRestService;
+
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
@@ -50,11 +56,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       String accessToken = parseAccessToken(request);
       // log.debug("accessToken {}", accessToken);
       if (accessToken != null && jwtUtils.validateJwtToken(accessToken)) {
-        String subject = jwtUtils.getSubjectFromJwtToken(accessToken);
-        // log.debug("subject {}", subject);
-        //
-        UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 从数据库验证token是否有效（未被撤销且未过期）
+        Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
+        if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
+          String subject = jwtUtils.getSubjectFromJwtToken(accessToken);
+          // log.debug("subject {}", subject);
+          //
+          UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+          log.debug("Token is invalid or revoked");
+        }
       }
     } catch (Exception e) {
       log.error("Cannot set user authentication: {}", e);

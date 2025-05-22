@@ -22,6 +22,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSpecificationExecutor<TokenEntity> {
     
+    Optional<TokenEntity> findByUid(String uid);
+
     /**
      * 通过访问令牌查找Token实体
      * @param accessToken 访问令牌
