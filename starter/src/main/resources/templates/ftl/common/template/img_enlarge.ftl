@@ -3,7 +3,7 @@
 <!--预览容器，存放点击放大后的图片-->
 <div class="kb_enlarge_container" id="kb_enlarge_container">
     <!-- 关闭按钮，一个叉号图片 -->
-    <img src="https://cdn.bytedesk.com/kb/assets/img/close.png" alt="close" class="kb_close" id="kb_close">
+    <img src="/kbase/img/close.png" alt="close" class="kb_close" id="kb_close">
 </div>
 
 <script>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 10:58:58
+ * @LastEditTime: 2025-05-22 09:10:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
@@ -38,8 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PushServiceImplSms extends PushNotifier {
 
-    // @Value("${bytedesk.debug}")
-    // private Boolean debug;
+    @Value("${aliyun.region.id:cn-hangzhou}")
+    private String regionId;
 
     @Value("${aliyun.access.key.id:}")
     private String accessKeyId;
@@ -88,11 +89,7 @@ public class PushServiceImplSms extends PushNotifier {
 
     public void sendValidateCode(String phone, String code) {
 
-        // if (debug) {
-        // return;
-        // }
-
-        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+        DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
         IAcsClient client = new DefaultAcsClient(profile);
 
         CommonRequest request = new CommonRequest();
@@ -100,25 +97,49 @@ public class PushServiceImplSms extends PushNotifier {
         request.setSysDomain("dysmsapi.aliyuncs.com");
         request.setSysVersion("2017-05-25");
         request.setSysAction("SendSms");
-        // request.setMethod(MethodType.POST);
-        // request.setDomain("dysmsapi.aliyuncs.com");
-        // request.setVersion("2017-05-25");
-        // request.setAction("SendSms");
-        request.putQueryParameter("RegionId", "cn-hangzhou");
+        request.putQueryParameter("RegionId", regionId);
         request.putQueryParameter("PhoneNumbers", phone);
-        // FIXME:替换为配置文件方式，会发送失败
-        request.putQueryParameter("SignName", "微语");
+        // 将中文签名转换为Unicode编码，以确保与阿里云短信API兼容
+        String unicodeSignName = containsChineseChar(signName) ? convertToUnicode(signName) : signName;
+        if (log.isDebugEnabled() && containsChineseChar(signName)) {
+            log.debug("原始签名：{}, Unicode签名：{}", signName, unicodeSignName);
+        }
+        request.putQueryParameter("SignName", unicodeSignName);
         request.putQueryParameter("TemplateCode", templateCode);
         request.putQueryParameter("TemplateParam", "{\"code\":\"" + code + "\"}");
         try {
-            client.getCommonResponse(request);
-            // CommonResponse response = client.getCommonResponse(request);
-            // System.out.println(response.getData());
+            // client.getCommonResponse(request);
+            CommonResponse response = client.getCommonResponse(request);
+            log.info("send sms response: {}", response.getData());
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * 将中文字符串转换为Unicode编码
+     * @param str 需要转换的中文字符串
+     * @return Unicode编码字符串
+     */
+    private String convertToUnicode(String str) {
+        if (str == null) {
+            return null;
+        }
+        
+        StringBuilder unicode = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 判断是否是ASCII码表中的字符
+            if (c < 256) {
+                unicode.append(c);
+            } else {
+                // 转换为Unicode
+                unicode.append("\\u").append(Integer.toHexString(c));
+            }
+        }
+        return unicode.toString();
     }
 
 }
