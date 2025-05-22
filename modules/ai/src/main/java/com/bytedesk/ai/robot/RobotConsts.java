@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 17:15:20
+ * @LastEditTime: 2025-05-23 07:34:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,7 +50,7 @@ public class RobotConsts {
   public static final String ROBOT_NAME_TICKET_ASSISTANT = "ticket_assistant"; // 工单助手
   public static final String ROBOT_NAME_TICKET_SOLUTION_RECOMMENDATION = "ticket_solution_recommendation"; // 工单解决方案推荐
   public static final String ROBOT_NAME_TICKET_SUMMARY = "ticket_summary"; // 工单小结
-  public static final String ROBOT_NAME_TICKET_GENERATE = "ticket_generate"; // 生成工单
+  public static final String ROBOT_NAME_TICKET_GENERATE = "ticket_generate"; // 工单生成
 //   
   public static final String ROBOT_NAME_VISITOR_PORTRAIT = "visitor_portrait"; // 访客画像
   public static final String ROBOT_NAME_VISITOR_INVITATION = "visitor_invitation"; // 接客助手
