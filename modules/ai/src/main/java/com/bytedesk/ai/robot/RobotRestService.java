@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 13:15:29
+ * @LastEditTime: 2025-05-22 14:13:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -179,10 +179,16 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (robotProtobuf == null) {
             throw new RuntimeException("robot is required");
         }
-        String robotUid = robotProtobuf.getUid();
-        if (!StringUtils.hasText(robotUid)) {
+        // 因为robotProtobuf中没有name字段，所以前端通过uid传递name
+        String robotName = robotProtobuf.getUid();
+        if (!StringUtils.hasText(robotName)) {
             throw new RuntimeException("robotUid is required");
         }
+        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, owner.getOrgUid());
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + robotName + " not found");
+        }
+        String robotUid = robotOptional.get().getUid();
         // 
         String topic = null;
         if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
@@ -199,11 +205,6 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             if (threadOptional.isPresent()) {
                 return threadService.convertToResponse(threadOptional.get());
             }
-        }
-        //
-        Optional<RobotEntity> robotOptional = findByUid(robotUid);
-        if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot " + robotUid + " not found");
         }
         //
         RobotEntity robotEntity = robotOptional.get();
