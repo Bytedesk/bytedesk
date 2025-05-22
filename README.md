@@ -187,7 +187,7 @@ demo password: admin
 bytedesk.appkey=ZjoyMDI1LTA2LTIxOkNPTU1VTklUWTo6
 BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOkNPTU1VTklUWTo6
 # Enterprise Trial
-到期日期: 2025-06-21
+Until: 2025-06-21
 bytedesk.appkey=ZjoyMDI1LTA2LTIxOkVOVEVSUFJJU0U6Og==
 BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOkVOVEVSUFJJU0U6Og==
 # Platform Trial
