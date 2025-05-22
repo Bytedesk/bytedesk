@@ -33,7 +33,7 @@ import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,16 +41,16 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     
-    private TokenRestService tokenRestService;
+    private final TokenRestService tokenRestService;
 
     public UserEntity getUser() {
         // not logged in

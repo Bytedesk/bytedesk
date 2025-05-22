@@ -25,6 +25,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     private final TokenRepository tokenRepository;
 
     private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
     
     @Override
     public Page<TokenResponse> queryByOrg(TokenRequest request) {
@@ -133,6 +136,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(24); // 默认24小时过期
         
         TokenEntity tokenEntity = TokenEntity.builder()
+            .uid(uidUtils.getUid())
             .name("Login Token")
             .description("User login authentication token")
             .accessToken(accessToken)
@@ -140,9 +144,9 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             .expiresAt(expiresAt)
             .client(client)
             .device(device)
+            .userUid(userUid)
             .build();
         
-        tokenEntity.setUserUid(userUid);
         return doSave(tokenEntity);
     }
 }
