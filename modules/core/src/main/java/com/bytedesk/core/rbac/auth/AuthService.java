@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 10:28:36
+ * @LastEditTime: 2025-05-22 16:07:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
@@ -47,6 +48,8 @@ public class AuthService {
     private UserDetailsServiceImpl userDetailsService;
 
     private ModelMapper modelMapper;
+    
+    private TokenRestService tokenRestService;
 
     public UserEntity getUser() {
         // not logged in
@@ -104,10 +107,10 @@ public class AuthService {
 
         UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
-        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
+        String accessToken = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
 
         return AuthResponse.builder()
-                .accessToken(jwt)
+                .accessToken(accessToken)
                 .user(userResponse)
                 .build();
     }

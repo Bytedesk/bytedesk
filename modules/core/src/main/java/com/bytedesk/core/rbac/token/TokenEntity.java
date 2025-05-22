@@ -73,6 +73,8 @@ public class TokenEntity extends BaseEntityNoOrg {
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;
 
+    // 父类中 userUid 唯一标识所属用户
+
     // 验证token是否有效
     public Boolean isValid() {
         return !revoked && expiresAt.isAfter(LocalDateTime.now());
