@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 09:10:45
+ * @LastEditTime: 2025-05-22 09:52:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,6 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.push.PushNotifier;
-// import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -80,9 +79,9 @@ public class PushServiceImplSms extends PushNotifier {
         }
 
         // 测试环境不发送验证码
-        if (bytedeskProperties.getDebug()) {
-            return;
-        }
+        // if (bytedeskProperties.getDebug()) {
+        //     return;
+        // }
 
         sendValidateCode(mobile, content);
     }
@@ -100,8 +99,8 @@ public class PushServiceImplSms extends PushNotifier {
         request.putQueryParameter("RegionId", regionId);
         request.putQueryParameter("PhoneNumbers", phone);
         // 将中文签名转换为Unicode编码，以确保与阿里云短信API兼容
-        String unicodeSignName = containsChineseChar(signName) ? convertToUnicode(signName) : signName;
-        if (log.isDebugEnabled() && containsChineseChar(signName)) {
+        String unicodeSignName = Utils.containsChineseChar(signName) ? Utils.convertToUnicode(signName) : signName;
+        if (log.isDebugEnabled() && Utils.containsChineseChar(signName)) {
             log.debug("原始签名：{}, Unicode签名：{}", signName, unicodeSignName);
         }
         request.putQueryParameter("SignName", unicodeSignName);
@@ -118,28 +117,5 @@ public class PushServiceImplSms extends PushNotifier {
         }
     }
     
-    /**
-     * 将中文字符串转换为Unicode编码
-     * @param str 需要转换的中文字符串
-     * @return Unicode编码字符串
-     */
-    private String convertToUnicode(String str) {
-        if (str == null) {
-            return null;
-        }
-        
-        StringBuilder unicode = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            // 判断是否是ASCII码表中的字符
-            if (c < 256) {
-                unicode.append(c);
-            } else {
-                // 转换为Unicode
-                unicode.append("\\u").append(Integer.toHexString(c));
-            }
-        }
-        return unicode.toString();
-    }
-
+    
 }
