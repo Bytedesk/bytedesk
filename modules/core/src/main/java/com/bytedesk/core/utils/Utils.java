@@ -109,4 +109,49 @@ public class Utils {
         return String.join(",", list);
     }
 
+    /**
+     * 将中文字符串转换为Unicode编码
+     * @param str 需要转换的中文字符串
+     * @return Unicode编码字符串
+     */
+    public static String convertToUnicode(String str) {
+        if (str == null) {
+            return null;
+        }
+        
+        StringBuilder unicode = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 判断是否是ASCII码表中的字符
+            if (c < 256) {
+                unicode.append(c);
+            } else {
+                // 转换为Unicode
+                unicode.append("\\u").append(String.format("%04x", (int) c));
+            }
+        }
+        return unicode.toString();
+    }
+    
+    /**
+     * 判断字符串是否包含中文字符
+     * @param str 要检查的字符串
+     * @return true:包含中文字符 false:不包含中文字符
+     */
+    public static boolean containsChineseChar(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c > 255) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
 }
