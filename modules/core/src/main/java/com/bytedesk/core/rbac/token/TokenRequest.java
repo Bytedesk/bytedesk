@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:29:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-05-08 11:29:10
+ * @LastEditTime: 2025-05-22 15:47:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,46 @@
  */
 package com.bytedesk.core.rbac.token;
 
-public class TokenRequest {
+import java.time.LocalDateTime;
+
+import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.enums.ClientEnum;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+public class TokenRequest extends BaseRequest {
+
+    private String name;
+
+    private String description;
+
+    private String accessToken;
+
+    private String refreshToken;
+
+    @Builder.Default
+    private String type = TokenTypeEnum.LOGIN.name();
+
+    private LocalDateTime expiresAt;
+
+    @Builder.Default
+    private Boolean revoked = false;
+
+    @Builder.Default
+    private String client = ClientEnum.WEB.name();
+
+    // 设备信息，比如安卓手机信息、苹果手机信息等
+    private String device;
+
 
 }
