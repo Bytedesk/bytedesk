@@ -49,6 +49,12 @@ public class AuthRequest extends BaseRequest {
     private String captchaCode;
 
     private String deviceUid;
+    
+    // 客户端类型 WEB, ANDROID, IOS 等
+    private String client;
+    
+    // 设备信息
+    private String device;
     // 修改邮箱、手机号需要记录用户uid和组织uid
     private String userUid;
 

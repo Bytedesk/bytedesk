@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
@@ -89,13 +90,17 @@ public class AuthService {
         return authentication;
     }
 
-    public AuthToken authenticationWithMobileAndPlatform(String mobile, String platform) {
+    public AuthToken authenticationWithMobileAndPlatform(String mobile, String platform, String client, String device) {
         UserDetailsImpl userDetails = userDetailsService.loadUserByMobileAndPlatform(mobile, platform);
+        userDetails.setClient(client);
+        userDetails.setDevice(device);
         return new AuthToken(userDetails);
     }
 
-    public AuthToken authenticationWithEmailAndPlatform(String email, String platform) {
+    public AuthToken authenticationWithEmailAndPlatform(String email, String platform, String client, String device) {
         UserDetailsImpl userDetails = userDetailsService.loadUserByEmailAndPlatform(email, platform);
+        userDetails.setClient(client);
+        userDetails.setDevice(device);
         return new AuthToken(userDetails);
     }
 
@@ -108,6 +113,26 @@ public class AuthService {
         UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
         String accessToken = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
+        
+        // 登录成功后，将生成的accessToken同时保存到数据库中
+        String client = userDetails.getClient();
+        if (client == null || client.isEmpty()) {
+            // 如果UserDetailsImpl中没有client信息，使用默认值
+            client = ClientEnum.WEB.name();
+        }
+        
+        String device = userDetails.getDevice();
+        if (device == null || device.isEmpty()) {
+            // 如果没有设备信息，使用一个描述性值
+            device = "Unknown Device";
+        }
+        
+        tokenRestService.createLoginToken(
+            userDetails.getUid(), 
+            accessToken, 
+            client, 
+            device
+        );
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
