@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-06-03 12:10:03
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:10:44
+ * @LastEditTime: 2025-05-08 12:40:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,41 +11,35 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.organization;
+package com.bytedesk.team.organization_apply;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.rbac.user.UserEntity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.bytedesk.core.base.BaseResponse;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
-@Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false, exclude = { "user" })
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_core_org_apply")
-public class OrganizationApplyEntity extends BaseEntity {
+public class OrganizationApplyResponse extends BaseResponse {
 
+    private String name;
 
-    private String note;
+    private String description;
 
-    // apply user
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UserEntity user;
+    private String type;
 
-    // apply organization
-    @ManyToOne(fetch = FetchType.LAZY)
-    private OrganizationEntity organization;
+    private String color;
 
+    private Integer order;
+
+    // private LocalDateTime createdAt;
 }
