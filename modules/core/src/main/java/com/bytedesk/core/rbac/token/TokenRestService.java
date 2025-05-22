@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.token;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -58,8 +59,9 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public TokenResponse create(TokenRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        TokenEntity entity = modelMapper.map(request, TokenEntity.class);
+        entity = doSave(entity);
+        return modelMapper.map(entity, TokenResponse.class);
     }
 
     @Override
@@ -70,8 +72,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     protected TokenEntity doSave(TokenEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'doSave'");
+        return tokenRepository.save(entity);
     }
 
     @Override
@@ -99,4 +100,48 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
     
+    /**
+     * 根据accessToken查找Token实体
+     * @param accessToken JWT访问令牌
+     * @return Optional<TokenEntity>
+     */
+    public Optional<TokenEntity> findByAccessToken(String accessToken) {
+        return tokenRepository.findByAccessToken(accessToken);
+    }
+
+    /**
+     * 根据用户UID和类型查找有效的Token列表
+     * @param userUid 用户UID
+     * @param type 令牌类型
+     * @return List<TokenEntity>
+     */
+    public List<TokenEntity> findValidTokensByUserUidAndType(String userUid, String type) {
+        return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
+            userUid, type, LocalDateTime.now());
+    }
+
+    /**
+     * 创建登录Token
+     * @param userUid 用户UID
+     * @param accessToken JWT访问令牌
+     * @param client 客户端类型
+     * @param device 设备信息
+     * @return TokenEntity 创建的Token实体
+     */
+    public TokenEntity createLoginToken(String userUid, String accessToken, String client, String device) {
+        LocalDateTime expiresAt = LocalDateTime.now().plusHours(24); // 默认24小时过期
+        
+        TokenEntity tokenEntity = TokenEntity.builder()
+            .name("Login Token")
+            .description("User login authentication token")
+            .accessToken(accessToken)
+            .type(TokenTypeEnum.LOGIN.name())
+            .expiresAt(expiresAt)
+            .client(client)
+            .device(device)
+            .build();
+        
+        tokenEntity.setUserUid(userUid);
+        return doSave(tokenEntity);
+    }
 }
