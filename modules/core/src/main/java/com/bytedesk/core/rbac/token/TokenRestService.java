@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 16:29:01
+ * @LastEditTime: 2025-05-22 16:49:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -55,17 +56,22 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
+    @Cacheable(cacheNames = "token", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TokenEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return tokenRepository.findByUid(uid);
     }
 
     @Override
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
-        entity = doSave(entity);
-        return modelMapper.map(entity, TokenResponse.class);
+        entity.setUid(uidUtils.getUid());
+        // 
+        TokenEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create token failed");
+        }
+        return convertToResponse(savedEntity);
     }
 
     @Override
@@ -81,14 +87,17 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<TokenEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            entity.setDeleted(true);
+            save(entity);
+        }
     }
 
     @Override
     public void delete(TokenRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(request.getUid());
     }
 
     @Override
@@ -100,8 +109,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public TokenResponse convertToResponse(TokenEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+       return modelMapper.map(entity, TokenResponse.class);
     }
     
     /**
@@ -124,29 +132,5 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             userUid, type, LocalDateTime.now());
     }
 
-    /**
-     * 创建登录Token
-     * @param userUid 用户UID
-     * @param accessToken JWT访问令牌
-     * @param client 客户端类型
-     * @param device 设备信息
-     * @return TokenEntity 创建的Token实体
-     */
-    public TokenEntity createLoginToken(String userUid, String accessToken, String client, String device) {
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(24); // 默认24小时过期
-        
-        TokenEntity tokenEntity = TokenEntity.builder()
-            .uid(uidUtils.getUid())
-            .name("Login Token")
-            .description("User login authentication token")
-            .accessToken(accessToken)
-            .type(TokenTypeEnum.LOGIN.name())
-            .expiresAt(expiresAt)
-            .client(client)
-            .device(device)
-            .userUid(userUid)
-            .build();
-        
-        return doSave(tokenEntity);
-    }
+
 }
