@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 10:20:15
+ * @LastEditTime: 2025-05-22 15:56:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,7 @@ package com.bytedesk.core.rbac.token;
 
 import java.time.LocalDateTime;
 
-import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.enums.ClientEnum;
 
 import jakarta.persistence.Column;
@@ -45,7 +45,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_core_token")
-public class TokenEntity extends BaseEntity {
+public class TokenEntity extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
 
