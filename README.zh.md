@@ -175,6 +175,20 @@ http://127.0.0.1:9003/
 默认密码: admin
 ```
 
+```bash
+# 社区版
+bytedesk.appkey=ZjoyMDI1LTA2LTIxOkNPTU1VTklUWTo6
+BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOkNPTU1VTklUWTo6
+# 试用演示 企业版
+到期日期: 2025-06-21
+bytedesk.appkey=ZjoyMDI1LTA2LTIxOkVOVEVSUFJJU0U6Og==
+BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOkVOVEVSUFJJU0U6Og==
+# 试用演示 平台版
+到期日期: 2025-06-21
+bytedesk.appkey=ZjoyMDI1LTA2LTIxOlBMQVRGT1JNOjo=
+BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOlBMQVRGT1JNOjo=
+```
+
 ## 架构图
 
 - [架构图](https://www.weiyuai.cn/architecture.html)
