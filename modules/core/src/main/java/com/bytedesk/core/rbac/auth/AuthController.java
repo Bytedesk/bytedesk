@@ -134,8 +134,11 @@ public class AuthController {
             userService.register(userRequest);
         }
 
-        Authentication authentication = authService.authenticationWithMobileAndPlatform(authRequest.getMobile(),
-                authRequest.getPlatform());
+        Authentication authentication = authService.authenticationWithMobileAndPlatform(
+                authRequest.getMobile(),
+                authRequest.getPlatform(),
+                authRequest.getClient(),
+                authRequest.getDevice());
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
 
@@ -180,8 +183,11 @@ public class AuthController {
             userService.register(userRequest);
         }
 
-        Authentication authentication = authService.authenticationWithEmailAndPlatform(authRequest.getEmail(),
-                authRequest.getPlatform());
+        Authentication authentication = authService.authenticationWithEmailAndPlatform(
+                authRequest.getEmail(),
+                authRequest.getPlatform(),
+                authRequest.getClient(),
+                authRequest.getDevice());
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
 

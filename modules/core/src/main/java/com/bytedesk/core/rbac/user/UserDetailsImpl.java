@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 16:28:06
+ * @LastEditTime: 2025-05-22 16:23:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,6 +50,8 @@ public class UserDetailsImpl implements UserDetails {
     private Boolean emailVerified;
     private Boolean mobileVerified;
     private String platform;
+    private String client;
+    private String device;
     // 
     private String orgUid;
     private LocalDateTime createdAt;
@@ -78,6 +80,8 @@ public class UserDetailsImpl implements UserDetails {
             Boolean emailVerified,
             Boolean mobileVerified,
             String platform,
+            String client,
+            String device,
             String orgUid,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
@@ -104,6 +108,8 @@ public class UserDetailsImpl implements UserDetails {
         this.emailVerified = emailVerified;
         this.mobileVerified = mobileVerified;
         this.platform = platform;
+        this.client = client;
+        this.device = device;
         this.orgUid = orgUid;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -139,6 +145,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.isEmailVerified(),
                 user.isMobileVerified(),
                 user.getPlatform(),
+                null, // client，存token时单独设置
+                null, // device，存token时单独设置
                 user.getOrgUid(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
