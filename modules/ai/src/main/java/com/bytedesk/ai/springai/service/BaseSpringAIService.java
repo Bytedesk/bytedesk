@@ -13,7 +13,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
@@ -199,6 +198,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         try {
             // 使用通用方法处理知识库搜索和响应生成
             List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
+            log.info("BaseSpringAIService sendSyncMessage searchResultList {}", searchResultList);
             
             // 如果知识库未启用或未开启LLM，直接使用基本提示词
             if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) && robot.getLlm().getEnabled()) {
@@ -209,6 +209,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 // 设置回复内容和类型
                 messageProtobufReply.setContent(response);
                 messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 1 {}", messageProtobufReply);
                 
                 // 保存消息
                 persistMessage(messageProtobufQuery, messageProtobufReply, false);
@@ -221,6 +222,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             // 根据是否启用LLM决定如何处理结果
             if (robot.getLlm().getEnabled()) {
+                log.info("BaseSpringAIService sendSyncMessage searchContentList {}", searchResultList.size());
                 // 启用大模型，组合搜索结果和提示词
                 if (searchResultList.isEmpty()) {
                     // 未找到相关知识，使用默认回复
@@ -228,6 +230,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     messageProtobufReply.setContent(answer);
                     messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 2 {}", messageProtobufReply);
                     
                     // 保存错误消息（标记为未回答成功）
                     persistMessage(messageProtobufQuery, messageProtobufReply, true);
@@ -239,13 +242,16 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 } else {
                     // 获取搜索结果作为上下文
                     String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+                    log.info("BaseSpringAIService sendSyncMessage context {}", context);
                     
                     // 使用通用方法处理同步消息
                     String response = createAndProcessPromptSync(query, context, robot, messageProtobufQuery, messageProtobufReply);
+                    log.info("BaseSpringAIService sendSyncMessage response {}", response);
                     
                     // 设置回复内容和类型
                     messageProtobufReply.setContent(response);
                     messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 3 {}", messageProtobufReply);
                     
                     // 保存消息
                     persistMessage(messageProtobufQuery, messageProtobufReply, false);
@@ -285,6 +291,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 // 设置回复内容和类型
                 messageProtobufReply.setContent(answer);
                 messageProtobufReply.setType(messageType);
+                log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 4 {}", messageProtobufReply);
                 
                 // 保存消息
                 persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);
@@ -582,46 +589,46 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    @Override
-    public String generateFaqPairsAsync(String chunk) {
-        if (!StringUtils.hasText(chunk)) {
-            return "";
-        }
-        String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
-        //
-        return generateFaqPairs(prompt);
-    }
+    // @Override
+    // public String generateFaqPairsAsync(String chunk) {
+    //     if (!StringUtils.hasText(chunk)) {
+    //         return "";
+    //     }
+    //     String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
+    //     //
+    //     return generateFaqPairs(prompt);
+    // }
 
-    @Override
-    public void generateFaqPairsSync(String chunk) {
-        Assert.hasText(chunk, "Chunk must not be empty");
+    // @Override
+    // public void generateFaqPairsSync(String chunk) {
+    //     Assert.hasText(chunk, "Chunk must not be empty");
 
-        String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
-        int maxRetries = 3;
-        int retryCount = 0;
-        int retryDelay = 1000;
+    //     String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
+    //     int maxRetries = 3;
+    //     int retryCount = 0;
+    //     int retryDelay = 1000;
 
-        while (retryCount < maxRetries) {
-            try {
-                String result = generateFaqPairs(prompt);
-                log.info("FAQ generation result: {}", result);
-                return;
-            } catch (Exception e) {
-                retryCount++;
-                if (retryCount == maxRetries) {
-                    log.error("Failed to generate FAQ pairs after {} retries", maxRetries, e);
-                    throw new RuntimeException("Failed to generate FAQ pairs", e);
-                }
+    //     while (retryCount < maxRetries) {
+    //         try {
+    //             String result = generateFaqPairs(prompt);
+    //             log.info("FAQ generation result: {}", result);
+    //             return;
+    //         } catch (Exception e) {
+    //             retryCount++;
+    //             if (retryCount == maxRetries) {
+    //                 log.error("Failed to generate FAQ pairs after {} retries", maxRetries, e);
+    //                 throw new RuntimeException("Failed to generate FAQ pairs", e);
+    //             }
 
-                try {
-                    Thread.sleep(retryDelay * (1 << (retryCount - 1)));
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Interrupted while retrying", ie);
-                }
-            }
-        }
-    }
+    //             try {
+    //                 Thread.sleep(retryDelay * (1 << (retryCount - 1)));
+    //             } catch (InterruptedException ie) {
+    //                 Thread.currentThread().interrupt();
+    //                 throw new RuntimeException("Interrupted while retrying", ie);
+    //             }
+    //         }
+    //     }
+    // }
 
     @Override
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
@@ -758,7 +765,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 抽象方法，由具体实现类提供
-    protected abstract String generateFaqPairs(String prompt);
+    // protected abstract String generateFaqPairs(String prompt);
 
     /**
      * 发送消息的通用方法

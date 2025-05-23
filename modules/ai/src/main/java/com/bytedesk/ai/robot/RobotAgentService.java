@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-21 14:23:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 08:46:23
+ * @LastEditTime: 2025-05-23 10:23:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,9 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.ai.springai.service.SpringAIService;
+import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RobotAgentService {
 
     private final RobotRestService robotRestService;
+    private final SpringAIServiceRegistry springAIServiceRegistry;
     
     @Autowired
     private ChatClient chatClient;
@@ -45,24 +49,32 @@ public class RobotAgentService {
         if (robotOptional.isPresent()) {
             RobotLlm llm = robotOptional.get().getLlm();
             String prompt = llm.getPrompt();
+            String provider = llm.getProvider();
             String model = llm.getModel();
             Double temperature = llm.getTemperature();
             Double topP = llm.getTopP();
 
-            // Create chat options
-            OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .model(model)
-                .temperature(temperature)
-                .topP(topP)
-                .build();
+            try {
+                // Get the appropriate service from registry
+                SpringAIService service = springAIServiceRegistry.getServiceByProviderName(provider);
+                
+               
+            } catch (IllegalArgumentException e) {
+                log.warn("Provider {} not found, falling back to OpenAI", provider);
+                // Fallback to OpenAI if provider not found
+                OpenAiChatOptions options = OpenAiChatOptions.builder()
+                    .model(model)
+                    .temperature(temperature)
+                    .topP(topP)
+                    .build();
 
-            // Get response using prompt() method with options
-            return chatClient.prompt()
-                .system(prompt)
-                .user(query)
-                .options(options)
-                .call()
-                .content();
+                return chatClient.prompt()
+                    .system(prompt)
+                    .user(query)
+                    .options(options)
+                    .call()
+                    .content();
+            }
         }
         return "Robot not found";
     }
