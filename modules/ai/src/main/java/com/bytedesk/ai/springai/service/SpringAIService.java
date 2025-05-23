@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 14:48:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 10:25:33
+ * @LastEditTime: 2025-05-23 11:04:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,6 +47,17 @@ public interface SpringAIService {
      * @return 回复内容
      */
     String sendSyncMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply);
+    
+    /**
+     * 直接处理LLM请求并同步返回结果
+     * 主要用于RobotAgentService中的processLlmRequest方法
+     * 
+     * @param query 用户查询
+     * @param prompt 提示词
+     * @param robot 机器人配置
+     * @return 大模型生成的回复内容
+     */
+    String processDirectLlmRequest(String query, RobotProtobuf robot);
 
     /**
      * 消息持久化

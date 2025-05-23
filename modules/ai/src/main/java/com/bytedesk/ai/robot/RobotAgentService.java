@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-21 14:23:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 10:23:44
+ * @LastEditTime: 2025-05-23 11:50:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,6 @@ package com.bytedesk.ai.robot;
 
 import java.util.Optional;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.springai.service.SpringAIService;
@@ -38,8 +35,8 @@ public class RobotAgentService {
     private final RobotRestService robotRestService;
     private final SpringAIServiceRegistry springAIServiceRegistry;
     
-    @Autowired
-    private ChatClient chatClient;
+    // @Autowired
+    // private ChatClient chatClient;
 
     /**
      * Base function to handle LLM interactions
@@ -48,32 +45,32 @@ public class RobotAgentService {
         Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
         if (robotOptional.isPresent()) {
             RobotLlm llm = robotOptional.get().getLlm();
-            String prompt = llm.getPrompt();
+            // String prompt = llm.getPrompt();
             String provider = llm.getProvider();
-            String model = llm.getModel();
-            Double temperature = llm.getTemperature();
-            Double topP = llm.getTopP();
-
+            
             try {
                 // Get the appropriate service from registry
                 SpringAIService service = springAIServiceRegistry.getServiceByProviderName(provider);
                 
+                // 使用新添加的接口方法直接调用大模型并获取结果
+                RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
+                return service.processDirectLlmRequest(query, robot);
                
             } catch (IllegalArgumentException e) {
                 log.warn("Provider {} not found, falling back to OpenAI", provider);
                 // Fallback to OpenAI if provider not found
-                OpenAiChatOptions options = OpenAiChatOptions.builder()
-                    .model(model)
-                    .temperature(temperature)
-                    .topP(topP)
-                    .build();
+                // OpenAiChatOptions options = OpenAiChatOptions.builder()
+                //     .model(model)
+                //     .temperature(temperature)
+                //     .topP(topP)
+                //     .build();
 
-                return chatClient.prompt()
-                    .system(prompt)
-                    .user(query)
-                    .options(options)
-                    .call()
-                    .content();
+                // return chatClient.prompt()
+                //     .system(prompt)
+                //     .user(query)
+                //     .options(options)
+                //     .call()
+                //     .content();
             }
         }
         return "Robot not found";

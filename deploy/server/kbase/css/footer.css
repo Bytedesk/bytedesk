@@ -1,0 +1,18 @@
+#app {
+    margin-top: 100px;
+}
+/*
+ * Footer
+ */
+ .bd-footer {
+    padding: 2.5rem 0;
+    color: #999;
+    text-align: center;
+    background-color: #f9f9f9;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+}
+.bd-footer p:last-child {
+    margin-bottom: 0;
+}

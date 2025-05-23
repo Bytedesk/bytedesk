@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 12:08:57
+ * @LastEditTime: 2025-05-23 11:21:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,7 +56,7 @@ public class SpringAIOllamaController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        String response = springAIOllamaService.processPromptSync(message);
+        String response = springAIOllamaService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

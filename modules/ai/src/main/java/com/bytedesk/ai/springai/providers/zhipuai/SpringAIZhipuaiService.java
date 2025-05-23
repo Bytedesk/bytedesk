@@ -100,7 +100,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式1：异步流式调用
      */
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
@@ -117,13 +117,13 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Zhipuai API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
@@ -134,9 +134,29 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式2：同步调用
      */
     @Override
-    public String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
-            return bytedeskZhipuaiChatModel.call(message);
+            if (bytedeskZhipuaiChatModel == null) {
+                return "Zhipuai service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建动态的模型实例
+                    ZhiPuAiChatModel chatModel = createDynamicChatModel(robot.getLlm());
+                    if (chatModel != null) {
+                        var response = chatModel.call(message);
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = bytedeskZhipuaiChatModel.call(message);
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Zhipuai API call error: ", e);
+                return "服务暂时不可用，请稍后重试";
+            }
         } catch (Exception e) {
             log.error("Zhipuai API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -147,7 +167,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * 方式3：SSE方式调用
      */
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
@@ -195,7 +215,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     public Boolean isServiceHealthy() {
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用");
         } catch (Exception e) {
             log.error("Error checking Zhipuai service health", e);

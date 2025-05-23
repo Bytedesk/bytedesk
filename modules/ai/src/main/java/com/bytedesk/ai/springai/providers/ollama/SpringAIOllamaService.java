@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 10:56:02
+ * @LastEditTime: 2025-05-23 11:48:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,7 +99,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
@@ -108,7 +108,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         
         if (chatModel == null) {
             log.info("Ollama API not available");
-            sendMessage(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
             return;
         }
 
@@ -122,20 +122,20 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Ollama API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
                 });
         } catch (Exception e) {
             log.error("Error processing Ollama prompt", e);
-            sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
         }
     }
 
@@ -154,11 +154,23 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     // }
 
     @Override
-    protected String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
             if (bytedeskOllamaChatModel != null) {
                 try {
-                    return bytedeskOllamaChatModel.call(message);
+                    // 如果有robot参数，尝试创建自定义选项
+                    if (robot != null && robot.getLlm() != null) {
+                        // 创建自定义选项
+                        OllamaOptions customOptions = createDynamicOptions(robot.getLlm());
+                        if (customOptions != null) {
+                            // 使用自定义选项创建Prompt
+                            Prompt prompt = new Prompt(message, customOptions);
+                            var response = bytedeskOllamaChatModel.call(prompt);
+                            return extractTextFromResponse(response);
+                        }
+                    }
+                    var response = bytedeskOllamaChatModel.call(message);
+                    return extractTextFromResponse(response);
                 } catch (Exception e) {
                     log.error("Ollama API sync error", e);
                     return "服务暂时不可用，请稍后重试";
@@ -173,7 +185,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
@@ -264,7 +276,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Ollama service is not available");
         } catch (Exception e) {
             log.error("Error checking Ollama service health", e);

@@ -58,7 +58,7 @@ public class SpringAICustomController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        String response = springAICustomService.processPromptSync(message);
+        String response = springAICustomService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

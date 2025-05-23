@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 10:56:26
+ * @LastEditTime: 2025-05-23 11:47:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,12 +62,12 @@ public class SpringAITencentService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
         if (tencentChatModel == null) {
-            sendMessage(MessageTypeEnum.ERROR, "腾讯服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "腾讯服务不可用", messageProtobufReply);
             return;
         }
         
@@ -88,13 +88,13 @@ public class SpringAITencentService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Tencent API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
@@ -107,9 +107,31 @@ public class SpringAITencentService extends BaseSpringAIService {
     // }
 
     @Override
-    protected String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
-            return tencentChatModel != null ? tencentChatModel.call(message) : "Tencent service is not available";
+            if (tencentChatModel == null) {
+                return "Tencent service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = tencentChatModel.call(prompt);
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = tencentChatModel.call(message);
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Tencent API call error: ", e);
+                return "服务暂时不可用，请稍后重试";
+            }
         } catch (Exception e) {
             log.error("Tencent API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -117,7 +139,7 @@ public class SpringAITencentService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
@@ -174,7 +196,7 @@ public class SpringAITencentService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Tencent service is not available");
         } catch (Exception e) {
             log.error("Error checking Tencent service health", e);
