@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 09:50:58
+ * @LastEditTime: 2025-05-23 15:25:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,6 +52,32 @@ public class PushServiceImplSms extends PushNotifier {
 
     @Value("${aliyun.sms.templatecode:}")
     private String templateCode;
+    
+    /**
+     * 初始化时处理配置项编码问题
+     */
+    @Autowired
+    public void init() {
+        try {
+            // 检查签名是否为乱码，如果是则进行转换
+            if (signName != null && !signName.isEmpty()) {
+                boolean needsConversion = false;
+                for (char c : signName.toCharArray()) {
+                    if (c > 0x7F) { // 非ASCII字符
+                        needsConversion = true;
+                        break;
+                    }
+                }
+                
+                if (needsConversion) {
+                    signName = new String(signName.getBytes("ISO-8859-1"), "UTF-8");
+                    log.info("短信签名编码转换完成: {}", signName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("短信签名编码转换失败", e);
+        }
+    }
 
     @Autowired
     private BytedeskProperties bytedeskProperties;
@@ -99,16 +125,12 @@ public class PushServiceImplSms extends PushNotifier {
         request.setSysAction("SendSms");
         request.putQueryParameter("RegionId", regionId);
         request.putQueryParameter("PhoneNumbers", phone);
-        // 将中文签名转换为Unicode编码，以确保与阿里云短信API兼容
-        String unicodeSignName = Utils.containsChineseChar(signName) ? Utils.convertToUnicode(signName) : signName;
-        if (log.isDebugEnabled() && Utils.containsChineseChar(signName)) {
-            log.debug("原始签名：{}, Unicode签名：{}", signName, unicodeSignName);
-        }
-        request.putQueryParameter("SignName", unicodeSignName);
+        // 已在init方法中处理了编码问题，此处直接使用
+        log.debug("配置文件签名：{}", signName);
+        request.putQueryParameter("SignName", signName);
         request.putQueryParameter("TemplateCode", templateCode);
         request.putQueryParameter("TemplateParam", "{\"code\":\"" + code + "\"}");
         try {
-            // client.getCommonResponse(request);
             CommonResponse response = client.getCommonResponse(request);
             log.info("sendValidateCode sms response: {}", response.getData());
         } catch (ServerException e) {
