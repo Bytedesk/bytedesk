@@ -114,20 +114,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(robot, "RobotEntity must not be null");
         Assert.notNull(messageProtobufQuery, "MessageProtobuf must not be null");
-        //
-        // 获取系统提示词
+        
+        // 使用通用方法处理知识库搜索和响应生成
+        List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
+        
+        // 创建消息列表，添加系统提示词
         String systemPrompt = robot.getLlm().getPrompt();
-        
-        // 初始化消息列表
         List<Message> messages = new ArrayList<>();
-        
-        // 添加系统提示词
         messages.add(new SystemMessage(systemPrompt));
         
-        // 如果知识库启用，添加上下文信息
-        if (StringUtils.hasText(robot.getKbUid()) && robot.getIsKbEnabled()) {
-            // 这里可以添加知识库相关上下文
-            String context = "";
+        // 如果有搜索结果，添加作为上下文
+        if (!searchResultList.isEmpty()) {
+            String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
             if (StringUtils.hasText(context)) {
                 messages.add(new SystemMessage("搜索结果: " + context));
             }
@@ -147,39 +145,16 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(emitter, "SseEmitter must not be null");
 
-        // 如果知识库未启用，直接跟据配置的提示词进行回复
+        // 使用通用方法处理知识库搜索和响应生成
+        List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
+        
+        // 如果知识库未启用，直接根据配置的提示词进行回复
         if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
             // 使用通用方法处理提示词和SSE消息，传入空上下文
             String context = "";
             createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
-        }
-
-        List<FaqProtobuf> searchResultList = new ArrayList<>();
-
-        // 根据搜索类型执行相应的搜索
-        String searchType = robot.getLlm().getSearchType();
-        if (searchType == null) {
-            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
-        }
-
-        // 执行搜索
-        switch (RobotSearchTypeEnum.valueOf(searchType)) {
-            case VECTOR:
-                log.info("使用向量搜索");
-                executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                break;
-            case MIXED:
-                log.info("使用混合搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                break;
-            case FULLTEXT:
-            default:
-                log.info("使用全文搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                break;
         }
 
         // 根据是否启用LLM决定如何处理结果
@@ -484,7 +459,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         
         try {
-            // 如果知识库未启用，直接跟据配置的提示词进行回复
+            // 使用通用方法处理知识库搜索和响应生成
+            List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
+            
+            // 如果知识库未启用，直接根据配置的提示词进行回复
             if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
                 log.info("知识库未启用或未指定知识库UID");
                 // 使用原有方法处理
@@ -505,33 +483,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 messageSendService.sendProtobufMessage(messageProtobufReply);
                 
                 return response;
-            }
-            
-            // 创建搜索结果列表
-            List<FaqProtobuf> searchResultList = new ArrayList<>();
-            
-            // 根据搜索类型执行相应的搜索
-            String searchType = robot.getLlm().getSearchType();
-            if (searchType == null) {
-                searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
-            }
-            
-            // 执行搜索
-            switch (RobotSearchTypeEnum.valueOf(searchType)) {
-                case VECTOR:
-                    log.info("使用向量搜索");
-                    executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                    break;
-                case MIXED:
-                    log.info("使用混合搜索");
-                    executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                    executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                    break;
-                case FULLTEXT:
-                default:
-                    log.info("使用全文搜索");
-                    executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                    break;
             }
             
             // 根据是否启用LLM决定如何处理结果
@@ -641,6 +592,50 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             return errorMessage;
         }
+    }
+
+    /**
+     * 通用知识库搜索方法，根据机器人配置执行相应的搜索
+     * 
+     * @param query 用户查询
+     * @param robot 机器人配置
+     * @return 搜索结果列表
+     */
+    protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
+        // 如果知识库未启用，直接返回空列表
+        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
+            log.info("知识库未启用或未指定知识库UID");
+            return new ArrayList<>();
+        }
+        
+        // 创建搜索结果列表
+        List<FaqProtobuf> searchResultList = new ArrayList<>();
+        
+        // 根据搜索类型执行相应的搜索
+        String searchType = robot.getLlm().getSearchType();
+        if (searchType == null) {
+            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
+        }
+        
+        // 执行搜索
+        switch (RobotSearchTypeEnum.valueOf(searchType)) {
+            case VECTOR:
+                log.info("使用向量搜索");
+                executeVectorSearch(query, robot.getKbUid(), searchResultList);
+                break;
+            case MIXED:
+                log.info("使用混合搜索");
+                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                executeVectorSearch(query, robot.getKbUid(), searchResultList);
+                break;
+            case FULLTEXT:
+            default:
+                log.info("使用全文搜索");
+                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                break;
+        }
+        
+        return searchResultList;
     }
 
     // 抽象方法，由具体实现类提供
