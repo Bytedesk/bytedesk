@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 09:52:40
+ * @LastEditTime: 2025-05-23 09:50:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,7 @@ public class PushServiceImplSms extends PushNotifier {
     }
 
     public void sendValidateCode(String phone, String code) {
+        log.info("sendValidateCode sms to {}, code: {}", phone, code);
 
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
         IAcsClient client = new DefaultAcsClient(profile);
@@ -109,7 +110,7 @@ public class PushServiceImplSms extends PushNotifier {
         try {
             // client.getCommonResponse(request);
             CommonResponse response = client.getCommonResponse(request);
-            log.info("send sms response: {}", response.getData());
+            log.info("sendValidateCode sms response: {}", response.getData());
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {

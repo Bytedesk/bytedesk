@@ -118,25 +118,47 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 使用通用方法处理知识库搜索和响应生成
         List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
         
-        // 创建消息列表，添加系统提示词
-        String systemPrompt = robot.getLlm().getPrompt();
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(systemPrompt));
-        
-        // 如果有搜索结果，添加作为上下文
-        if (!searchResultList.isEmpty()) {
-            String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
-            if (StringUtils.hasText(context)) {
-                messages.add(new SystemMessage("搜索结果: " + context));
+        // 根据是否启用LLM决定如何处理结果
+        if (robot.getLlm().getEnabled()) {
+            // 启用大模型
+            processLlmResponseWebsocket(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply);
+        } else {
+            // 未开启大模型，直接返回搜索结果
+            if (searchResultList.isEmpty()) {
+                // 直接返回未找到相关问题答案
+                String answer = robot.getLlm().getDefaultReply();
+                messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                messageProtobufReply.setContent(answer);
+                messageProtobufReply.setClient(ClientEnum.SYSTEM);
+                
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                
+                // 发送消息
+                messageSendService.sendProtobufMessage(messageProtobufReply);
+            } else {
+                // 搜索到内容，返回搜索内容
+                FaqProtobuf firstFaq = searchResultList.get(0);
+
+                // 如果有多个搜索结果，将其余的添加为相关问题
+                if (searchResultList.size() > 1) {
+                    List<FaqProtobuf> relatedFaqs = new ArrayList<>(searchResultList.subList(1, searchResultList.size()));
+                    firstFaq.setRelatedFaqs(relatedFaqs);
+                }
+
+                // 将处理后的单个FaqProtobuf对象转换为JSON字符串
+                String answer = firstFaq.toJson();
+                messageProtobufReply.setType(MessageTypeEnum.FAQ_ANSWER);
+                messageProtobufReply.setContent(answer);
+                messageProtobufReply.setClient(ClientEnum.SYSTEM);
+                
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                
+                // 发送消息
+                messageSendService.sendProtobufMessage(messageProtobufReply);
             }
         }
-        
-        // 添加用户查询
-        messages.add(new UserMessage(query));
-        
-        // 创建并处理提示
-        Prompt aiPrompt = new Prompt(messages);
-        processPrompt(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
     }
 
     @Override
@@ -164,6 +186,127 @@ public abstract class BaseSpringAIService implements SpringAIService {
         } else {
             // 未开启大模型，使用搜索结果直接回复
             processDirectResponse(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        }
+    }
+
+    @Override
+    public String sendSyncMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        Assert.hasText(query, "Query must not be empty");
+        Assert.notNull(robot, "Robot must not be null");
+        Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
+        Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
+        
+        try {
+            // 使用通用方法处理知识库搜索和响应生成
+            List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
+            
+            // 如果知识库未启用或未开启LLM，直接使用基本提示词
+            if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) && robot.getLlm().getEnabled()) {
+                log.info("知识库未启用或未指定知识库UID，但开启了LLM");
+                // 使用空上下文调用通用方法
+                String response = createAndProcessPromptSync(query, "", robot, messageProtobufQuery, messageProtobufReply);
+                
+                // 设置回复内容和类型
+                messageProtobufReply.setContent(response);
+                messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                
+                // 保存消息
+                persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                
+                // 发送消息
+                messageSendService.sendProtobufMessage(messageProtobufReply);
+                
+                return response;
+            }
+            
+            // 根据是否启用LLM决定如何处理结果
+            if (robot.getLlm().getEnabled()) {
+                // 启用大模型，组合搜索结果和提示词
+                if (searchResultList.isEmpty()) {
+                    // 未找到相关知识，使用默认回复
+                    String answer = robot.getLlm().getDefaultReply();
+                    
+                    messageProtobufReply.setContent(answer);
+                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    
+                    // 保存错误消息（标记为未回答成功）
+                    persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                    
+                    // 发送消息
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    
+                    return answer;
+                } else {
+                    // 获取搜索结果作为上下文
+                    String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+                    
+                    // 使用通用方法处理同步消息
+                    String response = createAndProcessPromptSync(query, context, robot, messageProtobufQuery, messageProtobufReply);
+                    
+                    // 设置回复内容和类型
+                    messageProtobufReply.setContent(response);
+                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
+                    
+                    // 保存消息
+                    persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                    
+                    // 发送消息
+                    messageSendService.sendProtobufMessage(messageProtobufReply);
+                    
+                    return response;
+                }
+            } else {
+                // 不启用大模型，直接返回搜索结果
+                String answer;
+                MessageTypeEnum messageType;
+                boolean isUnanswered;
+                
+                if (searchResultList.isEmpty()) {
+                    // 未找到相关知识，使用默认回复
+                    answer = robot.getLlm().getDefaultReply();
+                    messageType = MessageTypeEnum.TEXT;
+                    isUnanswered = true;
+                } else {
+                    // 搜索到内容，返回搜索内容
+                    FaqProtobuf firstFaq = searchResultList.get(0);
+                    
+                    // 如果有多个搜索结果，将其余的添加为相关问题
+                    if (searchResultList.size() > 1) {
+                        List<FaqProtobuf> relatedFaqs = new ArrayList<>(searchResultList.subList(1, searchResultList.size()));
+                        firstFaq.setRelatedFaqs(relatedFaqs);
+                    }
+                    
+                    // 将处理后的单个FaqProtobuf对象转换为JSON字符串
+                    answer = firstFaq.toJson();
+                    messageType = MessageTypeEnum.FAQ_ANSWER;
+                    isUnanswered = false;
+                }
+                
+                // 设置回复内容和类型
+                messageProtobufReply.setContent(answer);
+                messageProtobufReply.setType(messageType);
+                
+                // 保存消息
+                persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);
+                
+                // 发送消息
+                messageSendService.sendProtobufMessage(messageProtobufReply);
+                
+                return answer;
+            }
+        } catch (Exception e) {
+            log.error("Error in sendSyncMessage", e);
+            String errorMessage = "服务暂时不可用，请稍后重试";
+            messageProtobufReply.setContent(errorMessage);
+            messageProtobufReply.setType(MessageTypeEnum.ERROR);
+            
+            // 保存错误消息
+            persistMessage(messageProtobufQuery, messageProtobufReply, true);
+            
+            // 发送错误消息
+            messageSendService.sendProtobufMessage(messageProtobufReply);
+            
+            return errorMessage;
         }
     }
 
@@ -520,127 +663,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected abstract void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter);
             
-    @Override
-    public String sendSyncMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        Assert.hasText(query, "Query must not be empty");
-        Assert.notNull(robot, "Robot must not be null");
-        Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
-        Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
-        
-        try {
-            // 使用通用方法处理知识库搜索和响应生成
-            List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
-            
-            // 如果知识库未启用或未开启LLM，直接使用基本提示词
-            if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) && robot.getLlm().getEnabled()) {
-                log.info("知识库未启用或未指定知识库UID，但开启了LLM");
-                // 使用空上下文调用通用方法
-                String response = createAndProcessPromptSync(query, "", robot, messageProtobufQuery, messageProtobufReply);
-                
-                // 设置回复内容和类型
-                messageProtobufReply.setContent(response);
-                messageProtobufReply.setType(MessageTypeEnum.TEXT);
-                
-                // 保存消息
-                persistMessage(messageProtobufQuery, messageProtobufReply, false);
-                
-                // 发送消息
-                messageSendService.sendProtobufMessage(messageProtobufReply);
-                
-                return response;
-            }
-            
-            // 根据是否启用LLM决定如何处理结果
-            if (robot.getLlm().getEnabled()) {
-                // 启用大模型，组合搜索结果和提示词
-                if (searchResultList.isEmpty()) {
-                    // 未找到相关知识，使用默认回复
-                    String answer = robot.getLlm().getDefaultReply();
-                    
-                    messageProtobufReply.setContent(answer);
-                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
-                    
-                    // 保存错误消息（标记为未回答成功）
-                    persistMessage(messageProtobufQuery, messageProtobufReply, true);
-                    
-                    // 发送消息
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
-                    
-                    return answer;
-                } else {
-                    // 获取搜索结果作为上下文
-                    String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
-                    
-                    // 使用通用方法处理同步消息
-                    String response = createAndProcessPromptSync(query, context, robot, messageProtobufQuery, messageProtobufReply);
-                    
-                    // 设置回复内容和类型
-                    messageProtobufReply.setContent(response);
-                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
-                    
-                    // 保存消息
-                    persistMessage(messageProtobufQuery, messageProtobufReply, false);
-                    
-                    // 发送消息
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
-                    
-                    return response;
-                }
-            } else {
-                // 不启用大模型，直接返回搜索结果
-                String answer;
-                MessageTypeEnum messageType;
-                boolean isUnanswered;
-                
-                if (searchResultList.isEmpty()) {
-                    // 未找到相关知识，使用默认回复
-                    answer = robot.getLlm().getDefaultReply();
-                    messageType = MessageTypeEnum.TEXT;
-                    isUnanswered = true;
-                } else {
-                    // 搜索到内容，返回搜索内容
-                    FaqProtobuf firstFaq = searchResultList.get(0);
-                    
-                    // 如果有多个搜索结果，将其余的添加为相关问题
-                    if (searchResultList.size() > 1) {
-                        List<FaqProtobuf> relatedFaqs = new ArrayList<>(searchResultList.subList(1, searchResultList.size()));
-                        firstFaq.setRelatedFaqs(relatedFaqs);
-                    }
-                    
-                    // 将处理后的单个FaqProtobuf对象转换为JSON字符串
-                    answer = firstFaq.toJson();
-                    messageType = MessageTypeEnum.FAQ_ANSWER;
-                    isUnanswered = false;
-                }
-                
-                // 设置回复内容和类型
-                messageProtobufReply.setContent(answer);
-                messageProtobufReply.setType(messageType);
-                
-                // 保存消息
-                persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);
-                
-                // 发送消息
-                messageSendService.sendProtobufMessage(messageProtobufReply);
-                
-                return answer;
-            }
-        } catch (Exception e) {
-            log.error("Error in sendSyncMessage", e);
-            String errorMessage = "服务暂时不可用，请稍后重试";
-            messageProtobufReply.setContent(errorMessage);
-            messageProtobufReply.setType(MessageTypeEnum.ERROR);
-            
-            // 保存错误消息
-            persistMessage(messageProtobufQuery, messageProtobufReply, true);
-            
-            // 发送错误消息
-            messageSendService.sendProtobufMessage(messageProtobufReply);
-            
-            return errorMessage;
-        }
-    }
-
+    
     /**
      * 通用知识库搜索方法，根据机器人配置执行相应的搜索
      * 
@@ -683,6 +706,55 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
         
         return searchResultList;
+    }
+
+    /**
+     * 处理LLM直接响应的通用方法 - WebSocket版本
+     * 
+     * @param query                用户查询
+     * @param searchResultList     搜索结果列表
+     * @param robot                机器人配置
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     */
+    protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        log.info("BaseSpringAIService processLlmResponseWebsocket searchContentList {}", searchResultList.size());
+        
+        if (searchResultList.isEmpty()) {
+            // 直接返回未找到相关问题答案
+            String answer = robot.getLlm().getDefaultReply();
+            messageProtobufReply.setType(MessageTypeEnum.TEXT);
+            messageProtobufReply.setContent(answer);
+            messageProtobufReply.setClient(ClientEnum.SYSTEM);
+            
+            // 保存消息到数据库
+            persistMessage(messageProtobufQuery, messageProtobufReply, true);
+            
+            // 发送消息
+            messageSendService.sendProtobufMessage(messageProtobufReply);
+            return;
+        }
+        
+        // 有搜索结果，构建上下文
+        String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+        
+        // 构建消息列表，添加系统提示词
+        String systemPrompt = robot.getLlm().getPrompt();
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(systemPrompt));
+        
+        // 添加搜索结果作为上下文
+        if (StringUtils.hasText(context)) {
+            messages.add(new SystemMessage("搜索结果: " + context));
+        }
+        
+        // 添加用户查询
+        messages.add(new UserMessage(query));
+        
+        // 创建并处理提示
+        Prompt aiPrompt = new Prompt(messages);
+        processPrompt(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
     }
 
     // 抽象方法，由具体实现类提供
