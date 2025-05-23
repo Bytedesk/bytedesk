@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-19 16:37:30
+ * @LastEditTime: 2025-05-23 11:45:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ public class SpringAISiliconFlowController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        String response = springAISiliconFlowService.processPromptSync(message);
+        String response = springAISiliconFlowService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

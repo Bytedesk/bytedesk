@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 10:56:15
+ * @LastEditTime: 2025-05-23 11:47:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,12 +61,12 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
         if (openrouterChatModel == null) {
-            sendMessage(MessageTypeEnum.ERROR, "OpenAI服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "OpenAI服务不可用", messageProtobufReply);
             return;
         }
         
@@ -87,13 +87,13 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Openrouter API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
@@ -106,9 +106,26 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
     // }
 
     @Override
-    protected String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
-            return openrouterChatModel != null ? openrouterChatModel.call(message) : "Openrouter service is not available";
+            if (openrouterChatModel == null) {
+                return "Openrouter service is not available";
+            }
+            
+            // 如果有robot参数，尝试创建自定义选项
+            if (robot != null && robot.getLlm() != null) {
+                // 创建自定义选项
+                OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                if (customOptions != null) {
+                    // 使用自定义选项创建Prompt
+                    Prompt prompt = new Prompt(message, customOptions);
+                    var response = openrouterChatModel.call(prompt);
+                    return extractTextFromResponse(response);
+                }
+            }
+            
+            var response = openrouterChatModel.call(message);
+            return extractTextFromResponse(response);
         } catch (Exception e) {
             log.error("Openrouter API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -116,7 +133,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         RobotLlm llm = robot.getLlm();
 
         if (openrouterChatModel == null) {
@@ -172,7 +189,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Openrouter service is not available");
         } catch (Exception e) {
             log.error("Error checking OpenAI service health", e);

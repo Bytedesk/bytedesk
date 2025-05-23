@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 10:55:55
+ * @LastEditTime: 2025-05-23 11:48:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,12 +62,12 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
         if (giteeChatModel == null) {
-            sendMessage(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobufReply);
             return;
         }
 
@@ -88,28 +88,45 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Gitee API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
                 });
     }
 
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return giteeChatModel != null ? giteeChatModel.call(prompt) : "";
-    // }
-
     @Override
-    protected String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
-            return giteeChatModel != null ? giteeChatModel.call(message) : "Gitee service is not available";
+            if (giteeChatModel == null) {
+                return "Gitee service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = giteeChatModel.call(prompt);
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = giteeChatModel.call(message);
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Gitee API call error: ", e);
+                return "服务暂时不可用，请稍后重试";
+            }
         } catch (Exception e) {
             log.error("Gitee API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -117,7 +134,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         RobotLlm llm = robot.getLlm();
 
         if (giteeChatModel == null) {
@@ -175,7 +192,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Gitee service is not available");
         } catch (Exception e) {
             log.error("Error checking Gitee service health", e);

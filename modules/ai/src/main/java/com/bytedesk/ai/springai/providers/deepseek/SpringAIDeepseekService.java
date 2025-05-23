@@ -62,12 +62,12 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
         if (deepseekChatModel == null) {
-            sendMessage(MessageTypeEnum.ERROR, "Deepseek服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek服务不可用", messageProtobufReply);
             return;
         }
         
@@ -88,13 +88,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Deepseek API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
@@ -107,9 +107,31 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     // }
 
     @Override
-    protected String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
-            return deepseekChatModel != null ? deepseekChatModel.call(message) : "Deepseek service is not available";
+            if (deepseekChatModel == null) {
+                return "Deepseek service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = deepseekChatModel.call(prompt);
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = deepseekChatModel.call(message);
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Deepseek API call error: ", e);
+                return "服务暂时不可用，请稍后重试";
+            }
         } catch (Exception e) {
             log.error("Deepseek API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -117,7 +139,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
@@ -175,7 +197,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Deepseek service is not available");
         } catch (Exception e) {
             log.error("Error checking Deepseek service health", e);

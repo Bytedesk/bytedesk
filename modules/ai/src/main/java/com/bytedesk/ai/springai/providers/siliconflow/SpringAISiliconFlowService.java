@@ -64,12 +64,12 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
         if (!siliconFlowChatModel.isPresent()) {
-            sendMessage(MessageTypeEnum.ERROR, "SiliconFlow服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "SiliconFlow服务不可用", messageProtobufReply);
             return;
         }
         
@@ -90,29 +90,48 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessage(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("siliconFlow API error: ", error);
-                    sendMessage(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
                 });
-    }
-
-    // @Override
+    }    // @Override
     // protected String generateFaqPairs(String prompt) {
     //     return siliconFlowChatModel.map(model -> model.call(prompt)).orElse("");
     // }
 
     @Override
-    protected String processPromptSync(String message) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
-            return siliconFlowChatModel.map(model -> model.call(message))
-                    .orElse("siliconFlow service is not available");
+            if (!siliconFlowChatModel.isPresent()) {
+                return "siliconFlow service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = siliconFlowChatModel.get().call(prompt);
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = siliconFlowChatModel.get().call(message);
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("siliconFlow API call error: ", e);
+                return "服务暂时不可用，请稍后重试";
+            }
         } catch (Exception e) {
             log.error("siliconFlow API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
@@ -120,7 +139,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
@@ -171,16 +190,14 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
 
     public Optional<OpenAiChatModel> getChatModel() {
         return siliconFlowChatModel;
-    }
-
-    public Boolean isServiceHealthy() {
+    }    public Boolean isServiceHealthy() {
         if (!siliconFlowChatModel.isPresent()) {
             return false;
         }
 
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("siliconFlow service is not available");
         } catch (Exception e) {
             log.error("Error checking SiliconFlow service health", e);

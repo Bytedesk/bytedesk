@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -462,7 +464,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
-        processPromptSSE(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
     /**
@@ -531,7 +533,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 创建提示并处理
         Prompt aiPrompt = new Prompt(messages);
-        return processPromptSync(aiPrompt.toString());
+        return processPromptSync(aiPrompt.toString(), robot);
     }
 
     /**
@@ -589,47 +591,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    // @Override
-    // public String generateFaqPairsAsync(String chunk) {
-    //     if (!StringUtils.hasText(chunk)) {
-    //         return "";
-    //     }
-    //     String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
-    //     //
-    //     return generateFaqPairs(prompt);
-    // }
-
-    // @Override
-    // public void generateFaqPairsSync(String chunk) {
-    //     Assert.hasText(chunk, "Chunk must not be empty");
-
-    //     String prompt = RobotConsts.PROMPT_LLM_GENERATE_FAQ_TEMPLATE.replace("{chunk}", chunk);
-    //     int maxRetries = 3;
-    //     int retryCount = 0;
-    //     int retryDelay = 1000;
-
-    //     while (retryCount < maxRetries) {
-    //         try {
-    //             String result = generateFaqPairs(prompt);
-    //             log.info("FAQ generation result: {}", result);
-    //             return;
-    //         } catch (Exception e) {
-    //             retryCount++;
-    //             if (retryCount == maxRetries) {
-    //                 log.error("Failed to generate FAQ pairs after {} retries", maxRetries, e);
-    //                 throw new RuntimeException("Failed to generate FAQ pairs", e);
-    //             }
-
-    //             try {
-    //                 Thread.sleep(retryDelay * (1 << (retryCount - 1)));
-    //             } catch (InterruptedException ie) {
-    //                 Thread.currentThread().interrupt();
-    //                 throw new RuntimeException("Interrupted while retrying", ie);
-    //             }
-    //         }
-    //     }
-    // }
-
     @Override
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered) {
@@ -662,15 +623,55 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 抽象方法，由具体实现类提供
-    protected abstract void processPrompt(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply);
 
-    protected abstract String processPromptSync(String message);
+    /**
+     * 处理同步提示词并返回结果
+     * @param message 消息内容
+     * @param robot 机器人配置，可用于获取模型参数
+     * @return 生成的回复内容
+     */
+    protected abstract String processPromptSync(String message, RobotProtobuf robot);
 
-    protected abstract void processPromptSSE(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter);
-            
     
+    /**
+     * 从响应对象中提取文本内容
+     * 用于统一处理各种类型的响应对象并提取其中的文本
+     * 
+     * @param response 待处理的响应对象
+     * @return 提取的文本内容
+     */
+    protected String extractTextFromResponse(Object response) {
+        try {
+            if (response == null) {
+                return "No response received";
+            }
+            
+            // 处理不同类型的响应
+            if (response instanceof ChatResponse) {
+                // 新版API返回ChatResponse
+                return ((ChatResponse)response).getResult().getOutput().getText();
+            } else if (response instanceof String) {
+                // 字符串直接返回
+                return (String) response;
+            } else if (response instanceof AssistantMessage) {
+                // AssistantMessage提取文本
+                return ((AssistantMessage)response).getText();
+            } else {
+                // 其他类型尝试toString()
+                log.info("Unknown response type: {}", response.getClass().getName());
+                return response.toString();
+            }
+
+        } catch (Exception e) {
+            log.error("Error extracting text from response", e);
+            return "Error processing response";
+        }
+    }
+            
     /**
      * 通用知识库搜索方法，根据机器人配置执行相应的搜索
      * 
@@ -761,11 +762,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
-        processPrompt(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
+        processPromptWebsocket(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
     }
-
-    // 抽象方法，由具体实现类提供
-    // protected abstract String generateFaqPairs(String prompt);
 
     /**
      * 发送消息的通用方法
@@ -774,7 +772,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @param content              消息内容
      * @param messageProtobufReply 回复消息对象
      */
-    protected void sendMessage(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
+    protected void sendMessageWebsocket(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(content);
         messageSendService.sendProtobufMessage(messageProtobufReply);
@@ -946,6 +944,37 @@ public abstract class BaseSpringAIService implements SpringAIService {
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getModel(), e);
             return null;
+        }
+    }
+
+    @Override
+    public String processDirectLlmRequest(String query, RobotProtobuf robot) {
+        String prompt = robot.getLlm().getPrompt();
+        log.info("处理直接LLM请求: query={}, prompt={}, robot={}", query, prompt, robot.getUid());
+        
+        // 构建提示词
+        StringBuilder aiPrompt = new StringBuilder();
+        if (StringUtils.hasText(prompt)) {
+            aiPrompt.append(prompt);
+        } else {
+            // 如果未提供提示词，尝试从机器人配置中获取
+            if (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getPrompt())) {
+                aiPrompt.append(robot.getLlm().getPrompt());
+            } else {
+                // 默认提示词
+                aiPrompt.append("请回答以下问题：");
+            }
+        }
+        
+        // 添加用户查询
+        aiPrompt.append("\n\n").append(query);
+        
+        // 调用子类实现的处理方法
+        try {
+            return processPromptSync(aiPrompt.toString(), robot);
+        } catch (Exception e) {
+            log.error("处理LLM请求失败", e);
+            return "抱歉，服务暂时不可用，请稍后再试。";
         }
     }
 }
