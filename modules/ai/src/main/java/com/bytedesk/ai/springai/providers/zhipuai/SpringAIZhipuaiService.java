@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 12:05:01
+ * @LastEditTime: 2025-05-23 10:56:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -187,10 +187,10 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 });
     }
 
-    @Override
-    protected String generateFaqPairs(String prompt) {
-        return bytedeskZhipuaiChatModel.call(prompt);
-    }
+    // @Override
+    // protected String generateFaqPairs(String prompt) {
+    //     return bytedeskZhipuaiChatModel.call(prompt);
+    // }
 
     public Boolean isServiceHealthy() {
         try {
