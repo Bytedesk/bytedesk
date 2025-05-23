@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 17:47:28
+ * @LastEditTime: 2025-05-23 14:02:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,20 +27,21 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.bytedesk.ai.robot.RobotConsts;
-import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot.agent.RobotAgentService;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -93,7 +94,9 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
 
     private final CategoryRestService categoryService;
 
-    private final RobotRestService robotRestService;
+    private final RobotAgentService robotAgentService;
+
+    private final MessageRestService messageRestService;
 
     @Override
     public Page<TicketEntity> queryByOrgEntity(TicketRequest request) {
@@ -441,16 +444,16 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
         return modelMapper.map(entity, TicketExcel.class);
     }
 
-    public TicketRequest autoFillTicket(TicketRequest request) {
-        String name = RobotConsts.ROBOT_NAME_TICKET_GENERATE;
+    public String autoFillTicket(TicketRequest request) {
+        // 
+        String content = "";
         String orgUid = request.getOrgUid();
-        Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
-        if (robotOptional.isPresent()) {
-            // 
-
+        List<MessageEntity> messages = messageRestService.findByThreadUid(request.getThreadUid());
+        for (MessageEntity message : messages) {
+            content += message.getContent() + "\n";
         }
-
-        return request;
+        // 
+        return robotAgentService.autoFillTicket(content, orgUid);
     }
 
 }

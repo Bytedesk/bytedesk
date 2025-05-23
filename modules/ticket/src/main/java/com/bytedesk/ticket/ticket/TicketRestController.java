@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 17:24:34
+ * @LastEditTime: 2025-05-23 13:51:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -142,15 +142,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
             "Ticket",
             "Ticket"
         );
-    }
-
-    // 智能填写工单
-    @PostMapping("/auto/fill/ticket")
-    public ResponseEntity<?> autoFillTicket(@RequestBody TicketRequest request) {
-        //
-        TicketRequest ticketRequest = ticketRestService.autoFillTicket(request);
-
-        return ResponseEntity.ok(JsonResult.success(ticketRequest));
     }
 
     /**
@@ -358,6 +349,13 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
         return ResponseEntity.ok(JsonResult.success(activities));
     }
 
-    
+    // 智能填写工单
+    @PostMapping("/auto/fill")
+    public ResponseEntity<?> autoFillTicket(@RequestBody TicketRequest request) {
+        //
+        String ticket = ticketRestService.autoFillTicket(request);
+
+        return ResponseEntity.ok(JsonResult.success(ticket));
+    }
 
 }

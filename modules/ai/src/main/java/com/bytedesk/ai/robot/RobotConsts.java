@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 07:34:53
+ * @LastEditTime: 2025-05-23 13:22:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,7 @@ public class RobotConsts {
   public static final String ROBOT_NAME_GENERATE_WECHAT_ARTICLE = "generate_wechat_article"; // 生成公众号文章
   public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article"; // 生成小红书文章
   public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant"; // 客服助手
-  public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary"; // 会话摘要
+  public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary"; // 会话小结
   public static final String ROBOT_NAME_THREAD_COMPLETION = "thread_completion"; // 输入补全
   public static final String ROBOT_NAME_CHINESE_WORD_SEGMENTATION = "chinese_word_segmentation"; // 中文分词
   public static final String ROBOT_NAME_PART_OF_SPEECH_TAGGING = "part_of_speech_tagging"; // 词性标注
