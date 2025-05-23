@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-23 12:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 12:17:14
+ * @LastEditTime: 2025-05-23 13:01:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,11 @@
  */
 package com.bytedesk.ai.robot.agent;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.bytedesk.core.utils.JsonResult;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,243 +30,288 @@ public class RobotAgentController {
     // ==================== 工单相关 ====================
     
     @PostMapping("/ticket/auto-fill")
-    public String autoFillTicket(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.autoFillTicket(content, orgUid);
+    public ResponseEntity<?> autoFillTicket(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.autoFillTicket(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/ticket/assistant")
-    public String ticketAssistant(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.ticketAssistant(content, orgUid);
+    public ResponseEntity<?> ticketAssistant(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.ticketAssistant(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/ticket/solution-recommendation")
-    public String ticketSolutionRecommendation(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.ticketSolutionRecommendation(content, orgUid);
+    public ResponseEntity<?> ticketSolutionRecommendation(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.ticketSolutionRecommendation(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/ticket/summary")
-    public String ticketSummary(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.ticketSummary(content, orgUid);
+    public ResponseEntity<?> ticketSummary(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.ticketSummary(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 客服相关 ====================
 
     @PostMapping("/customer/service")
-    public String customerService(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.customerService(content, orgUid);
+    public ResponseEntity<?> customerService(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.customerService(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/customer/assistant")
-    public String customerAssistant(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.customerAssistant(content, orgUid);
+    public ResponseEntity<?> customerAssistant(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.customerAssistant(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/customer/expert")
-    public String customerServiceExpert(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.customerServiceExpert(content, orgUid);
+    public ResponseEntity<?> customerServiceExpert(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.customerServiceExpert(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/customer/pre-sale")
-    public String preSaleCustomerAssistant(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.preSaleCustomerAssistant(content, orgUid);
+    public ResponseEntity<?> preSaleCustomerAssistant(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.preSaleCustomerAssistant(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/customer/after-sale")
-    public String afterSaleCustomerAssistant(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.afterSaleCustomerAssistant(content, orgUid);
+    public ResponseEntity<?> afterSaleCustomerAssistant(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.afterSaleCustomerAssistant(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/customer/logistics")
-    public String logisticsCustomerAssistant(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.logisticsCustomerAssistant(content, orgUid);
+    public ResponseEntity<?> logisticsCustomerAssistant(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.logisticsCustomerAssistant(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 访客相关 ====================
 
     @PostMapping("/visitor/portrait")
-    public String visitorPortrait(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.visitorPortrait(content, orgUid);
+    public ResponseEntity<?> visitorPortrait(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.visitorPortrait(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/visitor/invitation")
-    public String visitorInvitation(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.visitorInvitation(content, orgUid);
+    public ResponseEntity<?> visitorInvitation(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.visitorInvitation(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/visitor/recommendation")
-    public String visitorRecommendation(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.visitorRecommendation(content, orgUid);
+    public ResponseEntity<?> visitorRecommendation(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.visitorRecommendation(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 质检相关 ====================
 
     @PostMapping("/inspection/robot")
-    public String robotInspection(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.robotInspection(content, orgUid);
+    public ResponseEntity<?> robotInspection(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.robotInspection(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/inspection/agent")
-    public String agentInspection(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.agentInspection(content, orgUid);
+    public ResponseEntity<?> agentInspection(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.agentInspection(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 语言处理相关 ====================
 
     @PostMapping("/language/translation")
-    public String languageTranslation(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.languageTranslation(content, orgUid);
+    public ResponseEntity<?> languageTranslation(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.languageTranslation(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/language/recognition")
-    public String languageRecognition(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.languageRecognition(content, orgUid);
+    public ResponseEntity<?> languageRecognition(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.languageRecognition(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/language/semantic-analysis")
-    public String semanticAnalysis(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.semanticAnalysis(content, orgUid);
+    public ResponseEntity<?> semanticAnalysis(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.semanticAnalysis(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/language/entity-recognition")
-    public String entityRecognition(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.entityRecognition(content, orgUid);
+    public ResponseEntity<?> entityRecognition(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.entityRecognition(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/language/sentiment-analysis")
-    public String sentimentAnalysis(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.sentimentAnalysis(content, orgUid);
+    public ResponseEntity<?> sentimentAnalysis(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.sentimentAnalysis(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/language/emotion-analysis")
-    public String emotionAnalysis(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.emotionAnalysis(content, orgUid);
+    public ResponseEntity<?> emotionAnalysis(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.emotionAnalysis(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 会话相关 ====================
 
     @PostMapping("/thread/classification")
-    public String threadClassification(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.threadClassification(content, orgUid);
+    public ResponseEntity<?> threadClassification(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.threadClassification(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/thread/summary")
-    public String threadSummary(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.threadSummary(content, orgUid);
+    public ResponseEntity<?> threadSummary(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.threadSummary(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/thread/completion")
-    public String threadCompletion(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.threadCompletion(content, orgUid);
+    public ResponseEntity<?> threadCompletion(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.threadCompletion(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 内容生成相关 ====================
 
     @PostMapping("/content/generate-faq")
-    public String generateFaq(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.generateFaq(content, orgUid);
+    public ResponseEntity<?> generateFaq(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.generateFaq(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/content/generate-wechat-article")
-    public String generateWechatArticle(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.generateWechatArticle(content, orgUid);
+    public ResponseEntity<?> generateWechatArticle(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.generateWechatArticle(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/content/generate-xiaohongshu-article")
-    public String generateXiaohongshuArticle(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.generateXiaohongshuArticle(content, orgUid);
+    public ResponseEntity<?> generateXiaohongshuArticle(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.generateXiaohongshuArticle(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 文本处理相关 ====================
 
     @PostMapping("/text/chinese-word-segmentation")
-    public String chineseWordSegmentation(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.chineseWordSegmentation(content, orgUid);
+    public ResponseEntity<?> chineseWordSegmentation(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.chineseWordSegmentation(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/part-of-speech-tagging")
-    public String partOfSpeechTagging(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.partOfSpeechTagging(content, orgUid);
+    public ResponseEntity<?> partOfSpeechTagging(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.partOfSpeechTagging(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/dependency-parsing")
-    public String dependencyParsing(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.dependencyParsing(content, orgUid);
+    public ResponseEntity<?> dependencyParsing(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.dependencyParsing(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/constituency-parsing")
-    public String constituencyParsing(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.constituencyParsing(content, orgUid);
+    public ResponseEntity<?> constituencyParsing(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.constituencyParsing(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/semantic-dependency-analysis")
-    public String semanticDependencyAnalysis(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.semanticDependencyAnalysis(content, orgUid);
+    public ResponseEntity<?> semanticDependencyAnalysis(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.semanticDependencyAnalysis(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/semantic-role-labeling")
-    public String semanticRoleLabeling(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.semanticRoleLabeling(content, orgUid);
+    public ResponseEntity<?> semanticRoleLabeling(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.semanticRoleLabeling(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/abstract-meaning-representation")
-    public String abstractMeaningRepresentation(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.abstractMeaningRepresentation(content, orgUid);
+    public ResponseEntity<?> abstractMeaningRepresentation(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.abstractMeaningRepresentation(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/coreference-resolution")
-    public String coreferenceResolution(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.coreferenceResolution(content, orgUid);
+    public ResponseEntity<?> coreferenceResolution(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.coreferenceResolution(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/semantic-text-similarity")
-    public String semanticTextSimilarity(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.semanticTextSimilarity(content, orgUid);
+    public ResponseEntity<?> semanticTextSimilarity(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.semanticTextSimilarity(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/style-transfer")
-    public String textStyleTransfer(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.textStyleTransfer(content, orgUid);
+    public ResponseEntity<?> textStyleTransfer(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.textStyleTransfer(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/keyword-extraction")
-    public String keywordExtraction(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.keywordExtraction(content, orgUid);
+    public ResponseEntity<?> keywordExtraction(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.keywordExtraction(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/correction")
-    public String textCorrection(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.textCorrection(content, orgUid);
+    public ResponseEntity<?> textCorrection(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.textCorrection(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/classification")
-    public String textClassification(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.textClassification(content, orgUid);
+    public ResponseEntity<?> textClassification(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.textClassification(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/text/faq-similar-questions")
-    public String faqSimilarQuestions(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.faqSimilarQuestions(content, orgUid);
+    public ResponseEntity<?> faqSimilarQuestions(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.faqSimilarQuestions(request.getQuestion(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     // ==================== 其他功能 ====================
 
     @PostMapping("/void-agent")
-    public String voidAgent(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.voidAgent(content, orgUid);
+    public ResponseEntity<?> voidAgent(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.voidAgent(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/query-expansion")
-    public String queryExpansion(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.queryExpansion(content, orgUid);
+    public ResponseEntity<?> queryExpansion(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.queryExpansion(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/intent/rewrite")
-    public String intentRewrite(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.intentRewrite(content, orgUid);
+    public ResponseEntity<?> intentRewrite(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.intentRewrite(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
     @PostMapping("/intent/classification")
-    public String intentClassification(@RequestParam String content, @RequestParam String orgUid) {
-        return robotAgentService.intentClassification(content, orgUid);
+    public ResponseEntity<?> intentClassification(@RequestBody RobotAgentRequest request) {
+        String response = robotAgentService.intentClassification(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", response));
     }
 }

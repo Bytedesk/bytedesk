@@ -387,7 +387,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 调用子类实现的处理方法
         try {
-            return processPromptSync(aiPrompt.toString(), robot);
+            String response = processPromptSync(aiPrompt.toString(), robot);
+            log.info("processDirectLlmRequest response {}", response);
+            if (response != null && response.contains("<think>")) {
+                log.debug("processDirectLlmRequest 替换前的内容: {}", response);
+                response = response.replaceAll("(?s)<think>.*?</think>", "");
+                log.debug("processDirectLlmRequest 替换后的内容: {}", response);
+            }
+            return response;
         } catch (Exception e) {
             log.error("处理LLM请求失败", e);
             return "抱歉，服务暂时不可用，请稍后再试。";
