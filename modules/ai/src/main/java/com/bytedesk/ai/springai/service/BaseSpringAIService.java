@@ -109,6 +109,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         this.messageSendService = messageSendService;
     }
 
+    // 1. 核心消息处理方法
     @Override
     public void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
@@ -319,9 +320,118 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 执行全文搜索
-     */
+    @Override
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            Boolean isUnanswered) {
+        Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
+        Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
+        messagePersistCache.pushForPersist(messageProtobufReply.toJson());
+        //
+        MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
+        //
+        // 记录未找到相关答案的问题到另外一个表，便于梳理问题
+        RobotMessageRequest robotMessage = RobotMessageRequest.builder()
+                .uid(messageProtobufReply.getUid()) // 使用机器人回复消息作为uid
+                .type(messageProtobufQuery.getType().name())
+                .status(messageProtobufReply.getStatus().name())
+                //
+                .topic(messageProtobufQuery.getThread().getTopic())
+                .threadUid(messageProtobufQuery.getThread().getUid())
+                //
+                .content(messageProtobufQuery.getContent())
+                .answer(messageProtobufReply.getContent())
+                //
+                .user(messageProtobufQuery.getUser().toJson())
+                .robot(messageProtobufReply.getUser().toJson())
+                // messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED)
+                .isUnAnswered(isUnanswered)
+                .orgUid(extraObject.getOrgUid())
+                //
+                .build();
+        robotMessageCache.pushRequest(robotMessage);
+    }
+
+    @Override
+    public String processDirectLlmRequest(String query, RobotProtobuf robot) {
+        // 检查是否启用大模型
+        if (robot.getLlm() == null || !robot.getLlm().getEnabled()) {
+            log.warn("LLM未启用，无法处理直接LLM请求");
+            return "抱歉，大模型功能未启用";
+        }
+
+        String prompt = robot.getLlm().getPrompt();
+        log.info("处理直接LLM请求: query={}, prompt={}, robot={}", query, prompt, robot.getUid());
+        
+        // 使用通用方法处理知识库搜索和响应生成
+        List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
+        log.info("processDirectLlmRequest searchResultList {}", searchResultList);
+        
+        // 构建提示词
+        StringBuilder aiPrompt = new StringBuilder();
+        if (StringUtils.hasText(prompt)) {
+            aiPrompt.append(prompt);
+        } else {
+            // 如果未提供提示词，使用默认提示词
+            aiPrompt.append("请根据以下上下文回答问题：\n\n");
+        }
+        
+        // 如果有搜索结果，添加为上下文
+        if (!searchResultList.isEmpty()) {
+            String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+            log.info("processDirectLlmRequest context {}", context);
+            aiPrompt.append("上下文：\n").append(context).append("\n\n");
+        }
+        
+        // 添加用户查询
+        aiPrompt.append("问题：\n").append(query);
+        
+        // 调用子类实现的处理方法
+        try {
+            return processPromptSync(aiPrompt.toString(), robot);
+        } catch (Exception e) {
+            log.error("处理LLM请求失败", e);
+            return "抱歉，服务暂时不可用，请稍后再试。";
+        }
+    }
+
+    // 2. 知识库搜索相关方法
+    protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
+        // 如果知识库未启用，直接返回空列表
+        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
+            log.info("知识库未启用或未指定知识库UID");
+            return new ArrayList<>();
+        }
+        
+        // 创建搜索结果列表
+        List<FaqProtobuf> searchResultList = new ArrayList<>();
+        
+        // 根据搜索类型执行相应的搜索
+        String searchType = robot.getLlm().getSearchType();
+        if (searchType == null) {
+            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
+        }
+        
+        // 执行搜索
+        switch (RobotSearchTypeEnum.valueOf(searchType)) {
+            case VECTOR:
+                log.info("使用向量搜索");
+                executeVectorSearch(query, robot.getKbUid(), searchResultList);
+                break;
+            case MIXED:
+                log.info("使用混合搜索");
+                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                executeVectorSearch(query, robot.getKbUid(), searchResultList);
+                break;
+            case FULLTEXT:
+            default:
+                log.info("使用全文搜索");
+                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
+                break;
+        }
+        
+        return searchResultList;
+    }
+
     private void executeFulltextSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
@@ -348,9 +458,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 执行向量搜索
-     */
     private void executeVectorSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
         for (FaqVectorSearchResult withScore : searchResults) {
@@ -377,6 +484,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
+    // 3. LLM 处理相关方法
     private void processLlmResponse(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
@@ -396,16 +504,46 @@ public abstract class BaseSpringAIService implements SpringAIService {
         createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
-    /**
-     * 创建提示词并处理SSE消息的通用方法
-     * 
-     * @param query                用户查询
-     * @param context              上下文信息
-     * @param robot                机器人配置
-     * @param messageProtobufQuery 查询消息
-     * @param messageProtobufReply 回复消息
-     * @param emitter              SSE发射器
-     */
+    protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        log.info("BaseSpringAIService processLlmResponseWebsocket searchContentList {}", searchResultList.size());
+        
+        if (searchResultList.isEmpty()) {
+            // 直接返回未找到相关问题答案
+            String answer = robot.getLlm().getDefaultReply();
+            messageProtobufReply.setType(MessageTypeEnum.TEXT);
+            messageProtobufReply.setContent(answer);
+            messageProtobufReply.setClient(ClientEnum.SYSTEM);
+            
+            // 保存消息到数据库
+            persistMessage(messageProtobufQuery, messageProtobufReply, true);
+            
+            // 发送消息
+            messageSendService.sendProtobufMessage(messageProtobufReply);
+            return;
+        }
+        
+        // 有搜索结果，构建上下文
+        String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+        
+        // 构建消息列表，添加系统提示词
+        String systemPrompt = robot.getLlm().getPrompt();
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(systemPrompt));
+        
+        // 添加搜索结果作为上下文
+        if (StringUtils.hasText(context)) {
+            messages.add(new SystemMessage("搜索结果: " + context));
+        }
+        
+        // 添加用户查询
+        messages.add(new UserMessage(query));
+        
+        // 创建并处理提示
+        Prompt aiPrompt = new Prompt(messages);
+        processPromptWebsocket(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
+    }
+
     private void createAndProcessPrompt(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
@@ -467,16 +605,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
-    /**
-     * 创建提示词并处理同步消息的通用方法
-     * 
-     * @param query                用户查询
-     * @param context              上下文信息
-     * @param robot                机器人配置
-     * @param messageProtobufQuery 查询消息
-     * @param messageProtobufReply 回复消息
-     * @return 生成的回复内容
-     */
     private String createAndProcessPromptSync(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         
@@ -536,9 +664,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         return processPromptSync(aiPrompt.toString(), robot);
     }
 
-    /**
-     * 直接返回搜索结果，不经过大模型
-     */
     private void processDirectResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
@@ -547,7 +672,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (searchContentList.isEmpty()) {
             // 直接返回未找到相关问题答案
             String answer = robot.getLlm().getDefaultReply(); // RobotConsts.ROBOT_UNMATCHED;
-            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
+            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply,
+                    true,
                     emitter);
             return;
         } else {
@@ -568,6 +694,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
+    // 4. SSE/WebSocket 消息处理相关方法
     private void processAnswerMessage(String answer, MessageTypeEnum type, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, Boolean isUnanswered, SseEmitter emitter) {
@@ -591,224 +718,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    @Override
-    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            Boolean isUnanswered) {
-        Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
-        Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
-        messagePersistCache.pushForPersist(messageProtobufReply.toJson());
-        //
-        MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
-        //
-        // 记录未找到相关答案的问题到另外一个表，便于梳理问题
-        RobotMessageRequest robotMessage = RobotMessageRequest.builder()
-                .uid(messageProtobufReply.getUid()) // 使用机器人回复消息作为uid
-                .type(messageProtobufQuery.getType().name())
-                .status(messageProtobufReply.getStatus().name())
-                //
-                .topic(messageProtobufQuery.getThread().getTopic())
-                .threadUid(messageProtobufQuery.getThread().getUid())
-                //
-                .content(messageProtobufQuery.getContent())
-                .answer(messageProtobufReply.getContent())
-                //
-                .user(messageProtobufQuery.getUser().toJson())
-                .robot(messageProtobufReply.getUser().toJson())
-                // messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED)
-                .isUnAnswered(isUnanswered)
-                .orgUid(extraObject.getOrgUid())
-                //
-                .build();
-        robotMessageCache.pushRequest(robotMessage);
-    }
-
-    // 抽象方法，由具体实现类提供
-    protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply);
-
-    /**
-     * 处理同步提示词并返回结果
-     * @param message 消息内容
-     * @param robot 机器人配置，可用于获取模型参数
-     * @return 生成的回复内容
-     */
-    protected abstract String processPromptSync(String message, RobotProtobuf robot);
-
-    protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter);
-    
-    /**
-     * 从响应对象中提取文本内容
-     * 用于统一处理各种类型的响应对象并提取其中的文本
-     * 
-     * @param response 待处理的响应对象
-     * @return 提取的文本内容
-     */
-    protected String extractTextFromResponse(Object response) {
-        try {
-            if (response == null) {
-                return "No response received";
-            }
-            
-            // 处理不同类型的响应
-            if (response instanceof ChatResponse) {
-                // 新版API返回ChatResponse
-                return ((ChatResponse)response).getResult().getOutput().getText();
-            } else if (response instanceof String) {
-                // 字符串直接返回
-                return (String) response;
-            } else if (response instanceof AssistantMessage) {
-                // AssistantMessage提取文本
-                return ((AssistantMessage)response).getText();
-            } else {
-                // 其他类型尝试toString()
-                log.info("Unknown response type: {}", response.getClass().getName());
-                return response.toString();
-            }
-
-        } catch (Exception e) {
-            log.error("Error extracting text from response", e);
-            return "Error processing response";
-        }
-    }
-            
-    /**
-     * 通用知识库搜索方法，根据机器人配置执行相应的搜索
-     * 
-     * @param query 用户查询
-     * @param robot 机器人配置
-     * @return 搜索结果列表
-     */
-    protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
-        // 如果知识库未启用，直接返回空列表
-        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
-            log.info("知识库未启用或未指定知识库UID");
-            return new ArrayList<>();
-        }
-        
-        // 创建搜索结果列表
-        List<FaqProtobuf> searchResultList = new ArrayList<>();
-        
-        // 根据搜索类型执行相应的搜索
-        String searchType = robot.getLlm().getSearchType();
-        if (searchType == null) {
-            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
-        }
-        
-        // 执行搜索
-        switch (RobotSearchTypeEnum.valueOf(searchType)) {
-            case VECTOR:
-                log.info("使用向量搜索");
-                executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                break;
-            case MIXED:
-                log.info("使用混合搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                break;
-            case FULLTEXT:
-            default:
-                log.info("使用全文搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                break;
-        }
-        
-        return searchResultList;
-    }
-
-    /**
-     * 处理LLM直接响应的通用方法 - WebSocket版本
-     * 
-     * @param query                用户查询
-     * @param searchResultList     搜索结果列表
-     * @param robot                机器人配置
-     * @param messageProtobufQuery 查询消息
-     * @param messageProtobufReply 回复消息
-     */
-    protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
-            MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        log.info("BaseSpringAIService processLlmResponseWebsocket searchContentList {}", searchResultList.size());
-        
-        if (searchResultList.isEmpty()) {
-            // 直接返回未找到相关问题答案
-            String answer = robot.getLlm().getDefaultReply();
-            messageProtobufReply.setType(MessageTypeEnum.TEXT);
-            messageProtobufReply.setContent(answer);
-            messageProtobufReply.setClient(ClientEnum.SYSTEM);
-            
-            // 保存消息到数据库
-            persistMessage(messageProtobufQuery, messageProtobufReply, true);
-            
-            // 发送消息
-            messageSendService.sendProtobufMessage(messageProtobufReply);
-            return;
-        }
-        
-        // 有搜索结果，构建上下文
-        String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
-        
-        // 构建消息列表，添加系统提示词
-        String systemPrompt = robot.getLlm().getPrompt();
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(systemPrompt));
-        
-        // 添加搜索结果作为上下文
-        if (StringUtils.hasText(context)) {
-            messages.add(new SystemMessage("搜索结果: " + context));
-        }
-        
-        // 添加用户查询
-        messages.add(new UserMessage(query));
-        
-        // 创建并处理提示
-        Prompt aiPrompt = new Prompt(messages);
-        processPromptWebsocket(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
-    }
-
-    /**
-     * 发送消息的通用方法
-     * 
-     * @param type                 消息类型
-     * @param content              消息内容
-     * @param messageProtobufReply 回复消息对象
-     */
     protected void sendMessageWebsocket(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(content);
         messageSendService.sendProtobufMessage(messageProtobufReply);
     }
 
-    /**
-     * 检查SseEmitter是否已完成
-     * 
-     * @param emitter SSE发射器
-     * @return 如果emitter已完成或关闭返回true，否则返回false
-     */
-    protected boolean isEmitterCompleted(SseEmitter emitter) {
-        if (emitter == null) {
-            return true;
-        }
-
-        try {
-            // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
-            // 使用一个空注释作为心跳，这不会影响客户端
-            emitter.send(SseEmitter.event().comment("heartbeat"));
-            return false; // 如果发送成功，则表示emitter未完成
-        } catch (Exception e) {
-            // 如果发送失败，说明emitter已经完成或关闭
-            log.debug("Emitter appears to be completed: {}", e.getMessage());
-            return true;
-        }
-    }
-
-    /**
-     * 处理SSE错误的通用方法
-     * 
-     * @param error                发生的错误
-     * @param messageProtobufQuery 查询消息
-     * @param messageProtobufReply 回复消息
-     * @param emitter              SSE发射器
-     */
     protected void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         try {
@@ -844,13 +759,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 发送流式开始消息
-     * 
-     * @param messageProtobufReply 回复消息对象
-     * @param emitter              SSE发射器
-     * @param initialContent       初始内容，通常为"正在思考中..."
-     */
     protected void sendStreamStartMessage(MessageProtobuf messageProtobufReply, SseEmitter emitter,
             String initialContent) {
         try {
@@ -868,14 +776,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 发送流式内容消息
-     * 
-     * @param messageProtobufQuery 查询消息对象
-     * @param messageProtobufReply 回复消息对象
-     * @param emitter              SSE发射器
-     * @param content              消息内容
-     */
     protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, String content) {
         try {
@@ -896,13 +796,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 发送流式结束消息
-     * 
-     * @param messageProtobufQuery 查询消息对象
-     * @param messageProtobufReply 回复消息对象
-     * @param emitter              SSE发射器
-     */
     protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
         try {
@@ -925,14 +818,52 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 创建动态的聊天选项（通用方法，使用泛型）
-     * 
-     * @param <T>           选项类型参数
-     * @param llm           机器人LLM配置
-     * @param optionBuilder 选项构建器函数接口
-     * @return 根据机器人配置创建的选项
-     */
+    // 5. 工具和辅助方法
+    protected String extractTextFromResponse(Object response) {
+        try {
+            if (response == null) {
+                return "No response received";
+            }
+            
+            // 处理不同类型的响应
+            if (response instanceof ChatResponse) {
+                // 新版API返回ChatResponse
+                return ((ChatResponse)response).getResult().getOutput().getText();
+            } else if (response instanceof String) {
+                // 字符串直接返回
+                return (String) response;
+            } else if (response instanceof AssistantMessage) {
+                // AssistantMessage提取文本
+                return ((AssistantMessage)response).getText();
+            } else {
+                // 其他类型尝试toString()
+                log.info("Unknown response type: {}", response.getClass().getName());
+                return response.toString();
+            }
+
+        } catch (Exception e) {
+            log.error("Error extracting text from response", e);
+            return "Error processing response";
+        }
+    }
+            
+    protected boolean isEmitterCompleted(SseEmitter emitter) {
+        if (emitter == null) {
+            return true;
+        }
+
+        try {
+            // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
+            // 使用一个空注释作为心跳，这不会影响客户端
+            emitter.send(SseEmitter.event().comment("heartbeat"));
+            return false; // 如果发送成功，则表示emitter未完成
+        } catch (Exception e) {
+            // 如果发送失败，说明emitter已经完成或关闭
+            log.debug("Emitter appears to be completed: {}", e.getMessage());
+            return true;
+        }
+    }
+
     protected <T> T createDynamicOptions(RobotLlm llm, Function<RobotLlm, T> optionBuilder) {
         if (llm == null || !StringUtils.hasText(llm.getModel())) {
             return null;
@@ -947,34 +878,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    @Override
-    public String processDirectLlmRequest(String query, RobotProtobuf robot) {
-        String prompt = robot.getLlm().getPrompt();
-        log.info("处理直接LLM请求: query={}, prompt={}, robot={}", query, prompt, robot.getUid());
-        
-        // 构建提示词
-        StringBuilder aiPrompt = new StringBuilder();
-        if (StringUtils.hasText(prompt)) {
-            aiPrompt.append(prompt);
-        } else {
-            // 如果未提供提示词，尝试从机器人配置中获取
-            if (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getPrompt())) {
-                aiPrompt.append(robot.getLlm().getPrompt());
-            } else {
-                // 默认提示词
-                aiPrompt.append("请回答以下问题：");
-            }
-        }
-        
-        // 添加用户查询
-        aiPrompt.append("\n\n").append(query);
-        
-        // 调用子类实现的处理方法
-        try {
-            return processPromptSync(aiPrompt.toString(), robot);
-        } catch (Exception e) {
-            log.error("处理LLM请求失败", e);
-            return "抱歉，服务暂时不可用，请稍后再试。";
-        }
-    }
+    // 抽象方法
+    protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply);
+
+    protected abstract String processPromptSync(String message, RobotProtobuf robot);
+
+    protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter);
 }
