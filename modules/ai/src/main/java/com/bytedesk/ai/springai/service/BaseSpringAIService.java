@@ -316,6 +316,75 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     /**
+     * 创建提示词并处理同步消息的通用方法
+     * 
+     * @param query                用户查询
+     * @param context              上下文信息
+     * @param robot                机器人配置
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @return 生成的回复内容
+     */
+    private String createAndProcessPromptSync(String query, String context, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        
+        // 创建系统提示信息，包含知识库上下文
+        String systemPrompt = robot.getLlm().getPrompt();
+        
+        // 初始化消息列表
+        List<Message> messages = new ArrayList<>();
+        
+        // 1. 先添加系统消息（不包含用户当前查询）
+        messages.add(new SystemMessage(systemPrompt));
+        
+        // 2. 根据配置，拉取并添加历史聊天记录
+        if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0) {
+            String threadTopic = messageProtobufQuery.getThread().getTopic();
+            int limit = robot.getLlm().getContextMsgCount();
+            List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
+            
+            if (!recentMessages.isEmpty()) {
+                log.info("添加 {} 条历史聊天记录", recentMessages.size());
+                
+                for (MessageEntity messageEntity : recentMessages) {
+                    // 处理消息内容，移除<think>标签
+                    String content = messageEntity.getContent();
+                    if (content != null && content.contains("<think>")) {
+                        log.debug("替换前的内容: {}", content);
+                        content = content.replaceAll("(?s)<think>.*?</think>", "");
+                        log.debug("替换后的内容: {}", content);
+                    }
+
+                    // 根据消息来源添加不同类型的消息
+                    if (messageEntity.isFromVisitor() 
+                            || messageEntity.isFromUser()
+                            || messageEntity.isFromMember()) {
+                        messages.add(new UserMessage(content));
+                    } else {
+                        // 机器人、客服、系统等其他消息统一使用SystemMessage
+                        messages.add(new SystemMessage(content));
+                    }
+                }
+            }
+        }
+        
+        // 3. 添加当前查询的上下文信息
+        if (StringUtils.hasText(context)) {
+            messages.add(new SystemMessage("搜索结果: " + context));
+        }
+        
+        // 4. 最后添加当前用户查询
+        messages.add(new UserMessage(query));
+        
+        // 记录消息，用于调试
+        log.info("BaseSpringAIService createAndProcessPromptSync messages {}", messages);
+        
+        // 创建提示并处理
+        Prompt aiPrompt = new Prompt(messages);
+        return processPromptSync(aiPrompt.toString());
+    }
+
+    /**
      * 直接返回搜索结果，不经过大模型
      */
     private void processDirectResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
@@ -462,15 +531,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 使用通用方法处理知识库搜索和响应生成
             List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
             
-            // 如果知识库未启用，直接根据配置的提示词进行回复
-            if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
-                log.info("知识库未启用或未指定知识库UID");
-                // 使用原有方法处理
-                String systemPrompt = robot.getLlm().getPrompt();
-                String prompt = systemPrompt + "\n\n用户问题：" + query;
-                
-                // 调用同步处理方法
-                String response = processPromptSync(prompt);
+            // 如果知识库未启用或未开启LLM，直接使用基本提示词
+            if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) && robot.getLlm().getEnabled()) {
+                log.info("知识库未启用或未指定知识库UID，但开启了LLM");
+                // 使用空上下文调用通用方法
+                String response = createAndProcessPromptSync(query, "", robot, messageProtobufQuery, messageProtobufReply);
                 
                 // 设置回复内容和类型
                 messageProtobufReply.setContent(response);
@@ -503,27 +568,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     return answer;
                 } else {
-                    // 构建带有搜索结果上下文的提示
-                    String systemPrompt = robot.getLlm().getPrompt();
+                    // 获取搜索结果作为上下文
                     String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
                     
-                    // 构建消息列表
-                    List<Message> messages = new ArrayList<>();
-                    messages.add(new SystemMessage(systemPrompt));
-                    
-                    // 添加搜索结果作为上下文
-                    if (StringUtils.hasText(context)) {
-                        messages.add(new SystemMessage("搜索结果: " + context));
-                    }
-                    
-                    // 添加用户查询
-                    messages.add(new UserMessage(query));
-                    
-                    // 创建提示
-                    Prompt aiPrompt = new Prompt(messages);
-                    
-                    // 处理提示，获取回复
-                    String response = processPromptSync(aiPrompt.toString());
+                    // 使用通用方法处理同步消息
+                    String response = createAndProcessPromptSync(query, context, robot, messageProtobufQuery, messageProtobufReply);
                     
                     // 设置回复内容和类型
                     messageProtobufReply.setContent(response);
@@ -539,20 +588,15 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 }
             } else {
                 // 不启用大模型，直接返回搜索结果
+                String answer;
+                MessageTypeEnum messageType;
+                boolean isUnanswered;
+                
                 if (searchResultList.isEmpty()) {
                     // 未找到相关知识，使用默认回复
-                    String answer = robot.getLlm().getDefaultReply();
-                    
-                    messageProtobufReply.setContent(answer);
-                    messageProtobufReply.setType(MessageTypeEnum.TEXT);
-                    
-                    // 保存错误消息（标记为未回答成功）
-                    persistMessage(messageProtobufQuery, messageProtobufReply, true);
-                    
-                    // 发送消息
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
-                    
-                    return answer;
+                    answer = robot.getLlm().getDefaultReply();
+                    messageType = MessageTypeEnum.TEXT;
+                    isUnanswered = true;
                 } else {
                     // 搜索到内容，返回搜索内容
                     FaqProtobuf firstFaq = searchResultList.get(0);
@@ -564,19 +608,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     }
                     
                     // 将处理后的单个FaqProtobuf对象转换为JSON字符串
-                    String answer = firstFaq.toJson();
-                    
-                    messageProtobufReply.setContent(answer);
-                    messageProtobufReply.setType(MessageTypeEnum.FAQ_ANSWER);
-                    
-                    // 保存消息
-                    persistMessage(messageProtobufQuery, messageProtobufReply, false);
-                    
-                    // 发送消息
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
-                    
-                    return answer;
+                    answer = firstFaq.toJson();
+                    messageType = MessageTypeEnum.FAQ_ANSWER;
+                    isUnanswered = false;
                 }
+                
+                // 设置回复内容和类型
+                messageProtobufReply.setContent(answer);
+                messageProtobufReply.setType(messageType);
+                
+                // 保存消息
+                persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);
+                
+                // 发送消息
+                messageSendService.sendProtobufMessage(messageProtobufReply);
+                
+                return answer;
             }
         } catch (Exception e) {
             log.error("Error in sendSyncMessage", e);
