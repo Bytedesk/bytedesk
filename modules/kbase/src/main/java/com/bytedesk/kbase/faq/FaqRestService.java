@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 13:32:20
+ * @LastEditTime: 2025-05-23 12:24:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -723,5 +723,12 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         }
         return Optional.empty();
     }
+
+
+    // generateSimilarQuestions
+    // public List<String> generateSimilarQuestions(FaqRequest request) {
+    //     List<String> similarQuestions = new ArrayList<>();
+    //     // 使用OpenAI API生成相似问题
+    // }
 
 }

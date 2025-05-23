@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-17 10:38:46
+ * @LastEditTime: 2025-05-23 12:24:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -175,5 +175,16 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }
+
+    // ai 依赖于 kbase, 不能在此调用 ai，所以迁移到 ai 模块
+    // generateSimilarQuestions
+    // @ActionAnnotation(title = "常见问题", action = "生成相似问题", description = "generate similar questions")
+    // @PostMapping("/generateSimilarQuestions")
+    // public ResponseEntity<?> generateSimilarQuestions(@RequestBody FaqRequest request) {
+
+    //     List<String> similarQuestions = faqRestService.generateSimilarQuestions(request);
+
+    //     return ResponseEntity.ok(JsonResult.success(similarQuestions));
+    // }
 
 }
