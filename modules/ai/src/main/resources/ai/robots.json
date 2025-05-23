@@ -537,17 +537,17 @@
       "i18n": {
         "en": {
           "nickname": "Thread Summary",
-          "prompt": "Extract summary information from conversation records and quickly generate conversation summaries after the thread ends, including customer issues and solutions. Support manual review and further editing.",
+          "prompt": "Please extract key information from the conversation records and output a conversation summary in the following JSON format: {\"title\": \"Conversation title summarizing the main customer issue\", \"content\": \"Detailed description of the customer's problems and needs\", \"category\": \"Inquiry type, such as general consultation, complaints, technical issues, etc.\", \"solution\": \"Solutions and key points provided to the customer\", \"status\": \"Processing status, such as pending, processed, closed, etc.\", \"tagList\": [\"Relevant tag 1\", \"Relevant tag 2\"]}. Ensure the information is accurate, well-organized, and suitable for subsequent manual review and editing.",
           "description": "Create a thread summary bot"
         },
         "zh_cn": {
-          "nickname": "会话摘要",
-          "prompt": "从会话记录中提取摘要信息，在会话结束后，快速生成会话摘要，包含客户问题及解决方案，同时支持人工校审和进一步编辑。",
+          "nickname": "会话小结",
+          "prompt": "请从会话记录中提取关键信息，按照以下JSON格式输出会话小结：{\"title\": \"会话标题，简要概括客户的主要问题\", \"content\": \"详细描述客户的问题和需求\", \"category\": \"咨询类型，如一般咨询、投诉建议、技术问题等\", \"solution\": \"提供给客户的解决方案和回复要点\", \"status\": \"处理状态，如待处理、已处理、已关闭等\", \"tagList\": [\"相关标签1\", \"相关标签2\"]}。确保信息准确、条理清晰，并适合后续人工审核和编辑。",
           "description": "创建一个会话摘要机器人"
         },
         "zh_tw": {
-          "nickname": "會話摘要",
-          "prompt": "從會話記錄中提取摘要信息，在會話結束後，快速生成會話摘要，包含客戶問題及解決方案，同時支持人工校審和進一步編輯。",
+          "nickname": "會話小结",
+          "prompt": "請從會話記錄中提取關鍵信息，按照以下JSON格式輸出會話小結：{\"title\": \"會話標題，簡要概括客戶的主要問題\", \"content\": \"詳細描述客戶的問題和需求\", \"category\": \"咨詢類型，如一般咨詢、投訴建議、技術問題等\", \"solution\": \"提供給客戶的解決方案和回覆要點\", \"status\": \"處理狀態，如待處理、已處理、已關閉等\", \"tagList\": [\"相關標籤1\", \"相關標籤2\"]}。確保信息準確、條理清晰，並適合後續人工審核和編輯。",
           "description": "創建一個會話摘要機器人"
         }
       }
@@ -583,17 +583,17 @@
       "i18n": {
         "en": {
           "nickname": "Ticket Generation",
-          "prompt": "When a ticket needs to be submitted for follow-up service based on the current conversation, one-click extraction of relevant content from the conversation according to the required ticket fields, such as customer name, related orders, contact information, ticket content, etc. Can also suggest ticket priority through visitor emotion recognition.",
+          "prompt": "Based on the current conversation, extract relevant information and output in JSON format with the following fields: {\"title\": \"Summarize the main issue as a title\", \"description\": \"A detailed description of the customer's problem and needs\", \"status\": \"Processing status, such as pending, in-progress, closed\", \"priority\": \"The ticket priority: low, medium, high, urgent\", \"category\": \"The category of the ticket: general inquiry, complaint, technical issue, etc.\"}. The priority should consider the urgency of the issue and the customer's emotional state.",
           "description": "Create a ticket generation bot"
         },
         "zh_cn": {
           "nickname": "工单生成",
-          "prompt": "根据当前会话，如果需要提交工单跟进后续服务时，可以根据工单所需的字段，一键提取会话中的关联内容，如客户名字、关联订单、联系方式、工单内容等，还可以通过识别访客情绪，建议工单的优先级。",
+          "prompt": "根据当前会话内容，提取相关信息并以JSON格式输出，包含以下字段：{\"title\": \"将主要问题概括为标题\", \"description\": \"客户问题和需求的详细描述\", \"status\": \"处理状态，如待处理、处理中、已关闭等\", \"priority\": \"工单优先级：低、中、高、紧急\", \"category\": \"工单分类：一般咨询、投诉建议、技术问题等\"}。优先级应考虑问题的紧急程度和客户的情绪状态。",
           "description": "创建一个智能填写工单机器人"
         },
         "zh_tw": {
           "nickname": "工單生成",
-          "prompt": "根據當前會話，如果需要提交工單跟進後續服務時，可以根據工單所需的字段，一鍵提取會話中的關聯內容，如客戶名字、關聯訂單、聯繫方式、工單內容等，還可以通過識別訪客情緒，建議工單的優先級。",
+          "prompt": "根據當前會話內容，提取相關信息並以JSON格式輸出，包含以下字段：{\"title\": \"將主要問題概括為標題\", \"description\": \"客戶問題和需求的詳細描述\", \"status\": \"處理狀態，如待處理、處理中、已關閉等\", \"priority\": \"工單優先級：低、中、高、緊急\", \"category\": \"工單分類：一般咨詢、投訴建議、技術問題等\"}。優先級應考慮問題的緊急程度和客戶的情緒狀態。",
           "description": "創建一個智能填写工單機器人"
         }
       }
