@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 13:22:16
+ * @LastEditTime: 2025-05-23 17:18:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,7 +66,7 @@ public class RobotConsts {
   public static final String ROBOT_NAME_SENTIMENT_ANALYSIS = "sentiment_analysis"; // 情感分析
   public static final String ROBOT_NAME_THREAD_CLASSIFICATION = "thread_classification"; // 会话分类
   public static final String ROBOT_NAME_CUSTOMER_SERVICE_EXPERT = "customer_service_expert"; // 客服专家
-  public static final String ROBOT_NAME_GENERATE_FAQ = "generate_faq"; // 生成FAQ
+  public static final String ROBOT_NAME_FAQ_GENERATE = "faq_generate"; // 生成FAQ
   public static final String ROBOT_NAME_GENERATE_WECHAT_ARTICLE = "generate_wechat_article"; // 生成公众号文章
   public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article"; // 生成小红书文章
   public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant"; // 客服助手
@@ -100,7 +100,7 @@ public class RobotConsts {
       6. 如果上下文内容不完整，无法回答问题，直接回答“未查找到相关问题答案”，不要猜测;
       """;
 
-  public static final String PROMPT_LLM_GENERATE_FAQ_TEMPLATE = """
+  public static final String PROMPT_LLM_faq_generate_TEMPLATE = """
       基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
 
       1. 问题部分：

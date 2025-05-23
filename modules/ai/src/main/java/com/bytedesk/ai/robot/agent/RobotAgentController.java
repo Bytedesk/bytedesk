@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-23 12:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 13:01:25
+ * @LastEditTime: 2025-05-23 16:55:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,13 +13,18 @@
  */
 package com.bytedesk.ai.robot.agent;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.kbase.faq.FaqRequest;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/robot/agent")
 @RequiredArgsConstructor
@@ -185,10 +190,16 @@ public class RobotAgentController {
 
     // ==================== 内容生成相关 ====================
 
+    /**
+     * 生成FAQ
+     * 
+     * @param request 生成请求体
+     * @return FaqRequest对象列表
+     */
     @PostMapping("/content/generate-faq")
     public ResponseEntity<?> generateFaq(@RequestBody RobotAgentRequest request) {
-        String response = robotAgentService.generateFaq(request.getContent(), request.getOrgUid());
-        return ResponseEntity.ok(JsonResult.success("success", response));
+        List<FaqRequest> faqRequests = robotAgentService.generateFaq(request.getContent(), request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success("success", faqRequests));
     }
 
     @PostMapping("/content/generate-wechat-article")
@@ -285,8 +296,9 @@ public class RobotAgentController {
 
     @PostMapping("/text/faq-similar-questions")
     public ResponseEntity<?> faqSimilarQuestions(@RequestBody RobotAgentRequest request) {
-        String response = robotAgentService.faqSimilarQuestions(request.getQuestion(), request.getOrgUid());
-        return ResponseEntity.ok(JsonResult.success("success", response));
+        FaqRequest faqRequest = robotAgentService.faqSimilarQuestions(request.getQuestion(), request.getOrgUid());
+        log.info("faqSimilarQuestions: {}", faqRequest.getSimilarQuestions());
+        return ResponseEntity.ok(JsonResult.success("success", faqRequest));
     }
 
     // ==================== 其他功能 ====================

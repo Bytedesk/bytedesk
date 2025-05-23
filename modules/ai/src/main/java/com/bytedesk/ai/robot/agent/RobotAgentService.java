@@ -14,6 +14,11 @@
 package com.bytedesk.ai.robot.agent;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
@@ -24,6 +29,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.service.SpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.kbase.faq.FaqRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -248,9 +254,17 @@ public class RobotAgentService {
 
     /**
      * 生成FAQ
+     * 
+     * @param content 用于生成FAQ的内容
+     * @param orgUid 组织ID
+     * @return FaqRequest对象列表
      */
-    public String generateFaq(String content, String orgUid) {
-        return processLlmRequest(RobotConsts.ROBOT_NAME_GENERATE_FAQ, orgUid, content);
+    public List<FaqRequest> generateFaq(String content, String orgUid) {
+        String response = processLlmRequest(RobotConsts.ROBOT_NAME_FAQ_GENERATE, orgUid, content);
+        log.debug("生成FAQ原始返回: {}", response);
+        
+        // 调用新的转换工具类将JSON字符串转换为FaqRequest列表
+        return RobotFaqConverter.convertToFaqRequests(response);
     }
 
     /**
@@ -362,9 +376,28 @@ public class RobotAgentService {
 
     /**
      * FAQ相似问题生成
+     * 将大模型返回的相似问题数组添加到FaqRequest对象的similarQuestions字段中
      */
-    public String faqSimilarQuestions(String content, String orgUid) {
-        return processLlmRequest(RobotConsts.ROBOT_NAME_FAQ_SIMILAR_QUESTIONS, orgUid, content);
+    public FaqRequest faqSimilarQuestions(String content, String orgUid) {
+        String response = processLlmRequest(RobotConsts.ROBOT_NAME_FAQ_SIMILAR_QUESTIONS, orgUid, content);
+        log.debug("FAQ相似问题生成原始返回: {}", response);
+        
+        // 创建FaqRequest对象
+        FaqRequest faqRequest = new FaqRequest();
+        faqRequest.setQuestion(content);
+        
+        // 解析JSON数组
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<String> similarQuestions = objectMapper.readValue(response, new TypeReference<List<String>>() {});
+            faqRequest.setSimilarQuestions(similarQuestions);
+        } catch (JsonProcessingException e) {
+            log.error("解析相似问题JSON失败: {}", e.getMessage());
+            // 创建一个空列表作为默认值
+            faqRequest.setSimilarQuestions(new ArrayList<>());
+        }
+        
+        return faqRequest;
     }
 
     // ==================== 其他功能 ====================
