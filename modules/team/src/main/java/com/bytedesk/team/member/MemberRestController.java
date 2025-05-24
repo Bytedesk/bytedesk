@@ -28,6 +28,7 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * http://127.0.0.1:9003/swagger-ui/index.html
@@ -36,7 +37,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member")
-// @Tag(name = "member", description = "member apis")
+@Tag(name = "member - 成员", description = "member apis")
 public class MemberRestController extends BaseRestController<MemberRequest> {
 
     private final MemberRestService memberRestService;

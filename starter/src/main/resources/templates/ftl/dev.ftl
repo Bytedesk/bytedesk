@@ -154,7 +154,7 @@
 
             <h2>${i18n['zh']["systemDevelopment"]}</h2>
             <ul>
-                <li><a href="/apidocs/index.html" target="_blank">${i18n['zh']["javaDoc"]}</a></li>
+                <li><a href="/javadocs/index.html" target="_blank">${i18n['zh']["javaDoc"]}</a></li>
                 <li><a href="/swagger-ui/index.html" target="_blank">${i18n['zh']["apiDoc"]}</a></li>
                 <li><a href="/doc.html" target="_blank">${i18n['zh']["knife4jDoc"]}</a></li>
                 <li><a href="/druid" target="_blank">Druid</a></li>
