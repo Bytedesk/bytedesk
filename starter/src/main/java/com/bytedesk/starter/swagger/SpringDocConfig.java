@@ -28,7 +28,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
- * http://127.0.0.1:9003/swagger-ui/index.html
+ * http://127.0.0.1:9003/swagger-ui/index.html?lang=zh_CN
  * 支持国际化: 添加参数 ?lang=en|zh_CN|zh_TW
  */
 @Configuration

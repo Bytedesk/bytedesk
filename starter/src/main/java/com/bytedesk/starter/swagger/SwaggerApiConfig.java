@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 11:10:00
+ * @LastEditTime: 2025-05-24 14:59:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,8 @@ package com.bytedesk.starter.swagger;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
+// import org.springdoc.core.models.GroupedOpenApi;
+// import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -22,39 +24,53 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SwaggerApiConfig {
+    
+    /**
+     * Api分组接口 - 所有接口
+     */
+    @Bean
+    public GroupedOpenApi allApis() {
+        return GroupedOpenApi.builder()
+                .group("all-apis")
+                .displayName("所有接口")
+                .pathsToMatch("/api/v1/**")
+                .build();
+    }
+    
+    /**
+     * 群组管理接口
+     */
+    @Bean
+    public GroupedOpenApi groupApis() {
+        return GroupedOpenApi.builder()
+                .group("group-apis")
+                .displayName("群组接口")
+                .pathsToMatch( "/api/v1/group/**")
+                .build();
+    }
 
-    // 移除了 langParameterApi 方法，因为已经合并到 SpringDocConfig 中的 customOpenApi 方法了
-    
     /**
-     * API 分组示例 - 核心接口
+     * 部门管理接口
      */
     @Bean
-    public GroupedOpenApi coreApis() {
+    public GroupedOpenApi departmentApis() {
         return GroupedOpenApi.builder()
-                .group("core-apis")
-                .pathsToMatch("/api/v1/core/**")
+                .group("department-apis")
+                .displayName("部门接口")
+                .pathsToMatch("/api/v1/department/**")
+                .build();
+    }
+
+    /**
+     * 成员管理接口
+     */
+    @Bean
+    public GroupedOpenApi memberApis() {
+        return GroupedOpenApi.builder()
+                .group("member-apis")
+                .displayName("成员接口")
+                .pathsToMatch("/api/v1/member/**")
                 .build();
     }
     
-    /**
-     * API 分组示例 - 团队管理接口
-     */
-    @Bean
-    public GroupedOpenApi teamApis() {
-        return GroupedOpenApi.builder()
-                .group("team-apis")
-                .pathsToMatch("/api/v1/team/**", "/api/v1/group/**")
-                .build();
-    }
-    
-    /**
-     * API 分组示例 - 聊天接口
-     */
-    @Bean
-    public GroupedOpenApi chatApis() {
-        return GroupedOpenApi.builder()
-                .group("chat-apis")
-                .pathsToMatch("/api/v1/chat/**", "/api/v1/message/**")
-                .build();
-    }
 }

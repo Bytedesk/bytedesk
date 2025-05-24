@@ -24,7 +24,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
-// import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +33,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/department")
-// @Tag(name = "department - 部门", description = "department apis")
+@Tag(name = "department - 部门", description = "department apis")
 public class DepartmentRestController extends BaseRestController<DepartmentRequest> {
 
     private final DepartmentRestService departmentRestService;

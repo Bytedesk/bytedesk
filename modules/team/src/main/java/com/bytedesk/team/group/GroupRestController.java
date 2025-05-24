@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 15:59:48
+ * @LastEditTime: 2025-05-24 14:56:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
-import com.bytedesk.core.annotation.I18nApi;
+// import com.bytedesk.core.annotation.I18nApi;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.team.member.MemberProtobuf;
@@ -70,8 +70,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
      * @return 成员列表分页结果
      */
     @GetMapping("/members")
-    @I18nApi(summary = "swagger.operation.queryMembers.summary", 
-             description = "swagger.operation.queryMembers.description")
+    // @I18nApi(summary = "swagger.operation.queryMembers.summary", description = "swagger.operation.queryMembers.description")
     public ResponseEntity<?> queryMembers(GroupRequest request) {
         
         Page<MemberProtobuf> page = groupRestService.queryGroupMembers(request);
