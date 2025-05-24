@@ -23,48 +23,7 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-core</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-kbase</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-ai</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-team</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-service</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-ticket</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency>
-
+		
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 		
 		<!-- FreeSwitch ESL (Event Socket Library) Client -->
@@ -76,11 +35,12 @@
 		</dependency>
 		
 		<!-- Spring WebSocket支持 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		 -->
 		
 		<!-- RTP媒体处理 -->
 		 <!-- https://mvnrepository.com/artifact/javax.sip/jain-sip-ri -->

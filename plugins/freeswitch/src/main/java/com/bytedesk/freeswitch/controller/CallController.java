@@ -9,19 +9,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.freeswitch.service.CallService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 /**
  * 呼叫控制器
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v2/call")
 @RequiredArgsConstructor
 public class CallController {
+    
+    private static final Logger log = LoggerFactory.getLogger(CallController.class);
 
     private final CallService callService;
 
