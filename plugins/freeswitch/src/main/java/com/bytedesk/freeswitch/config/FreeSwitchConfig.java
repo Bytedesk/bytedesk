@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:14:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 10:27:07
+ * @LastEditTime: 2025-05-24 10:47:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,19 +20,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bytedesk.freeswitch.handler.FreeSwitchEventListener;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableScheduling
 @ComponentScan("com.bytedesk.freeswitch")
-@ConditionalOnProperty(prefix = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class FreeSwitchConfig {
-
+        
     private final FreeSwitchProperties freeSwitchProperties;
     private final FreeSwitchEventListener freeSwitchEventListener;
 
