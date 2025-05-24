@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 11:59:26
+ * @LastEditTime: 2025-05-24 12:39:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.method.HandlerMethod;
+
+import com.bytedesk.core.annotation.I18nApi;
 
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.tags.Tag;
@@ -86,7 +88,7 @@ public class SwaggerI18nConfig {
             // 2. 处理 @I18nApi 注解的国际化
             try {
                 // 处理方法上的 I18nApi 注解
-                var i18nApiAnnotation = handlerMethod.getMethodAnnotation(com.bytedesk.core.annotation.I18nApi.class);
+                var i18nApiAnnotation = handlerMethod.getMethodAnnotation(I18nApi.class);
                 if (i18nApiAnnotation != null) {
                     // 设置国际化的摘要
                     if (!i18nApiAnnotation.summary().isEmpty()) {
@@ -100,7 +102,7 @@ public class SwaggerI18nConfig {
                 }
                 
                 // 处理类上的 I18nApi 注解
-                var classAnnotation = handlerMethod.getBeanType().getAnnotation(com.bytedesk.core.annotation.I18nApi.class);
+                var classAnnotation = handlerMethod.getBeanType().getAnnotation(I18nApi.class);
                 if (classAnnotation != null) {
                     // 如果方法没有设置摘要，则使用类级别的配置
                     if (operation.getSummary() == null && !classAnnotation.summary().isEmpty()) {

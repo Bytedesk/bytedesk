@@ -78,7 +78,7 @@ public class I18nConfig implements WebMvcConfigurer {
     public FilterRegistrationBean<BrowserLanguageFilter> browserLanguageFilter() {
         FilterRegistrationBean<BrowserLanguageFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new BrowserLanguageFilter(localeResolver()));
-        registrationBean.addUrlPatterns("/swagger-ui/*", "/v3/api-docs/*", "/api/*");
+        registrationBean.addUrlPatterns("/swagger-ui/*", "/v3/api-docs/*");
         registrationBean.setOrder(1); // 确保较高优先级
         return registrationBean;
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 11:00:00
+ * @LastEditTime: 2025-05-24 12:21:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,9 +34,9 @@ public class SwaggerUIConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         // 添加一个重定向，从 /api/docs 到 Swagger UI
-        registry.addRedirectViewController("/api/docs", "/swagger-language.html");
+        registry.addRedirectViewController("/api-docs", "/swagger-language.html");
         
         // 为API文档添加语言选择页面
-        registry.addViewController("/api/language").setViewName("forward:/swagger-language.html");
+        registry.addViewController("/api-language").setViewName("forward:/swagger-language.html");
     }
 }
