@@ -263,7 +263,7 @@ services:
 
   # FreeSwitch 语音通话服务
   bytedesk-freeswitch:
-    image: signalwire/freeswitch:latest
+    image: freeswitch/freeswitch:latest
     container_name: freeswitch-bytedesk
     ports:
       - "15060:5060/tcp"   # SIP
