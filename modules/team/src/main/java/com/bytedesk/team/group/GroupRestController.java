@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.annotation.I18nApi;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.team.member.MemberProtobuf;
@@ -69,6 +70,8 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
      * @return 成员列表分页结果
      */
     @GetMapping("/members")
+    @I18nApi(summary = "swagger.operation.queryMembers.summary", 
+             description = "swagger.operation.queryMembers.description")
     public ResponseEntity<?> queryMembers(GroupRequest request) {
         
         Page<MemberProtobuf> page = groupRestService.queryGroupMembers(request);
