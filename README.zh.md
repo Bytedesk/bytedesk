@@ -49,20 +49,6 @@
 - 工作流
 - ...
 
-### [客户之声](./modules/voc/readme.zh.md)
-
-- 意见反馈
-- 服务投诉
-- 问卷调查
-- ...
-
-### [项目看板](./plugins/kanban/readme.zh.md)
-
-- 待办todo卡片
-- 日报/周报
-- 统计
-- ...
-
 ### 工作流
 
 - 自定义表单
@@ -70,13 +56,36 @@
 - 工单流程可视化
 - ...
 
-### OpenManus
+### [客户之声](./modules/voc/readme.zh.md)
 
-- 浏览器自动化执行
+- 意见反馈
+- 服务投诉
+- 问卷调查
+- ...
 
-### 视频会议
+### [呼叫中心](./plugins/freeswitch/readme.zh.md)
 
-- 集成jitsi
+- 基于FreeSwitch的专业呼叫平台
+- 支持来电弹屏、自动分配、通话录音
+- 数据统计，语音与文字服务无缝集成
+
+### [视频客服](./plugins/webrtc/readme.zh.md)
+
+- 基于WebRTC技术的高清视频通话
+- 支持一键视频对话与屏幕共享
+- 适用于需要直观展示的服务场景
+
+### [视频会议](./plugins/jitsi/readme.zh.md)
+
+- 集成Jitsi的专业会议平台
+- 支持多人在线会议、屏幕共享
+- 会议录制等功能，满足远程协作需求
+
+### [项目看板](./plugins/kanban/readme.zh.md)
+
+- 支持任务创建、分配、进度监控
+- 文件共享与团队协作功能
+- 帮助团队高效完成项目目标
 
 ### [社交群组](./modules/social/readme.zh.md)
 
