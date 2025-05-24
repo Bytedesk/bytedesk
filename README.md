@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 09:45:16
+ * @LastEditTime: 2025-05-24 09:46:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,24 +59,17 @@ AI powered Omnichannel customer service With Team Cooperation
 - Function calling
 - Mcp
 
-### [Voice Of Customer](./modules/voc/readme.md)
-
-- feedback
-- survey
-- ...
-
-### [project kanban](./plugins/kanban/readme.md)
-
-- todo list
-- daily/weekly report
-- statistics
-- ...
-
 ### workflow
 
 - form
 - process
 - ticket process
+- ...
+
+### [Voice Of Customer](./modules/voc/readme.md)
+
+- feedback
+- survey
 - ...
 
 ### [Call Center](./plugins/freeswitch/readme.zh.md)
@@ -96,6 +89,13 @@ AI powered Omnichannel customer service With Team Cooperation
 - Professional meeting platform integrated with Jitsi
 - Supports multi-person online meetings and screen sharing
 - Meeting recording and other features to meet remote collaboration needs
+
+### [project kanban](./plugins/kanban/readme.md)
+
+- todo list
+- daily/weekly report
+- statistics
+- ...
 
 ### [Social Group](./modules/social/readme.md)
 
