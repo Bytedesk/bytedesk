@@ -262,30 +262,30 @@ services:
   #     - bytedesk-network
 
   # FreeSwitch 语音通话服务
-  bytedesk-freeswitch:
-    image: signalwire/freeswitch:latest
-    container_name: freeswitch-bytedesk
-    ports:
-      - "15060:5060/tcp"   # SIP
-      - "15060:5060/udp"   # SIP
-      - "15080:5080/tcp"   # SIP 安全端口
-      - "15080:5080/udp"   # SIP 安全端口
-      - "8021:8021"        # 控制台
-      - "18081-18082:8081-8082"  # 事件
-      - "17443:7443"       # WebRTC HTTPS
-      - "15066:5066"       # WebSocket 信令
-      - "16000-16129:16000-16129/udp" # RTP 媒体端口范围
-    environment:
-      - FREESWITCH_PASSWORD=bytedesk123
-    volumes:
-      - freeswitch_data:/usr/local/freeswitch/
-    networks:
-      - bytedesk-network
-    healthcheck:
-      test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # bytedesk-freeswitch:
+  #   image: signalwire/freeswitch:latest
+  #   container_name: freeswitch-bytedesk
+  #   ports:
+  #     - "15060:5060/tcp"   # SIP
+  #     - "15060:5060/udp"   # SIP
+  #     - "15080:5080/tcp"   # SIP 安全端口
+  #     - "15080:5080/udp"   # SIP 安全端口
+  #     - "8021:8021"        # 控制台
+  #     - "18081-18082:8081-8082"  # 事件
+  #     - "17443:7443"       # WebRTC HTTPS
+  #     - "15066:5066"       # WebSocket 信令
+  #     - "16000-16129:16000-16129/udp" # RTP 媒体端口范围
+  #   environment:
+  #     - FREESWITCH_PASSWORD=bytedesk123
+  #   volumes:
+  #     - freeswitch_data:/usr/local/freeswitch/
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
 
 volumes:
   mysql_data:
