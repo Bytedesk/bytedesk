@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 13:57:47
+ * @LastEditTime: 2025-05-24 09:45:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,13 +79,23 @@ AI powered Omnichannel customer service With Team Cooperation
 - ticket process
 - ...
 
-### OpenManus
+### [Call Center](./plugins/freeswitch/readme.zh.md)
 
-- browser automation
+- Professional call platform based on FreeSwitch
+- Supports incoming call pop-up screens, automatic allocation, and call recording
+- Data statistics, seamless integration of voice and text services
 
-### video conference
+### [Video Customer Service](./plugins/webrtc/readme.zh.md)
 
-- jitsi
+- High-definition video calls based on WebRTC technology
+- Supports one-click video conversations and screen sharing
+- Suitable for service scenarios requiring intuitive demonstrations
+
+### [Video Conference](./plugins/jitsi/readme.zh.md)
+
+- Professional meeting platform integrated with Jitsi
+- Supports multi-person online meetings and screen sharing
+- Meeting recording and other features to meet remote collaboration needs
 
 ### [Social Group](./modules/social/readme.md)
 
