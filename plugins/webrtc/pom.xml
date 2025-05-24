@@ -6,14 +6,14 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-		<artifactId>modules</artifactId>
+		<artifactId>plugins</artifactId>
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>bytedesk-module-jitsi</artifactId>
+	<artifactId>bytedesk-plugin-webrtc</artifactId>
 	<version>${revision}</version>
 
-	<name>bytedesk-module-jitsi</name>
+	<name>bytedesk-plugin-webrtc</name>
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>

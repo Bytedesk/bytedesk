@@ -6,14 +6,14 @@
 
 	<parent>
 		<groupId>com.bytedesk</groupId>
-		<artifactId>modules</artifactId>
+		<artifactId>plugins</artifactId>
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>bytedesk-module-freeswitch</artifactId>
+	<artifactId>bytedesk-plugin-freeswitch</artifactId>
 	<version>${revision}</version>
 
-	<name>bytedesk-module-freeswitch</name>
+	<name>bytedesk-plugin-freeswitch</name>
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>

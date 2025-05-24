@@ -18,15 +18,12 @@
         <module>ai</module>
         <module>core</module>
         <module>forum</module>
-        <module>freeswitch</module>
-        <module>jitsi</module>
         <module>kbase</module>
         <module>service</module>
         <module>social</module>
         <module>team</module>
         <module>ticket</module>
         <module>voc</module>
-        <module>webrtc</module>
     </modules>
 
     <properties>
