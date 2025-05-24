@@ -20,7 +20,7 @@ import java.util.Map;
  * 呼叫控制器
  */
 @RestController
-@RequestMapping("/api/v2/call")
+@RequestMapping("/api/v1/call")
 @RequiredArgsConstructor
 public class CallController {
     
