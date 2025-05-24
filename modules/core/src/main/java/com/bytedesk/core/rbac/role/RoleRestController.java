@@ -24,10 +24,12 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/role")
+@Tag(name = "Role Management", description = "Role management APIs")
 public class RoleRestController extends BaseRestController<RoleRequest> {
 
     private final RoleRestService roleService;

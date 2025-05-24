@@ -24,10 +24,12 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/authority")
 @AllArgsConstructor
+@Tag(name = "Authority Management", description = "Authority management APIs")
 public class AuthorityRestController extends BaseRestController<AuthorityRequest> {
 
     private final AuthorityRestService authorityService;
