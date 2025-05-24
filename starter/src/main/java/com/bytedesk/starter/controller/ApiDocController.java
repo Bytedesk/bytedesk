@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 11:30:00
+ * @LastEditTime: 2025-05-24 12:08:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,11 +30,12 @@ public class ApiDocController {
     private MessageSource messageSource;
     
     /**
+     * http://127.0.0.1:9003/apidoc/custom-docs
      * 自定义的Swagger UI入口点
      * @param model 视图模型
      * @return 模板名称
      */
-    @GetMapping("/api/custom-docs")
+    @GetMapping("/apidoc/custom-docs")
     public String customSwaggerUi(Model model) {
         // 获取国际化标题
         String title = messageSource.getMessage("swagger.title", null, LocaleContextHolder.getLocale());
@@ -44,12 +45,4 @@ public class ApiDocController {
         return "swagger-ui";
     }
     
-    /**
-     * API文档语言选择页面
-     * @return 视图名称
-     */
-    @GetMapping("/api/select-language")
-    public String selectLanguage() {
-        return "swagger-language";
-    }
 }
