@@ -41,7 +41,7 @@ import com.bytedesk.core.utils.JsonResult;
 @RestController
 @RequestMapping("/auth/v1")
 @AllArgsConstructor
-@Tag(name = "Auth Management Interface")
+@Tag(name = "Authentication", description = "Authentication APIs")
 public class AuthController {
 
     private UserService userService;

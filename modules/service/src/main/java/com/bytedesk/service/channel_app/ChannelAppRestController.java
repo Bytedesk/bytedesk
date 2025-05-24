@@ -26,6 +26,14 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "渠道应用管理", description = "渠道应用管理相关接口")
 @RestController
 @RequestMapping("/api/v1/channel/app")
 @AllArgsConstructor
@@ -33,8 +41,10 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
 
     private final ChannelAppRestService appRestService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "应用", action = "组织查询", description = "query app by org")
+    @Operation(summary = "查询组织下的渠道应用", description = "根据组织ID查询渠道应用列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = ChannelAppResponse.class)))
     @Override
     public ResponseEntity<?> queryByOrg(ChannelAppRequest request) {
         
@@ -43,7 +53,10 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(apps));
     }
 
-    @ActionAnnotation(title = "应用", action = "用户查询", description = "query app by user")
+    @Operation(summary = "查询用户下的渠道应用", description = "根据用户ID查询渠道应用列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = ChannelAppResponse.class)))
     @Override
     public ResponseEntity<?> queryByUser(ChannelAppRequest request) {
         
@@ -52,7 +65,10 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(apps));
     }
 
-    @ActionAnnotation(title = "应用", action = "查询详情", description = "query app by uid")
+    @Operation(summary = "查询指定渠道应用", description = "根据UID查询渠道应用详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = ChannelAppResponse.class)))
     @Override
     public ResponseEntity<?> queryByUid(ChannelAppRequest request) {
         
@@ -61,9 +77,11 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
-    @ActionAnnotation(title = "应用", action = "新建", description = "create app")
+    @Operation(summary = "创建渠道应用", description = "创建新的渠道应用")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = ChannelAppResponse.class)))
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(ChannelAppRequest request) {
         
         ChannelAppResponse app = appRestService.create(request);
@@ -71,9 +89,11 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
-    @ActionAnnotation(title = "应用", action = "更新", description = "update app")
+    @Operation(summary = "更新渠道应用", description = "更新渠道应用信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = ChannelAppResponse.class)))
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(ChannelAppRequest request) {
         
         ChannelAppResponse app = appRestService.update(request);
@@ -81,9 +101,9 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
-    @ActionAnnotation(title = "应用", action = "删除", description = "delete app")
+    @Operation(summary = "删除渠道应用", description = "删除指定的渠道应用")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(ChannelAppRequest request) {
         
         appRestService.delete(request);
@@ -91,9 +111,9 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "应用", action = "导出", description = "export app")
+    @Operation(summary = "导出渠道应用", description = "导出渠道应用数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
     public Object export(ChannelAppRequest request, HttpServletResponse response) {
         return exportTemplate(

@@ -24,11 +24,13 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/token")
 @AllArgsConstructor
+@Tag(name = "Token Management", description = "Token management APIs")
 public class TokenRestController extends BaseRestController<TokenRequest> {
 
     private final TokenRestService tokenRestService;

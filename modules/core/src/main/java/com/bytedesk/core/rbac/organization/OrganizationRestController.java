@@ -28,7 +28,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
-// import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/org")
-// @Tag(name = "organization - 组织", description = "organization apis")
+@Tag(name = "Organization", description = "Organization management APIs")
 public class OrganizationRestController extends BaseRestController<OrganizationRequest> {
 
     private final OrganizationRestService organizationService;
