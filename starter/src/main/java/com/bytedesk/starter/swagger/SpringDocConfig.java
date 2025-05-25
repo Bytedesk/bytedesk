@@ -19,6 +19,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springdoc.core.SwaggerUiConfigParameters;
+import org.springdoc.core.SwaggerUiConfigProperties;
+import org.springdoc.webmvc.ui.SwaggerWelcomeCommon;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -32,7 +36,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
  * 支持国际化: 添加参数 ?lang=en|zh_CN|zh_TW
  */
 @Configuration
-public class SpringDocConfig {
+public class SpringDocConfig implements WebMvcConfigurer {
 
     @Value("${application.version}")
     private String version;
@@ -88,6 +92,15 @@ public class SpringDocConfig {
         }
         
         return openAPI;
+    }
+    
+    /**
+     * 配置 SwaggerWelcomeCommon Bean，解决 SwaggerWelcomeCommon 注入问题
+     */
+    @Bean
+    public SwaggerWelcomeCommon swaggerWelcomeCommon(SwaggerUiConfigProperties swaggerUiConfigProperties,
+                                                    SwaggerUiConfigParameters swaggerUiConfigParameters) {
+        return new SwaggerWelcomeCommon(swaggerUiConfigProperties, swaggerUiConfigParameters);
     }
 }
 
