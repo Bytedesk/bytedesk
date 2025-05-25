@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-22 11:54:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 07:17:57
+ * @LastEditTime: 2025-05-26 07:21:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springdoc.core.models.GroupedOpenApi;
-
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
