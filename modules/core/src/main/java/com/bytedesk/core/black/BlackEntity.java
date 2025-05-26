@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:21:40
+ * @LastEditTime: 2025-05-26 14:51:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,7 +49,7 @@ public class BlackEntity extends BaseEntity {
     @Builder.Default
     private String type = BlackTypeEnum.VISITOR.name();
 
-    private String reason;
+    
 
     // AI: 考虑到黑名单功能主要用于用户访问控制,需要频繁查询和过滤,我建议使用单独字段存储的方式:
     // 黑名单用户uid
@@ -61,6 +61,8 @@ public class BlackEntity extends BaseEntity {
 
     // 黑名单用户头像
     private String blackAvatar;
+
+    private String reason;
 
     // 是否封禁ip
     @Builder.Default
