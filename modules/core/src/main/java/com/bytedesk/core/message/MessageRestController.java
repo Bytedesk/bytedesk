@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-09 08:53:47
+ * @LastEditTime: 2025-05-26 14:20:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,23 +27,36 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 消息管理接口控制器
+ * 
  * @author Jackning (270580156@qq.com)
+ * @since 2024-01-29
  */
 @Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/message")
+@Tag(name = "消息管理", description = "消息管理相关接口，包括查询、创建、更新、删除等操作")
 public class MessageRestController extends BaseRestController<MessageRequest> {
 
     private final MessageRestService messageRestService;
 
     private final IMessageSendService messageSendService;
 
+    /**
+     * 根据组织查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据组织查询消息", description = "返回当前组织的消息列表")
     @Override
     public ResponseEntity<?> queryByOrg(MessageRequest request) {
 
@@ -52,6 +65,13 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(messagePage));
     }
 
+    /**
+     * 根据用户查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据用户查询消息", description = "返回当前用户的消息列表")
     public ResponseEntity<?> queryByUser(MessageRequest request) {
 
         Page<MessageResponse> response = messageRestService.queryByUser(request);
@@ -59,6 +79,13 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 根据主题查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(MessageRequest request) {
 
@@ -67,12 +94,26 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 根据UID查询消息
+     * 
+     * @param request 查询请求
+     * @return 消息详情
+     */
+    @Operation(summary = "根据UID查询消息", description = "通过唯一标识符查询消息")
     @Override
     public ResponseEntity<?> queryByUid(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
+    /**
+     * 根据会话UID查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
 
@@ -81,6 +122,13 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 创建消息
+     * 
+     * @param request 创建请求
+     * @return 创建的消息
+     */
+    @Operation(summary = "创建消息", description = "创建新的消息记录")
     @Override
     public ResponseEntity<?> create(MessageRequest request) {
         
@@ -89,6 +137,13 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 更新消息
+     * 
+     * @param request 更新请求
+     * @return 更新后的消息
+     */
+    @Operation(summary = "更新消息", description = "更新已存在的消息记录")
     @Override
     public ResponseEntity<?> update(MessageRequest request) {
         
@@ -97,6 +152,13 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 删除消息
+     * 
+     * @param request 删除请求
+     * @return 删除结果
+     */
+    @Operation(summary = "删除消息", description = "删除指定的消息记录")
     @Override
     public ResponseEntity<?> delete(MessageRequest request) {
         
@@ -109,9 +171,10 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
      * 当客户端长连接断开时，启用此rest接口发送消息
      * send offline message
      *
-     * @param map map
-     * @return json
+     * @param map 包含JSON消息的Map
+     * @return 发送结果
      */
+    @Operation(summary = "发送离线消息", description = "当客户端长连接断开时，通过REST接口发送消息")
     @PostMapping("/rest/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
 
@@ -123,8 +186,14 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
-    // https://github.com/alibaba/easyexcel
-    // https://easyexcel.opensource.alibaba.com/docs/current/
+    /**
+     * 导出消息列表
+     * 
+     * @param request 导出请求
+     * @param response HTTP响应
+     * @return 导出结果
+     */
+    @Operation(summary = "导出消息数据", description = "将消息数据导出为Excel格式")
     @ActionAnnotation(title = "消息", action = "导出", description = "export message")
     @GetMapping("/export")
     public Object export(MessageRequest request, HttpServletResponse response) {

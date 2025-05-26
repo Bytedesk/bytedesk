@@ -504,4 +504,40 @@ public class SwaggerApiConfig {
                 .pathsToMatch("/api/v1/browse/**")
                 .build();
     }
+
+    /**
+     * 黑名单管理接口
+     */
+    @Bean
+    public GroupedOpenApi blackApis() {
+        return GroupedOpenApi.builder()
+                .group("black-apis")
+                .displayName("黑名单接口")
+                .pathsToMatch("/api/v1/black/**")
+                .build();
+    }
+
+    /**
+     * 会话管理接口
+     */
+    @Bean
+    public GroupedOpenApi threadApis() {
+        return GroupedOpenApi.builder()
+                .group("thread-apis")
+                .displayName("会话管理接口")
+                .pathsToMatch("/api/v1/thread/**")
+                .build();
+    }
+
+    /**
+     * 消息管理接口
+     */
+    @Bean
+    public GroupedOpenApi messageApis() {
+        return GroupedOpenApi.builder()
+                .group("message-apis")
+                .displayName("消息管理接口")
+                .pathsToMatch("/api/v1/message/**")
+                .build();
+    }
 }
