@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 10:13:37
+ * @LastEditTime: 2025-05-26 17:46:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -76,16 +77,16 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     @Cacheable(value = "ipBlacklist", key = "#uid", unless = "#result == null")
     @Override
     public Optional<IpBlacklistEntity> findByUid(String uid) {
-        return ipBlacklistRepository.findByUid(uid);
+        return ipBlacklistRepository.findByUidAndDeletedFalse(uid);
     }
 
     @Cacheable(value = "ipBlacklist", key = "#ip", unless = "#result == null")
     public Optional<IpBlacklistEntity> findByIp(String ip) {
-        return ipBlacklistRepository.findByIp(ip);
+        return ipBlacklistRepository.findByIpAndDeletedFalse(ip);
     }
 
     public List<IpBlacklistEntity> findByEndTimeBefore(LocalDateTime dateTime) {
-        return ipBlacklistRepository.findByEndTimeBefore(dateTime);
+        return ipBlacklistRepository.findByEndTimeBeforeAndDeletedFalse(dateTime);
     }
 
     // api高频调用，自动添加系统黑名单
@@ -105,29 +106,31 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     }
 
     // 用户拉黑，同时拉黑ip
-    public void addToBlacklist(String ip, 
-        String ipLocation, 
-        LocalDateTime endTime, 
-        String reason, 
-        String blackUid, 
-        String blackNickname,
-        String userUid, 
-        String userNickname,
-        String orgUid) {
+    public void addToBlacklist(String ip, String ipLocation, BlackEntity blackEntity) {
         IpBlacklistRequest request = IpBlacklistRequest.builder()
                 .ip(ip)
                 .ipLocation(ipLocation)
-                .endTime(endTime)
-                .reason(reason)
-                .blackUid(blackUid)
-                .blackNickname(blackNickname)
-                .userUid(userUid)
-                .userNickname(userNickname)
+                .endTime(blackEntity.getEndTime())
+                .reason(blackEntity.getReason())
+                .blackUid(blackEntity.getBlackUid())
+                .blackNickname(blackEntity.getBlackNickname())
+                .userUid(blackEntity.getUserUid())
+                .userNickname(blackEntity.getUserNickname())
+                .orgUid(blackEntity.getOrgUid())
                 .build();
-        request.setOrgUid(orgUid);
         create(request);
     }
 
+    public void deleteByIp(String ip) {
+        Optional<IpBlacklistEntity> ipBlacklistOptional = findByIp(ip);
+        if (ipBlacklistOptional.isPresent()) {
+            IpBlacklistEntity ipBlacklist = ipBlacklistOptional.get();
+            // ipBlacklistRepository.delete(ipBlacklist);
+            ipBlacklist.setDeleted(true);
+            save(ipBlacklist);
+        }
+    }
+    
     @Override
     public IpBlacklistResponse create(IpBlacklistRequest request) {
         // 判断ip是否在黑名单中
@@ -164,25 +167,18 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     }
 
     @Override
-    public IpBlacklistEntity save(IpBlacklistEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
-    }
-
-    @Override
     protected IpBlacklistEntity doSave(IpBlacklistEntity entity) {
         return ipBlacklistRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<IpBlacklistEntity> ipBlacklist = findByUid(uid);
-        if (ipBlacklist.isPresent()) {
-            ipBlacklistRepository.delete(ipBlacklist.get());
+        Optional<IpBlacklistEntity> ipBlacklistOptional = findByUid(uid);
+        if (ipBlacklistOptional.isPresent()) {
+            // ipBlacklistRepository.delete(ipBlacklist.get());
+            IpBlacklistEntity ipBlacklist = ipBlacklistOptional.get();
+            ipBlacklist.setDeleted(true);
+            save(ipBlacklist);
         }
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:18:24
+ * @LastEditTime: 2025-05-26 17:53:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,12 +37,12 @@ import java.util.Optional;
 @Transactional
 @AllArgsConstructor
 public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAccessRequest, IpAccessResponse> {
-    
+
     private static final int MAX_REQUESTS_PER_MINUTE = 60;
     private static final int MAX_RETRY_COUNT = 3;
-    
+
     private final IpAccessRepository ipAccessRepository;
-        
+
     private final IpWhitelistRepository whitelistRepository;
 
     private final IpBlacklistRestService ipBlacklistService;
@@ -50,26 +50,26 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
     private final IpService ipService;
 
     private final UidUtils uidUtils;
-    
+
     public Boolean isIpBlocked(String ip) {
         // 检查是否在白名单中
         if (whitelistRepository.existsByIp(ip)) {
             return false;
         }
-        
+
         // 检查是否在黑名单中且未过期
         Optional<IpBlacklistEntity> blacklist = ipBlacklistService.findByIp(ip);
         if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(LocalDateTime.now())) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     public void recordAccess(String ip, String endpoint, String params) {
         Assert.notNull(ip, "IP address must not be null");
         Assert.notNull(endpoint, "Endpoint must not be null");
-        // 
+        //
         if (endpoint.equals("/visitor/api/v1/ping")) {
             return;
         }
@@ -79,14 +79,15 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
             try {
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime oneMinuteAgo = now.minusMinutes(1);
-                
+
                 // 获取最近一分钟的访问记录
-                Optional<IpAccessEntity> accessOptional = ipAccessRepository.findFirstByIpAndEndpointAndAccessTimeAfter(ip, endpoint, oneMinuteAgo);
+                Optional<IpAccessEntity> accessOptional = ipAccessRepository
+                        .findFirstByIpAndEndpointAndAccessTimeAfter(ip, endpoint, oneMinuteAgo);
                 // 如果访问记录不存在，则创建新的访问记录
                 IpAccessEntity access;
                 if (accessOptional.isEmpty()) {
                     String ipLocation = ipService.getIpLocation(ip);
-                    // 
+                    //
                     access = new IpAccessEntity();
                     access.setIp(ip);
                     access.setIpLocation(ipLocation);
@@ -104,7 +105,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 ipAccessRepository.save(access);
                 // 检查是否需要加入黑名单
                 if (access.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
-                    // 
+                    //
                     ipBlacklistService.addToBlacklistSystem(ip);
                 }
                 // 成功保存，退出重试循环
@@ -130,7 +131,8 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
     }
 
     @Override
-    public IpAccessEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, IpAccessEntity entity) {
+    public IpAccessEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            IpAccessEntity entity) {
         log.warn("Optimistic locking failure for IP: {} with endpoint: {}", entity.getIp(), entity.getEndpoint());
         // 尝试刷新实体状态
         if (entity.getId() != null) {
@@ -141,7 +143,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 fresh.setAccessCount(fresh.getAccessCount() + 1);
                 fresh.setLastAccessTime(LocalDateTime.now());
                 ipAccessRepository.save(fresh);
-                
+
                 // 如果访问次数超过限制，加入黑名单
                 if (fresh.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
                     ipBlacklistService.addToBlacklistSystem(fresh.getIp());
@@ -182,16 +184,6 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
     public IpAccessResponse update(IpAccessRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public IpAccessEntity save(IpAccessEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
     }
 
     @Override

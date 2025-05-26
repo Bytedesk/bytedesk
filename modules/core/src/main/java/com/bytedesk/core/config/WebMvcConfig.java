@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 20:25:46
+ * @LastEditTime: 2025-05-26 17:36:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.black.BlackAccessInterceptor;
+// import com.bytedesk.core.black.BlackAccessInterceptor;
 import com.bytedesk.core.ip.access.IpAccessInterceptor;
 
 // import com.bytedesk.core.config.BytedeskProperties;
@@ -45,8 +45,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private IpAccessInterceptor ipAccessInterceptor;
 
-    @Autowired
-    private BlackAccessInterceptor visitorAccessInterceptor;
+//     @Autowired
+//     private BlackAccessInterceptor visitorAccessInterceptor;
 
     /**
      * @{VisitorAnonymousController}
@@ -58,8 +58,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
                 
         // 注册Visitor访问拦截器，只拦截visitor相关接口
-        registry.addInterceptor(visitorAccessInterceptor)
-                .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
+        // registry.addInterceptor(visitorAccessInterceptor)
+                // .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
     }
 
     /**
