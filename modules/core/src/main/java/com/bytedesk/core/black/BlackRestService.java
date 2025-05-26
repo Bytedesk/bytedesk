@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 14:51:58
+ * @LastEditTime: 2025-05-26 16:02:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,7 +81,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     // 根据黑名单用户uid查询
     @Cacheable(value = "black", key = "#blackUid", unless = "#result == null")
     public Optional<BlackEntity> findByBlackUid(String blackUid) {
-        return repository.findFirstByBlackUid(blackUid);
+        return repository.findFirstByBlackUidAndDeletedFalse(blackUid);
     }
 
     @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid", unless = "#result == null")
@@ -93,6 +93,16 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     public BlackResponse queryByUid(BlackRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    public Boolean existsByBlackUid(BlackRequest request) {
+        // 根据黑名单用户uid查询
+        Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
+        if (black.isPresent()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
