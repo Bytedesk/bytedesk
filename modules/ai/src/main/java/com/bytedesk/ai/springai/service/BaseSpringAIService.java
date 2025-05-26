@@ -103,9 +103,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 可以保留一个带参数的构造函数用于单元测试或特殊情况
-    protected BaseSpringAIService(SpringAIVectorStoreService springAIVectorService,
-            IMessageSendService messageSendService) {
-        // this.springAIVectorService = springAIVectorService;
+    protected BaseSpringAIService(IMessageSendService messageSendService) {
         this.messageSendService = messageSendService;
     }
 
