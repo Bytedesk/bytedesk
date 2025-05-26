@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-01 09:07:10
+ * @LastEditTime: 2025-05-26 18:40:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,7 +58,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
+public class ThreadRestService
+        extends BaseRestServiceWithExcel<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
 
     private final AuthService authService;
 
@@ -93,7 +94,7 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
         }
         request.setUserUid(user.getUid());
         request.setOwnerUid(user.getUid());
-        // 
+        //
         return queryByOrg(request);
     }
 
@@ -181,7 +182,7 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
         }
         // 文件助手用户信息，头像、昵称等
         UserProtobuf userSimple = UserUtils.getFileAssistantUser();
-        // 
+        //
         ThreadEntity assistantThread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.ASSISTANT.name())
@@ -205,36 +206,37 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
 
     // 剪贴板会话：clipboard/{user_uid}
     // public ThreadResponse createClipboardAssistantThread(UserEntity user) {
-    //     //
-    //     String topic = TopicUtils.getClipboardTopic(user.getUid());
-    //     //
-    //     Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, user);
-    //     if (threadOptional.isPresent()) {
-    //         return convertToResponse(threadOptional.get());
-    //     }
-    //     // 剪贴助手用户信息，头像、昵称等
-    //     UserProtobuf userSimple = UserUtils.getClipboardAssistantUser();
-    //     ThreadEntity assistantThread = ThreadEntity.builder()
-    //             .type(ThreadTypeEnum.ASSISTANT.name())
-    //             .topic(topic)
-    //             .unreadCount(0)
-    //             .state(ThreadStateEnum.STARTED.name())
-    //             .client(ClientEnum.SYSTEM.name())
-    //             .user(JSON.toJSONString(userSimple))
-    //             .owner(user)
-    //             .build();
-    //     assistantThread.setUid(uidUtils.getUid());
-    //     if (StringUtils.hasText(user.getOrgUid())) {
-    //         assistantThread.setOrgUid(user.getOrgUid());
-    //     } else {
-    //         assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-    //     }
-    //     //
-    //     ThreadEntity updateThread = save(assistantThread);
-    //     if (updateThread == null) {
-    //         throw new RuntimeException("thread save failed");
-    //     }
-    //     return convertToResponse(updateThread);
+    // //
+    // String topic = TopicUtils.getClipboardTopic(user.getUid());
+    // //
+    // Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic,
+    // user);
+    // if (threadOptional.isPresent()) {
+    // return convertToResponse(threadOptional.get());
+    // }
+    // // 剪贴助手用户信息，头像、昵称等
+    // UserProtobuf userSimple = UserUtils.getClipboardAssistantUser();
+    // ThreadEntity assistantThread = ThreadEntity.builder()
+    // .type(ThreadTypeEnum.ASSISTANT.name())
+    // .topic(topic)
+    // .unreadCount(0)
+    // .state(ThreadStateEnum.STARTED.name())
+    // .client(ClientEnum.SYSTEM.name())
+    // .user(JSON.toJSONString(userSimple))
+    // .owner(user)
+    // .build();
+    // assistantThread.setUid(uidUtils.getUid());
+    // if (StringUtils.hasText(user.getOrgUid())) {
+    // assistantThread.setOrgUid(user.getOrgUid());
+    // } else {
+    // assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+    // }
+    // //
+    // ThreadEntity updateThread = save(assistantThread);
+    // if (updateThread == null) {
+    // throw new RuntimeException("thread save failed");
+    // }
+    // return convertToResponse(updateThread);
     // }
 
     // 系统通知会话：system/{user_uid}
@@ -503,6 +505,33 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
         return convertToResponse(updateThread);
     }
 
+    // 找到第一个未关闭的，执行关闭并返回，用于处理前端传递thread.uid不准确的情况
+    public ThreadResponse closeByTopic(ThreadRequest threadRequest) {
+        List<ThreadEntity> threads = findListByTopic(threadRequest.getTopic());
+        for (ThreadEntity thread : threads) {
+            // 找到第一个未关闭的，执行关闭并返回
+            if (!thread.isClosed()) {
+                thread.setAutoClose(threadRequest.getAutoClose());
+                thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+                // 发布关闭消息, 通知用户
+                String content = threadRequest.getAutoClose()
+                        ? I18Consts.I18N_AUTO_CLOSED
+                        : I18Consts.I18N_AGENT_CLOSED;
+                thread.setContent(content);
+                //
+                ThreadEntity updateThread = save(thread);
+                if (updateThread == null) {
+                    throw new RuntimeException("thread save failed");
+                }
+                // 发布关闭事件
+                bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
+                //
+                return convertToResponse(updateThread);
+            }
+        }
+        return null;
+    }
+
     // 获取当前接待会话数量
     public int countByThreadTopicAndState(String topic, String state) {
         return threadRepository.countByTopicAndStatusAndDeletedFalse(topic, state);
@@ -564,7 +593,8 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
     }
 
     @Override
-    public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ThreadEntity entity) {
+    public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            ThreadEntity entity) {
         try {
             Optional<ThreadEntity> latest = threadRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -667,12 +697,12 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
             tagRestService.create(tagRequest);
         }
     }
-   
+
     @Override
     public ThreadExcel convertToExcel(ThreadEntity entity) {
         ThreadExcel excel = modelMapper.map(entity, ThreadExcel.class);
         excel.setUid(entity.getUid());
-        // 
+        //
         if (entity.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(entity.getUser());
             excel.setVisitorNickname(user.getNickname());
@@ -691,19 +721,18 @@ public class ThreadRestService extends BaseRestServiceWithExcel<ThreadEntity, Th
             UserProtobuf workgroup = UserProtobuf.fromJson(entity.getWorkgroup());
             excel.setWorkgroupNickname(workgroup.getNickname());
         }
-        
+
         // 将client转换为中文
         if (StringUtils.hasText(entity.getClient())) {
             excel.setClient(ClientEnum.toChineseDisplay(entity.getClient()));
         }
-        
+
         // 将status转换为中文
         if (StringUtils.hasText(entity.getStatus())) {
             excel.setStatus(ThreadProcessStatusEnum.toChineseDisplay(entity.getStatus()));
         }
-        
+
         return excel;
     }
-
 
 }
