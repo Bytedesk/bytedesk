@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:51:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 17:06:53
+ * @LastEditTime: 2025-05-26 15:11:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.visitor;
+package com.bytedesk.service.visitor.aop;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -20,6 +20,8 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.black.BlackService;
+import com.bytedesk.service.visitor.VisitorAnnotation;
+import com.bytedesk.service.visitor.VisitorRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
