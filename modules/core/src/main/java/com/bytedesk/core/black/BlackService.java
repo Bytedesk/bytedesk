@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BlackService {
@@ -33,6 +35,7 @@ public class BlackService {
         if (blackOpt.isPresent()) {
             BlackEntity black = blackOpt.get();
             if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
+                log.info("1. User {} is in the blacklist for org {}", visitorUid, orgUid);
                 return true;
             }
         }
@@ -58,6 +61,7 @@ public class BlackService {
             if (blackOpt.isPresent()) {
                 BlackEntity black = blackOpt.get();
                 if (black.getEndTime() == null || black.getEndTime().isAfter(LocalDateTime.now())) {
+                    log.info("2. User {} is in the blacklist for org {}", userUid, orgUid);
                     return true;
                 }
             }
