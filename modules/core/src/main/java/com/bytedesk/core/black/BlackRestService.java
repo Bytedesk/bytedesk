@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 10:26:27
+ * @LastEditTime: 2025-05-26 14:51:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -174,8 +174,10 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     
     @Override
     public BlackExcel convertToExcel(BlackEntity entity) {
-        // return modelMapper.map(entity, BlackExcel.class);
-        return BlackConverter.toExcel(entity);
+        BlackExcel excel = modelMapper.map(entity, BlackExcel.class);
+        // return BlackConverter.toExcel(entity);
+        excel.setBlockIp(entity.getBlockIp() ? "是" : "否");
+        return excel;
     }
 
 }
