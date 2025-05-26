@@ -17,7 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.action.ActionEntity;
-import com.bytedesk.core.action.ActionCreateEvent;
+import com.bytedesk.core.action.event.ActionCreateEvent;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.notice.NoticeRequest;

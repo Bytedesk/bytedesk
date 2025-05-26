@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:06:34
+ * @LastEditTime: 2025-05-26 15:08:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/visitor/api/v1")
 public class VisitorRestControllerVisitor {
 
-    private final VisitorRestService visitorService;
+    private final VisitorRestService visitorRestService;
 
     private final MessageUnreadService messageUnreadService;
 
@@ -74,7 +74,7 @@ public class VisitorRestControllerVisitor {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
+    // @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @PostMapping("/init")
     public ResponseEntity<?> init(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
@@ -89,14 +89,14 @@ public class VisitorRestControllerVisitor {
             visitorRequest.setNickname(ipService.createVisitorNickname(httpRequest));
         }
         // 
-        VisitorResponse visitor = visitorService.create(visitorRequest);
+        VisitorResponse visitor = visitorRestService.create(visitorRequest);
         // 
         UserProtobuf user = ServiceConvertUtils.convertToVisitorProtobuf(visitor);
         //
         return ResponseEntity.ok(JsonResult.success(user));
     }
 
-    @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
+    // @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
     @PostMapping("/thread")
     public ResponseEntity<?> requestThread(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
@@ -106,12 +106,12 @@ public class VisitorRestControllerVisitor {
             visitorRequest.setIpLocation(ipService.getIpLocation(ip));
         }
         //
-        MessageProtobuf messageProtobuf = visitorService.requestThread(visitorRequest);
+        MessageProtobuf messageProtobuf = visitorRestService.requestThread(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
 
-    @VisitorAnnotation(title = "visitor", action = "browse", description = "visitor browse")
+    // @VisitorAnnotation(title = "visitor", action = "browse", description = "visitor browse")
     @PostMapping("/browse")
     public ResponseEntity<?> browse(VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
@@ -126,11 +126,10 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success("browse success"));
     }
 
-    // @VisitorAnnotation(title = "visitor", action = "ping", description = "ping")
     @GetMapping("/ping")
     public ResponseEntity<?> ping(VisitorRequest request) {
 
-        visitorService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
+        visitorRestService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
 
         int count = messageUnreadService.getUnreadCount(request.getUid());
 
