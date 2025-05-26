@@ -30,8 +30,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BlackResponse extends BaseResponse {
 
-    private String reason;
-
     // AI: 考虑到黑名单功能主要用于用户访问控制,需要频繁查询和过滤,我建议使用单独字段存储的方式:
     // 黑名单用户uid
     private String blackUid;
@@ -41,6 +39,9 @@ public class BlackResponse extends BaseResponse {
 
     // 黑名单用户头像
     private String blackAvatar;
+
+     // 黑名单原因
+    private String reason;
 
     // 是否封禁ip
     private Boolean blockIp;
@@ -60,6 +61,8 @@ public class BlackResponse extends BaseResponse {
     // 结束时间
     private LocalDateTime endTime;
 
+    // 被拉黑是的 会话uid
+    private String threadUid;
     // 会话主题
     private String threadTopic;
 }

@@ -82,9 +82,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         if (!StringUtils.hasText(uid)) {
             request.setUid(uidUtils.getUid());
         }
-        // else {
-        //  request.setUid(Utils.formatUid(request.getOrgUid(), uidUtils.getUid()));
-        // }
+        // 
         log.info("visitor init, uid: {}", uid);
         VisitorEntity visitor = findByUid(uid).orElse(null);
         if (visitor != null) {
@@ -254,6 +252,8 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     @Override
     public VisitorExcel convertToExcel(VisitorEntity entity) {
         // return VisitorExcelConverter.convert(entity);
-        return modelMapper.map(entity, VisitorExcel.class);
+        VisitorExcel excel = modelMapper.map(entity, VisitorExcel.class);
+        excel.setClient(ClientEnum.toChineseDisplay(entity.getClient()));
+        return excel;
     }
 }

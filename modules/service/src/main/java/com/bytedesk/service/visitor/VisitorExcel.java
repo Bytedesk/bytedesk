@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580206@qq.com
  * @Date: 2025-05-06 09:36:34
- * @LastEditors: jackning 270580206@qq.com
- * @LastEditTime: 2025-05-06 10:43:39
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-05-26 15:45:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,10 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.time.LocalDateTime;
+
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.bytedesk.core.base.BaseExcel;
 
@@ -29,13 +32,9 @@ import lombok.EqualsAndHashCode;
 public class VisitorExcel extends BaseExcel {
     
     @ExcelProperty(value = "昵称")
-    @ColumnWidth(20)
+    @ColumnWidth(25)
     private String nickname;
-    
-    // @ExcelProperty(value = "头像")
-    // @ColumnWidth(50)
-    // private String avatar;
-    
+
     // @ExcelProperty(value = "语言")
     // @ColumnWidth(10)
     // private String lang;
@@ -49,20 +48,20 @@ public class VisitorExcel extends BaseExcel {
     private String mobile;
     
     @ExcelProperty(value = "邮箱")
-    @ColumnWidth(30)
+    @ColumnWidth(20)
     private String email;
     
     @ExcelProperty(value = "备注")
-    @ColumnWidth(40)
+    @ColumnWidth(25)
     private String note;
     
     @ExcelProperty(value = "客户端")
     @ColumnWidth(20)
     private String client;
     
-    @ExcelProperty(value = "状态")
-    @ColumnWidth(20)
-    private String status;
+    // @ExcelProperty(value = "状态")
+    // @ColumnWidth(20)
+    // private String status;
     
     // @ExcelProperty(value = "标签")
     // @ColumnWidth(30)
@@ -83,4 +82,9 @@ public class VisitorExcel extends BaseExcel {
     @ExcelProperty(value = "会员等级")
     @ColumnWidth(20)
     private Integer vipLevel;
+
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ExcelProperty(value = "创建时间")
+    @ColumnWidth(25)
+    private LocalDateTime createdAt;
 }
