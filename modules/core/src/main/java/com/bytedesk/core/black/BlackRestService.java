@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 16:44:07
+ * @LastEditTime: 2025-05-26 17:15:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,6 +105,17 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
         }
     }
 
+    public void unblockByBlackUid(BlackRequest request) {
+        Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
+        if (black.isPresent()) {
+            BlackEntity entity = black.get();
+            entity.setDeleted(true);
+            save(entity);
+        } else {
+            throw new RuntimeException("unblockByBlackUid Black not found" + request.getBlackUid());
+        }
+    }
+
     @Override
     public BlackResponse create(BlackRequest request) {
         // 判断是否已经存在黑名单用户uid
@@ -161,7 +172,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
             entity.setDeleted(true);
             save(entity);
         } else {
-            throw new RuntimeException("Black not found");
+            throw new RuntimeException("deleteByUid Black not found " + uid);
         }
     }
 
