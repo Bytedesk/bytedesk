@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 16:02:23
+ * @LastEditTime: 2025-05-26 17:22:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,8 @@ package com.bytedesk.core.black;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -99,6 +101,16 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
             return ResponseEntity.ok(JsonResult.success(true));
         }
         return ResponseEntity.ok(JsonResult.success(false));
+    }
+
+    // unblock/BlackUid
+    @Operation(summary = "解除黑名单", description = "解除指定的黑名单")
+    @PostMapping("/unblock/blackUid")
+    public ResponseEntity<?> unblockByBlackUid(@RequestBody BlackRequest request) {
+        //
+        blackRestService.unblockByBlackUid(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
