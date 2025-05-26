@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-25 11:10:12
+ * @LastEditTime: 2025-05-26 15:02:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequestMapping("/api/v1/visitor")
 public class VisitorRestController extends BaseRestController<VisitorRequest> {
 
-    private final VisitorRestService visitorService;
+    private final VisitorRestService visitorRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "查询组织下的访客", description = "根据组织ID查询访客列表")
@@ -49,7 +49,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
 
-        Page<VisitorResponse> page = visitorService.queryByOrg(request);
+        Page<VisitorResponse> page = visitorRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -61,7 +61,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> queryByUser(VisitorRequest visitorRequest) {
         //
-        Page<VisitorResponse> visitorResponse = visitorService.queryByUser(visitorRequest);
+        Page<VisitorResponse> visitorResponse = visitorRestService.queryByUser(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
@@ -73,7 +73,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> queryByUid(VisitorRequest request) {
         
-        VisitorResponse visitorResponse = visitorService.queryByUid(request);
+        VisitorResponse visitorResponse = visitorRestService.queryByUid(request);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
@@ -85,7 +85,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> create(VisitorRequest request) {
         
-        VisitorResponse visitorResponse = visitorService.create(request);
+        VisitorResponse visitorResponse = visitorRestService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
@@ -97,7 +97,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
 
-        VisitorResponse visitorResponse = visitorService.update(visitorRequest);
+        VisitorResponse visitorResponse = visitorRestService.update(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
@@ -110,7 +110,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @PostMapping("/update/tagList")
     public ResponseEntity<?> updateTagList(@RequestBody VisitorRequest visitorRequest) {
 
-        VisitorResponse visitorResponse = visitorService.updateTagList(visitorRequest);
+        VisitorResponse visitorResponse = visitorRestService.updateTagList(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
@@ -120,7 +120,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
 
-        visitorService.delete(visitorRequest);
+        visitorRestService.delete(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success("delete success"));
     }
@@ -132,7 +132,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
         return exportTemplate(
             request,
             response,
-            visitorService,
+            visitorRestService,
             VisitorExcel.class,
             "访客",
             "visitor"
