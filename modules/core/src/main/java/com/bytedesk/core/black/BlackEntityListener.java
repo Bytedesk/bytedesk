@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 07:01:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 17:10:06
+ * @LastEditTime: 2025-05-26 16:45:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,10 +45,19 @@ public class BlackEntityListener {
     public void onPostUpdate(BlackEntity blackEntity) {
         log.info("BlackEntityListener onPostUpdate: " + blackEntity);
         BlackEntity clonedBlackEntity = SerializationUtils.clone(blackEntity);
-        
-        // 发布黑名单更新事件
-        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new BlackUpdateEvent(this, clonedBlackEntity));
+
+        if (clonedBlackEntity.isDeleted()) {
+            // 发布黑名单删除事件
+            BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder
+                    .getBean(BytedeskEventPublisher.class);
+            bytedeskEventPublisher.publishEvent(new BlackDeleteEvent(this, clonedBlackEntity));
+        } else {
+            // 发布黑名单更新事件
+            BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder
+                    .getBean(BytedeskEventPublisher.class);
+            bytedeskEventPublisher.publishEvent(new BlackUpdateEvent(this, clonedBlackEntity));
+        }
+
     }
 
     @PostRemove
