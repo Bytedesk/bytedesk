@@ -137,12 +137,17 @@ public class AuthService {
             .description("User login authentication token")
             .accessToken(accessToken)
             .type(TokenTypeEnum.LOGIN.name())
-            .expiresAt(LocalDateTime.now().plusHours(24)) // 默认24小时过期
             .revoked(false)
             .client(client)
             .device(device)
             .userUid(userDetails.getUid())
             .build();
+        // 只有当client中含有web字样时，expiresAt有效期24小时，否则为365天
+        if (client.toLowerCase().contains("web")) {
+            tokenRequest.setExpiresAt(LocalDateTime.now().plusHours(24)); // 默认24小时过期
+        } else {
+            tokenRequest.setExpiresAt(LocalDateTime.now().plusDays(365)); // 其他客户端默认365天过期
+        }
         
         tokenRestService.create(tokenRequest);
 
