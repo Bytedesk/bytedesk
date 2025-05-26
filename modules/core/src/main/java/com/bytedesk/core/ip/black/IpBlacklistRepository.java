@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:49:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-17 15:44:13
+ * @LastEditTime: 2025-05-26 17:54:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,9 +22,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface IpBlacklistRepository extends JpaRepository<IpBlacklistEntity, Long>, JpaSpecificationExecutor<IpBlacklistEntity> {
     
-    Optional<IpBlacklistEntity> findByIp(String ip);
+    Optional<IpBlacklistEntity> findByIpAndDeletedFalse(String ip);
 
-    Optional<IpBlacklistEntity> findByUid(String uid);
+    Optional<IpBlacklistEntity> findByUidAndDeletedFalse(String uid);
 
-    List<IpBlacklistEntity> findByEndTimeBefore(LocalDateTime endTime);
+    List<IpBlacklistEntity> findByEndTimeBeforeAndDeletedFalse(LocalDateTime endTime);
 } 
