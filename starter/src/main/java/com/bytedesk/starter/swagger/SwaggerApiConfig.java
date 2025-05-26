@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 15:38:41
+ * @LastEditTime: 2025-05-26 09:10:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -309,7 +309,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("message-feedback-apis")
                 .displayName("消息反馈接口")
-                .pathsToMatch("/api/v1/message_feedback/**")
+                .pathsToMatch("/api/v1/message/feedback/**")
                 .build();
     }
 
@@ -333,7 +333,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("message-parsed-apis")
                 .displayName("消息解析接口")
-                .pathsToMatch("/api/v1/message_parsed/**")
+                .pathsToMatch("/api/v1/message/parsed/**")
                 .build();
     }
 
@@ -357,7 +357,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("message-unanswered-apis")
                 .displayName("未回复消息接口")
-                .pathsToMatch("/api/v1/message_unanswered/**")
+                .pathsToMatch("/api/v1/message/unanswered/**")
                 .build();
     }
 
@@ -490,6 +490,18 @@ public class SwaggerApiConfig {
                 .group("ticket-apis")
                 .displayName("工单接口")
                 .pathsToMatch("/api/v1/ticket/**")
+                .build();
+    }
+
+    /**
+     * 浏览记录接口
+     */
+    @Bean
+    public GroupedOpenApi browseApis() {
+        return GroupedOpenApi.builder()
+                .group("browse-apis")
+                .displayName("浏览记录接口")
+                .pathsToMatch("/api/v1/browse/**")
                 .build();
     }
 }
