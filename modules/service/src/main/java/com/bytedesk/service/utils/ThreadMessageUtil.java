@@ -48,8 +48,6 @@ public class ThreadMessageUtil {
                 .orgUid(thread.getOrgUid())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                // .threadUid(thread.getUid())
-                // .topic(thread.getTopic())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
