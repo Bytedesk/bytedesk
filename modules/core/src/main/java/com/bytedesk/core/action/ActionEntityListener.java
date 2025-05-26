@@ -16,6 +16,7 @@ package com.bytedesk.core.action;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+import com.bytedesk.core.action.event.ActionCreateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
