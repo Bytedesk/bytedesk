@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 16:02:12
+ * @LastEditTime: 2025-05-26 16:44:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -160,7 +160,6 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
             BlackEntity entity = black.get();
             entity.setDeleted(true);
             save(entity);
-            // repository.delete(black.get());
         } else {
             throw new RuntimeException("Black not found");
         }
