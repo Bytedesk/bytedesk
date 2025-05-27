@@ -30,6 +30,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     // 
     private Custom custom;
     private Admin admin;
+    private Member member;
     private Features features;
     private Testing testing;
 
@@ -56,6 +57,11 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean allowRegister;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
+    }
+
+    @Data
+    public static class Member {
+        private String password;
     }
 
     @Data
