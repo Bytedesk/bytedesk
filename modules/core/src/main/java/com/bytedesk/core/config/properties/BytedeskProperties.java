@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 10:23:17
+ * @LastEditTime: 2025-05-27 09:34:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -132,6 +132,9 @@ public class BytedeskProperties {
     // 管理员配置
     private Admin admin = new Admin();
 
+    // 成员配置
+    private Member member = new Member();
+
     // 性能测试配置
     private Testing testing = new Testing();
     
@@ -195,7 +198,7 @@ public class BytedeskProperties {
     public static class Admin {
         private String email;
         private String password;
-        private String passwordDefault;
+        // private String passwordDefault;
         private String nickname;
         private String mobile;
         private List<String> mobileWhitelist = new ArrayList<>();
@@ -207,7 +210,12 @@ public class BytedeskProperties {
     }
 
     @Data
-    private static class  Testing {
+    public static class Member {
+        private String password;
+    }
+
+    @Data
+    private static class Testing {
         private Boolean enabled = false;
         private Integer accountCount = 300;
         private String accountUsername = "test";
@@ -328,7 +336,8 @@ public class BytedeskProperties {
     }
 
     public String getPasswordDefault() {
-        return admin.getPasswordDefault();
+        // return admin.getPasswordDefault();
+        return member.getPassword();
     }
 
     public String getNickname() {
