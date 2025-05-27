@@ -323,7 +323,7 @@ public class UserService {
         if (StringUtils.hasText(request.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         } else {
-            user.setPassword(passwordEncoder.encode(bytedeskProperties.getPasswordDefault()));
+            user.setPassword(passwordEncoder.encode(bytedeskProperties.getMemberDefaultPassword()));
         }
         //
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());

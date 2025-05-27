@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-27 09:34:26
+ * @LastEditTime: 2025-05-27 09:57:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -335,8 +335,8 @@ public class BytedeskProperties {
         return admin.getPassword();
     }
 
-    public String getPasswordDefault() {
-        // return admin.getPasswordDefault();
+    // 导入成员默认密码
+    public String getMemberDefaultPassword() {
         return member.getPassword();
     }
 
