@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 14:13:42
+ * @LastEditTime: 2025-05-27 08:58:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -648,6 +648,8 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         //
         RobotLlm llm = robot.getLlm();
         llm.setPrompt(request.getLlm().getPrompt());
+        llm.setProvider(request.getLlm().getProvider());
+        llm.setModel(request.getLlm().getModel());
         robot.setLlm(llm);
         //
         RobotEntity savedRobot = save(robot);
