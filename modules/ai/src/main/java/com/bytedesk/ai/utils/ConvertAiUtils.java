@@ -40,7 +40,7 @@ public class ConvertAiUtils {
 
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
         RobotProtobuf robotProtobuf =  modelMapper.map(entity, RobotProtobuf.class);
-        robotProtobuf.setIsKbEnabled(entity.getKbEnabled());
+        robotProtobuf.setKbEnabled(entity.getKbEnabled());
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return robotProtobuf;
     }

@@ -171,7 +171,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
         
         // 如果知识库未启用，直接根据配置的提示词进行回复
-        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
+        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
             // 使用通用方法处理提示词和SSE消息，传入空上下文
             String context = "";
@@ -202,7 +202,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             log.info("BaseSpringAIService sendSyncMessage searchResultList {}", searchResultList);
             
             // 如果知识库未启用或未开启LLM，直接使用基本提示词
-            if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) && robot.getLlm().getEnabled()) {
+            if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) && robot.getLlm().getEnabled()) {
                 log.info("知识库未启用或未指定知识库UID，但开启了LLM");
                 // 使用空上下文调用通用方法
                 String response = createAndProcessPromptSync(query, "", robot, messageProtobufQuery, messageProtobufReply);
@@ -402,7 +402,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // 2. 知识库搜索相关方法
     protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
         // 如果知识库未启用，直接返回空列表
-        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getIsKbEnabled()) {
+        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
             return new ArrayList<>();
         }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-06 11:28:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:03:33
+ * @LastEditTime: 2025-05-27 10:19:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,7 @@ public class RobotProtobuf implements Serializable {
 
     private String extra;
 
-    private Boolean isKbEnabled;
+    private Boolean kbEnabled;
 
     private String kbUid; // 对应知识库
 
@@ -66,7 +66,7 @@ public class RobotProtobuf implements Serializable {
                 .nickname(robotEntity.getNickname())
                 .avatar(robotEntity.getAvatar())
                 .type(UserTypeEnum.ROBOT.name())
-                .isKbEnabled(robotEntity.getKbEnabled()) // 确保正确设置
+                .kbEnabled(robotEntity.getKbEnabled()) // 确保正确设置
                 .kbUid(robotEntity.getKbUid())
                 .llm(robotEntity.getLlm())
                 .build();
