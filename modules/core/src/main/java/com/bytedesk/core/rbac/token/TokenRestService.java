@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 22:45:54
+ * @LastEditTime: 2025-05-28 23:08:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
-    
+
     @Override
     public Page<TokenResponse> queryByOrg(TokenRequest request) {
         Pageable pageable = request.getPageable();
@@ -63,6 +63,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     /**
      * 根据accessToken查找Token实体
+     * 
      * @param accessToken JWT访问令牌
      * @return Optional<TokenEntity>
      */
@@ -71,29 +72,27 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         return tokenRepository.findByAccessToken(accessToken);
     }
 
-    /**
-     * 根据用户UID和类型查找有效的Token列表
-     * @param userUid 用户UID
-     * @param type 令牌类型
-     * @return List<TokenEntity>
-     */
-    // @Cacheable(cacheNames = "token", key = "#userUid + '_' + #type", unless = "#result == null")
-    // public List<TokenEntity> findValidTokensByUserUidAndType(String userUid, String type) {
-    //     return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
-    //         userUid, type, LocalDateTime.now());
-    // }
-
-    @CachePut(cacheNames = "token", key = "#request.accessToken")
     @Override
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
         entity.setUid(uidUtils.getUid());
-        // 
+        //
         TokenEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create token failed");
         }
+
+        // 手动将实体放入缓存
+        cacheToken(savedEntity);
+
         return convertToResponse(savedEntity);
+    }
+
+    // 添加一个新方法来处理缓存
+    @CachePut(cacheNames = "token", key = "#entity.accessToken")
+    private TokenEntity cacheToken(TokenEntity entity) {
+        log.debug("Manually caching token with key: {}", entity.getAccessToken());
+        return entity;
     }
 
     @Override
@@ -131,8 +130,21 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public TokenResponse convertToResponse(TokenEntity entity) {
-       return modelMapper.map(entity, TokenResponse.class);
+        return modelMapper.map(entity, TokenResponse.class);
     }
-    
 
+     /**
+     * 根据用户UID和类型查找有效的Token列表
+     * 
+     * @param userUid 用户UID
+     * @param type    令牌类型
+     * @return List<TokenEntity>
+     */
+    // @Cacheable(cacheNames = "token", key = "#userUid + '_' + #type", unless =
+    // "#result == null")
+    // public List<TokenEntity> findValidTokensByUserUidAndType(String userUid,
+    // String type) {
+    // return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
+    // userUid, type, LocalDateTime.now());
+    // }
 }
