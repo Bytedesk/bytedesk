@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:23:22
+ * @LastEditTime: 2025-05-28 14:52:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.faq.vector.FaqVectorService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,14 +49,14 @@ public class FaqIndexConsumer {
      * 增强了对乐观锁冲突的处理
      * 
      * @param jmsMessage JMS原始消息
-     * @param message FAQ索引消息
+     * @param message    FAQ索引消息
      */
     @JmsListener(destination = JmsArtemisConstants.QUEUE_FAQ_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
     public void processIndexMessage(jakarta.jms.Message jmsMessage, FaqIndexMessage message) {
         boolean success = false;
         int maxRetryAttempts = 3; // 最大重试次数
         int currentAttempt = 1;
-        
+
         while (currentAttempt <= maxRetryAttempts && !success) {
             try {
                 if (currentAttempt > 1) {
@@ -63,12 +64,12 @@ public class FaqIndexConsumer {
                 } else {
                     log.debug("接收到FAQ索引请求: {}", message.getFaqUid());
                 }
-                
+
                 // 引入随机延迟，避免并发冲突，重试时增加延迟
                 int baseDelay = 50 + random.nextInt(200); // 基础随机延迟
                 int retryDelay = baseDelay * currentAttempt; // 根据重试次数增加延迟
                 Thread.sleep(retryDelay);
-                
+
                 // 获取FAQ实体
                 Optional<FaqEntity> optionalFaq = faqRestService.findByUid(message.getFaqUid());
                 if (!optionalFaq.isPresent()) {
@@ -77,20 +78,20 @@ public class FaqIndexConsumer {
                     success = true;
                     break;
                 }
-                
+
                 FaqEntity faq = optionalFaq.get();
-                
+
                 // 根据操作类型执行相应的操作
                 if ("delete".equals(message.getOperationType())) {
                     handleDeleteOperation(faq, message);
                 } else {
                     handleIndexOperation(faq, message);
                 }
-                
+
                 // 成功处理消息
                 success = true;
                 log.debug("成功处理FAQ索引消息: {}", message.getFaqUid());
-                
+
             } catch (org.springframework.orm.ObjectOptimisticLockingFailureException e) {
                 // 乐观锁冲突，特殊处理
                 log.warn("处理FAQ索引时发生乐观锁冲突: {}, 尝试次数: {}", message.getFaqUid(), currentAttempt);
@@ -110,10 +111,10 @@ public class FaqIndexConsumer {
                     break;
                 }
             }
-            
+
             currentAttempt++;
         }
-        
+
         // 根据处理结果确认或拒绝消息
         if (success) {
             acknowledgeMessage(jmsMessage);
@@ -121,7 +122,7 @@ public class FaqIndexConsumer {
             log.warn("FAQ索引消息处理失败，不确认消息，等待消息队列重新投递: {}", message.getFaqUid());
         }
     }
-    
+
     /**
      * 处理索引操作
      * 将全文索引和向量索引的操作分开处理，避免一个操作失败影响另一个操作
@@ -129,7 +130,7 @@ public class FaqIndexConsumer {
     private void handleIndexOperation(FaqEntity faq, FaqIndexMessage message) {
         boolean elasticSuccess = true;
         boolean vectorSuccess = true;
-        
+
         // 执行全文索引 - 独立事务
         if (message.getUpdateElasticIndex()) {
             try {
@@ -143,21 +144,33 @@ public class FaqIndexConsumer {
                 // 这里不抛出异常，继续处理向量索引
             }
         }
-        
+
         // 执行向量索引 - 独立事务
         if (message.getUpdateVectorIndex()) {
             try {
-                log.debug("为FAQ创建向量索引: {}", faq.getUid());
+                log.info("开始为FAQ创建向量索引: {}", faq.getUid());
                 // 在单独的事务中处理向量索引
                 processVectorIndex(faq);
-                vectorSuccess = true;
+
+                // 处理后检查FAQ状态以确定是否成功
+                FaqEntity updatedFaq = faqRestService.findByUid(faq.getUid()).orElse(null);
+                if (updatedFaq != null &&
+                        ChunkStatusEnum.SUCCESS.name().equals(updatedFaq.getVectorStatus())) {
+                    log.info("FAQ向量索引创建成功: {}, 状态: {}", faq.getUid(), updatedFaq.getVectorStatus());
+                    vectorSuccess = true;
+                } else {
+                    log.warn("FAQ向量索引创建可能失败: {}, 状态: {}",
+                            faq.getUid(),
+                            updatedFaq != null ? updatedFaq.getVectorStatus() : "未知");
+                    vectorSuccess = false;
+                }
             } catch (Exception e) {
                 log.error("FAQ向量索引创建失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
                 vectorSuccess = false;
                 // 这里不抛出异常，已经尝试过处理向量索引
             }
         }
-        
+
         // 根据处理结果决定是否重试消息
         if (!elasticSuccess || !vectorSuccess) {
             StringBuilder errorMessage = new StringBuilder("FAQ索引失败: ");
@@ -170,7 +183,7 @@ public class FaqIndexConsumer {
                 }
                 errorMessage.append("向量索引错误");
             }
-            
+
             // 如果两个索引都失败，抛出异常以便重试
             if (!elasticSuccess && !vectorSuccess) {
                 throw new RuntimeException(errorMessage.toString());
@@ -180,7 +193,7 @@ public class FaqIndexConsumer {
             }
         }
     }
-    
+
     /**
      * 在单独事务中处理全文索引
      */
@@ -189,29 +202,37 @@ public class FaqIndexConsumer {
         log.debug("在独立事务中处理全文索引: {}", faq.getUid());
         faqElasticService.indexFaq(faq);
     }
-    
+
     /**
      * 在单独事务中处理向量索引
      */
     // 不使用事务注解，让内部方法管理自己的事务
     public void processVectorIndex(FaqEntity faq) {
         try {
-            log.debug("在独立事务中处理向量索引: {}", faq.getUid());
+            log.info("开始处理FAQ向量索引: {}, 当前状态: {}", faq.getUid(), faq.getVectorStatus());
+
             // 先尝试删除旧的向量索引
             boolean deleteResult = deleteFaqVector(faq);
+            log.info("删除旧向量索引结果: {}, FAQ: {}", deleteResult, faq.getUid());
+
             if (deleteResult) {
                 // 删除成功后再创建新的向量索引
+                log.info("准备创建新向量索引: {}", faq.getUid());
                 boolean indexResult = indexFaqVector(faq);
-                if (!indexResult) {
-                    log.warn("向量索引创建失败，但不影响流程继续: {}", faq.getUid());
+                if (indexResult) {
+                    log.info("向量索引创建成功: {}, 状态: {}", faq.getUid(), faq.getVectorStatus());
+                } else {
+                    log.warn("向量索引创建失败，但不影响流程继续: {}, 状态: {}", faq.getUid(), faq.getVectorStatus());
                 }
+            } else {
+                log.warn("无法删除旧向量索引，跳过创建新索引: {}", faq.getUid());
             }
         } catch (Exception e) {
             // 记录异常但不抛出，避免影响整个流程
             log.error("处理向量索引时出错: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
         }
     }
-    
+
     /**
      * 在完全独立事务中删除向量索引
      */
@@ -225,7 +246,7 @@ public class FaqIndexConsumer {
             return false;
         }
     }
-    
+
     /**
      * 在完全独立事务中创建向量索引
      */
@@ -234,13 +255,22 @@ public class FaqIndexConsumer {
         try {
             log.debug("在完全独立事务中创建向量索引: {}", faq.getUid());
             faqVectorService.indexFaqVector(faq);
-            return true;
+
+            // 检查操作后的向量状态来确认索引是否创建成功
+            if (faq.getVectorStatus() != null &&
+                    faq.getVectorStatus().equals(ChunkStatusEnum.SUCCESS.name())) {
+                log.info("向量索引创建成功: {}", faq.getUid());
+                return true;
+            } else {
+                log.warn("向量索引状态未更新为成功: {}, 当前状态: {}", faq.getUid(), faq.getVectorStatus());
+                return false;
+            }
         } catch (Exception e) {
             log.error("创建向量索引失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
             return false;
         }
     }
-    
+
     /**
      * 处理删除操作
      * 将全文索引和向量索引的删除操作分开处理
@@ -248,7 +278,7 @@ public class FaqIndexConsumer {
     private void handleDeleteOperation(FaqEntity faq, FaqIndexMessage message) {
         boolean elasticSuccess = true;
         boolean vectorSuccess = true;
-        
+
         // 从全文索引中删除 - 独立事务
         if (message.getUpdateElasticIndex()) {
             try {
@@ -264,7 +294,7 @@ public class FaqIndexConsumer {
                 // 不抛出异常，继续处理向量索引删除
             }
         }
-        
+
         // 从向量索引中删除 - 独立事务
         if (message.getUpdateVectorIndex()) {
             try {
@@ -280,7 +310,7 @@ public class FaqIndexConsumer {
                 // 不抛出异常，已经尝试过处理向量索引删除
             }
         }
-        
+
         // 根据处理结果决定是否重试消息
         if (!elasticSuccess || !vectorSuccess) {
             StringBuilder errorMessage = new StringBuilder("FAQ删除失败: ");
@@ -293,7 +323,7 @@ public class FaqIndexConsumer {
                 }
                 errorMessage.append("向量索引删除错误");
             }
-            
+
             // 如果两个索引删除都失败，抛出异常以便重试
             if (!elasticSuccess && !vectorSuccess) {
                 throw new RuntimeException(errorMessage.toString());
@@ -303,7 +333,7 @@ public class FaqIndexConsumer {
             }
         }
     }
-    
+
     /**
      * 在单独事务中处理全文索引删除
      */
@@ -312,7 +342,7 @@ public class FaqIndexConsumer {
         log.debug("在独立事务中处理全文索引删除: {}", faqUid);
         return faqElasticService.deleteFaq(faqUid);
     }
-    
+
     /**
      * 在单独事务中处理向量索引删除
      */
@@ -321,7 +351,7 @@ public class FaqIndexConsumer {
         log.debug("在独立事务中处理向量索引删除: {}", faq.getUid());
         return faqVectorService.deleteFaqVector(faq);
     }
-    
+
     /**
      * 安全地确认消息
      * 只有在消息处理成功后才调用此方法
