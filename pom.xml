@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.5.0</version>
     </parent>
 
     <!-- https://www.sofastack.tech/projects/sofa-boot/quick-start/ -->
@@ -35,7 +35,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <sofa.boot.version>4.2.0</sofa.boot.version>
+        <spring-boot.version>3.5.0</spring-boot.version>
+        <sofa-boot.version>4.2.0</sofa-boot.version>
         <querydsl.version>5.1.0</querydsl.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <binarywang.weixin.version>4.7.0</binarywang.weixin.version>
