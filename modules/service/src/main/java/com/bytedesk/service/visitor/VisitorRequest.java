@@ -80,6 +80,12 @@ public class VisitorRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
+	// 商品信息
+	private String goodsInfo;
+
+	// 订单信息
+	private String orderInfo;
+
 	// 自定义参数，从URL传入，使用json格式传入，例如：{"key1":"value1","key2":"value2"}
 	@Builder.Default
 	private String extra = BytedeskConsts.EMPTY_JSON_STRING;
