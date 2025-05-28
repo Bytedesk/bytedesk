@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 15:21:53
+ * @LastEditTime: 2025-05-28 11:36:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,7 @@ public enum MessageTypeEnum {
     GOODS, // 商品
     CARD,
     EVENT, // 事件：离线、上线等
+    EXTRA, // 附加信息
     GUESS, // 猜你想问
     HOT, // 热门话题
     SHORTCUT, // 快捷路径
@@ -45,7 +46,7 @@ public enum MessageTypeEnum {
     TICKET_SUBMIT, // 工单提交
     TYPING, // 正在输入
     PROCESSING, // 正在处理，等待大模型回复中
-    
+    // 
     PREVIEW, // 消息预知
     RECALL, // 撤回
     DELIVERED, // 回执: 已送达
