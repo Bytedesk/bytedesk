@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 09:10:30
+ * @LastEditTime: 2025-05-28 09:26:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,19 +78,22 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
 
     public VisitorResponse create(VisitorRequest request) {
         //
-        String uid =  request.getUid();
+        String visitorUid =  request.getUid();
         String orgUid = request.getOrgUid();
-        // if (!StringUtils.hasText(uid)) {
-        //     request.setUid(uidUtils.getUid());
-        // }
         // 前端自定义uid，用于区别于自动生成uid
-        request.setVisitorUid(request.getUid());
-        // uid使用自动生成的uid，防止前端uid冲突
-        request.setUid(uidUtils.getUid());
+        request.setVisitorUid(visitorUid);
         // 
-        log.info("visitor init, uid: {}", uid);
-        VisitorEntity visitor = findByVisitorUidAndOrgUid(uid, orgUid).orElse(null);
-        if (visitor != null) {
+        log.info("visitor init, uid: {}", visitorUid);
+        Optional<VisitorEntity> visitorOptional = findByVisitorUidAndOrgUid(visitorUid, orgUid);
+        if (visitorOptional.isPresent()) {
+            VisitorEntity visitor = visitorOptional.get();
+            // 如果访客信息已存在，则更新访客信息
+            if (StringUtils.hasText(request.getNickname())) {
+                visitor.setNickname(request.getNickname());
+            }
+            if (StringUtils.hasText(request.getAvatar())) {
+                visitor.setAvatar(request.getAvatar());
+            }
             // 对比ip是否有变化
             if (visitor.getIp() == null || !visitor.getIp().equals(request.getIp())) {
                 // 更新浏览信息
@@ -112,13 +115,19 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
             }
             return convertToResponse(savedVisitor);
         }
-        // 
+        // 如果用户不存在，则创建新用户
         if (!StringUtils.hasText(request.getAvatar())) {
             request.setAvatar(getAvatar(request.getClient()));
         }
-        //
+        // uid使用自动生成的uid，防止前端uid冲突
+        request.setUid(uidUtils.getUid());
+        // 如果前端没有传递visitorUid，则使用uid作为visitorUid
+        if (!StringUtils.hasText(request.getVisitorUid())) {
+            request.setVisitorUid(request.getUid());
+        }
+        // 
         log.info("request {}", request);
-        visitor = modelMapper.map(request, VisitorEntity.class);
+        VisitorEntity visitor = modelMapper.map(request, VisitorEntity.class);
         //
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
         visitor.setDeviceInfo(device);
@@ -174,11 +183,19 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
     public Optional<VisitorEntity> findByUid(String uid) {
+        // 如果参数为空，则返回空
+        if (!StringUtils.hasText(uid)) {
+            return Optional.empty();
+        }
         return visitorRepository.findByUidAndDeleted(uid, false);
     }
 
     @Cacheable(value = "visitor", key = "#visitorUid-#orgUid", unless = "#result == null")
     public Optional<VisitorEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
+        // 如果参数为空，则返回空
+        if (!StringUtils.hasText(visitorUid) || !StringUtils.hasText(orgUid)) {
+            return Optional.empty();
+        }
         return visitorRepository.findByVisitorUidAndOrgUidAndDeleted(visitorUid, orgUid, false);
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:40:30
+ * @LastEditTime: 2025-05-18 10:22:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_text;
+package com.bytedesk.kbase.chunk;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,9 +20,8 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -39,6 +38,11 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 拆分实体
+ * 用于向量检索：文件、文本、网站等所有拆分内容全部存储在此
+ * 向量检索内容全部放到且仅放在此表中
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -46,19 +50,24 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({TextEntityListener.class})    
-@Table(name = "bytedesk_kbase_llm_text")
-public class TextEntity extends BaseEntity {
+@EntityListeners({ChunkEntityListener.class})
+@Table(name = "bytedesk_kbase_llm_chunk")
+public class ChunkEntity extends BaseEntity {
 
-    private String title;
+    private String name;
 
+    // chunk 之后可能不需要这么长的 content，待优化
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // 文本类型，TODO: 后期支持OCR提取图片文字、音频转录、视频文字提取等
     @Builder.Default
-    @Column(name = "text_type")
-    private String type = MessageTypeEnum.TEXT.name();
+    @Column(name = "chunk_type")
+    private String type = ChunkTypeEnum.FILE.name();
+
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
     private String status = ChunkStatusEnum.NEW.name();
@@ -66,11 +75,6 @@ public class TextEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "vector_status")
     private String vectorStatus = ChunkStatusEnum.NEW.name();
-
-    @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> tagList = new ArrayList<>();
 
     // 是否启用，状态：启用/禁用
     @Builder.Default
@@ -86,42 +90,41 @@ public class TextEntity extends BaseEntity {
     @Builder.Default
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
-    private String categoryUid; // 所属分类
+    // 对应 拆分 document 的 id
+    private String docId;
+
+    // 所属分类
+    private String categoryUid;
 
     // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;
 
-    // vector store id
-    @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> docIdList = new ArrayList<>();
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    private FileEntity file;
 
     // set Success
-    public TextEntity setSuccess() {
+    public ChunkEntity setSuccess() {
         this.setStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
-    public TextEntity setError() {
+    public ChunkEntity setError() {
         this.setStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
 
-
     /**
      * 判断内容是否有变化
      * 只有当关键内容发生变化时，才会触发更新向量索引
-     * @param request TextRequest 请求对象
+     * @param request ChunkRequest 请求对象
      * @return 如果关键内容有变化返回 true，否则返回 false
      */
-    public Boolean hasChanged(TextRequest request) {
-        // 比较标题是否变化
-        if ((title == null && request.getTitle() != null) ||
-            (title != null && !title.equals(request.getTitle()))) {
+    public Boolean hasChanged(ChunkRequest request) {
+        // 比较名称是否变化
+        if ((name == null && request.getName() != null) ||
+            (name != null && !name.equals(request.getName()))) {
             return true;
         }
         
@@ -156,4 +159,5 @@ public class TextEntity extends BaseEntity {
         // 所有字段都没有变化
         return false;
     }
+
 }

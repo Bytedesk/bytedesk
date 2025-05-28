@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:40:30
+ * @LastEditTime: 2025-05-14 10:54:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_text;
+package com.bytedesk.kbase.file;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.kbase.chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.core.message.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -46,26 +46,17 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({TextEntityListener.class})    
-@Table(name = "bytedesk_kbase_llm_text")
-public class TextEntity extends BaseEntity {
+@EntityListeners({FileEntityListener.class})
+@Table(name = "bytedesk_kbase_llm_file")
+public class FileEntity extends BaseEntity {
 
-    private String title;
+    private String fileName;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // 文本类型，TODO: 后期支持OCR提取图片文字、音频转录、视频文字提取等
-    @Builder.Default
-    @Column(name = "text_type")
-    private String type = MessageTypeEnum.TEXT.name();
-
-    @Builder.Default
-    private String status = ChunkStatusEnum.NEW.name();
-
-    @Builder.Default
-    @Column(name = "vector_status")
-    private String vectorStatus = ChunkStatusEnum.NEW.name();
+    // 对应 uploadEntity 的 fileUrl
+    private String fileUrl;
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
@@ -77,7 +68,7 @@ public class TextEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
-    // 有效开始日期
+     // 有效开始日期
     @Builder.Default
     private LocalDateTime startDate = LocalDateTime.now();
 
@@ -86,11 +77,23 @@ public class TextEntity extends BaseEntity {
     @Builder.Default
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
+    @Builder.Default
+    private String status = ChunkStatusEnum.NEW.name();
+
+    @Builder.Default
+    private String vectorStatus = ChunkStatusEnum.NEW.name();
+
     private String categoryUid; // 所属分类
 
     // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;
+
+    // 对应 uploadEntity 的 uid
+    // private String uploadUid;
+    // 多对一关联UploadEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UploadEntity upload;
 
     // vector store id
     @Builder.Default
@@ -98,36 +101,39 @@ public class TextEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
 
-
     // set Success
-    public TextEntity setSuccess() {
+    public FileEntity setSuccess() {
         this.setStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
-    public TextEntity setError() {
+    public FileEntity setError() {
         this.setStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
-
-
+    
     /**
-     * 判断内容是否有变化
-     * 只有当关键内容发生变化时，才会触发更新向量索引
-     * @param request TextRequest 请求对象
-     * @return 如果关键内容有变化返回 true，否则返回 false
+     * 判断文件内容是否有变化
+     * @param request FileRequest 请求
+     * @return 如果文件内容或属性有变化返回 true，否则返回 false
      */
-    public Boolean hasChanged(TextRequest request) {
-        // 比较标题是否变化
-        if ((title == null && request.getTitle() != null) ||
-            (title != null && !title.equals(request.getTitle()))) {
+    public Boolean hasChanged(FileRequest request) {
+        // 比较文件名是否变化
+        if ((fileName == null && request.getFileName() != null) ||
+            (fileName != null && !fileName.equals(request.getFileName()))) {
             return true;
         }
         
         // 比较内容是否变化
         if ((content == null && request.getContent() != null) ||
-            (content != null && request.getContent() != null && !content.equals(request.getContent()))) {
+            (content != null && !content.equals(request.getContent()))) {
+            return true;
+        }
+        
+        // 比较文件URL是否变化
+        if ((fileUrl == null && request.getFileUrl() != null) ||
+            (fileUrl != null && !fileUrl.equals(request.getFileUrl()))) {
             return true;
         }
         
@@ -142,14 +148,22 @@ public class TextEntity extends BaseEntity {
         if (enabled != request.getEnabled()) {
             return true;
         }
-        
+
         // StartDate
-        if (startDate != null && request.getStartDate() != null && !startDate.equals(request.getStartDate())) {
+        if ((startDate == null && request.getStartDate() != null) ||
+            (startDate != null && request.getStartDate() != null && !startDate.equals(request.getStartDate()))) {
             return true;
         }
         
         // EndDate
-        if (endDate != null && request.getEndDate() != null && !endDate.equals(request.getEndDate())) {
+        if ((endDate == null && request.getEndDate() != null) ||
+            (endDate != null && request.getEndDate() != null && !endDate.equals(request.getEndDate()))) {
+            return true;
+        }
+
+        // 分类
+        if ((categoryUid == null && request.getCategoryUid() != null) ||
+            (categoryUid != null && !categoryUid.equals(request.getCategoryUid()))) {
             return true;
         }
 
