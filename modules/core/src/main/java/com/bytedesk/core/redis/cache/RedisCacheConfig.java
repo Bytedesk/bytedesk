@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-27 18:45:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 13:06:35
+ * @LastEditTime: 2025-05-28 22:07:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,16 +14,25 @@
 package com.bytedesk.core.redis.cache;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CachingConfigurer;
-// import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.CacheErrorHandler;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * cache config
@@ -33,118 +42,86 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
  * https://docs.spring.io/spring-boot/docs/3.2.0/reference/htmlsingle/#io.caching
  * https://www.51cto.com/article/753777.html
  */
+@Slf4j
 @Configuration
-// @EnableCaching // 开启缓存
+@EnableCaching // 开启缓存
 public class RedisCacheConfig implements CachingConfigurer {
 
-    // @Bean
-    // public Caffeine<Object, Object> caffeineConfig() {
-    // return Caffeine.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS);
-    // }
+    @Value("${spring.cache.redis.time-to-live:1800000}")
+    private long timeToLive;
 
-    // @Bean
-    // public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
-    // CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
-    // caffeineCacheManager.setCaffeine(caffeine);
-    // return caffeineCacheManager;
-    // }
+    @Value("${spring.cache.redis.key-prefix:bytedeskim:cache:}")
+    private String keyPrefix;
 
-    // @Autowired
-    // private BytedeskProperties bytedeskProperties;
-
-    // @Autowired
-    // private RedisConnectionFactory redisConnectionFactory;
-
-    // @Value("${cache.caffeine.maximumSize}")
-    // private Integer maximumSize;
-
-    // @Value("${cache.caffeine.expireAfterWriteSeconds}")
-    // private Integer expireAfterWriteSeconds;
-
-    // @Value("${spring.cache.redis.time-to-live}")
-    // private long redisTimeToLiveSeconds;
-
-    // @Bean
-    // public CacheManager cacheManager(RedisConnectionFactory
-    // redisConnectionFactory,
-    // GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer) {
-    // if (bytedeskProperties.getCacheLevel() == 0) {
-    // return new NoOpCacheManager();
-    // } else if (bytedeskProperties.getCacheLevel() == 1) {
-    // return caffeineCacheManager();
-    // } else {
-    // return compositeCacheManager(caffeineCacheManager(),
-    // redisCacheManager(redisConnectionFactory, jackson2JsonRedisSerializer));
-    // }
-    // }
-
-    // public CaffeineCacheManager caffeineCacheManager() {
-    // CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-    // // cacheManager.setCaffeine(caffeineCacheBuilder());
-    // return cacheManager;
-    // }
-
-    // // private Caffeine<Object, Object> caffeineCacheBuilder() {
-    // // return Caffeine.newBuilder()
-    // // .expireAfterWrite(expireAfterWriteSeconds, TimeUnit.SECONDS)
-    // // .maximumSize(maximumSize);
-    // // }
-
-    // /**
-    // * https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html
-    // * 使用自定义redisCache时，遇到下面错误：
-    // * FIXME: SerializationException: Could not read JSON:failed to lazily
-    // initialize a collection: could not initialize proxy - no Session
-    // * @return
-    // */
+    /**
+     * 自定义Key生成器，用于@Cacheable注解
+     * 格式: 类名::方法名:参数
+     */
     @Bean
-    @ConditionalOnProperty(name ="spring.cache.type", havingValue = "redis")
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration defaults = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofDays(2))
-                .enableTimeToIdle();
-        return RedisCacheManager.builder(redisConnectionFactory)
-                // .cacheDefaults(cacheConfiguration())
-                .cacheDefaults(defaults)
-                .build();
+    public KeyGenerator keyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getName());
+            sb.append("::");
+            sb.append(method.getName());
+            sb.append(":");
+            for (Object param : params) {
+                if (param != null) {
+                    sb.append(param.toString());
+                    sb.append("_");
+                }
+            }
+            return sb.toString();
+        };
     }
 
-    // public RedisCacheConfiguration cacheConfiguration() {
-    //     return RedisCacheConfiguration.defaultCacheConfig()
-    //             //  .entryTtl(Duration.ofMinutes(connectionProperties.getTimeToLive()))
-    //             .disableCachingNullValues()
-    //             .serializeValuesWith(RedisSerializationContext.SerializationPair
-    //                     .fromSerializer(new CustomRedisSerializer()));
-    //     // return RedisCacheConfiguration.defaultCacheConfig()
-    //     //         .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()));
-    //     // .serializeValuesWith(SerializationPair.fromSerializer(jackson2JsonRedisSerializer));
-    //     // .serializeValuesWith(SerializationPair.fromSerializer(new
-    //     // GenericJackson2JsonRedisSerializer()));
-    // }
-
-    // /**
-    // * FIXME: 二级缓存未触发redis缓存？
-    // * @param caffeineCacheManager
-    // * @param redisCacheManager
-    // * @return
-    // */
-    // // @SuppressWarnings("null")
-    // public CompositeCacheManager compositeCacheManager(CaffeineCacheManager
-    // caffeineCacheManager,
-    // RedisCacheManager redisCacheManager) {
-    // CompositeCacheManager compositeCacheManager = new CompositeCacheManager();
-    // // Arrays.asList(caffeineCacheManager, redisCacheManager)
-    // 中caffeineCacheManager放在前面，
-    // // 即先查询caffeineCacheManager缓存，未命中则查询redisCacheManager。顺序很重要，别搞错
-    // compositeCacheManager.setCacheManagers(Arrays.asList(caffeineCacheManager,
-    // redisCacheManager));
-    // compositeCacheManager.setFallbackToNoOpCache(false); // 关闭缓存未命中时自动创建的空缓存
-    // return compositeCacheManager;
-    // }
+    /**
+     * Redis缓存管理器配置
+     * 支持TTL和自定义序列化
+     */
+    @Bean
+    @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        log.info("初始化Redis缓存管理器");
+        
+        // 默认配置
+        RedisCacheConfiguration defaultConfig = defaultCacheConfiguration();
+        
+        // 自定义不同缓存空间的TTL
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+        // 用户缓存配置 - 30分钟过期
+        cacheConfigurations.put("userCache", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
+        // 系统配置缓存 - 2小时过期
+        cacheConfigurations.put("configCache", defaultCacheConfiguration().entryTtl(Duration.ofHours(2)));
+        // 会话缓存 - 4小时过期
+        cacheConfigurations.put("sessionCache", defaultCacheConfiguration().entryTtl(Duration.ofHours(4)));
+        
+        return RedisCacheManager.builder(redisConnectionFactory)
+                .cacheDefaults(defaultConfig)
+                .withInitialCacheConfigurations(cacheConfigurations)
+                .transactionAware() // 支持事务
+                .build();
+    }
+    
+    /**
+     * 默认缓存配置
+     * 使用Jackson作为JSON序列化器
+     */
+    private RedisCacheConfiguration defaultCacheConfiguration() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMillis(timeToLive)) // 设置TTL
+                .disableCachingNullValues() // 不缓存null值
+                .computePrefixWith(cacheName -> keyPrefix + cacheName + ":") // 设置key前缀
+                .serializeKeysWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
+                ) // 使用StringRedisSerializer来序列化key
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())
+                ); // 使用GenericJackson2JsonRedisSerializer来序列化value
+    }
 
     @Override
     public CacheErrorHandler errorHandler() {
         return new RedisCacheErrorHandler();
     }
-
 }
