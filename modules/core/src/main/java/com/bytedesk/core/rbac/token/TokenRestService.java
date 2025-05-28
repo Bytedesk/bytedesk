@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 16:49:43
+ * @LastEditTime: 2025-05-28 22:13:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,6 +62,28 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         return tokenRepository.findByUid(uid);
     }
 
+    /**
+     * 根据accessToken查找Token实体
+     * @param accessToken JWT访问令牌
+     * @return Optional<TokenEntity>
+     */
+    @Cacheable(cacheNames = "token", key = "#accessToken", unless = "#result == null")
+    public Optional<TokenEntity> findByAccessToken(String accessToken) {
+        return tokenRepository.findByAccessToken(accessToken);
+    }
+
+    /**
+     * 根据用户UID和类型查找有效的Token列表
+     * @param userUid 用户UID
+     * @param type 令牌类型
+     * @return List<TokenEntity>
+     */
+    @Cacheable(cacheNames = "token", key = "#userUid + '_' + #type", unless = "#result == null")
+    public List<TokenEntity> findValidTokensByUserUidAndType(String userUid, String type) {
+        return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
+            userUid, type, LocalDateTime.now());
+    }
+
     @Override
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
@@ -112,25 +134,5 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
        return modelMapper.map(entity, TokenResponse.class);
     }
     
-    /**
-     * 根据accessToken查找Token实体
-     * @param accessToken JWT访问令牌
-     * @return Optional<TokenEntity>
-     */
-    public Optional<TokenEntity> findByAccessToken(String accessToken) {
-        return tokenRepository.findByAccessToken(accessToken);
-    }
-
-    /**
-     * 根据用户UID和类型查找有效的Token列表
-     * @param userUid 用户UID
-     * @param type 令牌类型
-     * @return List<TokenEntity>
-     */
-    public List<TokenEntity> findValidTokensByUserUidAndType(String userUid, String type) {
-        return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
-            userUid, type, LocalDateTime.now());
-    }
-
 
 }
