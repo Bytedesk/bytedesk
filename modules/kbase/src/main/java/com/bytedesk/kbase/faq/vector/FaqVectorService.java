@@ -58,38 +58,36 @@ public class FaqVectorService {
      * 将FAQ内容添加到向量存储中
      * @param faq FAQ实体
      */
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    @Transactional
     public void indexFaqVector(FaqEntity faq) {
-        String faqUid = faq.getUid();
-        log.info("开始向量索引FAQ: {}, ID: {}, 初始状态: {}", faq.getQuestion(), faqUid, faq.getVectorStatus());
+        log.info("开始向量索引FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
+        
+        // 在处理前先获取最新的FAQ实体
+        Optional<FaqEntity> currentFaqOpt = faqRestService.findByUid(faq.getUid());
+        if (!currentFaqOpt.isPresent()) {
+            log.error("FAQ实体不存在，无法创建向量索引: {}", faq.getUid());
+            throw new RuntimeException("FAQ实体不存在: " + faq.getUid());
+        }
+        
+        FaqEntity currentFaq = currentFaqOpt.get();
+        log.info("获取到最新FAQ实体，当前向量状态: {}, ID: {}", currentFaq.getVectorStatus(), currentFaq.getUid());
         
         try {
-            // 先从数据库获取最新状态的实体
-            Optional<FaqEntity> freshFaqOpt = faqRestService.findByUid(faqUid);
-            if (freshFaqOpt.isEmpty()) {
-                log.warn("无法找到要创建向量的FAQ实体: {}", faqUid);
-                throw new RuntimeException("FAQ实体不存在: " + faqUid);
-            }
-            
-            FaqEntity freshFaq = freshFaqOpt.get();
-            log.info("获取到最新的FAQ实体: {}, 状态: {}, 文档ID列表: {}", 
-                    freshFaq.getUid(), freshFaq.getVectorStatus(), freshFaq.getDocIdList());
-            
             // 1. 为问题和答案创建文档（带有元数据）
-            String id = "faq_" + freshFaq.getUid();
-            String content = freshFaq.getQuestion() + "\n" + freshFaq.getAnswer();
+            String id = "faq_" + currentFaq.getUid();
+            String content = currentFaq.getQuestion() + "\n" + currentFaq.getAnswer();
             
             // 处理标签，将其转化为字符串便于索引
-            String tags = String.join(",", freshFaq.getTagList());
+            String tags = String.join(",", currentFaq.getTagList());
             
             // 元数据
             Map<String, Object> metadata = Map.of(
-                "uid", freshFaq.getUid(),
-                "question", freshFaq.getQuestion(),
-                KbaseConst.KBASE_KB_UID, freshFaq.getKbase() != null ? freshFaq.getKbase().getUid() : "",
-                "categoryUid", freshFaq.getCategoryUid() != null ? freshFaq.getCategoryUid() : "",
-                "orgUid", freshFaq.getOrgUid(),
-                "enabled", Boolean.toString(freshFaq.getEnabled()),
+                "uid", currentFaq.getUid(),
+                "question", currentFaq.getQuestion(),
+                KbaseConst.KBASE_KB_UID, currentFaq.getKbase() != null ? currentFaq.getKbase().getUid() : "",
+                "categoryUid", currentFaq.getCategoryUid() != null ? currentFaq.getCategoryUid() : "",
+                "orgUid", currentFaq.getOrgUid(),
+                "enabled", Boolean.toString(currentFaq.getEnabled()),
                 "tags", tags
             );
             
@@ -97,70 +95,68 @@ public class FaqVectorService {
             Document document = new Document(id, content, metadata);
             
             // 2. 添加到向量存储
-            // 检查是否已存在该文档ID
-            log.info("检查并删除可能存在的文档: {}", id);
-            checkAndDeleteExistingDoc(id);
-            
-            log.info("向向量存储添加文档: {}", id);
-            // 添加新文档
-            vectorStore.add(List.of(document));
-            log.info("向量存储添加文档成功: {}", id);
-            
-            // 3. 更新FAQ实体中的文档ID列表
-            List<String> docIdList = freshFaq.getDocIdList();
-            if (docIdList == null) {
-                docIdList = new ArrayList<>();
+            // 检查是否已存在该文档ID并删除
+            try {
+                checkAndDeleteExistingDoc(id);
+                log.info("已检查并删除存在的文档(如果有): {}", id);
+            } catch (Exception e) {
+                log.warn("检查和删除现有文档时出错，继续处理: {}, 错误: {}", id, e.getMessage());
             }
             
-            // 无论是否已存在，都更新状态并保存
+            // 添加新文档到向量存储
+            log.info("向向量存储添加文档: {}", id);
+            vectorStore.add(List.of(document));
+            log.info("已成功添加文档到向量存储: {}", id);
+            
+            // 3. 更新FAQ实体中的文档ID列表
+            List<String> docIdList = currentFaq.getDocIdList();
+            if (docIdList == null) {
+                docIdList = new ArrayList<>();
+            } else if (docIdList.contains(id)) {
+                // 如果已包含该ID，先移除再添加以确保唯一性
+                docIdList.remove(id);
+                log.info("从文档ID列表中移除重复ID: {}", id);
+            }
+            
+            // 添加文档ID并更新状态
             docIdList.add(id);
-            freshFaq.setDocIdList(docIdList);
+            currentFaq.setDocIdList(docIdList);
             
             // 设置向量索引状态为成功
-            log.info("设置FAQ向量状态为成功: {} -> {}", freshFaq.getVectorStatus(), ChunkStatusEnum.SUCCESS.name());
-            freshFaq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+            currentFaq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
             
-            // 更新FAQ实体
-            log.info("保存FAQ实体更新，设置向量索引状态为成功: {}, 文档ID数量: {}", 
-                    freshFaq.getUid(), freshFaq.getDocIdList().size());
-            FaqEntity savedFaq = faqRestService.save(freshFaq);
+            // 更新FAQ实体 - 使用明确的事务保证状态更新和保存原子性
+            log.info("准备保存FAQ实体更新，设置向量索引状态为成功: {}", currentFaq.getUid());
             
-            // 确认保存后状态
-            log.info("FAQ向量索引保存成功确认：{}, 状态: {}, 文档ID列表: {}", 
-                    savedFaq.getUid(), savedFaq.getVectorStatus(), savedFaq.getDocIdList());
+            // 确保isDeleted标志为false，防止触发删除事件
+            if (currentFaq.isDeleted()) {
+                log.warn("FAQ实体标记为已删除，重置isDeleted标志: {}", currentFaq.getUid());
+                currentFaq.setDeleted(false);
+            }
             
-            // 更新原始传入的对象，确保调用者也能看到变化
-            if (faq != null) {
-                faq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-                faq.setDocIdList(docIdList);
+            // 强制刷新实体状态并确保事务提交
+            FaqEntity savedFaq = updateFaqEntityStatus(currentFaq, ChunkStatusEnum.SUCCESS.name(), docIdList);
+            
+            // 确认保存成功
+            if (ChunkStatusEnum.SUCCESS.name().equals(savedFaq.getVectorStatus())) {
+                log.info("FAQ向量索引成功并确认状态已更新: {}, 文档ID: {}", currentFaq.getQuestion(), savedFaq.getDocIdList());
+            } else {
+                log.warn("FAQ实体已保存但向量状态未正确更新: {}, 当前状态: {}", savedFaq.getUid(), savedFaq.getVectorStatus());
             }
             
         } catch (Exception e) {
-            log.error("FAQ向量索引失败: {}, 错误: {}", faqUid, e.getMessage(), e);
+            log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage(), e);
             
+            // 设置向量索引状态为失败
+            currentFaq.setVectorStatus(ChunkStatusEnum.ERROR.name());
             try {
-                // 重新获取实体以确保我们修改的是最新版本
-                Optional<FaqEntity> errorFaqOpt = faqRestService.findByUid(faqUid);
-                if (errorFaqOpt.isPresent()) {
-                    FaqEntity errorFaq = errorFaqOpt.get();
-                    // 设置向量索引状态为失败
-                    log.warn("设置FAQ向量状态为错误: {} -> {}", errorFaq.getVectorStatus(), ChunkStatusEnum.ERROR.name());
-                    errorFaq.setVectorStatus(ChunkStatusEnum.ERROR.name());
-                    FaqEntity savedErrorFaq = faqRestService.save(errorFaq);
-                    log.info("保存FAQ错误状态成功: {}, 新状态: {}", savedErrorFaq.getUid(), savedErrorFaq.getVectorStatus());
-                    
-                    // 更新原始传入的对象
-                    if (faq != null) {
-                        faq.setVectorStatus(ChunkStatusEnum.ERROR.name());
-                    }
-                } else {
-                    log.warn("无法找到FAQ实体进行错误状态更新: {}", faqUid);
-                }
+                log.info("保存FAQ实体更新，设置向量索引状态为失败: {}", currentFaq.getUid());
+                faqRestService.save(currentFaq);
             } catch (Exception saveEx) {
-                log.error("更新FAQ向量索引错误状态失败: {}, 错误: {}", faqUid, saveEx.getMessage());
+                log.error("更新FAQ向量索引状态失败: {}, 错误: {}", currentFaq.getUid(), saveEx.getMessage());
             }
             
-            throw e;
+            throw new RuntimeException("创建向量索引失败: " + e.getMessage(), e);
         }
     }
     
@@ -204,75 +200,129 @@ public class FaqVectorService {
      * @param faq 要删除的FAQ实体
      * @return 是否删除成功
      */
+    /**
+     * 单独事务更新FAQ实体状态
+     * 确保状态更新能够正确提交到数据库
+     * 
+     * @param faq FAQ实体
+     * @param status 要设置的向量状态
+     * @param docIdList 文档ID列表
+     * @return 更新后的FAQ实体
+     */
     @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    public FaqEntity updateFaqEntityStatus(FaqEntity faq, String status, List<String> docIdList) {
+        log.info("在单独事务中更新FAQ实体状态: {}, 新状态: {}", faq.getUid(), status);
+        
+        // 使用新的查询获取实体，确保在新事务中最新的状态
+        Optional<FaqEntity> latestFaqOpt = faqRestService.findByUid(faq.getUid());
+        if (!latestFaqOpt.isPresent()) {
+            log.warn("找不到要更新的FAQ实体: {}", faq.getUid());
+            // 如果找不到，还是尝试保存传入的实体
+            faq.setVectorStatus(status);
+            faq.setDocIdList(docIdList);
+            return faqRestService.save(faq);
+        }
+        
+        // 获取最新实体并更新状态
+        FaqEntity latestFaq = latestFaqOpt.get();
+        latestFaq.setVectorStatus(status);
+        latestFaq.setDocIdList(docIdList);
+        
+        // 确保isDeleted标志为false，避免触发删除事件
+        latestFaq.setDeleted(false);
+        
+        // 保存并返回更新后的实体
+        FaqEntity savedFaq = faqRestService.save(latestFaq);
+        log.info("FAQ实体状态已更新: {}, 状态: {}, 文档ID数量: {}", 
+                savedFaq.getUid(), 
+                savedFaq.getVectorStatus(), 
+                savedFaq.getDocIdList() != null ? savedFaq.getDocIdList().size() : 0);
+                
+        return savedFaq;
+    }
+    
+    @Transactional
     public Boolean deleteFaqVector(FaqEntity faq) {
-        String faqUid = faq.getUid();
-        log.info("从向量索引中删除FAQ: {}, 文档ID列表: {}", faq.getQuestion(), faq.getDocIdList());
+        log.info("从向量索引中删除FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
+        
+        // 获取最新状态的FAQ实体
+        Optional<FaqEntity> currentFaqOpt = faqRestService.findByUid(faq.getUid());
+        if (!currentFaqOpt.isPresent()) {
+            log.error("FAQ实体不存在，无法删除向量索引: {}", faq.getUid());
+            return false;
+        }
+        
+        FaqEntity currentFaq = currentFaqOpt.get();
+        
+        // 添加去重逻辑：如果状态已经是NEW且没有文档ID，说明已处理过，直接返回
+        if (ChunkStatusEnum.NEW.name().equals(currentFaq.getVectorStatus()) &&
+            (currentFaq.getDocIdList() == null || currentFaq.getDocIdList().isEmpty())) {
+            log.info("FAQ已处理过删除操作，避免重复处理: {}", currentFaq.getUid());
+            return true;
+        }
+        
+        log.info("获取到最新FAQ实体，当前向量状态: {}, 文档ID列表: {}", currentFaq.getVectorStatus(), currentFaq.getDocIdList());
         
         try {
-            // 先从数据库获取最新状态
-            Optional<FaqEntity> freshFaqOpt = faqRestService.findByUid(faqUid);
-            if (freshFaqOpt.isEmpty()) {
-                log.warn("无法找到要删除向量的FAQ实体: {}", faqUid);
-                return false;
-            }
-            
-            FaqEntity freshFaq = freshFaqOpt.get();
-            log.info("获取到最新的FAQ实体用于删除向量: {}, 状态: {}, 文档ID列表: {}", 
-                    freshFaq.getUid(), freshFaq.getVectorStatus(), freshFaq.getDocIdList());
-            
             // 获取文档ID列表
-            List<String> docIdList = freshFaq.getDocIdList();
+            List<String> docIdList = currentFaq.getDocIdList();
             if (docIdList != null && !docIdList.isEmpty()) {
+                log.info("准备删除FAQ向量文档，文档ID数量: {}", docIdList.size());
+                
+                // 尝试删除所有关联的向量文档
                 try {
-                    // 删除所有关联的向量文档
-                    log.info("删除向量文档: {}", docIdList);
                     vectorStore.delete(docIdList);
-                    log.info("成功从向量存储中删除文档: {}", docIdList);
+                    log.info("已从向量存储中删除文档，数量: {}", docIdList.size());
                 } catch (Exception e) {
-                    log.warn("从向量存储删除文档时出错，但将继续处理: {}, 错误: {}", docIdList, e.getMessage());
-                    // 即使删除失败，我们仍继续更新状态，因为重要的是将状态重置为NEW
+                    log.warn("删除向量文档时出现错误，将继续更新状态: {}, 错误: {}", currentFaq.getUid(), e.getMessage());
                 }
                 
-                // 清空文档ID列表并更新状态
-                freshFaq.setDocIdList(new ArrayList<>());
-                log.info("设置FAQ向量状态为NEW: {} -> {}", freshFaq.getVectorStatus(), ChunkStatusEnum.NEW.name());
-                freshFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                // 清空文档ID列表并更新状态，确保delete标志不会触发新的删除操作
+                currentFaq.setDocIdList(new ArrayList<>());
+                currentFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
                 
-                log.info("更新FAQ状态为NEW，清空文档ID列表: {}", freshFaq.getUid());
-                FaqEntity savedFaq = faqRestService.save(freshFaq);
-                log.info("保存FAQ删除向量后状态成功: {}, 新状态: {}, 文档ID列表: {}", 
-                        savedFaq.getUid(), savedFaq.getVectorStatus(), savedFaq.getDocIdList());
-                
-                // 更新原始传入的对象，确保调用者能看到变化
-                if (faq != null) {
-                    faq.setDocIdList(new ArrayList<>());
-                    faq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                // 记录原始删除标志，确保不会重复触发删除循环
+                boolean wasDeleted = currentFaq.isDeleted();
+                if (wasDeleted) {
+                    // 临时设置为false以避免触发删除事件
+                    currentFaq.setDeleted(false);
                 }
                 
-                return true;
-            } else {
-                log.info("FAQ没有关联的向量文档，无需删除向量存储: {}", freshFaq.getUid());
+                // 保存更新后的FAQ实体
+                FaqEntity savedFaq = faqRestService.save(currentFaq);
+                log.info("已更新FAQ实体，清除文档ID列表并设置向量状态为NEW: {}, 原删除标志: {}", 
+                          savedFaq.getUid(), wasDeleted);
                 
-                // 仍然将状态设置为NEW，以便后续可以创建新的向量索引
-                if (!ChunkStatusEnum.NEW.name().equals(freshFaq.getVectorStatus())) {
-                    log.info("更新FAQ向量状态为NEW: {} -> {}", freshFaq.getVectorStatus(), ChunkStatusEnum.NEW.name());
-                    freshFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
-                    FaqEntity savedFaq = faqRestService.save(freshFaq);
-                    log.info("保存FAQ更新状态成功: {}, 新状态: {}", savedFaq.getUid(), savedFaq.getVectorStatus());
-                    
-                    // 更新原始传入的对象
-                    if (faq != null) {
-                        faq.setVectorStatus(ChunkStatusEnum.NEW.name());
-                    }
+                // 检查状态是否成功更新
+                if (ChunkStatusEnum.NEW.name().equals(savedFaq.getVectorStatus()) && 
+                   (savedFaq.getDocIdList() == null || savedFaq.getDocIdList().isEmpty())) {
+                    log.info("确认FAQ向量索引已成功删除: {}", savedFaq.getUid());
+                    return true;
                 } else {
-                    log.info("FAQ向量状态已经是NEW，无需更新: {}", freshFaq.getUid());
+                    log.warn("FAQ实体已保存但状态或文档ID列表未正确更新: {}, 当前状态: {}, 文档ID列表: {}", 
+                             savedFaq.getUid(), savedFaq.getVectorStatus(), savedFaq.getDocIdList());
+                    
+                    // 尝试再次更新
+                    savedFaq.setDocIdList(new ArrayList<>());
+                    savedFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                    faqRestService.save(savedFaq);
+                    log.info("已尝试再次更新FAQ实体状态: {}", savedFaq.getUid());
+                    
+                    return true;
                 }
-                
+            } else {
+                // 如果没有文档ID列表，检查状态是否需要更新
+                if (!ChunkStatusEnum.NEW.name().equals(currentFaq.getVectorStatus())) {
+                    currentFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                    faqRestService.save(currentFaq);
+                    log.info("FAQ实体没有文档ID，已更新向量状态为NEW: {}", currentFaq.getUid());
+                } else {
+                    log.info("FAQ实体没有文档ID且状态已是NEW，无需删除操作: {}", currentFaq.getUid());
+                }
                 return true;
             }
         } catch (Exception e) {
-            log.error("从向量存储中删除FAQ失败: {}, 错误: {}", faq.getQuestion(), e.getMessage(), e);
+            log.error("从向量存储中删除FAQ失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage());
             return false;
         }
     }
@@ -413,36 +463,80 @@ public class FaqVectorService {
     
     /**
      * 检查并删除已存在的文档
+     * 增强版本：多次尝试并提供详细日志
      * @param docId 文档ID
      */
     private void checkAndDeleteExistingDoc(String docId) {
-        try {
-            // 使用过滤表达式查询已存在的文档
-            FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
-            FilterExpressionBuilder.Op idOp = expressionBuilder.eq("id", docId);
-            Expression expression = idOp.build();
-            
-            // 构建搜索请求，只查询是否存在，不关心内容
-            SearchRequest searchRequest = SearchRequest.builder()
-                    .query("")
-                    .filterExpression(expression)
-                    .build();
-            
-            List<Document> existingDocs = vectorStore.similaritySearch(searchRequest);
-            
-            // 如果文档存在，则删除
-            if (existingDocs != null && !existingDocs.isEmpty()) {
-                log.info("删除已存在的FAQ向量文档: {}", docId);
-                vectorStore.delete(List.of(docId));
-            }
-        } catch (Exception e) {
-            log.warn("检查文档存在性时出错: {}, 错误: {}", docId, e.getMessage());
-            // 安全起见，尝试直接删除
+        // 验证输入
+        if (docId == null || docId.isEmpty()) {
+            log.warn("尝试检查空文档ID，跳过操作");
+            return;
+        }
+
+        log.info("开始检查并删除文档是否存在: {}", docId);
+        
+        // 最大重试次数
+        int maxRetries = 3;
+        boolean deleteSuccess = false;
+        Exception lastError = null;
+        
+        for (int attempt = 1; attempt <= maxRetries && !deleteSuccess; attempt++) {
             try {
-                vectorStore.delete(List.of(docId));
-            } catch (Exception ex) {
-                log.warn("删除可能存在的文档时出错: {}", ex.getMessage());
+                // 首先尝试使用过滤表达式查询已存在的文档
+                FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+                FilterExpressionBuilder.Op idOp = expressionBuilder.eq("id", docId);
+                Expression expression = idOp.build();
+                
+                // 构建搜索请求，只查询是否存在，不关心内容
+                SearchRequest searchRequest = SearchRequest.builder()
+                        .query("")
+                        .filterExpression(expression)
+                        .build();
+                
+                log.info("尝试第{}次查找文档: {}", attempt, docId);
+                List<Document> existingDocs = vectorStore.similaritySearch(searchRequest);
+                
+                // 如果文档存在，则删除
+                if (existingDocs != null && !existingDocs.isEmpty()) {
+                    log.info("找到已存在的FAQ向量文档: {}, 数量: {}, 尝试删除", docId, existingDocs.size());
+                    vectorStore.delete(List.of(docId));
+                    log.info("成功删除FAQ向量文档: {}", docId);
+                    deleteSuccess = true;
+                } else {
+                    log.info("未找到要删除的FAQ向量文档，可能是新文档: {}", docId);
+                    deleteSuccess = true; // 如果文档不存在也算成功，因为不需要删除
+                }
+            } catch (Exception e) {
+                lastError = e;
+                log.warn("第{}次检查和删除文档时出错: {}, 错误: {}", attempt, docId, e.getMessage());
+                
+                if (attempt == maxRetries) {
+                    // 最后一次尝试，直接强制删除，忽略错误
+                    try {
+                        log.info("最后一次尝试，直接强制删除文档: {}", docId);
+                        vectorStore.delete(List.of(docId));
+                        log.info("强制删除文档可能成功: {}", docId);
+                        deleteSuccess = true;
+                    } catch (Exception ex) {
+                        log.warn("强制删除文档最终失败: {}, 错误: {}", docId, ex.getMessage());
+                    }
+                }
+                
+                // 短暂等待后重试
+                try {
+                    Thread.sleep(100 * attempt); // 100ms, 200ms, 300ms
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
+        }
+        
+        if (deleteSuccess) {
+            log.info("文档检查和删除操作最终成功: {}", docId);
+        } else if (lastError != null) {
+            log.error("经过{}次尝试后，文档检查和删除操作失败: {}, 最后错误: {}", 
+                    maxRetries, docId, lastError.getMessage());
         }
     }
 }
