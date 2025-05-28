@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:57:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:00:27
+ * @LastEditTime: 2025-05-28 15:29:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -45,11 +45,13 @@ public class FaqEntityListener {
         FaqEntity clonedFaq = SerializationUtils.clone(faq);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        
+        // 只有在实体被标记为删除且没有向量处理正在进行时才发送删除事件
         if (faq.isDeleted()) {
-            log.info("FaqEntityListener FaqDeleteEvent: {}", faq.getQuestion());
+            log.info("FaqEntityListener FaqDeleteEvent: {}, 向量状态: {}",  faq.getQuestion(), faq.getVectorStatus());
             publisher.publishEvent(new FaqDeleteEvent(clonedFaq));
         } else {
-            // log.info("FaqEntityListener FaqUpdateEvent: {}", faq.getQuestion());
+            // 如果是状态更新而不是删除操作
             publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
         }
     }
