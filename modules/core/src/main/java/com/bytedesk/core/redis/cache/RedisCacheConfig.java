@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-27 18:45:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 23:09:00
+ * @LastEditTime: 2025-05-29 07:14:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,10 +83,8 @@ public class RedisCacheConfig implements CachingConfigurer {
     @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis", matchIfMissing = false)
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
         log.info("初始化Redis缓存管理器");
-        
         // 默认配置
         RedisCacheConfiguration defaultConfig = defaultCacheConfiguration();
-        
         // 自定义不同缓存空间的TTL
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
         // 用户缓存配置 - 30分钟过期
