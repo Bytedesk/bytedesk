@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 21:26:02
+ * @LastEditTime: 2025-05-28 12:32:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -314,6 +314,18 @@ public class PageRouteController {
 	public String kanban(@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
 		return "forward:/kanban/index.html";
+	}
+
+
+	@GetMapping({
+			"/reactdemo",
+			"/reactdemo/",
+			"/reactdemo/{path:[^\\.]*}",
+			"/reactdemo/{path:[^\\.]*}/{path2:[^\\.]*}"
+	})
+	public String reactdemo(@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
+		return "forward:/reactdemo/index.html";
 	}
 
 	/**
