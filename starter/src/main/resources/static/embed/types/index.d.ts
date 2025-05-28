@@ -30,6 +30,7 @@ declare interface ButtonConfig {
 export declare interface BytedeskConfig {
     isDebug?: boolean;
     isPreload?: boolean;
+    forceRefresh?: boolean;
     baseUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
