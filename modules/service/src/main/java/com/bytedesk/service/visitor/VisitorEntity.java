@@ -54,6 +54,9 @@ public class VisitorEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 
+	// 前端自定义uid，用于区别于自动生成uid
+	private String visitorUid;
+
 	private String nickname;
 
 	@Builder.Default
