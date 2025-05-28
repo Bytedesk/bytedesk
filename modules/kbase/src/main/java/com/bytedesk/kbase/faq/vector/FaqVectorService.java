@@ -58,26 +58,38 @@ public class FaqVectorService {
      * 将FAQ内容添加到向量存储中
      * @param faq FAQ实体
      */
-    @Transactional
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public void indexFaqVector(FaqEntity faq) {
-        log.info("开始向量索引FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
+        String faqUid = faq.getUid();
+        log.info("开始向量索引FAQ: {}, ID: {}, 初始状态: {}", faq.getQuestion(), faqUid, faq.getVectorStatus());
         
         try {
+            // 先从数据库获取最新状态的实体
+            Optional<FaqEntity> freshFaqOpt = faqRestService.findByUid(faqUid);
+            if (freshFaqOpt.isEmpty()) {
+                log.warn("无法找到要创建向量的FAQ实体: {}", faqUid);
+                throw new RuntimeException("FAQ实体不存在: " + faqUid);
+            }
+            
+            FaqEntity freshFaq = freshFaqOpt.get();
+            log.info("获取到最新的FAQ实体: {}, 状态: {}, 文档ID列表: {}", 
+                    freshFaq.getUid(), freshFaq.getVectorStatus(), freshFaq.getDocIdList());
+            
             // 1. 为问题和答案创建文档（带有元数据）
-            String id = "faq_" + faq.getUid();
-            String content = faq.getQuestion() + "\n" + faq.getAnswer();
+            String id = "faq_" + freshFaq.getUid();
+            String content = freshFaq.getQuestion() + "\n" + freshFaq.getAnswer();
             
             // 处理标签，将其转化为字符串便于索引
-            String tags = String.join(",", faq.getTagList());
+            String tags = String.join(",", freshFaq.getTagList());
             
             // 元数据
             Map<String, Object> metadata = Map.of(
-                "uid", faq.getUid(),
-                "question", faq.getQuestion(),
-                KbaseConst.KBASE_KB_UID, faq.getKbase() != null ? faq.getKbase().getUid() : "",
-                "categoryUid", faq.getCategoryUid() != null ? faq.getCategoryUid() : "",
-                "orgUid", faq.getOrgUid(),
-                "enabled", Boolean.toString(faq.getEnabled()),
+                "uid", freshFaq.getUid(),
+                "question", freshFaq.getQuestion(),
+                KbaseConst.KBASE_KB_UID, freshFaq.getKbase() != null ? freshFaq.getKbase().getUid() : "",
+                "categoryUid", freshFaq.getCategoryUid() != null ? freshFaq.getCategoryUid() : "",
+                "orgUid", freshFaq.getOrgUid(),
+                "enabled", Boolean.toString(freshFaq.getEnabled()),
                 "tags", tags
             );
             
@@ -86,40 +98,66 @@ public class FaqVectorService {
             
             // 2. 添加到向量存储
             // 检查是否已存在该文档ID
+            log.info("检查并删除可能存在的文档: {}", id);
             checkAndDeleteExistingDoc(id);
             
             log.info("向向量存储添加文档: {}", id);
             // 添加新文档
             vectorStore.add(List.of(document));
+            log.info("向量存储添加文档成功: {}", id);
             
             // 3. 更新FAQ实体中的文档ID列表
-            List<String> docIdList = faq.getDocIdList();
+            List<String> docIdList = freshFaq.getDocIdList();
             if (docIdList == null) {
                 docIdList = new ArrayList<>();
             }
             
             // 无论是否已存在，都更新状态并保存
             docIdList.add(id);
-            faq.setDocIdList(docIdList);
+            freshFaq.setDocIdList(docIdList);
             
             // 设置向量索引状态为成功
-            faq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+            log.info("设置FAQ向量状态为成功: {} -> {}", freshFaq.getVectorStatus(), ChunkStatusEnum.SUCCESS.name());
+            freshFaq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
             
             // 更新FAQ实体
-            log.info("保存FAQ实体更新，设置向量索引状态为成功: {}", faq.getUid());
-            faqRestService.save(faq);
+            log.info("保存FAQ实体更新，设置向量索引状态为成功: {}, 文档ID数量: {}", 
+                    freshFaq.getUid(), freshFaq.getDocIdList().size());
+            FaqEntity savedFaq = faqRestService.save(freshFaq);
             
-            log.info("FAQ向量索引成功: {}, 文档ID: {}", faq.getQuestion(), faq.getDocIdList());
+            // 确认保存后状态
+            log.info("FAQ向量索引保存成功确认：{}, 状态: {}, 文档ID列表: {}", 
+                    savedFaq.getUid(), savedFaq.getVectorStatus(), savedFaq.getDocIdList());
+            
+            // 更新原始传入的对象，确保调用者也能看到变化
+            if (faq != null) {
+                faq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+                faq.setDocIdList(docIdList);
+            }
+            
         } catch (Exception e) {
-            log.error("FAQ向量索引失败: {}, 错误: {}", faq.getQuestion(), e.getMessage(), e);
+            log.error("FAQ向量索引失败: {}, 错误: {}", faqUid, e.getMessage(), e);
             
-            // 设置向量索引状态为失败
-            faq.setVectorStatus(ChunkStatusEnum.ERROR.name());
             try {
-                log.info("保存FAQ实体更新，设置向量索引状态为失败: {}", faq.getUid());
-                faqRestService.save(faq);
+                // 重新获取实体以确保我们修改的是最新版本
+                Optional<FaqEntity> errorFaqOpt = faqRestService.findByUid(faqUid);
+                if (errorFaqOpt.isPresent()) {
+                    FaqEntity errorFaq = errorFaqOpt.get();
+                    // 设置向量索引状态为失败
+                    log.warn("设置FAQ向量状态为错误: {} -> {}", errorFaq.getVectorStatus(), ChunkStatusEnum.ERROR.name());
+                    errorFaq.setVectorStatus(ChunkStatusEnum.ERROR.name());
+                    FaqEntity savedErrorFaq = faqRestService.save(errorFaq);
+                    log.info("保存FAQ错误状态成功: {}, 新状态: {}", savedErrorFaq.getUid(), savedErrorFaq.getVectorStatus());
+                    
+                    // 更新原始传入的对象
+                    if (faq != null) {
+                        faq.setVectorStatus(ChunkStatusEnum.ERROR.name());
+                    }
+                } else {
+                    log.warn("无法找到FAQ实体进行错误状态更新: {}", faqUid);
+                }
             } catch (Exception saveEx) {
-                log.error("更新FAQ向量索引状态失败: {}, 错误: {}", faq.getUid(), saveEx.getMessage());
+                log.error("更新FAQ向量索引错误状态失败: {}, 错误: {}", faqUid, saveEx.getMessage());
             }
             
             throw e;
@@ -166,29 +204,71 @@ public class FaqVectorService {
      * @param faq 要删除的FAQ实体
      * @return 是否删除成功
      */
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public Boolean deleteFaqVector(FaqEntity faq) {
+        String faqUid = faq.getUid();
         log.info("从向量索引中删除FAQ: {}, 文档ID列表: {}", faq.getQuestion(), faq.getDocIdList());
         
         try {
+            // 先从数据库获取最新状态
+            Optional<FaqEntity> freshFaqOpt = faqRestService.findByUid(faqUid);
+            if (freshFaqOpt.isEmpty()) {
+                log.warn("无法找到要删除向量的FAQ实体: {}", faqUid);
+                return false;
+            }
+            
+            FaqEntity freshFaq = freshFaqOpt.get();
+            log.info("获取到最新的FAQ实体用于删除向量: {}, 状态: {}, 文档ID列表: {}", 
+                    freshFaq.getUid(), freshFaq.getVectorStatus(), freshFaq.getDocIdList());
+            
             // 获取文档ID列表
-            List<String> docIdList = faq.getDocIdList();
+            List<String> docIdList = freshFaq.getDocIdList();
             if (docIdList != null && !docIdList.isEmpty()) {
-                // 删除所有关联的向量文档
-                log.info("删除向量文档: {}", docIdList);
-                vectorStore.delete(docIdList);
+                try {
+                    // 删除所有关联的向量文档
+                    log.info("删除向量文档: {}", docIdList);
+                    vectorStore.delete(docIdList);
+                    log.info("成功从向量存储中删除文档: {}", docIdList);
+                } catch (Exception e) {
+                    log.warn("从向量存储删除文档时出错，但将继续处理: {}, 错误: {}", docIdList, e.getMessage());
+                    // 即使删除失败，我们仍继续更新状态，因为重要的是将状态重置为NEW
+                }
                 
                 // 清空文档ID列表并更新状态
-                faq.setDocIdList(new ArrayList<>());
-                faq.setVectorStatus(ChunkStatusEnum.NEW.name());
-                log.info("更新FAQ状态为NEW，清空文档ID列表: {}", faq.getUid());
-                faqRestService.save(faq);
+                freshFaq.setDocIdList(new ArrayList<>());
+                log.info("设置FAQ向量状态为NEW: {} -> {}", freshFaq.getVectorStatus(), ChunkStatusEnum.NEW.name());
+                freshFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                
+                log.info("更新FAQ状态为NEW，清空文档ID列表: {}", freshFaq.getUid());
+                FaqEntity savedFaq = faqRestService.save(freshFaq);
+                log.info("保存FAQ删除向量后状态成功: {}, 新状态: {}, 文档ID列表: {}", 
+                        savedFaq.getUid(), savedFaq.getVectorStatus(), savedFaq.getDocIdList());
+                
+                // 更新原始传入的对象，确保调用者能看到变化
+                if (faq != null) {
+                    faq.setDocIdList(new ArrayList<>());
+                    faq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                }
                 
                 return true;
             } else {
-                log.info("FAQ没有关联的向量文档，无需删除: {}", faq.getUid());
+                log.info("FAQ没有关联的向量文档，无需删除向量存储: {}", freshFaq.getUid());
+                
                 // 仍然将状态设置为NEW，以便后续可以创建新的向量索引
-                faq.setVectorStatus(ChunkStatusEnum.NEW.name());
-                faqRestService.save(faq);
+                if (!ChunkStatusEnum.NEW.name().equals(freshFaq.getVectorStatus())) {
+                    log.info("更新FAQ向量状态为NEW: {} -> {}", freshFaq.getVectorStatus(), ChunkStatusEnum.NEW.name());
+                    freshFaq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                    FaqEntity savedFaq = faqRestService.save(freshFaq);
+                    log.info("保存FAQ更新状态成功: {}, 新状态: {}", savedFaq.getUid(), savedFaq.getVectorStatus());
+                    
+                    // 更新原始传入的对象
+                    if (faq != null) {
+                        faq.setVectorStatus(ChunkStatusEnum.NEW.name());
+                    }
+                } else {
+                    log.info("FAQ向量状态已经是NEW，无需更新: {}", freshFaq.getUid());
+                }
+                
                 return true;
             }
         } catch (Exception e) {
