@@ -1,6 +1,6 @@
 import { jsx as n } from "react/jsx-runtime";
 import { useRef as i, useEffect as o } from "react";
-import u from "../node_modules/next/dynamic/index.js";
+import u from "../node_modules/.pnpm/next@14.2.28_@babel_core@7.26.10_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dynamic/index.js";
 import { IntlProvider as m } from "react-intl";
 import { messages as c } from "../locales/index/index.js";
 const w = u(() => Promise.resolve(({ locale: e = "zh-cn", ...t }) => /* @__PURE__ */ n(
