@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-20 09:59:28
+ * @LastEditTime: 2025-05-28 18:29:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,13 +96,15 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
-        // || e.getMessage().contains("/wechat/")
         if (e.getMessage().contains("/vip/")) {
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                     .body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
         }
         //
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), 404));
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(e.getMessage(), 404));
         // // 如果你确定要进行后端跳转，并且你的应用支持这种做法，你可以使用以下方式：
         // String redirectUrl = "/error/404.html";
         // // 使用HttpStatus.SEE_OTHER（303）来表示重定向
