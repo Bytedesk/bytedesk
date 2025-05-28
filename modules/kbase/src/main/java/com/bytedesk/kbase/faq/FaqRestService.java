@@ -48,12 +48,12 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.kbase.chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
