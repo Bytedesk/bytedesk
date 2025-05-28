@@ -17,7 +17,6 @@ com.bytedesk.ai.robot.agent
 com.bytedesk.ai.robot.event
 com.bytedesk.ai.settings
 com.bytedesk.ai.springai
-com.bytedesk.ai.springai.back
 com.bytedesk.ai.springai.controller
 com.bytedesk.ai.springai.event
 com.bytedesk.ai.springai.listener
@@ -47,7 +46,9 @@ com.bytedesk.control
 com.bytedesk.control.controller
 com.bytedesk.core
 com.bytedesk.core.action
+com.bytedesk.core.action.aop
 com.bytedesk.core.action.disruptor
+com.bytedesk.core.action.event
 com.bytedesk.core.annotation
 com.bytedesk.core.aop
 com.bytedesk.core.assistant
@@ -92,7 +93,6 @@ com.bytedesk.core.message.event
 com.bytedesk.core.notice
 com.bytedesk.core.notice.event
 com.bytedesk.core.notice.extra
-com.bytedesk.core.ocr
 com.bytedesk.core.order
 com.bytedesk.core.payment
 com.bytedesk.core.push
@@ -223,14 +223,14 @@ com.bytedesk.kbase.faq.elastic
 com.bytedesk.kbase.faq.event
 com.bytedesk.kbase.faq.mq
 com.bytedesk.kbase.faq.vector
+com.bytedesk.kbase.file
+com.bytedesk.kbase.file.event
 com.bytedesk.kbase.kbase
 com.bytedesk.kbase.kbase_invite
 com.bytedesk.kbase.kbase_invite.event
 com.bytedesk.kbase.kbase.event
 com.bytedesk.kbase.llm_chunk
 com.bytedesk.kbase.llm_chunk.event
-com.bytedesk.kbase.llm_file
-com.bytedesk.kbase.llm_file.event
 com.bytedesk.kbase.llm_text
 com.bytedesk.kbase.llm_text.event
 com.bytedesk.kbase.llm_website
@@ -429,7 +429,6 @@ com.bytedesk.webrtc
 com.bytedesk.wechat
 com.bytedesk.wechat.app
 com.bytedesk.wechat.app.event
-com.bytedesk.wechat.channel
 com.bytedesk.wechat.common
 com.bytedesk.wechat.common.aes_json
 com.bytedesk.wechat.common.aes_xml

@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.freeswitch.esl.client.inbound.Client;
 import org.freeswitch.esl.client.transport.SendMsg;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+// import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 // import com.bytedesk.freeswitch.config.FreeSwitchProperties;
@@ -24,7 +24,7 @@ public class CallService {
 
     private final Client eslClient;
     // private final FreeSwitchProperties freeSwitchProperties;
-    private final SimpMessagingTemplate messagingTemplate;
+    // private final SimpMessagingTemplate messagingTemplate;
     
     // 存储活动呼叫信息
     private final Map<String, CallInfo> activeCallMap = new ConcurrentHashMap<>();
@@ -387,14 +387,14 @@ public class CallService {
      */
     private void notifyCallEvent(String userId, String eventType, Object data) {
         String destination = String.format("/user/%s/queue/call-events", userId);
-        Map<String, Object> payload = Map.of(
-            "type", eventType,
-            "data", data,
-            "timestamp", System.currentTimeMillis()
-        );
+        // Map<String, Object> payload = Map.of(
+        //     "type", eventType,
+        //     "data", data,
+        //     "timestamp", System.currentTimeMillis()
+        // );
         
         log.debug("发送呼叫事件: {} -> {} {}", destination, eventType, data);
-        messagingTemplate.convertAndSendToUser(userId, "/queue/call-events", payload);
+        // messagingTemplate.convertAndSendToUser(userId, "/queue/call-events", payload);
     }
     
     /**
