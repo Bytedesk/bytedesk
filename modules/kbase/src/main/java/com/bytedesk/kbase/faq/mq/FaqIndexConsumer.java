@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-17 10:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 15:31:34
+ * @LastEditTime: 2025-05-28 15:59:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,6 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.faq.vector.FaqVectorService;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -193,47 +192,57 @@ public class FaqIndexConsumer {
     
     /**
      * 在单独事务中处理向量索引
+     * 删除向量索引后，更新实体状态
      */
-    // 不使用事务注解，让内部方法管理自己的事务
+    // 不使用事务注解，让内部方法管理自己的事务，并添加乐观锁重试机制
     public void processVectorIndex(FaqEntity faq) {
         try {
             log.info("开始处理FAQ向量索引: {}, 当前状态: {}", faq.getUid(), faq.getVectorStatus());
-            
-            // 获取当前实体的最新状态
-            Optional<FaqEntity> latestFaqOpt = faqRestService.findByUid(faq.getUid());
-            if (!latestFaqOpt.isPresent()) {
-                log.error("无法获取最新FAQ实体，处理向量索引失败: {}", faq.getUid());
-                return;
-            }
-            FaqEntity latestFaq = latestFaqOpt.get();
-            
+
             // 先尝试删除旧的向量索引
-            boolean deleteResult = deleteFaqVector(latestFaq);
-            log.info("删除旧向量索引结果: {}, FAQ: {}", deleteResult, latestFaq.getUid());
+            boolean deleteResult = deleteFaqVector(faq);
+            log.info("删除旧向量索引结果: {}, FAQ: {}", deleteResult, faq.getUid());
             
             // 即使删除失败，也尝试创建索引，因为可能是首次创建没有需要删除的索引
-            log.info("准备创建新向量索引: {}", latestFaq.getUid());
-            boolean indexResult = indexFaqVector(latestFaq);
+            log.info("准备创建新向量索引: {}", faq.getUid());
             
-            if (indexResult) {
-                log.info("向量索引创建成功: {}, 状态: {}", latestFaq.getUid(), latestFaq.getVectorStatus());
-                
-                // 再次检查状态确保保存成功
-                Optional<FaqEntity> finalFaqOpt = faqRestService.findByUid(latestFaq.getUid());
-                if (finalFaqOpt.isPresent() && 
-                    ChunkStatusEnum.SUCCESS.name().equals(finalFaqOpt.get().getVectorStatus())) {
-                    log.info("已确认FAQ向量索引状态已更新为SUCCESS: {}", latestFaq.getUid());
-                } else {
-                    log.warn("FAQ向量索引可能创建成功但状态未正确更新: {}", latestFaq.getUid());
+            // 添加乐观锁重试机制
+            int maxRetries = 3;
+            int retryCount = 0;
+            boolean indexSuccess = false;
+            
+            while (!indexSuccess && retryCount < maxRetries) {
+                try {
+                    if (retryCount > 0) {
+                        // 重试前等待一段随机时间，避免并发冲突
+                        int delay = 100 + random.nextInt(retryCount * 200);
+                        Thread.sleep(delay);
+                        
+                        // 重新获取最新的FAQ实体
+                        Optional<FaqEntity> refreshedFaqOpt = faqRestService.findByUid(faq.getUid());
+                        if (refreshedFaqOpt.isPresent()) {
+                            faq = refreshedFaqOpt.get();
+                            log.info("重试前刷新FAQ实体: {}, 尝试次数: {}", faq.getUid(), retryCount + 1);
+                        } else {
+                            log.warn("重试时无法找到FAQ实体: {}", faq.getUid());
+                            break;
+                        }
+                    }
+                    faqVectorService.indexFaqVector(faq);
+                    indexSuccess = true;
+                    log.info("成功创建FAQ向量索引: {}, 尝试次数: {}", faq.getUid(), retryCount + 1);
+                    
+                } catch (org.springframework.orm.ObjectOptimisticLockingFailureException e) {
+                    retryCount++;
+                    log.warn("创建向量索引时发生乐观锁冲突: {}, 尝试次数: {}/{}",
+                            faq.getUid(), retryCount, maxRetries);
+                    
+                    if (retryCount >= maxRetries) {
+                        log.error("达到最大重试次数，创建向量索引失败: {}", faq.getUid());
+                    }
                 }
-            } else {
-                log.warn("向量索引创建失败: {}, 状态: {}", latestFaq.getUid(), latestFaq.getVectorStatus());
-                
-                // 如果创建失败，再尝试一次
-                log.info("重试创建向量索引: {}", latestFaq.getUid());
-                indexResult = indexFaqVector(latestFaq);
-                log.info("重试创建向量索引结果: {}, FAQ: {}", indexResult, latestFaq.getUid());
             }
+            
         } catch (Exception e) {
             // 记录异常但不抛出，避免影响整个流程
             log.error("处理向量索引时出错: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
@@ -250,76 +259,6 @@ public class FaqIndexConsumer {
             return faqVectorService.deleteFaqVector(faq);
         } catch (Exception e) {
             log.error("删除向量索引失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
-            return false;
-        }
-    }
-    
-    /**
-     * 在完全独立事务中创建向量索引
-     */
-    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public Boolean indexFaqVector(FaqEntity faq) {
-        try {
-            log.info("在完全独立事务中创建向量索引: {}", faq.getUid());
-            
-            // 先确保FAQ存在且状态正确
-            Optional<FaqEntity> faqOpt = faqRestService.findByUid(faq.getUid());
-            if (!faqOpt.isPresent()) {
-                log.error("找不到FAQ实体，无法创建向量索引: {}", faq.getUid());
-                return false;
-            }
-            
-            // 使用最新的FAQ实体
-            FaqEntity latestFaq = faqOpt.get();
-
-            // 调用向量服务创建索引
-            faqVectorService.indexFaqVector(latestFaq);
-            
-            // 清除缓存并重新获取FAQ以检查状态更新
-            try {
-                // 尝试清除可能的缓存
-                faqRestService.getClass().getMethod("clearCache", String.class).invoke(faqRestService, latestFaq.getUid());
-            } catch (Exception ex) {
-                log.debug("清除缓存方法不存在，忽略: {}", ex.getMessage());
-            }
-            
-            Optional<FaqEntity> updatedFaqOpt = faqRestService.findByUid(latestFaq.getUid());
-            if (!updatedFaqOpt.isPresent()) {
-                log.error("创建向量索引后无法获取FAQ实体: {}", latestFaq.getUid());
-                return false;
-            }
-            
-            FaqEntity updatedFaq = updatedFaqOpt.get();
-            
-            // 检查操作后的向量状态来确认索引是否创建成功
-            if (updatedFaq.getVectorStatus() != null && 
-                updatedFaq.getVectorStatus().equals(ChunkStatusEnum.SUCCESS.name())) {
-                log.info("确认向量索引创建成功: {}, 状态: {}, 文档ID: {}", 
-                        updatedFaq.getUid(), 
-                        updatedFaq.getVectorStatus(),
-                        updatedFaq.getDocIdList());
-                return true;
-            } else {
-                log.warn("向量索引状态未更新为成功: {}, 当前状态: {}", updatedFaq.getUid(), updatedFaq.getVectorStatus());
-                
-                // 尝试手动强制更新状态
-                try {
-                    log.info("尝试强制更新向量索引状态: {}", updatedFaq.getUid());
-                    updatedFaq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-                    updatedFaq.setDeleted(false); // 确保不会触发删除事件
-                    FaqEntity savedFaq = faqRestService.save(updatedFaq);
-                    
-                    log.info("手动更新向量索引状态结果: 状态={}, 文档ID数量={}", 
-                            savedFaq.getVectorStatus(), 
-                            savedFaq.getDocIdList() != null ? savedFaq.getDocIdList().size() : 0);
-                    return true;
-                } catch (Exception statusEx) {
-                    log.error("强制更新向量索引状态失败: {}, 错误: {}", updatedFaq.getUid(), statusEx.getMessage());
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            log.error("创建向量索引失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
             return false;
         }
     }
