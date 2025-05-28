@@ -30,10 +30,10 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.file.event.FileUpdateDocEvent;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;

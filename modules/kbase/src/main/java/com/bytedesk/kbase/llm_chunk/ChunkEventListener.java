@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.chunk;
+package com.bytedesk.kbase.llm_chunk;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,13 +24,13 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.kbase.chunk.event.ChunkCreateEvent;
-import com.bytedesk.kbase.chunk.event.ChunkDeleteEvent;
-import com.bytedesk.kbase.chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileResponse;
 import com.bytedesk.kbase.file.FileRestService;
 import com.bytedesk.kbase.file.event.FileChunkEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

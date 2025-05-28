@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.faq.FaqRequest;
 import com.bytedesk.kbase.faq.FaqStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

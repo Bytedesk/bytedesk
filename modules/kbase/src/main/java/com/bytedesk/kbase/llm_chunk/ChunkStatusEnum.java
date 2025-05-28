@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.chunk;
+package com.bytedesk.kbase.llm_chunk;
 
 public enum ChunkStatusEnum {
     NEW, // 新建

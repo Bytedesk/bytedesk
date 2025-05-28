@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
