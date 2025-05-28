@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="90px" height="90px" viewBox="0 0 90 90" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Customer Service</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(5.000000, 5.000000)" stroke="#3578E5" stroke-width="2">
+            <circle cx="40" cy="20" r="15"></circle>
+            <path d="M15,60 C15,46.745 26.745,35 40,35 C53.255,35 65,46.745 65,60" stroke-linecap="round"></path>
+            <path d="M20,50 L20,70" stroke-linecap="round"></path>
+            <path d="M60,50 L60,70" stroke-linecap="round"></path>
+            <path d="M20,55 L15,55" stroke-linecap="round"></path>
+            <path d="M60,55 L65,55" stroke-linecap="round"></path>
+            <path d="M25,75 L55,75" stroke-linecap="round"></path>
+            <path d="M40,65 L40,75" stroke-linecap="round"></path>
+            <path d="M30,15 C30,15 35,25 50,15" stroke-linecap="round"></path>
+        </g>
+    </g>
+</svg>

@@ -149,10 +149,10 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         }
         robot.setName(request.getName());
         robot.setNickname(request.getNickname());
-        // robot.setType(request.getType());
+        robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
-        // robot.setKbEnabled(request.getKbEnabled());
-        // robot.setKbUid(request.getKbUid());
+        robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
+        robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
         
         // 设置llm相关属性
         if (request.getLlm() != null) {
