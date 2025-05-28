@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.chunk;
+package com.bytedesk.kbase.llm_chunk;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,12 +29,11 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileRestService;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
-
+import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 
 import lombok.RequiredArgsConstructor;

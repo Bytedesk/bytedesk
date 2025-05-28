@@ -6,6 +6,6 @@
  * @since 2024
  */
 @NonNullApi
-package com.bytedesk.kbase.chunk;
+package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.lang.NonNullApi; 

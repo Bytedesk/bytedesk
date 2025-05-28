@@ -21,8 +21,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.upload.UploadEntity;
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

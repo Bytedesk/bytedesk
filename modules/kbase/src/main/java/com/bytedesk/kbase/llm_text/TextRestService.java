@@ -34,9 +34,9 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
 
 import lombok.AllArgsConstructor;

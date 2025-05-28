@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.kbase.chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

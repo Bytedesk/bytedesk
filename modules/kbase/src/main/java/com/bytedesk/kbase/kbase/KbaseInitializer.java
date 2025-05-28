@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.kbase.chunk.ChunkInitializer;
 import com.bytedesk.kbase.faq.FaqInitializer;
 import com.bytedesk.kbase.file.FileInitializer;
+import com.bytedesk.kbase.llm_chunk.ChunkInitializer;
 import com.bytedesk.kbase.llm_text.TextInitializer;
 import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
 

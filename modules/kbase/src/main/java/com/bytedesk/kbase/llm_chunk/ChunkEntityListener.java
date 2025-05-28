@@ -11,16 +11,16 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.chunk;
+package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.chunk.event.ChunkCreateEvent;
-import com.bytedesk.kbase.chunk.event.ChunkDeleteEvent;
-import com.bytedesk.kbase.chunk.event.ChunkUpdateEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
+import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
