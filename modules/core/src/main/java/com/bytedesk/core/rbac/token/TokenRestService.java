@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 22:13:05
+ * @LastEditTime: 2025-05-28 22:45:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,11 +13,10 @@
  */
 package com.bytedesk.core.rbac.token;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,12 +77,13 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * @param type 令牌类型
      * @return List<TokenEntity>
      */
-    @Cacheable(cacheNames = "token", key = "#userUid + '_' + #type", unless = "#result == null")
-    public List<TokenEntity> findValidTokensByUserUidAndType(String userUid, String type) {
-        return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
-            userUid, type, LocalDateTime.now());
-    }
+    // @Cacheable(cacheNames = "token", key = "#userUid + '_' + #type", unless = "#result == null")
+    // public List<TokenEntity> findValidTokensByUserUidAndType(String userUid, String type) {
+    //     return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
+    //         userUid, type, LocalDateTime.now());
+    // }
 
+    @CachePut(cacheNames = "token", key = "#request.accessToken")
     @Override
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);

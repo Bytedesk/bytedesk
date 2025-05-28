@@ -107,15 +107,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
     }
 
     @Override
-    public UserEntity save(UserEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
     protected UserEntity doSave(UserEntity entity) {
         return userRepository.save(entity);
     }
@@ -178,4 +169,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         // excel.setOrgUid(entity.getOrgUid());
         return excel;
     }
+
+
 }
