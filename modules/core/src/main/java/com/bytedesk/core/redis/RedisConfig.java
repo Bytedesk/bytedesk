@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-29 12:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-23 17:18:02
+ * @LastEditTime: 2025-05-29 12:49:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,12 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -41,6 +36,9 @@ public class RedisConfig {
 
     @Autowired
     private JedisPoolProperties jedisPoolProperties;
+    
+    @Autowired
+    private ObjectMapper objectMapperBean;
     
     // https://github.com/redis/jedis
     @Bean
@@ -74,22 +72,10 @@ public class RedisConfig {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         
-        // 配置ObjectMapper以支持Java 8日期时间类型
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, 
-                ObjectMapper.DefaultTyping.NON_FINAL);
-        // 添加JavaTimeModule以支持LocalDateTime等Java 8日期时间类型
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        // 配置循环引用处理
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // 设置JSON序列化特性，处理循环引用
-        objectMapper.configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false);
-        // 禁用未知属性导致失败
-        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // 使用共享的ObjectMapper配置
+        ObjectMapper objectMapper = objectMapperBean;
         
-        // 使用配置好的ObjectMapper创建序列化器
+        // 使用配置好的共享ObjectMapper创建序列化器
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         
         // 设置序列化器
