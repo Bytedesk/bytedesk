@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-27 18:45:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 11:04:10
+ * @LastEditTime: 2025-05-29 14:31:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,29 +60,7 @@ public class RedisCacheConfig implements CachingConfigurer {
     @Autowired
     @Qualifier("redisObjectMapper")
     private ObjectMapper objectMapperBean;
-
-    /**
-     * 自定义Key生成器，用于@Cacheable注解
-     * 格式: 类名::方法名:参数
-     */
-    // @Bean
-    // public KeyGenerator keyGenerator() {
-    //     return (target, method, params) -> {
-    //         StringBuilder sb = new StringBuilder();
-    //         sb.append(target.getClass().getName());
-    //         sb.append("::");
-    //         sb.append(method.getName());
-    //         sb.append(":");
-    //         for (Object param : params) {
-    //             if (param != null) {
-    //                 sb.append(param.toString());
-    //                 sb.append("_");
-    //             }
-    //         }
-    //         return sb.toString();
-    //     };
-    // }
-
+    
     /**
      * Redis缓存管理器配置
      * 支持TTL和自定义序列化

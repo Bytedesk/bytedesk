@@ -57,6 +57,7 @@ public class UserOrganizationRoleEntity implements Serializable  {
     private UserEntity user;
 
     @ManyToOne
+    @com.fasterxml.jackson.annotation.JsonBackReference("org-userRoles")
     private OrganizationEntity organization;
 
     // 可以设置多个角色
@@ -67,6 +68,7 @@ public class UserOrganizationRoleEntity implements Serializable  {
         joinColumns = @JoinColumn(name = "user_org_role_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"authorities"})
     private Set<RoleEntity> roles = new HashSet<>();
     
     // 用户角色有效期

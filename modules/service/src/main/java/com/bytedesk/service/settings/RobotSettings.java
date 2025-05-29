@@ -16,6 +16,7 @@ package com.bytedesk.service.settings;
 import java.io.Serializable;
 
 import com.bytedesk.ai.robot.RobotEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
@@ -47,6 +48,7 @@ public class RobotSettings  implements Serializable {
     private Boolean nonWorktimeRobot = false;
     
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private RobotEntity robot;
 
     // 是否应该转接到机器人
