@@ -29,6 +29,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
@@ -99,6 +100,7 @@ public class QueueEntity extends BaseEntity {
         private List<QueueMemberEntity> robotQueueMembers = new ArrayList<>();
 
         // 将queueMembers中的thread, 按照thread.created按照24小时分组，统计每个分组的数量？
+        @JsonIgnore
         public List<Integer> getThreadsCountByHour() {
                 List<Integer> threadsCountByHour = new ArrayList<>();
                 for (int i = 0; i < 24; i++) {
