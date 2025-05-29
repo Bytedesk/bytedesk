@@ -53,6 +53,7 @@ public class UserOrganizationRoleEntity implements Serializable  {
     private Long id;
 
     @ManyToOne
+    @com.fasterxml.jackson.annotation.JsonBackReference("user-orgRoles")
     private UserEntity user;
 
     @ManyToOne
