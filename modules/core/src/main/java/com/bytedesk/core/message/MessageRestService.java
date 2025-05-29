@@ -16,10 +16,11 @@ package com.bytedesk.core.message;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -127,6 +128,16 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
     public MessageResponse update(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    @CachePut(value = "message", key = "#message.uid")
+    public MessageEntity save(MessageEntity message) {
+        try {
+            return doSave(message);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return handleOptimisticLockingFailureException(e, message);
+        }
     }
 
     @Override

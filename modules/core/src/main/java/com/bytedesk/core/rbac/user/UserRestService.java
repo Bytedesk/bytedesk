@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:24:25
+ * @LastEditTime: 2025-05-29 14:02:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -58,7 +58,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
-    @Cacheable(value = "userCache", key = "#uid", unless = "#result == null")
+    @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     @Override
     public Optional<UserEntity> findByUid(String uid) {
         return userRepository.findByUid(uid);

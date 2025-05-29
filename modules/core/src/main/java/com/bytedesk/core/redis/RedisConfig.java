@@ -14,6 +14,7 @@
 package com.bytedesk.core.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -38,6 +39,7 @@ public class RedisConfig {
     private JedisPoolProperties jedisPoolProperties;
     
     @Autowired
+    @Qualifier("redisObjectMapper")
     private ObjectMapper objectMapperBean;
     
     // https://github.com/redis/jedis
