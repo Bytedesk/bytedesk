@@ -32,6 +32,13 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -104,6 +111,26 @@ public class RedisCacheConfig implements CachingConfigurer {
      * 使用Jackson作为JSON序列化器
      */
     private RedisCacheConfiguration defaultCacheConfiguration() {
+        // 配置ObjectMapper以支持Java 8日期时间类型
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, 
+                ObjectMapper.DefaultTyping.NON_FINAL);
+        // 添加JavaTimeModule以支持LocalDateTime等Java 8日期时间类型
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // 配置循环引用处理
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        // 设置JSON序列化特性，处理循环引用
+        objectMapper.configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false);
+        // 增加循环引用检测并处理
+        objectMapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT);
+        // 禁用未知属性导致失败
+        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // 使用配置好的ObjectMapper创建序列化器
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMillis(timeToLive)) // 设置TTL
                 .disableCachingNullValues() // 不缓存null值
@@ -112,8 +139,8 @@ public class RedisCacheConfig implements CachingConfigurer {
                         RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
                 ) // 使用StringRedisSerializer来序列化key
                 .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())
-                ); // 使用GenericJackson2JsonRedisSerializer来序列化value
+                        RedisSerializationContext.SerializationPair.fromSerializer(serializer)
+                ); // 使用配置好的序列化器来序列化value
     }
 
     @Override

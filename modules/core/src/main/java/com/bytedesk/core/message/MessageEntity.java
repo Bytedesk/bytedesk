@@ -16,6 +16,7 @@ package com.bytedesk.core.message;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class MessageEntity extends AbstractMessageEntity {
     // 多对一thread, 多条消息对应一个thread
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
+    @JsonBackReference
     private ThreadEntity thread;
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
