@@ -41,7 +41,9 @@ public class ThreadSLATimeoutNotificationDelegate implements JavaDelegate {
         String userUid = (String) execution.getVariable("userUid");
         String agentUid = (String) execution.getVariable("agentUid");
         String workgroupUid = (String) execution.getVariable("workgroupUid");
-        String slaTime = (String) execution.getVariable("slaTime");
+        // 从流程变量获取slaTime，并确保类型安全的转换
+        Object slaTimeObj = execution.getVariable("slaTime");
+        String slaTime = slaTimeObj != null ? String.valueOf(slaTimeObj) : null;
         log.info("Processing SLA timeout for thread: {}, visitor: {}, agent: {}, workgroup: {}, SLA time: {}",
             threadUid, userUid, agentUid, workgroupUid, slaTime);
         

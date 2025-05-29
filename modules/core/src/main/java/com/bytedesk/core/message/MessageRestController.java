@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 14:20:47
+ * @LastEditTime: 2025-05-29 18:11:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,8 +86,8 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
      * @return 分页消息列表
      */
     @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
-    @GetMapping("/query/topic")
-    public ResponseEntity<?> queryByTopic(MessageRequest request) {
+    @GetMapping("/thread/topic")
+    public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
@@ -114,7 +114,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
      * @return 分页消息列表
      */
     @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
-    @GetMapping("/query/thread/uid")
+    @GetMapping("/thread/uid")
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
