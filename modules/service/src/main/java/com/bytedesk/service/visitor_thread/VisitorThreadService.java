@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:28:15
+ * @LastEditTime: 2025-05-29 17:53:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,6 +37,7 @@ import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -186,13 +187,21 @@ public class VisitorThreadService
         //
         String orgUid = agent.getOrgUid();
         //
+        // 为避免空指针异常，先检查agent.getMember()是否为空
+        UserEntity owner = null;
+        if (agent.getMember() != null) {
+            owner = agent.getMember().getUser();
+        } else {
+            log.warn("Agent member is null for agent uid: {}", agent.getUid());
+        }
+
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.AGENT.name())
                 .agent(agentProtobuf.toJson())
                 .userUid(agent.getUid()) // 客服uid
-                .owner(agent.getMember().getUser())
+                .owner(owner) // 使用安全获取的owner值
                 .user(visitor)
                 .extra(extra)
                 .client(visitorRequest.getClient())

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 15:11:26
+ * @LastEditTime: 2025-05-29 18:09:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -39,7 +40,9 @@ import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.message_unread.MessageUnreadService;
@@ -47,6 +50,7 @@ import com.bytedesk.service.message_unread.MessageUnreadService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +69,8 @@ public class VisitorRestControllerVisitor {
     private final MessageUnreadService messageUnreadService;
 
     private final IMessageSendService messageSendService;
+
+    private final MessageRestService messageRestService;
 
     private final IpService ipService;
 
@@ -134,6 +140,36 @@ public class VisitorRestControllerVisitor {
         int count = messageUnreadService.getUnreadCount(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success("pong", count));
+    }
+
+    /**
+     * 根据主题查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
+    @GetMapping("/message/thread/topic")
+    public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
+
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 根据会话UID查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
+    @GetMapping("/message/thread/uid")
+    public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
+
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     // 访客拉取未读消息
@@ -232,7 +268,6 @@ public class VisitorRestControllerVisitor {
         return emitter;
     }
 
-
     // message/sync
     @BlackIpFilter(title = "black", action = "sync")
     @BlackUserFilter(title = "black", action = "sync")
@@ -241,8 +276,6 @@ public class VisitorRestControllerVisitor {
     @VisitorAnnotation(title = "visitor", action = "sync", description = "sync visitor message")
     @PostMapping("/message/sync")
     public ResponseEntity<?> sync(@RequestBody VisitorRequest visitorRequest) {
-
-        
 
         return ResponseEntity.ok(JsonResult.success("sync success"));
     }
