@@ -47,11 +47,8 @@ public class ObjectMapperConfig {
         ObjectMapper objectMapper = JsonMapper.builder()
             // 设置可见性
             .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
-            // 启用默认类型
-            .activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance, 
-                ObjectMapper.DefaultTyping.NON_FINAL
-            )
+            // 禁用默认类型信息，避免在JSON中包含类型信息
+            // .activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL)
             // 处理循环引用
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
             .configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false)
