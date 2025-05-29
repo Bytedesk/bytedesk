@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-27 08:58:22
+ * @LastEditTime: 2025-05-29 19:30:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,8 +37,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class RobotRestController extends BaseRestController<RobotRequest> {
 
     private final RobotRestService robotRestService;
-
-    // private final RobotAgentService robotAgentService;
 
     // @PreAuthorize("hasAuthority('ROBOT_READ')")
     @Override
