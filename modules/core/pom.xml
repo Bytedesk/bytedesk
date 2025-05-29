@@ -163,6 +163,13 @@
 			<version>0.25.0</version>
 		</dependency>
 
+		<!-- Required for Hibernate5Module to work with JPA annotations -->
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+
 		<!-- TODO: Rate Limiter -->
 		<!-- https://bucket4j.com/8.14.0/toc.html -->
 		<!-- https://github.com/bucket4j/bucket4j -->
