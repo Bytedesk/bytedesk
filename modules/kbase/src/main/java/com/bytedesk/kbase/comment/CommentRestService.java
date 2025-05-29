@@ -16,6 +16,8 @@ package com.bytedesk.kbase.comment;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -113,11 +115,13 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
         }
     }
 
+    @CachePut(value = "comment", key = "#entity.uid")
     @Override
     protected CommentEntity doSave(CommentEntity entity) {
         return commentRepository.save(entity);
     }
 
+    @CacheEvict(value = "comment", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<CommentEntity> optional = commentRepository.findByUid(uid);

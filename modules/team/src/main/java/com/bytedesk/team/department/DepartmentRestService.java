@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -133,11 +135,13 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         }
     }
 
+    @CachePut(value = "department", key = "#entity.uid")
     @Override
     protected DepartmentEntity doSave(DepartmentEntity entity) {
         return departmentRepository.save(entity);
     }
 
+    @CacheEvict(value = "department", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<DepartmentEntity> optional = findByUid(uid);
