@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CachingConfigurer;
@@ -57,6 +58,7 @@ public class RedisCacheConfig implements CachingConfigurer {
     private String keyPrefix;
     
     @Autowired
+    @Qualifier("redisObjectMapper")
     private ObjectMapper objectMapperBean;
 
     /**
@@ -94,9 +96,9 @@ public class RedisCacheConfig implements CachingConfigurer {
         // 自定义不同缓存空间的TTL
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
         // 用户缓存配置 - 30分钟过期
-        cacheConfigurations.put("userCache", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("user", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
         // 会话缓存 - 4小时过期
-        cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
+        // cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
         // 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
@@ -107,13 +109,13 @@ public class RedisCacheConfig implements CachingConfigurer {
     
     /**
      * 默认缓存配置
-     * 使用Jackson作为JSON序列化器
+     * 使用Jackson作为JSON序列化器，需要包含类型信息以便正确反序列化
      */
     private RedisCacheConfiguration defaultCacheConfiguration() {
-        // 使用共享的ObjectMapper配置
+        // 使用Redis专用的ObjectMapper配置（包含类型信息）
         ObjectMapper objectMapper = objectMapperBean;
 
-        // 使用配置好的共享ObjectMapper创建序列化器
+        // 使用配置好的Redis专用ObjectMapper创建序列化器
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
         return RedisCacheConfiguration.defaultCacheConfig()
