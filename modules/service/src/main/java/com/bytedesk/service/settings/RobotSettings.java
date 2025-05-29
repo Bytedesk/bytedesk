@@ -17,6 +17,9 @@ import java.io.Serializable;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
@@ -33,6 +36,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
 public class RobotSettings implements Serializable {
     
     private static final long serialVersionUID = 1L;

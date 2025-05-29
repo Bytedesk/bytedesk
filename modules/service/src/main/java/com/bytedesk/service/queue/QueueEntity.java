@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:38:06
+ * @LastEditTime: 2025-05-29 15:20:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * 队列实体类：
@@ -82,14 +84,17 @@ public class QueueEntity extends BaseEntity {
         // 仅用于在工作组情况下，记录存储robot/agent接待来自技能组数量
         // 添加新的一对多关系 - 作为工作组队列
         @OneToMany(mappedBy = "workgroupQueue", cascade = CascadeType.ALL, orphanRemoval = false)
+        @JsonManagedReference("workgroupQueueMembers")
         @Builder.Default
         private List<QueueMemberEntity> workgroupQueueMembers = new ArrayList<>();
 
         @OneToMany(mappedBy = "agentQueue", cascade = CascadeType.ALL, orphanRemoval = false)
+        @JsonManagedReference("agentQueueMembers")
         @Builder.Default
         private List<QueueMemberEntity> agentQueueMembers = new ArrayList<>();
 
         @OneToMany(mappedBy = "robotQueue", cascade = CascadeType.ALL, orphanRemoval = false)
+        @JsonManagedReference("robotQueueMembers")
         @Builder.Default
         private List<QueueMemberEntity> robotQueueMembers = new ArrayList<>();
 
