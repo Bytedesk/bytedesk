@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-29 12:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 14:45:33
+ * @LastEditTime: 2025-05-29 16:04:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,8 @@ package com.bytedesk.core.redis.cache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Role;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -27,6 +29,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 
 
 /**
@@ -36,6 +39,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * 2. Redis专用的 ObjectMapper (包含类型信息)
  */
 @Configuration
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class ObjectMapperConfig {
 
     /**
@@ -77,6 +81,7 @@ public class ObjectMapperConfig {
      * @return 配置好的Redis专用ObjectMapper实例
      */
     @Bean(name = "redisObjectMapper")
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public ObjectMapper redisObjectMapper() {
         // 使用JsonMapper.builder()替代直接创建ObjectMapper实例
         ObjectMapper objectMapper = JsonMapper.builder()
@@ -96,12 +101,20 @@ public class ObjectMapperConfig {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             // 处理Jackson注解
             .enable(MapperFeature.USE_ANNOTATIONS)
+            // 禁用代理对象的序列化
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
             // 构建ObjectMapper实例
             .build();
         
         // 添加Java 8时间模块 (在build后添加，因为builder中没有直接设置模块的方法)
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        
+        // 添加Hibernate代理支持
+        objectMapper.registerModule(new Hibernate5Module()
+            .configure(Hibernate5Module.Feature.FORCE_LAZY_LOADING, false)
+            .configure(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION, false)
+            .configure(Hibernate5Module.Feature.REPLACE_PERSISTENT_COLLECTIONS, true));
         
         return objectMapper;
     }
