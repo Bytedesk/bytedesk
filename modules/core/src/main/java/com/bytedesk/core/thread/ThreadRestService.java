@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 14:03:52
+ * @LastEditTime: 2025-05-29 14:15:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -541,7 +541,6 @@ public class ThreadRestService
         return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
-    // TODO: how to cacheput or cacheevict?
     @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
     public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
@@ -555,15 +554,6 @@ public class ThreadRestService
 
     @Override
     @CachePut(value = "thread", key = "#thread.uid")
-    public ThreadEntity save(ThreadEntity thread) {
-        try {
-            return doSave(thread);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, thread);
-        }
-    }
-
-    @Override
     protected ThreadEntity doSave(ThreadEntity entity) {
         return threadRepository.save(entity);
     }
@@ -593,6 +583,8 @@ public class ThreadRestService
         return null;
     }
 
+    
+    @CacheEvict(value = "thread", key = "#uid")
     public void deleteByTopic(String topic) {
         List<ThreadEntity> threads = findListByTopic(topic);
         threads.forEach(thread -> {
@@ -616,11 +608,7 @@ public class ThreadRestService
             @CacheEvict(value = "thread", key = "#thread.topic")
     })
     public void delete(@NonNull ThreadRequest entity) {
-        Optional<ThreadEntity> threadOptional = findByUid(entity.getUid());
-        threadOptional.ifPresent(thread -> {
-            thread.setDeleted(true);
-            save(thread);
-        });
+        deleteByUid(entity.getUid());
     }
 
     public ThreadResponse convertToResponse(ThreadEntity thread) {

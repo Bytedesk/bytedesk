@@ -130,6 +130,7 @@ public class UserEntity extends BaseEntityNoOrg {
 	// 一个用户可以属于多个组织，每个组织中可以多个角色
 	@Builder.Default
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@com.fasterxml.jackson.annotation.JsonManagedReference("user-orgRoles")
 	private Set<UserOrganizationRoleEntity> userOrganizationRoles = new HashSet<>();
 
 	// 添加方法以简化对用户组织和角色的管理
