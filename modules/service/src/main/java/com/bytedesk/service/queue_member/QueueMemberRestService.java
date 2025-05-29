@@ -16,6 +16,8 @@ package com.bytedesk.service.queue_member;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -82,6 +84,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         return queueMemberRepository.findByThreadUid(threadUid);
     }
 
+    @CachePut(value = "queue_member", key = "#entity.uid")
     @Override
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);
@@ -170,6 +173,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         return convertToResponse(savedCounter);
     }
 
+    @CacheEvict(value = "queue_member", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<QueueMemberEntity> optional = findByUid(uid);

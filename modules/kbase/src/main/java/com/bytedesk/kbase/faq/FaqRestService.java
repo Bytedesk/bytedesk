@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -321,6 +323,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     
     
+    @CachePut(value = "faq", key = "#entity.uid")
     @Override
     protected FaqEntity doSave(FaqEntity entity) {
         return faqRepository.save(entity);
@@ -386,6 +389,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
         faqRepository.saveAll(entities);
     }
 
+    @CacheEvict(value = "faq", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<FaqEntity> optional = findByUid(uid);

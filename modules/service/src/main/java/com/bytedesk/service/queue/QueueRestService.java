@@ -16,6 +16,8 @@ package com.bytedesk.service.queue;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -117,11 +119,13 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
         return create(request);
     }
 
+    @CachePut(value = "queue", key = "#entity.uid")
     @Override
     protected QueueEntity doSave(QueueEntity entity) {
         return queueRepository.save(entity);
     }
 
+    @CacheEvict(value = "queue", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<QueueEntity> optional = findByUid(uid);

@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -246,11 +248,13 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
     }
     
+    @CachePut(value = "workgroup", key = "#entity.uid")
     @Override
     protected WorkgroupEntity doSave(WorkgroupEntity entity) {
         return workgroupRepository.save(entity);
     }
 
+    @CacheEvict(value = "workgroup", key = "#uid")
     public void deleteByUid(String uid) {
         Optional<WorkgroupEntity> workgroupOptional = findByUid(uid);
         workgroupOptional.ifPresent(workgroup -> {

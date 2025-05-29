@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -163,6 +165,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         }
     }
 
+    @CachePut(value = "quickreply", key = "#entity.uid")
     protected QuickReplyEntity doSave(QuickReplyEntity entity) {
         return quickReplyRepository.save(entity);
     }
@@ -202,6 +205,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         }
     }
 
+    @CacheEvict(value = "quickreply", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<QuickReplyEntity> optional = findByUid(uid);

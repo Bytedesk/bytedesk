@@ -16,6 +16,8 @@ package com.bytedesk.service.visitor;
 import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -207,11 +209,13 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return visitorRepository.updateStatusByUid(uid, newStatus);
     }
 
+    @CachePut(value = "visitor", key = "#entity.uid")
     @Override
     protected VisitorEntity doSave(VisitorEntity entity) {
         return visitorRepository.save(entity);
     }
 
+    @CacheEvict(value = "visitor", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<VisitorEntity> visitorOptional = findByUid(uid);

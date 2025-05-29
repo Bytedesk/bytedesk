@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -273,6 +275,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         return memberRepository.existsByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
     }
 
+    @CachePut(value = "member", key = "#member.uid")
     @Override
     protected MemberEntity doSave(MemberEntity member) {
         return memberRepository.save(member);
@@ -300,6 +303,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         memberRepository.saveAll(members);
     }
 
+    @CacheEvict(value = "member", key = "#uid")
     public void deleteByUid(String uid) {
         Optional<MemberEntity> memberOptional = findByUid(uid);
         memberOptional.ifPresent(member -> {

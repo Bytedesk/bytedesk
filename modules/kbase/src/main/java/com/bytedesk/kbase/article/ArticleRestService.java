@@ -16,6 +16,8 @@ package com.bytedesk.kbase.article;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -143,11 +145,13 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
         }
     }
 
+    @CachePut(value = "article", key = "#entity.uid")
     @Override
     protected ArticleEntity doSave(ArticleEntity entity) {
         return articleRepository.save(entity);
     }
 
+    @CacheEvict(value = "article", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<ArticleEntity> optional = findByUid(uid);

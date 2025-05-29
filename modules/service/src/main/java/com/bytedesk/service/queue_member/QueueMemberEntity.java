@@ -25,6 +25,7 @@ import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -65,14 +66,17 @@ public class QueueMemberEntity extends BaseEntity {
     // private QueueEntity queue;
     
     // 作为工作组队列成员关系
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workgroup_queue_id")
     private QueueEntity workgroupQueue;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_queue_id")
     private QueueEntity agentQueue;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "robot_queue_id")
     private QueueEntity robotQueue;

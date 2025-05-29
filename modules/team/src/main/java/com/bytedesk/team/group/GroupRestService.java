@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:15:24
+ * @LastEditTime: 2025-05-29 14:57:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -92,6 +95,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         }
     }
 
+    @Cacheable(value = "group", key = "#uid", unless = "#result == null")
     @Override
     public Optional<GroupEntity> findByUid(String uid) {
         return groupRepository.findByUid(uid);
@@ -154,21 +158,13 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         throw new RuntimeException("Failed to dismiss group by uid: " + request.getUid());
     }
 
-    @Override
-    public GroupEntity save(GroupEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
-    }
-
+    @CachePut(value = "group", key = "#entity.uid")
     @Override
     protected GroupEntity doSave(GroupEntity entity) {
         return groupRepository.save(entity);
     }
 
+    @CacheEvict(value = "group", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<GroupEntity> optional = findByUid(uid);
@@ -183,7 +179,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     @Override
     public void delete(GroupRequest entity) {
-        // delete(entity.getUid());
+        deleteByUid(entity.getUid());
     }
 
     @Override
@@ -221,10 +217,6 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         
         return response;
     }
-
-    // public GroupExcel convertToExcel(GroupResponse group) {
-    //     return modelMapper.map(group, GroupExcel.class);
-    // }   
     
     /**
      * 将群组实体转换为Excel导出对象
