@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-27 18:45:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 07:14:42
+ * @LastEditTime: 2025-05-29 10:25:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,10 +89,8 @@ public class RedisCacheConfig implements CachingConfigurer {
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
         // 用户缓存配置 - 30分钟过期
         cacheConfigurations.put("userCache", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
-        // 系统配置缓存 - 2小时过期
-        cacheConfigurations.put("configCache", defaultCacheConfiguration().entryTtl(Duration.ofHours(2)));
         // 会话缓存 - 4小时过期
-        cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(4)));
+        cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
         
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
