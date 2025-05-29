@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+bin/
+*.class
+*.log
+*.tmp

@@ -27,7 +27,6 @@
     </modules>
 
     <properties>
-        <jackson.version>2.18.2</jackson.version>
     </properties>
 
     <dependencies>
@@ -245,12 +244,11 @@
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-hibernate5 -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-hibernate5-jakarta -->
         <!-- 用于处理Hibernate懒加载代理对象的序列化 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate5</artifactId>
+            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
