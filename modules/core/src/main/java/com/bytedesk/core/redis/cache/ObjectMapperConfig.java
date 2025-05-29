@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-29 12:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 16:04:53
+ * @LastEditTime: 2025-05-29 16:35:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.fasterxml.jackson.datatype.hibernate5.jakarta.Hibernate5JakartaModule;
 
 
 /**
@@ -111,10 +111,10 @@ public class ObjectMapperConfig {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         
         // 添加Hibernate代理支持
-        objectMapper.registerModule(new Hibernate5Module()
-            .configure(Hibernate5Module.Feature.FORCE_LAZY_LOADING, false)
-            .configure(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION, false)
-            .configure(Hibernate5Module.Feature.REPLACE_PERSISTENT_COLLECTIONS, true));
+        objectMapper.registerModule(new Hibernate5JakartaModule()
+            .configure(Hibernate5JakartaModule.Feature.FORCE_LAZY_LOADING, false)
+            .configure(Hibernate5JakartaModule.Feature.USE_TRANSIENT_ANNOTATION, false)
+            .configure(Hibernate5JakartaModule.Feature.REPLACE_PERSISTENT_COLLECTIONS, true));
         
         return objectMapper;
     }
