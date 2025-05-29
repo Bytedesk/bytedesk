@@ -100,7 +100,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
 
         // initialize RingBuffer & RingBufferPaddingExecutor
         this.initRingBuffer();
-        LOGGER.info("Initialized RingBuffer successfully.");
+        // LOGGER.info("Initialized RingBuffer successfully.");
     }
 
     @Override
@@ -150,7 +150,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
         // initialize RingBuffer
         int bufferSize = ((int) bitsAllocator.getMaxSequence() + 1) << boostPower;
         this.ringBuffer = new RingBuffer(bufferSize, paddingFactor);
-        LOGGER.info("Initialized ring buffer size:{}, paddingFactor:{}", bufferSize, paddingFactor);
+        // LOGGER.info("Initialized ring buffer size:{}, paddingFactor:{}", bufferSize, paddingFactor);
 
         // initialize RingBufferPaddingExecutor
         boolean usingSchedule = (scheduleInterval != null);
@@ -159,7 +159,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
             bufferPaddingExecutor.setScheduleInterval(scheduleInterval);
         }
 
-        LOGGER.info("Initialized BufferPaddingExecutor. Using schdule:{}, interval:{}", usingSchedule, scheduleInterval);
+        // LOGGER.info("Initialized BufferPaddingExecutor. Using schdule:{}, interval:{}", usingSchedule, scheduleInterval);
 
         // set rejected put/take handle policy
         this.ringBuffer.setBufferPaddingExecutor(bufferPaddingExecutor);

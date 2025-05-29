@@ -94,10 +94,10 @@ public class DefaultUidGenerator implements UidGeneratorService, InitializingBea
         if (workerId > bitsAllocator.getMaxWorkerId()) {
             log.error("Worker id " + workerId + " exceeds the max " + bitsAllocator.getMaxWorkerId());
             workerId = workerId % bitsAllocator.getMaxWorkerId();
-            log.info("new Worker id = " + workerId);
+            // log.info("new Worker id = " + workerId);
         }
 
-        log.info("Initialized bits(1, {}, {}, {}) for workerID:{}", uidProperties.getTimeBits(), uidProperties.getWorkerBits(), uidProperties.getSeqBits(), workerId);
+        // log.info("Initialized bits(1, {}, {}, {}) for workerID:{}", uidProperties.getTimeBits(), uidProperties.getWorkerBits(), uidProperties.getSeqBits(), workerId);
     }
 
     @Override
