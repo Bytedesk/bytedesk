@@ -114,6 +114,7 @@ public class UserEntity extends BaseEntityNoOrg {
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@ManyToOne(fetch = FetchType.LAZY)
+	@com.fasterxml.jackson.annotation.JsonManagedReference
 	private OrganizationEntity currentOrganization;
 
 	// 用户当前拥有的角色

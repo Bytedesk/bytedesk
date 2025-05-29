@@ -194,6 +194,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // belongs to user
     @ManyToOne(fetch = FetchType.LAZY)
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private UserEntity owner;
 
 }

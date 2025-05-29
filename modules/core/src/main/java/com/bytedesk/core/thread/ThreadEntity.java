@@ -23,6 +23,7 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -63,6 +64,7 @@ public class ThreadEntity extends AbstractThreadEntity {
     // cascade = CascadeType.ALL, orphanRemoval = true, 
     @Builder.Default
     @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<MessageEntity> messages = new ArrayList<>();
 
     public Boolean isNew() {
