@@ -236,7 +236,26 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     @Cacheable(value = "workgroup", key = "#uid", unless = "#result == null")
     public Optional<WorkgroupEntity> findByUid(String uid) {
-        return workgroupRepository.findByUid(uid);
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRepository.findByUid(uid);
+        // 确保从数据库加载时所有依赖属性都被初始化，防止延迟加载的问题
+        if (workgroupOptional.isPresent()) {
+            WorkgroupEntity workgroup = workgroupOptional.get();
+            // 确保robotSettings被初始化
+            if (workgroup.getRobotSettings() != null) {
+                workgroup.getRobotSettings().toString(); // 触发加载
+            }
+            // 确保其他可能需要的设置也被初始化
+            if (workgroup.getMessageLeaveSettings() != null) {
+                workgroup.getMessageLeaveSettings().toString();
+            }
+            if (workgroup.getServiceSettings() != null) {
+                workgroup.getServiceSettings().toString();
+            }
+            if (workgroup.getQueueSettings() != null) {
+                workgroup.getQueueSettings().toString();
+            }
+        }
+        return workgroupOptional;
     }
 
     @Override

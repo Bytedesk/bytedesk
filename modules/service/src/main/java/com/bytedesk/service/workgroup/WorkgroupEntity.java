@@ -33,6 +33,8 @@ import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -72,7 +74,8 @@ import lombok.experimental.SuperBuilder;
     "agents",
     "messageLeaveAgent",
     "inviteSettings",
-    "intentionSetting"
+    "intentionSetting",
+    "availableAgents"
 })
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
 @Table(name = "bytedesk_service_workgroup")
@@ -151,6 +154,7 @@ public class WorkgroupEntity extends BaseEntity {
      * 获取可用客服
      * @return 可用客服列表
      */
+    @JsonIgnore
     public List<AgentEntity> getAvailableAgents() {
         return this.agents.stream().filter(agent -> agent.isConnectedAndAvailable()).collect(Collectors.toList());
     }
@@ -158,6 +162,7 @@ public class WorkgroupEntity extends BaseEntity {
     /**
      * 检查是否超载
      */
+    @JsonIgnore
     public Boolean isOverloaded() {
         // 1. 检查总会话数是否超限
         // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
@@ -238,6 +243,7 @@ public class WorkgroupEntity extends BaseEntity {
     //     return assignedAgent;
     // }
 
+    @JsonIgnore
     public Boolean isConnected() {
         if (this.agents == null || this.agents.isEmpty()) {
             return false;
@@ -245,6 +251,7 @@ public class WorkgroupEntity extends BaseEntity {
         return this.agents.stream().anyMatch(agent -> agent.getConnected());
     }
 
+    @JsonIgnore
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
             .uid(this.getUid())
@@ -256,6 +263,7 @@ public class WorkgroupEntity extends BaseEntity {
 
     // 监控客服组登录坐席、开启自动领取坐席数、空闲坐席数、领取会话数、已处理会话数、流失会话数、留言数。
     // agent connected count
+    @JsonIgnore
     public long getConnectedAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
@@ -264,6 +272,7 @@ public class WorkgroupEntity extends BaseEntity {
     }
 
     // agent available count
+    @JsonIgnore
     public long getAvailableAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
@@ -272,6 +281,7 @@ public class WorkgroupEntity extends BaseEntity {
     }
 
     // agent offline count
+    @JsonIgnore
     public long getOfflineAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
@@ -280,6 +290,7 @@ public class WorkgroupEntity extends BaseEntity {
     }
 
     // agent busy count
+    @JsonIgnore
     public long getBusyAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
@@ -288,6 +299,7 @@ public class WorkgroupEntity extends BaseEntity {
     }
     
     // agent away count
+    @JsonIgnore
     public long getAwayAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
