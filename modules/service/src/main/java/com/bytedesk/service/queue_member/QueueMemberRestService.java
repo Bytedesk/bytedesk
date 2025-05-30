@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 16:50:53
+ * @LastEditTime: 2025-05-30 10:52:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -211,16 +211,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         }
         return response;
     }
-
-    /**
-     * 将LocalDateTime转换为易于阅读的字符串格式
-     */
-    // private String formatLocalDateTime(LocalDateTime dateTime) {
-    //     if (dateTime == null) {
-    //         return null;
-    //     }
-    //     return dateTime.toString().replace("T", " ").split("\\.")[0];
-    // }
 
     @Override
     public QueueMemberExcel convertToExcel(QueueMemberEntity entity) {

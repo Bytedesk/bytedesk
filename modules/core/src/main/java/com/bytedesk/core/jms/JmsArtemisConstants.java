@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 16:49:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 15:43:33
+ * @LastEditTime: 2025-05-30 10:47:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,4 +35,6 @@ public class JmsArtemisConstants {
 
     // FAQ索引队列
     public static final String QUEUE_FAQ_INDEX = QUEUE_PREFIX + "faq.index";
+    // queue member 队列
+    public static final String QUEUE_MEMBER_UPDATE = QUEUE_PREFIX + "member.update";
 }
