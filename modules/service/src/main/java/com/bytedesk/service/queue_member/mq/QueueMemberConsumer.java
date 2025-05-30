@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 11:05:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 12:00:04
+ * @LastEditTime: 2025-05-30 17:14:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.service.queue_member.mq;
 
 import java.util.Map;
 import java.util.Optional;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.jms.JmsArtemisConstants;
-import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;

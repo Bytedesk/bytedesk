@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 15:20:11
+ * @LastEditTime: 2025-05-30 17:18:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,6 @@
 package com.bytedesk.service.routing_strategy;
 
 import java.util.Optional;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -49,15 +46,13 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 
-import jakarta.annotation.Nonnull;
-
 import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.bytedesk.core.utils.OptimisticLockingHandler;
-import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
+// import com.bytedesk.core.utils.OptimisticLockingHandler;
+// import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 
 /**
  * @author Jack Ning 270580156@qq.com
@@ -85,9 +80,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final OptimisticLockingHandler optimisticLockingHandler;
+    // private final OptimisticLockingHandler optimisticLockingHandler;
 
-    private final QueueMemberMessageService queueMemberMessageService;
+    // private final QueueMemberMessageService queueMemberMessageService;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -248,11 +243,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         log.info("before save agent: {}", thread.getAgent());
         ThreadEntity savedThread = threadService.save(thread);
         log.info("after save agent: {}", savedThread.getAgent());
-        ThreadEntity dbThread = threadService.findByUid(thread.getUid()).get();
-        log.info("db agent: {}", dbThread.getAgent());
-        if (savedThread == null) {
-            throw new RuntimeException("Failed to save thread");
-        }
         // 客服接待时，自动接受会话
         queueMemberEntity.agentAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);

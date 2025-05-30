@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 16:56:57
+ * @LastEditTime: 2025-05-30 17:28:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -555,6 +554,7 @@ public class ThreadRestService
     @Override
     // @CachePut(value = "thread", key = "#thread.uid")
     protected ThreadEntity doSave(ThreadEntity entity) {
+        log.info("doSave thread: {}", entity.getAgent());
         return threadRepository.save(entity);
     }
 
@@ -562,9 +562,10 @@ public class ThreadRestService
     public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             ThreadEntity entity) {
         try {
-            Optional<ThreadEntity> latest = threadRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                ThreadEntity latestEntity = latest.get();
+            Optional<ThreadEntity> latestOptional = threadRepository.findByUid(entity.getUid());
+            if (latestOptional.isPresent()) {
+                ThreadEntity latestEntity = latestOptional.get();
+                log.warn("乐观锁冲突，尝试合并数据: {}", latestEntity.getAgent());
                 // 合并需要保留的数据
                 // 保留最新的会话状态
                 latestEntity.setStatus(entity.getStatus());
@@ -573,6 +574,10 @@ public class ThreadRestService
                 // 保留最新内容
                 if (entity.getContent() != null) {
                     latestEntity.setContent(entity.getContent());
+                }
+                // 保留agent信息
+                if (entity.getAgent() != null) {
+                    latestEntity.setAgent(entity.getAgent());
                 }
                 return threadRepository.save(latestEntity);
             }
