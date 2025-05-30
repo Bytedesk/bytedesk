@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 11:56:59
+ * @LastEditTime: 2025-05-30 14:59:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -168,7 +168,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 转机器人
                 RobotEntity robot = workgroup.getRobotSettings().getRobot();
                 if (robot != null) {
-                    // thread = visitorThreadService.reInitRobotThreadExtra(thread, robot);
                     // 重新初始化会话，包括重置机器人状态等
                     thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                     // 返回机器人欢迎消息
@@ -181,7 +180,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             log.info("Force transfer to agent");
         }
         // 下面人工接待
-        AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread, workgroup.getAvailableAgents());
+        AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread);
         if (agentEntity == null) {
             // 离线留言接待客服
             agentEntity = workgroup.getMessageLeaveAgent();
@@ -195,13 +194,17 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
         // log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
         if (visitorRequest.getForceAgent()) {
+            log.info("force agent transfer to agent {}", agentEntity.getUid());
             // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
             bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            
+            // 
+            queueMemberEntity.transferRobotToAgent();
+            queueMemberRestService.save(queueMemberEntity);
+            // 
             // 使用MQ异步处理转人工操作
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("robotToAgent", true);
-            queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
+            // Map<String, Object> updates = new HashMap<>();
+            // updates.put("robotToAgent", true);
+            // queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
         }
         //
         if (agentEntity.isConnectedAndAvailable()) {
@@ -221,6 +224,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     }
 
     private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
+        log.info("handleAvailableWorkgroup");
         // 未满则接待
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
@@ -232,8 +236,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agent.getUid());
-        thread.setChatting().setContent(content).setUnreadCount(1)
-            .setOwner(agent.getMember().getUser());
+        thread.setChatting().setContent(content).setUnreadCount(1);
+        
+        // Only set owner if member exists
+        if (agent.getMember() != null) {
+            thread.setOwner(agent.getMember().getUser());
+        }
         //
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
@@ -254,14 +262,13 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
-
+    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+        log.info("handleQueuedWorkgroup {}", agentEntity.getNickname());
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
 
         // 排队，已满则排队
-        // String queueTip = agent.getQueueSettings().getQueueTip();
         String content = "";
         if (queueMemberEntity.getWorkgroupQueue().getQueuingCount() == 0) {
             // 客服接待刚满员，下一个就是他，
@@ -273,7 +280,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
 
         // 进入排队队列
-        thread.setUserUid(agent.getUid());
+        thread.setUserUid(agentEntity.getUid());
         thread.setQueuing().setContent(content).setUnreadCount(0);
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
@@ -282,14 +289,14 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         bytedeskEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, savedThread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agentEntity, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
         return messageProtobuf;
     }
 
-    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agent, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
-        //
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agentEntity, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
+        log.info("getOfflineMessage {}", agentEntity.getNickname());
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
@@ -299,14 +306,13 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "请稍后，客服会尽快回复您";
         }
         thread.setOffline().setContent(content);
-        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
         // 
-        log.info("Agent is offline {}", agent.getUid());
         queueMemberEntity.setAgentOffline(true);
         queueMemberRestService.save(queueMemberEntity);
         // 创建新的留言消息
@@ -322,7 +328,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf getWorkgroupContinueMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getWorkgroupContinueMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getWorkgroupContinueMessage user: {}", user.getNickname());
@@ -337,7 +343,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf getWorkgroupQueuingMessage(VisitorRequest visitorRequest, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getWorkgroupQueuingMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getWorkgroupQueuingMessage: user: {}, agent {}", user.toString(), thread.getAgent());
