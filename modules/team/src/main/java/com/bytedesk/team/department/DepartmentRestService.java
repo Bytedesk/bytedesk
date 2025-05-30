@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 11:02:31
+ * @LastEditTime: 2025-05-30 12:50:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,8 @@ package com.bytedesk.team.department;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -208,9 +210,23 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         if (department.getParent() != null) {
             departmentResponse.setParentUid(department.getParent().getUid());
         }
-        // 计算成员数
-        List<MemberEntity> members = memberRepository.findByDeptUidAndDeletedFalse(department.getUid());
-        departmentResponse.setMemberCount(members.size());
+        
+        // 计算当前部门的直接成员数
+        List<MemberEntity> directMembers = memberRepository.findByDeptUidAndDeletedFalse(department.getUid());
+        int totalMemberCount = directMembers.size();
+        
+        // 递归计算所有子部门的成员数，并设置子部门的成员数量
+        Set<DepartmentResponse> childResponses = new HashSet<>();
+        for (DepartmentEntity child : department.getChildren()) {
+            if (!child.isDeleted()) {
+                DepartmentResponse childResponse = convertToResponse(child);
+                totalMemberCount += childResponse.getMemberCount();
+                childResponses.add(childResponse);
+            }
+        }
+        
+        departmentResponse.setChildren(childResponses);
+        departmentResponse.setMemberCount(totalMemberCount);
         return departmentResponse;
     }
 

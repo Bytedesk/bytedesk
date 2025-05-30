@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:34:06
+ * @LastEditTime: 2025-05-30 13:10:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,11 +84,10 @@ public class MemberRequest extends BaseRequest {
     @Builder.Default
 	private Set<String> roleUids = new HashSet<>(); 
 
-    // private String userUid;
-
     @NotBlank
     private String deptUid;
-    // 
-    // @NotBlank
-    // private String orgUid;
+
+    // 存储deptUid对应的子部门uid列表
+    @Builder.Default
+    private Set<String> subDeptUids = new HashSet<>();
 }
