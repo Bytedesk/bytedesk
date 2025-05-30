@@ -105,7 +105,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         );
     }
 
-
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
         UserResponse userResponse = userRestService.getProfile();
@@ -115,7 +114,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
             return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
         }
     }
-   
     
     @ActionAnnotation(title = "user", action = "changePassword", description = "changePassword")
     @PostMapping("/change/password")
