@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 11:43:27
+ * @LastEditTime: 2025-05-30 13:33:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,23 +73,23 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "counter", key = "#uid")
+    // @Cacheable(value = "counter", key = "#uid")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
         return queueMemberRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
+    // @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
     public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRepository.findByThreadUid(threadUid);
     }
 
     // save
-    public QueueMemberEntity save(QueueMemberEntity entity) {
-        return doSave(entity);
-    }
+    // public QueueMemberEntity save(QueueMemberEntity entity) {
+    //     return doSave(entity);
+    // }
 
-    @CachePut(value = "queue_member", key = "#entity.uid")
+    // @CachePut(value = "queue_member", key = "#entity.uid")
     @Override
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);

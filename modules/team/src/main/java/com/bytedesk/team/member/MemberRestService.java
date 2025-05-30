@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:10:48
+ * @LastEditTime: 2025-05-30 14:22:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -244,27 +244,67 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
     public Optional<MemberEntity> findByUid(String uid) {
-        return memberRepository.findByUid(uid);
+        Optional<MemberEntity> memberOptional = memberRepository.findByUid(uid);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            // 预加载user，确保user数据被包含在缓存中
+            if (member.getUser() != null) {
+                member.getUser().getUid();
+            }
+        }
+        return memberOptional;
     }
 
     @Cacheable(value = "member", key = "#uid", unless = "#result == null")
     public Optional<MemberEntity> findByUserUid(String uid) {
-        return memberRepository.findByUser_UidAndDeletedFalse(uid);
+        Optional<MemberEntity> memberOptional = memberRepository.findByUser_UidAndDeletedFalse(uid);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            // 预加载user，确保user数据被包含在缓存中
+            if (member.getUser() != null) {
+                member.getUser().getUid();
+            }
+        }
+        return memberOptional;
     }
 
     @Cacheable(value = "member", key = "#mobile", unless = "#result == null")
     public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
-        return memberRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
+        Optional<MemberEntity> memberOptional = memberRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            // 预加载user，确保user数据被包含在缓存中
+            if (member.getUser() != null) {
+                member.getUser().getUid();
+            }
+        }
+        return memberOptional;
     }
 
     @Cacheable(value = "member", key = "#email", unless = "#result == null")
     public Optional<MemberEntity> findByEmailAndOrgUid(String email, String orgUid) {
-        return memberRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
+        Optional<MemberEntity> memberOptional = memberRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            // 预加载user，确保user数据被包含在缓存中
+            if (member.getUser() != null) {
+                member.getUser().getUid();
+            }
+        }
+        return memberOptional;
     }
 
     @Cacheable(value = "member", key = "#user.uid", unless = "#result == null")
     public Optional<MemberEntity> findByUserAndOrgUid(UserEntity user, String orgUid) {
-        return memberRepository.findByUserAndOrgUidAndDeletedFalse(user, orgUid);
+        Optional<MemberEntity> memberOptional = memberRepository.findByUserAndOrgUidAndDeletedFalse(user, orgUid);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            // 预加载user，确保user数据被包含在缓存中
+            if (member.getUser() != null) {
+                member.getUser().getUid();
+            }
+        }
+        return memberOptional;
     }
 
     public Boolean existsByEmailAndOrgUid(String email, String orgUid) {
@@ -447,6 +487,8 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     public MemberResponse convertToResponse(MemberEntity entity) {
         MemberResponse response = modelMapper.map(entity, MemberResponse.class);
         if (entity.getUser() != null) {
+            // 预加载user，确保user数据被包含在缓存中
+            entity.getUser().getUid();
             response.setUser(modelMapper.map(entity.getUser(), UserResponse.class));
         }
         return response;

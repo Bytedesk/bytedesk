@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:45:36
+ * @LastEditTime: 2025-05-30 14:28:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,8 @@
  */
 package com.bytedesk.service.agent;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 
 import org.modelmapper.ModelMapper;
@@ -33,10 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.action.ActionRequest;
-import com.bytedesk.core.action.ActionRestService;
-import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -85,8 +79,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final ActionRestService actionService;
-
     private final ServiceSettingsService serviceSettingsService;
 
     private final MqttConnectionService mqttConnectionService;
@@ -107,7 +99,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             throw new RuntimeException("user not found");
         }
         request.setUserUid(user.getUid());
-        // 
+        //
         return queryByUser(request);
     }
 
@@ -130,7 +122,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public AgentResponse create(AgentRequest request) {
-        // 
+        //
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
@@ -143,7 +135,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         if (existsByUserUidAndOrgUid(memberOptional.get().getUser().getUid(), request.getOrgUid())) {
             throw new RuntimeException(I18ServiceConsts.I18N_AGENT_EXISTS);
         }
-        // 
+        //
         MemberEntity member = memberOptional.get();
         UserEntity user = member.getUser();
         userService.addRoleAgent(member.getUser());
@@ -161,7 +153,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setOrgUid(request.getOrgUid());
         agent.setMember(member);
         agent.setUserUid(user.getUid());
-        // 
+        //
         Set<String> userIds = mqttConnectionService.getConnectedUserUids();
         if (userIds.contains(agent.getUserUid())) {
             agent.setConnected(true);
@@ -217,24 +209,26 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 暂不允许修改绑定成员
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
-        // 
+        //
         MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatAgentMessageLeaveSettings(request);
         agent.setMessageLeaveSettings(messageLeaveSettings);
-        // 
+        //
         // 一对一人工客服，不支持机器人接待
-        // RobotSettings robotSettings = serviceSettingsService.formatAgentRobotSettings(request);
+        // RobotSettings robotSettings =
+        // serviceSettingsService.formatAgentRobotSettings(request);
         // agent.setRobotSettings(robotSettings);
-        // 
+        //
         ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
         agent.setServiceSettings(serviceSettings);
-        // 
+        //
         AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
         agent.setAutoReplySettings(autoReplySettings);
-        // 
+        //
         QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
         agent.setQueueSettings(queueSettings);
-        // 
-        // InviteSettings inviteSettings = serviceSettingsService.formatAgentInviteSettings(request);
+        //
+        // InviteSettings inviteSettings =
+        // serviceSettingsService.formatAgentInviteSettings(request);
         // agent.setInviteSettings(inviteSettings);
         // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
@@ -249,7 +243,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     // updateAvatar
     @Transactional
     public AgentResponse updateAvatar(AgentRequest request) {
-        AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        AgentEntity agent = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         agent.setAvatar(request.getAvatar());
         //
         AgentEntity updatedAgent = save(agent);
@@ -262,18 +257,21 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Transactional
     public AgentResponse updateStatus(AgentRequest request) {
         // agentRepository.updateStatusByUid(request.getStatus(), request.getUid());
-        AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        AgentEntity agent = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         agent.setStatus(request.getStatus()); // 更新接待状态
-        // 
-        // int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadProcessStatusEnum.CLOSED.name());
+        //
+        // int currentThreadCount =
+        // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
+        // ThreadProcessStatusEnum.CLOSED.name());
         // agent.setCurrentThreadCount(currentThreadCount);
         log.info("update agent: {} status", agent.getNickname());
-        // 
+        //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to save agent.");
         }
-        // 
+        //
         bytedeskEventPublisher.publishEvent(new AgentUpdateStatusEvent(this, updatedAgent));
 
         return convertToResponse(updatedAgent);
@@ -293,12 +291,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         // 遍历userIds，更新为在线状态
         for (String userUid : userIds) {
-            updateConnect(userUid, true);            
+            updateConnect(userUid, true);
         }
     }
 
-
-     public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
+    public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
         if (!agentOptional.isPresent()) {
@@ -330,8 +327,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public AgentResponse syncCurrentThreadCount(AgentRequest request) {
 
         if (StringUtils.hasText(request.getUid())) {
-            AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-            // int currentThreadCount = threadRestService.countByThreadTopicAndStateNot(agent.getUid(), ThreadProcessStatusEnum.CLOSED.name());
+            AgentEntity agent = findByUid(request.getUid())
+                    .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+            // int currentThreadCount =
+            // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
+            // ThreadProcessStatusEnum.CLOSED.name());
             // agent.setCurrentThreadCount(currentThreadCount);
             // 更新Agent的信息
             AgentEntity updatedAgent = save(agent);
@@ -340,13 +340,14 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             }
             return convertToResponse(updatedAgent);
         }
-        
+
         return null;
     }
 
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {
-        AgentEntity agent = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        AgentEntity agent = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         //
         AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
                 AutoReplySettings.class);
@@ -359,13 +360,12 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
-    // 
-
+    //
 
     /**
      * 更新坐席在线状态
      * 
-     * @param userUid 用户ID
+     * @param userUid   用户ID
      * @param connected 是否在线
      */
     @Async
@@ -376,61 +376,27 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // TODO: redis cache agent online status
     }
 
-    @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
-    public Optional<AgentEntity> findByUid(String uid) {
-        return agentRepository.findByUid(uid);
-    }
-
-    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
-    public Optional<AgentEntity> findByUserUid(String userUid) {
-        return agentRepository.findByUserUid(userUid);
-    }
-
-    @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")
-    public Optional<AgentEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
-        return agentRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
-    }
-
-    @Cacheable(value = "agent", key = "#email", unless = "#result == null")
-    public Optional<AgentEntity> findByEmailAndOrgUid(String email, String orgUid) {
-        return agentRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
-    }
-
-    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
-    public Optional<AgentEntity> findByUserUidAndOrgUid(String userUid, String orgUid) {
-        return agentRepository.findByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
-    }
-
-    public Boolean existsByUserUidAndOrgUid(String userUid, String orgUid) {
-        return agentRepository.existsByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
-    }
-
-    public Boolean existsByUid(String uid) {
-        return agentRepository.existsByUid(uid);
-    }
-
-    public List<AgentEntity> findAllConnected() {
-        return findByConnected(true);
-    }
-
-    public List<AgentEntity> findByConnected(boolean connected) {
-        return agentRepository.findByConnectedAndDeletedFalse(connected);
-    }
-
     @Caching(put = {
             @CachePut(value = "agent", key = "#agent.uid"),
             @CachePut(value = "agent", key = "#agent.mobile", unless = "#agent.mobile == null"),
             @CachePut(value = "agent", key = "#agent.email", unless = "#agent.email == null"),
+            @CachePut(value = "agent", key = "#agent.userUid", unless = "#agent.userUid == null"),
+            @CachePut(value = "agent", key = "#agent.member.uid", unless = "#agent.member == null"),
+            @CachePut(value = "agent", key = "#agent.member.user.uid", unless = "#agent.member == null || #agent.member.user == null")
     })
     @Override
     public AgentEntity save(AgentEntity agent) {
         try {
+            // 确保所有延迟加载的关联都被初始化，以便正确缓存
+            if (agent.getMember() != null) {
+                agent.getMember().getUser(); // 触发加载
+            }
             return doSave(agent);
         } catch (ObjectOptimisticLockingFailureException e) {
             return handleOptimisticLockingFailureException(e, agent);
         }
     }
-    
+
     @Override
     protected AgentEntity doSave(AgentEntity entity) {
         return agentRepository.save(entity);
@@ -451,133 +417,149 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return ServiceConvertUtils.convertToAgentResponse(entity);
     }
 
-    private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
-    private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
-    private final Queue<AgentEntity> retryQueue = new LinkedList<>();
+    // private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
+    // private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
+    // private final Queue<AgentEntity> retryQueue = new LinkedList<>();
 
-    public AgentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentEntity agent) {
-        retryQueue.add(agent);
-        processRetryQueue();
+    public AgentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            AgentEntity agent) {
+        // retryQueue.add(agent);
+        // processRetryQueue();
         return agent;
     }
 
-    private void processRetryQueue() {
-        while (!retryQueue.isEmpty()) {
-            AgentEntity agent = retryQueue.poll(); // 从队列中取出一个元素
-            if (agent == null) {
-                break; // 队列为空，跳出循环
-            }
+    // private void processRetryQueue() {
+    //     while (!retryQueue.isEmpty()) {
+    //         AgentEntity agent = retryQueue.poll(); // 从队列中取出一个元素
+    //         if (agent == null) {
+    //             break; // 队列为空，跳出循环
+    //         }
 
-            int retryCount = 0;
-            while (retryCount < MAX_RETRY_ATTEMPTS) {
-                try {
-                    // 尝试更新Topic对象
-                    agentRepository.save(agent);
-                    // 更新成功，无需进一步处理
-                    log.info("Optimistic locking succeeded for agent: {}", agent.getUid());
-                    break; // 跳出内部循环
-                } catch (ObjectOptimisticLockingFailureException ex) {
-                    // 捕获乐观锁异常
-                    log.error("Optimistic locking failure for agent: {}, retry count: {}", agent.getUid(),
-                            retryCount + 1);
-                    // 等待一段时间后重试
-                    try {
-                        Thread.sleep(RETRY_DELAY_MS);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        log.error("Interrupted while waiting for retry", ie);
-                        return;
-                    }
-                    retryCount++; // 增加重试次数
+    //         int retryCount = 0;
+    //         while (retryCount < MAX_RETRY_ATTEMPTS) {
+    //             try {
+    //                 // 尝试更新Topic对象
+    //                 agentRepository.save(agent);
+    //                 // 更新成功，无需进一步处理
+    //                 log.info("Optimistic locking succeeded for agent: {}", agent.getUid());
+    //                 break; // 跳出内部循环
+    //             } catch (ObjectOptimisticLockingFailureException ex) {
+    //                 // 捕获乐观锁异常
+    //                 log.error("Optimistic locking failure for agent: {}, retry count: {}", agent.getUid(),
+    //                         retryCount + 1);
+    //                 // 等待一段时间后重试
+    //                 try {
+    //                     Thread.sleep(RETRY_DELAY_MS);
+    //                 } catch (InterruptedException ie) {
+    //                     Thread.currentThread().interrupt();
+    //                     log.error("Interrupted while waiting for retry", ie);
+    //                     return;
+    //                 }
+    //                 retryCount++; // 增加重试次数
 
-                    // 如果还有重试机会，则将agent放回队列末尾
-                    if (retryCount < MAX_RETRY_ATTEMPTS) {
-                        // FIXME: 发现会一直失败，暂时不重复处理
-                        // retryQueue.add(agent);
-                    } else {
-                        // 所有重试都失败了
-                        handleFailedRetries(agent);
-                    }
-                }
+    //                 // 如果还有重试机会，则将agent放回队列末尾
+    //                 if (retryCount < MAX_RETRY_ATTEMPTS) {
+    //                     // FIXME: 发现会一直失败，暂时不重复处理
+    //                     // retryQueue.add(agent);
+    //                 } else {
+    //                     // 所有重试都失败了
+    //                     handleFailedRetries(agent);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    // private void handleFailedRetries(AgentEntity agent) {
+    //     String agentJSON = JSONObject.toJSONString(agent);
+    //     ActionRequest actionRequest = ActionRequest.builder()
+    //             .title("agent")
+    //             .action("save")
+    //             .description("All retry attempts failed for optimistic locking")
+    //             .extra(agentJSON)
+    //             .build();
+    //     actionRequest.setType(ActionTypeEnum.FAILED.name());
+    //     actionService.create(actionRequest);
+    //     // bytedeskEventPublisher.publishActionCreateEvent(actionRequest);
+    //     log.error("All retry attempts failed for optimistic locking of agent: {}", agent.getUid());
+    //     // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
+    //     // notifyUserOfFailure(agent);
+    // }
+
+    @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
+    public Optional<AgentEntity> findByUid(String uid) {
+        Optional<AgentEntity> agentOptional = agentRepository.findByUid(uid);
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        agentOptional.ifPresent(agent -> {
+            if (agent.getMember() != null) {
+                agent.getMember().getUser(); // 触发加载
             }
-        }
+        });
+        return agentOptional;
     }
 
-    private void handleFailedRetries(AgentEntity agent) {
-        String agentJSON = JSONObject.toJSONString(agent);
-        ActionRequest actionRequest = ActionRequest.builder()
-                .title("agent")
-                .action("save")
-                .description("All retry attempts failed for optimistic locking")
-                .extra(agentJSON)
-                .build();
-        actionRequest.setType(ActionTypeEnum.FAILED.name());
-        actionService.create(actionRequest);
-        // bytedeskEventPublisher.publishActionCreateEvent(actionRequest);
-        log.error("All retry attempts failed for optimistic locking of agent: {}", agent.getUid());
-        // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
-        // notifyUserOfFailure(agent);
+    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
+    public Optional<AgentEntity> findByUserUid(String userUid) {
+        Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(userUid);
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        agentOptional.ifPresent(agent -> {
+            if (agent.getMember() != null) {
+                agent.getMember().getUser(); // 触发加载
+            }
+        });
+        return agentOptional;
     }
 
-    // if (request.getServiceSettings() == null
-        //         || request.getServiceSettings().getWorktimeUids() == null
-        //         || request.getServiceSettings().getWorktimeUids().isEmpty()) {
-        //     ServiceSettingsRequest serviceSettings = ServiceSettingsRequest.builder().build();
-        //     List<String> worktimeUids = new ArrayList<>();
-        //     String worktimeUid = worktimeService.createDefault();
-        //     worktimeUids.add(worktimeUid);
-        //     serviceSettings.setWorktimeUids(worktimeUids);
-        //     request.setServiceSettings(serviceSettings);
-        // }
-        // //
-        // Iterator<String> worktimeIterator = request.getServiceSettings().getWorktimeUids().iterator();
-        // while (worktimeIterator.hasNext()) {
-        //     String worktimeUid = worktimeIterator.next();
-        //     // log.info("worktimeUid {}", worktimeUid);
-        //     Optional<WorktimeEntity> worktimeOptional = worktimeService.findByUid(worktimeUid);
-        //     if (worktimeOptional.isPresent()) {
-        //         WorktimeEntity worktimeEntity = worktimeOptional.get();
-        //         agent.getServiceSettings().getWorktimes().add(worktimeEntity);
-        //     } else {
-        //         throw new RuntimeException(worktimeUid + " is not found.");
-        //     }
-        // }
-        // //
-        // if (request.getServiceSettings() != null
-        //         && request.getServiceSettings().getFaqUids() != null
-        //         && request.getServiceSettings().getFaqUids().size() > 0) {
-        //     Iterator<String> iterator = request.getServiceSettings().getFaqUids().iterator();
-        //     while (iterator.hasNext()) {
-        //         String faqUid = iterator.next();
-        //         Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
-        //         if (faqOptional.isPresent()) {
-        //             FaqEntity faqEntity = faqOptional.get();
-        //             log.info("agent faqUid added {}", faqUid);
+    @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")
+    public Optional<AgentEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
+        Optional<AgentEntity> agentOptional = agentRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        agentOptional.ifPresent(agent -> {
+            if (agent.getMember() != null) {
+                agent.getMember().getUser(); // 触发加载
+            }
+        });
+        return agentOptional;
+    }
 
-        //             agent.getServiceSettings().getFaqs().add(faqEntity);
-        //         } else {
-        //             throw new RuntimeException("agent faq " + faqUid + " not found");
-        //         }
-        //     }
-        // } else {
-        //     log.info("agent faq uids is null");
-        // }
-        // // log.info("agent {}", agent);
-        // if (request.getServiceSettings() != null
-        //         && request.getServiceSettings().getQuickFaqUids() != null
-        //         && request.getServiceSettings().getQuickFaqUids().size() > 0) {
-        //     Iterator<String> iterator = request.getServiceSettings().getQuickFaqUids().iterator();
-        //     while (iterator.hasNext()) {
-        //         String quickFaqUid = iterator.next();
-        //         Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
-        //         if (quickFaqOptional.isPresent()) {
-        //             FaqEntity quickFaqEntity = quickFaqOptional.get();
-        //             log.info("quickFaqUid added {}", quickFaqUid);
-        //             agent.getServiceSettings().getQuickFaqs().add(quickFaqEntity);
-        //         } else {
-        //             throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
-        //         }
-        //     }
-        // }
+    @Cacheable(value = "agent", key = "#email", unless = "#result == null")
+    public Optional<AgentEntity> findByEmailAndOrgUid(String email, String orgUid) {
+        Optional<AgentEntity> agentOptional = agentRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        agentOptional.ifPresent(agent -> {
+            if (agent.getMember() != null) {
+                agent.getMember().getUser(); // 触发加载
+            }
+        });
+        return agentOptional;
+    }
+
+    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
+    public Optional<AgentEntity> findByUserUidAndOrgUid(String userUid, String orgUid) {
+        Optional<AgentEntity> agentOptional = agentRepository.findByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        agentOptional.ifPresent(agent -> {
+            if (agent.getMember() != null) {
+                agent.getMember().getUser(); // 触发加载
+            }
+        });
+        return agentOptional;
+    }
+
+    public Boolean existsByUserUidAndOrgUid(String userUid, String orgUid) {
+        return agentRepository.existsByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
+    }
+
+    public Boolean existsByUid(String uid) {
+        return agentRepository.existsByUid(uid);
+    }
+
+    public List<AgentEntity> findAllConnected() {
+        return findByConnected(true);
+    }
+
+    public List<AgentEntity> findByConnected(boolean connected) {
+        return agentRepository.findByConnectedAndDeletedFalse(connected);
+    }
 
 }

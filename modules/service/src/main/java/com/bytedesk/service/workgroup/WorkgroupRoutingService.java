@@ -41,7 +41,8 @@ public class WorkgroupRoutingService {
     /**
      * 根据工作组路由模式选择客服
      */
-    public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread, List<AgentEntity> availableAgents) {
+    public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
+        List<AgentEntity> availableAgents = workgroup.getAvailableAgents();
         // 
         switch (workgroup.getRoutingMode()) {
             case "ROUND_ROBIN":
@@ -53,7 +54,7 @@ public class WorkgroupRoutingService {
             case "WEIGHTED_RANDOM":
                 return selectByWeightedRandom(availableAgents);
             case "CONSISTENT_HASH":
-                return selectByConsistentHash("thread.getVisitorUid()", availableAgents);
+                return selectByConsistentHash(thread.getUserProtobuf().getUid(), availableAgents);
             case "FASTEST_RESPONSE":
                 return selectByFastestResponse(availableAgents);
             default:
