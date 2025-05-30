@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.base.LlmModelConfigResponse;
+import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -134,7 +134,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         //
         // Get default model config if not provided
         if (!StringUtils.hasText(request.getEmbeddingProvider()) || !StringUtils.hasText(request.getEmbeddingModel())) {
-            LlmModelConfigResponse modelConfig = getDefaultModelConfig();
+            LlmProviderConfigDefault modelConfig = getLlmProviderConfigDefault();
             entity.setEmbeddingProvider(request.getEmbeddingProvider() != null ? request.getEmbeddingProvider() : modelConfig.getDefaultEmbeddingProvider());
             entity.setEmbeddingModel(request.getEmbeddingModel() != null ? request.getEmbeddingModel() : modelConfig.getDefaultEmbeddingModel());
         } else {
@@ -374,8 +374,8 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         create(kownledgebaseRequestTaboo);
     }
 
-    public LlmModelConfigResponse getDefaultModelConfig() {
-        return LlmConfigUtils.getDefaultModelConfig(environment);
+    public LlmProviderConfigDefault getLlmProviderConfigDefault() {
+        return LlmConfigUtils.getLlmProviderConfigDefault(environment);
     }
 
 }

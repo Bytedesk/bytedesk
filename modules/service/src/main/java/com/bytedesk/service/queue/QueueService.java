@@ -114,7 +114,7 @@ public class QueueService {
         if (memberOptional.isPresent()) {
             QueueMemberEntity member = memberOptional.get();
             // 更新工作组队列
-            if (agent.getType().equals(ThreadTypeEnum.AGENT.name())) {
+            if (agent.isAgent()) {
                 member.setAgentQueue(agentQueue);
             } else {
                 member.setRobotQueue(agentQueue);

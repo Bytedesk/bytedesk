@@ -33,7 +33,7 @@ import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.base.LlmModelConfigResponse;
+import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
@@ -161,7 +161,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             RobotLlm llm = request.getLlm();
             // Get default model config if not provided
             if (!StringUtils.hasText(llm.getProvider()) || !StringUtils.hasText(llm.getModel())) {
-                LlmModelConfigResponse modelConfig = llmProviderRestService.getDefaultModelConfig();
+                LlmProviderConfigDefault modelConfig = llmProviderRestService.getLlmProviderConfigDefault();
                 llm.setProvider(llm.getProvider() != null ? llm.getProvider() : modelConfig.getDefaultChatProvider());
                 llm.setModel(llm.getModel() != null ? llm.getModel() : modelConfig.getDefaultChatModel());
             }
