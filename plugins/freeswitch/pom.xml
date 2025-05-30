@@ -23,17 +23,17 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
-		
+
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
-		
+
 		<!-- FreeSwitch ESL (Event Socket Library) Client -->
-		 <!-- https://mvnrepository.com/artifact/org.freeswitch.esl.client/org.freeswitch.esl.client -->
+		<!-- https://mvnrepository.com/artifact/org.freeswitch.esl.client/org.freeswitch.esl.client -->
 		<dependency>
 			<groupId>org.freeswitch.esl.client</groupId>
 			<artifactId>org.freeswitch.esl.client</artifactId>
 			<version>${freeswitch.esl.version}</version>
 		</dependency>
-		
+
 		<!-- Spring WebSocket支持 -->
 		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -41,15 +41,16 @@
 			<scope>provided</scope>
 		</dependency>
 		 -->
-		
+
 		<!-- RTP媒体处理 -->
-		 <!-- https://mvnrepository.com/artifact/javax.sip/jain-sip-ri -->
+		<!-- https://github.com/RestComm/jain-sip -->
+		<!-- https://mvnrepository.com/artifact/javax.sip/jain-sip-ri -->
 		<dependency>
 			<groupId>javax.sip</groupId>
 			<artifactId>jain-sip-ri</artifactId>
 			<version>1.3.0-91</version>
 		</dependency>
-		
+
 		<!-- Lombok简化代码 -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
