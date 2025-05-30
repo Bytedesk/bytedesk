@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:05:15
+ * @LastEditTime: 2025-05-30 15:18:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,12 +27,12 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import io.swagger.v3.oas.annotations.tags.Tag;
+// import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
-@Tag(name = "User Management", description = "User management APIs")
+// @Tag(name = "User Management", description = "User management APIs")
 public class UserRestController extends BaseRestController<UserRequest> {
 
     private final UserRestService userRestService;
@@ -64,7 +64,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @PreAuthorize("hasRole('SUPER')")
     @ActionAnnotation(title = "user", action = "新建", description = "create user info")
     @Override
     public ResponseEntity<?> create(UserRequest request) {
@@ -74,7 +73,6 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @PreAuthorize("hasRole('SUPER')")
     @ActionAnnotation(title = "user", action = "更新", description = "update user info")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
@@ -110,23 +108,12 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
-        
         UserResponse userResponse = userRestService.getProfile();
-
         if (userResponse != null) {
             return ResponseEntity.ok(JsonResult.success(userResponse));
         } else {
             return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
         }
-
-        // UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
-        // Optional<UserEntity> userOptional = userService.findByUid(user.getUid());
-        // if (userOptional.isPresent()) {
-        //     UserResponse userResponse = ConvertUtils.convertToUserResponse(userOptional.get());
-        //     return ResponseEntity.ok(JsonResult.success(userResponse));
-        // } else {
-        //     return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
-        // }
     }
    
     

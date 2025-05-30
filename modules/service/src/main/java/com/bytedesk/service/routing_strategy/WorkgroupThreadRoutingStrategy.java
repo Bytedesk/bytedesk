@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 14:59:26
+ * @LastEditTime: 2025-05-30 15:20:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -223,39 +223,40 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
     }
 
-    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
-        log.info("handleAvailableWorkgroup");
+    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+        log.info("handleAvailableWorkgroup {}", agentEntity.getNickname());
         // 未满则接待
         Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
         // 
-        String content = agent.getServiceSettings().getWelcomeTip();
+        String content = agentEntity.getServiceSettings().getWelcomeTip();
         if (content == null || content.isEmpty()) {
             content = "您好，请问有什么可以帮助您？";
         }
         // 未满则接待
-        thread.setUserUid(agent.getUid());
+        thread.setUserUid(agentEntity.getUid());
         thread.setChatting().setContent(content).setUnreadCount(1);
         
         // Only set owner if member exists
-        if (agent.getMember() != null) {
-            thread.setOwner(agent.getMember().getUser());
+        if (agentEntity.getMember() != null) {
+            thread.setOwner(agentEntity.getMember().getUser());
         }
         //
-        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
+        log.info("thread agent {}", thread.getAgent());
         ThreadEntity savedThread = threadService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
-        // 客服接待
+        // 客服接待时，自动接受会话
         queueMemberEntity.agentAutoAcceptThread();
         queueMemberRestService.save(queueMemberEntity);
         //
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-        //
+        // 发送欢迎消息
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
