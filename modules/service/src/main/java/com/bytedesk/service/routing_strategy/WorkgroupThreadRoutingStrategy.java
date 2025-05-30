@@ -245,8 +245,11 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
-        log.info("thread agent {}", thread.getAgent());
+        log.info("before save agent: {}", thread.getAgent());
         ThreadEntity savedThread = threadService.save(thread);
+        log.info("after save agent: {}", savedThread.getAgent());
+        ThreadEntity dbThread = threadService.findByUid(thread.getUid()).get();
+        log.info("db agent: {}", dbThread.getAgent());
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
