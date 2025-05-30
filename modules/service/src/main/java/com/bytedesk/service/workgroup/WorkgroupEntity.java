@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 15:51:58
+ * @LastEditTime: 2025-05-30 09:11:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -71,11 +71,6 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties({
     "hibernateLazyInitializer", 
     "handler",
-    "agents",
-    "messageLeaveAgent",
-    "inviteSettings",
-    "intentionSetting",
-    "availableAgents"
 })
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
 @Table(name = "bytedesk_service_workgroup")
@@ -115,14 +110,6 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
 
-    // @Embedded
-    // @Builder.Default
-    // private InviteSettings inviteSettings = new InviteSettings();
-
-    // @Embedded
-    // @Builder.Default
-    // private IntentionSettings intentionSettings = new IntentionSettings();
-
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
@@ -156,92 +143,25 @@ public class WorkgroupEntity extends BaseEntity {
      */
     @JsonIgnore
     public List<AgentEntity> getAvailableAgents() {
+        if (this.agents == null) {
+            return new ArrayList<>();
+        }
         return this.agents.stream().filter(agent -> agent.isConnectedAndAvailable()).collect(Collectors.toList());
     }
 
-    /**
-     * 检查是否超载
-     */
     @JsonIgnore
-    public Boolean isOverloaded() {
-        // 1. 检查总会话数是否超限
-        // if (getCurrentThreadCount() >= getMaxConcurrentThreads()) {
-        //     return true;
-        // }
-
-        // 2. 检查等待队列是否超限 
-        // if (getWaitingThreadCount() >= getMaxWaitingThreads()) {
-        //     return true;
-        // }
-
-        // 3. 检查客服平均负载是否超限
-        // if (getOnlineAgentCount() > 0) {
-        //     double avgLoad = (double) getCurrentThreadCount() / getOnlineAgentCount();
-        //     if (avgLoad >= getMaxThreadPerAgent()) {
-        //         return true;
-        //     }
-        // }
-
-        // 4. 检查负载率是否超过告警阈值
-        // double loadRate = (double) getCurrentThreadCount() / getMaxConcurrentThreads();
-        // if (loadRate >= getAlertThreshold()) {
-        //     return true;
-        // }
-
-        return false;
+    public AgentEntity getMessageLeaveAgent() {
+        if (this.messageLeaveAgent == null) {
+            if (this.agents == null || this.agents.isEmpty()) {
+                // 这里可以考虑记录一个警告日志
+                return null;
+            }
+            return this.agents.stream()
+                .findFirst()
+                .orElse(null);
+        }
+        return this.messageLeaveAgent;
     }
-
-    // TODO: 根据算法选择一个agent
-    // TODO: 增加agent-currentThreadCount数量
-    // TODO: 模拟测试10000个访客分配给10个客服，每个客服平均分配50个访客
-    // public AgentEntity nextAgent() {
-
-        // TODO: 所有客服都离线或小休不接待状态，则进入留言
-
-        // TODO:  所有客服都达到最大接待人数，则进入排队
-
-        // TODO: 排队人数动态变化，随时通知访客端。数据库记录排队人数变动时间点
-
-        // TODO: 首先完善各个客服的统计数据，比如接待量、等待时长等
-
-    //     if (routingMode.equals(WorkgroupRoutingModeEnum.ROUND_ROBIN.name())) {
-    //         // return assignAgentByRobin();
-
-    //     } else if (routingMode.equals(WorkgroupRoutingModeEnum.LEAST_ACTIVE.name())) {
-
-    //     }
-
-    //     return getAgents().iterator().next();
-    // }
-
-    /**
-     * 路由队列，用于分配客服
-     */
-    // @Transient
-    // @Builder.Default
-    // private Queue<AgentEntity> agentQueue = new LinkedList<>();
-
-    /**
-     * 轮询分配算法实现访客到客服的分配
-     * @return 分配到的客服
-     */
-    // public AgentEntity assignAgentByRobin() {
-    //     if (agentQueue.isEmpty()) {
-    //         Iterator<AgentEntity> iterator = agents.iterator();
-    //         while (iterator.hasNext()) {
-    //             AgentEntity agent = iterator.next();
-    //             if (agent.isConnected() && agent.isAvailable()) {
-    //                 agentQueue.add(agent);
-    //             }
-    //         }
-    //     }
-    //     // 从队列头部获取一个客服
-    //     AgentEntity assignedAgent = agentQueue.poll();
-    //     // 为了保证轮询的连续性，将该客服重新加入队列尾部
-    //     agentQueue.offer(assignedAgent);
-    //     // 返回分配到的客服
-    //     return assignedAgent;
-    // }
 
     @JsonIgnore
     public Boolean isConnected() {

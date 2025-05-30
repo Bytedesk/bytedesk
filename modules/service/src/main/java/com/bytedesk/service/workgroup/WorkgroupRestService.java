@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 17:46:08
+ * @LastEditTime: 2025-05-30 09:13:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.workgroup;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -254,6 +255,21 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             if (workgroup.getQueueSettings() != null) {
                 workgroup.getQueueSettings().toString();
             }
+            // 确保agents被初始化
+            if (workgroup.getAgents() != null) {
+                workgroup.getAgents().size(); // 触发加载
+                if (workgroup.getAgents().isEmpty()) {
+                    log.warn("工作组 {} 没有客服成员", workgroup.getUid());
+                }
+            } else {
+                // 如果agents为null，初始化为空列表，避免后续NPE
+                workgroup.setAgents(new ArrayList<>());
+                log.warn("工作组 {} 的客服列表为null，已初始化为空列表", workgroup.getUid());
+            }
+            // 确保messageLeaveAgent被初始化
+            if (workgroup.getMessageLeaveAgent() != null) {
+                workgroup.getMessageLeaveAgent().getUid(); // 触发加载
+            }
         }
         return workgroupOptional;
     }
@@ -261,7 +277,19 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     @CachePut(value = "workgroup", key = "#entity.uid")
     @Override
     protected WorkgroupEntity doSave(WorkgroupEntity entity) {
-        return workgroupRepository.save(entity);
+        // 确保agents不为null，避免缓存后出现NPE
+        if (entity.getAgents() == null) {
+            entity.setAgents(new ArrayList<>());
+            log.warn("保存前检测到工作组 {} 的客服列表为null，已初始化为空列表", entity.getUid());
+        }
+        WorkgroupEntity savedEntity = workgroupRepository.save(entity);
+        
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        if (savedEntity.getAgents() != null) {
+            savedEntity.getAgents().size(); // 触发加载
+        }
+        
+        return savedEntity;
     }
 
     @CacheEvict(value = "workgroup", key = "#uid")

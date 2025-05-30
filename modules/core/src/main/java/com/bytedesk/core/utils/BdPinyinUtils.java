@@ -20,6 +20,8 @@ import org.springframework.util.StringUtils;
 import com.github.houbb.pinyin.bs.PinyinBs;
 import com.github.houbb.pinyin.support.style.PinyinToneStyles;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * 高性能中文拼音转换工具
  * 
@@ -28,10 +30,9 @@ import com.github.houbb.pinyin.support.style.PinyinToneStyles;
  * https://github.com/houbb/pinyin/blob/master/src/test/java/com/github/houbb/pinyin/test/util/PinyinHelperTest.java
  * 
  */
+@UtilityClass
 public class BdPinyinUtils {
 
-    private BdPinyinUtils() {}
-    
     /**
      * 普通格式, 没有声调
      * 

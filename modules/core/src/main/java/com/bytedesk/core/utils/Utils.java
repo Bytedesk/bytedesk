@@ -20,10 +20,10 @@ import java.util.UUID;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-public class Utils {
+import lombok.experimental.UtilityClass;
 
-    private Utils() {
-    }
+@UtilityClass
+public class Utils {
 
     // /**
     //  * ID 生成器

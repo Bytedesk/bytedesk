@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:35:01
+ * @LastEditTime: 2025-05-30 09:31:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,10 +15,12 @@ package com.bytedesk.ai.provider;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.base.LlmModelConfigResponse;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,6 +84,12 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
     public ResponseEntity<?> queryByUid(LlmProviderRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+    @GetMapping("/model-config")
+    public ResponseEntity<?> getDefaultModelConfig() {
+        LlmModelConfigResponse response = llmProviderRestService.getDefaultModelConfig();
+        return ResponseEntity.ok(JsonResult.success(response));
     }
     
 }

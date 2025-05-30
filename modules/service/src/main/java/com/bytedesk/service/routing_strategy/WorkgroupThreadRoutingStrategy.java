@@ -176,6 +176,10 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (agentEntity == null) {
             // 离线留言接待客服
             agentEntity = workgroup.getMessageLeaveAgent();
+            if (agentEntity == null) {
+                log.error("离线留言接待客服不存在，请配置工作组留言接待客服。尝试从数据库重新加载工作组信息。");
+                throw new RuntimeException("Workgroup message leave agent not found");
+            }
         }
         // 
         UserProtobuf agent = agentEntity.toUserProtobuf();

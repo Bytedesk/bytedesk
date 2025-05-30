@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-04 16:53:16
+ * @LastEditTime: 2025-05-30 09:52:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,9 +39,6 @@ import com.bytedesk.core.utils.JwtUtils;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
   @Autowired
-  private JwtUtils jwtUtils;
-
-  @Autowired
   private AuthService authService;
 
   @Autowired
@@ -55,11 +52,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     try {
       String accessToken = parseAccessToken(request);
       // log.debug("accessToken {}", accessToken);
-      if (accessToken != null && jwtUtils.validateJwtToken(accessToken)) {
+      if (accessToken != null && JwtUtils.validateJwtToken(accessToken)) {
         // 从数据库验证token是否有效（未被撤销且未过期）
         Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
         if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
-          String subject = jwtUtils.getSubjectFromJwtToken(accessToken);
+          String subject = JwtUtils.getSubjectFromJwtToken(accessToken);
           // log.debug("subject {}", subject);
           //
           UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);

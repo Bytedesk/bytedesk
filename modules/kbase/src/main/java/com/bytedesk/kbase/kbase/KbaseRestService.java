@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:04:30
+ * @LastEditTime: 2025-05-30 09:39:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.LlmModelConfigResponse;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -42,8 +43,10 @@ import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
+import com.bytedesk.core.utils.LlmConfigUtils;
 
 import lombok.AllArgsConstructor;
+import org.springframework.core.env.Environment;
 
 @Service
 @AllArgsConstructor
@@ -58,6 +61,8 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     private final ArticleRestService articleService;
 
     private final AuthService authService;
+
+    private final Environment environment;
 
     @Override
     public Page<KbaseResponse> queryByOrg(KbaseRequest request) {
@@ -127,8 +132,15 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         entity.setOrgUid(request.getOrgUid());
         entity.setAgentUid(request.getAgentUid());
         //
-        entity.setEmbeddingProvider(request.getEmbeddingProvider());
-        entity.setEmbeddingModel(request.getEmbeddingModel());
+        // Get default model config if not provided
+        if (!StringUtils.hasText(request.getEmbeddingProvider()) || !StringUtils.hasText(request.getEmbeddingModel())) {
+            LlmModelConfigResponse modelConfig = getDefaultModelConfig();
+            entity.setEmbeddingProvider(request.getEmbeddingProvider() != null ? request.getEmbeddingProvider() : modelConfig.getDefaultEmbeddingProvider());
+            entity.setEmbeddingModel(request.getEmbeddingModel() != null ? request.getEmbeddingModel() : modelConfig.getDefaultEmbeddingModel());
+        } else {
+            entity.setEmbeddingProvider(request.getEmbeddingProvider());
+            entity.setEmbeddingModel(request.getEmbeddingModel());
+        }
         //
         KbaseEntity savedKb = save(entity);
         if (savedKb == null) {
@@ -360,6 +372,10 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         kownledgebaseRequestTaboo.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID));
         kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
+    }
+
+    public LlmModelConfigResponse getDefaultModelConfig() {
+        return LlmConfigUtils.getDefaultModelConfig(environment);
     }
 
 }

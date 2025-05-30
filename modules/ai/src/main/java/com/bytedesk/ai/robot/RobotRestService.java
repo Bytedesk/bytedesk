@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-27 10:08:37
+ * @LastEditTime: 2025-05-30 09:32:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.core.env.Environment;
 
 // import com.bytedesk.ai.demo.utils.FileContent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
@@ -32,6 +33,7 @@ import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.LlmModelConfigResponse;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
@@ -156,7 +158,14 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         
         // 设置llm相关属性
         if (request.getLlm() != null) {
-            robot.setLlm(request.getLlm());
+            RobotLlm llm = request.getLlm();
+            // Get default model config if not provided
+            if (!StringUtils.hasText(llm.getProvider()) || !StringUtils.hasText(llm.getModel())) {
+                LlmModelConfigResponse modelConfig = llmProviderRestService.getDefaultModelConfig();
+                llm.setProvider(llm.getProvider() != null ? llm.getProvider() : modelConfig.getDefaultChatProvider());
+                llm.setModel(llm.getModel() != null ? llm.getModel() : modelConfig.getDefaultChatModel());
+            }
+            robot.setLlm(llm);
         }
         
         // Set common settings

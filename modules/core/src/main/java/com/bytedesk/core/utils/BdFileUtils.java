@@ -1,5 +1,6 @@
 package com.bytedesk.core.utils;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -35,10 +36,8 @@ import java.nio.charset.Charset;
  * @date 4/9/19
  */
 @Slf4j
+@UtilityClass
 public class BdFileUtils {
-
-    private BdFileUtils() {
-    }
 
     /**
      * 上传文件

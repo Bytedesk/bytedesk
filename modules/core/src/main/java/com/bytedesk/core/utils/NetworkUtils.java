@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@UtilityClass
 public class NetworkUtils {
 
     /**
