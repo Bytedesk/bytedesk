@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 15:41:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:39:13
+ * @LastEditTime: 2025-05-30 13:16:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,9 +37,18 @@ public class MemberSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getUsername())) {
                 predicates.add(criteriaBuilder.like(root.get("user").get("username"), "%" + request.getUsername() + "%"));
             }
-            // 
-            if (StringUtils.hasText(request.getDeptUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));
+            // deptUid and subDeptUids with OR relationship
+            if (StringUtils.hasText(request.getDeptUid()) || (request.getSubDeptUids() != null && request.getSubDeptUids().size() > 0)) {
+                List<Predicate> deptPredicates = new ArrayList<>();
+                if (StringUtils.hasText(request.getDeptUid())) {
+                    deptPredicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));
+                }
+                if (request.getSubDeptUids() != null && request.getSubDeptUids().size() > 0) {
+                    for (String subDeptUid : request.getSubDeptUids()) {
+                        deptPredicates.add(criteriaBuilder.equal(root.get("deptUid"), subDeptUid));
+                    }
+                }
+                predicates.add(criteriaBuilder.or(deptPredicates.toArray(new Predicate[0])));
             }
             //
             if (StringUtils.hasText(request.getNickname())) {
