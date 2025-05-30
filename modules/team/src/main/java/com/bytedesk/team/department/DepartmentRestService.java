@@ -122,9 +122,12 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         if (optional.isPresent()) {
             DepartmentEntity department = optional.get();
             // modelMapper.map(departmentRequest, DepartmentEntity.class);
+            if (request.getUid().equals(request.getParentUid())) {
+                throw new RuntimeException("不能将当前部门设置为父部门");
+            }
             department.setName(request.getName());
             department.setDescription(request.getDescription());
-            // 
+            // 判断parentUid是否跟当前部门uid相同
             if (StringUtils.hasText(request.getParentUid())) {
                 Optional<DepartmentEntity> parentOptional = departmentRepository.findByUid(request.getParentUid());
                 if (parentOptional.isPresent()) {

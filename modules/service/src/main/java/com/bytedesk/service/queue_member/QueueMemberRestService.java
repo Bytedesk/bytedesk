@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 10:52:54
+ * @LastEditTime: 2025-05-30 11:43:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,6 +82,11 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
     public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRepository.findByThreadUid(threadUid);
+    }
+
+    // save
+    public QueueMemberEntity save(QueueMemberEntity entity) {
+        return doSave(entity);
     }
 
     @CachePut(value = "queue_member", key = "#entity.uid")
