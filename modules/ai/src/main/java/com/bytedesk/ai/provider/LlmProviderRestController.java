@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.base.LlmModelConfigResponse;
+import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -86,9 +86,9 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @GetMapping("/model-config")
-    public ResponseEntity<?> getDefaultModelConfig() {
-        LlmModelConfigResponse response = llmProviderRestService.getDefaultModelConfig();
+    @GetMapping("/config/default")
+    public ResponseEntity<?> getLlmProviderConfigDefault() {
+        LlmProviderConfigDefault response = llmProviderRestService.getLlmProviderConfigDefault();
         return ResponseEntity.ok(JsonResult.success(response));
     }
     

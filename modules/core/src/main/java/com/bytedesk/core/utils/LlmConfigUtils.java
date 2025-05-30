@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 09:44:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:47:10
+ * @LastEditTime: 2025-05-30 10:21:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,14 +15,14 @@ package com.bytedesk.core.utils;
 
 import org.springframework.core.env.Environment;
 
-import com.bytedesk.core.base.LlmModelConfigResponse;
+import com.bytedesk.core.base.LlmProviderConfigDefault;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class LlmConfigUtils {
 
-    public LlmModelConfigResponse getDefaultModelConfig(Environment environment) {
+    public LlmProviderConfigDefault getLlmProviderConfigDefault(Environment environment) {
         // Get the default chat provider and model
         String defaultChatProvider = environment.getProperty("spring.ai.model.chat", "ollama");
         String defaultChatModel = "";
@@ -47,7 +47,7 @@ public class LlmConfigUtils {
             defaultEmbeddingModel = "bge-m3:latest";
         }
 
-        return LlmModelConfigResponse.builder()
+        return LlmProviderConfigDefault.builder()
                 .defaultChatProvider(defaultChatProvider)
                 .defaultChatModel(defaultChatModel)
                 .defaultEmbeddingProvider(defaultEmbeddingProvider)

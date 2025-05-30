@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:44:06
+ * @LastEditTime: 2025-05-30 10:21:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.base.LlmModelConfigResponse;
+import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -218,8 +218,8 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    public LlmModelConfigResponse getDefaultModelConfig() {
-        return LlmConfigUtils.getDefaultModelConfig(environment);
+    public LlmProviderConfigDefault getLlmProviderConfigDefault() {
+        return LlmConfigUtils.getLlmProviderConfigDefault(environment);
     }
 
 }

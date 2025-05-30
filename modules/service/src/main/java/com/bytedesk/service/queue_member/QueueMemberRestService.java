@@ -136,17 +136,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
                 return queueMemberRepository.save(latestEntity);
             } else {
                 log.warn("无法找到UID为{}的QueueMember实体，将使用原始实体副本", entity.getUid());
-                // 为避免事务回滚，创建一个新的实体副本而不是返回null
-                QueueMemberEntity newEntity = new QueueMemberEntity();
-                newEntity.setUid(entity.getUid());
-                newEntity.setVisitorMessageCount(entity.getVisitorMessageCount());
-                newEntity.setAgentMessageCount(entity.getAgentMessageCount());
-                newEntity.setRobotMessageCount(entity.getRobotMessageCount());
-                newEntity.setSystemMessageCount(entity.getSystemMessageCount());
-                newEntity.setVisitorLastMessageAt(entity.getVisitorLastMessageAt());
-                newEntity.setAgentLastResponseAt(entity.getAgentLastResponseAt());
-                // 复制其他必要的字段...
-                return queueMemberRepository.save(newEntity);
+                return null;
             }
         } catch (Exception ex) {
             log.error("在处理乐观锁异常时发生错误: {}", ex.getMessage(), ex);
