@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:15:16
+ * @LastEditTime: 2025-05-30 11:02:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,7 +87,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         // 
         if (existsByNameAndOrgUid(request.getName(), request.getOrgUid())) {
             log.error("department  " + request.getName() + " already exists");
-            throw new RuntimeException("department " + request.getName() + " already exists");
+            throw new RuntimeException("部门 " + request.getName() + " 已经存在，请修改部门名称");
         }
 
         DepartmentEntity department = modelMapper.map(request, DepartmentEntity.class);
@@ -116,15 +116,22 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return convertToResponse(createdDepartment);
     }
 
-    public DepartmentResponse update(DepartmentRequest departmentRequest) {
+    public DepartmentResponse update(DepartmentRequest request) {
         //
-        Optional<DepartmentEntity> optional = findByUid(departmentRequest.getUid());
+        Optional<DepartmentEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             DepartmentEntity department = optional.get();
             // modelMapper.map(departmentRequest, DepartmentEntity.class);
-            department.setName(departmentRequest.getName());
-            department.setDescription(departmentRequest.getDescription());
-
+            department.setName(request.getName());
+            department.setDescription(request.getDescription());
+            // 
+            if (StringUtils.hasText(request.getParentUid())) {
+                Optional<DepartmentEntity> parentOptional = departmentRepository.findByUid(request.getParentUid());
+                if (parentOptional.isPresent()) {
+                    parentOptional.get().addChild(department);
+                }
+            }
+            // 
             DepartmentEntity savedEntity = save(department);
             if (savedEntity == null) {
                 throw new RuntimeException("department update failed");
