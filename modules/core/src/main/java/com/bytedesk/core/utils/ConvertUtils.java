@@ -40,12 +40,12 @@ import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadResponse;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class ConvertUtils {
 
     private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
-
-    private ConvertUtils() {
-    }
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
         // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities

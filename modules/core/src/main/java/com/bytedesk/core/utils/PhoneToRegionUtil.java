@@ -24,6 +24,7 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.google.i18n.phonenumbers.geocoding.PhoneNumberOfflineGeocoder;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,9 +33,8 @@ import lombok.extern.slf4j.Slf4j;
  * 基于google的libphonenumber将手机号转成地区及供应商信息
  */
 @Slf4j
+@UtilityClass
 public class PhoneToRegionUtil {
-    private PhoneToRegionUtil() {
-    }
 
     // 手机号工具
     private final static PhoneNumberUtil PHONE_NUMBER_UTIL = PhoneNumberUtil.getInstance();
@@ -105,6 +105,5 @@ public class PhoneToRegionUtil {
         affiliation.put("region",getPhoneRegin(phone));
         return affiliation;
     }
-
 
 }

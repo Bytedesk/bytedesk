@@ -48,8 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final JwtUtils jwtUtils;
-
     private final UserDetailsServiceImpl userDetailsService;
 
     private final ModelMapper modelMapper;
@@ -116,7 +114,7 @@ public class AuthService {
 
         UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
-        String accessToken = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
+        String accessToken = JwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
         
         // 登录成功后，将生成的accessToken同时保存到数据库中
         String client = userDetails.getClient();

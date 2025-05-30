@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-19 12:31:53
+ * @Date: 2025-05-30 09:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:17:45
+ * @LastEditTime: 2025-05-30 09:30:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,25 +11,22 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.queue;
+package com.bytedesk.core.base;
 
-import org.springframework.stereotype.Component;
+import lombok.Builder;
+import lombok.Data;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@Slf4j
-@Component
-public class QueueEntityListener {
-
-    // @PostPersist
-    // public void postPersist(QueueEntity queue) {
-    //     log.info("QueueEntity postPersist {}", queue.getUid());
-    // }
-
-    // @PostUpdate
-    // public void postUpdate(QueueEntity queue) {
-    //     log.info("QueueEntity postUpdate {}", queue.getUid());
-    // }
-
-
-}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LlmModelConfigResponse {
+    
+    private String defaultChatProvider;
+    private String defaultChatModel;
+    private String defaultEmbeddingProvider;
+    private String defaultEmbeddingModel;
+} 
