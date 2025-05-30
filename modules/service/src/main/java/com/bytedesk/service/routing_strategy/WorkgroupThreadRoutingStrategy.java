@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 11:35:38
+ * @LastEditTime: 2025-05-30 11:56:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,8 @@
 package com.bytedesk.service.routing_strategy;
 
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -54,6 +56,9 @@ import com.bytedesk.core.thread.ThreadEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.bytedesk.core.utils.OptimisticLockingHandler;
+import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
+
 /**
  * @author Jack Ning 270580156@qq.com
  */
@@ -79,6 +84,10 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     private final WorkgroupRoutingService workgroupRoutingService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final OptimisticLockingHandler optimisticLockingHandler;
+
+    private final QueueMemberMessageService queueMemberMessageService;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -188,9 +197,11 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (visitorRequest.getForceAgent()) {
             // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
             bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            queueMemberEntity.transferRobotToAgent();
-            // 更新 queueMemberEntity
-            queueMemberEntity = queueMemberRestService.save(queueMemberEntity);
+            
+            // 使用MQ异步处理转人工操作
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("robotToAgent", true);
+            queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
         }
         //
         if (agentEntity.isConnectedAndAvailable()) {
@@ -317,7 +328,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         log.info("getWorkgroupContinueMessage user: {}", user.getNickname());
         // 继续会话
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
-        // 微信公众号等渠道不能重复推送”继续会话“消息
+        // 微信公众号等渠道不能重复推送"继续会话"消息
         if (!visitorRequest.isWeChat()) {
             // 广播消息，由消息通道统一处理
             messageSendService.sendProtobufMessage(messageProtobuf);

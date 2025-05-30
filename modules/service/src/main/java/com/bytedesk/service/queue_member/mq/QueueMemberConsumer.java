@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 11:05:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 10:53:25
+ * @LastEditTime: 2025-05-30 12:00:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.service.queue_member.mq;
 
 import java.util.Map;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
@@ -202,7 +204,18 @@ public class QueueMemberConsumer implements MessageListener {
                     member.setAgentOffline((Boolean) value);
                     break;
                 case "robotToAgent":
-                    member.setRobotToAgent((Boolean) value);
+                    if (Boolean.TRUE.equals(value)) {
+                        // 执行完整的转人工逻辑
+                        member.transferRobotToAgent();
+                        // // 设置转人工状态
+                        // member.setTransferStatus(ThreadTransferStatusEnum.ROBOT_TO_AGENT.name());
+                        // // 设置机器人结束时间
+                        // member.setRobotClosedAt(LocalDateTime.now());
+                        // // 设置人工开始时间
+                        // member.setAgentAcceptedAt(LocalDateTime.now());
+                        // // 设置人工接入方式为自动
+                        // member.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+                    }
                     break;
                 case "rated":
                     member.setRated((Boolean) value);
