@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
+import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

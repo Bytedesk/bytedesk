@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-05-13 18:15:32
+ * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:15:32
+ * @LastEditTime: 2025-02-25 10:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,30 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_text;
+package com.bytedesk.kbase.llm_webpage.event;
 
-import java.io.Serializable;
+import org.springframework.context.ApplicationEvent;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.bytedesk.kbase.llm_webpage.WebpageEntity;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TextElasticSearchResult implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public class WebpageCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
-    
-    private TextElastic textElastic;
-   
-    private float score;
-    
-    // 存储带高亮标记的内容文本
-    private String highlightedContent;
-    
-    // 存储带高亮标记的名称
-    private String highlightedName;
+
+    private WebpageEntity webpage;
+
+    public WebpageCreateEvent(WebpageEntity webpage) {
+        super(webpage);
+        this.webpage = webpage;
+    }
+
 }

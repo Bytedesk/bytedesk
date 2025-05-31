@@ -28,9 +28,11 @@ import com.bytedesk.kbase.file.FileEntity;
 import com.bytedesk.kbase.file.FileResponse;
 import com.bytedesk.kbase.file.FileRestService;
 import com.bytedesk.kbase.file.event.FileChunkEvent;
+import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
+import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

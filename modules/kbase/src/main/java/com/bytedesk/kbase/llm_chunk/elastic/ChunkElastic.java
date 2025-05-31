@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-04-22 17:03:29
+ * @Date: 2025-05-13 15:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 10:16:04
+ * @LastEditTime: 2025-05-31 08:58:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_text;
+package com.bytedesk.kbase.llm_chunk.elastic;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,68 +27,62 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Chunk实体的Elasticsearch版本
+ * 用于全文搜索
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "bytedesk_kbase_llm_text")
-public class TextElastic {
+@Document(indexName = "bytedesk_kbase_llm_chunk")
+public class ChunkElastic {
     
     @Id
     private String uid;
-
+    
     @Field(type = FieldType.Keyword)
-    private String title;
-
+    private String name;
+    
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String content;
-
+    
     @Field(type = FieldType.Keyword)
     private String type;
-
-    @Field(type = FieldType.Keyword)
-    private String status;
-
+    
     @Field(type = FieldType.Keyword)
     private List<String> tagList;
-
+    
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
-
-     // startDate
+    
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime startDate;
-
-    // endDate
+    
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime endDate;
     
+    @Field(type = FieldType.Keyword)
+    private String docId;
+    
+    @Field(type = FieldType.Keyword)
+    private String fileUid;
+    
+    @Field(type = FieldType.Keyword)
+    private String categoryUid;
+    
+    @Field(type = FieldType.Keyword)
+    private String kbaseUid;
+    
     // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     // private LocalDateTime createdAt;
     
     // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     // private LocalDateTime updatedAt;
-
-    @Field(type = FieldType.Keyword)
-    private String categoryUid;
-
-    @Field(type = FieldType.Keyword)
-    private String kbaseUid;
-
-    @Field(type = FieldType.Keyword)
-    private List<String> docIdList;
-
-    // @Field(type = FieldType.Date)
-    // private LocalDateTime createdAt;
-
-    // @Field(type = FieldType.Date)
-    // private LocalDateTime updatedAt;
-
+    
     // @Field(type = FieldType.Keyword)
     // private String createdBy;
-
+    
     // @Field(type = FieldType.Keyword)
     // private String updatedBy;
-
-
 }

@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_chunk;
+package com.bytedesk.kbase.llm_chunk.vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.kbase.config.KbaseConst;
+import com.bytedesk.kbase.llm_chunk.ChunkEntity;
+import com.bytedesk.kbase.llm_chunk.ChunkRequest;
+import com.bytedesk.kbase.llm_chunk.ChunkRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
