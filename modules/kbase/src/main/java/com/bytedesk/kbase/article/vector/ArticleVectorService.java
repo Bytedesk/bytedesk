@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 17:30:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 10:09:33
+ * @LastEditTime: 2025-05-31 11:04:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,12 +19,10 @@ import java.util.Optional;
 import java.util.Map;
 
 import org.springframework.ai.document.Document;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,9 +49,6 @@ public class ArticleVectorService {
     private final ElasticsearchVectorStore vectorStore;
 
     private final ArticleRestService articleRestService;
-
-    @Qualifier("bytedeskOllamaEmbeddingModel")
-    private final EmbeddingModel embeddingModel;
 
     /**
      * 将文章内容添加到向量存储中

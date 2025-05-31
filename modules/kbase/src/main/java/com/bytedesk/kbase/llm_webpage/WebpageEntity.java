@@ -102,5 +102,12 @@ public class WebpageEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
-
+    
+    // 页面浏览统计
+    @Builder.Default
+    private Integer viewCount = 0;
+    
+    // 点击统计
+    @Builder.Default
+    private Integer clickCount = 0;
 }
