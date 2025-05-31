@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 15:12:10
+ * @LastEditTime: 2025-05-31 09:30:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,21 +51,6 @@ public class QuickReplyRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean enabled = true;
-
-    // 是否开启自动同步到llm_qa问答
-    @Builder.Default
-    private Boolean autoSyncLlmQa = false;
-
-    // 是否已经同步llm问答
-    @Builder.Default
-    private Boolean llmQaSynced = false;
-
-    // 同步到llm qa kbUid 
-    private String llmQaKbUid;
-
-    // 同步到llm qa uid
-    private String llmQaUid;
-
 
     // 被点击次数
     @Builder.Default

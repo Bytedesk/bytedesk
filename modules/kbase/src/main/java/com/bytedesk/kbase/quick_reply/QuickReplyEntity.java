@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 15:11:43
+ * @LastEditTime: 2025-05-31 09:30:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,24 +69,6 @@ public class QuickReplyEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "reply_type", nullable = false)
     private String type = MessageTypeEnum.TEXT.name();
-
-    // 是否开启自动同步到llm_qa问答
-    @Builder.Default
-    @Column(name = "is_auto_sync_llm_qa")
-    private Boolean autoSyncLlmQa = false;
-
-    // 是否已经同步llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa_synced")
-    private Boolean llmQaSynced = false;
-
-    // 同步到llm qa kbUid 
-    @Column(name = "llm_kb_uid")
-    private String llmQaKbUid;
-
-    // 同步到llm qa uid
-    @Column(name = "llm_qa_uid")
-    private String llmQaUid;
 
     // 被点击次数
     @Builder.Default

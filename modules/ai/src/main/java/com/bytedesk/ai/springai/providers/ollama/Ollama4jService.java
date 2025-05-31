@@ -37,43 +37,6 @@ public class Ollama4jService {
     @Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")
     private String ollamaEmbeddingOptionsModel;
 
-    // 初始化方法，检查并拉取必要的嵌入模型
-    // @PostConstruct
-    // public void init() {
-    //     ensureEmbeddingModelExists(ollamaEmbeddingOptionsModel);
-    // }
-
-    /**
-     * 检查并确保嵌入模型存在，如果不存在则尝试拉取
-     * 通过配置文件设置拉取策略
-     * spring.ai.ollama.init.pull-model-strategy=when_missing
-     * 
-     * @param modelName 模型名称
-     */
-    // private void ensureEmbeddingModelExists(String modelName) {
-    //     try {
-    //         log.info("检查嵌入模型是否存在: {}", modelName);
-    //         // 使用showModel方法替代不存在的getModelInfo方法
-    //         bytedeskOllamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
-    //         log.info("嵌入模型已存在: {}", modelName);
-    //     } catch (HttpClientErrorException e) {
-    //         if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-    //             log.warn("嵌入模型不存在: {}，尝试拉取模型...", modelName);
-    //             try {
-    //                 // 模型不存在，尝试拉取
-    //                 bytedeskOllamaApi.pullModel(new OllamaApi.PullModelRequest(modelName));
-    //                 log.info("成功拉取嵌入模型: {}", modelName);
-    //             } catch (Exception pullEx) {
-    //                 log.error("拉取嵌入模型失败: {}, 错误: {}", modelName, pullEx.getMessage(), pullEx);
-    //             }
-    //         } else {
-    //             log.error("检查嵌入模型时发生错误: {}, 状态码: {}", modelName, e.getStatusCode(), e);
-    //         }
-    //     } catch (Exception e) {
-    //         log.error("检查嵌入模型时发生未知错误: {}, 错误: {}", modelName, e.getMessage(), e);
-    //     }
-    // }
-
     /**
      * 检查模型是否存在
      * 
