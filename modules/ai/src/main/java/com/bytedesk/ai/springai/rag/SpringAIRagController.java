@@ -14,6 +14,8 @@
 package com.bytedesk.ai.springai.rag;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -22,7 +24,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
@@ -36,8 +38,10 @@ import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,14 +63,14 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/spring/ai/rag")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnBean(ChatModel.class)
 public class SpringAIRagController {
 
     private final VectorStore vectorStore;
 
-    private final OllamaChatModel bytedeskOllamaChatModel;
+    private final EmbeddingModel embeddingModel;
 
-//     private final SpringAIVectorStoreService springAIVectorService;
+    private final ChatModel chatModel;
 
     private final ObservationRegistry observationRegistry;
 
@@ -87,7 +91,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
         // 使用chatClient，添加ObservationRegistry
-        ChatResponse response = ChatClient.builder(bytedeskOllamaChatModel, observationRegistry, null)
+        ChatResponse response = ChatClient.builder(chatModel, observationRegistry, null)
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -107,7 +111,7 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
-        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel)
+        ChatClient chatClient = ChatClient.builder(chatModel)
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(SearchRequest.builder().build())
                         .build())
@@ -136,13 +140,13 @@ public class SpringAIRagController {
                         .similarityThreshold(0.50)
                         .vectorStore(vectorStore)
                         .build())
-                // 允许为空
-                // .queryAugmenter(ContextualQueryAugmenter.builder()
-                // .allowEmptyContext(true)
-                // .build())
+        // 允许为空
+        // .queryAugmenter(ContextualQueryAugmenter.builder()
+        // .allowEmptyContext(true)
+        // .build())
                 .build();
 
-        String answer = ChatClient.builder(bytedeskOllamaChatModel)
+        String answer = ChatClient.builder(chatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -163,7 +167,7 @@ public class SpringAIRagController {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
-                        .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
+                        .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
                         .build())
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                         .similarityThreshold(0.50)
@@ -171,7 +175,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
 
-        String answer = ChatClient.builder(bytedeskOllamaChatModel)
+        String answer = ChatClient.builder(chatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -206,13 +210,13 @@ public class SpringAIRagController {
         // conversation history and a follow-up query into a standalone query that
         // captures the essence of the conversation.
         CompressionQueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel)
+        String answer = ChatClient.builder(chatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -241,13 +245,13 @@ public class SpringAIRagController {
         // to provide better results when querying a target system, such as a vector
         // store or a web search engine.
         QueryTransformer queryTransformer = RewriteQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel)
+        String answer = ChatClient.builder(chatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -272,14 +276,14 @@ public class SpringAIRagController {
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
         QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
                 .targetLanguage("english")
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel)
+        String answer = ChatClient.builder(chatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -302,14 +306,14 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskOllamaChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
                 .numberOfQueries(3)
                 // .includeOriginal(false)
                 .build();
         List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskOllamaChatModel)
+        String answer = ChatClient.builder(chatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -393,7 +397,7 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> observedChat(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
             
-        ChatClient chatClient = ChatClient.builder(bytedeskOllamaChatModel, observationRegistry, null)
+        ChatClient chatClient = ChatClient.builder(chatModel, observationRegistry, null)
                 .build();
                 
         ChatResponse response = chatClient.prompt()
@@ -404,6 +408,88 @@ public class SpringAIRagController {
         log.info("Observed chat response: {}", response);
         
         return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // 查看当前ElasticsearchVectorStore详情
+    // http://127.0.0.1:9003/spring/ai/rag/vector-store-info
+    @GetMapping("/vector-store-info")
+    ResponseEntity<JsonResult<?>> getVectorStoreInfo() {
+        log.info("Getting VectorStore info");
+        
+        Map<String, Object> vectorStoreInfo = new HashMap<>();
+        
+        try {
+            vectorStoreInfo.put("type", vectorStore.getClass().getSimpleName());
+            vectorStoreInfo.put("className", vectorStore.getClass().getName());
+            
+            // 如果是ElasticsearchVectorStore，获取更详细的信息
+            if (vectorStore instanceof ElasticsearchVectorStore) {
+                vectorStoreInfo.put("vectorStoreType", "ElasticsearchVectorStore");
+                vectorStoreInfo.put("status", "Active");
+                // 注意：由于ElasticsearchVectorStore的内部属性可能是私有的，
+                // 这里只能获取到公开的信息
+                vectorStoreInfo.put("description", "Elasticsearch-based vector store for semantic search");
+            } else {
+                vectorStoreInfo.put("vectorStoreType", "Unknown");
+            }
+            
+            vectorStoreInfo.put("timestamp", System.currentTimeMillis());
+            
+        } catch (Exception e) {
+            log.error("Error getting vector store info: {}", e.getMessage());
+            vectorStoreInfo.put("error", e.getMessage());
+            vectorStoreInfo.put("status", "Error");
+        }
+        
+        return ResponseEntity.ok(JsonResult.success(vectorStoreInfo));
+    }
+
+    // 查看当前EmbeddingModel详情
+    // http://127.0.0.1:9003/spring/ai/rag/embedding-model-info
+    @GetMapping("/embedding-model-info")
+    ResponseEntity<JsonResult<?>> getEmbeddingModelInfo() {
+        log.info("Getting EmbeddingModel info");
+        
+        Map<String, Object> embeddingModelInfo = new HashMap<>();
+        
+        try {
+            embeddingModelInfo.put("type", embeddingModel.getClass().getSimpleName());
+            embeddingModelInfo.put("className", embeddingModel.getClass().getName());
+            
+            // 获取embedding维度信息
+            try {
+                // 使用一个简单的测试文本来获取embedding维度
+                var testEmbedding = embeddingModel.embed("test");
+                embeddingModelInfo.put("dimensions", testEmbedding.length);
+                embeddingModelInfo.put("status", "Active");
+                embeddingModelInfo.put("testEmbeddingSize", testEmbedding.length);
+            } catch (Exception e) {
+                log.warn("Could not get embedding dimensions: {}", e.getMessage());
+                embeddingModelInfo.put("dimensionsError", e.getMessage());
+                embeddingModelInfo.put("status", "Error");
+            }
+            
+            // 根据类名判断embedding模型类型
+            String className = embeddingModel.getClass().getSimpleName();
+            if (className.contains("Ollama")) {
+                embeddingModelInfo.put("modelType", "Ollama Embedding Model");
+                embeddingModelInfo.put("description", "Local Ollama embedding model (e.g., bgm-m3)");
+            } else if (className.contains("Zhipuai") || className.contains("ZhiPu")) {
+                embeddingModelInfo.put("modelType", "Zhipuai Embedding Model");
+                embeddingModelInfo.put("description", "Zhipuai cloud embedding model");
+            } else {
+                embeddingModelInfo.put("modelType", "Unknown Embedding Model");
+            }
+            
+            embeddingModelInfo.put("timestamp", System.currentTimeMillis());
+            
+        } catch (Exception e) {
+            log.error("Error getting embedding model info: {}", e.getMessage());
+            embeddingModelInfo.put("error", e.getMessage());
+            embeddingModelInfo.put("status", "Error");
+        }
+        
+        return ResponseEntity.ok(JsonResult.success(embeddingModelInfo));
     }
 
 }

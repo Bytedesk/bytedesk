@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 23:00:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 15:30:52
+ * @LastEditTime: 2025-05-31 12:39:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,11 +40,10 @@ public class GroupEventListener {
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         ThreadEntity thread = event.getThread();
-        // ThreadRequest request = event.getRequest();
-        log.info("group ThreadCreateEvent: {}", thread.getUid());
         //
-        if (thread.getType().equals(ThreadTypeEnum.GROUP.name())) {
+        if (ThreadTypeEnum.GROUP.name().equals(thread.getType())) {
             String topic = thread.getTopic();
+            log.info("group ThreadCreateEvent: {}", topic);
             // 同事群组会话：org/group/{group_uid}
             String groupUid = topic.split("/")[2];
             log.info("groupUid {}", groupUid);

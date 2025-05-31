@@ -19,12 +19,10 @@ import java.util.Optional;
 import java.util.Map;
 
 import org.springframework.ai.document.Document;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -226,13 +224,14 @@ public class WebpageVectorService {
             return new ArrayList<>();
         }
 
-        // 创建过滤表达式生成器
-        FilterExpressionBuilder expressionBuilder = FilterExpressionBuilder.create();
-        FilterExpressionBuilder.Op finalOp = expressionBuilder.value(true);
+        // 创建过滤表达式构建器
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
 
-        // 添加过滤条件：启用状态
+        // 构建查询条件
         FilterExpressionBuilder.Op enabledOp = expressionBuilder.eq("enabled", "true");
-        finalOp = expressionBuilder.and(finalOp, enabledOp);
+
+        // 添加可选的过滤条件
+        FilterExpressionBuilder.Op finalOp = enabledOp;
 
         // 添加可选的过滤条件：知识库、分类、组织
         if (kbUid != null && !kbUid.isEmpty()) {

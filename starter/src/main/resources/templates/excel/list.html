@@ -61,6 +61,7 @@
             <thead>
                 <tr>
                     <th>文件名</th>
+                    <th>文件用途</th>
                     <th>大小</th>
                     <th>最后修改时间</th>
                     <th>操作</th>
@@ -70,6 +71,9 @@
                 <tr th:each="file : ${files}">
                     <td>
                         <span th:text="${file.name}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${file.description}" style="color: #28a745; font-weight: 500;"></span>
                     </td>
                     <td class="file-size">
                         <span th:text="${#numbers.formatDecimal(file.size/1024, 0, 2)} + ' KB'"></span>

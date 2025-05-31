@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:50:24
+ * @LastEditTime: 2025-05-31 13:17:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,12 +37,7 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ RoleEntityListener.class })
-@Table(name = "bytedesk_core_role"
-// , uniqueConstraints = {
-// @UniqueConstraint(columnNames = { "name", "orgUid" }), // is_deleted=false
-// 时不加限定
-// }
-)
+@Table(name = "bytedesk_core_role")
 public class RoleEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
@@ -53,10 +48,6 @@ public class RoleEntity extends BaseEntity {
 
 	private String description;
 
-	// 超级管理员、管理员等是平台角色，用户自定义角色是Level.ORGANIZATION
-	// @Builder.Default
-	// private String level = LevelEnum.PLATFORM.name();
-
 	// 是否是系统角色
 	@Builder.Default
 	@Column(name = "is_system", nullable = false)
@@ -66,12 +57,6 @@ public class RoleEntity extends BaseEntity {
 	@ManyToMany
 	@JoinTable(name = "bytedesk_core_role_authority", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
 	private Set<AuthorityEntity> authorities = new HashSet<>();
-
-	// 除系统自带角色之外，允许管理员-自己创建角色
-	// private String userUid;
-
-	// @Builder.Default
-	// private String platform = PlatformEnum.BYTEDESK.name();
 
 	public void addAuthority(AuthorityEntity authority) {
 		this.authorities.add(authority);
