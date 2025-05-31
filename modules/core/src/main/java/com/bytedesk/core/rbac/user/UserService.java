@@ -16,6 +16,8 @@ package com.bytedesk.core.rbac.user;
 import java.util.Optional;
 import java.util.Set;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,14 +48,14 @@ import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.modelmapper.ModelMapper;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -67,6 +69,9 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final UidUtils uidUtils;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final OrganizationRepository organizationRepository;
 
@@ -350,8 +355,9 @@ public class UserService {
             Optional<RoleEntity> optional = roleService.findByUid(roleUid);
             if (optional.isPresent()) {
                 RoleEntity role = optional.get();
-                // 直接使用数据库查询的角色实例，不再调用save
-                user.addOrganizationRole(role);
+                // 确保角色实体处于托管状态
+                RoleEntity managedRole = entityManager.merge(role);
+                user.addOrganizationRole(managedRole);
             } else {
                 throw new RuntimeException("Role not found: " + roleUid);
             }
@@ -373,8 +379,10 @@ public class UserService {
         Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_USER);
         if (roleOptional.isPresent()) {
             RoleEntity role = roleOptional.get();
+            // 确保角色实体处于托管状态
+            RoleEntity managedRole = entityManager.merge(role);
             // ROLE_USER 不需要organization的限制，直接添加到用户角色列表中
-            user.getCurrentRoles().add(role);
+            user.getCurrentRoles().add(managedRole);
 
             // 直接保存用户实体
             try {
@@ -428,9 +436,12 @@ public class UserService {
         Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(roleName);
         if (roleOptional.isPresent()) {
             RoleEntity role = roleOptional.get();
-            // 重要：不要在这里调用roleService.save(role)
-            // 使用已存在的持久化角色实例，避免创建分离状态的实体
-            user.addOrganizationRole(role);
+            
+            // 确保角色实体处于托管状态，避免分离实体持久化错误
+            // 通过EntityManager重新获取或合并实体状态
+            RoleEntity managedRole = entityManager.merge(role);
+            
+            user.addOrganizationRole(managedRole);
 
             // 直接保存用户实体
             try {
