@@ -37,10 +37,8 @@ public class VectorStoreConfig {
      */
     @Bean("elasticsearchVectorStore")
 //     @Primary
-    @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true")
-    public ElasticsearchVectorStore elasticsearchVectorStore(
-            RestClient restClient, // 修改为org.elasticsearch.client.RestClient
-            EmbeddingModel embeddingModel) {
+    @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true", matchIfMissing = false)
+    public ElasticsearchVectorStore elasticsearchVectorStore(RestClient restClient, EmbeddingModel embeddingModel) {
         
         log.info("Configuring ElasticsearchVectorStore with index: {} and dimensions: {}", 
                 elasticsearchIndexName, elasticsearchDimensions);
@@ -56,6 +54,8 @@ public class VectorStoreConfig {
         ElasticsearchVectorStoreOptions options = new ElasticsearchVectorStoreOptions();
         options.setIndexName(elasticsearchIndexName);
         options.setDimensions(elasticsearchDimensions);
+        // 智谱embedding-v2模型，固定维度为1024
+        // ollama bgm-m3模型，固定维度为1024
         // options.setDimensions(1024); // 固定维度为1536
         
         // 使用正确的builder方法调用，提供必需的RestClient和EmbeddingModel参数
@@ -67,55 +67,12 @@ public class VectorStoreConfig {
         
         return vectorStore;
     }
-    
-
-    /**
-     * Ollama专用的RedisVectorStore配置
-     */
-    // @Bean("bytedeskOllamaRedisVectorStore")
-    // @ConditionalOnProperty(name = {"spring.ai.ollama.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema"}, 
-    //     havingValue = "true", matchIfMissing = false)
-    // public RedisVectorStore bytedeskOllamaRedisVectorStore(RedisVectorStoreProperties properties) {
-    //     try {
-            
-    //         var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
-    //         var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
-            
-    //         var jedisPooled = new JedisPooled(jedisProperties.getHost(),
-    //                 jedisProperties.getPort(),
-    //                 null,
-    //                 jedisProperties.getPassword());
-
-    //         var embeddingModel = applicationContext.getBean("bytedeskOllamaEmbeddingModel", EmbeddingModel.class);
-    //         RedisVectorStore vectorStore = RedisVectorStore.builder(jedisPooled, embeddingModel)
-    //                 .indexName(properties.getIndexName())
-    //                 .prefix(properties.getPrefix())
-    //                 .metadataFields(kbUid, fileUid)
-    //                 .initializeSchema(true)
-    //                 .build();
-
-    //         try {
-    //             vectorStore.afterPropertiesSet();
-    //             log.info("Successfully initialized RedisVectorStore");
-    //             return vectorStore;
-    //         } catch (Exception e) {
-    //             log.error("Error initializing RedisVectorStore: {}", e.getMessage());
-    //             // return createFallbackVectorStore(jedisPooled, properties);
-    //         }
-
-    //     } catch (Exception e) {
-    //         log.error("Failed to create RedisVectorStore with Ollama: {}", e.getMessage());
-    //     }
-
-    //     return null;
-    // }
 
     /**
      * Zhipuai专用的RedisVectorStore配置
      */
     // @Bean("bytedeskZhipuaiRedisVectorStore")
-    // @ConditionalOnProperty(name = {"spring.ai.zhipuai.embedding.enabled", "spring.ai.vectorstore.redis.initialize-schema"}, 
-    //     havingValue = "true", matchIfMissing = false)
+    // @ConditionalOnProperty(name = "spring.ai.vectorstore.redis.initialize-schema",  havingValue = "true", matchIfMissing = false)
     // public RedisVectorStore bytedeskZhipuaiRedisVectorStore(RedisVectorStoreProperties properties) {
     //     try {
     //         var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);

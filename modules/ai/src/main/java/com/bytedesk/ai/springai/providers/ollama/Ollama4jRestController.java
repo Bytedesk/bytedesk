@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 17:49:04
+ * @LastEditTime: 2025-05-31 09:47:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -134,12 +134,11 @@ public class Ollama4jRestController {
     // 检查嵌入模型是否已经存在
     // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
     @GetMapping("/embedding-model/exists")
-    public ResponseEntity<?> isEmbeddingModelExists() {
-        String modelName = ollama4jService.getEmbeddingModelName();
-        boolean exists = ollama4jService.isModelExists(modelName);
-        log.info("Embedding model exists: {}, {}", modelName, exists);
+    public ResponseEntity<?> isEmbeddingModelExists(String model) {
+        // String modelName = ollama4jService.getEmbeddingModelName();
+        boolean exists = ollama4jService.isModelExists(model);
+        log.info("Embedding model exists: {}, {}", model, exists);
         // 
         return ResponseEntity.ok(JsonResult.success(exists));
-        // return ResponseEntity.ok(JsonResult.success(false));
     }
 }

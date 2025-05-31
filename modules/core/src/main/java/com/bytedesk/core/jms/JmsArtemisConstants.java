@@ -35,6 +35,8 @@ public class JmsArtemisConstants {
 
     // FAQ索引队列
     public static final String QUEUE_FAQ_INDEX = QUEUE_PREFIX + "faq.index";
+    // Article索引队列
+    public static final String QUEUE_ARTICLE_INDEX = QUEUE_PREFIX + "article.index";
     // queue member 队列
     public static final String QUEUE_MEMBER_UPDATE = QUEUE_PREFIX + "member.update";
 }
