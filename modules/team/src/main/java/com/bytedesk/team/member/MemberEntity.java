@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 13:34:15
+ * @LastEditTime: 2025-05-31 11:06:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,6 @@ import com.bytedesk.core.rbac.user.UserEntity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,7 +31,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
@@ -42,13 +40,7 @@ import org.springframework.cache.annotation.Cacheable;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ MemberEntityListener.class })
-@Table(name = "bytedesk_team_member"
-// 去掉表级别的唯一约束，使用代码级别的唯一约束
-//, uniqueConstraints = {
-//     @UniqueConstraint(columnNames = { "email", "org_uid", "is_deleted" }),
-//     @UniqueConstraint(columnNames = { "mobile", "org_uid", "is_deleted" })
-// }
-)
+@Table(name = "bytedesk_team_member")
 public class MemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -72,9 +64,7 @@ public class MemberEntity extends BaseEntity {
     @Email(message = "email format error")
     private String email;
 
-    // only support chinese mobile number, 
-    // TODO: support other country mobile number using libphonenumber library
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid mobile number format")
+    // only support chinese mobile number
     private String mobile;
 
     @Builder.Default

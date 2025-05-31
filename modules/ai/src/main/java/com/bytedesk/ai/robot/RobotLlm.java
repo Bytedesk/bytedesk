@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 14:58:14
+ * @LastEditTime: 2025-05-31 11:04:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,16 +103,6 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_search_type")
     private String searchType = RobotSearchTypeEnum.FULLTEXT.name();
-
-    // 迁移到kbase
-    // @Builder.Default
-    // @Column(name = "llm_embedding_provider")
-    // private String embeddingProvider = "zhipu";
-    
-    // @Builder.Default
-    // @Column(name = "llm_embedding_model")
-    // private String embeddingModel = "embedding-v2";
-    // // private String embeddingModel = defaultEmbeddingModel;
 
     @Builder.Default
     @Column(name = "llm_top_k")

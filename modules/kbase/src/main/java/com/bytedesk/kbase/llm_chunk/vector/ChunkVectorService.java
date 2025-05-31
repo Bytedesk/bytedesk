@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:55:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 16:21:41
+ * @LastEditTime: 2025-05-31 11:05:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,12 +19,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.ai.document.Document;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.kbase.config.KbaseConst;
@@ -49,11 +47,6 @@ public class ChunkVectorService {
     private final ElasticsearchVectorStore vectorStore;
     
     private final ChunkRestService chunkRestService;
-    
-    @Qualifier("bytedeskOllamaEmbeddingModel") 
-    private final EmbeddingModel embeddingModel;
-
-    
     
     /**
      * 将chunk内容添加到向量存储中
