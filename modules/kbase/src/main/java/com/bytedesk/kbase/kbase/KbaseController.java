@@ -137,7 +137,7 @@ public class KbaseController {
         if (articleOptional.isPresent()) {
             model.addAttribute("article", articleService.convertToResponse(articleOptional.get()));
             // 
-            Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(articleOptional.get().getKbUid());
+            Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(articleOptional.get().getKbase().getUid());
             if (kbaseOptional.isPresent()) {
                 model.addAttribute("kbase", kbaseOptional.get());
                 // 

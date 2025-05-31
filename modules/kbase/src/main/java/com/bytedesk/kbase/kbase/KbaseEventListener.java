@@ -160,12 +160,12 @@ public class KbaseEventListener {
         public void onArticleCreateEvent(ArticleCreateEvent event) {
                 // ArticleCreateEvent articleCreateEvent = event.getObject();
                 ArticleEntity article = event.getArticle();
-                log.info("onArticleCreateEvent {}, {}", article.getTitle(), article.getKbUid());
-                if (article.getKbUid() == null) {
+                log.info("onArticleCreateEvent {}, {}", article.getTitle(), article.getKbase().getUid());
+                if (article.getKbase().getUid() == null) {
                         return;
                 }
                 //
-                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbase().getUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
@@ -178,7 +178,7 @@ public class KbaseEventListener {
                         // articleService.convertToResponse(article), categoriesPage.getContent(), new
                         // ArrayList<>());
                 } else {
-                        log.error("onArticleCreateEvent kb not found {}", article.getKbUid());
+                        log.error("onArticleCreateEvent kb not found {}", article.getKbase().getUid());
                 }
         }
 
@@ -186,12 +186,12 @@ public class KbaseEventListener {
         public void onArticleUpdateEvent(ArticleUpdateEvent event) {
                 // ArticleUpdateEvent articleUpdateEvent = event.getObject();
                 ArticleEntity article = event.getArticle();
-                log.info("onArticleUpdateEvent {}, {}", article.getTitle(), article.getKbUid());
-                if (article.getKbUid() == null) {
+                log.info("onArticleUpdateEvent {}, {}", article.getTitle(), article.getKbase().getUid());
+                if (article.getKbase().getUid() == null) {
                         return;
                 }
                 //
-                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbase().getUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
@@ -204,7 +204,7 @@ public class KbaseEventListener {
                         // articleService.convertToResponse(article), categoriesPage.getContent(), new
                         // ArrayList<>());
                 } else {
-                        log.error("onArticleUpdateEvent kb not found {}", article.getKbUid());
+                        log.error("onArticleUpdateEvent kb not found {}", article.getKbase().getUid());
                 }
         }
 
