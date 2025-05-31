@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:09:32
+ * @LastEditTime: 2025-05-31 10:08:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,8 +21,12 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.kbase.kbase.KbaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -76,45 +80,6 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     private Boolean markdown = false;
 
-    // 是否开启自动生成llm问答
-    @Builder.Default
-    @Column(name = "is_auto_generate_llm_qa")
-    private Boolean autoGenerateLlmQa = false;
-
-    // 是否已经生成llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa_generated")
-    private Boolean llmQaGenerated = false;
-
-    // is auto delete llm qa
-    @Builder.Default
-    @Column(name = "is_auto_delete_llm_qa")
-    private Boolean autoDeleteLlmQa = false;
-
-    // 是否已经删除llm问答
-    @Builder.Default
-    @Column(name = "is_llm_qa_deleted")
-    private Boolean llmQaDeleted = false;
-
-    // 是否开启自动llm split切块
-    @Builder.Default
-    @Column(name = "is_auto_llm_split")
-    private Boolean autoLlmSplit = false;
-
-    // 是否已经自动llm split切块
-    @Builder.Default
-    @Column(name = "is_llm_splitted")
-    private Boolean llmSplitted = false;
-
-    // is auto delete llm split
-    @Builder.Default
-    @Column(name = "is_auto_delete_llm_split")
-    private Boolean autoDeleteLlmSplit = false;
-
-    // 是否已经删除llm split切块
-    @Builder.Default
-    @Column(name = "is_llm_split_deleted")
-    private Boolean llmSplitDeleted = false;
 
     @Builder.Default
     private Integer readCount = 0;
@@ -163,11 +128,22 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     private String categoryUid; // 文章分类
 
-    private String kbUid; // 对应知识库
+     // 替换kbUid为KbaseEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    private KbaseEntity kbase;
 
     @Column(name = "create_user", length = 1024)
     @Builder.Default
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 向量索引状态 (对应ChunkStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    private String vectorStatus;
+
+    // 存储在向量库中的文档ID列表
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Builder.Default
+    private List<String> docIdList = new ArrayList<>();
 
     // 多个附件，暂时不启用，直接将链接放在contentMarkdown/contentHtml中即可
     // @OneToMany
