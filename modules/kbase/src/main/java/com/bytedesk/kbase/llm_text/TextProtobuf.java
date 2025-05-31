@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.kbase.llm_text.elastic.TextElastic;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

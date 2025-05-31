@@ -24,9 +24,11 @@ import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
 import com.bytedesk.core.utils.BdFileUtils;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
+import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.event.TextCreateEvent;
 import com.bytedesk.kbase.llm_text.event.TextDeleteEvent;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
+import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

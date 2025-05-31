@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:18:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:18:42
+ * @LastEditTime: 2025-05-31 08:59:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_text;
+package com.bytedesk.kbase.llm_text.vector;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +20,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import com.bytedesk.kbase.llm_text.TextEntity;
+
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 
 import lombok.AllArgsConstructor;

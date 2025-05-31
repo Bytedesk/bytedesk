@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 08:57:14
+ * @LastEditTime: 2025-05-18 10:50:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_website;
+package com.bytedesk.kbase.llm_webpage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,9 +34,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebsiteRequest extends BaseRequest {
+public class WebpageRequest extends BaseRequest {
 
-    private String name;
+    private String title;
 
     private String url;
 

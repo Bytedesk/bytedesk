@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_text;
+package com.bytedesk.kbase.llm_text.vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.llm_text.TextEntity;
+import com.bytedesk.kbase.llm_text.TextRequest;
+import com.bytedesk.kbase.llm_text.TextRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
