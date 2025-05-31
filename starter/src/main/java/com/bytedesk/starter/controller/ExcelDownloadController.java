@@ -74,10 +74,11 @@ public class ExcelDownloadController {
                         return new FileInfo(
                             resource.getFilename(),
                             resource.contentLength(),
-                            resource.lastModified()
+                            resource.lastModified(),
+                            getFileDescription(resource.getFilename())
                         );
                     } catch (IOException e) {
-                        return new FileInfo(resource.getFilename(), 0, 0);
+                        return new FileInfo(resource.getFilename(), 0, 0, getFileDescription(resource.getFilename()));
                     }
                 })
                 .collect(Collectors.toList());
@@ -90,16 +91,86 @@ public class ExcelDownloadController {
         }
     }
 
+    /**
+     * 根据文件名获取文件用途描述
+     */
+    private String getFileDescription(String filename) {
+        if (filename == null) return "未知";
+        
+        String name = filename.toLowerCase();
+        
+        // 精确匹配特定文件名
+        if (name.equals("kbase_auto_reply_fixed.xlsx")) {
+            return "固定自动回复";
+        } else if (name.equals("kbase_auto_reply_keyword.xlsx")) {
+            return "根据关键词自动回复";
+        } else if (name.equals("kbase_faq.xlsx")) {
+            return "常见问题模板";
+        } else if (name.equals("kbase_quick_reply.xlsx")) {
+            return "快捷回复模板";
+        } else if (name.equals("kbase_replace.xlsx")) {
+            return "知识库替换模板";
+        } else if (name.equals("kbase_taboo.xlsx")) {
+            return "敏感词模板";
+        } else if (name.equals("kbase_text.xlsx")) {
+            return "大模型纯文本导入模板";
+        } else if (name.equals("kbase_transfer.xlsx")) {
+            return "自动触发转人工模板";
+        } else if (name.equals("team_member.xlsx")) {
+            return "导入组织成员模板";
+        }
+        // 通用匹配规则（作为后备）
+        else if (name.contains("kbase") && name.contains("auto") && name.contains("reply")) {
+            return "知识库自动回复模板";
+        } else if (name.contains("kbase") && name.contains("faq")) {
+            return "知识库常见问题模板";
+        } else if (name.contains("kbase") && name.contains("quick")) {
+            return "知识库快捷回复模板";
+        } else if (name.contains("kbase") && name.contains("taboo")) {
+            return "知识库敏感词模板";
+        } else if (name.contains("kbase") && name.contains("text")) {
+            return "知识库文本导入模板";
+        } else if (name.contains("kbase") && name.contains("transfer")) {
+            return "知识库转人工模板";
+        } else if (name.contains("kbase") && name.contains("replace")) {
+            return "知识库替换模板";
+        } else if (name.contains("team") && name.contains("member")) {
+            return "团队成员导入模板";
+        } else if (name.contains("keyword")) {
+            return "关键词管理模板";
+        } else if (name.contains("faq")) {
+            return "常见问题模板";
+        } else if (name.contains("user") || name.contains("member")) {
+            return "用户信息导入模板";
+        } else if (name.contains("agent") || name.contains("staff")) {
+            return "客服人员管理模板";
+        } else if (name.contains("category") || name.contains("cate")) {
+            return "分类管理模板";
+        } else if (name.contains("feedback")) {
+            return "反馈信息导入模板";
+        } else if (name.contains("message") || name.contains("chat")) {
+            return "聊天记录导入模板";
+        } else if (name.contains("statistics") || name.contains("stat")) {
+            return "统计数据导出模板";
+        } else if (name.contains("config") || name.contains("setting")) {
+            return "配置信息模板";
+        } else {
+            return "数据导入/导出模板";
+        }
+    }
+
     // 文件信息类
     public static class FileInfo {
         private String name;
         private long size;
         private long lastModified;
+        private String description;
 
-        public FileInfo(String name, long size, long lastModified) {
+        public FileInfo(String name, long size, long lastModified, String description) {
             this.name = name;
             this.size = size;
             this.lastModified = lastModified;
+            this.description = description;
         }
 
         public String getName() {
@@ -112,6 +183,10 @@ public class ExcelDownloadController {
 
         public long getLastModified() {
             return lastModified;
+        }
+
+        public String getDescription() {
+            return description;
         }
     }
 } 

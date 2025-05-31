@@ -51,4 +51,18 @@ public class WebpageIndexMessage implements Serializable {
      * 是否需要更新向量索引
      */
     private Boolean updateVectorIndex;
+    
+    /**
+     * 检查是否需要更新Elastic索引
+     */
+    public boolean isUpdateElasticIndex() {
+        return updateElasticIndex != null && updateElasticIndex;
+    }
+    
+    /**
+     * 检查是否需要更新向量索引
+     */
+    public boolean isUpdateVectorIndex() {
+        return updateVectorIndex != null && updateVectorIndex;
+    }
 }

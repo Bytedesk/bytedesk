@@ -24,6 +24,7 @@ import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
+import com.bytedesk.kbase.llm_webpage.service.WebpageCrawlerService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class WebpageIndexConsumer {
     private final WebpageElasticService webpageElasticService;
     private final WebpageVectorService webpageVectorService;
     private final WebpageRestService webpageRestService;
+    private final WebpageCrawlerService webpageCrawlerService;
     private final Random random = new Random();
 
     /**
@@ -131,6 +133,23 @@ public class WebpageIndexConsumer {
      */
     private void handleIndexOperation(WebpageEntity webpage, WebpageIndexMessage message) {
         try {
+            // 首先检查是否需要抓取网页内容
+            if (webpageCrawlerService.needsCrawling(webpage)) {
+                log.info("网页需要抓取内容，开始抓取: {}", webpage.getUrl());
+                webpage = webpageCrawlerService.crawlAndUpdateContent(webpage);
+                
+                // 验证抓取到的内容是否有效
+                if (!webpageCrawlerService.isValidContent(webpage.getContent())) {
+                    log.warn("网页内容无效或为空，跳过索引操作: {}", webpage.getUrl());
+                    return;
+                }
+                
+                log.info("成功抓取网页内容，继续索引操作: {} (内容长度: {})", 
+                    webpage.getUrl(), webpage.getContent().length());
+            } else {
+                log.debug("网页已有内容或不需要抓取，直接进行索引: {}", webpage.getUrl());
+            }
+            
             // 处理Elastic搜索索引
             if (message.isUpdateElasticIndex()) {
                 processElasticIndex(webpage);

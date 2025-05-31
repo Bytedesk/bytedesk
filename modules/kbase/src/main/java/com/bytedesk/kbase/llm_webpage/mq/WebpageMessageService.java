@@ -136,32 +136,3 @@ public class WebpageMessageService {
         }
     }
 }
-    
-    /**
-     * 发送网页UID到索引队列，用于异步创建或更新索引
-     * 
-     * @param uid 网页UID
-     */
-    public void sendToIndexQueue(String uid) {
-        try {
-            log.info("发送网页到索引队列: {}", uid);
-            amqpTemplate.convertAndSend(WEBPAGE_INDEX_QUEUE, uid);
-        } catch (Exception e) {
-            log.error("发送网页到索引队列失败: {}, 错误: {}", uid, e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * 发送网页UID到删除队列，用于异步删除索引
-     * 
-     * @param uid 网页UID
-     */
-    public void sendToDeleteQueue(String uid) {
-        try {
-            log.info("发送网页到删除队列: {}", uid);
-            amqpTemplate.convertAndSend(WEBPAGE_DELETE_QUEUE, uid);
-        } catch (Exception e) {
-            log.error("发送网页到删除队列失败: {}, 错误: {}", uid, e.getMessage(), e);
-        }
-    }
-}

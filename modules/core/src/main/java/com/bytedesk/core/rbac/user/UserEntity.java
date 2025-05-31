@@ -26,10 +26,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-// import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,15 +44,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ UserEntityListener.class })
-@Table(name = "bytedesk_core_user"
-// 去掉表级别的唯一约束，使用代码级别的唯一约束
-// , uniqueConstraints = {
-// 		@UniqueConstraint(columnNames = { "num", "platform", "is_deleted" }),
-// 		@UniqueConstraint(columnNames = { "username", "platform", "is_deleted" }),
-// 		@UniqueConstraint(columnNames = { "email", "platform", "is_deleted" }),
-// 		@UniqueConstraint(columnNames = { "mobile", "platform", "is_deleted" }),
-// }
-)
+@Table(name = "bytedesk_core_user")
 public class UserEntity extends BaseEntityNoOrg {
 
 	private static final long serialVersionUID = 1L;
@@ -80,11 +70,6 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Builder.Default
 	private String country = "86";
 
-	// @Digits(message = "phone length error", fraction = 0, integer = 11)
-	// @Column(unique = true) // mobile + platform unique
-    // only support chinese mobile number, 
-    // TODO: support other country mobile number using libphonenumber library
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid mobile number format")
     private String mobile;
 
 	@Builder.Default
@@ -113,13 +98,13 @@ public class UserEntity extends BaseEntityNoOrg {
 	private boolean mobileVerified = false;
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@com.fasterxml.jackson.annotation.JsonManagedReference
 	private OrganizationEntity currentOrganization;
 
 	// 用户当前拥有的角色
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "bytedesk_core_user_roles",
         joinColumns = @JoinColumn(name = "user_id"),

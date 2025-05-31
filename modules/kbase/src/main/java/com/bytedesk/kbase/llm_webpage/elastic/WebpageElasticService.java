@@ -52,6 +52,31 @@ public class WebpageElasticService {
     private final WebpageRestService webpageRestService;
 
     /**
+     * 更新单个网页的Elasticsearch索引
+     * @param request 网页请求对象
+     */
+    public void updateIndex(WebpageRequest request) {
+        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUid(request.getUid());
+        if (webpageOpt.isPresent()) {
+            WebpageEntity webpage = webpageOpt.get();
+            indexWebpage(webpage);
+        } else {
+            throw new IllegalArgumentException("Webpage not found with UID: " + request.getUid());
+        }
+    }
+
+    /**
+     * 更新知识库下所有网页的Elasticsearch索引
+     * @param request 网页请求对象，包含知识库UID
+     */
+    public void updateAllIndex(WebpageRequest request) {
+        List<WebpageEntity> webpageList = webpageRestService.findByKbUid(request.getKbUid());
+        webpageList.forEach(webpage -> {
+            indexWebpage(webpage); 
+        });
+    }
+
+    /**
      * 索引网页实体到Elasticsearch
      * @param webpage 要索引的网页实体
      */
@@ -99,10 +124,13 @@ public class WebpageElasticService {
     public void deleteWebpageIndexByKbUid(String kbUid) {
         log.info("批量删除知识库下所有网页索引: {}", kbUid);
         try {
-            // 创建删除查询
-            DeleteQuery deleteQuery = DeleteQuery.builder()
+            // 创建查询条件
+            Query query = NativeQuery.builder()
                 .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
                 .build();
+            
+            // 创建删除查询
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
             
             // 执行删除
             elasticsearchOperations.delete(deleteQuery, WebpageElastic.class);
