@@ -14,7 +14,7 @@ Main Banner START -->
 			<div class="col-md-5">
 				<!-- Title -->
 				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">企业级多租户即时通讯解决方案</h4>
+				<h4 class="mb-3">开源企业协同解决方案</h4>
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>
 			</div>

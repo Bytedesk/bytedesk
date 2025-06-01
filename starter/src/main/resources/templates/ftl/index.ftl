@@ -25,7 +25,7 @@ Listed course START -->
 		<!-- Title -->
 		<div class="row mb-4">
 			<div class="col-lg-8 mx-auto text-center">
-				<h2>微语开源套件：八合一</h2>
+				<h2>微语开源套件：九合一</h2>
 				<p class="mb-0">开源、免费，私有部署，所有数据存储在您自己的服务器上</p>
 			</div>
 		</div>
@@ -128,6 +128,17 @@ Listed course START -->
 					</div>
 					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins/kanban/" class="stretched-link" target="_blank">项目管理</a></h5>
 					<span class="mb-0">看板、日报、任务管理</span>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/puzzle.svg" alt="">
+					</div>
+					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins" class="stretched-link" target="_blank">插件模块</a></h5>
+					<span class="mb-0">扩展能力，支持第三方插件开发和集成，自定义业务流程、API对接，插件商店，一键安装</span>
 				</div>
 			</div>
 			
