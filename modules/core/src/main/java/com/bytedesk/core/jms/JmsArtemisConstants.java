@@ -41,4 +41,6 @@ public class JmsArtemisConstants {
     public static final String QUEUE_WEBPAGE_INDEX = QUEUE_PREFIX + "webpage.index";
     // queue member 队列
     public static final String QUEUE_MEMBER_UPDATE = QUEUE_PREFIX + "member.update";
+    // Member批量导入队列
+    public static final String QUEUE_MEMBER_BATCH_IMPORT = QUEUE_PREFIX + "member.batch.import";
 }

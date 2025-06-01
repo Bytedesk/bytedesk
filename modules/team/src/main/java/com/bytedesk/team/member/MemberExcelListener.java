@@ -19,6 +19,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.team.member.mq.MemberBatchMessageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,19 +29,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MemberExcelListener implements ReadListener<MemberExcel> {
 
-    private final MemberRestService memberService;
+    private final MemberBatchMessageService memberBatchMessageService;
 
     private final String orgUid;
     
     /**
-     * 每隔5条存储数据库，实际使用中可以100条，然后清理list ，方便内存回收
+     * 每隔100条发送到消息队列，避免内存积累过多
      */
     private static final int BATCH_COUNT = 100;
 
     /**
      * 缓存的数据
      */
-    private List<MemberEntity> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<MemberExcel> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
     
     /**
      * 这个每一条数据解析都会来调用
@@ -48,12 +49,12 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
     @Override
     public void invoke(MemberExcel data, AnalysisContext context) {
         log.info("MemberExcelListener invoke: {}", JSON.toJSONString(data));
-        MemberEntity faq = memberService.convertExcelToMember(data, orgUid);
-        cachedDataList.add(faq);
-        // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
+        // 直接缓存Excel数据，不再进行转换
+        cachedDataList.add(data);
+        // 达到BATCH_COUNT了，需要发送到消息队列，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
-            saveData();
-            // 存储完成清理 list
+            sendToQueue();
+            // 发送完成清理 list
             cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         }
     }
@@ -64,22 +65,41 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
         log.info("MemberExcelListener doAfterAllAnalysed");
-        // 这里也要保存数据，确保最后遗留的数据也存储到数据库
-        saveData();
-        log.info("所有数据解析完成！");
+        // 这里也要发送数据到队列，确保最后遗留的数据也处理
+        sendToQueue();
+        log.info("所有数据解析完成，已发送到消息队列进行异步处理！");
     }
     
     /**
-     * 加上存储数据库
+     * 发送数据到消息队列进行异步处理
+     * 这样可以避免批量保存时的OptimisticLockException问题
      */
-    private void saveData() {
+    private void sendToQueue() {
         if (cachedDataList.size() > 0) {
-            // 删除第一行标头
-            cachedDataList.remove(0);
+            // 删除第一行标头（如果存在）
+            if (cachedDataList.size() > 0 && isHeaderRow(cachedDataList.get(0))) {
+                cachedDataList.remove(0);
+            }
         }
-        log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        memberService.save(cachedDataList);
-        log.info("存储数据库成功！");
+        
+        if (cachedDataList.size() > 0) {
+            log.info("{}条数据，开始发送到消息队列进行异步处理！", cachedDataList.size());
+            // 发送到消息队列进行异步批量导入
+            memberBatchMessageService.sendBatchImportMessages(cachedDataList, orgUid);
+            log.info("发送到消息队列成功！");
+        }
+    }
+    
+    /**
+     * 判断是否为表头行
+     * 简单的判断逻辑，可以根据实际情况调整
+     */
+    private boolean isHeaderRow(MemberExcel memberExcel) {
+        return memberExcel != null && 
+               ("姓名".equals(memberExcel.getNickname()) || 
+                "昵称".equals(memberExcel.getNickname()) ||
+                "工号".equals(memberExcel.getJobNo()) ||
+                "职位".equals(memberExcel.getJobTitle()));
     }
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 16:19:38
+ * @LastEditTime: 2025-06-01 09:19:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -355,8 +355,21 @@ public class UserService {
             Optional<RoleEntity> optional = roleService.findByUid(roleUid);
             if (optional.isPresent()) {
                 RoleEntity role = optional.get();
-                // 确保角色实体处于托管状态
-                RoleEntity managedRole = entityManager.merge(role);
+                // 处理乐观锁冲突：使用重试机制或重新获取最新实体
+                RoleEntity managedRole;
+                try {
+                    // 尝试合并实体状态
+                    managedRole = entityManager.merge(role);
+                } catch (jakarta.persistence.OptimisticLockException e) {
+                    log.warn("乐观锁冲突，重新获取角色实体: {}", roleUid);
+                    // 重新从数据库获取最新的角色实体
+                    Optional<RoleEntity> freshRoleOptional = roleService.findByUid(roleUid);
+                    if (freshRoleOptional.isPresent()) {
+                        managedRole = freshRoleOptional.get();
+                    } else {
+                        throw new RuntimeException("重新获取角色失败: " + roleUid);
+                    }
+                }
                 user.addOrganizationRole(managedRole);
             } else {
                 throw new RuntimeException("Role not found: " + roleUid);
@@ -379,8 +392,21 @@ public class UserService {
         Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_USER);
         if (roleOptional.isPresent()) {
             RoleEntity role = roleOptional.get();
-            // 确保角色实体处于托管状态
-            RoleEntity managedRole = entityManager.merge(role);
+            // 处理乐观锁冲突：使用重试机制或重新获取最新实体
+            RoleEntity managedRole;
+            try {
+                // 尝试合并实体状态
+                managedRole = entityManager.merge(role);
+            } catch (jakarta.persistence.OptimisticLockException e) {
+                log.warn("乐观锁冲突，重新获取用户角色实体: {}", RoleConsts.ROLE_USER);
+                // 重新从数据库获取最新的角色实体
+                Optional<RoleEntity> freshRoleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_USER);
+                if (freshRoleOptional.isPresent()) {
+                    managedRole = freshRoleOptional.get();
+                } else {
+                    throw new RuntimeException("重新获取用户角色失败: " + RoleConsts.ROLE_USER);
+                }
+            }
             // ROLE_USER 不需要organization的限制，直接添加到用户角色列表中
             user.getCurrentRoles().add(managedRole);
 
@@ -437,9 +463,21 @@ public class UserService {
         if (roleOptional.isPresent()) {
             RoleEntity role = roleOptional.get();
             
-            // 确保角色实体处于托管状态，避免分离实体持久化错误
-            // 通过EntityManager重新获取或合并实体状态
-            RoleEntity managedRole = entityManager.merge(role);
+            // 处理乐观锁冲突：使用重试机制或重新获取最新实体
+            RoleEntity managedRole;
+            try {
+                // 尝试合并实体状态
+                managedRole = entityManager.merge(role);
+            } catch (jakarta.persistence.OptimisticLockException e) {
+                log.warn("乐观锁冲突，重新获取角色实体: {}", roleName);
+                // 重新从数据库获取最新的角色实体
+                Optional<RoleEntity> freshRoleOptional = roleService.findByNamePlatform(roleName);
+                if (freshRoleOptional.isPresent()) {
+                    managedRole = freshRoleOptional.get();
+                } else {
+                    throw new RuntimeException("重新获取角色失败: " + roleName);
+                }
+            }
             
             user.addOrganizationRole(managedRole);
 

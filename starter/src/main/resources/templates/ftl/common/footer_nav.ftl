@@ -4,7 +4,7 @@
 		<div class="row g-4 justify-content-between pt-5">
 
 			<!-- Widget 1 START -->
-			<div class="col-md-6 col-lg-6">
+			<div class="col-md-6 col-lg-4">
 				<!-- logo -->
 				<a class="me-0" href="index.html">
 					<#--  <img class="light-mode-item h-40px" src="assets/images/logo.svg" alt="logo">  -->
@@ -12,7 +12,7 @@
 				</a>
 
 				<p class="my-4"><h3>微语 - 重复工作自动化</h3></p>
-				<p ><h5>重复工作自动化-Chat As A Service(CAAS)</h5></p>
+				<p ><h5>开源办公软件</h5></p>
 				<#--  开源即时通讯平台、重复工作自动化、开源AI应用创新平台  -->
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
@@ -23,61 +23,80 @@
 						<button type="submit" class="btn btn-dark m-0">Subscribe</button>
 					</div>
 				</form>  -->
+				
+				<!-- 联系方式 -->
+				<div class="mt-3">
+					<h5>联系我们</h5>
+					<p><a href="mailto:270580156@qq.com">270580156@qq.com</a></p>
+					<p>添加微信请备注：微语</p>
+					<a href="/assets/images/qrcode/wechat.png" target="_blank">
+						<img src="/assets/images/qrcode/wechat.png" style="height: 80px;"/>
+					</a>
+				</div>
 			</div>
 			<!-- Widget 1 END -->
 
 			<!-- Widget 2 START -->
-			<div class="col-md-6 col-lg-6">
-				<div class="row g-4 g-lg-5">
-					<!-- Link block -->
-					<div class="col-6 col-sm-4">
-						<ul class="nav flex-column">
-							<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/docs/" target="_blank">文档</a></li>
-							<#--  <li class="nav-item"><a class="nav-link pt-0" href="#">Blog</a></li>  -->
-							<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/contact.html" target="_blank">联系</a></li>
-							<#--  <li class="nav-item"><a class="nav-link" href="mailto:270580156@qq.com">270580156@qq.com</a></li>  -->
-							<#--  <li class="nav-item"><a class="nav-link" href="#">Privacy Policy</a></li>  -->
-							<#--  <li class="nav-item"><a class="nav-link" href="#">Sitemap</a></li>  -->
-						</ul>
+			<div class="col-md-6 col-lg-2">
+				<h5 class="mb-3">快速链接</h5>
+				<ul class="nav flex-column">
+					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/docs/" target="_blank">文档</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/download.html" target="_blank">下载</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/about.html" target="_blank">关于</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/contact.html" target="_blank">联系</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank">Github</a></li>
+				</ul>
+				
+				<!-- 微信公众号 -->
+				<div class="row mt-4">
+					<div class="col-6">
+						<h6 class="mb-2">服务号</h6>
+						<a href="/assets/images/qrcode/weiyu/qrcode_1280.jpg" target="_blank">
+							<img src="/assets/images/qrcode/weiyu/qrcode_1280.jpg" style="height: 80px;" alt="微语服务号"/>
+						</a>
 					</div>
-
-					<!-- Link block -->
-					<div class="col-6 col-sm-4">
-						<ul class="nav flex-column">
-							<li class="nav-item"><a class="nav-link pt-0" href="https://www.weiyuai.cn/download.html" target="_blank">下载</a></li>
-							<li class="nav-item"><a class="nav-link pt-0" href="https://www.weiyuai.cn/about.html" target="_blank">关于</a></li>
-							<#--  <li class="nav-item"><a class="nav-link" href="#">Download</a></li>  -->
-							<#--  <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>  -->
-							
-						</ul>
-					</div>
-
-					<!-- Link block -->
-					<div class="col-6 col-sm-4">
-						<ul class="nav flex-column">
-							<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank">Github</a></li>
-							<#--  <li class="nav-item"><a class="nav-link pt-0" href="#"><i class="fab fa-facebook-square text-facebook me-2"></i>Facebook</a></li>  -->
-							<#--  <li class="nav-item"><a class="nav-link" href="#"><i class="fab fa-instagram-square text-instagram-gradient me-2"></i>Instagram</a></li>  -->
-							<#--  <li class="nav-item"><a class="nav-link" href="https://twitter.com/bytedeskai" target="_blank"><i class="fab fa-twitter-square text-twitter me-2"></i>Twitter</a></li>  -->
-							<#--  <li class="nav-item"><a class="nav-link" href="#"><i class="fab fa-linkedin text-linkedin me-2"></i>Linkedin</a></li>  -->
-							<li class="nav-item">
-								服务号
-								<a href="/assets/images/qrcode/weiyu/qrcode_1280.jpg" target="_blank">
-									<img src="/assets/images/qrcode/weiyu/qrcode_1280.jpg" style="height: 100px;"/>
-								</a>
-							</li>
-							<li class="nav-item">
-								订阅号
-								<a href="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" target="_blank">
-									<img src="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" style="height: 100px;"/>
-								</a>
-							</li>
-						</ul>
+					<div class="col-6">
+						<h6 class="mb-2">订阅号</h6>
+						<a href="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" target="_blank">
+							<img src="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" style="height: 80px;" alt="微语订阅号"/>
+						</a>
 					</div>
 				</div>
 			</div>
-			<!-- Widget 2 END -->
+			
+			<!-- Widget 3 START - 微语开源套件 -->
+			<div class="col-md-12 col-lg-6">
+				<h5 class="mb-3">微语开源套件</h5>
+				<div class="row g-3">
+					<!-- 第一行 -->
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/team" class="text-reset d-inline-block mb-1" target="_blank">企业IM</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/service" class="text-reset d-inline-block mb-1" target="_blank">在线客服</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/ai" class="text-reset d-inline-block mb-1" target="_blank">AI Agent</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/kbase" class="text-reset d-inline-block mb-1" target="_blank">企业知识库</a>
+					</div>
 
+					<!-- 第二行 -->
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/voc" class="text-reset d-inline-block mb-1" target="_blank">客户之声</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/ticket" class="text-reset d-inline-block mb-1" target="_blank">工单系统</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/plugins/kanban/" class="text-reset d-inline-block mb-1" target="_blank">工作流</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://demo.weiyuai.cn/plugins/kanban/" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
+					</div>
+				</div>
+			</div>
 		</div><!-- Row END -->
 
 		<hr> <!-- Divider -->

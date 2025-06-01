@@ -50,6 +50,7 @@ import com.bytedesk.team.department.DepartmentRequest;
 import com.bytedesk.team.department.DepartmentResponse;
 import com.bytedesk.team.department.DepartmentRestService;
 import com.bytedesk.team.member.event.MemberCreateEvent;
+import com.bytedesk.team.member.mq.MemberBatchMessageService;
 
 import jakarta.transaction.Transactional;
 
@@ -69,6 +70,8 @@ public class MemberEventListener {
     private final TopicCacheService topicCacheService;
 
     private final UploadRestService uploadService;
+    
+    private final MemberBatchMessageService memberBatchMessageService;
 
     @Transactional
     @Order(1)
@@ -148,12 +151,12 @@ public class MemberEventListener {
             if (resource.exists()) {
                 String filePath = resource.getFile().getAbsolutePath();
                 log.info("UploadEventListener loadAsResource: {}", filePath);
-                // 导入成员
+                // 导入成员 - 使用异步消息队列处理，避免OptimisticLockException
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                 EasyExcel.read(filePath,
                         MemberExcel.class,
-                        new MemberExcelListener(memberService, upload.getOrgUid())).sheet().doRead();
+                        new MemberExcelListener(memberBatchMessageService, upload.getOrgUid())).sheet().doRead();
             }
         }
 
