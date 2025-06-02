@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 13:26:04
+ * @LastEditTime: 2025-06-02 10:57:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bytedesk.core.converter.JsonListConverter;
 import com.bytedesk.core.converter.StringListConverter;
 
@@ -194,7 +195,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // belongs to user
     @ManyToOne(fetch = FetchType.LAZY)
-    @com.fasterxml.jackson.annotation.JsonBackReference
+    @JsonBackReference
     private UserEntity owner;
 
 }
