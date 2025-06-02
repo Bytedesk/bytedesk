@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 08:38:22
+ * @LastEditTime: 2025-06-02 10:47:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,7 @@ import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -360,8 +358,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
-    //
-
     /**
      * 更新坐席在线状态
      * 
@@ -376,29 +372,13 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // TODO: redis cache agent online status
     }
 
-    @Caching(put = {
-            @CachePut(value = "agent", key = "#agent.uid"),
-            @CachePut(value = "agent", key = "#agent.mobile", unless = "#agent.mobile == null"),
-            @CachePut(value = "agent", key = "#agent.email", unless = "#agent.email == null"),
-            @CachePut(value = "agent", key = "#agent.userUid", unless = "#agent.userUid == null"),
-            @CachePut(value = "agent", key = "#agent.member.uid", unless = "#agent.member == null"),
-            @CachePut(value = "agent", key = "#agent.member.user.uid", unless = "#agent.member == null || #agent.member.user == null")
-    })
-    @Override
-    public AgentEntity save(AgentEntity agent) {
-        try {
-            // 确保所有延迟加载的关联都被初始化，以便正确缓存
-            if (agent.getMember() != null) {
-                agent.getMember().getUser(); // 触发加载
-            }
-            return doSave(agent);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, agent);
-        }
-    }
-
+    @Cacheable(value = "agent", key = "#entity.uid", unless = "#result == null")
     @Override
     protected AgentEntity doSave(AgentEntity entity) {
+        // 确保所有延迟加载的关联都被初始化，以便正确缓存
+        if (entity.getMember() != null) {
+            entity.getMember().getUser(); // 触发加载
+        }
         return agentRepository.save(entity);
     }
 
@@ -417,74 +397,36 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return ServiceConvertUtils.convertToAgentResponse(entity);
     }
 
-    // private static final int MAX_RETRY_ATTEMPTS = 3; // 设定最大重试次数
-    // private static final long RETRY_DELAY_MS = 5000; // 设定重试间隔（毫秒）
-    // private final Queue<AgentEntity> retryQueue = new LinkedList<>();
-
+    @Override
     public AgentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             AgentEntity agent) {
-        // retryQueue.add(agent);
-        // processRetryQueue();
-        return agent;
+        try {
+            log.warn("处理坐席乐观锁冲突: {} - {}", agent.getUid(), e.getMessage());
+            
+            // 获取最新版本的实体
+            Optional<AgentEntity> latest = findByUid(agent.getUid());
+            if (latest.isPresent()) {
+                AgentEntity latestEntity = latest.get();
+                // 将当前实体的变更应用到最新实体上
+                // 注意：这里需要根据业务场景决定哪些字段需要保留，哪些需要覆盖
+                log.info("最新坐席信息: {}", latestEntity.getNickname());
+                
+                // 以下是示例，实际需要根据业务需求调整
+                // 保留原始实体ID和版本信息
+                // agent.setId(latestEntity.getId());
+                // agent.setVersion(latestEntity.getVersion());
+                
+                // 重新尝试保存
+                return doSave(agent);
+            } else {
+                log.error("处理乐观锁冲突时找不到坐席: {}", agent.getUid());
+            }
+        } catch (Exception ex) {
+            log.error("无法处理坐席乐观锁冲突", ex);
+            throw new RuntimeException("无法处理坐席乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
-
-    // private void processRetryQueue() {
-    //     while (!retryQueue.isEmpty()) {
-    //         AgentEntity agent = retryQueue.poll(); // 从队列中取出一个元素
-    //         if (agent == null) {
-    //             break; // 队列为空，跳出循环
-    //         }
-
-    //         int retryCount = 0;
-    //         while (retryCount < MAX_RETRY_ATTEMPTS) {
-    //             try {
-    //                 // 尝试更新Topic对象
-    //                 agentRepository.save(agent);
-    //                 // 更新成功，无需进一步处理
-    //                 log.info("Optimistic locking succeeded for agent: {}", agent.getUid());
-    //                 break; // 跳出内部循环
-    //             } catch (ObjectOptimisticLockingFailureException ex) {
-    //                 // 捕获乐观锁异常
-    //                 log.error("Optimistic locking failure for agent: {}, retry count: {}", agent.getUid(),
-    //                         retryCount + 1);
-    //                 // 等待一段时间后重试
-    //                 try {
-    //                     Thread.sleep(RETRY_DELAY_MS);
-    //                 } catch (InterruptedException ie) {
-    //                     Thread.currentThread().interrupt();
-    //                     log.error("Interrupted while waiting for retry", ie);
-    //                     return;
-    //                 }
-    //                 retryCount++; // 增加重试次数
-
-    //                 // 如果还有重试机会，则将agent放回队列末尾
-    //                 if (retryCount < MAX_RETRY_ATTEMPTS) {
-    //                     // FIXME: 发现会一直失败，暂时不重复处理
-    //                     // retryQueue.add(agent);
-    //                 } else {
-    //                     // 所有重试都失败了
-    //                     handleFailedRetries(agent);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
-    // private void handleFailedRetries(AgentEntity agent) {
-    //     String agentJSON = JSONObject.toJSONString(agent);
-    //     ActionRequest actionRequest = ActionRequest.builder()
-    //             .title("agent")
-    //             .action("save")
-    //             .description("All retry attempts failed for optimistic locking")
-    //             .extra(agentJSON)
-    //             .build();
-    //     actionRequest.setType(ActionTypeEnum.FAILED.name());
-    //     actionService.create(actionRequest);
-    //     // bytedeskEventPublisher.publishActionCreateEvent(actionRequest);
-    //     log.error("All retry attempts failed for optimistic locking of agent: {}", agent.getUid());
-    //     // 根据业务逻辑决定如何处理失败，例如通知用户稍后重试或执行其他操作
-    //     // notifyUserOfFailure(agent);
-    // }
 
     @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
     public Optional<AgentEntity> findByUid(String uid) {

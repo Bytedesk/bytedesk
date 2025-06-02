@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 15:05:19
+ * @LastEditTime: 2025-06-02 10:29:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,7 +89,6 @@ public class GroupEntity extends BaseEntity {
     // @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     // private List<RobotEntity> robots = new ArrayList<>();
 
-    
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity creator;
 
