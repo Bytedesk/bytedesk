@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 11:05:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 10:48:24
+ * @LastEditTime: 2025-06-02 10:04:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,12 +46,60 @@ public class QueueMemberMessageService {
         try {
             log.debug("发送队列成员更新消息: {}", member.getUid());
             
+            // 创建消息对象
             QueueMemberMessage message = QueueMemberMessage.builder()
                     .memberUid(member.getUid())
                     .operationType("update")
                     .updates(updates)
                     .updateStats(true)
+                    ._type("queueMemberMessage") // 确保设置了消息类型标记
                     .build();
+                    
+            // 处理特殊字段 - 从updates复制到消息对象中
+            if (updates != null) {
+                // 针对常用字段进行特殊处理
+                if (updates.containsKey("agentAutoAcceptThread")) {
+                    message.setAgentAutoAcceptThread((Boolean) updates.get("agentAutoAcceptThread"));
+                }
+                
+                if (updates.containsKey("robotToAgent")) {
+                    message.setRobotToAgent((Boolean) updates.get("robotToAgent"));
+                }
+                
+                // 复制所有其他字段，确保消息包含完整信息
+                for (Map.Entry<String, Object> entry : updates.entrySet()) {
+                    // 根据字段名称设置相应的属性
+                    switch(entry.getKey()) {
+                        case "agentAcceptType":
+                            message.setAgentAcceptType((String) entry.getValue());
+                            break;
+                        case "robotAcceptType":
+                            message.setRobotAcceptType((String) entry.getValue());
+                            break;
+                        case "transferStatus":
+                            message.setTransferStatus((String) entry.getValue());
+                            break;
+                        case "inviteStatus":
+                            message.setInviteStatus((String) entry.getValue());
+                            break;
+                        case "rated":
+                            message.setRated((Boolean) entry.getValue());
+                            break;
+                        case "resolved":
+                            message.setResolved((Boolean) entry.getValue());
+                            break;
+                        // 其他字段也可以类似处理
+                    }
+                }
+            }
+                    
+            // 将对象转换为JSON字符串，确保所有字段都被序列化
+            String messageJson = com.alibaba.fastjson2.JSON.toJSONString(message, 
+                com.alibaba.fastjson2.JSONWriter.Feature.WriteMapNullValue,
+                com.alibaba.fastjson2.JSONWriter.Feature.WriteNulls);
+            
+            // 记录发送的消息内容，便于排查问题
+            log.debug("发送的更新消息内容: {}", messageJson);
             
             // 创建一个消息后置处理器，设置消息属性
             org.springframework.jms.core.MessagePostProcessor postProcessor = jmsMessage -> {
@@ -66,10 +114,14 @@ public class QueueMemberMessageService {
                 // 设置消息分组，确保相同成员的消息按顺序处理
                 jmsMessage.setStringProperty("JMSXGroupID", "member-" + member.getUid());
                 
+                // 添加消息类型标记
+                jmsMessage.setStringProperty("_type", "queueMemberMessage");
+                
                 return jmsMessage;
             };
             
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_UPDATE, message, postProcessor);
+            // 发送JSON字符串而不是对象
+            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_UPDATE, messageJson, postProcessor);
             log.debug("消息已发送到队列: {}", JmsArtemisConstants.QUEUE_MEMBER_UPDATE);
         } catch (Exception e) {
             log.error("发送队列成员更新消息失败: {}", e.getMessage(), e);
@@ -88,7 +140,16 @@ public class QueueMemberMessageService {
             QueueMemberMessage message = QueueMemberMessage.builder()
                     .memberUid(memberUid)
                     .operationType("delete")
+                    ._type("queueMemberMessage") // 确保设置了消息类型标记
                     .build();
+                    
+            // 将对象转换为JSON字符串，确保所有字段都被序列化
+            String messageJson = com.alibaba.fastjson2.JSON.toJSONString(message, 
+                com.alibaba.fastjson2.JSONWriter.Feature.WriteMapNullValue,
+                com.alibaba.fastjson2.JSONWriter.Feature.WriteNulls);
+                
+            // 记录发送的消息内容，便于排查问题
+            log.debug("发送的删除消息内容: {}", messageJson);
             
             // 创建一个消息后置处理器，设置消息属性
             org.springframework.jms.core.MessagePostProcessor postProcessor = jmsMessage -> {
@@ -106,10 +167,14 @@ public class QueueMemberMessageService {
                 // 设置消息分组
                 jmsMessage.setStringProperty("JMSXGroupID", "member-" + memberUid);
                 
+                // 添加消息类型标记
+                jmsMessage.setStringProperty("_type", "queueMemberMessage");
+                
                 return jmsMessage;
             };
             
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_UPDATE, message, postProcessor);
+            // 发送JSON字符串而不是对象
+            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_UPDATE, messageJson, postProcessor);
             log.debug("删除消息已发送到队列: {}", JmsArtemisConstants.QUEUE_MEMBER_UPDATE);
         } catch (Exception e) {
             log.error("发送队列成员删除消息失败: {}", e.getMessage(), e);

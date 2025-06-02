@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 08:39:51
+ * @LastEditTime: 2025-06-02 10:48:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -275,7 +275,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         return workgroupOptional;
     }
     
-    @CachePut(value = "workgroup", key = "#entity.uid")
+    @CachePut(value = "workgroup", key = "#entity.uid", unless = "#result == null")
     @Override
     protected WorkgroupEntity doSave(WorkgroupEntity entity) {
         // 确保agents不为null，避免缓存后出现NPE

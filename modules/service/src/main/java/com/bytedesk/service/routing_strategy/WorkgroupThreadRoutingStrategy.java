@@ -54,9 +54,6 @@ import com.bytedesk.core.thread.ThreadEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// import com.bytedesk.core.utils.OptimisticLockingHandler;
-// import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
-
 /**
  * @author Jack Ning 270580156@qq.com
  */
@@ -83,8 +80,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
     
-    // private final OptimisticLockingHandler optimisticLockingHandler;
-
     private final QueueMemberMessageService queueMemberMessageService;
 
     @Override
@@ -240,6 +235,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // Only set owner if member exists
         if (agentEntity.getMember() != null) {
             thread.setOwner(agentEntity.getMember().getUser());
+        } else {
+            log.warn("AgentEntity {} does not have a member associated, owner will not be set.", agentEntity.getUid());
+            throw new RuntimeException("AgentEntity member not found, cannot set owner for thread.");
         }
         //
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
@@ -279,7 +277,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = " 当前排队人数：" + queueMemberEntity.getWorkgroupQueue().getQueuingCount() + " 大约等待时间："
                     + queueMemberEntity.getWorkgroupQueue().getQueuingCount() * 2 + "  分钟";
         }
-
         // 进入排队队列
         thread.setUserUid(agentEntity.getUid());
         thread.setQueuing().setContent(content).setUnreadCount(0);
