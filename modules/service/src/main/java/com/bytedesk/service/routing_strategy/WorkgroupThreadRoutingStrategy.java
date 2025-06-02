@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 17:18:30
+ * @LastEditTime: 2025-06-02 08:40:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,7 +79,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     private final WorkgroupRoutingService workgroupRoutingService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
-
+    
     // private final OptimisticLockingHandler optimisticLockingHandler;
 
     // private final QueueMemberMessageService queueMemberMessageService;
@@ -97,9 +97,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 是否已经存在会话
         ThreadEntity thread = null;
         WorkgroupEntity workgroup = null;
+        
+        // 从数据库重新获取工作组信息，确保拿到最新的数据
         Optional<WorkgroupEntity> workgroupOptional = workgroupService.findByUid(workgroupUid);
         if (workgroupOptional.isPresent()) {
             workgroup = workgroupOptional.get();
+            log.info("已获取工作组最新数据，在线客服数量: {}", workgroup.getConnectedAgentCount());
         } else {
             throw new RuntimeException("Workgroup uid " + workgroupUid + " not found");
         }
