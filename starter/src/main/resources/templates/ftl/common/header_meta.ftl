@@ -5,5 +5,5 @@
 <meta name="author" content="weiyuai.cn">
 <meta name="description" content="企业IM、即时通讯、在线客服系统、大模型AI助手">
 <!-- Favicon -->
-<link rel="shortcut icon" href="assets/images/favicon.ico">
+<link rel="shortcut icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.weiyuai.cn/">

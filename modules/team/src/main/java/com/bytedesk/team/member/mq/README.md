@@ -13,9 +13,16 @@
 3. **MemberBatchConsumer** - 批量导入消息消费者
 4. **MemberExcelListener** - Excel监听器（已修改为异步）
 
+### 最新更新 (2025-06-01)
+
+1. **修复序列化问题**
+   - 解决 `Body not assignable to class MemberBatchMessage` 错误
+   - 使用 JSON 格式正确传输和解析消息
+   - 增加消息类型标识 `_type` 属性
+
 ### 处理流程
 
-```
+```bash
 Excel上传 → MemberExcelListener → MemberBatchMessageService → Artemis MQ → MemberBatchConsumer → Member创建
 ```
 
@@ -88,6 +95,12 @@ public void sendBatchImportMessages(List<MemberExcel> memberExcelList, String or
 @JmsListener(destination = JmsArtemisConstants.QUEUE_MEMBER_BATCH_IMPORT)
 public void onMessage(Message message) {
     try {
+        // 获取消息内容 - 从TextMessage中获取JSON字符串
+        String messageBody = message.getBody(String.class);
+        
+        // 使用JSON转换器解析消息内容为MemberBatchMessage对象
+        MemberBatchMessage batchMessage = JSON.parseObject(messageBody, MemberBatchMessage.class);
+        
         // 处理批量导入消息
         boolean success = processBatchImport(batchMessage);
         
@@ -100,6 +113,69 @@ public void onMessage(Message message) {
         // 特殊处理乐观锁异常
     }
 }
+```
+
+## 消息序列化问题修复 (2025-06-01)
+
+### 问题描述
+
+在消费消息时，MemberBatchConsumer 遇到序列化错误:
+
+```java
+Body not assignable to class com.bytedesk.team.member.mq.MemberBatchMessage
+at org.apache.activemq.artemis.jms.client.ActiveMQMessage.getBody(ActiveMQMessage.java:739)
+at com.bytedesk.team.member.mq.MemberBatchConsumer.onMessage(MemberBatchConsumer.java:73)
+```
+
+原因分析：
+
+- 我们使用了 MappingJackson2MessageConverter 将消息转换为 JSON 文本，但在消费者端直接使用 `message.getBody(MemberBatchMessage.class)` 尝试获取 Java 对象
+- JMS 消息体实际上是 TextMessage 类型，而不是直接序列化的 Java 对象
+- MessageConverter 配置与消息获取方式不匹配
+
+### 修复方案
+
+1. **修改消费者端获取消息的方法**:
+
+```java
+// 修改前 - 直接获取Java对象（会导致异常）
+MemberBatchMessage batchMessage = message.getBody(MemberBatchMessage.class);
+
+// 修改后 - 获取字符串并手动解析为对象
+String messageBody = message.getBody(String.class);
+MemberBatchMessage batchMessage = JSON.parseObject(messageBody, MemberBatchMessage.class);
+```
+
+<!-- 2. **在消息发送时添加类型标记**: -->
+
+```java
+jmsMessage.setStringProperty("_type", "memberBatchMessage");
+```
+
+<!-- 3. **编写测试验证序列化/反序列化流程** -->
+
+### 最佳实践
+
+1. **消息映射**:
+   - 使用 TextMessage 格式传输 JSON 数据（而非二进制序列化）
+   - 使用 FastJSON 或 Jackson 进行消息体解析
+
+2. **类型安全**:
+   - 在发送消息时添加类型标记 (`_type`)
+   - 在接收消息时检查类型并使用正确的解析器
+
+3. **错误处理**:
+   - 解析失败时优雅降级并提供详细日志
+   - 处理解析异常并适当确认消息（避免无限重试）
+
+### 相关文件
+
+```java
+// 修改文件
+- MemberBatchConsumer.java - 修改消息处理逻辑
+- JmsArtemisConfig.java - 配置消息转换器
+- MemberBatchMessageService.java - 发送消息时设置类型标记
+- MemberBatchMqTest.java - 添加序列化测试
 ```
 
 ## 配置说明
@@ -158,19 +234,19 @@ public void importMembers(List<MemberExcel> memberList, String orgUid) {
 
 ### 1. 常见问题
 
-**OptimisticLockException仍然出现**
+#### OptimisticLockException仍然出现
 
 - 检查重试机制是否正常工作
 - 确认消息延迟配置是否生效
 - 验证数据库连接池配置
 
-**消息积压**
+#### 消息积压
 
 - 检查消费者线程池配置
 - 监控数据库性能
 - 确认重试逻辑是否合理
 
-**数据不一致**
+#### 数据不一致
 
 - 检查事务配置
 - 验证消息确认机制
