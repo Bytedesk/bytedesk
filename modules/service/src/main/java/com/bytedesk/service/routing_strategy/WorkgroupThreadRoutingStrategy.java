@@ -13,6 +13,8 @@
  */
 package com.bytedesk.service.routing_strategy;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -37,6 +39,7 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -82,7 +85,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     
     // private final OptimisticLockingHandler optimisticLockingHandler;
 
-    // private final QueueMemberMessageService queueMemberMessageService;
+    private final QueueMemberMessageService queueMemberMessageService;
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
@@ -197,12 +200,10 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
             // 
             queueMemberEntity.transferRobotToAgent();
-            queueMemberRestService.save(queueMemberEntity);
-            // 
             // 使用MQ异步处理转人工操作
-            // Map<String, Object> updates = new HashMap<>();
-            // updates.put("robotToAgent", true);
-            // queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("robotToAgent", true);
+            queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
         }
         //
         if (agentEntity.isConnectedAndAvailable()) {
@@ -246,9 +247,12 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         log.info("before save agent: {}", thread.getAgent());
         ThreadEntity savedThread = threadService.save(thread);
         log.info("after save agent: {}", savedThread.getAgent());
-        // 客服接待时，自动接受会话
+        // 客服接待时，通过消息队列异步自动接受会话
         queueMemberEntity.agentAutoAcceptThread();
-        queueMemberRestService.save(queueMemberEntity);
+        // 使用MQ异步处理自动接受会话操作
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("agentAutoAcceptThread", true);
+        queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
         //
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
