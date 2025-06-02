@@ -554,7 +554,7 @@ public class ThreadRestService
     @Override
     // @CachePut(value = "thread", key = "#thread.uid")
     protected ThreadEntity doSave(ThreadEntity entity) {
-        log.info("doSave thread: {}", entity.getAgent());
+        log.info("doSave thread owner: {}, agent: {}", entity.getAgent(), entity.getOwner());
         return threadRepository.save(entity);
     }
 

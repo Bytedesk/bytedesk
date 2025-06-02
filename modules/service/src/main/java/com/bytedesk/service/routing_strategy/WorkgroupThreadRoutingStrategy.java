@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 08:40:37
+ * @LastEditTime: 2025-06-02 10:56:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -234,6 +234,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         
         // Only set owner if member exists
         if (agentEntity.getMember() != null) {
+            log.info("Setting owner for thread: {}", agentEntity.getMember().getUser().getNickname());
             thread.setOwner(agentEntity.getMember().getUser());
         } else {
             log.warn("AgentEntity {} does not have a member associated, owner will not be set.", agentEntity.getUid());
@@ -242,9 +243,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
-        log.info("before save agent: {}", thread.getAgent());
+        log.info("before save agent: {}, owner {}", thread.getAgent(), thread.getOwner());
         ThreadEntity savedThread = threadService.save(thread);
-        log.info("after save agent: {}", savedThread.getAgent());
+        log.info("after save agent: {}, owner {}", savedThread.getAgent(), thread.getOwner());
         // 客服接待时，通过消息队列异步自动接受会话
         queueMemberEntity.agentAutoAcceptThread();
         // 使用MQ异步处理自动接受会话操作
