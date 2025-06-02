@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:13:33
+ * @LastEditTime: 2025-06-02 08:39:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -235,7 +235,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         return convertToResponse(updatedWorkgroup);
     }
 
-    @Cacheable(value = "workgroup", key = "#uid", unless = "#result == null")
+    // 待同步agent entity状态之后，开启缓存
+    // @Cacheable(value = "workgroup", key = "#uid", unless = "#result == null")
     public Optional<WorkgroupEntity> findByUid(String uid) {
         Optional<WorkgroupEntity> workgroupOptional = workgroupRepository.findByUid(uid);
         // 确保从数据库加载时所有依赖属性都被初始化，防止延迟加载的问题

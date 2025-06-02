@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-01 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 10:00:00
+ * @LastEditTime: 2025-06-02 08:17:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,9 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
-import org.springframework.jms.support.converter.MessageConverter;
-import org.springframework.jms.support.converter.MessageType;
 import org.springframework.test.context.TestPropertySource;
 
 import com.alibaba.fastjson2.JSON;
