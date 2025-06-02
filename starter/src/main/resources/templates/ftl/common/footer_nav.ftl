@@ -40,7 +40,7 @@
 			<div class="col-md-6 col-lg-2">
 				<h5 class="mb-3">快速链接</h5>
 				<ul class="nav flex-column">
-					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/docs/" target="_blank">文档</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank">文档</a></li>
 					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/download.html" target="_blank">下载</a></li>
 					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/about.html" target="_blank">关于</a></li>
 					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/contact.html" target="_blank">联系</a></li>

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-01 15:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 09:21:26
+ * @LastEditTime: 2025-06-01 10:47:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,6 +50,12 @@ public class MemberBatchMessageService {
             log.warn("Member列表为空，无需发送批量导入消息");
             return;
         }
+        
+        // 安全检查 - 确保orgUid不为空
+        if (orgUid == null || orgUid.isEmpty()) {
+            log.error("发送批量导入消息失败：组织UID为空");
+            return;
+        }
 
         String batchUid = UidUtils.getInstance().getUid();
         int total = memberExcelList.size();
@@ -94,6 +100,9 @@ public class MemberBatchMessageService {
                     // 设置消息优先级（正常优先级）
                     jmsMessage.setJMSPriority(5);
 
+                    // 设置消息类型标识符
+                    jmsMessage.setStringProperty("_type", "memberBatchMessage");
+                    
                     // 设置消息属性，便于监控和调试
                     jmsMessage.setStringProperty("batchUid", batchUid);
                     jmsMessage.setStringProperty("orgUid", orgUid);
@@ -128,8 +137,21 @@ public class MemberBatchMessageService {
      */
     public void sendRetryMessage(MemberBatchMessage originalMessage, long retryDelay) {
         try {
+            // 安全检查 - 确保关键字段不为null
+            if (originalMessage.getBatchUid() == null) {
+                log.error("重试消息缺少批次UID，无法发送");
+                return;
+            }
+            
+            if (originalMessage.getOrgUid() == null) {
+                log.error("重试消息缺少组织UID，无法发送: 批次{}, 索引{}", 
+                        originalMessage.getBatchUid(), originalMessage.getBatchIndex());
+                return;
+            }
+            
             // 增加重试次数
-            originalMessage.setRetryCount(originalMessage.getRetryCount() + 1);
+            Integer retryCount = originalMessage.getRetryCount();
+            originalMessage.setRetryCount(retryCount != null ? retryCount + 1 : 1);
 
             // 创建消息后置处理器
             org.springframework.jms.core.MessagePostProcessor postProcessor = jmsMessage -> {
@@ -141,8 +163,18 @@ public class MemberBatchMessageService {
                 jmsMessage.setIntProperty("JMSXDeliveryCount", originalMessage.getRetryCount());
                 jmsMessage.setStringProperty("JMSXGroupID", "member-batch-retry-" + originalMessage.getBatchUid());
 
+                // 设置消息类型标识符
+                jmsMessage.setStringProperty("_type", "memberBatchMessage");
+                
                 // 降低重试消息的优先级
                 jmsMessage.setJMSPriority(3);
+                
+                // 重新设置所有必要的属性，确保它们在消费者端可用
+                jmsMessage.setStringProperty("batchUid", originalMessage.getBatchUid());
+                jmsMessage.setStringProperty("orgUid", originalMessage.getOrgUid());
+                jmsMessage.setIntProperty("batchIndex", originalMessage.getBatchIndex());
+                jmsMessage.setIntProperty("batchTotal", originalMessage.getBatchTotal());
+                jmsMessage.setBooleanProperty("isLastBatch", originalMessage.getIsLastBatch());
 
                 return jmsMessage;
             };

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:54:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 15:44:35
+ * @LastEditTime: 2025-06-01 10:51:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,6 +77,10 @@ public class JmsArtemisConfig {
 		MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
 		converter.setTargetType(MessageType.TEXT);
 		converter.setTypeIdPropertyName("_type");
+		
+		// NOTE: 我们不在这里定义类型映射，而是在消费者端使用自定义解析逻辑
+		// 这样可以避免模块间的直接依赖
+		
 		// ObjectMapper objectMapper， for transforming localDateTime to json
 		// converter.setObjectMapper(objectMapper);
 		return converter;

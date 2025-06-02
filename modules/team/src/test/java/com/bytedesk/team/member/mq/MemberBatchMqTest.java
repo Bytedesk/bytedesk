@@ -17,11 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.jms.support.converter.MessageType;
 import org.springframework.test.context.TestPropertySource;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.jms.JmsArtemisConstants;
 import com.bytedesk.team.member.MemberExcel;
 
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,6 +44,10 @@ import lombok.extern.slf4j.Slf4j;
     "spring.artemis.embedded.persistent=false"
 })
 public class MemberBatchMqTest {
+    
+    @Autowired
+    private JmsTemplate jmsTemplate;
+    
 
     /**
      * 测试消息的序列化和反序列化
@@ -139,16 +152,75 @@ public class MemberBatchMqTest {
      */
     @Test
     public void testQueueConstants() {
-        String expectedQueue = "bytedesk.queue.member.batch.import";
+        String queueName = JmsArtemisConstants.QUEUE_MEMBER_BATCH_IMPORT;
         
-        // 验证队列常量（需要根据实际实现调整）
-        log.info("队列名称: {}", expectedQueue);
+        // 验证队列常量
+        log.info("队列名称: {}", queueName);
         
-        assert expectedQueue.startsWith("bytedesk.queue.");
-        assert expectedQueue.contains("member");
-        assert expectedQueue.contains("batch");
-        assert expectedQueue.contains("import");
+        assert queueName.startsWith("bytedesk.queue.");
+        assert queueName.contains("member");
+        assert queueName.contains("batch");
+        assert queueName.contains("import");
 
         log.info("消息队列常量测试通过");
+    }
+    
+    /**
+     * 测试消息序列化和反序列化整个流程
+     * 这个测试会验证我们的修复是否解决了序列化问题
+     */
+    @Test
+    public void testMessageSerializationAndDeserialization() throws Exception {
+        // 1. 创建测试数据
+        MemberExcel memberExcel = new MemberExcel();
+        memberExcel.setNickname("测试用户");
+        memberExcel.setMobile("13800138000");
+        memberExcel.setEmail("test@example.com");
+
+        // 2. 创建批量导入消息
+        MemberBatchMessage originalMessage = MemberBatchMessage.builder()
+                .batchUid("test-batch-001")
+                .operationType("batch_import")
+                .memberExcelJson(JSON.toJSONString(memberExcel))
+                .orgUid("test-org-001")
+                .batchIndex(1)
+                .batchTotal(10)
+                .isLastBatch(false)
+                .retryCount(0)
+                .createTimestamp(System.currentTimeMillis())
+                .build();
+                
+        // 3. 发送消息 - 使用JmsTemplate发送消息
+        jmsTemplate.convertAndSend("test.queue.member.serialization", originalMessage, message -> {
+            message.setStringProperty("_type", "memberBatchMessage");
+            message.setStringProperty("batchUid", originalMessage.getBatchUid());
+            message.setIntProperty("batchIndex", originalMessage.getBatchIndex());
+            return message;
+        });
+        
+        // 4. 接收消息 - 使用JmsTemplate接收消息
+        Message receivedJmsMessage = jmsTemplate.receive("test.queue.member.serialization");
+        
+        // 5. 验证接收到的消息是TextMessage类型
+        assert receivedJmsMessage instanceof TextMessage;
+        TextMessage textMessage = (TextMessage) receivedJmsMessage;
+        
+        // 6. 获取消息体(String)并解析为MemberBatchMessage对象
+        String messageBody = textMessage.getText();
+        log.info("接收到的消息体: {}", messageBody);
+        assert messageBody != null && !messageBody.isEmpty();
+        
+        // 7. 使用JSON转换器解析消息内容
+        MemberBatchMessage deserializedMessage = JSON.parseObject(messageBody, MemberBatchMessage.class);
+        
+        // 8. 验证解析后的消息与原始消息一致
+        assert deserializedMessage != null;
+        assert deserializedMessage.getBatchUid().equals(originalMessage.getBatchUid());
+        assert deserializedMessage.getOperationType().equals(originalMessage.getOperationType());
+        assert deserializedMessage.getBatchIndex().equals(originalMessage.getBatchIndex());
+        assert deserializedMessage.getBatchTotal().equals(originalMessage.getBatchTotal());
+        assert deserializedMessage.getIsLastBatch().equals(originalMessage.getIsLastBatch());
+        
+        log.info("消息序列化和反序列化测试通过: {}", deserializedMessage);
     }
 }

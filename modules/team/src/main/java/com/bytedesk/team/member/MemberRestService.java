@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 14:22:41
+ * @LastEditTime: 2025-06-01 15:25:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -383,36 +383,58 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         }
         // 生成user
         // 尝试根据邮箱和平台查找用户
-        UserRequest userRequest = UserRequest.builder().build();
-        userRequest.setAvatar(AvatarConsts.getDefaultAvatarUrl());
-        userRequest.setNickname(excel.getNickname());
-        userRequest.setEmail(excel.getEmail());
-        userRequest.setMobile(excel.getMobile());
-        userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
-        userRequest.setOrgUid(orgUid);
-        //
         UserEntity user = null;
-        if (StringUtils.hasText(excel.getMobile())) {
-            user = userService.findByMobileAndPlatform(excel.getMobile(),
-                    PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUserFromMember(userRequest));
-        } else if (StringUtils.hasText(excel.getEmail())) {
-            user = userService.findByEmailAndPlatform(excel.getEmail(),
-                    PlatformEnum.BYTEDESK.name())
-                    .orElseGet(() -> userService.createUserFromMember(userRequest));
-        } else {
-            throw new RuntimeException("mobile and email should not be both null.");
+        
+        try {
+            // 先尝试查找现有用户，避免创建重复用户
+            if (StringUtils.hasText(excel.getMobile())) {
+                Optional<UserEntity> existingUser = userService.findByMobileAndPlatform(
+                        excel.getMobile(), PlatformEnum.BYTEDESK.name());
+                if (existingUser.isPresent()) {
+                    user = existingUser.get();
+                }
+            } else if (StringUtils.hasText(excel.getEmail())) {
+                Optional<UserEntity> existingUser = userService.findByEmailAndPlatform(
+                        excel.getEmail(), PlatformEnum.BYTEDESK.name());
+                if (existingUser.isPresent()) {
+                    user = existingUser.get();
+                }
+            }
+            
+            // 如果没有找到现有用户，则创建新用户
+            if (user == null) {
+                UserRequest userRequest = UserRequest.builder()
+                    .avatar(AvatarConsts.getDefaultAvatarUrl())
+                    .nickname(excel.getNickname())
+                    .email(excel.getEmail())
+                    .mobile(excel.getMobile())
+                    .platform(PlatformEnum.BYTEDESK.name())
+                    .orgUid(orgUid) // 确保设置组织UID，避免OrganizationRepository.findByUid接收null参数
+                    .build();
+                    
+                if (!StringUtils.hasText(excel.getMobile()) && !StringUtils.hasText(excel.getEmail())) {
+                    throw new RuntimeException("mobile and email should not be both null.");
+                }
+                
+                // 直接创建用户，避免使用orElseGet回调方式
+                user = userService.createUserFromMember(userRequest);
+            }
+            
+            // 设置用户到成员对象中
+            member.setUser(user);
+            
+            // 保存成员
+            MemberEntity saveMember = save(member);
+            if (saveMember == null) {
+                throw new RuntimeException("Failed to save member.");
+            }
+            
+            return saveMember;
+            
+        } catch (Exception e) {
+            log.error("批量导入成员失败: {}", e.getMessage(), e);
+            throw e;
         }
-        // 设置用户到成员对象中
-        member.setUser(user);
-        //
-        MemberEntity saveMember = save(member);
-        if (saveMember == null) {
-            // 根据业务逻辑决定如何处理保存失败的情况
-            // 例如，可以抛出一个异常或返回一个错误响应
-            throw new RuntimeException("Failed to save member.");
-        }
-        return saveMember;
     }
 
      /** 同事私聊会话：org/member/{self_member_uid}/{other_member_uid} */
