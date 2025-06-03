@@ -4,7 +4,7 @@
 
 微语智能呼叫中心是一套革命性的AI驱动企业通信平台，致力于重新定义客户服务体验。通过整合最先进的大语言模型技术，我们提供全方位、智能化的客户服务解决方案，帮助企业显著提升服务质量，降低运营成本。
 
-> 注：本系统使用FreeSwitch作为通信基础组件。如需了解部署细节，请参阅：[FreeSwitch 部署步骤](/deploy/depend/freeswitch.md)
+<!-- > 注：本系统使用FreeSwitch作为通信基础组件。如需了解部署细节，请参阅：[FreeSwitch 部署步骤](/deploy/depend/freeswitch.md) -->
 
 ## AI 驱动的智能服务核心优势
 

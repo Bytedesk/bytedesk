@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 17:28:24
+ * @LastEditTime: 2025-06-03 12:09:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -540,7 +541,7 @@ public class ThreadRestService
         return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
-    @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
     public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }
@@ -552,9 +553,12 @@ public class ThreadRestService
     }
 
     @Override
-    // @CachePut(value = "thread", key = "#thread.uid")
+    @Caching(put = {
+        @CachePut(value = "thread", key = "#thread.uid", unless = "#result == null"),
+        @CachePut(value = "thread", key = "#thread.topic", unless = "#result == null")
+    })
     protected ThreadEntity doSave(ThreadEntity entity) {
-        log.info("doSave thread owner: {}, agent: {}", entity.getAgent(), entity.getOwner());
+        log.info("doSave thread agent: {}, owner: {}", entity.getAgent(), entity.getOwner());
         return threadRepository.save(entity);
     }
 
@@ -565,25 +569,93 @@ public class ThreadRestService
             Optional<ThreadEntity> latestOptional = threadRepository.findByUid(entity.getUid());
             if (latestOptional.isPresent()) {
                 ThreadEntity latestEntity = latestOptional.get();
-                log.warn("乐观锁冲突，尝试合并数据: {}", latestEntity.getAgent());
-                // 合并需要保留的数据
-                // 保留最新的会话状态
-                latestEntity.setStatus(entity.getStatus());
-                // 保留未读数量，取较大值
-                latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
-                // 保留最新内容
+                log.warn("Optimistic locking conflict detected for thread {}, attempting to merge data", entity.getUid());
+                
+                // Preserve basic thread information
+                if (entity.getTopic() != null) {
+                    latestEntity.setTopic(entity.getTopic());
+                }
                 if (entity.getContent() != null) {
                     latestEntity.setContent(entity.getContent());
                 }
-                // 保留agent信息
+                if (entity.getType() != null) {
+                    latestEntity.setType(entity.getType());
+                }
+                if (entity.getStatus() != null) {
+                    latestEntity.setStatus(entity.getStatus());
+                }
+                
+                // Preserve thread state flags
+                latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
+                latestEntity.setStar(entity.getStar() != null ? entity.getStar() : latestEntity.getStar());
+                latestEntity.setTop(entity.getTop() != null ? entity.getTop() : latestEntity.getTop());
+                latestEntity.setUnread(entity.getUnread() != null ? entity.getUnread() : latestEntity.getUnread());
+                latestEntity.setMute(entity.getMute() != null ? entity.getMute() : latestEntity.getMute());
+                latestEntity.setHide(entity.getHide() != null ? entity.getHide() : latestEntity.getHide());
+                latestEntity.setFolded(entity.getFolded() != null ? entity.getFolded() : latestEntity.getFolded());
+                latestEntity.setAutoClose(entity.getAutoClose() != null ? entity.getAutoClose() : latestEntity.getAutoClose());
+                
+                // Preserve metadata
+                if (entity.getNote() != null) {
+                    latestEntity.setNote(entity.getNote());
+                }
+                if (entity.getTagList() != null && !entity.getTagList().isEmpty()) {
+                    latestEntity.setTagList(entity.getTagList());
+                }
+                if (entity.getClient() != null) {
+                    latestEntity.setClient(entity.getClient());
+                }
+                if (entity.getExtra() != null) {
+                    latestEntity.setExtra(entity.getExtra());
+                }
+                
+                // Preserve user and agent information
+                if (entity.getUser() != null) {
+                    latestEntity.setUser(entity.getUser());
+                }
                 if (entity.getAgent() != null) {
                     latestEntity.setAgent(entity.getAgent());
                 }
+                if (entity.getRobot() != null) {
+                    latestEntity.setRobot(entity.getRobot());
+                }
+                if (entity.getWorkgroup() != null) {
+                    latestEntity.setWorkgroup(entity.getWorkgroup());
+                }
+                
+                // Preserve lists
+                if (entity.getInvites() != null && !entity.getInvites().isEmpty()) {
+                    latestEntity.setInvites(entity.getInvites());
+                }
+                if (entity.getMonitors() != null && !entity.getMonitors().isEmpty()) {
+                    latestEntity.setMonitors(entity.getMonitors());
+                }
+                if (entity.getAssistants() != null && !entity.getAssistants().isEmpty()) {
+                    latestEntity.setAssistants(entity.getAssistants());
+                }
+                if (entity.getTicketors() != null && !entity.getTicketors().isEmpty()) {
+                    latestEntity.setTicketors(entity.getTicketors());
+                }
+                
+                // Preserve process information
+                if (entity.getProcessInstanceId() != null) {
+                    latestEntity.setProcessInstanceId(entity.getProcessInstanceId());
+                }
+                if (entity.getProcessEntityUid() != null) {
+                    latestEntity.setProcessEntityUid(entity.getProcessEntityUid());
+                }
+                
+                // Preserve owner if changed
+                if (entity.getOwner() != null) {
+                    latestEntity.setOwner(entity.getOwner());
+                }
+                
+                log.info("Successfully merged thread data for {}", entity.getUid());
                 return threadRepository.save(latestEntity);
             }
         } catch (Exception ex) {
-            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+            log.error("Failed to handle optimistic locking conflict for thread {}: {}", entity.getUid(), ex.getMessage(), ex);
+            throw new RuntimeException("Failed to handle optimistic locking conflict: " + ex.getMessage(), ex);
         }
         return null;
     }
