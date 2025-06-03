@@ -1,4 +1,4 @@
-<#macro base title="ByteDesk 呼叫中心">
+<#macro base title="微语 呼叫中心">
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,7 +13,7 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="/callcenter">ByteDesk 呼叫中心</a>
+            <a class="navbar-brand" href="/callcenter">微语 呼叫中心</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,7 +22,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/callcenter">首页</a>
                     </li>
-                    <li class="nav-item">
+                    <#--  <li class="nav-item">
                         <a class="nav-link" href="/callcenter/calls">呼叫记录</a>
                     </li>
                     <#if currentUser??>
@@ -40,9 +40,9 @@
                                 </ul>
                             </li>
                         </#if>
-                    </#if>
+                    </#if>  -->
                 </ul>
-                <div class="navbar-nav">
+                <#--  <div class="navbar-nav">
                     <#if currentUser??>
                         <div class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
@@ -58,7 +58,7 @@
                         <a class="nav-link" href="/login">登录</a>
                         <a class="nav-link" href="/register">注册</a>
                     </#if>
-                </div>
+                </div>  -->
             </div>
         </div>
     </nav>
@@ -72,11 +72,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>ByteDesk 呼叫中心</h5>
+                    <h5>微语 呼叫中心</h5>
                     <p>专业的呼叫中心解决方案</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p>&copy; 2025 ByteDesk. All rights reserved.</p>
+                    <p>&copy; 2025 微语. All rights reserved.</p>
                 </div>
             </div>
         </div>
