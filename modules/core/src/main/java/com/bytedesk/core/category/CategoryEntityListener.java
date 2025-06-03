@@ -16,6 +16,8 @@ package com.bytedesk.core.category;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.category.event.CategoryCreateEvent;
+import com.bytedesk.core.category.event.CategoryUpdateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
