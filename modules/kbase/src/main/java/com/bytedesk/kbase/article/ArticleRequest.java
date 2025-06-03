@@ -67,38 +67,6 @@ public class ArticleRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean published = false;
-
-    // 是否开启自动生成enable_llm_qa问答
-    @Builder.Default
-    private Boolean autoGenerateLlmQa = false;
-
-    // 是否已经生成llm问答
-    @Builder.Default
-    private Boolean llmQaGenerated = false;
-
-    // 是否开启自动删除llm问答
-    @Builder.Default
-    private Boolean autoDeleteLlmQa = false;
-
-    // 是否已经删除llm问答
-    @Builder.Default
-    private Boolean llmQaDeleted = false;
-
-    // 是否开启自动llm split切块
-    @Builder.Default
-    private Boolean autoLlmSplit = false;
-
-    // 是否已经自动llm split切块
-    @Builder.Default
-    private Boolean llmSplitted = false;
-
-    // 是否开启自动删除llm split切块
-    @Builder.Default
-    private Boolean autoDeleteLlmSplit = false;
-
-    // 是否已经删除llm split切块
-    @Builder.Default
-    private Boolean llmSplitDeleted = false;
     
     @Builder.Default
     private Boolean markdown = false;

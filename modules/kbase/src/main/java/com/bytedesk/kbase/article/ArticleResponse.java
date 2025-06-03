@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:12:58
+ * @LastEditTime: 2025-06-03 14:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,30 +53,6 @@ public class ArticleResponse extends BaseResponse {
     private Boolean top;
 
     private Boolean published;
-
-    // 是否开启自动生成enable_llm_qa问答
-    private Boolean autoGenerateLlmQa;
-
-    // 是否已经生成llm问答
-    private Boolean llmQaGenerated;
-
-    // 是否开启自动删除llm问答
-    private Boolean autoDeleteLlmQa;
-
-    // 是否已经删除llm问答
-    private Boolean llmQaDeleted;
-
-    // 是否开启自动llm split切块
-    private Boolean autoLlmSplit;
-
-    // 是否已经自动llm split切块
-    private Boolean llmSplitted;
-
-    // 是否开启自动删除llm split切块
-    private Boolean autoDeleteLlmSplit;
-
-    // 是否已经删除llm split切块
-    private Boolean llmSplittedDeleted;
 
     private Boolean markdown;
 
