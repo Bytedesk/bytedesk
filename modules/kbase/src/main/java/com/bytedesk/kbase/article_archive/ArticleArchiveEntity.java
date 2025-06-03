@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:18:21
+ * @LastEditTime: 2025-06-03 16:58:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,9 @@
 package com.bytedesk.kbase.article_archive;
 
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.article.AbstractArticleEntity;
+import com.bytedesk.kbase.article.ArticleAuditStatusEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -44,22 +46,19 @@ public class ArticleArchiveEntity extends AbstractArticleEntity {
 
     @PrePersist
     public void prePersist() {
-        // if (getType() == null) {
-        //     setType(KbaseTypeEnum.HELPCENTER.name());
-        // }
-        if (getElasticStatus() == null) {
-            setElasticStatus(ArticleArchiveStatusEnum.DRAFT.name());
+        if (getType() == null) {
+            setType(MessageTypeEnum.TEXT.name());
         }
         if (getAuditStatus() == null) {
-            setAuditStatus(ArticleArchiveAuditStatusEnum.PENDING.name());
+            setAuditStatus(ArticleAuditStatusEnum.PENDING.name());
         }
     }
     
     @PostLoad
     public void postLoad() {
-        // if (getType() == null) {
-        //     setType(KbaseTypeEnum.HELPCENTER.name());
-        // }
+        if (getType() == null) {
+            setType(MessageTypeEnum.TEXT.name());
+        }
     }
 
     // public Document toDocument(@NonNull ArticleArchiveEntity article_archive) {
