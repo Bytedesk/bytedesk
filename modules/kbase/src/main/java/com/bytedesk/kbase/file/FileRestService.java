@@ -178,7 +178,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
 
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
-                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setElasticStatus(entity.getElasticStatus());
 
                 return fileRepository.save(latestEntity);
             }
@@ -254,7 +254,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
             excel.setKbaseName(file.getKbase().getName());
         }
         // 将状态和向量状态转换为中文
-        excel.setStatus(ChunkStatusEnum.toChineseDisplay(file.getStatus()));
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(file.getElasticStatus()));
         excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(file.getVectorStatus()));
         return excel;
     }
