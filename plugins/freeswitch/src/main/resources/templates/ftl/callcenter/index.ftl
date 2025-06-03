@@ -1,222 +1,231 @@
 <#import "layout/base.ftl" as base>
 
-<@base.base title="ByteDesk 呼叫中心 - 企业级通信解决方案">
+<@base.base title="ByteDesk 智能呼叫中心 - AI驱动的企业级通信解决方案">
     <!-- 顶部介绍区域 -->
     <div class="row text-center mb-5">
         <div class="col">
-            <h1 class="display-4 mb-3">ByteDesk FreeSWITCH 呼叫中心</h1>
-            <p class="lead">企业级开源通信平台，打造无缝客户沟通体验</p>
+            <h1 class="display-4 mb-3">ByteDesk 智能呼叫中心</h1>
+            <p class="lead">AI驱动的企业级通信平台，重新定义客户服务体验</p>
+            <div class="mt-4">
+                <a href="/contact" class="btn btn-primary btn-lg me-3">免费试用</a>
+                <a href="/demo" class="btn btn-outline-primary btn-lg">在线演示</a>
+            </div>
         </div>
     </div>
 
-    <!-- 顶部统计信息 -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center feature-box h-100">
-                <div class="card-body">
-                    <div class="feature-icon">📞</div>
-                    <h5 class="card-title">今日呼叫</h5>
-                    <p class="card-text display-6">${statistics.todayCallCount!'0'}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center feature-box h-100">
-                <div class="card-body">
-                    <div class="feature-icon">⏱️</div>
-                    <h5 class="card-title">平均通话时长</h5>
-                    <p class="card-text display-6">${statistics.averageCallDuration!'0'}分钟</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center feature-box h-100">
-                <div class="card-body">
-                    <div class="feature-icon">👥</div>
-                    <h5 class="card-title">在线座席</h5>
-                    <p class="card-text display-6">${statistics.onlineAgentsCount!'0'}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center feature-box h-100">
-                <div class="card-body">
-                    <div class="feature-icon">🔄</div>
-                    <h5 class="card-title">实时呼叫</h5>
-                    <p class="card-text display-6">${statistics.activeCallsCount!'0'}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 主要功能介绍 -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="feature-box h-100">
-                <div class="feature-icon">🔌</div>
-                <h3>基于FreeSWITCH</h3>
-                <p>FreeSWITCH是一个开源通信平台，支持VoIP、WebRTC和传统电话网络，提供强大的通信能力。</p>
-                <ul class="list-unstyled">
-                    <li><i class="bi bi-check-circle"></i> 高性能架构</li>
-                    <li><i class="bi bi-check-circle"></i> 多协议支持</li>
-                    <li><i class="bi bi-check-circle"></i> 开源灵活</li>
-                </ul>
-            </div>
+    <!-- AI 核心优势 -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2>AI 驱动的智能服务</h2>
+            <p class="lead text-muted">结合大语言模型，打造智能化客户服务体验</p>
         </div>
         <div class="col-md-4">
             <div class="feature-box h-100">
-                <div class="feature-icon">🔀</div>
-                <h3>智能呼叫路由</h3>
-                <p>根据客户需求和座席技能自动分配呼叫，提高服务质量和效率。</p>
+                <div class="feature-icon">🤖</div>
+                <h3>智能语音助手</h3>
+                <p>基于大语言模型的智能语音助手，7x24小时不间断服务，自动处理80%的常见咨询，显著降低人工成本。</p>
                 <ul class="list-unstyled">
-                    <li><i class="bi bi-check-circle"></i> 基于技能的路由</li>
-                    <li><i class="bi bi-check-circle"></i> 优先级队列</li>
-                    <li><i class="bi bi-check-circle"></i> 智能座席调度</li>
+                    <li><i class="bi bi-check-circle"></i> 自然语言理解</li>
+                    <li><i class="bi bi-check-circle"></i> 多轮对话能力</li>
+                    <li><i class="bi bi-check-circle"></i> 个性化服务体验</li>
                 </ul>
             </div>
         </div>
         <div class="col-md-4">
             <div class="feature-box h-100">
                 <div class="feature-icon">📊</div>
-                <h3>全面数据分析</h3>
-                <p>通过详细的呼叫统计和报表，帮助企业优化客户服务流程。</p>
+                <h3>智能数据分析</h3>
+                <p>AI驱动的数据分析系统，自动识别客户意图，生成服务洞察，助力企业优化服务流程。</p>
                 <ul class="list-unstyled">
-                    <li><i class="bi bi-check-circle"></i> 实时监控面板</li>
-                    <li><i class="bi bi-check-circle"></i> 自定义报表</li>
-                    <li><i class="bi bi-check-circle"></i> 性能指标追踪</li>
+                    <li><i class="bi bi-check-circle"></i> 实时情感分析</li>
+                    <li><i class="bi bi-check-circle"></i> 智能质检评分</li>
+                    <li><i class="bi bi-check-circle"></i> 预测性分析</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-box h-100">
+                <div class="feature-icon">🎯</div>
+                <h3>智能路由分配</h3>
+                <p>基于AI的智能路由系统，根据客户画像和座席技能自动匹配，提升服务效率和客户满意度。</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle"></i> 智能技能匹配</li>
+                    <li><i class="bi bi-check-circle"></i> 负载均衡</li>
+                    <li><i class="bi bi-check-circle"></i> 实时优化</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <!-- 更多功能展示 -->
+    <!-- 核心功能展示 -->
     <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="text-center mb-4">强大的呼叫中心功能</h2>
+        <div class="col-12 text-center mb-4">
+            <h2>企业级呼叫中心功能</h2>
+            <p class="lead text-muted">全面的功能支持，满足企业多样化需求</p>
         </div>
         <div class="col-md-6">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-telephone"></i> 多渠道通信</h5>
-                    <p class="card-text">支持SIP、WebRTC、PSTN等多种通信协议，实现全渠道客户沟通。</p>
+                    <h5 class="card-title"><i class="bi bi-telephone"></i> 全渠道通信</h5>
+                    <p class="card-text">支持SIP、WebRTC、PSTN等多种通信协议，实现全渠道客户沟通，确保服务无死角。</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check2"></i> 语音通话</li>
+                        <li><i class="bi bi-check2"></i> 视频通话</li>
+                        <li><i class="bi bi-check2"></i> 即时消息</li>
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-record-circle"></i> 通话录音</h5>
-                    <p class="card-text">自动录制所有通话，支持质量控制和培训需求。</p>
+                    <h5 class="card-title"><i class="bi bi-record-circle"></i> 智能质检</h5>
+                    <p class="card-text">AI驱动的智能质检系统，自动分析通话内容，提供质量评估和改进建议。</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check2"></i> 自动语音转写</li>
+                        <li><i class="bi bi-check2"></i> 关键词识别</li>
+                        <li><i class="bi bi-check2"></i> 服务质量评分</li>
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-volume-up"></i> IVR语音菜单</h5>
-                    <p class="card-text">通过可视化界面轻松构建交互式语音应答系统。</p>
+                    <h5 class="card-title"><i class="bi bi-volume-up"></i> 智能IVR</h5>
+                    <p class="card-text">基于AI的智能语音导航系统，提供自然流畅的语音交互体验。</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check2"></i> 语音识别</li>
+                        <li><i class="bi bi-check2"></i> 意图理解</li>
+                        <li><i class="bi bi-check2"></i> 动态菜单</li>
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-person-lines-fill"></i> CRM集成</h5>
-                    <p class="card-text">与客户关系管理系统无缝集成，提供完整的客户服务视图。</p>
+                    <h5 class="card-title"><i class="bi bi-graph-up"></i> 智能报表</h5>
+                    <p class="card-text">AI驱动的数据分析平台，提供深度业务洞察，助力决策优化。</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check2"></i> 实时监控</li>
+                        <li><i class="bi bi-check2"></i> 预测分析</li>
+                        <li><i class="bi bi-check2"></i> 自定义报表</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 技术架构介绍 -->
+    <!-- 客户价值 -->
     <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="text-center mb-4">技术架构</h2>
-            <div class="text-center mb-4">
-                <img src="/images/callcenter/architecture.png" alt="ByteDesk呼叫中心架构" class="img-fluid rounded shadow" style="max-width: 80%;">
+        <div class="col-12 text-center mb-4">
+            <h2>为什么选择 ByteDesk 智能呼叫中心？</h2>
+            <p class="lead text-muted">为企业创造实实在在的价值</p>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center">
+                <div class="feature-icon">💰</div>
+                <h4>降低成本</h4>
+                <p>AI自动化处理80%常见咨询，显著降低人工成本</p>
             </div>
-            <p class="text-center">ByteDesk呼叫中心基于FreeSWITCH构建，采用微服务架构，具有高可用性和可扩展性。</p>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center">
+                <div class="feature-icon">⚡</div>
+                <h4>提升效率</h4>
+                <p>智能路由和AI助手提升服务效率达300%</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center">
+                <div class="feature-icon">📈</div>
+                <h4>增加收入</h4>
+                <p>智能营销和交叉销售提升转化率30%</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center">
+                <div class="feature-icon">😊</div>
+                <h4>提升满意度</h4>
+                <p>个性化服务提升客户满意度至95%</p>
+            </div>
         </div>
     </div>
 
-    <!-- 呼叫统计图表 -->
+    <!-- 技术优势 -->
     <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="text-center mb-4">呼叫统计</h2>
+        <div class="col-12 text-center mb-4">
+            <h2>技术优势</h2>
+            <p class="lead text-muted">企业级技术架构，确保系统稳定可靠</p>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <div class="feature-box h-100">
+                <div class="feature-icon">🔒</div>
+                <h3>安全可靠</h3>
+                <p>企业级安全架构，数据加密传输，多重备份机制，确保系统安全可靠。</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-box h-100">
+                <div class="feature-icon">📱</div>
+                <h3>灵活部署</h3>
+                <p>支持公有云、私有云、混合云多种部署方式，满足不同企业需求。</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-box h-100">
+                <div class="feature-icon">🔄</div>
+                <h3>高可用性</h3>
+                <p>分布式架构设计，支持水平扩展，确保系统7x24小时稳定运行。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客户案例 -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2>成功案例</h2>
+            <p class="lead text-muted">值得信赖的企业级解决方案</p>
+        </div>
+        <div class="col-md-4">
             <div class="card">
-                <div class="card-header">
-                    本周呼叫量统计
-                </div>
                 <div class="card-body">
-                    <canvas id="weeklyCallsChart"></canvas>
+                    <h5 class="card-title">某大型电商平台</h5>
+                    <p class="card-text">通过部署ByteDesk智能呼叫中心，客服效率提升300%，客户满意度提升40%。</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card">
-                <div class="card-header">
-                    呼叫类型分布
-                </div>
                 <div class="card-body">
-                    <canvas id="callTypeChart"></canvas>
+                    <h5 class="card-title">某金融机构</h5>
+                    <p class="card-text">AI驱动的智能服务系统，帮助客户服务成本降低50%，业务转化率提升35%。</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">某教育机构</h5>
+                    <p class="card-text">智能呼叫中心助力招生咨询效率提升200%，客户转化率提升45%。</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 快速操作区 -->
+    <!-- 行动召唤 -->
     <div class="row text-center mb-5">
         <div class="col-12">
-            <h2 class="mb-4">快速入门</h2>
+            <h2 class="mb-4">开启智能客服新时代</h2>
+            <p class="lead mb-4">立即体验 ByteDesk 智能呼叫中心，让AI为您的企业创造价值</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="/callcenter/docs" class="btn btn-primary btn-lg">查看文档</a>
-                <a href="/callcenter/demo" class="btn btn-outline-primary btn-lg">在线演示</a>
+                <a href="/contact" class="btn btn-primary btn-lg">免费试用</a>
+                <a href="/demo" class="btn btn-outline-primary btn-lg">预约演示</a>
+                <a href="/docs" class="btn btn-outline-secondary btn-lg">查看文档</a>
             </div>
         </div>
     </div>
-
-    <!-- Chart.js引入 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 每周呼叫量统计图表
-            const weeklyCallsCtx = document.getElementById('weeklyCallsChart').getContext('2d');
-            new Chart(weeklyCallsCtx, {
-                type: 'line',
-                data: {
-                    labels: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
-                    datasets: [{
-                        label: '呼叫量',
-                        data: [65, 78, 80, 85, 90, 45, 30],
-                        borderColor: '#0d6efd',
-                        tension: 0.1,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-            
-            // 呼叫类型分布图表
-            const callTypeCtx = document.getElementById('callTypeChart').getContext('2d');
-            new Chart(callTypeCtx, {
-                type: 'pie',
-                data: {
-                    labels: ['入站呼叫', '出站呼叫', '内部呼叫', '会议呼叫'],
-                    datasets: [{
-                        data: [55, 30, 10, 5],
-                        backgroundColor: ['#0d6efd', '#6c757d', '#198754', '#ffc107']
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-        });
-    </script>
 
     <style>
         .feature-icon {
@@ -231,6 +240,13 @@
             transition: all 0.3s ease;
         }
         .feature-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }

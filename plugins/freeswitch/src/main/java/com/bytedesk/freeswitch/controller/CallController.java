@@ -1,5 +1,6 @@
 package com.bytedesk.freeswitch.controller;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,23 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.freeswitch.service.CallService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 /**
  * 呼叫控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/call")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class CallController {
     
-    private static final Logger log = LoggerFactory.getLogger(CallController.class);
-
     private final CallService callService;
 
     /**

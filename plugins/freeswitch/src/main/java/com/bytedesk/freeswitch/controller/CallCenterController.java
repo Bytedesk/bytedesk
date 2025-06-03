@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-03 14:30:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 09:28:50
+ * @LastEditTime: 2025-06-03 10:07:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,9 +26,6 @@ import com.bytedesk.freeswitch.service.CallStatisticsService;
 @Controller
 @RequestMapping("/callcenter")
 public class CallCenterController {
-
-    // @Autowired
-    // private CallService callService;
     
     @Autowired
     private CallStatisticsService callStatisticsService;

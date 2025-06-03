@@ -4,7 +4,7 @@ import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.service.CallService;
+import com.bytedesk.freeswitch.service.ICallService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FreeSwitchEventListener implements IEslEventListener {
 
-    private final CallService callService;
+    private final ICallService callService;
     
     /**
      * 处理FreeSwitch事件
