@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:10:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 10:10:00
+ * @LastEditTime: 2025-06-03 16:18:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,8 +54,8 @@ public class ArticleElastic {
     @Field(type = FieldType.Keyword)
     private List<String> tagList;
     
-    @Field(type = FieldType.Keyword)
-    private String type;
+    // @Field(type = FieldType.Keyword)
+    // private String type;
     
     @Field(type = FieldType.Keyword)
     private String status;
@@ -104,7 +104,7 @@ public class ArticleElastic {
             .contentMarkdown(article.getContentMarkdown())
             .contentHtml(article.getContentHtml())
             .tagList(article.getTagList())
-            .type(article.getType())
+            // .type(article.getType())
             .status(article.getElasticStatus())
             .auditStatus(article.getAuditStatus())
             .top(article.getTop())

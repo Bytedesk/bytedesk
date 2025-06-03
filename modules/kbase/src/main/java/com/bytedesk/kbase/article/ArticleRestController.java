@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:07:39
+ * @LastEditTime: 2025-06-03 16:08:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,8 @@
  */
 package com.bytedesk.kbase.article;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.kbase.article.elastic.ArticleElasticSearchResult;
+import com.bytedesk.kbase.article.elastic.ArticleElasticService;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +37,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
     private final ArticleRestService articleRestService;
+
+    private final ArticleElasticService articleElasticService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -112,10 +119,10 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     }
 
     // 输入联想搜索faq
-    @GetMapping("/suggest")
-    public ResponseEntity<?> suggest(ArticleRequest request) {
+    @GetMapping("/search")
+    public ResponseEntity<?> searchElastic(ArticleRequest request) {
 
-        List<FaqElasticSearchResult> suggestList = faqElasticService.suggestFaq(request);
+        List<ArticleElasticSearchResult> suggestList = articleElasticService.searchArticle(request);
 
         return ResponseEntity.ok(JsonResult.success(suggestList));
     }
