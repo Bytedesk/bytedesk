@@ -37,97 +37,133 @@
             <div class="col">
                 <h1 class="display-4 mb-3">智能工单管理系统</h1>
                 <p class="lead">提供全方位的客户服务解决方案，助力企业提升服务效率和客户满意度</p>
+                <div class="mt-4">
+                    <a href="/contact" class="btn btn-primary btn-lg me-3">免费试用</a>
+                    <a href="/docs/zh-CN" class="btn btn-outline-primary btn-lg">查看文档</a>
+                </div>
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">📋</div>
-                    <h3>工单管理</h3>
-                    <ul class="list-unstyled">
-                        <li>工单创建与分配</li>
-                        <li>工单状态跟踪</li>
-                        <li>优先级管理</li>
-                        <li>SLA监控</li>
-                        <li>工单分类与标签</li>
-                        <li>自动分配规则</li>
-                    </ul>
-                </div>
+        <!-- AI 核心优势 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>AI 驱动的智能工单</h2>
+                <p class="lead text-muted">结合大语言模型，打造智能化工单处理体验</p>
             </div>
-
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">🎯</div>
-                    <h3>智能分类</h3>
-                    <ul class="list-unstyled">
-                        <li>问题类型分类</li>
-                        <li>自定义分类体系</li>
-                        <li>多级分类管理</li>
-                        <li>智能分类推荐</li>
-                        <li>分类统计分析</li>
-                        <li>知识库关联</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">🏷️</div>
-                    <h3>标签系统</h3>
-                    <ul class="list-unstyled">
-                        <li>自定义标签</li>
-                        <li>多维度标记</li>
-                        <li>快速检索</li>
-                        <li>标签组管理</li>
-                        <li>标签权限控制</li>
-                        <li>标签统计报表</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">📊</div>
-                    <h3>数据分析</h3>
-                    <ul class="list-unstyled">
-                        <li>工单统计报表</li>
-                        <li>处理效率分析</li>
-                        <li>客服绩效评估</li>
-                        <li>客户满意度分析</li>
-                        <li>问题热点分析</li>
-                        <li>趋势预测</li>
-                    </ul>
-                </div>
-            </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">🤖</div>
-                    <h3>智能辅助</h3>
+                    <h3>智能工单处理</h3>
+                    <p>基于大语言模型的智能工单处理系统，自动分类、分配、处理工单，提升服务效率。</p>
                     <ul class="list-unstyled">
-                        <li>智能路由分配</li>
-                        <li>自动回复建议</li>
-                        <li>相似案例推荐</li>
-                        <li>知识库联动</li>
-                        <li>工作流自动化</li>
-                        <li>AI辅助处理</li>
+                        <li><i class="bi bi-check-circle"></i> 自动工单分类</li>
+                        <li><i class="bi bi-check-circle"></i> 智能分配策略</li>
+                        <li><i class="bi bi-check-circle"></i> 自动处理建议</li>
                     </ul>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
-                    <div class="feature-icon">⚙️</div>
-                    <h3>系统集成</h3>
+                    <div class="feature-icon">📊</div>
+                    <h3>智能分析预测</h3>
+                    <p>AI驱动的工单分析系统，自动发现服务热点，预测工单趋势，助力企业优化服务流程。</p>
                     <ul class="list-unstyled">
-                        <li>CRM系统集成</li>
-                        <li>即时通讯集成</li>
-                        <li>邮件系统集成</li>
-                        <li>工作流引擎</li>
-                        <li>API接口支持</li>
-                        <li>第三方扩展</li>
+                        <li><i class="bi bi-check-circle"></i> 工单趋势分析</li>
+                        <li><i class="bi bi-check-circle"></i> 智能预警机制</li>
+                        <li><i class="bi bi-check-circle"></i> 服务质量评估</li>
                     </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box h-100">
+                    <div class="feature-icon">🎯</div>
+                    <h3>智能知识推荐</h3>
+                    <p>基于AI的知识推荐系统，自动匹配相似案例，提供处理建议，提升工单处理效率。</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle"></i> 相似案例推荐</li>
+                        <li><i class="bi bi-check-circle"></i> 处理方案建议</li>
+                        <li><i class="bi bi-check-circle"></i> 知识库联动</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客户价值 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>为什么选择 微语 智能工单？</h2>
+                <p class="lead text-muted">为企业创造实实在在的价值</p>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">💰</div>
+                    <h4>降低成本</h4>
+                    <p>AI自动化处理工单，降低人工成本60%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">⚡</div>
+                    <h4>提升效率</h4>
+                    <p>智能工单处理提升效率达300%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">📈</div>
+                    <h4>服务质量</h4>
+                    <p>智能分析预测提升服务质量40%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">😊</div>
+                    <h4>提升满意度</h4>
+                    <p>快速响应提升客户满意度至95%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客户案例 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>成功案例</h2>
+                <p class="lead text-muted">值得信赖的企业级工单解决方案</p>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某大型科技公司</h5>
+                        <p class="card-text">通过部署微语智能工单系统，工单处理效率提升300%，人工成本降低60%，客户满意度提升40%。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某金融机构</h5>
+                        <p class="card-text">AI驱动的工单系统，帮助服务成本降低50%，工单处理时间缩短80%，服务质量提升35%。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某教育机构</h5>
+                        <p class="card-text">智能工单系统助力服务效率提升200%，问题解决率提升45%，人工成本降低70%。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行动召唤 -->
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="mb-4">开启智能工单新时代</h2>
+                <p class="lead mb-4">立即体验 微语 智能工单，让AI为您的企业创造价值</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/contact" class="btn btn-primary btn-lg">免费试用</a>
+                    <a href="/docs/zh-CN" class="btn btn-outline-secondary btn-lg">查看文档</a>
                 </div>
             </div>
         </div>

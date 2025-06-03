@@ -36,97 +36,133 @@
             <div class="col">
                 <h1 class="display-4 mb-3">智能知识库管理系统</h1>
                 <p class="lead">基于大语言模型的新一代智能知识管理平台，让知识管理更智能、更高效</p>
+                <div class="mt-4">
+                    <a href="/contact" class="btn btn-primary btn-lg me-3">免费试用</a>
+                    <a href="/docs/zh-CN" class="btn btn-outline-primary btn-lg">查看文档</a>
+                </div>
             </div>
         </div>
 
-        <div class="row g-4">
+        <!-- AI 核心优势 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>AI 驱动的知识管理</h2>
+                <p class="lead text-muted">结合大语言模型，打造智能化知识管理体验</p>
+            </div>
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">🤖</div>
-                    <h3>AI对话</h3>
+                    <h3>智能知识处理</h3>
+                    <p>基于大语言模型的智能知识处理系统，自动提取、分类、关联知识，提升知识管理效率。</p>
                     <ul class="list-unstyled">
-                        <li>智能问答系统</li>
-                        <li>上下文理解</li>
-                        <li>多轮对话</li>
-                        <li>语义理解</li>
-                        <li>个性化回复</li>
-                        <li>实时学习</li>
+                        <li><i class="bi bi-check-circle"></i> 自动知识提取</li>
+                        <li><i class="bi bi-check-circle"></i> 智能分类标注</li>
+                        <li><i class="bi bi-check-circle"></i> 知识关联推荐</li>
                     </ul>
                 </div>
             </div>
-
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">📚</div>
-                    <h3>知识库管理</h3>
-                    <ul class="list-unstyled">
-                        <li>内部知识库</li>
-                        <li>外部知识库</li>
-                        <li>知识分类管理</li>
-                        <li>版本控制</li>
-                        <li>协同编辑</li>
-                        <li>权限管理</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">🏷️</div>
-                    <h3>标签系统</h3>
-                    <ul class="list-unstyled">
-                        <li>智能标签推荐</li>
-                        <li>自定义标签</li>
-                        <li>标签分类</li>
-                        <li>标签关联</li>
-                        <li>热门标签</li>
-                        <li>标签统计</li>
-                    </ul>
-                </div>
-            </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">🔍</div>
-                    <h3>智能搜索</h3>
+                    <h3>智能搜索问答</h3>
+                    <p>AI驱动的智能搜索系统，实现语义理解、多轮对话、精准答案推荐，提升知识获取效率。</p>
                     <ul class="list-unstyled">
-                        <li>全文检索</li>
-                        <li>语义搜索</li>
-                        <li>相关推荐</li>
-                        <li>搜索历史</li>
-                        <li>热门搜索</li>
-                        <li>精准匹配</li>
+                        <li><i class="bi bi-check-circle"></i> 语义理解搜索</li>
+                        <li><i class="bi bi-check-circle"></i> 智能问答推荐</li>
+                        <li><i class="bi bi-check-circle"></i> 多轮对话交互</li>
                     </ul>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">📊</div>
-                    <h3>数据分析</h3>
+                    <h3>智能分析洞察</h3>
+                    <p>AI驱动的知识分析系统，自动发现知识热点、使用趋势，助力企业优化知识管理。</p>
                     <ul class="list-unstyled">
-                        <li>知识使用分析</li>
-                        <li>热点问题分析</li>
-                        <li>用户行为分析</li>
-                        <li>知识覆盖率</li>
-                        <li>问答效果分析</li>
-                        <li>趋势预测</li>
+                        <li><i class="bi bi-check-circle"></i> 知识热点分析</li>
+                        <li><i class="bi bi-check-circle"></i> 使用趋势预测</li>
+                        <li><i class="bi bi-check-circle"></i> 知识价值评估</li>
                     </ul>
                 </div>
             </div>
+        </div>
 
+        <!-- 客户价值 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>为什么选择 微语 智能知识库？</h2>
+                <p class="lead text-muted">为企业创造实实在在的价值</p>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">💰</div>
+                    <h4>降低成本</h4>
+                    <p>AI自动化处理知识，降低人工管理成本60%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">⚡</div>
+                    <h4>提升效率</h4>
+                    <p>智能搜索和问答提升知识获取效率300%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">📈</div>
+                    <h4>知识价值</h4>
+                    <p>知识利用率提升200%，助力业务增长</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">😊</div>
+                    <h4>提升满意度</h4>
+                    <p>智能服务提升用户满意度至95%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客户案例 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>成功案例</h2>
+                <p class="lead text-muted">值得信赖的企业级知识管理解决方案</p>
+            </div>
             <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">🔄</div>
-                    <h3>系统集成</h3>
-                    <ul class="list-unstyled">
-                        <li>工单系统集成</li>
-                        <li>聊天系统集成</li>
-                        <li>CRM系统集成</li>
-                        <li>API接口支持</li>
-                        <li>数据导入导出</li>
-                        <li>第三方扩展</li>
-                    </ul>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某大型科技公司</h5>
+                        <p class="card-text">通过部署微语智能知识库，知识管理效率提升300%，员工培训成本降低50%，知识利用率提升200%。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某金融机构</h5>
+                        <p class="card-text">AI驱动的知识库系统，帮助客服效率提升200%，培训时间缩短70%，客户满意度提升40%。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某教育机构</h5>
+                        <p class="card-text">智能知识库助力教学资源管理效率提升250%，教师备课时间缩短60%，学生学习效果提升35%。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行动召唤 -->
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="mb-4">开启智能知识管理新时代</h2>
+                <p class="lead mb-4">立即体验 微语 智能知识库，让AI为您的企业创造价值</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/contact" class="btn btn-primary btn-lg">免费试用</a>
+                    <a href="/docs/zh-CN" class="btn btn-outline-secondary btn-lg">查看文档</a>
                 </div>
             </div>
         </div>

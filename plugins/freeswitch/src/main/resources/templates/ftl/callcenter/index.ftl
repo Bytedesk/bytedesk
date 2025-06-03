@@ -8,7 +8,7 @@
             <p class="lead">AI驱动的企业级通信平台，重新定义客户服务体验</p>
             <div class="mt-4">
                 <a href="/contact" class="btn btn-primary btn-lg me-3">免费试用</a>
-                <#--  <a href="/demo" class="btn btn-outline-primary btn-lg">在线演示</a>  -->
+                <a href="/docs/zh-CN" class="btn btn-outline-primary btn-lg">查看文档</a>
             </div>
         </div>
     </div>
@@ -221,7 +221,6 @@
             <p class="lead mb-4">立即体验 微语 智能呼叫中心，让AI为您的企业创造价值</p>
             <div class="d-flex justify-content-center gap-3">
                 <a href="/contact" class="btn btn-primary btn-lg">免费试用</a>
-                <#--  <a href="/demo" class="btn btn-outline-primary btn-lg">预约演示</a>  -->
                 <a href="/docs/zh-CN" class="btn btn-outline-secondary btn-lg">查看文档</a>
             </div>
         </div>
