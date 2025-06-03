@@ -24,10 +24,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.category.CategoryCreateEvent;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryResponse;
-import com.bytedesk.core.category.CategoryUpdateEvent;
+import com.bytedesk.core.category.event.CategoryCreateEvent;
+import com.bytedesk.core.category.event.CategoryUpdateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.kbase.article.ArticleEntity;
