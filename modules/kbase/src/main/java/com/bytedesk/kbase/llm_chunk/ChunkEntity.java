@@ -70,10 +70,9 @@ public class ChunkEntity extends BaseEntity {
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
-    private String status = ChunkStatusEnum.NEW.name();
+    private String elasticStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
-    @Column(name = "vector_status")
     private String vectorStatus = ChunkStatusEnum.NEW.name();
 
     // 是否启用，状态：启用/禁用
@@ -105,13 +104,13 @@ public class ChunkEntity extends BaseEntity {
 
     // set Success
     public ChunkEntity setSuccess() {
-        this.setStatus(ChunkStatusEnum.SUCCESS.name());
+        this.setElasticStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
     public ChunkEntity setError() {
-        this.setStatus(ChunkStatusEnum.ERROR.name());
+        this.setElasticStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:15:03
+ * @LastEditTime: 2025-06-03 15:37:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -99,7 +99,7 @@ public class ArticleRequest extends BaseRequest {
 
     // elastic 索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
     @Builder.Default
-    private String status = ArticleStatusEnum.NEW.name();
+    private String elasticStatus = ArticleStatusEnum.NEW.name();
 
     // 向量索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
     @Builder.Default

@@ -105,7 +105,7 @@ public class ArticleElastic {
             .contentHtml(article.getContentHtml())
             .tagList(article.getTagList())
             .type(article.getType())
-            .status(article.getStatus())
+            .status(article.getElasticStatus())
             .auditStatus(article.getAuditStatus())
             .top(article.getTop())
             .published(article.getPublished())

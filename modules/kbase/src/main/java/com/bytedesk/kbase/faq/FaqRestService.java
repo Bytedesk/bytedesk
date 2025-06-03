@@ -269,7 +269,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             entity.setImages(request.getImages());
             entity.setAttachments(request.getAttachments());
             entity.setAnswerList(request.getAnswerList());
-            entity.setStatus(request.getStatus());
+            entity.setElasticStatus(request.getElasticStatus());
             entity.setTagList(request.getTagList());
             entity.setType(request.getType());
             entity.setEnabled(request.getEnabled());
@@ -368,7 +368,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
                 // docIdList
                 latestEntity.setDocIdList(entity.getDocIdList());
-                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setElasticStatus(entity.getElasticStatus());
 
                 // 尝试保存，可能会再次失败
                 try {
@@ -439,7 +439,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             excel.setEnabled("否");
         }
         // 将状态和向量状态转换为中文
-        excel.setStatus(ChunkStatusEnum.toChineseDisplay(faq.getStatus()));
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(faq.getElasticStatus()));
         excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(faq.getVectorStatus()));
         return excel;
     }

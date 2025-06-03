@@ -47,8 +47,8 @@ public class ArticleArchiveEntity extends AbstractArticleEntity {
         if (getType() == null) {
             setType(KbaseTypeEnum.HELPCENTER.name());
         }
-        if (getStatus() == null) {
-            setStatus(ArticleArchiveStatusEnum.DRAFT.name());
+        if (getElasticStatus() == null) {
+            setElasticStatus(ArticleArchiveStatusEnum.DRAFT.name());
         }
         if (getAuditStatus() == null) {
             setAuditStatus(ArticleArchiveAuditStatusEnum.PENDING.name());

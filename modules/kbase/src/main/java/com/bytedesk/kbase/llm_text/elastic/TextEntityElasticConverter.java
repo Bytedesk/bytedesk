@@ -39,7 +39,7 @@ public class TextEntityElasticConverter {
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .type(entity.getType())
-                .status(entity.getStatus())
+                .status(entity.getElasticStatus())
                 .tagList(entity.getTagList())
                 .enabled(entity.getEnabled())
                 .startDate(entity.getStartDate())

@@ -124,7 +124,7 @@ public class ChunkVector {
             .fileUid(fileUid)
             .startDate(chunk.getStartDate())
             .endDate(chunk.getEndDate())
-            .status(chunk.getStatus())
+            .status(chunk.getElasticStatus())
             .vectorStatus(chunk.getVectorStatus())
             .build();
     }
