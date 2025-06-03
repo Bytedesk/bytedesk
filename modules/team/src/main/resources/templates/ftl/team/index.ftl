@@ -7,8 +7,8 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>企业IM系统 - 微语</title>
-        <meta name="description" content="微语企业IM系统是一个安全可靠的企业级即时通讯解决方案">
+        <title>微语 企业IM - AI驱动的智能协作平台</title>
+        <meta name="description" content="微语企业IM系统是一个基于AI的智能协作平台，为企业提供安全可靠的企业级即时通讯解决方案">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="/assets/vendor/bootstrap5/css/bootstrap.min.css" rel="stylesheet">
         <style>
@@ -43,99 +43,131 @@
         <div class="container my-5">
             <div class="row text-center mb-5">
                 <div class="col">
-                    <h1 class="display-4 mb-3">企业级即时通讯解决方案</h1>
-                    <p class="lead">安全可靠的企业通讯平台，助力企业内部高效协作与沟通</p>
+                    <h1 class="display-4 mb-3">AI驱动的智能协作平台</h1>
+                    <p class="lead">基于大语言模型的智能协作系统，重新定义企业沟通与协作体验</p>
+                    <div class="mt-4">
+                        <a href="/contact" class="btn btn-primary btn-lg me-3">免费试用</a>
+                        <a href="/docs/zh-CN" class="btn btn-outline-primary btn-lg">查看文档</a>
+                    </div>
                 </div>
             </div>
 
-            <div class="row g-4">
+            <div class="row mb-5">
+                <div class="col-12 text-center mb-4">
+                    <h2>AI 驱动的智能协作</h2>
+                    <p class="lead text-muted">结合大语言模型，打造智能化协作体验</p>
+                </div>
                 <div class="col-md-4">
                     <div class="feature-box h-100">
-                        <div class="feature-icon">💬</div>
-                        <h3>即时通讯</h3>
+                        <div class="feature-icon">🤖</div>
+                        <h3>智能助手</h3>
+                        <p>基于大语言模型的智能助手，提供实时协作支持，提升工作效率。</p>
                         <ul class="list-unstyled">
-                            <li>单聊/群聊支持</li>
-                            <li>文字/图片/语音/视频</li>
-                            <li>消息撤回与已读回执</li>
-                            <li>历史消息查询</li>
-                            <li>消息转发与引用</li>
-                            <li>@提醒功能</li>
+                            <li><i class="bi bi-check-circle"></i> 智能问答</li>
+                            <li><i class="bi bi-check-circle"></i> 任务提醒</li>
+                            <li><i class="bi bi-check-circle"></i> 知识推荐</li>
                         </ul>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="feature-box h-100">
-                        <div class="feature-icon">👥</div>
-                        <h3>组织管理</h3>
+                        <div class="feature-icon">📊</div>
+                        <h3>智能分析</h3>
+                        <p>AI驱动的协作分析系统，提供团队效能洞察，优化工作流程。</p>
                         <ul class="list-unstyled">
-                            <li>多级部门管理</li>
-                            <li>员工信息维护</li>
-                            <li>角色权限控制</li>
-                            <li>组织架构同步</li>
-                            <li>员工状态管理</li>
-                            <li>通讯录管理</li>
+                            <li><i class="bi bi-check-circle"></i> 效能分析</li>
+                            <li><i class="bi bi-check-circle"></i> 协作洞察</li>
+                            <li><i class="bi bi-check-circle"></i> 优化建议</li>
                         </ul>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="feature-box h-100">
-                        <div class="feature-icon">🛡️</div>
-                        <h3>安全管控</h3>
+                        <div class="feature-icon">🎯</div>
+                        <h3>智能协作</h3>
+                        <p>基于AI的智能协作系统，自动优化团队协作，提升工作效率。</p>
                         <ul class="list-unstyled">
-                            <li>端到端加密</li>
-                            <li>消息内容监控</li>
-                            <li>敏感词过滤</li>
-                            <li>聊天记录存档</li>
-                            <li>登录安全策略</li>
-                            <li>数据防泄漏</li>
+                            <li><i class="bi bi-check-circle"></i> 任务分配</li>
+                            <li><i class="bi bi-check-circle"></i> 进度跟踪</li>
+                            <li><i class="bi bi-check-circle"></i> 资源调度</li>
                         </ul>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-4">
-                    <div class="feature-box h-100">
-                        <div class="feature-icon">👥</div>
-                        <h3>群组管理</h3>
-                        <ul class="list-unstyled">
-                            <li>群组创建与解散</li>
-                            <li>群成员管理</li>
-                            <li>群公告与设置</li>
-                            <li>群消息群发</li>
-                            <li>群文件共享</li>
-                            <li>群权限控制</li>
-                        </ul>
+            <div class="row mb-5">
+                <div class="col-12 text-center mb-4">
+                    <h2>为什么选择 微语 企业IM？</h2>
+                    <p class="lead text-muted">为企业创造实实在在的价值</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="feature-icon">💰</div>
+                        <h4>降低成本</h4>
+                        <p>AI助手降低沟通成本40%</p>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="feature-box h-100">
-                        <div class="feature-icon">📨</div>
-                        <h3>消息管理</h3>
-                        <ul class="list-unstyled">
-                            <li>消息模板管理</li>
-                            <li>群发消息</li>
-                            <li>消息撤回</li>
-                            <li>消息搜索</li>
-                            <li>消息备份</li>
-                            <li>消息导出</li>
-                        </ul>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="feature-icon">⚡</div>
+                        <h4>提升效率</h4>
+                        <p>智能协作提升工作效率200%</p>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="feature-icon">📈</div>
+                        <h4>优化管理</h4>
+                        <p>智能分析助力管理效率提升50%</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="feature-icon">😊</div>
+                        <h4>提升满意度</h4>
+                        <p>高效协作提升员工满意度至95%</p>
+                    </div>
+                </div>
+            </div>
 
+            <div class="row mb-5">
+                <div class="col-12 text-center mb-4">
+                    <h2>成功案例</h2>
+                    <p class="lead text-muted">值得信赖的企业级解决方案</p>
+                </div>
                 <div class="col-md-4">
-                    <div class="feature-box h-100">
-                        <div class="feature-icon">🔗</div>
-                        <h3>系统集成</h3>
-                        <ul class="list-unstyled">
-                            <li>单点登录(SSO)</li>
-                            <li>OA系统集成</li>
-                            <li>CRM系统集成</li>
-                            <li>工单系统集成</li>
-                            <li>API接口支持</li>
-                            <li>自定义扩展</li>
-                        </ul>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">某大型科技公司</h5>
+                            <p class="card-text">通过部署微语企业IM，团队协作效率提升200%，沟通成本降低40%。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">某跨国企业</h5>
+                            <p class="card-text">AI驱动的智能协作系统，帮助全球团队效率提升150%，管理成本降低35%。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">某教育机构</h5>
+                            <p class="card-text">智能协作平台助力教学管理效率提升45%，师生满意度提升50%。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="mb-4">开启智能协作新时代</h2>
+                    <p class="lead mb-4">立即体验 微语 企业IM，让AI为您的企业创造价值</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/contact" class="btn btn-primary btn-lg">免费试用</a>
+                        <a href="/docs/zh-CN" class="btn btn-outline-secondary btn-lg">查看文档</a>
                     </div>
                 </div>
             </div>

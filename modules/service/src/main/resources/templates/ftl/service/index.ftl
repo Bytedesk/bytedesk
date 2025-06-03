@@ -36,97 +36,133 @@
             <div class="col">
                 <h1 class="display-4 mb-3">智能在线客服系统</h1>
                 <p class="lead">多渠道整合的智能客服平台，为企业打造专业、高效的客户服务体系</p>
+                <div class="mt-4">
+                    <a href="/contact" class="btn btn-primary btn-lg me-3">免费试用</a>
+                    <a href="/docs/zh-CN" class="btn btn-outline-primary btn-lg">查看文档</a>
+                </div>
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">💬</div>
-                    <h3>多渠道接入</h3>
-                    <ul class="list-unstyled">
-                        <li>网页即时通讯</li>
-                        <li>微信公众号</li>
-                        <li>企业微信</li>
-                        <li>钉钉集成</li>
-                        <li>手机APP</li>
-                        <li>邮件系统</li>
-                    </ul>
-                </div>
+        <!-- AI 核心优势 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>AI 驱动的智能客服</h2>
+                <p class="lead text-muted">结合大语言模型，打造智能化客服体验</p>
             </div>
-
-            <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">👨‍💼</div>
-                    <h3>人工客服</h3>
-                    <ul class="list-unstyled">
-                        <li>客服分组管理</li>
-                        <li>会话分配策略</li>
-                        <li>客服状态监控</li>
-                        <li>会话转接管理</li>
-                        <li>服务质量评估</li>
-                        <li>客服绩效统计</li>
-                    </ul>
-                </div>
-            </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">🤖</div>
-                    <h3>智能机器人</h3>
+                    <h3>智能客服机器人</h3>
+                    <p>基于大语言模型的智能客服机器人，7x24小时不间断服务，自动处理80%的常见咨询。</p>
                     <ul class="list-unstyled">
-                        <li>智能问答系统</li>
-                        <li>知识库对接</li>
-                        <li>自动回复</li>
-                        <li>意图识别</li>
-                        <li>对话流程管理</li>
-                        <li>机器人训练</li>
+                        <li><i class="bi bi-check-circle"></i> 自然语言理解</li>
+                        <li><i class="bi bi-check-circle"></i> 多轮对话能力</li>
+                        <li><i class="bi bi-check-circle"></i> 个性化服务体验</li>
                     </ul>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">📊</div>
-                    <h3>统计报表</h3>
+                    <h3>智能数据分析</h3>
+                    <p>AI驱动的数据分析系统，自动识别客户意图，生成服务洞察，助力企业优化服务流程。</p>
                     <ul class="list-unstyled">
-                        <li>会话量统计</li>
-                        <li>响应时间分析</li>
-                        <li>客服工作量</li>
-                        <li>满意度评价</li>
-                        <li>渠道分布分析</li>
-                        <li>问题类型统计</li>
+                        <li><i class="bi bi-check-circle"></i> 实时情感分析</li>
+                        <li><i class="bi bi-check-circle"></i> 智能质检评分</li>
+                        <li><i class="bi bi-check-circle"></i> 预测性分析</li>
                     </ul>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="feature-box h-100">
-                    <div class="feature-icon">🔄</div>
-                    <h3>会话管理</h3>
+                    <div class="feature-icon">🎯</div>
+                    <h3>智能路由分配</h3>
+                    <p>基于AI的智能路由系统，根据客户画像和座席技能自动匹配，提升服务效率和客户满意度。</p>
                     <ul class="list-unstyled">
-                        <li>消息撤回</li>
-                        <li>快捷回复</li>
-                        <li>消息记录</li>
-                        <li>敏感词过滤</li>
-                        <li>多媒体消息</li>
-                        <li>历史会话查询</li>
+                        <li><i class="bi bi-check-circle"></i> 智能技能匹配</li>
+                        <li><i class="bi bi-check-circle"></i> 负载均衡</li>
+                        <li><i class="bi bi-check-circle"></i> 实时优化</li>
                     </ul>
                 </div>
             </div>
+        </div>
 
+        <!-- 客户价值 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>为什么选择 微语 智能客服？</h2>
+                <p class="lead text-muted">为企业创造实实在在的价值</p>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">💰</div>
+                    <h4>降低成本</h4>
+                    <p>AI自动化处理80%常见咨询，显著降低人工成本</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">⚡</div>
+                    <h4>提升效率</h4>
+                    <p>智能路由和AI助手提升服务效率达300%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">📈</div>
+                    <h4>增加收入</h4>
+                    <p>智能营销和交叉销售提升转化率30%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="feature-icon">😊</div>
+                    <h4>提升满意度</h4>
+                    <p>个性化服务提升客户满意度至95%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客户案例 -->
+        <div class="row mb-5">
+            <div class="col-12 text-center mb-4">
+                <h2>成功案例</h2>
+                <p class="lead text-muted">值得信赖的企业级客服解决方案</p>
+            </div>
             <div class="col-md-4">
-                <div class="feature-box h-100">
-                    <div class="feature-icon">🔒</div>
-                    <h3>安全管理</h3>
-                    <ul class="list-unstyled">
-                        <li>访问权限控制</li>
-                        <li>数据加密传输</li>
-                        <li>隐私信息保护</li>
-                        <li>操作日志记录</li>
-                        <li>安全审计</li>
-                        <li>备份恢复</li>
-                    </ul>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某大型电商平台</h5>
+                        <p class="card-text">通过部署微语智能客服系统，客服效率提升300%，客户满意度提升40%，人工成本降低60%。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某金融机构</h5>
+                        <p class="card-text">AI驱动的智能客服系统，帮助客户服务成本降低50%，业务转化率提升35%，服务响应时间缩短80%。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">某教育机构</h5>
+                        <p class="card-text">智能客服系统助力招生咨询效率提升200%，客户转化率提升45%，人工成本降低70%。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行动召唤 -->
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="mb-4">开启智能客服新时代</h2>
+                <p class="lead mb-4">立即体验 微语 智能客服，让AI为您的企业创造价值</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/contact" class="btn btn-primary btn-lg">免费试用</a>
+                    <a href="/docs/zh-CN" class="btn btn-outline-secondary btn-lg">查看文档</a>
                 </div>
             </div>
         </div>
