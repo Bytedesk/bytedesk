@@ -115,7 +115,7 @@ public class TextVector {
             .enabled(text.getEnabled())
             .startDate(text.getStartDate())
             .endDate(text.getEndDate())
-            .status(text.getStatus())
+            .status(text.getElasticStatus())
             .vectorStatus(text.getVectorStatus())
             .docIdList(text.getDocIdList())
             .build();

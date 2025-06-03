@@ -131,7 +131,7 @@ public class WebpageRestService
 
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
-                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setElasticStatus(entity.getElasticStatus());
 
                 return webpageRepository.save(latestEntity);
             }

@@ -284,7 +284,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
             excel.setKbaseName(chunk.getKbase().getName());
         }
         // 将状态和向量状态转换为中文
-        excel.setStatus(ChunkStatusEnum.toChineseDisplay(chunk.getStatus()));
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(chunk.getElasticStatus()));
         excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(chunk.getVectorStatus()));
         return excel;
     }

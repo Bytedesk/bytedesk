@@ -43,7 +43,7 @@ public class WebpageRequest extends BaseRequest {
     private String description;
 
     @Builder.Default
-    private String status = ChunkStatusEnum.NEW.name();
+    private String elasticStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
     private String vectorStatus = ChunkStatusEnum.NEW.name();

@@ -63,7 +63,7 @@ public class ArticleEntity extends AbstractArticleEntity {
 
     // elastic 索引状态
     public boolean isStatusSuccess() {
-        return "SUCCESS".equals(getStatus());
+        return "SUCCESS".equals(getElasticStatus());
     }
 
     /**

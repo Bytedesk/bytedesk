@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 18:40:30
+ * @LastEditTime: 2025-06-03 15:34:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,10 +61,9 @@ public class TextEntity extends BaseEntity {
     private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
-    private String status = ChunkStatusEnum.NEW.name();
+    private String elasticStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
-    @Column(name = "vector_status")
     private String vectorStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
@@ -101,13 +100,13 @@ public class TextEntity extends BaseEntity {
 
     // set Success
     public TextEntity setSuccess() {
-        this.setStatus(ChunkStatusEnum.SUCCESS.name());
+        this.setElasticStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
     public TextEntity setError() {
-        this.setStatus(ChunkStatusEnum.ERROR.name());
+        this.setElasticStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
 

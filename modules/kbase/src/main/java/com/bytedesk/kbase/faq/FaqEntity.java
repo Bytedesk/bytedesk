@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-20 11:07:20
+ * @LastEditTime: 2025-06-03 15:33:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -107,10 +107,10 @@ public class FaqEntity extends BaseEntity {
     private List<FaqEntity> relatedFaqs = new ArrayList<>();
 
     @Builder.Default
-    private String status = FaqStatusEnum.NEW.name();
+    private String elasticStatus = FaqStatusEnum.NEW.name();
 
     @Builder.Default
-    private String vectorStatus = ChunkStatusEnum.NEW.name();
+    private String vectorStatus = FaqStatusEnum.NEW.name();
     /**
      * 标签列表
      */
@@ -204,13 +204,13 @@ public class FaqEntity extends BaseEntity {
 
     // set Success
     public FaqEntity setSuccess() {
-        this.setStatus(FaqStatusEnum.SUCCESS.name());
+        this.setElasticStatus(FaqStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
     public FaqEntity setError() {
-        this.setStatus(FaqStatusEnum.ERROR.name());
+        this.setElasticStatus(FaqStatusEnum.ERROR.name());
         return this;
     }
 

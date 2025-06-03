@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 17:46:00
+ * @LastEditTime: 2025-06-03 15:35:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,32 +46,8 @@ public class TextResponse extends BaseResponse {
 
     // 有效结束日期
     private LocalDateTime endDate;
-
-    // // 是否开启自动生成enable_llm_qa问答
-    // private Boolean autoGenerateLlmQa;
-
-    // // 是否已经生成llm问答
-    // private Boolean llmQaGenerated;
-
-    // // 是否开启自动删除llm问答
-    // private Boolean autoDeleteLlmQa;
-
-    // // 是否已经删除llm问答
-    // private Boolean llmQaDeleted;
-
-    // // 是否开启自动llm Chunk切块
-    // private Boolean autoLlmChunk;
-
-    // // 是否已经自动llm Chunk切块
-    // private Boolean llmChunked;
-
-    // // 是否开启自动删除llm Chunk切块
-    // private Boolean autoDeleteLlmChunk;
-
-    // // 是否已经删除llm Chunk切块
-    // private Boolean llmChunkedDeleted;
-
-    private String status;
+    
+    private String elasticStatus;
 
     private String vectorStatus;
 

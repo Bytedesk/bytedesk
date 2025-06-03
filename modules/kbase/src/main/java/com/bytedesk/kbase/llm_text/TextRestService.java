@@ -144,7 +144,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             entity.setCategoryUid(request.getCategoryUid());
             // entity.setType(request.getType());
             // entity.setDocIdList(request.getDocIdList());
-            entity.setStatus(request.getStatus());
+            entity.setElasticStatus(request.getElasticStatus());
             
             //
             TextEntity savedEntity = save(entity);
@@ -219,7 +219,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
 
                 // 文档ID列表和状态
                 latestEntity.setDocIdList(entity.getDocIdList());
-                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setElasticStatus(entity.getElasticStatus());
 
                 return textRepository.save(latestEntity);
             }
@@ -252,7 +252,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
             excel.setKbaseName(text.getKbase().getName());
         }
         // 将状态和向量状态转换为中文
-        excel.setStatus(ChunkStatusEnum.toChineseDisplay(text.getStatus()));
+        excel.setStatus(ChunkStatusEnum.toChineseDisplay(text.getElasticStatus()));
         excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(text.getVectorStatus()));
         return excel;
     }

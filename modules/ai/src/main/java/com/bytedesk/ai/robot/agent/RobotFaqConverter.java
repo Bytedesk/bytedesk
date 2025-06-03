@@ -102,7 +102,7 @@ public class RobotFaqConverter {
                 
                 // 设置默认值
                 faqRequest.setType(MessageTypeEnum.TEXT.name());
-                faqRequest.setStatus(FaqStatusEnum.NEW.name());
+                faqRequest.setElasticStatus(FaqStatusEnum.NEW.name());
                 faqRequest.setVectorStatus(ChunkStatusEnum.NEW.name());
                 faqRequest.setEnabled(true);
                 
