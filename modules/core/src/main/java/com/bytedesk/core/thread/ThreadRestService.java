@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 12:29:38
+ * @LastEditTime: 2025-06-03 13:11:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -569,7 +569,7 @@ public class ThreadRestService
             Optional<ThreadEntity> latestOptional = threadRepository.findByUid(entity.getUid());
             if (latestOptional.isPresent()) {
                 ThreadEntity latestEntity = latestOptional.get();
-                log.warn("Optimistic locking conflict detected for thread {}, attempting to merge data", entity.getUid());
+                log.warn("Optimistic locking conflict detected for thread topic {}, attempting to merge data", entity.getTopic());
                 
                 // Preserve basic thread information
                 if (entity.getTopic() != null) {
@@ -584,6 +584,7 @@ public class ThreadRestService
                 if (entity.getStatus() != null) {
                     latestEntity.setStatus(entity.getStatus());
                 }
+                log.info("latestEntity status: {}", latestEntity.getStatus());
                 
                 // Preserve thread state flags
                 latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
