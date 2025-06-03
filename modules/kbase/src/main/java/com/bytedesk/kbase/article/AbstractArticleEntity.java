@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:43:10
+ * @LastEditTime: 2025-06-03 15:11:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,9 +86,6 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     private Integer likeCount = 0;
 
-    // 状态 - 具体枚举值由子类定义
-    private String status;
-
     // 编辑者
     @Builder.Default
     private String editor = BytedeskConsts.EMPTY_STRING;
@@ -135,7 +132,10 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 向量索引状态 (对应ChunkStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    // elastic 索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    private String status;
+
+    // 向量索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
     private String vectorStatus;
 
     // 存储在向量库中的文档ID列表
