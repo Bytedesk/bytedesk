@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:37:04
+ * @LastEditTime: 2025-06-03 16:12:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -110,4 +110,7 @@ public class ArticleRequest extends BaseRequest {
     private String kbUid;
 
     private String userUid;
+
+    // 
+    private String searchText;
 }

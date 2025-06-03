@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:20:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:59:21
+ * @LastEditTime: 2025-06-03 16:11:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleRestService;
-import com.bytedesk.kbase.article.ArticleStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
@@ -268,6 +267,11 @@ public class ArticleElasticService {
  
         return articleElasticResultList;
     }
+
+    public List<ArticleElasticSearchResult> searchArticle(ArticleRequest request) {
+        return searchArticle(request.getSearchText(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
+    }
+
 
     /**
      * 搜索相似文章
