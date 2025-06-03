@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 10:54:13
+ * @LastEditTime: 2025-06-03 15:38:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,7 @@ public class FileEntity extends BaseEntity {
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
     @Builder.Default
-    private String status = ChunkStatusEnum.NEW.name();
+    private String elasticStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
     private String vectorStatus = ChunkStatusEnum.NEW.name();
@@ -103,13 +103,13 @@ public class FileEntity extends BaseEntity {
 
     // set Success
     public FileEntity setSuccess() {
-        this.setStatus(ChunkStatusEnum.SUCCESS.name());
+        this.setElasticStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
     public FileEntity setError() {
-        this.setStatus(ChunkStatusEnum.ERROR.name());
+        this.setElasticStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
     

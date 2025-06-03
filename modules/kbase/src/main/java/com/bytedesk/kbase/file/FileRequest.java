@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 09:26:43
+ * @LastEditTime: 2025-06-03 15:38:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,40 +56,8 @@ public class FileRequest extends BaseRequest {
     @Builder.Default
     private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
 
-    // // 是否开启自动生成enable_llm_qa问答
-    // @Builder.Default
-    // private Boolean autoGenerateLlmQa = false;
-
-    // // 是否已经生成llm问答
-    // @Builder.Default
-    // private Boolean llmQaGenerated = false;
-
-    // // 是否开启自动删除llm问答
-    // @Builder.Default
-    // private Boolean autoDeleteLlmQa = false;
-
-    // // 是否已经删除llm问答
-    // @Builder.Default
-    // private Boolean llmQaDeleted = false;
-
-    // // 是否开启自动llm Chunk切块
-    // @Builder.Default
-    // private Boolean autoLlmChunk = false;
-
-    // // 是否已经自动llm Chunk切块
-    // @Builder.Default
-    // private Boolean llmChunked = false;
-
-    // // 是否开启自动删除llm Chunk切块
-    // @Builder.Default
-    // private Boolean autoDeleteLlmChunk = false;
-
-    // // 是否已经删除llm Chunk切块
-    // @Builder.Default
-    // private Boolean llmChunkDeleted = false;
-
     @Builder.Default
-    private String status = ChunkStatusEnum.NEW.name();
+    private String elasticStatus = ChunkStatusEnum.NEW.name();
 
     @Builder.Default
     private String vectorStatus = ChunkStatusEnum.NEW.name();
