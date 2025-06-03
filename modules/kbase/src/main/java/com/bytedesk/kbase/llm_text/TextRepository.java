@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 17:49:53
+ * @LastEditTime: 2025-06-03 15:46:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,9 +31,9 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
     
     /**
      * 查找状态为指定值但向量状态不是指定值的Text实体
-     * @param status 状态值
+     * @param elasticStatus 状态值
      * @param vectorStatus 向量状态值 
      * @return Text实体列表
      */
-    List<TextEntity> findByStatusAndVectorStatusNot(String status, String vectorStatus);
+    List<TextEntity> findByElasticStatusAndVectorStatusNot(String elasticStatus, String vectorStatus);
 }

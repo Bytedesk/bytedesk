@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 17:30:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:49:56
+ * @LastEditTime: 2025-06-03 16:00:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -111,7 +111,8 @@ public class ArticleVectorService {
             currentArticle.setDocIdList(docIdList);
 
             // 设置向量索引状态为成功
-            currentArticle.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+            // currentArticle.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+            currentArticle.setVectorSuccess();
 
             // 更新文章实体 - 使用明确的事务保证状态更新和保存原子性
             log.info("准备保存文章实体更新，设置向量索引状态为成功: {}", currentArticle.getUid());

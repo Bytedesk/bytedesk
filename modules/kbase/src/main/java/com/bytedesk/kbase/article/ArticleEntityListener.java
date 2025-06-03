@@ -43,7 +43,7 @@ public class ArticleEntityListener {
     @PostUpdate
     public void onPostUpdate(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostUpdate");
-        if (!article.isVectorIndexed() && !article.isStatusSuccess()) {
+        if (!article.isVectorIndexed() && !article.isElasticStatusSuccess()) {
             ArticleEntity clonedArticle = SerializationUtils.clone(article);
             //
             if (article.isDeleted()) {
