@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 13:20:24
+ * @LastEditTime: 2025-06-03 14:18:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -508,7 +508,7 @@ public class ThreadRestService
         return threadRepository.countByTopicAndStatusNotAndDeletedFalse(topic, state);
     }
 
-    @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
     public Optional<ThreadEntity> findByUid(@NonNull String uid) {
         return threadRepository.findByUid(uid);
     }
@@ -529,6 +529,7 @@ public class ThreadRestService
         return threadRepository.findByTopicAndDeleted(topic, false);
     }
 
+    // 状态不能及时更新，暂时注释掉，TODO: 待完善
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
         return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
@@ -541,7 +542,7 @@ public class ThreadRestService
         return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
-    // @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
+    @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
     public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }
@@ -563,6 +564,10 @@ public class ThreadRestService
     }
 
     @Override
+    @Caching(put = {
+        @CachePut(value = "thread", key = "#entity.uid", unless = "#result == null"),
+        @CachePut(value = "thread", key = "#entity.topic", unless = "#result == null")
+    })
     public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             ThreadEntity entity) {
         try {
