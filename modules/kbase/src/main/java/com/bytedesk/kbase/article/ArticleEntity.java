@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 17:25:56
+ * @LastEditTime: 2025-06-03 14:58:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,5 +59,18 @@ public class ArticleEntity extends AbstractArticleEntity {
         if (getType() == null) {
             setType(KbaseTypeEnum.HELPCENTER.name());
         }
+    }
+
+    // isStatusSuccess
+    public boolean isStatusSuccess() {
+        return "SUCCESS".equals(getStatus());
+    }
+
+    /**
+     * 检查文章是否已经完成向量索引
+     * @return true if vectorStatus is SUCCESS
+     */
+    public boolean isVectorIndexed() {
+        return "SUCCESS".equals(getVectorStatus());
     }
 }

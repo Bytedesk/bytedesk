@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 17:30:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 11:04:47
+ * @LastEditTime: 2025-06-03 14:49:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,7 @@ public class ArticleVectorService {
      * @param article 文章实体
      */
     @Transactional
-    public void indexArticleVector(ArticleEntity article) {
+    public void indexVector(ArticleEntity article) {
         log.info("开始向量索引文章: {}, ID: {}", article.getTitle(), article.getUid());
 
         // 在处理前先获取最新的文章实体
@@ -144,9 +144,9 @@ public class ArticleVectorService {
         if (articleOpt.isPresent()) {
             ArticleEntity article = articleOpt.get();
             // 删除旧的向量索引
-            deleteArticleVector(article);
+            deleteArticle(article);
             // 创建新的向量索引
-            indexArticleVector(article);
+            indexVector(article);
         } else {
             log.warn("未找到要更新向量索引的文章: {}", request.getUid());
         }
@@ -162,9 +162,9 @@ public class ArticleVectorService {
         articleList.forEach(article -> {
             try {
                 // 删除旧的向量索引
-                deleteArticleVector(article);
+                deleteArticle(article);
                 // 创建新的向量索引
-                indexArticleVector(article);
+                indexVector(article);
             } catch (Exception e) {
                 log.error("更新文章向量索引失败: {}, 错误: {}", article.getTitle(), e.getMessage());
             }
@@ -179,7 +179,7 @@ public class ArticleVectorService {
      * @return 删除成功返回true，否则返回false
      */
     @Transactional(readOnly = true) // 只读事务，因为我们不会修改实体
-    public Boolean deleteArticleVector(ArticleEntity article) {
+    public Boolean deleteArticle(ArticleEntity article) {
         log.info("从向量索引中删除文章: {}, ID: {}", article.getTitle(), article.getUid());
         try {
             // 获取文章文档ID列表

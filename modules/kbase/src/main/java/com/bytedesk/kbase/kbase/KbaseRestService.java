@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:39:17
+ * @LastEditTime: 2025-06-03 14:36:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,9 +56,9 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     private final UidUtils uidUtils;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
-    private final ArticleRestService articleService;
+    private final ArticleRestService articleRestService;
 
     private final AuthService authService;
 
@@ -243,7 +243,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         categoryRequest.setKbUid(kbaseEntity.getUid());
         categoryRequest.setOrgUid(kbaseEntity.getOrgUid());
         //
-        return categoryService.queryByOrg(categoryRequest);
+        return categoryRestService.queryByOrg(categoryRequest);
     }
 
     public Page<ArticleResponse> getArticles(KbaseEntity kbaseEntity) {
@@ -254,7 +254,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         articleRequest.setKbUid(kbaseEntity.getUid());
         articleRequest.setOrgUid(kbaseEntity.getOrgUid());
         //
-        return articleService.queryByOrg(articleRequest);
+        return articleRestService.queryByOrg(articleRequest);
     }
 
     public Page<ArticleResponse> getArticlesByCategory(KbaseEntity kbaseEntity, String categoryUid) {
@@ -266,7 +266,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         articleRequest.setKbUid(kbaseEntity.getUid());
         articleRequest.setOrgUid(kbaseEntity.getOrgUid());
         //
-        return articleService.queryByOrg(articleRequest);
+        return articleRestService.queryByOrg(articleRequest);
     }
 
     // 初始化知识库

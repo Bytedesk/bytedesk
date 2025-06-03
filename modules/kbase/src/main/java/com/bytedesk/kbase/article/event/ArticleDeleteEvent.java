@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:40:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 09:38:34
+ * @LastEditTime: 2025-06-03 14:57:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,19 +13,23 @@
  */
 package com.bytedesk.kbase.article.event;
 
+import org.springframework.context.ApplicationEvent;
+
 import com.bytedesk.kbase.article.ArticleEntity;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * 文章删除事件
- */
-@Getter
-public class ArticleDeleteEvent {
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class ArticleDeleteEvent extends ApplicationEvent {
     
-    private final ArticleEntity article;
-    
-    public ArticleDeleteEvent(ArticleEntity article) {
+    private static final long serialVersionUID = 1L;
+
+    private ArticleEntity article;
+
+    public ArticleDeleteEvent(Object source, ArticleEntity article) {
+        super(source);
         this.article = article;
     }
 }
