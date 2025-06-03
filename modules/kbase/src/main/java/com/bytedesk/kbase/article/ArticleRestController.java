@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:06:53
+ * @LastEditTime: 2025-06-03 16:07:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,7 +71,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_CREATE')")
+    // @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleRequest request) {
 
@@ -80,7 +80,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
+    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(@RequestBody ArticleRequest request) {
 
@@ -89,7 +89,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
-    @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    // @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(@RequestBody ArticleRequest request) {
 
@@ -109,5 +109,14 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
             "文章",
             "Article"
         );
+    }
+
+    // 输入联想搜索faq
+    @GetMapping("/suggest")
+    public ResponseEntity<?> suggest(ArticleRequest request) {
+
+        List<FaqElasticSearchResult> suggestList = faqElasticService.suggestFaq(request);
+
+        return ResponseEntity.ok(JsonResult.success(suggestList));
     }
 }

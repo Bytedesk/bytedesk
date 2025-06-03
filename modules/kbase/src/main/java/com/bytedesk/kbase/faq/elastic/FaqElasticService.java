@@ -98,7 +98,7 @@ public class FaqElasticService {
             }
 
             // 将索引结果保存到数据库中
-            faq.setSuccess();
+            faq.setElasticSuccess();
             faqRestService.save(faq);
 
         } catch (Exception e) {
