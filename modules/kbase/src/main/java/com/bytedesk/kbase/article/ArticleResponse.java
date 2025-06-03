@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:30:31
+ * @LastEditTime: 2025-06-03 15:16:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,6 @@ public class ArticleResponse extends BaseResponse {
     private String title;
 
     private String summary;
-    // private String coverImageUrl;
 
     private String contentMarkdown;
 
@@ -60,9 +59,6 @@ public class ArticleResponse extends BaseResponse {
 
     private Integer likeCount = 0;
 
-    // status 状态
-    private String status;
-
     // editor 编辑者
     private String editor;
 
@@ -82,19 +78,12 @@ public class ArticleResponse extends BaseResponse {
 
     private String kbUid;
 
-    // private String orgUid;
-
-    // private LocalDateTime createdAt;
-
-    // private LocalDateTime updatedAt;
-
     private UserProtobuf user;
 
-    // public String getCreatedAt() {
-    //     return BdDateUtils.formatDatetimeToString(createdAt);
-    // }
+    // elastic 索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    private String status;
 
-    // public String getUpdatedAt() {
-    //     return BdDateUtils.formatDatetimeToString(updatedAt);
-    // }
+    // 向量索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    private String vectorStatus;
+
 }

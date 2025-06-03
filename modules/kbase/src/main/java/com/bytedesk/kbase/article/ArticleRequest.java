@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 17:11:51
+ * @LastEditTime: 2025-06-03 15:15:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ public class ArticleRequest extends BaseRequest {
 
     private String summary;
     // private String coverImageUrl;
-    
+
     private String contentMarkdown;
 
     private String contentHtml;
@@ -57,7 +57,7 @@ public class ArticleRequest extends BaseRequest {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
-    
+
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
@@ -67,7 +67,7 @@ public class ArticleRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean published = false;
-    
+
     @Builder.Default
     private Boolean markdown = false;
 
@@ -76,10 +76,6 @@ public class ArticleRequest extends BaseRequest {
 
     @Builder.Default
     private Integer likeCount = 0;
-
-    // status 状态
-    @Builder.Default
-    private String status = ArticleStatusEnum.DRAFT.name();
 
     // editor 编辑者
     @Builder.Default
@@ -100,6 +96,14 @@ public class ArticleRequest extends BaseRequest {
     // 审核人
     @Builder.Default
     private String auditUser = BytedeskConsts.EMPTY_STRING;
+
+    // elastic 索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    @Builder.Default
+    private String status = ArticleStatusEnum.NEW.name();
+
+    // 向量索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
+    @Builder.Default
+    private String vectorStatus = ArticleStatusEnum.NEW.name();
 
     private String categoryUid;
 

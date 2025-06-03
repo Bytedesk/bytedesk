@@ -110,7 +110,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
         entity.setUid(uidUtils.getUid());
         // 
         UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
-        entity.setUser(JSON.toJSONString(userProtobuf));
+        entity.setUser(userProtobuf.toJson());
         entity.setOrgUid(user.getOrgUid());
         //
         Optional<KbaseEntity> kbase = kbaseRepository.findByUid(request.getKbUid());
