@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 13:11:51
+ * @LastEditTime: 2025-06-03 13:20:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -603,9 +603,9 @@ public class ThreadRestService
                 if (entity.getTagList() != null && !entity.getTagList().isEmpty()) {
                     latestEntity.setTagList(entity.getTagList());
                 }
-                if (entity.getClient() != null) {
-                    latestEntity.setClient(entity.getClient());
-                }
+                // if (entity.getClient() != null) {
+                //     latestEntity.setClient(entity.getClient());
+                // }
                 if (entity.getExtra() != null) {
                     latestEntity.setExtra(entity.getExtra());
                 }
