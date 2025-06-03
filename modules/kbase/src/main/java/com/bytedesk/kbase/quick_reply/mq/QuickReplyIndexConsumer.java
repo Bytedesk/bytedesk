@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 16:35:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-03-15 16:25:40
+ * @LastEditTime: 2025-06-03 17:13:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import com.bytedesk.kbase.quick_reply.QuickReplyEntity;
 import com.bytedesk.kbase.quick_reply.QuickReplyRepository;
 import com.bytedesk.kbase.quick_reply.elastic.QuickReplyElasticService;
 import com.bytedesk.kbase.quick_reply.vector.QuickReplyVectorService;
-import com.bytedesk.kbase.utils.EmbeddingService;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
@@ -44,9 +43,6 @@ public class QuickReplyIndexConsumer {
     @Autowired
     private QuickReplyVectorService quickReplyVectorService;
 
-    @Autowired
-    private EmbeddingService embeddingService;
-
     /**
      * 处理快捷回复索引消息
      */
@@ -60,7 +56,7 @@ public class QuickReplyIndexConsumer {
                     .orElseThrow(() -> new IllegalArgumentException("快捷回复不存在: " + quickReplyUid));
 
             // 更新全文索引
-            if (indexMessage.isUpdateElasticIndex()) {
+            if (Boolean.TRUE.equals(indexMessage.getUpdateElasticIndex())) {
                 try {
                     quickReplyElasticService.updateIndex(quickReply);
                     log.info("更新快捷回复全文索引成功: {}", quickReplyUid);
@@ -71,12 +67,10 @@ public class QuickReplyIndexConsumer {
             }
 
             // 更新向量索引
-            if (indexMessage.isUpdateVectorIndex()) {
+            if (Boolean.TRUE.equals(indexMessage.getUpdateVectorIndex())) {
                 try {
-                    // 生成向量嵌入
-                    float[] embedding = embeddingService.getEmbedding(quickReply.getTitle() + " " + quickReply.getContent());
-                    // 更新向量索引
-                    quickReplyVectorService.updateVectorIndex(quickReply, embedding);
+                    // 直接调用向量服务的 updateVectorIndex，让其内部处理向量化
+                    quickReplyVectorService.updateVectorIndex(quickReply);
                     log.info("更新快捷回复向量索引成功: {}", quickReplyUid);
                 } catch (Exception e) {
                     log.error("更新快捷回复向量索引失败: {}", e.getMessage(), e);

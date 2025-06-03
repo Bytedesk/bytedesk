@@ -84,6 +84,18 @@ public class QuickReplyVectorService {
     }
 
     /**
+     * 新增重载方法，自动向量化（mock 示例）
+     */
+    public void updateVectorIndex(QuickReplyEntity quickReply) {
+        // 生成一个 mock embedding，例如全零向量
+        float[] embedding = new float[ 1536 ];
+        for (int i = 0; i < embedding.length; i++) {
+             embedding[i] = 0.01f * i; // 模拟递增向量
+        }
+        updateVectorIndex(quickReply, embedding);
+    }
+
+    /**
      * 从Elasticsearch中删除向量索引
      */
     public Boolean deleteVectorIndex(String uid) {
