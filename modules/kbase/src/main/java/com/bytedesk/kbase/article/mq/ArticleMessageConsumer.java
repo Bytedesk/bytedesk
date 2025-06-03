@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:35:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 17:00:00
+ * @LastEditTime: 2025-06-03 14:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import com.bytedesk.core.jms.JmsArtemisConstants;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
+import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class ArticleMessageConsumer {
 
     private final ArticleElasticService articleElasticService;
     private final ArticleRestService articleRestService;
+    private final ArticleVectorService articleVectorService;
     private final Random random = new Random();
 
     /**
@@ -150,7 +152,7 @@ public class ArticleMessageConsumer {
             if (message.getUpdateVectorIndex()) {
                 log.info("更新文章向量索引: {}", articleUid);
                 // 如果有文章向量服务，在这里调用
-                // articleVectorService.indexArticle(article);
+                articleVectorService.indexVector(article);
             }
             
             log.info("文章索引操作完成: {}", articleUid);
@@ -185,12 +187,12 @@ public class ArticleMessageConsumer {
             if (message.getUpdateVectorIndex()) {
                 log.info("从向量引擎中删除文章索引: {}", articleUid);
                 // 如果有文章向量服务，在这里调用
-                // boolean vectorDeleted = articleVectorService.deleteArticle(articleUid);
-                // if (vectorDeleted) {
-                //     log.info("成功从向量引擎中删除文章索引: {}", articleUid);
-                // } else {
-                //     log.warn("从向量引擎中删除文章索引失败: {}", articleUid);
-                // }
+                boolean vectorDeleted = articleVectorService.deleteArticle(article);
+                if (vectorDeleted) {
+                    log.info("成功从向量引擎中删除文章索引: {}", articleUid);
+                } else {
+                    log.warn("从向量引擎中删除文章索引失败: {}", articleUid);
+                }
             }
             
             log.info("文章删除操作完成: {}", articleUid);
@@ -200,4 +202,5 @@ public class ArticleMessageConsumer {
             throw e; // 重新抛出异常，触发消息重发
         }
     }
+
 }

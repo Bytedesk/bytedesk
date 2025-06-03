@@ -71,7 +71,7 @@ public class ArticleIndexMessageListener {
                 // 删除向量索引
                 if (message.getUpdateVectorIndex()) {
                     try {
-                        articleVectorService.deleteArticleVector(article);
+                        articleVectorService.deleteArticle(article);
                     } catch (Exception e) {
                         log.error("删除文章向量索引时出错: {}, 错误: {}", article.getUid(), e.getMessage(), e);
                     }
@@ -93,7 +93,7 @@ public class ArticleIndexMessageListener {
                 // 创建/更新向量索引
                 if (message.getUpdateVectorIndex()) {
                     try {
-                        articleVectorService.indexArticleVector(article);
+                        articleVectorService.indexVector(article);
                     } catch (Exception e) {
                         log.error("创建文章向量索引时出错: {}, 错误: {}", article.getUid(), e.getMessage(), e);
                     }

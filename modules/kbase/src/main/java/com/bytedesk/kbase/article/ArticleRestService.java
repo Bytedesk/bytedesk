@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:32:22
+ * @LastEditTime: 2025-06-03 14:37:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.kbase.KbaseRepository;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -51,7 +51,9 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
 
     private final AuthService authService;
 
-    private final KbaseRestService kbaseRestService;
+    // 循环依赖
+    // private final KbaseRestService kbaseRestService;
+    private final KbaseRepository kbaseRepository;
 
     @Override
     public Page<ArticleEntity> queryByOrgEntity(ArticleRequest request) {
@@ -73,7 +75,6 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
             throw new RuntimeException("user not found");
         }
         String userUid = user.getUid();
-        //
         request.setUserUid(userUid);
         // 
         return queryByOrg(request);
@@ -112,7 +113,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
         entity.setUser(JSON.toJSONString(userProtobuf));
         entity.setOrgUid(user.getOrgUid());
         //
-        Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+        Optional<KbaseEntity> kbase = kbaseRepository.findByUid(request.getKbUid());
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
