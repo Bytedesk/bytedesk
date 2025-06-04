@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:51:47
+ * @LastEditTime: 2025-06-04 16:59:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,11 +14,8 @@
 package com.bytedesk.core.thread;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
@@ -40,17 +37,17 @@ public class ThreadEventListener {
 
     private final TopicCacheService topicCacheService;
 
-    private final ThreadRestService threadRestService;
+    // private final ThreadRestService threadRestService;
 
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        threadRestService.initThreadCategory(orgUid);
-        // threadRestService.initThreadTag(orgUid);
-    }
+    // @Order(3)
+    // @EventListener
+    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+    //     // OrganizationEntity organization = (OrganizationEntity) event.getSource();
+    //     // String orgUid = organization.getUid();
+    //     // log.info("thread - organization created: {}", organization.getName());
+    //     // threadRestService.initThreadCategory(orgUid);
+    //     // threadRestService.initThreadTag(orgUid);
+    // }
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {

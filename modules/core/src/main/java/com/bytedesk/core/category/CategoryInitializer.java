@@ -16,15 +16,22 @@ package com.bytedesk.core.category;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
+
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class CategoryInitializer implements SmartInitializingSingleton {
 
+    private final CategoryRestService categoryRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         init();
+        // 创建默认的工单分类
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        categoryRestService.initCategories(orgUid);
     }
 
     // @PostConstruct

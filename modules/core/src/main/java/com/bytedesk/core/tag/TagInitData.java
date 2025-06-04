@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 08:54:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:59:07
+ * @LastEditTime: 2025-06-04 16:55:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,6 @@ public class TagInitData {
      */
     public static final String[] TECHNICAL_SUPPORT = {
             I18Consts.I18N_PREFIX + "thread.tag.technical_support", // parent
-            // I18Consts.I18N_PREFIX + "thread.tag.technical.system_error", // children
-            // I18Consts.I18N_PREFIX + "thread.tag.technical.software_issue",
-            // I18Consts.I18N_PREFIX + "thread.tag.technical.hardware_issue",
-            // I18Consts.I18N_PREFIX + "thread.tag.technical.network_issue",
-            // I18Consts.I18N_PREFIX + "thread.tag.technical.account_permission"
     };
 
     /**
@@ -36,11 +31,6 @@ public class TagInitData {
      */
     public static final String[] SERVICE_REQUEST = {
             I18Consts.I18N_PREFIX + "thread.tag.service_request", // parent
-            // I18Consts.I18N_PREFIX + "thread.tag.service.new_account", // children
-            // I18Consts.I18N_PREFIX + "thread.tag.service.permission_change",
-            // I18Consts.I18N_PREFIX + "thread.tag.service.device_request",
-            // I18Consts.I18N_PREFIX + "thread.tag.service.environment_setup",
-            // I18Consts.I18N_PREFIX + "thread.tag.service.data_recovery"
     };
 
     /**
@@ -49,9 +39,6 @@ public class TagInitData {
      */
     public static final String[] CONSULTATION = {
             I18Consts.I18N_PREFIX + "thread.tag.consultation", // parent
-            // I18Consts.I18N_PREFIX + "thread.tag.consult.product_usage", // children
-            // I18Consts.I18N_PREFIX + "thread.tag.consult.technical_solution",
-            // I18Consts.I18N_PREFIX + "thread.tag.consult.business_process"
     };
 
     /**
