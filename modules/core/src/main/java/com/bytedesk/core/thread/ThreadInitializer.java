@@ -33,7 +33,7 @@ public class ThreadInitializer implements SmartInitializingSingleton {
         // 创建默认的工单分类
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         threadRestService.initThreadCategory(orgUid);
-        threadRestService.initThreadTag(orgUid);
+        // threadRestService.initThreadTag(orgUid);
     }
 
     private void initAuthority() {
