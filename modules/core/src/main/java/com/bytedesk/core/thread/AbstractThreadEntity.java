@@ -56,7 +56,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
      * @{TopicUtils}
      */
     @NotBlank
-    @Column(name = "thread_topic", nullable = false)
+    @Column(name = "thread_topic")
     private String topic;
 
     @Builder.Default
@@ -66,12 +66,12 @@ public abstract class AbstractThreadEntity extends BaseEntity {
      * @{ThreadTypeConsts}
      */
     @Builder.Default
-    @Column(name = "thread_type", nullable = false)
+    @Column(name = "thread_type")
     private String type = ThreadTypeEnum.WORKGROUP.name();
 
     // process status
     @Builder.Default
-    @Column(name = "thread_status", nullable = false)
+    @Column(name = "thread_status")
     private String status = ThreadProcessStatusEnum.NEW.name();
 
     // 

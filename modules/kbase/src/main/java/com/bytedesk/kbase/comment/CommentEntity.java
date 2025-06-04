@@ -47,7 +47,7 @@ public class CommentEntity extends BaseEntity {
     private String content;
 
     @Builder.Default
-    @Column(name = "comment_type", nullable = false)
+    @Column(name = "comment_type")
     private String type = CommentTypeEnum.ARTICLE.name();
 
     // @Builder.Default

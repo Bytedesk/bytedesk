@@ -60,7 +60,7 @@ public class TodoListEntity extends BaseEntity {
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "todo_order", nullable = false)
+    @Column(name = "todo_order")
     private int order = 0;
 
     // task list

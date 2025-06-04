@@ -58,7 +58,7 @@ public class TaskEntity extends BaseEntity {
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "task_order", nullable = false)
+    @Column(name = "task_order")
     private int order = 0;
 
     @Builder.Default

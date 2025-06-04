@@ -45,7 +45,7 @@ public class AssistantEntity extends BaseEntityNoOrg {
 
     private String topic;
 
-    // @Column(name = "action_type", nullable = false)
+    // @Column(name = "action_type")
     // private String type;
 
     private String nickname;

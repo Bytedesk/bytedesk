@@ -74,7 +74,7 @@ public abstract class BaseEntity implements Serializable {
     // @NotBlank 在应用层（业务逻辑或表单验证）确保uid字段在提交时必须是非空且去除空格后有实际内容的。
 	// nullable = false 通过@Column注解告知JPA，数据库中的uuid列不允许NULL值，这是一个数据库级别的约束
 	@NotBlank(message = "uid is required")
-	@Column(name = "uuid", unique = true, nullable = false)
+	@Column(name = "uuid", unique = true)
 	private String uid;
     
     // 乐观锁版本字段，每次更新时版本号加1
@@ -84,7 +84,7 @@ public abstract class BaseEntity implements Serializable {
     // 在配置文件中存储时区信息
     // 数据库DDL中： created_at timestamp(6) without time zone,
     // @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 

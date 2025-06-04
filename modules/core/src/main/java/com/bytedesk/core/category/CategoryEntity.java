@@ -48,7 +48,7 @@ public class CategoryEntity extends BaseEntity {
     private String name;
 
     // this category type may be user defined, so it should use string type, not enum
-    @Column(name = "category_type", nullable = false)
+    @Column(name = "category_type")
     private String type;
 
     // private String icon;
@@ -56,7 +56,7 @@ public class CategoryEntity extends BaseEntity {
     // private String path;
 
     @Builder.Default
-    @Column(name = "category_order", nullable = false)
+    @Column(name = "category_order")
     private Integer order = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)

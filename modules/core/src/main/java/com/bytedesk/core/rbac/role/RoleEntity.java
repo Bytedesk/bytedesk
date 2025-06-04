@@ -50,7 +50,7 @@ public class RoleEntity extends BaseEntity {
 
 	// 是否是系统角色
 	@Builder.Default
-	@Column(name = "is_system", nullable = false)
+	@Column(name = "is_system")
 	private Boolean system = false;
 
 	@Builder.Default

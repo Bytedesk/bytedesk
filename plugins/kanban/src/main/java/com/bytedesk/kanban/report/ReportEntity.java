@@ -44,7 +44,7 @@ public class ReportEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "report_type", nullable = false)
+    @Column(name = "report_type")
     private String type = ReportTypeEnum.CUSTOMER.name();
 
     @Builder.Default

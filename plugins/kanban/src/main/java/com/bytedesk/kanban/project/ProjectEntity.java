@@ -58,11 +58,11 @@ public class ProjectEntity extends BaseEntity {
     private String type = ProjectTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "project_color", nullable = false)
+    @Column(name = "project_color")
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "project_order", nullable = false)
+    @Column(name = "project_order")
     private int order = 0;
 
     // @Builder.Default

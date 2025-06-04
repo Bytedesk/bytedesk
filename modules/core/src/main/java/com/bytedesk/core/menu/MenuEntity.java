@@ -38,7 +38,7 @@ public class MenuEntity extends BaseEntity {
     private String name;
 
     @Builder.Default
-    @Column(name = "menu_type", nullable = false)
+    @Column(name = "menu_type")
     private String type = MenuTypeEnum.CUSTOMER.name();
 
     @Builder.Default

@@ -47,7 +47,7 @@ public class OrganizationEntity extends BaseEntityNoOrg {
 
     @NotBlank
     /** name should be unique */
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String name;
 
     // logo

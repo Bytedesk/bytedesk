@@ -37,15 +37,15 @@ import lombok.NoArgsConstructor;
 public class WorktimeEntity extends BaseEntity {
 
     @Builder.Default
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private String startTime = "09:00";  // 开始时间
 
     @Builder.Default
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time")
     private String endTime = "18:00";    // 结束时间
 
     @Builder.Default
-    @Column(name = "work_days", nullable = false)
+    @Column(name = "work_days")
     private String workDays = "1,2,3,4,5";  // 工作日(1-7代表周一到周日)
 
     /**

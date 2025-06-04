@@ -26,10 +26,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class FeedbackEntity extends BaseEntity {
 
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT, nullable = false)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
     private String type = "suggestion"; // suggestion, bug, complaint, other

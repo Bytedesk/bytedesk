@@ -44,7 +44,7 @@ public class FavoriteEntity extends BaseEntity {
     private String name;
 
     @Builder.Default
-    @Column(name = "favorite_type", nullable = false)
+    @Column(name = "favorite_type")
     private String type = FavoriteTypeEnum.CUSTOMER.name();
 
     // @Builder.Default

@@ -69,7 +69,7 @@ public class FaqEntity extends BaseEntity {
     // 答案格式类型
     // 暂时忽略掉，因为答案里面可以同时包含：文本、图片、附件等
     @Builder.Default
-    @Column(name = "faq_type", nullable = false)
+    @Column(name = "faq_type")
     private String type = MessageTypeEnum.TEXT.name();
 
     // 默认答案（对所有用户级别展示的通用答案），等级为0时答案

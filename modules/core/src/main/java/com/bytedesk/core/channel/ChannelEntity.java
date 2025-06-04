@@ -46,7 +46,7 @@ public class ChannelEntity extends BaseEntityNoOrg {
 
     private String topic;
 
-    // @Column(name = "channel_type", nullable = false)
+    // @Column(name = "channel_type")
     // private String type;
 
     private String nickname;

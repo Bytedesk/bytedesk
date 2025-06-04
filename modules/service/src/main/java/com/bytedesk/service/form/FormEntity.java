@@ -49,32 +49,32 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_service_form")
 public class FormEntity extends BaseEntity {
 
-    @Column(name = "form_name", nullable = false)
+    @Column(name = "form_name")
     private String name;
 
-    @Column(name = "form_key", unique = true, nullable = false)
+    @Column(name = "form_key", unique = true)
     private String key;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)    
     private String description;    
 
     // @Builder.Default    
-    // @Column(name = "form_type", nullable = false)    
+    // @Column(name = "form_type")    
     // private String type = FormTypeEnum.TICKET.name();        
 
     // 表单状态：草稿、已发布、已归档、已禁用
     @Builder.Default
-    @Column(name = "form_status", nullable = false)
+    @Column(name = "form_status")
     private String status = FormStatusEnum.DRAFT.name();
     
     // 表单版本号
     // @Builder.Default
-    // @Column(name = "version", nullable = false)
+    // @Column(name = "version")
     // private String version = "1.0";
     
     // 是否为模板
     @Builder.Default
-    @Column(name = "is_template", nullable = false)
+    @Column(name = "is_template")
     private Boolean isTemplate = false;
     
     // 表单结构定义，存储为JSON格式
@@ -109,7 +109,7 @@ public class FormEntity extends BaseEntity {
     
     // 是否允许匿名提交
     @Builder.Default
-    @Column(name = "allow_anonymous", nullable = false)
+    @Column(name = "allow_anonymous")
     private Boolean allowAnonymous = true;
     
     // 表单访问权限设置，JSON格式
@@ -131,7 +131,7 @@ public class FormEntity extends BaseEntity {
     // private String organizationId;
     
     // 创建者ID
-    // @Column(name = "creator_id", nullable = false)
+    // @Column(name = "creator_id")
     // private String creatorId;
     
     // 标签

@@ -51,6 +51,6 @@ public class ChannelAppEntity extends BaseEntity {
     private String appPlatform = ChannelAppPlatformEnum.ANDROID.name();
 
     // @Builder.Default
-    // @Column(name = "app_type", nullable = false)
+    // @Column(name = "app_type")
     // private String type = ChannelAppTypeEnum.CUSTOMER.name();
 }
