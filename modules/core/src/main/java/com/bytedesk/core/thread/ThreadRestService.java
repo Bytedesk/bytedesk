@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 16:59:55
+ * @LastEditTime: 2025-06-04 19:32:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -484,6 +484,8 @@ public class ThreadRestService
                 bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
                 //
                 return convertToResponse(updateThread);
+            } else {
+                return convertToResponse(thread);
             }
         }
         return null;
@@ -517,7 +519,7 @@ public class ThreadRestService
     // unique result: 4 results were returned
     @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
     public List<ThreadEntity> findListByTopic(@NonNull String topic) {
-        return threadRepository.findByTopicAndDeleted(topic, false);
+        return threadRepository.findByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
     // 状态不能及时更新，暂时注释掉，TODO: 待完善
