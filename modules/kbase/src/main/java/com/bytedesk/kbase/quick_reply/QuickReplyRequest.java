@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 13:23:47
+ * @LastEditTime: 2025-06-04 18:42:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,9 +43,6 @@ public class QuickReplyRequest extends BaseRequest {
     // private String type;
     // private MessageTypeEnum type = MessageTypeEnum.TEXT;
 
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
@@ -64,8 +61,6 @@ public class QuickReplyRequest extends BaseRequest {
 
     private String kbUid; // 对应知识库的uid
 
-    // private String orgUid;
-
     private String agentUid;
 
     // elastic 索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
@@ -75,4 +70,7 @@ public class QuickReplyRequest extends BaseRequest {
     // 向量索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
     @Builder.Default
     private String vectorStatus = QuickReplyStatusEnum.NEW.name();
+
+    // 
+    private String searchText;
 }

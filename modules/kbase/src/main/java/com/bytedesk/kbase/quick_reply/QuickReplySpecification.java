@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 15:55:00
+ * @LastEditTime: 2025-06-04 18:19:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,6 +47,14 @@ public class QuickReplySpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = "%" + request.getSearchText() + "%";
+                Predicate titlePredicate = criteriaBuilder.like(root.get("title"), searchText);
+                Predicate contentPredicate = criteriaBuilder.like(root.get("content"), searchText);
+                // Predicate shortCutPredicate = criteriaBuilder.like(root.get("shortCut"), searchText);
+                predicates.add(criteriaBuilder.or(titlePredicate, contentPredicate));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
