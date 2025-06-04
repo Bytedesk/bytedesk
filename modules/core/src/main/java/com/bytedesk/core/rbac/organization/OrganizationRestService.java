@@ -168,6 +168,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     }
 
     @Override
+    @Transactional
     protected OrganizationEntity doSave(OrganizationEntity entity) {
         return organizationRepository.save(entity);
     }

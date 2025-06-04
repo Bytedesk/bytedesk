@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -57,6 +58,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
     }
 
     // @PostConstruct
+    @Transactional
     public void init() {
         // 
         if (organizationRepository.count() > 0) {
