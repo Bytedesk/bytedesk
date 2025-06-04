@@ -6,6 +6,6 @@
 
     <!-- <include file="db/changelog/migration/250512_update_member_table_unique_constraints.xml" /> -->
     <!-- <include file="db/changelog/migration/250512_drop_user_table_unique_constraints.xml" /> -->
-    <!-- <include file="db/changelog/migration/250603_drop_article_type_column.xml" /> -->
+    <include file="db/changelog/migration/250603_drop_article_type_column.xml" />
 
 </databaseChangeLog>
