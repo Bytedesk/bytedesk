@@ -450,14 +450,17 @@ public class UserService {
         return removeRole(user, RoleConsts.ROLE_ADMIN);
     }
 
+    @Transactional
     public UserEntity addRoleSuper(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_SUPER);
     }
 
+    @Transactional
     public UserEntity removeRoleSuper(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_SUPER);
     }
 
+    @Transactional
     public UserEntity addRole(UserEntity user, String roleName) {
         Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(roleName);
         if (roleOptional.isPresent()) {
