@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-08 12:40:30
+ * @LastEditTime: 2025-06-04 15:35:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,6 @@ public class TagResponse extends BaseResponse {
 
     private String color;
 
-    private Integer order;
+    // private Integer order;
 
-    // private LocalDateTime createdAt;
 }
