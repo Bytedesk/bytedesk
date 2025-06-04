@@ -242,7 +242,7 @@ public class QueueMemberEntity extends BaseEntity {
     
     // resolved status
     @Builder.Default
-    @Column(name = "thread_resolved_status", nullable = false)
+    @Column(name = "thread_resolved_status")
     private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
     // 直接在质检表里面根据threadUid查询是否已经质检
@@ -253,22 +253,22 @@ public class QueueMemberEntity extends BaseEntity {
 
     // 质检结果
     @Builder.Default
-    @Column(name = "thread_quality_check_result", nullable = false)
+    @Column(name = "thread_quality_check_result")
     private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 意图类型
     @Builder.Default
-    @Column(name = "thread_intention_type", nullable = false)
+    @Column(name = "thread_intention_type")
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
 
     // 情绪类型
     @Builder.Default
-    @Column(name = "thread_emotion_type", nullable = false)
+    @Column(name = "thread_emotion_type")
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
     // 机器人转人工
     @Builder.Default
-    @Column(name = "thread_robot_to_agent", nullable = false)
+    @Column(name = "thread_robot_to_agent")
     private Boolean robotToAgent = false;
 
     // 机器人转人工时间
@@ -276,13 +276,13 @@ public class QueueMemberEntity extends BaseEntity {
 
     // 人工转人工
     @Builder.Default
-    @Column(name = "thread_transfer_status", nullable = false)
+    @Column(name = "thread_transfer_status")
     private String transferStatus = ThreadTransferStatusEnum.NONE.name();
 
     // TODO: 可能同时邀请多个人
     // invite status
     @Builder.Default
-    @Column(name = "thread_invite_status", nullable = false)
+    @Column(name = "thread_invite_status")
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
     /**

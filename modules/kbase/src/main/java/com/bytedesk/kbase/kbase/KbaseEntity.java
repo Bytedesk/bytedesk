@@ -61,7 +61,7 @@ public class KbaseEntity extends BaseEntity {
     private String description;
 
     @Builder.Default
-    @Column(name = "kb_type", nullable = false)
+    @Column(name = "kb_type")
     private String type = KbaseTypeEnum.HELPCENTER.name();
 
     // headline标头

@@ -26,13 +26,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ReplyEntity extends BaseEntity {
 
-    @Column(name = "feedback_id", nullable = false)
+    @Column(name = "feedback_id")
     private Long feedbackId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT, nullable = false)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
     @Column(name = "parent_id")

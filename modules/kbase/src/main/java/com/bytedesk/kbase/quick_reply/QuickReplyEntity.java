@@ -67,7 +67,7 @@ public class QuickReplyEntity extends BaseEntity {
     private Boolean enabled = true;
 
     @Builder.Default
-    @Column(name = "reply_type", nullable = false)
+    @Column(name = "reply_type")
     private String type = MessageTypeEnum.TEXT.name();
 
     // 被点击次数

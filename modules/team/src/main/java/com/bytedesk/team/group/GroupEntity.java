@@ -69,7 +69,7 @@ public class GroupEntity extends BaseEntity {
     private Boolean external = false;
 
     @Builder.Default
-    @Column(name = "group_type", nullable = false)
+    @Column(name = "group_type")
     private String type = GroupTypeEnum.NORMAL.name();
 
     @Builder.Default

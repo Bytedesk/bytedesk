@@ -48,7 +48,7 @@ public class ClipboardEntity extends BaseEntity {
     private String content;
 
     @Builder.Default
-    @Column(name = "message_type", nullable = false)
+    @Column(name = "message_type")
     private String type = MessageTypeEnum.TEXT.name();
     
     // 用户uid

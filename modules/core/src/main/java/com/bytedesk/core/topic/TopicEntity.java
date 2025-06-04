@@ -60,7 +60,7 @@ public class TopicEntity extends BaseEntityNoOrg {
     // user, no need map, just uid
     // 用户uid或者robotUid
     // @NotBlank
-    // @Column(unique = true, nullable = false)
+    // @Column(unique = true)
     // private String userUid;
 
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */

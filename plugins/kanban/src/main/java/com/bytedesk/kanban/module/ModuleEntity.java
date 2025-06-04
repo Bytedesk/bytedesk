@@ -58,11 +58,11 @@ public class ModuleEntity extends BaseEntity {
     private String type = ModuleTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "module_color", nullable = false)
+    @Column(name = "module_color")
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "module_order", nullable = false)
+    @Column(name = "module_order")
     private int order = 0;
 
     // @Builder.Default

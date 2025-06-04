@@ -79,7 +79,7 @@ public class QueueEntity extends BaseEntity {
 
     // 队列状态
     @Builder.Default
-    @Column(name = "queue_status", nullable = false)
+    @Column(name = "queue_status")
     private String status = QueueStatusEnum.ACTIVE.name(); // 队列状态
 
     // 仅用于在工作组情况下，记录存储robot/agent接待来自技能组数量

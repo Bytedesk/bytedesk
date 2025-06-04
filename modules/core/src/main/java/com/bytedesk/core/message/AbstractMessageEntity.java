@@ -36,7 +36,7 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
-    @Column(name = "message_type", nullable = false)
+    @Column(name = "message_type")
     private String type = MessageTypeEnum.TEXT.name();
 
     // 仅对一对一/客服/技能组聊天有效，表示对方是否已读。群聊无效

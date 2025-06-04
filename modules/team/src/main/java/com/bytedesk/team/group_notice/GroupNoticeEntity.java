@@ -44,15 +44,15 @@ public class GroupNoticeEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "group_notice_type", nullable = false)
+    @Column(name = "group_notice_type")
     private String type = GroupNoticeTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "group_notice_color", nullable = false)
+    @Column(name = "group_notice_color")
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "group_notice_order", nullable = false)
+    @Column(name = "group_notice_order")
     private Integer order = 0;
 
 }

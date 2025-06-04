@@ -38,7 +38,7 @@ public class PostEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(name = "view_count")

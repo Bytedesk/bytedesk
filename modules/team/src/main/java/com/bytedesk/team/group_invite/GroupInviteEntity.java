@@ -44,15 +44,15 @@ public class GroupInviteEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "group_invite_type", nullable = false)
+    @Column(name = "group_invite_type")
     private String type = GroupInviteTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "group_invite_color", nullable = false)
+    @Column(name = "group_invite_color")
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "group_invite_order", nullable = false)
+    @Column(name = "group_invite_order")
     private Integer order = 0;
 
     // @Builder.Default

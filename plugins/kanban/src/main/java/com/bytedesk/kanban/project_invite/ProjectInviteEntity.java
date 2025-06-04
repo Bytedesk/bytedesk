@@ -44,15 +44,15 @@ public class ProjectInviteEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "project_invite_type", nullable = false)
+    @Column(name = "project_invite_type")
     private String type = ProjectInviteTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "project_invite_color", nullable = false)
+    @Column(name = "project_invite_color")
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "project_invite_order", nullable = false)
+    @Column(name = "project_invite_order")
     private int order = 0;
 
     // @Builder.Default

@@ -57,7 +57,7 @@ public class ActionEntity extends BaseEntity {
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
-    @Column(name = "action_type", nullable = false)
+    @Column(name = "action_type")
     private String type = ActionTypeEnum.LOG.name();
 
     // action failed object

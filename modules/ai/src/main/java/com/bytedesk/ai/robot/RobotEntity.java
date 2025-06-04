@@ -96,7 +96,7 @@ public class RobotEntity extends BaseEntity {
 
     // service、ask、chat
     @Builder.Default
-    @Column(name = "robot_type", nullable = false)
+    @Column(name = "robot_type")
     private String type = RobotTypeEnum.SERVICE.name();
 
     // stream, 使用流式返回

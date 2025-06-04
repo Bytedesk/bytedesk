@@ -43,7 +43,7 @@ public class OrganizationApplyEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "apply_type", nullable = false)
+    @Column(name = "apply_type")
     private String type = OrganizationApplyTypeEnum.CUSTOMER.name();
 
 }
