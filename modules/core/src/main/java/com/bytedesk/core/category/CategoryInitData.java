@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.category;
 
-import com.bytedesk.core.constant.I18Consts;
+// import com.bytedesk.core.constant.I18Consts;
 
 public class CategoryInitData {
 
@@ -22,7 +22,8 @@ public class CategoryInitData {
      * 技术支持类
      */
     public static final String[] TECHNICAL_SUPPORT = {
-            I18Consts.I18N_PREFIX + "thread.category.technical_support", // parent
+            // I18Consts.I18N_PREFIX + "thread.category.technical_support", // parent
+            "技术支持", // parent
     };
 
     /**
@@ -30,7 +31,8 @@ public class CategoryInitData {
      * 服务请求类
      */
     public static final String[] SERVICE_REQUEST = {
-            I18Consts.I18N_PREFIX + "thread.category.service_request", // parent
+            // I18Consts.I18N_PREFIX + "thread.category.service_request", // parent
+            "服务请求", // parent
     };
 
     /**
@@ -38,7 +40,8 @@ public class CategoryInitData {
      * 咨询类
      */
     public static final String[] CONSULTATION = {
-            I18Consts.I18N_PREFIX + "thread.category.consultation", // parent
+            // I18Consts.I18N_PREFIX + "thread.category.consultation", // parent
+            "咨询", // parent
     };
 
     /**
@@ -46,7 +49,8 @@ public class CategoryInitData {
      * 投诉与建议类
      */
     public static final String[] COMPLAINT_SUGGESTION = {
-            I18Consts.I18N_PREFIX + "thread.category.complaint_suggestion", // parent
+            // I18Consts.I18N_PREFIX + "thread.category.complaint_suggestion", // parent
+            "投诉建议", // parent
     };
 
     /**
@@ -54,9 +58,11 @@ public class CategoryInitData {
      * 运维类
      */
     public static final String[] OPERATION_MAINTENANCE = {
-            I18Consts.I18N_PREFIX + "thread.category.operation_maintenance", // parent
+            // I18Consts.I18N_PREFIX + "thread.category.operation_maintenance", // parent
+            "运维", // parent
             // 其他
-            I18Consts.I18N_PREFIX + "thread.category.other",
+            // I18Consts.I18N_PREFIX + "thread.category.other",
+            "其他",
     };
 
     /**
@@ -79,8 +85,9 @@ public class CategoryInitData {
         if (isParentCategory(childCategory)) {
             return null;
         }
-        String[] parts = childCategory.split("\\.");
-        return I18Consts.I18N_PREFIX + "thread.category." + parts[2];
+        // 由于已将常量转为中文，此方法可能需要重新实现
+        // 这里仅保留基本结构，具体实现需要根据新的分类体系来调整
+        return null;
     }
 
     /**

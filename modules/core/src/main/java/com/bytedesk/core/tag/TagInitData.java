@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 08:54:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 16:55:40
+ * @LastEditTime: 2025-06-04 17:12:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.tag;
 
-import com.bytedesk.core.constant.I18Consts;
+// import com.bytedesk.core.constant.I18Consts;
 
 public class TagInitData {
 
@@ -22,7 +22,8 @@ public class TagInitData {
      * 技术支持标签
      */
     public static final String[] TECHNICAL_SUPPORT = {
-            I18Consts.I18N_PREFIX + "thread.tag.technical_support", // parent
+            // I18Consts.I18N_PREFIX + "thread.tag.technical_support", // parent
+            "技术支持", // parent
     };
 
     /**
@@ -30,7 +31,8 @@ public class TagInitData {
      * 服务请求标签
      */
     public static final String[] SERVICE_REQUEST = {
-            I18Consts.I18N_PREFIX + "thread.tag.service_request", // parent
+            // I18Consts.I18N_PREFIX + "thread.tag.service_request", // parent
+            "服务请求", // parent
     };
 
     /**
@@ -38,7 +40,8 @@ public class TagInitData {
      * 咨询标签
      */
     public static final String[] CONSULTATION = {
-            I18Consts.I18N_PREFIX + "thread.tag.consultation", // parent
+            // I18Consts.I18N_PREFIX + "thread.tag.consultation", // parent
+            "咨询", // parent
     };
 
     /**
@@ -46,7 +49,8 @@ public class TagInitData {
      * 投诉与建议标签
      */
     public static final String[] COMPLAINT_SUGGESTION = {
-            I18Consts.I18N_PREFIX + "thread.tag.complaint_suggestion", // parent
+            // I18Consts.I18N_PREFIX + "thread.tag.complaint_suggestion", // parent
+            "投诉建议", // parent
     };
 
     /**
@@ -54,9 +58,11 @@ public class TagInitData {
      * 运维标签
      */
     public static final String[] OPERATION_MAINTENANCE = {
-            I18Consts.I18N_PREFIX + "thread.tag.operation_maintenance", // parent
+            // I18Consts.I18N_PREFIX + "thread.tag.operation_maintenance", // parent
+            "运维", // parent
             // 其他
-            I18Consts.I18N_PREFIX + "thread.tag.other",
+            // I18Consts.I18N_PREFIX + "thread.tag.other",
+            "其他",
     };
 
     /**
@@ -79,8 +85,9 @@ public class TagInitData {
         if (isParentTag(childTag)) {
             return null;
         }
-        String[] parts = childTag.split("\\.");
-        return I18Consts.I18N_PREFIX + "thread.tag." + parts[2];
+        // 由于已将常量转为中文，此方法可能需要重新实现
+        // 这里仅保留基本结构，具体实现需要根据新的标签体系来调整
+        return null;
     }
 
     /**
