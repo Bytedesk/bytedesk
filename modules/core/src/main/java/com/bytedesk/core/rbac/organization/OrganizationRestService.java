@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 16:27:02
+ * @LastEditTime: 2025-06-05 07:24:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -155,41 +153,53 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return organizationRepository.existsByCodeAndDeleted(code, false);
     }
 
-    @Caching(put = {
-            @CachePut(value = "organization", key = "#organization.uid"),
-            @CachePut(value = "organization", key = "#organization.name")
-    })
-    public OrganizationEntity save(OrganizationEntity organization) {
-        try {
-            return doSave(organization);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, organization);
-        }
-    }
-
+    @Cacheable(value = "organization", key = "#organization.uid", unless = "#result == null")
     @Override
     @Transactional
     protected OrganizationEntity doSave(OrganizationEntity entity) {
         return organizationRepository.save(entity);
     }
 
+    @Cacheable(value = "organization", key = "#organization.uid", unless = "#result == null")
     @Override
     public OrganizationEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             OrganizationEntity organization) {
         log.info("handleOptimisticLockingFailureException: " + e.getMessage());
+        try {
+            Optional<OrganizationEntity> latest = organizationRepository.findByUid(organization.getUid());
+            if (latest.isPresent()) {
+                OrganizationEntity latestEntity = latest.get();
+
+                // 合并需要保留的数据
+                latestEntity.setName(organization.getName());
+                latestEntity.setLogo(organization.getLogo());
+                latestEntity.setCode(organization.getCode());
+                latestEntity.setDescription(organization.getDescription());
+
+                // 保存更新后的数据
+                return organizationRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("Error retrieving latest organization: " + ex.getMessage());
+        }
         return null;
     }
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<OrganizationEntity> organizationOptional = findByUid(uid);
+        if (organizationOptional.isPresent()) {
+            OrganizationEntity organization = organizationOptional.get();
+            organization.setDeleted(true); // 逻辑删除
+            save(organization);
+        } else {
+            throw new RuntimeException("Organization with UID: " + uid + " not found.");
+        }
     }
 
     @Override
     public void delete(OrganizationRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(request.getUid());
     }
 
     public OrganizationResponse convertToResponse(OrganizationEntity organization) {
@@ -201,30 +211,5 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
-
-    
-    
-
-    // public void initData() {
-
-    // if (organizationRepository.count() > 0) {
-    // return;
-    // }
-    // //
-    // Optional<UserEntity> adminOptional = userService.getAdmin();
-    // if (adminOptional.isPresent()) {
-    // //
-    // OrganizationEntity organization = OrganizationEntity.builder()
-    // .name(bytedeskProperties.getOrganizationName())
-    // .code(bytedeskProperties.getOrganizationCode())
-    // .description(bytedeskProperties.getOrganizationName() + " Description")
-    // .user(adminOptional.get())
-    // .build();
-    // organization.setUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-    // //
-    // save(organization);
-    // }
-
-    // }
 
 }
