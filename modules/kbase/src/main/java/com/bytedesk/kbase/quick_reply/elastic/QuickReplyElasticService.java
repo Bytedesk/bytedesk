@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-27 18:04:45
+ * @LastEditTime: 2025-06-04 13:24:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.kbase.quick_reply.elastic;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.quick_reply.QuickReplyEntity;
-import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
+// import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
@@ -49,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QuickReplyElasticService {
 
     private final ElasticsearchOperations elasticsearchOperations;
-    private final QuickReplyRestService quickReplyRestService;
+    // private final QuickReplyRestService quickReplyRestService;
 
     /**
      * 更新索引
