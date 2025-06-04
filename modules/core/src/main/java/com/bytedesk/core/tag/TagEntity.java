@@ -44,14 +44,14 @@ public class TagEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "tag_type", nullable = false)
+    @Column(name = "tag_type")
     private String type = TagTypeEnum.CUSTOMER.name();
 
     @Builder.Default
-    @Column(name = "tag_color", nullable = false)
+    @Column(name = "tag_color")
     private String color = "red";
 
     @Builder.Default
-    @Column(name = "tag_order", nullable = false)
+    @Column(name = "tag_order")
     private Integer order = 0;
 }
