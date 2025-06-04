@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 12:56:29
+ * @LastEditTime: 2025-06-04 15:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,26 +27,26 @@ import lombok.Data;
 @Data
 public class TagExcel {
 
-    @ExcelProperty(index = 0, value = "Name")
+    @ExcelProperty(index = 0, value = "标签名称")
     @ColumnWidth(20)
     private String name;
 
-    @ExcelProperty(index = 1, value = "Type")
+    @ExcelProperty(index = 1, value = "类型")
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(index = 2, value = "Color")
+    @ExcelProperty(index = 2, value = "颜色")
     @ColumnWidth(20)
     private String color;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
-    @ColumnWidth(20)
+    @ColumnWidth(25)
     private LocalDateTime createdAt;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "修改时间")
-    @ColumnWidth(20)
+    @ColumnWidth(25)
     private LocalDateTime updatedAt;
 
 }

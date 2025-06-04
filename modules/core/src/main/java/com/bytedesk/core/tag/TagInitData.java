@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 08:54:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 08:54:37
+ * @LastEditTime: 2025-06-04 15:59:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,11 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.thread;
+package com.bytedesk.core.tag;
 
 import com.bytedesk.core.constant.I18Consts;
 
-public class ThreadTags {
+public class TagInitData {
 
     /**
      * Technical Support Tags
@@ -60,9 +60,6 @@ public class ThreadTags {
      */
     public static final String[] COMPLAINT_SUGGESTION = {
             I18Consts.I18N_PREFIX + "thread.tag.complaint_suggestion", // parent
-            // I18Consts.I18N_PREFIX + "thread.tag.complaint.service_quality", // children
-            // I18Consts.I18N_PREFIX + "thread.tag.complaint.system_improvement",
-            // I18Consts.I18N_PREFIX + "thread.tag.complaint.process_optimization"
     };
 
     /**
@@ -71,13 +68,6 @@ public class ThreadTags {
      */
     public static final String[] OPERATION_MAINTENANCE = {
             I18Consts.I18N_PREFIX + "thread.tag.operation_maintenance", // parent
-            // I18Consts.I18N_PREFIX + "thread.tag.operation.system_maintenance", //
-            // children
-            // I18Consts.I18N_PREFIX + "thread.tag.operation.data_backup",
-            // I18Consts.I18N_PREFIX + "thread.tag.operation.monitoring_alert",
-            // I18Consts.I18N_PREFIX + "thread.tag.operation.security_issue",
-            // I18Consts.I18N_PREFIX + "thread.tag.operation.performance_optimization"
-
             // 其他
             I18Consts.I18N_PREFIX + "thread.tag.other",
     };

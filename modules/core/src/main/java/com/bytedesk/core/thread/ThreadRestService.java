@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:18:18
+ * @LastEditTime: 2025-06-04 15:51:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,9 +43,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
-import com.bytedesk.core.tag.TagRequest;
-import com.bytedesk.core.tag.TagRestService;
-import com.bytedesk.core.tag.TagTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -74,7 +71,7 @@ public class ThreadRestService
 
     private final CategoryRestService categoryService;
 
-    private final TagRestService tagRestService;
+    // private final TagRestService tagRestService;
 
     @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
@@ -728,23 +725,23 @@ public class ThreadRestService
         }
     }
 
-    public void initThreadTag(String orgUid) {
-        // log.info("initThreadTag");
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        for (String tag : ThreadTags.getAllTags()) {
-            // log.info("initThreadCategory: {}", category);
-            TagRequest tagRequest = TagRequest.builder()
-                    .uid(Utils.formatUid(orgUid, tag))
-                    .name(tag)
-                    .order(0)
-                    .type(TagTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            tagRestService.create(tagRequest);
-        }
-    }
+    // public void initThreadTag(String orgUid) {
+    //     // log.info("initThreadTag");
+    //     // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    //     for (String tag : ThreadTags.getAllTags()) {
+    //         // log.info("initThreadCategory: {}", category);
+    //         TagRequest tagRequest = TagRequest.builder()
+    //                 .uid(Utils.formatUid(orgUid, tag))
+    //                 .name(tag)
+    //                 .order(0)
+    //                 .type(TagTypeEnum.THREAD.name())
+    //                 .level(LevelEnum.ORGANIZATION.name())
+    //                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //                 .orgUid(orgUid)
+    //                 .build();
+    //         tagRestService.create(tagRequest);
+    //     }
+    // }
 
     @Override
     public ThreadExcel convertToExcel(ThreadEntity entity) {

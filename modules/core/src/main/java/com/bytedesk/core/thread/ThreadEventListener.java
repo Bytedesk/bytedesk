@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-16 17:01:55
+ * @LastEditTime: 2025-06-04 15:51:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,7 +49,7 @@ public class ThreadEventListener {
         String orgUid = organization.getUid();
         log.info("thread - organization created: {}", organization.getName());
         threadRestService.initThreadCategory(orgUid);
-        threadRestService.initThreadTag(orgUid);
+        // threadRestService.initThreadTag(orgUid);
     }
 
     @EventListener
