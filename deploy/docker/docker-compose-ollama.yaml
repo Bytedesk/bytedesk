@@ -248,6 +248,8 @@ services:
       # https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html#auto-pulling-models
       # always/when_missing/never
       SPRING_AI_OLLAMA_INIT_PULL_MODEL_STRATEGY: when_missing
+      # https://huggingface.co/BAAI/bge-reranker-v2-m3
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL_RERANK: bge-reranker-v2-m3:latest
       # zhipuai
       # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
       SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
