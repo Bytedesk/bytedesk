@@ -133,23 +133,23 @@ services:
       TZ: Asia/Shanghai
       SERVER_PORT: 9003
       # bytedesk config
-      BYTEDESK_DEBUG: true
+      BYTEDESK_DEBUG: "true"
       # BYTEDESK_EDITION: ENTERPRISE
       BYTEDESK_VERSION: 0.8.2
       BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOkVOVEVSUFJJU0U6Og==
       # enable custom config: name, logo, description
-      BYTEDESK_CUSTOM_ENABLED: false
+      BYTEDESK_CUSTOM_ENABLED: "false"
       BYTEDESK_CUSTOM_NAME: 
       BYTEDESK_CUSTOM_LOGO: 
       BYTEDESK_CUSTOM_DESCRIPTION: 
-      BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: true
+      BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: "true"
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL:
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL:
-      BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: true
-      BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: true
-      BYTEDESK_CUSTOM_LOGIN_EMAIL_ENABLE: false
-      BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: true
-      BYTEDESK_CUSTOM_DOC_URL_SHOW: true
+      BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_EMAIL_ENABLE: "false"
+      BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: "true"
+      BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
@@ -159,18 +159,18 @@ services:
       BYTEDESK_ADMIN_MOBILE_WHITELIST: 18888888000,18888888001,18888888002,18888888003,18888888004,18888888005
       BYTEDESK_ADMIN_EMAIL_WHITELIST: 100@email.com,101@email.com,102@email.com,103@email.com,104@email.com,105@email.com
       BYTEDESK_ADMIN_VALIDATE_CODE: 123456
-      BYTEDESK_ADMIN_FORCE_VALIDATE_MOBILE: true
-      BYTEDESK_ADMIN_FORCE_VALIDATE_EMAIL: true
+      BYTEDESK_ADMIN_FORCE_VALIDATE_MOBILE: "true"
+      BYTEDESK_ADMIN_FORCE_VALIDATE_EMAIL: "true"
       # Member config
       BYTEDESK_MEMBER_PASSWORD: 123456
       # Organization config
       BYTEDESK_ORGANIZATION_NAME: MyCompany
       BYTEDESK_ORGANIZATION_CODE: bytedesk
       # Features config
-      BYTEDESK_FEATURES_JAVA_AI: false
-      BYTEDESK_FEATURES_PYTHON_AI: true
+      BYTEDESK_FEATURES_JAVA_AI: "false"
+      BYTEDESK_FEATURES_PYTHON_AI: "true"
       BYTEDESK_FEATURES_EMAIL_TYPE: javamail
-      BYTEDESK_FEATURES_ENABLE_REGISTRATION: false
+      BYTEDESK_FEATURES_ENABLE_REGISTRATION: "false"
       BYTEDESK_FEATURES_AVATAR_BASE_URL: 
       # CORS config
       # BYTEDESK_CORS_ALLOWED_ORIGINS: *
@@ -184,10 +184,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: r8FqfdbWUaN3
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       # redis config
+      SPRING_DATA_REDIS_DATABASE: 0
       SPRING_DATA_REDIS_HOST: redis-bytedesk
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: qfRxz3tVT8Nh
-      SPRING_DATA_REDIS_DATABASE: 0
+      SPRING_DATA_REDIS_TIMEOUT: 10000
       # Cache config
       BYTEDESK_CACHE_LEVEL: 0
       BYTEDESK_CACHE_PREFIX: bytedeskim
@@ -238,11 +239,11 @@ services:
       # SPRING_AI_MODEL_EMBEDDING: zhipuai
       # ollama
       SPRING_AI_OLLAMA_BASE_URL: http://ollama-bytedesk:11434
-      SPRING_AI_OLLAMA_CHAT_ENABLED: true
+      SPRING_AI_OLLAMA_CHAT_ENABLED: "true"
       # SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: deepseek-r1:1.5b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen3:0.6b
       SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: true
+      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: "true"
       # 如果主要处理中文内容，推荐使用BGE模型，在中文语义理解上表现更好
       # https://huggingface.co/BAAI/bge-m3: Dimension: 1024, Sequence Length: 8192          
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: bge-m3:latest
@@ -254,28 +255,28 @@ services:
       # zhipuai
       # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
       SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
-      SPRING_AI_ZHIPUAI_CHAT_ENABLED: false
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: "false"
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: false
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "false"
       # deepseek
       # 申请key https://api-docs.deepseek.com/zh-cn/
       SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
       SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
-      SPRING_AI_DEEPSEEK_CHAT_ENABLED: false
+      SPRING_AI_DEEPSEEK_CHAT_ENABLED: "false"
       # SPRING_AI_OPENAI_CHAT_MODEL: deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL: deepseek-chat
       SPRING_AI_DEEPSEEK_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: false
+      SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: "false"
       # openai
       # https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html
       SPRING_AI_OPENAI_BASE_URL: https://api.openai.com
       SPRING_AI_OPENAI_API_KEY: 'sk-xxx'
-      SPRING_AI_OPENAI_CHAT_ENABLED: false
+      SPRING_AI_OPENAI_CHAT_ENABLED: "false"
       SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o
       # SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o-mini
       SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_OPENAI_EMBEDDING_ENABLED: false
+      SPRING_AI_OPENAI_EMBEDDING_ENABLED: "false"
       # alibaba
       # 阿里云百炼大模型获取api key：
       # https://bailian.console.aliyun.com/?apiKey=1#/api-key
@@ -304,7 +305,7 @@ services:
       # https://ai.gitee.com/docs/best-practice/integration
       SPRING_AI_GITEE_BASE_URL: https://ai.gitee.com
       SPRING_AI_GITEE_API_KEY: 'sk-xxx'
-      SPRING_AI_GITEE_CHAT_ENABLED: false
+      SPRING_AI_GITEE_CHAT_ENABLED: "false"
       SPRING_AI_GITEE_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
       SPRING_AI_GITEE_CHAT_OPTIONS_TEMPERATURE: 0.7
       # tencent
@@ -312,7 +313,7 @@ services:
       # https://cloud.tencent.com/document/product/1729/111007
       SPRING_AI_TENCENT_BASE_URL: https://api.hunyuan.cloud.tencent.com
       SPRING_AI_TENCENT_API_KEY: 'sk-xxx'
-      SPRING_AI_TENCENT_CHAT_ENABLED: false
+      SPRING_AI_TENCENT_CHAT_ENABLED: "false"
       SPRING_AI_TENCENT_CHAT_OPTIONS_MODEL: hunyuan-t1-latest
       SPRING_AI_TENCENT_CHAT_OPTIONS_TEMPERATURE: 0.7
       # baidu
@@ -321,7 +322,7 @@ services:
       SPRING_AI_BAIDU_BASE_URL: https://qianfan.baidubce.com/v2
       # model builder（可用）
       SPRING_AI_BAIDU_API_KEY: 'bce-v3/xxx'
-      SPRING_AI_BAIDU_CHAT_ENABLED: false
+      SPRING_AI_BAIDU_CHAT_ENABLED: "false"
       SPRING_AI_BAIDU_CHAT_OPTIONS_MODEL: ernie-x1-32k-preview
       SPRING_AI_BAIDU_CHAT_OPTIONS_TEMPERATURE: 0.7
       # volcengine 火山引擎
@@ -329,11 +330,11 @@ services:
       # https://www.volcengine.com/docs/82379/1330626
       SPRING_AI_VOLCENGINE_BASE_URL: https://ark.cn-beijing.volces.com/api/v3
       SPRING_AI_VOLCENGINE_API_KEY: 'sk-xxx'
-      SPRING_AI_VOLCENGINE_CHAT_ENABLED: false
+      SPRING_AI_VOLCENGINE_CHAT_ENABLED: "false"
       SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
       SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
       # vector store
-      SPRING_AI_VECTORSTORE_REDIS_INITIALIZE_SCHEMA: true
+      SPRING_AI_VECTORSTORE_REDIS_INITIALIZE_SCHEMA: "true"
       # SPRING_AI_VECTORSTORE_REDIS_URI: redis://:qfRxz3tVT8Nh@redis-bytedesk:6379
       SPRING_AI_VECTORSTORE_REDIS_INDEX_NAME: bytedesk_vs_index
       # SPRING_AI_VECTORSTORE_REDIS_PREFIX: bytedesk_vs_prefix:
@@ -343,22 +344,22 @@ services:
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch-bytedesk:9200
       SPRING_ELASTICSEARCH_USERNAME: elastic
       SPRING_ELASTICSEARCH_PASSWORD: bytedesk123
-      SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED: true
-      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA: true
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED: "true"
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA: "true"
       SPRING_AI_VECTORSTORE_ELASTICSEARCH_INDEX_NAME: bytedesk_vs_index
       SPRING_AI_VECTORSTORE_ELASTICSEARCH_DIMENSIONS: 1024
       # cosine/l2_norm/dot_product
       SPRING_AI_VECTORSTORE_ELASTICSEARCH_SIMILARITY: cosine
       # mcp
-      SPRING_AI_MCP_CLIENT_ENABLED: false
-      SPRING_AI_MCP_SERVER_ENABLED: false
-      SPRING_AI_MCP_SERVER_STDIO: false
+      SPRING_AI_MCP_CLIENT_ENABLED: "false"
+      SPRING_AI_MCP_SERVER_ENABLED: "false"
+      SPRING_AI_MCP_SERVER_STDIO: "false"
       SPRING_AI_MCP_SERVER_TYPE: SYNC
       # weaviate
-      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: false
-      # SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: true
+      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: "false"
+      # SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: "true"
       # wechat config
-      WECHAT_PAY_ENABLED: false
+      WECHAT_PAY_ENABLED: "false"
       # 阿里云短信服务的签名，可以在控制台找到，如是中文，请转为Unicode
       ALIYUN_SMS_SIGNNAME: ''
       #阿里云短信服务的模板Code，可以在控制台找到
@@ -371,14 +372,14 @@ services:
       SPRING_JMS_LISTENER_CONCURRENCY: 1
       SPRING_JMS_LISTENER_MAX_CONCURRENCY: 10
       SPRING_JMS_LISTENER_ACKNOWLEDGE_MODE: client
-      SPRING_JMS_LISTENER_AUTO_STARTUP: true
+      SPRING_JMS_LISTENER_AUTO_STARTUP: "true"
       SPRING_JMS_LISTENER_MAX_ATTEMPTS: 5
       SPRING_JMS_LISTENER_INITIAL_INTERVAL: 1000
       SPRING_JMS_LISTENER_MAX_INTERVAL: 10000
       SPRING_JMS_LISTENER_MULTIPLIER: 2.0
       SPRING_JMS_LISTENER_RECEIVE_TIMEOUT: 1000
       SPRING_ARTEMIS_EMBEDDED_QUEUES: DLQ
-      SPRING_JMS_LISTENER_MISSING_QUEUES_FATAL: false
+      SPRING_JMS_LISTENER_MISSING_QUEUES_FATAL: "false"
       # springdoc
       SPRINGDOC_SHOW_ACTUATOR: false
       # swagger-ui
