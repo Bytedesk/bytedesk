@@ -229,11 +229,11 @@ services:
       # ai config
       # 对话配置
       # SPRING_AI_MODEL_CHAT: none
-      # SPRING_AI_MODEL_CHAT: ollama
+      SPRING_AI_MODEL_CHAT: ollama
       # SPRING_AI_MODEL_CHAT: zhipuai
       # 向量模型
       # SPRING_AI_MODEL_EMBEDDING: none
-      # SPRING_AI_MODEL_EMBEDDING: ollama
+      SPRING_AI_MODEL_EMBEDDING: ollama
       # SPRING_AI_MODEL_EMBEDDING: zhipuai
       # ollama
       SPRING_AI_OLLAMA_BASE_URL: http://ollama-bytedesk:11434
