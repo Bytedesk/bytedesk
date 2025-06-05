@@ -45,14 +45,6 @@
 			<version>2.2.0</version>
 		</dependency>
 
-		<!-- Spring WebSocket支持 -->
-		<!-- <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		 -->
-
 		<!-- RTP媒体处理 -->
 		<!-- https://github.com/RestComm/jain-sip -->
 		<!-- https://mvnrepository.com/artifact/javax.sip/jain-sip-ri -->
@@ -63,11 +55,11 @@
 		</dependency>
 
 		<!-- Lombok简化代码 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 
 	</dependencies>
 
