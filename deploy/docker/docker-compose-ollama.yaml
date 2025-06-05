@@ -130,6 +130,7 @@ services:
       # bytedesk-artemis:
       #   condition: service_healthy
     environment:
+      TZ: Asia/Shanghai
       SERVER_PORT: 9003
       # bytedesk config
       BYTEDESK_DEBUG: true
