@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:35:31
+ * @LastEditTime: 2025-06-06 17:23:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,11 +47,12 @@ public class WebhookEntity extends BaseEntity {
     @Column(name = "webhook_type")
     private String type = WebhookTypeEnum.CUSTOMER.name();
 
-    @Builder.Default
-    @Column(name = "webhook_color")
-    private String color = "red";
+    // webhook url
+    @Column(name = "webhook_url")
+    private String url;
 
-    @Builder.Default
-    @Column(name = "webhook_order")
-    private Integer order = 0;
+    // webhook secret
+    @Column(name = "webhook_secret")
+    private String secret;
+    
 }
