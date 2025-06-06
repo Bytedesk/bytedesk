@@ -30,11 +30,11 @@
 		<!-- 太久未更新 -->
 		<!-- FreeSwitch ESL (Event Socket Library) Client -->
 		<!-- https://mvnrepository.com/artifact/org.freeswitch.esl.client/org.freeswitch.esl.client -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.freeswitch.esl.client</groupId>
 			<artifactId>org.freeswitch.esl.client</artifactId>
 			<version>${freeswitch.esl.version}</version>
-		</dependency> -->
+		</dependency>
 
 		<!-- https://github.com/zhouhailin/freeswitch-externals -->
 		<!-- https://zhouhailin.github.io/freeswitch-externals/ -->
