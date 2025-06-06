@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-06 17:49:21
+ * @LastEditTime: 2025-06-06 17:52:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.webhook;
+package com.bytedesk.core.webhook_received;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -34,9 +34,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({WebhookEntityListener.class})
-@Table(name = "bytedesk_core_webhook")
-public class WebhookEntity extends BaseEntity {
+// @EntityListeners({WebhookReceivedEntityListener.class})
+@Table(name = "bytedesk_core_webhook_received")
+public class WebhookReceivedEntity extends BaseEntity {
 
     private String name;
 
@@ -45,7 +45,7 @@ public class WebhookEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "webhook_type")
-    private String type = WebhookTypeEnum.CUSTOMER.name();
+    private String type = WebhookReceivedTypeEnum.CUSTOMER.name();
 
     // webhook url
     @Column(name = "webhook_url")
