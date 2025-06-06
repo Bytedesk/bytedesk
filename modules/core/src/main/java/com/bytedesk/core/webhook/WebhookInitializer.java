@@ -16,7 +16,7 @@ package com.bytedesk.core.webhook;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
+// import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 
@@ -24,14 +24,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class WebhookInitializer implements SmartInitializingSingleton {
 
-    private final WebhookRestService webhookRestService;
+    // private final WebhookRestService webhookRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // 创建默认的工单分类
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        webhookRestService.initWebhooks(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // webhookRestService.initWebhooks(orgUid);
     }
 
     private void initPermissions() {
