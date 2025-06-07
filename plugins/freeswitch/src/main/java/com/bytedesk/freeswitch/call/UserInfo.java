@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-06-03 15:10:25
+ * @Date: 2025-06-03 15:30:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:10:25
+ * @LastEditTime: 2025-06-03 15:30:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.model;
+package com.bytedesk.freeswitch.call;
+
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,56 +21,61 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 呼叫统计数据模型
+ * 用户信息
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CallStatistics {
+public class UserInfo {
     
     /**
-     * 今日呼叫总数
+     * 用户ID
      */
-    private int todayCallCount;
+    private String uid;
     
     /**
-     * 平均通话时长（分钟）
+     * SIP用户名
      */
-    private double averageCallDuration;
+    private String sipUsername;
     
     /**
-     * 在线座席数量
+     * 用户姓名
      */
-    private int onlineAgentsCount;
+    private String name;
     
     /**
-     * 当前活跃呼叫数量
+     * 头像URL
      */
-    private int activeCallsCount;
+    private String avatar;
     
     /**
-     * 呼入量
+     * 用户状态
      */
-    private int inboundCallsCount;
+    private String status;
     
     /**
-     * 呼出量
+     * 当前是否在通话中
      */
-    private int outboundCallsCount;
+    private boolean inCall;
     
     /**
-     * 已接通呼叫数量
+     * 当前通话ID
      */
-    private int answeredCallsCount;
+    private String currentCallId;
     
     /**
-     * 未接通呼叫数量
+     * 最后活动时间
      */
-    private int missedCallsCount;
+    private LocalDateTime lastActive;
     
     /**
-     * 接通率百分比
+     * 所属部门
      */
-    private double answerRate;
+    private String department;
+    
+    /**
+     * 技能标签
+     */
+    private String[] skills;
 }

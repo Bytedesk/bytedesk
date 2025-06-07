@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.service;
+package com.bytedesk.freeswitch.call;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,8 +7,6 @@ import org.freeswitch.esl.client.inbound.Client;
 import org.freeswitch.esl.client.transport.SendMsg;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.freeswitch.model.CallInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

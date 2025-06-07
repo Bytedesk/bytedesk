@@ -8,12 +8,12 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.config;
+package com.bytedesk.freeswitch.freeswitch;
 
-// import org.freeswitch.esl.client.inbound.Client;
-// import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.freeswitch.esl.client.inbound.Client;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-// import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +30,10 @@ public class FreeSwitchDefaultConfig {
     /**
      * 提供一个默认的ESL客户端，仅用于满足依赖注入需求
      */
-    // @Bean
-    // @ConditionalOnMissingBean(Client.class)
-    // public Client defaultEslClient() {
-    //     log.info("创建FreeSwitch默认Client实例（未连接）");
-    //     return new Client();
-    // }
+    @Bean
+    @ConditionalOnMissingBean(Client.class)
+    public Client defaultEslClient() {
+        log.info("创建FreeSwitch默认Client实例（未连接）");
+        return new Client();
+    }
 }

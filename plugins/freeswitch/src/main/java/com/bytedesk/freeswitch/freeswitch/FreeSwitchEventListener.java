@@ -1,10 +1,11 @@
-package com.bytedesk.freeswitch.handler;
+package com.bytedesk.freeswitch.freeswitch;
 
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.service.CallService;
+import com.bytedesk.freeswitch.call.CallService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class FreeSwitchEventListener implements IEslEventListener {
 
     private final CallService callService;

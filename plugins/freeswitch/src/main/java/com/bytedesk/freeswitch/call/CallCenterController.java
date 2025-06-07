@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.controller;
+package com.bytedesk.freeswitch.call;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,9 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import com.bytedesk.freeswitch.model.CallStatistics;
-import com.bytedesk.freeswitch.service.CallStatisticsService;
 
 @Controller
 @RequestMapping("/callcenter")
