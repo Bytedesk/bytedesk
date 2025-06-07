@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.auth.sso;
+package com.bytedesk.core.rbac.auth.oauth2;
 
 import java.util.Optional;
 
@@ -22,40 +22,40 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 
 @Service
-public class SsoOAuth2RestService extends BaseRestService<SsoOAuth2Entity, SsoOAuth2Request, SsoOAuth2Response> {
+public class OAuth2RestService extends BaseRestService<OAuth2Entity, OAuth2Request, OAuth2Response> {
 
     @Override
-    public Page<SsoOAuth2Response> queryByOrg(SsoOAuth2Request request) {
+    public Page<OAuth2Response> queryByOrg(OAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
     @Override
-    public Page<SsoOAuth2Response> queryByUser(SsoOAuth2Request request) {
+    public Page<OAuth2Response> queryByUser(OAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Override
-    public Optional<SsoOAuth2Entity> findByUid(String uid) {
+    public Optional<OAuth2Entity> findByUid(String uid) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
 
     @Override
-    public SsoOAuth2Response create(SsoOAuth2Request request) {
+    public OAuth2Response create(OAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
     @Override
-    public SsoOAuth2Response update(SsoOAuth2Request request) {
+    public OAuth2Response update(OAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public SsoOAuth2Entity save(SsoOAuth2Entity entity) {
+    public OAuth2Entity save(OAuth2Entity entity) {
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -64,12 +64,12 @@ public class SsoOAuth2RestService extends BaseRestService<SsoOAuth2Entity, SsoOA
     }
 
     @Override
-    protected SsoOAuth2Entity doSave(SsoOAuth2Entity entity) {
+    protected OAuth2Entity doSave(OAuth2Entity entity) {
         throw new UnsupportedOperationException("实现保存逻辑");
     }
 
     @Override
-    public SsoOAuth2Entity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SsoOAuth2Entity entity) {
+    public OAuth2Entity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, OAuth2Entity entity) {
         // 乐观锁处理逻辑
         throw new UnsupportedOperationException("实现乐观锁处理逻辑");
     }
@@ -81,19 +81,19 @@ public class SsoOAuth2RestService extends BaseRestService<SsoOAuth2Entity, SsoOA
     }
 
     @Override
-    public void delete(SsoOAuth2Request entity) {
+    public void delete(OAuth2Request entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
     @Override
-    public SsoOAuth2Response convertToResponse(SsoOAuth2Entity entity) {
+    public OAuth2Response convertToResponse(OAuth2Entity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 
     @Override
-    public SsoOAuth2Response queryByUid(SsoOAuth2Request request) {
+    public OAuth2Response queryByUid(OAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
