@@ -4,9 +4,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.freeswitch.esl.client.inbound.Client;
-import org.freeswitch.esl.client.transport.SendMsg;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.freeswitch.freeswitch.FreeSwitchProperties;
+import com.bytedesk.freeswitch.freeswitch.FreeSwitchService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +24,16 @@ import lombok.extern.slf4j.Slf4j;
 public class CallService {
 
     private final Client eslClient;
-    // private final FreeSwitchProperties freeSwitchProperties;
-    // private final SimpMessagingTemplate messagingTemplate;
+    private final FreeSwitchProperties freeSwitchProperties;
+    private final FreeSwitchService freeSwitchService;
+    private final SimpMessagingTemplate messagingTemplate;
     
     // 存储活动呼叫信息
     private final Map<String, CallInfo> activeCallMap = new ConcurrentHashMap<>();
     // 用户与UUID的映射
     private final Map<String, String> userCallMap = new ConcurrentHashMap<>();
+    // UUID与CallInfo的映射
+    private final Map<String, CallInfo> uuidCallMap = new ConcurrentHashMap<>();
 
     /**
      * 发起呼叫
@@ -40,43 +46,35 @@ public class CallService {
         log.info("发起呼叫: 从 {} 到 {}", fromUser, toUser);
         
         try {
-            // 创建呼叫命令
-            SendMsg sendMsg = new SendMsg();
-            sendMsg.addCallCommand("originate");
+            // 使用FreeSwitchService发起呼叫
+            String result = freeSwitchService.originate(fromUser, toUser, "default");
             
-            // 设置呼叫参数
-            String destination = String.format("user/%s", toUser);
-            String callerIdNumber = fromUser;
-            
-            // 设置超时和显示名
-            // sendMsg.addExecuteAppArg("origination_caller_id_number", callerIdNumber);
-            // sendMsg.addExecuteAppArg("origination_timeout", String.valueOf(freeSwitchProperties.getCallTimeout()));
-            
-            // 执行呼叫
-            eslClient.sendSyncApiCommand("originate", 
-                String.format("user/%s %s XML default %s %s", 
-                    fromUser, destination, callerIdNumber, callerIdNumber));
-            
-            // 生成呼叫ID
-            String callId = String.format("%s-%s-%d", fromUser, toUser, System.currentTimeMillis());
-            
-            // 创建呼叫信息对象
-            CallInfo callInfo = new CallInfo();
-            callInfo.setCallId(callId);
-            callInfo.setFromUser(fromUser);
-            callInfo.setToUser(toUser);
-            callInfo.setStartTime(System.currentTimeMillis());
-            callInfo.setStatus("CALLING");
-            
-            // 存储呼叫信息
-            activeCallMap.put(callId, callInfo);
-            userCallMap.put(fromUser, callId);
-            userCallMap.put(toUser, callId);
-            
-            // 通知用户有新的呼叫
-            notifyCallEvent(toUser, "incoming_call", callInfo);
-            
-            return callId;
+            if (result != null && !result.contains("ERR")) {
+                // 生成呼叫ID
+                String callId = String.format("%s-%s-%d", fromUser, toUser, System.currentTimeMillis());
+                
+                // 创建呼叫信息对象
+                CallInfo callInfo = new CallInfo();
+                callInfo.setCallId(callId);
+                callInfo.setFromUser(fromUser);
+                callInfo.setToUser(toUser);
+                callInfo.setStartTime(System.currentTimeMillis());
+                callInfo.setStatus("CALLING");
+                
+                // 存储呼叫信息
+                activeCallMap.put(callId, callInfo);
+                userCallMap.put(fromUser, callId);
+                userCallMap.put(toUser, callId);
+                
+                // 通知用户有新的呼叫
+                notifyCallEvent(toUser, "incoming_call", callInfo);
+                notifyCallEvent(fromUser, "outgoing_call", callInfo);
+                
+                return callId;
+            } else {
+                log.error("FreeSwitch发起呼叫失败: {}", result);
+                return null;
+            }
         } catch (Exception e) {
             log.error("发起呼叫失败: {}", e.getMessage(), e);
             return null;
@@ -108,11 +106,12 @@ public class CallService {
             
             // 如果呼叫尚未应答，则发送应答命令
             if (callInfo.getUuid() != null) {
-                eslClient.sendSyncApiCommand("uuid_answer", callInfo.getUuid());
+                freeSwitchService.answer(callInfo.getUuid());
             }
             
             // 通知用户呼叫已应答
             notifyCallEvent(callInfo.getFromUser(), "call_answered", callInfo);
+            notifyCallEvent(callInfo.getToUser(), "call_answered", callInfo);
             
             return true;
         } catch (Exception e) {
@@ -384,15 +383,19 @@ public class CallService {
      * 通知用户呼叫事件
      */
     private void notifyCallEvent(String userId, String eventType, Object data) {
-        String destination = String.format("/user/%s/queue/call-events", userId);
-        // Map<String, Object> payload = Map.of(
-        //     "type", eventType,
-        //     "data", data,
-        //     "timestamp", System.currentTimeMillis()
-        // );
-        
-        log.debug("发送呼叫事件: {} -> {} {}", destination, eventType, data);
-        // messagingTemplate.convertAndSendToUser(userId, "/queue/call-events", payload);
+        try {
+            String destination = String.format("/user/%s/queue/call-events", userId);
+            Map<String, Object> payload = Map.of(
+                "type", eventType,
+                "data", data,
+                "timestamp", System.currentTimeMillis()
+            );
+            
+            log.debug("发送呼叫事件: {} -> {} {}", destination, eventType, data);
+            messagingTemplate.convertAndSendToUser(userId, "/queue/call-events", payload);
+        } catch (Exception e) {
+            log.error("发送呼叫事件失败: {}", e.getMessage(), e);
+        }
     }
     
     /**
@@ -403,6 +406,34 @@ public class CallService {
         if (callInfo != null) {
             userCallMap.remove(callInfo.getFromUser());
             userCallMap.remove(callInfo.getToUser());
+            if (callInfo.getUuid() != null) {
+                uuidCallMap.remove(callInfo.getUuid());
+            }
         }
+    }
+
+    /**
+     * 获取活动呼叫数量
+     */
+    public int getActiveCallCount() {
+        return activeCallMap.size();
+    }
+
+    /**
+     * 获取用户的活动呼叫
+     */
+    public CallInfo getUserActiveCall(String userId) {
+        String callId = userCallMap.get(userId);
+        if (callId != null) {
+            return activeCallMap.get(callId);
+        }
+        return null;
+    }
+
+    /**
+     * 获取所有活动呼叫
+     */
+    public Map<String, CallInfo> getAllActiveCalls() {
+        return new java.util.HashMap<>(activeCallMap);
     }
 }
