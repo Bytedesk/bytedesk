@@ -11,11 +11,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.service;
+package com.bytedesk.freeswitch.call;
 
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.freeswitch.model.CallStatistics;
 
 import lombok.extern.slf4j.Slf4j;
 

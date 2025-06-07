@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-06-03 15:30:15
+ * @Date: 2025-06-03 15:10:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:30:15
+ * @LastEditTime: 2025-06-03 15:10:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,9 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.model;
-
-import java.time.LocalDateTime;
+package com.bytedesk.freeswitch.call;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,61 +19,56 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户信息
+ * 呼叫统计数据模型
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfo {
+public class CallStatistics {
     
     /**
-     * 用户ID
+     * 今日呼叫总数
      */
-    private String uid;
+    private int todayCallCount;
     
     /**
-     * SIP用户名
+     * 平均通话时长（分钟）
      */
-    private String sipUsername;
+    private double averageCallDuration;
     
     /**
-     * 用户姓名
+     * 在线座席数量
      */
-    private String name;
+    private int onlineAgentsCount;
     
     /**
-     * 头像URL
+     * 当前活跃呼叫数量
      */
-    private String avatar;
+    private int activeCallsCount;
     
     /**
-     * 用户状态
+     * 呼入量
      */
-    private String status;
+    private int inboundCallsCount;
     
     /**
-     * 当前是否在通话中
+     * 呼出量
      */
-    private boolean inCall;
+    private int outboundCallsCount;
     
     /**
-     * 当前通话ID
+     * 已接通呼叫数量
      */
-    private String currentCallId;
+    private int answeredCallsCount;
     
     /**
-     * 最后活动时间
+     * 未接通呼叫数量
      */
-    private LocalDateTime lastActive;
+    private int missedCallsCount;
     
     /**
-     * 所属部门
+     * 接通率百分比
      */
-    private String department;
-    
-    /**
-     * 技能标签
-     */
-    private String[] skills;
+    private double answerRate;
 }

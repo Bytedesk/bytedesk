@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.config;
+package com.bytedesk.freeswitch.freeswitch;
 
 
 /**
