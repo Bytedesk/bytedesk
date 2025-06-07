@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.freeswitch.freeswitch.FreeSwitchProperties;
+// import com.bytedesk.freeswitch.freeswitch.FreeSwitchProperties;
 import com.bytedesk.freeswitch.freeswitch.FreeSwitchService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CallService {
 
     private final Client eslClient;
-    private final FreeSwitchProperties freeSwitchProperties;
+    // private final FreeSwitchProperties freeSwitchProperties;
     private final FreeSwitchService freeSwitchService;
     private final SimpMessagingTemplate messagingTemplate;
     
