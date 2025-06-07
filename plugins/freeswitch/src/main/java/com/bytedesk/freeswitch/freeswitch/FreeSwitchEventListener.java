@@ -5,7 +5,7 @@ import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.call.CallService;
+import com.bytedesk.freeswitch.callcenter.CallService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
