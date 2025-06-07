@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.call;
+package com.bytedesk.freeswitch.callcenter;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;

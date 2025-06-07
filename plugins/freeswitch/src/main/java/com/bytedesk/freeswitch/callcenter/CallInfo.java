@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.call;
+package com.bytedesk.freeswitch.callcenter;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.call;
+package com.bytedesk.freeswitch.callcenter;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
