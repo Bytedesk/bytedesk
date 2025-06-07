@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.auth.sso;
+package com.bytedesk.core.rbac.auth.oauth2;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SsoOAuth2Request extends BaseRequest {
+public class OAuth2Request extends BaseRequest {
     
     private String openId;
 

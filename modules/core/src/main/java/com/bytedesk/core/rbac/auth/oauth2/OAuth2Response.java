@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.auth.sso;
+package com.bytedesk.core.rbac.auth.oauth2;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserResponse;
@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SsoOAuth2Response extends BaseResponse {
+public class OAuth2Response extends BaseResponse {
     
     private String openId;
 
@@ -39,8 +39,8 @@ public class SsoOAuth2Response extends BaseResponse {
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
-    // private SsoOAuth2ProviderEnum provider = SsoOAuth2ProviderEnum.GITHUB;
-    private String provider = SsoOAuth2ProviderEnum.GITHUB.name();
+    // private OAuth2ProviderEnum provider = OAuth2ProviderEnum.GITHUB;
+    private String provider = OAuth2ProviderEnum.GITHUB.name();
 
     private UserResponse user;
 }

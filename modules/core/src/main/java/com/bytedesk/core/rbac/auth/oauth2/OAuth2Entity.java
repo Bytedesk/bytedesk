@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-10 23:20:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 13:18:20
+ * @LastEditTime: 2025-06-07 10:31:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.rbac.auth.sso;
+package com.bytedesk.core.rbac.auth.oauth2;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -27,7 +27,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-// github：https://www.ruanyifeng.com/blog/2019/04/github-oauth.html
 // 第三方授权登录
 @Entity
 @Data
@@ -36,8 +35,8 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_core_sso_oauth2")
-public class SsoOAuth2Entity extends BaseEntity {
+@Table(name = "bytedesk_core_oauth2")
+public class OAuth2Entity extends BaseEntity {
 
     private String openId;
 
@@ -49,8 +48,8 @@ public class SsoOAuth2Entity extends BaseEntity {
 
     @Builder.Default
     // @Enumerated(EnumType.STRING)
-    // private SsoOAuth2ProviderEnum provider = SsoOAuth2ProviderEnum.GITHUB;
-    private String provider = SsoOAuth2ProviderEnum.GITHUB.name();
+    // private OAuth2ProviderEnum provider = OAuth2ProviderEnum.GITHUB;
+    private String provider = OAuth2ProviderEnum.GITHUB.name();
 
     // private String scope;
     // private String tokenType;
