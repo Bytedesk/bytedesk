@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-11 10:22:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-07 19:42:39
+ * @LastEditTime: 2025-06-07 19:49:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@
 
 ## 项目结构
 
-```
+```bash
 plugins/freeswitch/
 ├── pom.xml                                    # Maven 配置文件
 ├── readme.md                                  # 项目文档
@@ -122,6 +122,7 @@ mvn spring-boot:run
 ### 呼叫控制 API
 
 #### 发起呼叫
+
 ```bash
 curl -X POST http://localhost:9003/api/freeswitch/originate \
   -H "Content-Type: application/json" \
@@ -133,6 +134,7 @@ curl -X POST http://localhost:9003/api/freeswitch/originate \
 ```
 
 #### 挂断呼叫
+
 ```bash
 curl -X POST http://localhost:9003/api/freeswitch/hangup \
   -H "Content-Type: application/json" \
@@ -142,6 +144,7 @@ curl -X POST http://localhost:9003/api/freeswitch/hangup \
 ```
 
 #### 转接呼叫
+
 ```bash
 curl -X POST http://localhost:9003/api/freeswitch/transfer \
   -H "Content-Type: application/json" \
@@ -152,6 +155,7 @@ curl -X POST http://localhost:9003/api/freeswitch/transfer \
 ```
 
 #### 播放文件
+
 ```bash
 curl -X POST http://localhost:9003/api/freeswitch/playback \
   -H "Content-Type: application/json" \
@@ -164,11 +168,13 @@ curl -X POST http://localhost:9003/api/freeswitch/playback \
 ### 呼叫状态查询
 
 #### 获取活跃通话
+
 ```bash
 curl http://localhost:9003/api/freeswitch/calls/active
 ```
 
 #### 获取通道状态
+
 ```bash
 curl http://localhost:9003/api/freeswitch/channels/status
 ```
@@ -177,7 +183,7 @@ curl http://localhost:9003/api/freeswitch/channels/status
 
 ### 1. 访问测试页面
 
-启动应用后，访问：http://localhost:9003/webrtc-demo.html
+启动应用后，访问：<http://localhost:9003/webrtc-demo.html>
 
 ### 2. WebSocket 连接
 
@@ -369,9 +375,9 @@ public class CustomEventHandler {
 
 ## 支持
 
-- 邮箱: 270580156@qq.com
-- 官网: https://bytedesk.com
-- GitHub: https://github.com/Bytedesk/bytedesk
+- 邮箱: <270580156@qq.com>
+- 官网: <https://bytedesk.com>
+- GitHub: <https://github.com/Bytedesk/bytedesk>
 
 ## 贡献
 
