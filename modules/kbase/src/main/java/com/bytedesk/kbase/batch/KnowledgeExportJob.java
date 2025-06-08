@@ -34,7 +34,6 @@ package com.bytedesk.kbase.batch;
 // import org.springframework.context.annotation.Bean;
 // import org.springframework.context.annotation.Configuration;
 // import org.springframework.core.io.FileSystemResource;
-// import org.springframework.scheduling.annotation.EnableScheduling;
 // // import org.springframework.scheduling.annotation.Scheduled;
 // import org.springframework.transaction.PlatformTransactionManager;
 
@@ -48,7 +47,6 @@ package com.bytedesk.kbase.batch;
 //  */
 // @Slf4j
 // @Configuration
-// @EnableScheduling
 // @RequiredArgsConstructor
 // public class KnowledgeExportJob {
 
