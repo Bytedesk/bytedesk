@@ -17,14 +17,14 @@ import com.bytedesk.core.base.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -86,4 +86,26 @@ public class FreeSwitchConferenceResponse extends BaseResponse {
      * 是否有密码保护
      */
     private Boolean passwordProtected;
+
+    /**
+     * 从实体对象创建响应对象
+     */
+    public static FreeSwitchConferenceResponse fromEntity(FreeSwitchConferenceEntity entity) {
+        return FreeSwitchConferenceResponse.builder()
+                .uid(entity.getUid())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .conferenceName(entity.getConferenceName())
+                .description(entity.getDescription())
+                .password(entity.getPassword())
+                .maxMembers(entity.getMaxMembers())
+                .enabled(entity.getEnabled())
+                .recordEnabled(entity.getRecordEnabled())
+                .recordPath(entity.getRecordPath())
+                .creator(entity.getCreator())
+                .configJson(entity.getConfigJson())
+                .remarks(entity.getRemarks())
+                .passwordProtected(entity.getPassword() != null && !entity.getPassword().isEmpty())
+                .build();
+    }
 }

@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.model;
+package com.bytedesk.freeswitch.cdr;
 
 import org.springframework.stereotype.Component;
 
