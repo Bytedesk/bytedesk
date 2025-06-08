@@ -25,8 +25,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
-
 /**
  * FreeSwitch用户仓库接口
  */

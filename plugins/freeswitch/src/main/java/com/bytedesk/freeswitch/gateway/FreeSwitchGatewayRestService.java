@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 18:46:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,11 +25,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.auth.AuthService;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.StringUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

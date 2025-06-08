@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 18:46:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,13 +14,13 @@
 package com.bytedesk.freeswitch.gateway;
 
 import com.bytedesk.core.base.BaseSpecification;
-import com.bytedesk.core.utils.StringUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

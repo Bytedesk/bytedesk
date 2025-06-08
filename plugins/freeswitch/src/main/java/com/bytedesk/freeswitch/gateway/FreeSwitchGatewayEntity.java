@@ -20,6 +20,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -50,25 +51,25 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
     /**
      * 网关描述
      */
-    @Column(name = "description", length = 255)
+    @Column(length = 255)
     private String description;
 
     /**
      * SIP服务器地址
      */
-    @Column(name = "proxy", nullable = false, length = 255)
+    @Column(nullable = false, length = 255)
     private String proxy;
 
     /**
      * 用户名
      */
-    @Column(name = "username", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String username;
 
     /**
      * 密码
      */
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(nullable = false, length = 255)
     private String password;
 
     /**
@@ -86,25 +87,29 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
     /**
      * 注册
      */
-    @Column(name = "register", nullable = false)
+    @Builder.Default
+    @Column(name = "is_register", nullable = false)
     private Boolean register = true;
 
     /**
      * 注册传输协议
      */
+    @Builder.Default
     @Column(name = "register_transport", length = 20)
     private String registerTransport = "udp";
 
     /**
      * 网关状态
      */
-    @Column(name = "status", length = 20)
+    @Builder.Default
+    @Column(length = 20)
     private String status = "DOWN";
 
     /**
      * 是否启用
      */
-    @Column(name = "enabled", nullable = false)
+    @Builder.Default
+    @Column(name = "is_enabled", nullable = false)
     private Boolean enabled = true;
 
     /**
@@ -116,7 +121,7 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
     /**
      * 备注
      */
-    @Column(name = "remarks", length = 500)
+    @Column(length = 500)
     private String remarks;
 
     /**

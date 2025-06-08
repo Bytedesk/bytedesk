@@ -88,12 +88,17 @@ public class FreeSwitchConferenceRestController extends BaseRestController<FreeS
     }
 
     @ActionAnnotation(title = "FreeSwitch会议室", action = "导出", description = "export freeswitch conference to excel")
+    @Override
     @GetMapping("/export")
-    public ResponseEntity<?> export(FreeSwitchConferenceRequest request, HttpServletResponse response) {
-
-        freeSwitchConferenceRestService.export(request, response);
-
-        return ResponseEntity.ok(JsonResult.success("导出成功"));
+    public Object export(FreeSwitchConferenceRequest request, HttpServletResponse response) {
+        return exportTemplate(
+            request,
+            response,
+            freeSwitchConferenceRestService,
+            FreeSwitchConferenceExcel.class,
+            "FreeSwitch会议室",
+            "freeswitch_conference"
+        );
     }
 
 }

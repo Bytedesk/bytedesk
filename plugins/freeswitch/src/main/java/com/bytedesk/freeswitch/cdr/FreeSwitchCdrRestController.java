@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 18:24:08
+ * @LastEditTime: 2025-06-08 18:49:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -88,12 +88,17 @@ public class FreeSwitchCdrRestController extends BaseRestController<FreeSwitchCd
     }
 
     @ActionAnnotation(title = "FreeSwitch通话详单", action = "导出", description = "export freeswitch cdr to excel")
+    @Override
     @GetMapping("/export")
-    public ResponseEntity<?> export(FreeSwitchCdrRequest request, HttpServletResponse response) {
-
-        freeSwitchCdrRestService.export(request, response);
-
-        return ResponseEntity.ok(JsonResult.success("导出成功"));
+    public Object export(FreeSwitchCdrRequest request, HttpServletResponse response) {
+        return exportTemplate(
+            request,
+            response,
+            freeSwitchCdrRestService,
+            FreeSwitchCdrExcel.class,
+            "FreeSwitch通话详单",
+            "freeswitch_cdr"
+        );
     }
 
 }

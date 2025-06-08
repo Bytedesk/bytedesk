@@ -46,7 +46,7 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     /**
      * 通话唯一标识符
      */
-    @Column(name = "uuid", nullable = false, unique = true, length = 36)
+    @Column(nullable = false, unique = true, length = 36)
     private String uuid;
 
     /**
@@ -70,7 +70,7 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     /**
      * 上下文
      */
-    @Column(name = "context", length = 50)
+    @Column(length = 50)
     private String context;
 
     /**
@@ -94,13 +94,13 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     /**
      * 通话总时长（秒）
      */
-    @Column(name = "duration")
+    @Column
     private Integer duration;
 
     /**
      * 计费时长（秒）
      */
-    @Column(name = "billsec")
+    @Column
     private Integer billsec;
 
     /**
@@ -112,7 +112,7 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     /**
      * 账户代码
      */
-    @Column(name = "accountcode", length = 50)
+    @Column(length = 50)
     private String accountcode;
 
     /**
@@ -142,13 +142,13 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     /**
      * 通话方向（inbound/outbound）
      */
-    @Column(name = "direction", length = 20)
+    @Column(length = 20)
     private String direction;
 
     /**
      * JSON格式的扩展信息
      */
-    @Column(name = "json", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String json;
 
     /**

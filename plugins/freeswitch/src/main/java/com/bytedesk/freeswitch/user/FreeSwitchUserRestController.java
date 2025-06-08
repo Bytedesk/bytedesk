@@ -88,12 +88,17 @@ public class FreeSwitchUserRestController extends BaseRestController<FreeSwitchU
     }
 
     @ActionAnnotation(title = "FreeSwitch用户", action = "导出", description = "export freeswitch user to excel")
+    @Override
     @GetMapping("/export")
-    public ResponseEntity<?> export(FreeSwitchUserRequest request, HttpServletResponse response) {
-
-        freeSwitchUserRestService.export(request, response);
-
-        return ResponseEntity.ok(JsonResult.success("导出成功"));
+    public Object export(FreeSwitchUserRequest request, HttpServletResponse response) {
+        return exportTemplate(
+            request,
+            response,
+            freeSwitchUserRestService,
+            FreeSwitchUserExcel.class,
+            "FreeSwitch用户",
+            "freeswitch_user"
+        );
     }
 
 }
