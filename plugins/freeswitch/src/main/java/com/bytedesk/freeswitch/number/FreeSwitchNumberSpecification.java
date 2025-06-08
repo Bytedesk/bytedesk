@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.user;
+package com.bytedesk.freeswitch.number;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FreeSwitchUserSpecification extends BaseSpecification {
+public class FreeSwitchNumberSpecification extends BaseSpecification {
     
-    public static Specification<FreeSwitchUserEntity> search(FreeSwitchUserRequest request) {
+    public static Specification<FreeSwitchNumberEntity> search(FreeSwitchNumberRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

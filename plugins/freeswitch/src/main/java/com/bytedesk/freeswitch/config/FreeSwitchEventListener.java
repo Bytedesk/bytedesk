@@ -1,7 +1,6 @@
 package com.bytedesk.freeswitch.config;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
@@ -14,9 +13,8 @@ import com.bytedesk.freeswitch.callcenter.event.CallHangupEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallStartEvent;
 import com.bytedesk.freeswitch.callcenter.event.DtmfEvent;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
-import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
-import com.bytedesk.freeswitch.user.FreeSwitchUserService;
+// import com.bytedesk.freeswitch.number.FreeSwitchNumberService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +30,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
 
     private final ApplicationEventPublisher eventPublisher;
     private final FreeSwitchCdrService cdrService;
-    private final FreeSwitchUserService userService;
+    // private final FreeSwitchNumberService userService;
     
     /**
      * 处理FreeSwitch事件
@@ -184,13 +182,13 @@ public class FreeSwitchEventListener implements IEslEventListener {
      */
     private void updateUserOnlineStatus(String username, boolean online) {
         try {
-            Optional<FreeSwitchUserEntity> userOptional = userService.findByUsername(username);
-            if (userOptional.isPresent()) {
-                if (online) {
-                    userService.updateLastRegistration(username, LocalDateTime.now());
-                }
-                log.debug("已更新用户在线状态: {} -> {}", username, online);
-            }
+            // Optional<FreeSwitchNumberEntity> userOptional = userService.findByUsername(username);
+            // if (userOptional.isPresent()) {
+            //     if (online) {
+            //         userService.updateLastRegistration(username, LocalDateTime.now());
+            //     }
+            //     log.debug("已更新用户在线状态: {} -> {}", username, online);
+            // }
         } catch (Exception e) {
             log.error("更新用户在线状态失败: {} - {}", username, e.getMessage(), e);
         }

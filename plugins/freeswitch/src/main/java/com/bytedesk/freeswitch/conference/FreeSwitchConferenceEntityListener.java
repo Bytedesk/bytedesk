@@ -14,6 +14,12 @@
 package com.bytedesk.freeswitch.conference;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
+
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.freeswitch.config.FreeSwitchEventPublisher;
+import com.bytedesk.freeswitch.conference.event.FreeSwitchConferenceCreateEvent;
+import com.bytedesk.freeswitch.conference.event.FreeSwitchConferenceUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -30,11 +36,19 @@ public class FreeSwitchConferenceEntityListener {
     public void postPersist(FreeSwitchConferenceEntity entity) {
         log.info("FreeSwitch会议室创建: name={}, maxMembers={}", 
                 entity.getConferenceName(), entity.getMaxMembers());
+                
+        FreeSwitchConferenceEntity cloneEntity = SerializationUtils.clone(entity);
+        FreeSwitchEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(FreeSwitchEventPublisher.class);
+        freeSwitchEventPublisher.publishEvent(new FreeSwitchConferenceCreateEvent(cloneEntity));
     }
 
     @PostUpdate
     public void postUpdate(FreeSwitchConferenceEntity entity) {
         log.info("FreeSwitch会议室更新: name={}, enabled={}", 
                 entity.getConferenceName(), entity.getEnabled());
+                
+        FreeSwitchConferenceEntity cloneEntity = SerializationUtils.clone(entity);
+        FreeSwitchEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(FreeSwitchEventPublisher.class);
+        freeSwitchEventPublisher.publishEvent(new FreeSwitchConferenceUpdateEvent(cloneEntity));
     }
 }

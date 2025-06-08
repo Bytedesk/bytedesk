@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:31:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:03:38
+ * @LastEditTime: 2025-06-08 21:34:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,11 +24,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
-import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
 import com.bytedesk.freeswitch.config.FreeSwitchService;
-import com.bytedesk.freeswitch.user.FreeSwitchUserService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +43,7 @@ public class CallService {
     private final FreeSwitchService freeSwitchService;
     private final SimpMessagingTemplate messagingTemplate;
     private final FreeSwitchCdrService cdrService;
-    private final FreeSwitchUserService userService;
+    // private final FreeSwitchNumberService userService;
     
     // 存储活动呼叫信息
     private final Map<String, CallInfo> activeCallMap = new ConcurrentHashMap<>();
@@ -469,11 +466,11 @@ public class CallService {
      */
     private void updateUserLastRegistration(String username) {
         try {
-            Optional<FreeSwitchUserEntity> userOptional = userService.findByUsername(username);
-            if (userOptional.isPresent()) {
-                userService.updateLastRegistration(username, LocalDateTime.now());
-                log.debug("已更新用户最后注册时间: {}", username);
-            }
+            // Optional<FreeSwitchNumberEntity> userOptional = userService.findByUsername(username);
+            // if (userOptional.isPresent()) {
+            //     userService.updateLastRegistration(username, LocalDateTime.now());
+            //     log.debug("已更新用户最后注册时间: {}", username);
+            // }
         } catch (Exception e) {
             log.error("更新用户最后注册时间失败: {} - {}", username, e.getMessage(), e);
         }

@@ -45,71 +45,63 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
     /**
      * 网关名称
      */
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(unique = true)
     private String gatewayName;
 
     /**
      * 网关描述
      */
-    @Column(length = 255)
     private String description;
 
     /**
      * SIP服务器地址
      */
-    @Column(nullable = false, length = 255)
     private String proxy;
 
     /**
      * 用户名
      */
-    @Column(nullable = false, length = 100)
     private String username;
 
     /**
      * 密码
      */
-    @Column(nullable = false, length = 255)
     private String password;
 
     /**
      * 从号码
      */
-    @Column(length = 100)
     private String fromUser;
 
     /**
      * 从域名
      */
-    @Column(length = 100)
     private String fromDomain;
 
     /**
      * 注册
      */
     @Builder.Default
-    @Column(nullable = false)
+    @Column(name = "is_register")
     private Boolean register = true;
 
     /**
      * 注册传输协议
      */
     @Builder.Default
-    @Column(length = 20)
     private String registerTransport = "udp";
 
     /**
      * 网关状态
      */
     @Builder.Default
-    @Column(length = 20)
     private String status = "DOWN";
 
     /**
      * 是否启用
      */
     @Builder.Default
-    @Column(nullable = false)
+    @Column(name = "is_enabled")
     private Boolean enabled = true;
 
     /**
@@ -121,7 +113,6 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
     /**
      * 备注
      */
-    @Column(length = 500)
     private String remarks;
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:03:17
+ * @LastEditTime: 2025-06-08 21:30:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,46 +11,44 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.cdr;
+package com.bytedesk.freeswitch.number;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.freeswitch.cdr.event.FreeSwitchCdrCreateEvent;
-import com.bytedesk.freeswitch.cdr.event.FreeSwitchCdrUpdateEvent;
 import com.bytedesk.freeswitch.config.FreeSwitchEventPublisher;
+import com.bytedesk.freeswitch.number.event.FreeSwitchNumberCreateEvent;
+import com.bytedesk.freeswitch.number.event.FreeSwitchNumberUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * FreeSwitch CDR实体监听器
+ * FreeSwitch用户实体监听器
  */
 @Slf4j
 @Component
-public class FreeSwitchCdrEntityListener {
+public class FreeSwitchNumberEntityListener {
 
     @PostPersist
-    public void postPersist(FreeSwitchCdrEntity entity) {
-        log.info("FreeSwitch CDR记录创建: uuid={}, caller={}, destination={}, duration={}", 
-                entity.getUid(), entity.getCallerIdNumber(), 
-                entity.getDestinationNumber(), entity.getDuration());
+    public void postPersist(FreeSwitchNumberEntity entity) {
+        log.info("FreeSwitch用户创建: username={}, domain={}", 
+                entity.getUsername(), entity.getDomain());
                 
-        FreeSwitchCdrEntity cloneEntity = SerializationUtils.clone(entity);
+        FreeSwitchNumberEntity cloneEntity = SerializationUtils.clone(entity);
         FreeSwitchEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(FreeSwitchEventPublisher.class);
-        freeSwitchEventPublisher.publishEvent(new FreeSwitchCdrCreateEvent(cloneEntity));
+        freeSwitchEventPublisher.publishEvent(new FreeSwitchNumberCreateEvent(cloneEntity));
     }
-    
+
     @PostUpdate
-    public void onPostUpdate(FreeSwitchCdrEntity entity) {
-        log.info("FreeSwitch CDR记录更新: uuid={}, caller={}, destination={}, duration={}", 
-                entity.getUid(), entity.getCallerIdNumber(), 
-                entity.getDestinationNumber(), entity.getDuration());
+    public void postUpdate(FreeSwitchNumberEntity entity) {
+        log.info("FreeSwitch用户更新: username={}, enabled={}", 
+                entity.getUsername(), entity.getEnabled());
                 
-        FreeSwitchCdrEntity cloneEntity = SerializationUtils.clone(entity);
+        FreeSwitchNumberEntity cloneEntity = SerializationUtils.clone(entity);
         FreeSwitchEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(FreeSwitchEventPublisher.class);
-        freeSwitchEventPublisher.publishEvent(new FreeSwitchCdrUpdateEvent(cloneEntity));
+        freeSwitchEventPublisher.publishEvent(new FreeSwitchNumberUpdateEvent(cloneEntity));
     }
 }
