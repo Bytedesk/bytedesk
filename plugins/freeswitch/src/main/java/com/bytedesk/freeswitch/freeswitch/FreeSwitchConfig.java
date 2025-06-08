@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:14:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 14:16:18
+ * @LastEditTime: 2025-06-08 15:07:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
+/**
+ * FreeSwitch配置类
+ * 
+ * 该配置类用于设置FreeSwitch ESL客户端连接和事件监听器。
+ * https://github.com/esl-client/esl-client?tab=readme-ov-file
+ * 
+ * @author jackning
+ */
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -40,7 +48,7 @@ public class FreeSwitchConfig {
      */
     @Bean
     public Client eslClient() {
-        Client client = new Client();
+        Client inboundClient = new Client();
         
         // 连接重试配置
         int maxRetries = 3;
@@ -52,19 +60,19 @@ public class FreeSwitchConfig {
                         attempt, freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
                         
                 // 设置更长的超时时间
-                client.connect(
+                inboundClient.connect(
                     freeSwitchProperties.getServer(), 
                     freeSwitchProperties.getEslPort(), 
                     freeSwitchProperties.getEslPassword(),
                     20); // 增加超时时间到20秒
                     
                 // 验证连接是否真正建立
-                if (client.canSend()) {
+                if (inboundClient.canSend()) {
                     // 注册事件监听器
-                    client.addEventListener(freeSwitchEventListener);
+                    inboundClient.addEventListener(freeSwitchEventListener);
                     
                     // 订阅所有事件
-                    client.setEventSubscriptions("plain", "all");
+                    inboundClient.setEventSubscriptions("plain", "all");
                     
                     log.info("FreeSwitch ESL连接成功，服务器: {}:{}", 
                             freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
@@ -117,6 +125,6 @@ public class FreeSwitchConfig {
             }
         }
         
-        return client;
+        return inboundClient;
     }
 }

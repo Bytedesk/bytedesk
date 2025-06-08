@@ -38,6 +38,7 @@
 		<!-- 太久未更新 -->
 		<!-- FreeSwitch ESL (Event Socket Library) Client -->
 		<!-- https://mvnrepository.com/artifact/org.freeswitch.esl.client/org.freeswitch.esl.client -->
+		<!-- 内存泄露替代 https://github.com/esl-client/esl-client -->
 		<dependency>
 			<groupId>org.freeswitch.esl.client</groupId>
 			<artifactId>org.freeswitch.esl.client</artifactId>
