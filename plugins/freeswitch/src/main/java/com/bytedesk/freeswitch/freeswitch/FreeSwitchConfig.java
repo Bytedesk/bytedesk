@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:14:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 13:42:52
+ * @LastEditTime: 2025-06-08 14:16:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,36 +42,79 @@ public class FreeSwitchConfig {
     public Client eslClient() {
         Client client = new Client();
         
-        try {
-            log.info("连接FreeSwitch ESL: {}:{}", 
+        // 连接重试配置
+        int maxRetries = 3;
+        int retryDelayMs = 2000;
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                log.info("第{}次尝试连接FreeSwitch ESL: {}:{}", 
+                        attempt, freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
+                        
+                // 设置更长的超时时间
+                client.connect(
                     freeSwitchProperties.getServer(), 
-                    freeSwitchProperties.getEslPort());
+                    freeSwitchProperties.getEslPort(), 
+                    freeSwitchProperties.getEslPassword(),
+                    20); // 增加超时时间到20秒
                     
-            client.connect(
-                freeSwitchProperties.getServer(), 
-                freeSwitchProperties.getEslPort(), 
-                freeSwitchProperties.getEslPassword(),
-                2);
+                // 验证连接是否真正建立
+                if (client.canSend()) {
+                    // 注册事件监听器
+                    client.addEventListener(freeSwitchEventListener);
+                    
+                    // 订阅所有事件
+                    client.setEventSubscriptions("plain", "all");
+                    
+                    log.info("FreeSwitch ESL连接成功，服务器: {}:{}", 
+                            freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
+                    
+                    // 连接成功，跳出重试循环
+                    break;
+                } else {
+                    log.warn("ESL连接建立但无法发送命令，连接可能不稳定");
+                    throw new InboundConnectionFailure("Connection established but cannot send commands");
+                }
                 
-            // 注册事件监听器
-            client.addEventListener(freeSwitchEventListener);
-            
-            // 订阅所有事件
-            client.setEventSubscriptions("plain", "all");
-
-            //这里必须检查，防止网络抖动时，连接断开
-            if (client.canSend()) {
-                log.info("连接成功，准备发起呼叫...");
-                //（异步）向1000用户发起呼叫，用户接通后，播放音乐/tmp/demo1.wav
-                String callResult = client.sendAsyncApiCommand("originate", "user/1000 &playback(/tmp/demo.wav)");
-                log.info("api uuid:" + callResult);
+            } catch (InboundConnectionFailure e) {
+                log.error("第{}次ESL连接失败: {}", attempt, e.getMessage());
+                
+                // 检查具体的错误类型
+                if (e.getMessage() != null) {
+                    if (e.getMessage().contains("rude-rejection") || e.getMessage().contains("Access Denied")) {
+                        log.error("FreeSwitch ESL拒绝连接 - 可能的原因:");
+                        log.error("1. ESL密码错误 (当前密码: {})", freeSwitchProperties.getEslPassword());
+                        log.error("2. IP地址不在FreeSwitch的访问控制列表(ACL)中");
+                        log.error("3. FreeSwitch的event_socket.conf.xml配置限制了外部连接");
+                        log.error("4. 防火墙阻止了连接");
+                        
+                        // ACL拒绝错误通常不需要重试
+                        if (attempt == maxRetries) {
+                            log.error("所有连接尝试都被拒绝，请检查FreeSwitch的ESL配置");
+                        }
+                    } else if (e.getMessage().contains("Connection refused") || e.getMessage().contains("timeout")) {
+                        log.error("网络连接问题 - 可能的原因:");
+                        log.error("1. FreeSwitch服务未运行");
+                        log.error("2. 端口{}未开放或被防火墙阻止", freeSwitchProperties.getEslPort());
+                        log.error("3. 网络连接超时");
+                    }
+                }
+                
+                // 如果不是最后一次尝试，等待后重试
+                if (attempt < maxRetries) {
+                    try {
+                        log.info("等待{}毫秒后重试...", retryDelayMs);
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2; // 指数退避
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("连接重试被中断");
+                        break;
+                    }
+                } else {
+                    log.error("FreeSwitch ESL连接最终失败，已尝试{}次", maxRetries);
+                }
             }
-            
-            log.info("FreeSwitch ESL连接成功");
-        } catch (InboundConnectionFailure e) {
-            // 处理连接失败的情况
-            e.printStackTrace();
-            log.error("FreeSwitch ESL连接失败: {}, {}", e.getMessage(), e);
         }
         
         return client;
