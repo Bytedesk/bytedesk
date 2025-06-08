@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.model;
+package com.bytedesk.freeswitch.conference;
 
 import org.springframework.stereotype.Component;
 
@@ -20,21 +20,21 @@ import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * FreeSwitch网关实体监听器
+ * FreeSwitch会议室实体监听器
  */
 @Slf4j
 @Component
-public class FreeSwitchGatewayEntityListener {
+public class FreeSwitchConferenceEntityListener {
 
     @PostPersist
-    public void postPersist(FreeSwitchGatewayEntity entity) {
-        log.info("FreeSwitch网关创建: name={}, proxy={}", 
-                entity.getGatewayName(), entity.getProxy());
+    public void postPersist(FreeSwitchConferenceEntity entity) {
+        log.info("FreeSwitch会议室创建: name={}, maxMembers={}", 
+                entity.getConferenceName(), entity.getMaxMembers());
     }
 
     @PostUpdate
-    public void postUpdate(FreeSwitchGatewayEntity entity) {
-        log.info("FreeSwitch网关更新: name={}, status={}, enabled={}", 
-                entity.getGatewayName(), entity.getStatus(), entity.getEnabled());
+    public void postUpdate(FreeSwitchConferenceEntity entity) {
+        log.info("FreeSwitch会议室更新: name={}, enabled={}", 
+                entity.getConferenceName(), entity.getEnabled());
     }
 }

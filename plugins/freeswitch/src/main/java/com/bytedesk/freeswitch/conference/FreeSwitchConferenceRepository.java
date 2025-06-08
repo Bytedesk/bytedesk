@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.repository;
+package com.bytedesk.freeswitch.conference;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +23,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import com.bytedesk.freeswitch.model.FreeSwitchConferenceEntity;
 
 /**
  * FreeSwitch会议室仓库接口
