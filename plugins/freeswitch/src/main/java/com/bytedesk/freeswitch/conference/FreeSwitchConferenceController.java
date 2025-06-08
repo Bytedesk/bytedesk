@@ -59,7 +59,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("会议室创建成功", response));
         } catch (Exception e) {
             log.error("创建会议室失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -89,7 +89,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("查询成功", responses));
         } catch (Exception e) {
             log.error("查询会议室列表失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -108,7 +108,7 @@ public class FreeSwitchConferenceController {
             }
         } catch (Exception e) {
             log.error("获取会议室详情失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -127,7 +127,7 @@ public class FreeSwitchConferenceController {
             }
         } catch (Exception e) {
             log.error("根据名称获取会议室详情失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -153,7 +153,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("会议室更新成功", response));
         } catch (Exception e) {
             log.error("更新会议室失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -167,7 +167,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("会议室删除成功", "会议室删除成功"));
         } catch (Exception e) {
             log.error("删除会议室失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), ""));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -181,7 +181,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("会议室状态切换成功", "会议室状态切换成功"));
         } catch (Exception e) {
             log.error("切换会议室状态失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), ""));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -215,7 +215,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("查询成功", responses));
         } catch (Exception e) {
             log.error("获取启用会议室列表失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 
@@ -234,7 +234,7 @@ public class FreeSwitchConferenceController {
             return ResponseEntity.ok(JsonResult.success("查询成功", responses));
         } catch (Exception e) {
             log.error("根据容量查询会议室失败", e);
-            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400));
         }
     }
 }

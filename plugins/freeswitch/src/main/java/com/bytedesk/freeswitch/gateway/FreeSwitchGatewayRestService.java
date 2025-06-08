@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 18:57:15
+ * @LastEditTime: 2025-06-08 19:01:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * FreeSwitch网关REST服务
  */
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeSwitchGatewayEntity, FreeSwitchGatewayRequest, FreeSwitchGatewayResponse, FreeSwitchGatewayExcel> {
@@ -50,16 +51,12 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
     
     private final AuthService authService;
 
-    private static final Logger log = LoggerFactory.getLogger(FreeSwitchGatewayRestService.class);
-
     @Override
     @Cacheable(value = "gateway", key = "#request.orgUid + ':' + #request.page + ':' + #request.size")
     public Page<FreeSwitchGatewayResponse> queryByOrg(FreeSwitchGatewayRequest request) {
-        
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.Direction.DESC, "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<FreeSwitchGatewayEntity> spec = FreeSwitchGatewaySpecification.search(request);
         Page<FreeSwitchGatewayEntity> gatewayPage = gatewayRepository.findAll(spec, pageable);
-        
         return gatewayPage.map(this::convertToResponse);
     }
 
@@ -160,16 +157,6 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
                 .toList();
         
         exportToExcel(excelList, "网关列表", FreeSwitchGatewayExcel.class, response);
-    }
-
-    private FreeSwitchGatewayResponse findByUid(String uid) {
-        
-        Optional<FreeSwitchGatewayEntity> gatewayOptional = gatewayRepository.findByUidAndDeleted(uid, false);
-        if (gatewayOptional.isEmpty()) {
-            throw new RuntimeException("网关不存在");
-        }
-        
-        return convertToResponse(gatewayOptional.get());
     }
 
     @Override
