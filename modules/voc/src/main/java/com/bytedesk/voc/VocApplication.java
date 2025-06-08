@@ -18,7 +18,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 // @EnableCaching
 // @EnableAsync
-// @EnableScheduling
 public class VocApplication {
 
 	// public static void main(String[] args) {
