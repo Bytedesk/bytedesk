@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 12:45:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 12:46:04
+ * @LastEditTime: 2025-06-08 21:34:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.freeswitch.callcenter;
 
-import java.time.LocalDateTime;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -23,8 +21,6 @@ import com.bytedesk.freeswitch.callcenter.event.CallAnsweredEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallHangupEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallStartEvent;
 import com.bytedesk.freeswitch.callcenter.event.DtmfEvent;
-import com.bytedesk.freeswitch.user.FreeSwitchUserService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +36,7 @@ public class CallEventListener {
 
     private final CallService callService;
     // private final FreeSwitchCdrService cdrService; // 暂时未使用，保留以备后续扩展
-    private final FreeSwitchUserService userService;
+    // private final FreeSwitchNumberService userService;
 
     /**
      * 监听通话开始事件
@@ -119,10 +115,10 @@ public class CallEventListener {
      */
     private void updateUserActivity(String username) {
         try {
-            if (userService.findByUsername(username).isPresent()) {
-                userService.updateLastRegistration(username, LocalDateTime.now());
-                log.debug("已更新用户活动时间: {}", username);
-            }
+            // if (userService.findByUsername(username).isPresent()) {
+            //     userService.updateLastRegistration(username, LocalDateTime.now());
+            //     log.debug("已更新用户活动时间: {}", username);
+            // }
         } catch (Exception e) {
             log.error("更新用户活动时间失败: {} - {}", username, e.getMessage(), e);
         }

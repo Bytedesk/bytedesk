@@ -14,6 +14,12 @@
 package com.bytedesk.freeswitch.gateway;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
+
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.freeswitch.config.FreeSwitchEventPublisher;
+import com.bytedesk.freeswitch.gateway.event.FreeSwitchGatewayCreateEvent;
+import com.bytedesk.freeswitch.gateway.event.FreeSwitchGatewayUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -30,11 +36,19 @@ public class FreeSwitchGatewayEntityListener {
     public void postPersist(FreeSwitchGatewayEntity entity) {
         log.info("FreeSwitch网关创建: name={}, proxy={}", 
                 entity.getGatewayName(), entity.getProxy());
+                
+        FreeSwitchGatewayEntity cloneEntity = SerializationUtils.clone(entity);
+        FreeSwitchEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(FreeSwitchEventPublisher.class);
+        freeSwitchEventPublisher.publishEvent(new FreeSwitchGatewayCreateEvent(cloneEntity));
     }
 
     @PostUpdate
     public void postUpdate(FreeSwitchGatewayEntity entity) {
         log.info("FreeSwitch网关更新: name={}, status={}, enabled={}", 
                 entity.getGatewayName(), entity.getStatus(), entity.getEnabled());
+                
+        FreeSwitchGatewayEntity cloneEntity = SerializationUtils.clone(entity);
+        FreeSwitchEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(FreeSwitchEventPublisher.class);
+        freeSwitchEventPublisher.publishEvent(new FreeSwitchGatewayUpdateEvent(cloneEntity));
     }
 }

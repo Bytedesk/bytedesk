@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.user;
+package com.bytedesk.freeswitch.number;
 
 import java.util.Optional;
 
@@ -24,9 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwitchUserEntity, FreeSwitchUserRequest, FreeSwitchUserResponse, FreeSwitchUserExcel> {
+public class FreeSwitchNumberRestService extends BaseRestServiceWithExcel<FreeSwitchNumberEntity, FreeSwitchNumberRequest, FreeSwitchNumberResponse, FreeSwitchNumberExcel> {
 
-    private final FreeSwitchUserRepository freeSwitchUserRepository;
+    private final FreeSwitchNumberRepository freeSwitchNumberRepository;
 
     private final ModelMapper modelMapper;
 
@@ -35,51 +35,51 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
     private final AuthService authService;
 
     @Override
-    public Page<FreeSwitchUserEntity> queryByOrgEntity(FreeSwitchUserRequest request) {
+    public Page<FreeSwitchNumberEntity> queryByOrgEntity(FreeSwitchNumberRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<FreeSwitchUserEntity> specification = FreeSwitchUserSpecification.search(request);
-        return freeSwitchUserRepository.findAll(specification, pageable);
+        Specification<FreeSwitchNumberEntity> specification = FreeSwitchNumberSpecification.search(request);
+        return freeSwitchNumberRepository.findAll(specification, pageable);
     }
 
     @Override
-    public Page<FreeSwitchUserResponse> queryByOrg(FreeSwitchUserRequest request) {
-        Page<FreeSwitchUserEntity> entities = queryByOrgEntity(request);
+    public Page<FreeSwitchNumberResponse> queryByOrg(FreeSwitchNumberRequest request) {
+        Page<FreeSwitchNumberEntity> entities = queryByOrgEntity(request);
         return entities.map(this::convertToResponse);
     }
 
-    public Page<FreeSwitchUserEntity> queryByUserEntity(FreeSwitchUserRequest request) {
-        UserEntity user = authService.getUser();
-        request.setOrgUid(user.getOrgUid());
+    public Page<FreeSwitchNumberEntity> queryByNumberEntity(FreeSwitchNumberRequest request) {
+        // NumberEntity user = authService.getUser();
+        // request.setOrgUid(user.getOrgUid());
         return queryByOrgEntity(request);
     }
 
     @Override
-    public Page<FreeSwitchUserResponse> queryByUser(FreeSwitchUserRequest request) {
-        Page<FreeSwitchUserEntity> entities = queryByUserEntity(request);
+    public Page<FreeSwitchNumberResponse> queryByUser(FreeSwitchNumberRequest request) {
+        Page<FreeSwitchNumberEntity> entities = queryByNumberEntity(request);
         return entities.map(this::convertToResponse);
     }
 
     @Override
-    public Optional<FreeSwitchUserEntity> findByUid(String uid) {
-        return freeSwitchUserRepository.findByUid(uid);
+    public Optional<FreeSwitchNumberEntity> findByUid(String uid) {
+        return freeSwitchNumberRepository.findByUid(uid);
     }
 
     @Override
-    public FreeSwitchUserResponse convertToResponse(FreeSwitchUserEntity entity) {
-        return modelMapper.map(entity, FreeSwitchUserResponse.class);
+    public FreeSwitchNumberResponse convertToResponse(FreeSwitchNumberEntity entity) {
+        return modelMapper.map(entity, FreeSwitchNumberResponse.class);
     }
 
-    public FreeSwitchUserEntity convertToEntity(FreeSwitchUserRequest request) {
-        return modelMapper.map(request, FreeSwitchUserEntity.class);
-    }
-
-    @Override
-    public FreeSwitchUserExcel convertToExcel(FreeSwitchUserEntity entity) {
-        return modelMapper.map(entity, FreeSwitchUserExcel.class);
+    public FreeSwitchNumberEntity convertToEntity(FreeSwitchNumberRequest request) {
+        return modelMapper.map(request, FreeSwitchNumberEntity.class);
     }
 
     @Override
-    public FreeSwitchUserResponse create(FreeSwitchUserRequest request) {
+    public FreeSwitchNumberExcel convertToExcel(FreeSwitchNumberEntity entity) {
+        return modelMapper.map(entity, FreeSwitchNumberExcel.class);
+    }
+
+    @Override
+    public FreeSwitchNumberResponse create(FreeSwitchNumberRequest request) {
         UserEntity user = authService.getUser();
         if (!StringUtils.hasText(request.getOrgUid())) {
             request.setOrgUid(user.getOrgUid());
@@ -90,15 +90,15 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
         }
 
         // 检查用户名是否已存在
-        if (freeSwitchUserRepository.existsByUsernameAndDomain(request.getUsername(), request.getDomain())) {
+        if (freeSwitchNumberRepository.existsByNumbernameAndDomain(request.getUsername(), request.getDomain())) {
             throw new RuntimeException("用户名已存在: " + request.getUsername() + "@" + request.getDomain());
         }
 
-        FreeSwitchUserEntity entity = convertToEntity(request);
+        FreeSwitchNumberEntity entity = convertToEntity(request);
         entity.setLevel(LevelEnum.PLATFORM.name());
         entity.setPlatform(BytedeskConsts.PLATFORM_BYTEDESK);
 
-        FreeSwitchUserEntity savedEntity = save(entity);
+        FreeSwitchNumberEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("创建FreeSwitch用户失败");
         }
@@ -107,13 +107,13 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
     }
 
     @Override
-    public FreeSwitchUserResponse update(FreeSwitchUserRequest request) {
-        Optional<FreeSwitchUserEntity> optional = findByUid(request.getUid());
+    public FreeSwitchNumberResponse update(FreeSwitchNumberRequest request) {
+        Optional<FreeSwitchNumberEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
             throw new RuntimeException("FreeSwitch用户不存在");
         }
 
-        FreeSwitchUserEntity entity = optional.get();
+        FreeSwitchNumberEntity entity = optional.get();
         
         // 更新字段
         if (StringUtils.hasText(request.getDisplayName())) {
@@ -132,7 +132,7 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
             entity.setRemarks(request.getRemarks());
         }
 
-        FreeSwitchUserEntity updatedEntity = save(entity);
+        FreeSwitchNumberEntity updatedEntity = save(entity);
         if (updatedEntity == null) {
             throw new RuntimeException("更新FreeSwitch用户失败");
         }
@@ -141,22 +141,22 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
     }
 
     @Override
-    public FreeSwitchUserEntity save(FreeSwitchUserEntity entity) {
+    public FreeSwitchNumberEntity save(FreeSwitchNumberEntity entity) {
         try {
-            return freeSwitchUserRepository.save(entity);
+            return freeSwitchNumberRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             return handleOptimisticLockingFailureException(e, entity);
         }
     }
 
     @Override
-    public FreeSwitchUserEntity doSave(FreeSwitchUserEntity entity) {
-        return freeSwitchUserRepository.save(entity);
+    public FreeSwitchNumberEntity doSave(FreeSwitchNumberEntity entity) {
+        return freeSwitchNumberRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<FreeSwitchUserEntity> optional = findByUid(uid);
+        Optional<FreeSwitchNumberEntity> optional = findByUid(uid);
         optional.ifPresent(entity -> {
             entity.setDeleted(true);
             save(entity);
@@ -164,14 +164,14 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
     }
 
     @Override
-    public void delete(FreeSwitchUserRequest request) {
+    public void delete(FreeSwitchNumberRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
     @Cacheable(value = "freeswitch_user", key = "#uid", unless = "#result == null")
-    public FreeSwitchUserResponse queryByUid(FreeSwitchUserRequest request) {
-        Optional<FreeSwitchUserEntity> optional = findByUid(request.getUid());
+    public FreeSwitchNumberResponse queryByUid(FreeSwitchNumberRequest request) {
+        Optional<FreeSwitchNumberEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             return convertToResponse(optional.get());
         }
@@ -179,13 +179,13 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
     }
 
     @Override
-    public FreeSwitchUserEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchUserEntity entity) {
+    public FreeSwitchNumberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchNumberEntity entity) {
         log.warn("FreeSwitch用户保存时发生乐观锁异常 uid: {}, version: {}", entity.getUid(), entity.getVersion());
         // 重新查询最新版本并重试
         try {
-            Optional<FreeSwitchUserEntity> latest = findByUid(entity.getUid());
+            Optional<FreeSwitchNumberEntity> latest = findByUid(entity.getUid());
             if (latest.isPresent()) {
-                FreeSwitchUserEntity latestEntity = latest.get();
+                FreeSwitchNumberEntity latestEntity = latest.get();
                 // 将当前修改应用到最新版本
                 latestEntity.setPassword(entity.getPassword());
                 latestEntity.setEnabled(entity.getEnabled());

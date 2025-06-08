@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.user;
+package com.bytedesk.freeswitch.number;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +26,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class FreeSwitchUserExcel {
+public class FreeSwitchNumberExcel {
 
     @ExcelProperty(index = 0, value = "用户名")
     @ColumnWidth(20)

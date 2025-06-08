@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.user;
+package com.bytedesk.freeswitch.number;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -34,7 +34,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FreeSwitchUserRequest extends BaseRequest {
+public class FreeSwitchNumberRequest extends BaseRequest {
 
     /**
      * 用户名（SIP用户名）
