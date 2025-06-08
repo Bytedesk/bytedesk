@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 14:45:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 14:23:40
+ * @LastEditTime: 2025-06-08 14:50:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -155,6 +155,73 @@ public class FreeSwitchHealthIndicator implements HealthIndicator {
         
         return status;
     }
+
+    /**
+     * 测试ESL连接并获取详细响应
+     */
+    // private String testEslConnectionWithDetails() {
+    //     String server = freeSwitchProperties.getServer();
+    //     int port = freeSwitchProperties.getEslPort();
+        
+    //     try (Socket socket = new Socket()) {
+    //         socket.connect(new java.net.InetSocketAddress(server, port), 5000);
+            
+    //         // 尝试读取FreeSwitch响应
+    //         socket.setSoTimeout(3000);
+    //         byte[] buffer = new byte[1024];
+    //         int bytesRead = socket.getInputStream().read(buffer);
+            
+    //         if (bytesRead > 0) {
+    //             String response = new String(buffer, 0, bytesRead).trim();
+                
+    //             if (response.contains("rude-rejection")) {
+    //                 return "REJECTED - FreeSwitch ACL configuration blocks connection: " + response;
+    //             } else if (response.contains("auth/request")) {
+    //                 return "SUCCESS - FreeSwitch ESL server is responding properly";
+    //             } else {
+    //                 return "UNKNOWN_RESPONSE - " + response;
+    //             }
+    //         } else {
+    //             return "NO_RESPONSE - Connected but no data received";
+    //         }
+            
+    //     } catch (IOException e) {
+    //         if (e.getMessage().contains("Connection refused")) {
+    //             return "CONNECTION_REFUSED - FreeSwitch service may not be running";
+    //         } else if (e.getMessage().contains("timeout")) {
+    //             return "TIMEOUT - Network or firewall issue";
+    //         } else {
+    //             return "ERROR - " + e.getMessage();
+    //         }
+    //     }
+    // }
+
+    /**
+     * 获取故障排除信息
+     */
+    // private String getTroubleshootingInfo(String eslStatus) {
+    //     if (eslStatus.contains("REJECTED")) {
+    //         return "ACL配置问题 - 需要修改FreeSwitch的event_socket.conf.xml文件，移除或修改apply-inbound-acl参数";
+    //     } else if (eslStatus.contains("CONNECTION_REFUSED")) {
+    //         return "服务未运行 - 检查FreeSwitch服务状态: systemctl status freeswitch";
+    //     } else if (eslStatus.contains("TIMEOUT")) {
+    //         return "网络问题 - 检查防火墙和网络连接";
+    //     } else {
+    //         return "未知问题 - 查看FreeSwitch日志: tail -f /usr/local/freeswitch/log/freeswitch.log";
+    //     }
+    // }
+
+    /**
+     * 获取服务器修复命令
+     */
+    // private String getServerFixCommands() {
+    //     return "在FreeSwitch服务器上执行以下命令:\n" +
+    //            "1. 备份配置: sudo cp /usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml /tmp/event_socket.conf.xml.backup\n" +
+    //            "2. 修改配置: sudo sed -i 's/<param name=\"apply-inbound-acl\".*\\/>//g' /usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml\n" +
+    //            "3. 重新加载: sudo fs_cli -x 'reload mod_event_socket'\n" +
+    //            "4. 如果失败重启: sudo systemctl restart freeswitch\n" +
+    //            "5. 验证修复: telnet localhost 8021";
+    // }
 
     /**
      * 连接状态信息类
