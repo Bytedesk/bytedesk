@@ -99,10 +99,36 @@ public class FreeSwitchEslInboundConfig {
         InboundClient inboundClient = InboundClient.newInstance(option);
         
         try {
+            log.info("启动 thingscloud ESL 客户端...");
             inboundClient.start();
             log.info("thingscloud ESL 客户端启动成功");
         } catch (Exception e) {
-            log.error("thingscloud ESL 客户端启动失败: {}", e.getMessage(), e);
+            log.error("thingscloud ESL 客户端启动失败: {}", e.getMessage());
+            
+            // 分析错误类型并提供具体的解决建议
+            if (e.getMessage() != null) {
+                if (e.getMessage().contains("Connection refused")) {
+                    log.error("连接被拒绝 - 可能的解决方案:");
+                    log.error("1. 确认FreeSwitch服务正在运行");
+                    log.error("2. 检查端口{}是否正确并且可访问", freeSwitchProperties.getEslPort());
+                    log.error("3. 确认防火墙设置允许连接到该端口");
+                } else if (e.getMessage().contains("Authentication") || e.getMessage().contains("password")) {
+                    log.error("认证失败 - 可能的解决方案:");
+                    log.error("1. 检查ESL密码是否正确: {}", freeSwitchProperties.getEslPassword());
+                    log.error("2. 确认FreeSwitch的event_socket.conf.xml配置正确");
+                } else if (e.getMessage().contains("timeout")) {
+                    log.error("连接超时 - 可能的解决方案:");
+                    log.error("1. 检查网络连接");
+                    log.error("2. 增加连接超时时间");
+                    log.error("3. 确认服务器地址正确: {}", freeSwitchProperties.getServer());
+                }
+            }
+            
+            // 记录当前配置信息用于调试
+            log.error("当前ESL配置 - 服务器: {}:{}, 密码: {}", 
+                    freeSwitchProperties.getServer(), 
+                    freeSwitchProperties.getEslPort(),
+                    freeSwitchProperties.getEslPassword());
         }
 
         return inboundClient;

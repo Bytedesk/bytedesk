@@ -15,6 +15,40 @@
 
 基于 Spring Boot 的 FreeSwitch 集成模块，支持语音通话、WebRTC、呼叫中心功能和事件监听。
 
+## ⚠️ ESL连接问题修复 (2025-06-08)
+
+如果遇到 `text/rude-rejection` 或 `Access Denied` 错误，请查看详细修复指南：
+
+📋 **[FreeSwitch ESL 连接问题修复指南](FREESWITCH_ESL_FIX_GUIDE.md)**
+
+### 快速修复
+
+1. **检查连接状态** - 访问健康检查端点：
+
+   ```bash
+   curl http://localhost:9003/actuator/health/freeSwitch
+   ```
+
+2. **测试连接** - 使用管理API：
+
+   ```bash
+   curl -X POST http://localhost:9003/api/v1/freeswitch/test-connection
+   ```
+
+3. **查看配置** - 获取当前配置：
+
+   ```bash
+   curl http://localhost:9003/api/v1/freeswitch/config
+   ```
+
+### 新增功能
+
+- ✅ **智能错误诊断**: 自动识别连接问题并提供解决建议
+- ✅ **连接重试机制**: 指数退避重试策略
+- ✅ **健康状态监控**: Spring Boot Actuator集成
+- ✅ **管理REST API**: 连接测试和状态查询接口
+- ✅ **启动时连接测试**: 应用启动时自动检测FreeSwitch连接
+
 ## 功能特性
 
 - ✅ **FreeSwitch ESL 集成**: 通过 Event Socket Library 连接和控制 FreeSwitch
