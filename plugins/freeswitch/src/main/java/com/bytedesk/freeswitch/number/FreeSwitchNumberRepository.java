@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 22:49:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,12 +40,12 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
     /**
      * 根据用户名查找用户
      */
-    Optional<FreeSwitchNumberEntity> findByNumbername(String username);
+    Optional<FreeSwitchNumberEntity> findByUsername(String username);
 
     /**
      * 根据用户名和域名查找用户
      */
-    Optional<FreeSwitchNumberEntity> findByNumbernameAndDomain(String username, String domain);
+    Optional<FreeSwitchNumberEntity> findByUsernameAndDomain(String username, String domain);
 
     /**
      * 根据邮箱查找用户
@@ -75,12 +75,12 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
     /**
      * 检查用户名是否存在
      */
-    boolean existsByNumbername(String username);
+    boolean existsByUsername(String username);
 
     /**
      * 检查用户名和域名组合是否存在
      */
-    boolean existsByNumbernameAndDomain(String username, String domain);
+    boolean existsByUsernameAndDomain(String username, String domain);
 
     /**
      * 查找在线用户（最近指定时间内有注册记录）
@@ -106,7 +106,7 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
     /**
      * 根据用户名模糊搜索
      */
-    Page<FreeSwitchNumberEntity> findByNumbernameContainingIgnoreCase(String username, Pageable pageable);
+    Page<FreeSwitchNumberEntity> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 
     /**
      * 根据显示名称模糊搜索

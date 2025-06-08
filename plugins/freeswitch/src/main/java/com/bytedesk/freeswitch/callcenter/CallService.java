@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:31:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:34:27
+ * @LastEditTime: 2025-06-08 22:45:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -482,7 +482,7 @@ public class CallService {
     private void saveCdrRecord(CallInfo callInfo, String hangupCause) {
         try {
             // 检查是否已经存在CDR记录
-            Optional<FreeSwitchCdrEntity> existingCdrOptional = cdrService.findByUuid(callInfo.getUuid());
+            Optional<FreeSwitchCdrEntity> existingCdrOptional = cdrService.findByUid(callInfo.getUuid());
             if (!existingCdrOptional.isPresent()) {
                 // 创建新的CDR记录
                 FreeSwitchCdrEntity cdr = new FreeSwitchCdrEntity();

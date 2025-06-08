@@ -69,14 +69,14 @@ public class FreeSwitchNumberService {
      * 根据用户名查找用户
      */
     public Optional<FreeSwitchNumberEntity> findByNumbername(String username) {
-        return userRepository.findByNumbername(username);
+        return userRepository.findByUsername(username);
     }
 
     /**
      * 根据用户名和域名查找用户
      */
     public Optional<FreeSwitchNumberEntity> findByNumbernameAndDomain(String username, String domain) {
-        return userRepository.findByNumbernameAndDomain(username, domain);
+        return userRepository.findByUsernameAndDomain(username, domain);
     }
 
     /**
@@ -157,7 +157,7 @@ public class FreeSwitchNumberService {
      */
     @Transactional
     public void updateNumberRegistration(String username, String domain, String registerIp, String userAgent) {
-        Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByNumbernameAndDomain(username, domain);
+        Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByUsernameAndDomain(username, domain);
         if (userOpt.isPresent()) {
             FreeSwitchNumberEntity user = userOpt.get();
             user.setLastRegister(LocalDateTime.now());
@@ -237,14 +237,14 @@ public class FreeSwitchNumberService {
      * 检查用户名和域名组合是否存在
      */
     public boolean existsByNumbernameAndDomain(String username, String domain) {
-        return userRepository.existsByNumbernameAndDomain(username, domain);
+        return userRepository.existsByUsernameAndDomain(username, domain);
     }
 
     /**
      * 验证用户密码
      */
     public boolean validateNumberPassword(String username, String domain, String password) {
-        Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByNumbernameAndDomain(username, domain);
+        Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByUsernameAndDomain(username, domain);
         if (userOpt.isPresent()) {
             FreeSwitchNumberEntity user = userOpt.get();
             return user.getEnabled() && user.getPassword().equals(password);
@@ -257,7 +257,7 @@ public class FreeSwitchNumberService {
      */
     @Transactional
     public void updateLastRegistration(String username, LocalDateTime lastRegistration) {
-        Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByNumbername(username);
+        Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent()) {
             FreeSwitchNumberEntity user = userOpt.get();
             user.setLastRegister(lastRegistration);
