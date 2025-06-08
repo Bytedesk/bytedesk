@@ -1,9 +1,11 @@
 # FreeSwitch ESL 连接问题修复指南
 
 ## 问题描述
+
 Java应用程序连接FreeSwitch ESL时收到 "text/rude-rejection" 和 "Access Denied, go away" 错误。
 
 ## 根本原因
+
 FreeSwitch的Event Socket Library (ESL)配置中的访问控制列表(ACL)限制了外部连接。
 
 ## 修复方案
@@ -11,12 +13,14 @@ FreeSwitch的Event Socket Library (ESL)配置中的访问控制列表(ACL)限制
 ### 方案1: 修改ESL配置允许特定IP (推荐)
 
 1. **备份原配置文件**
+
 ```bash
 cp /usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml.backup
 cp /usr/local/freeswitch/conf/autoload_configs/acl.conf.xml /usr/local/freeswitch/conf/autoload_configs/acl.conf.xml.backup
 ```
 
 2. **修改event_socket.conf.xml**
+
 ```xml
 <configuration name="event_socket.conf" description="Socket Client">
   <settings>
@@ -32,6 +36,7 @@ cp /usr/local/freeswitch/conf/autoload_configs/acl.conf.xml /usr/local/freeswitc
 ```
 
 3. **修改acl.conf.xml，添加自定义ACL**
+
 ```xml
 <list name="bytedesk_allowed" default="deny">
   <!-- 允许本地连接 -->
@@ -51,6 +56,7 @@ cp /usr/local/freeswitch/conf/autoload_configs/acl.conf.xml /usr/local/freeswitc
 ### 方案2: 临时解决方案 - 移除ACL限制 (不推荐用于生产环境)
 
 修改event_socket.conf.xml:
+
 ```xml
 <configuration name="event_socket.conf" description="Socket Client">
   <settings>
@@ -69,11 +75,13 @@ cp /usr/local/freeswitch/conf/autoload_configs/acl.conf.xml /usr/local/freeswitc
 ### 方案3: 使用SSH隧道 (最安全)
 
 1. **建立SSH隧道**
+
 ```bash
 ssh -L 8021:localhost:8021 user@14.103.165.199
 ```
 
 2. **修改Java应用配置连接到本地**
+
 ```properties
 bytedesk.freeswitch.server=127.0.0.1
 bytedesk.freeswitch.esl-port=8021
@@ -97,16 +105,19 @@ fs_cli -x "reload mod_event_socket"
 ## 验证修复
 
 1. **测试端口连接**
+
 ```bash
 telnet 14.103.165.199 8021
 ```
 
 2. **检查FreeSwitch日志**
+
 ```bash
 tail -f /usr/local/freeswitch/log/freeswitch.log
 ```
 
 3. **使用fs_cli测试**
+
 ```bash
 fs_cli -H 14.103.165.199 -P 8021 -p bytedesk123
 ```
