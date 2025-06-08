@@ -1,5 +1,8 @@
 package com.bytedesk.freeswitch.freeswitch;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,6 +13,10 @@ import com.bytedesk.freeswitch.callcenter.event.CallAnsweredEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallHangupEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallStartEvent;
 import com.bytedesk.freeswitch.callcenter.event.DtmfEvent;
+import com.bytedesk.freeswitch.model.FreeSwitchCdrEntity;
+import com.bytedesk.freeswitch.model.FreeSwitchUserEntity;
+import com.bytedesk.freeswitch.service.FreeSwitchCdrService;
+import com.bytedesk.freeswitch.service.FreeSwitchUserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class FreeSwitchEventListener implements IEslEventListener {
 
     private final ApplicationEventPublisher eventPublisher;
+    private final FreeSwitchCdrService cdrService;
+    private final FreeSwitchUserService userService;
     
     /**
      * 处理FreeSwitch事件
@@ -78,6 +87,26 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         log.info("通道创建: 主叫 {} 被叫 {} UUID {}", callerId, destination, uuid);
         
+        // 创建CDR记录
+        try {
+            FreeSwitchCdrEntity cdr = new FreeSwitchCdrEntity();
+            cdr.setUuid(uuid);
+            cdr.setCallerIdNumber(callerId);
+            cdr.setDestinationNumber(destination);
+            cdr.setStartStamp(LocalDateTime.now());
+            cdr.setDirection("outbound"); // 默认为outbound，可根据实际情况调整
+            cdr.setHangupCause(""); // 初始为空
+            
+            cdrService.createCdr(cdr);
+            log.debug("已创建CDR记录: UUID {}", uuid);
+        } catch (Exception e) {
+            log.error("创建CDR记录失败: UUID {} - {}", uuid, e.getMessage(), e);
+        }
+        
+        // 更新用户在线状态
+        updateUserOnlineStatus(callerId, true);
+        updateUserOnlineStatus(destination, true);
+        
         // 发布通话开始事件
         eventPublisher.publishEvent(new CallStartEvent(this, uuid, callerId, destination));
     }
@@ -89,6 +118,14 @@ public class FreeSwitchEventListener implements IEslEventListener {
         String uuid = eslEvent.getEventHeaders().get("Unique-ID");
         
         log.info("通道应答: UUID {}", uuid);
+        
+        // 更新CDR记录 - 设置应答时间
+        try {
+            cdrService.updateCdrAnswerTime(uuid, LocalDateTime.now());
+            log.debug("已更新CDR应答时间: UUID {}", uuid);
+        } catch (Exception e) {
+            log.error("更新CDR应答时间失败: UUID {} - {}", uuid, e.getMessage(), e);
+        }
         
         // 发布通话应答事件
         eventPublisher.publishEvent(new CallAnsweredEvent(this, uuid));
@@ -102,6 +139,14 @@ public class FreeSwitchEventListener implements IEslEventListener {
         String hangupCause = eslEvent.getEventHeaders().get("Hangup-Cause");
         
         log.info("通道挂断: UUID {} 原因 {}", uuid, hangupCause);
+        
+        // 更新CDR记录 - 设置结束时间和挂断原因
+        try {
+            cdrService.updateCdrEndTime(uuid, LocalDateTime.now(), hangupCause);
+            log.debug("已更新CDR结束时间: UUID {} 原因 {}", uuid, hangupCause);
+        } catch (Exception e) {
+            log.error("更新CDR结束时间失败: UUID {} - {}", uuid, e.getMessage(), e);
+        }
         
         // 发布通话挂断事件
         eventPublisher.publishEvent(new CallHangupEvent(this, uuid, hangupCause));
@@ -132,5 +177,22 @@ public class FreeSwitchEventListener implements IEslEventListener {
         //     // 处理自定义事件
         //     log.info("自定义事件: {}", eslEvent.getEventHeaders());
         // }
+    }
+    
+    /**
+     * 更新用户在线状态
+     */
+    private void updateUserOnlineStatus(String username, boolean online) {
+        try {
+            Optional<FreeSwitchUserEntity> userOptional = userService.findByUsername(username);
+            if (userOptional.isPresent()) {
+                if (online) {
+                    userService.updateLastRegistration(username, LocalDateTime.now());
+                }
+                log.debug("已更新用户在线状态: {} -> {}", username, online);
+            }
+        } catch (Exception e) {
+            log.error("更新用户在线状态失败: {} - {}", username, e.getMessage(), e);
+        }
     }
 }

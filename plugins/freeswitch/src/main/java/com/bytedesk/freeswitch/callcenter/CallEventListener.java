@@ -13,6 +13,8 @@
  */
 package com.bytedesk.freeswitch.callcenter;
 
+import java.time.LocalDateTime;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,7 @@ import com.bytedesk.freeswitch.callcenter.event.CallAnsweredEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallHangupEvent;
 import com.bytedesk.freeswitch.callcenter.event.CallStartEvent;
 import com.bytedesk.freeswitch.callcenter.event.DtmfEvent;
+import com.bytedesk.freeswitch.service.FreeSwitchUserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CallEventListener {
 
     private final CallService callService;
+    // private final FreeSwitchCdrService cdrService; // 暂时未使用，保留以备后续扩展
+    private final FreeSwitchUserService userService;
 
     /**
      * 监听通话开始事件
@@ -46,6 +51,10 @@ public class CallEventListener {
                 event.getUuid(), event.getCallerId(), event.getDestination());
         
         try {
+            // 更新用户活动时间
+            updateUserActivity(event.getCallerId());
+            updateUserActivity(event.getDestination());
+            
             callService.handleCallStart(event.getCallerId(), event.getDestination(), event.getUuid());
             log.debug("通话开始事件处理完成: UUID {}", event.getUuid());
         } catch (Exception e) {
@@ -62,6 +71,8 @@ public class CallEventListener {
         
         try {
             callService.handleCallAnswered(event.getUuid());
+            
+            // 额外的数据库操作已在FreeSwitchEventListener中处理
             log.debug("通话应答事件处理完成: UUID {}", event.getUuid());
         } catch (Exception e) {
             log.error("处理通话应答事件失败: UUID {} - {}", event.getUuid(), e.getMessage(), e);
@@ -78,6 +89,8 @@ public class CallEventListener {
         
         try {
             callService.handleCallEnd(event.getUuid(), event.getHangupCause());
+            
+            // 额外的CDR更新已在FreeSwitchEventListener中处理
             log.debug("通话挂断事件处理完成: UUID {}", event.getUuid());
         } catch (Exception e) {
             log.error("处理通话挂断事件失败: UUID {} - {}", event.getUuid(), e.getMessage(), e);
@@ -98,6 +111,20 @@ public class CallEventListener {
         } catch (Exception e) {
             log.error("处理DTMF事件失败: UUID {} 按键 {} - {}", 
                     event.getUuid(), event.getDtmfDigit(), e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 更新用户活动时间
+     */
+    private void updateUserActivity(String username) {
+        try {
+            if (userService.findByUsername(username).isPresent()) {
+                userService.updateLastRegistration(username, LocalDateTime.now());
+                log.debug("已更新用户活动时间: {}", username);
+            }
+        } catch (Exception e) {
+            log.error("更新用户活动时间失败: {} - {}", username, e.getMessage(), e);
         }
     }
 }
