@@ -59,10 +59,8 @@ public class FreeSwitchCdrRestService extends BaseRestServiceWithExcel<FreeSwitc
 
     @Override
     public Page<FreeSwitchCdrEntity> queryByOrgEntity(FreeSwitchCdrRequest request) {
-
         Pageable pageable = request.getPageable();
         Specification<FreeSwitchCdrEntity> specification = FreeSwitchCdrSpecification.search(request);
-
         return freeSwitchCdrRepository.findAll(specification, pageable);
     }
 
@@ -160,12 +158,10 @@ public class FreeSwitchCdrRestService extends BaseRestServiceWithExcel<FreeSwitc
     @Override
     public FreeSwitchCdrEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchCdrEntity entity) {
         log.warn("FreeSwitch CDR保存时发生乐观锁异常 uid: {}, version: {}", entity.getUid(), entity.getVersion());
-        // 重新查询最新版本并重试
         try {
             Optional<FreeSwitchCdrEntity> latest = findByUid(entity.getUid());
             if (latest.isPresent()) {
                 FreeSwitchCdrEntity latestEntity = latest.get();
-                // CDR记录通常不允许修改，这里只是示例
                 return doSave(latestEntity);
             }
         } catch (Exception ex) {
@@ -195,11 +191,11 @@ public class FreeSwitchCdrRestService extends BaseRestServiceWithExcel<FreeSwitc
 
     // 业务方法
     public Page<FreeSwitchCdrEntity> findByCallerNumber(String callerNumber, Pageable pageable) {
-        return freeSwitchCdrRepository.findByCallerIdNumberContaining(callerNumber, pageable);
+        return freeSwitchCdrRepository.findByCallerIdNumber(callerNumber, pageable);
     }
 
     public Page<FreeSwitchCdrEntity> findByDestinationNumber(String destinationNumber, Pageable pageable) {
-        return freeSwitchCdrRepository.findByDestinationNumberContaining(destinationNumber, pageable);
+        return freeSwitchCdrRepository.findByDestinationNumber(destinationNumber, pageable);
     }
 
 }
