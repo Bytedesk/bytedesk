@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.freeswitch;
+package com.bytedesk.freeswitch.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;

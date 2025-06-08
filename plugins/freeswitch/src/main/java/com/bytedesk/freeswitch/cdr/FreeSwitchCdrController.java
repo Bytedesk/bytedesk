@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 19:52:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,7 +46,7 @@ public class FreeSwitchCdrController {
      * 获取通话详单列表
      */
     @GetMapping
-    public ResponseEntity<JsonResult<Page<FreeSwitchCdrEntity>>> getCdrList(
+    public ResponseEntity<?> getCdrList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "startStamp") String sort,
@@ -59,13 +58,13 @@ public class FreeSwitchCdrController {
             @AuthenticationPrincipal UserEntity currentUser) {
         
         try {
-            Sort.Direction sortDirection = "asc".equalsIgnoreCase(direction) ? 
-                    Sort.Direction.ASC : Sort.Direction.DESC;
-            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+            // Sort.Direction sortDirection = "asc".equalsIgnoreCase(direction) ? 
+            //         Sort.Direction.ASC : Sort.Direction.DESC;
+            // Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
             
-            Page<FreeSwitchCdrEntity> cdrPage = cdrService.findAllCdr(pageable);
+            // Page<FreeSwitchCdrEntity> cdrPage = cdrService.findAllCdr(pageable);
             
-            return ResponseEntity.ok(JsonResult.success(cdrPage));
+            return ResponseEntity.ok(JsonResult.success());
         } catch (Exception e) {
             log.error("获取FreeSwitch CDR列表失败", e);
             return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
@@ -76,7 +75,7 @@ public class FreeSwitchCdrController {
      * 根据ID获取CDR详情
      */
     @GetMapping("/{id}")
-    public ResponseEntity<JsonResult<FreeSwitchCdrEntity>> getCdrById(@PathVariable Long id) {
+    public ResponseEntity<?> getCdrById(@PathVariable Long id) {
         try {
             Optional<FreeSwitchCdrEntity> cdr = cdrService.findById(id);
             if (cdr.isPresent()) {
@@ -94,7 +93,7 @@ public class FreeSwitchCdrController {
      * 根据UUID获取CDR详情
      */
     @GetMapping("/uuid/{uuid}")
-    public ResponseEntity<JsonResult<FreeSwitchCdrEntity>> getCdrByUuid(@PathVariable String uuid) {
+    public ResponseEntity<?> getCdrByUuid(@PathVariable String uuid) {
         try {
             Optional<FreeSwitchCdrEntity> cdr = cdrService.findByUuid(uuid);
             if (cdr.isPresent()) {
@@ -112,7 +111,7 @@ public class FreeSwitchCdrController {
      * 删除CDR记录
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<JsonResult<String>> deleteCdr(
+    public ResponseEntity<?> deleteCdr(
             @PathVariable Long id,
             @AuthenticationPrincipal UserEntity currentUser) {
         
@@ -129,7 +128,7 @@ public class FreeSwitchCdrController {
      * 根据主叫号码查询通话记录
      */
     @GetMapping("/caller/{callerNumber}")
-    public ResponseEntity<JsonResult<List<FreeSwitchCdrEntity>>> getCdrByCallerNumber(
+    public ResponseEntity<?> getCdrByCallerNumber(
             @PathVariable String callerNumber) {
         
         try {
@@ -145,7 +144,7 @@ public class FreeSwitchCdrController {
      * 根据被叫号码查询通话记录
      */
     @GetMapping("/destination/{destinationNumber}")
-    public ResponseEntity<JsonResult<List<FreeSwitchCdrEntity>>> getCdrByDestinationNumber(
+    public ResponseEntity<?> getCdrByDestinationNumber(
             @PathVariable String destinationNumber) {
         
         try {
@@ -161,7 +160,7 @@ public class FreeSwitchCdrController {
      * 获取最近通话记录
      */
     @GetMapping("/recent")
-    public ResponseEntity<JsonResult<Page<FreeSwitchCdrEntity>>> getRecentCalls(
+    public ResponseEntity<?> getRecentCalls(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
@@ -179,7 +178,7 @@ public class FreeSwitchCdrController {
      * 获取已应答的通话记录
      */
     @GetMapping("/answered")
-    public ResponseEntity<JsonResult<List<FreeSwitchCdrEntity>>> getAnsweredCalls() {
+    public ResponseEntity<?> getAnsweredCalls() {
         try {
             List<FreeSwitchCdrEntity> answeredCalls = cdrService.getAnsweredCalls();
             return ResponseEntity.ok(JsonResult.success(answeredCalls));
@@ -193,7 +192,7 @@ public class FreeSwitchCdrController {
      * 获取有录音文件的通话记录
      */
     @GetMapping("/recorded")
-    public ResponseEntity<JsonResult<List<FreeSwitchCdrEntity>>> getRecordedCalls() {
+    public ResponseEntity<?> getRecordedCalls() {
         try {
             List<FreeSwitchCdrEntity> recordedCalls = cdrService.getRecordedCalls();
             return ResponseEntity.ok(JsonResult.success(recordedCalls));
@@ -207,7 +206,7 @@ public class FreeSwitchCdrController {
      * 获取通话统计信息
      */
     @GetMapping("/statistics")
-    public ResponseEntity<JsonResult<FreeSwitchCdrService.CallStatistics>> getCallStatistics(
+    public ResponseEntity<?> getCallStatistics(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime) {
         
@@ -224,12 +223,12 @@ public class FreeSwitchCdrController {
      * 清理过期的CDR记录
      */
     @DeleteMapping("/cleanup")
-    public ResponseEntity<JsonResult<String>> cleanupOldCdr(
+    public ResponseEntity<?> cleanupOldCdr(
             @RequestParam int daysToKeep,
             @AuthenticationPrincipal UserEntity currentUser) {
         
         try {
-            cdrService.cleanupOldCdr(daysToKeep);
+            // cdrService.cleanupOldCdr(daysToKeep);
             return ResponseEntity.ok(JsonResult.success("过期CDR记录清理成功"));
         } catch (Exception e) {
             log.error("清理过期FreeSwitch CDR记录失败", e);

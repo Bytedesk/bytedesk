@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 19:50:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({FreeSwitchUserEntityListener.class})
-@Table(name = "freeswitch_users")
+@Table(name = "bytedesk_freeswitch_user")
 public class FreeSwitchUserEntity extends BaseEntity {
 
     /**
@@ -65,7 +65,7 @@ public class FreeSwitchUserEntity extends BaseEntity {
     /**
      * 显示名称
      */
-    @Column(name = "display_name", length = 100)
+    @Column(length = 100)
     private String displayName;
 
     /**
@@ -84,25 +84,25 @@ public class FreeSwitchUserEntity extends BaseEntity {
      * 是否启用
      */
     @Builder.Default
-    @Column(name = "is_enabled", nullable = false)
+    @Column(nullable = false)
     private Boolean enabled = true;
 
     /**
      * 最后注册时间
      */
-    @Column(name = "last_register")
+    @Column
     private LocalDateTime lastRegister;
 
     /**
      * 注册IP地址
      */
-    @Column(name = "register_ip", length = 45)
+    @Column(length = 45)
     private String registerIp;
 
     /**
      * 用户代理
      */
-    @Column(name = "user_agent", length = 255)
+    @Column(length = 255)
     private String userAgent;
 
     /**

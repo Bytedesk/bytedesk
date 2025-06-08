@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 19:52:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,7 +44,7 @@ public class FreeSwitchConferenceController {
      * 创建会议室
      */
     @PostMapping
-    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> createConference(
+    public ResponseEntity<?> createConference(
             @Valid @RequestBody FreeSwitchConferenceRequest request) {
         
         try {
@@ -67,7 +67,7 @@ public class FreeSwitchConferenceController {
      * 分页查询会议室列表
      */
     @GetMapping
-    public ResponseEntity<JsonResult<Page<FreeSwitchConferenceResponse>>> listConferences(
+    public ResponseEntity<?> listConferences(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -97,7 +97,7 @@ public class FreeSwitchConferenceController {
      * 根据ID获取会议室详情
      */
     @GetMapping("/{id}")
-    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> getConference(@PathVariable Long id) {
+    public ResponseEntity<?> getConference(@PathVariable Long id) {
         try {
             Optional<FreeSwitchConferenceEntity> entity = conferenceService.findById(id);
             if (entity.isPresent()) {
@@ -116,7 +116,7 @@ public class FreeSwitchConferenceController {
      * 根据名称获取会议室详情
      */
     @GetMapping("/by-name/{name}")
-    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> getConferenceByName(@PathVariable String name) {
+    public ResponseEntity<?> getConferenceByName(@PathVariable String name) {
         try {
             Optional<FreeSwitchConferenceEntity> entity = conferenceService.findByConferenceName(name);
             if (entity.isPresent()) {
@@ -135,7 +135,7 @@ public class FreeSwitchConferenceController {
      * 更新会议室信息
      */
     @PutMapping("/{id}")
-    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> updateConference(
+    public ResponseEntity<?> updateConference(
             @PathVariable Long id,
             @Valid @RequestBody FreeSwitchConferenceRequest request) {
         
@@ -161,7 +161,7 @@ public class FreeSwitchConferenceController {
      * 删除会议室
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<JsonResult<String>> deleteConference(@PathVariable Long id) {
+    public ResponseEntity<?> deleteConference(@PathVariable Long id) {
         try {
             conferenceService.deleteById(id);
             return ResponseEntity.ok(JsonResult.success("会议室删除成功", "会议室删除成功"));
@@ -175,7 +175,7 @@ public class FreeSwitchConferenceController {
      * 切换会议室状态
      */
     @PatchMapping("/{id}/toggle-status")
-    public ResponseEntity<JsonResult<String>> toggleConferenceStatus(@PathVariable Long id) {
+    public ResponseEntity<?> toggleConferenceStatus(@PathVariable Long id) {
         try {
             conferenceService.toggleStatus(id);
             return ResponseEntity.ok(JsonResult.success("会议室状态切换成功", "会议室状态切换成功"));
@@ -206,7 +206,7 @@ public class FreeSwitchConferenceController {
      * 获取所有启用的会议室
      */
     @GetMapping("/enabled")
-    public ResponseEntity<JsonResult<List<FreeSwitchConferenceResponse>>> getEnabledConferences() {
+    public ResponseEntity<?> getEnabledConferences() {
         try {
             List<FreeSwitchConferenceEntity> entities = conferenceService.findByEnabled(true);
             List<FreeSwitchConferenceResponse> responses = entities.stream()
@@ -223,7 +223,7 @@ public class FreeSwitchConferenceController {
      * 根据最大成员数查询会议室
      */
     @GetMapping("/by-capacity")
-    public ResponseEntity<JsonResult<List<FreeSwitchConferenceResponse>>> getConferencesByCapacity(
+    public ResponseEntity<?> getConferencesByCapacity(
             @RequestParam Integer minCapacity) {
         
         try {

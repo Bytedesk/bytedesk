@@ -1,4 +1,4 @@
-package com.bytedesk.freeswitch.freeswitch;
+package com.bytedesk.freeswitch.config;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

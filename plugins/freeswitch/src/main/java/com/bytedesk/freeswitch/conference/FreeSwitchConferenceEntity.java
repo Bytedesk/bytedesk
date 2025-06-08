@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 19:50:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,13 +39,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({FreeSwitchConferenceEntityListener.class})
-@Table(name = "freeswitch_conferences")
+@Table(name = "bytedesk_freeswitch_conference")
 public class FreeSwitchConferenceEntity extends BaseEntity {
 
     /**
      * 会议室名称
      */
-    @Column(name = "conference_name", nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String conferenceName;
 
     /**
@@ -63,27 +63,27 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 最大参与者数量
      */
-    @Column(name = "max_members")
+    @Column
     private Integer maxMembers;
 
     /**
      * 是否启用
      */
     @Builder.Default
-    @Column(name = "is_enabled", nullable = false)
+    @Column(nullable = false)
     private Boolean enabled = true;
 
     /**
      * 是否录音
      */
     @Builder.Default
-    @Column(name = "is_record_enabled", nullable = false)
+    @Column(nullable = false)
     private Boolean recordEnabled = false;
 
     /**
      * 录音文件路径
      */
-    @Column(name = "record_path", length = 500)
+    @Column(length = 500)
     private String recordPath;
 
     /**
@@ -95,7 +95,7 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 会议室配置参数（JSON格式）
      */
-    @Column(name = "config_json", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String configJson;
 
     /**

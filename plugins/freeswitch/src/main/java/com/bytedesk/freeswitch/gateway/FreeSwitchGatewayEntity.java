@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 19:50:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,13 +39,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({FreeSwitchGatewayEntityListener.class})
-@Table(name = "freeswitch_gateways")
+@Table(name = "bytedesk_freeswitch_gateway")
 public class FreeSwitchGatewayEntity extends BaseEntity {
 
     /**
      * 网关名称
      */
-    @Column(name = "gateway_name", nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String gatewayName;
 
     /**
@@ -75,27 +75,27 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
     /**
      * 从号码
      */
-    @Column(name = "from_user", length = 100)
+    @Column(length = 100)
     private String fromUser;
 
     /**
      * 从域名
      */
-    @Column(name = "from_domain", length = 100)
+    @Column(length = 100)
     private String fromDomain;
 
     /**
      * 注册
      */
     @Builder.Default
-    @Column(name = "is_register", nullable = false)
+    @Column(nullable = false)
     private Boolean register = true;
 
     /**
      * 注册传输协议
      */
     @Builder.Default
-    @Column(name = "register_transport", length = 20)
+    @Column(length = 20)
     private String registerTransport = "udp";
 
     /**
@@ -109,13 +109,13 @@ public class FreeSwitchGatewayEntity extends BaseEntity {
      * 是否启用
      */
     @Builder.Default
-    @Column(name = "is_enabled", nullable = false)
+    @Column(nullable = false)
     private Boolean enabled = true;
 
     /**
      * 扩展配置（JSON格式）
      */
-    @Column(name = "config_json", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String configJson;
 
     /**

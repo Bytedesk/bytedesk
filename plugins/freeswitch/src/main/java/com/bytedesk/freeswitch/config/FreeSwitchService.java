@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.freeswitch;
+package com.bytedesk.freeswitch.config;
 
 import org.freeswitch.esl.client.inbound.Client;
 import org.freeswitch.esl.client.transport.SendMsg;
