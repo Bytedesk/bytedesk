@@ -30,7 +30,6 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,18 +48,27 @@ public class FreeSwitchConferenceRestService extends BaseRestServiceWithExcel<Fr
     private final AuthService authService;
 
     @Override
+    public Page<FreeSwitchConferenceResponse> queryByOrg(FreeSwitchConferenceRequest request) {
+        return queryByOrgEntity(request).map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<FreeSwitchConferenceResponse> queryByUser(FreeSwitchConferenceRequest request) {
+        return queryByUserEntity(request).map(this::convertToResponse);
+    }
+
+    @Override
     public Page<FreeSwitchConferenceEntity> queryByOrgEntity(FreeSwitchConferenceRequest request) {
 
-        Pageable pageable = Utils.getPageable(request);
-        Specification<FreeSwitchConferenceEntity> specification = FreeSwitchConferenceSpecification.search(request);
+        Pageable pageable = request.getPageable();
+        Specification<FreeSwitchConferenceEntity> specification = FreeSwitchConferenceSpecification.build(request);
 
         return freeSwitchConferenceRepository.findAll(specification, pageable);
     }
 
-    @Override
     public Page<FreeSwitchConferenceEntity> queryByUserEntity(FreeSwitchConferenceRequest request) {
 
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         request.setOrgUid(user.getOrgUid());
 
         return queryByOrgEntity(request);
@@ -68,7 +76,7 @@ public class FreeSwitchConferenceRestService extends BaseRestServiceWithExcel<Fr
 
     @Override
     public Optional<FreeSwitchConferenceEntity> findByUid(String uid) {
-        return freeSwitchConferenceRepository.findByUidAndDeleted(uid, false);
+        return freeSwitchConferenceRepository.findByUid(uid);
     }
 
     @Override
@@ -76,7 +84,6 @@ public class FreeSwitchConferenceRestService extends BaseRestServiceWithExcel<Fr
         return modelMapper.map(entity, FreeSwitchConferenceResponse.class);
     }
 
-    @Override
     public FreeSwitchConferenceEntity convertToEntity(FreeSwitchConferenceRequest request) {
         return modelMapper.map(request, FreeSwitchConferenceEntity.class);
     }
@@ -89,7 +96,7 @@ public class FreeSwitchConferenceRestService extends BaseRestServiceWithExcel<Fr
     @Override
     public FreeSwitchConferenceResponse create(FreeSwitchConferenceRequest request) {
 
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         if (StringUtils.hasText(request.getOrgUid())) {
             request.setOrgUid(user.getOrgUid());
         }
@@ -156,6 +163,38 @@ public class FreeSwitchConferenceRestService extends BaseRestServiceWithExcel<Fr
             return freeSwitchConferenceRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             handleOptimisticLockingFailureException(e, entity);
+        }
+        return null;
+    }
+
+    @Override
+    public FreeSwitchConferenceEntity doSave(FreeSwitchConferenceEntity entity) {
+        return freeSwitchConferenceRepository.save(entity);
+    }
+
+    @Override
+    public void delete(FreeSwitchConferenceRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
+    public FreeSwitchConferenceEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchConferenceEntity entity) {
+        log.warn("FreeSwitch会议室保存时发生乐观锁异常 uid: {}, version: {}", entity.getUid(), entity.getVersion());
+        // 重新查询最新版本并重试
+        try {
+            Optional<FreeSwitchConferenceEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                FreeSwitchConferenceEntity latestEntity = latest.get();
+                // 将当前修改应用到最新版本
+                latestEntity.setDescription(entity.getDescription());
+                latestEntity.setPassword(entity.getPassword());
+                latestEntity.setMaxMembers(entity.getMaxMembers());
+                latestEntity.setEnabled(entity.getEnabled());
+                latestEntity.setRecordEnabled(entity.getRecordEnabled());
+                return doSave(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
     }

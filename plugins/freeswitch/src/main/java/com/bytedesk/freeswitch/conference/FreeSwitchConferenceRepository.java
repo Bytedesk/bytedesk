@@ -32,6 +32,11 @@ public interface FreeSwitchConferenceRepository extends JpaRepository<FreeSwitch
         JpaSpecificationExecutor<FreeSwitchConferenceEntity> {
 
     /**
+     * 根据UID查找会议室
+     */
+    Optional<FreeSwitchConferenceEntity> findByUid(String uid);
+
+    /**
      * 根据会议室名称查找会议室
      */
     Optional<FreeSwitchConferenceEntity> findByConferenceName(String conferenceName);

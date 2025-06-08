@@ -35,6 +35,11 @@ public interface FreeSwitchUserRepository extends JpaRepository<FreeSwitchUserEn
         JpaSpecificationExecutor<FreeSwitchUserEntity> {
 
     /**
+     * 根据UID查找用户
+     */
+    Optional<FreeSwitchUserEntity> findByUid(String uid);
+
+    /**
      * 根据用户名查找用户
      */
     Optional<FreeSwitchUserEntity> findByUsername(String username);

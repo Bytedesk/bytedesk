@@ -13,23 +13,27 @@
  */
 package com.bytedesk.freeswitch.user;
 
+import com.bytedesk.core.base.BaseRequest;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * FreeSwitch用户请求实体
  */
 @Data
-@Builder
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FreeSwitchUserRequest {
+public class FreeSwitchUserRequest extends BaseRequest {
 
     /**
      * 用户名（SIP用户名）

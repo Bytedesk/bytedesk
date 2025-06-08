@@ -16,14 +16,14 @@ package com.bytedesk.freeswitch.conference;
 import com.bytedesk.core.base.BaseRequest;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
