@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 19:50:44
+ * @LastEditTime: 2025-06-08 21:02:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,107 +42,85 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({FreeSwitchCdrEntityListener.class})
 @Table(name = "bytedesk_freeswitch_cdr")
 public class FreeSwitchCdrEntity extends BaseEntity {
-
-    /**
-     * 通话唯一标识符
-     */
-    @Column(unique = true)
-    private String uuid;
-
+    
     /**
      * 主叫名称
      */
-    @Column
     private String callerIdName;
 
     /**
      * 主叫号码
      */
-    @Column
     private String callerIdNumber;
 
     /**
      * 被叫号码
      */
-    @Column
     private String destinationNumber;
 
     /**
      * 上下文
      */
-    @Column
     private String context;
 
     /**
      * 通话开始时间
      */
-    @Column
     private LocalDateTime startStamp;
 
     /**
      * 通话接通时间
      */
-    @Column
     private LocalDateTime answerStamp;
 
     /**
      * 通话结束时间
      */
-    @Column
     private LocalDateTime endStamp;
 
     /**
      * 通话总时长（秒）
      */
-    @Column
     private Integer duration;
 
     /**
      * 计费时长（秒）
      */
-    @Column
     private Integer billsec;
 
     /**
      * 挂断原因
      */
-    @Column
     private String hangupCause;
 
     /**
      * 账户代码
      */
-    @Column
     private String accountcode;
 
     /**
      * 读取编解码器
      */
-    @Column
     private String readCodec;
 
     /**
      * 写入编解码器
      */
-    @Column
     private String writeCodec;
 
     /**
      * SIP挂断处理
      */
-    @Column
     private String sipHangupDisposition;
 
     /**
      * 录音文件路径
      */
-    @Column
     private String recordFile;
 
     /**
      * 通话方向（inbound/outbound）
      */
-    @Column
     private String direction;
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 17:40:37
+ * @LastEditTime: 2025-06-08 21:02:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,11 +43,11 @@ public class FreeSwitchCdrService {
     @Transactional
     public FreeSwitchCdrEntity createCdr(FreeSwitchCdrEntity cdr) {
         log.info("创建CDR记录: UUID={}, 主叫={}, 被叫={}", 
-                cdr.getUuid(), cdr.getCallerIdNumber(), cdr.getDestinationNumber());
+                cdr.getUid(), cdr.getCallerIdNumber(), cdr.getDestinationNumber());
         
         // 检查UUID是否已存在
-        if (cdrRepository.existsByUuid(cdr.getUuid())) {
-            log.warn("CDR记录已存在: {}", cdr.getUuid());
+        if (cdrRepository.existsByUuid(cdr.getUid())) {
+            log.warn("CDR记录已存在: {}", cdr.getUid());
             return cdr;
         }
         
@@ -59,7 +59,7 @@ public class FreeSwitchCdrService {
      */
     @Transactional
     public FreeSwitchCdrEntity updateCdr(FreeSwitchCdrEntity cdr) {
-        log.info("更新CDR记录: UUID={}", cdr.getUuid());
+        log.info("更新CDR记录: UUID={}", cdr.getUid());
         return cdrRepository.save(cdr);
     }
 
@@ -190,7 +190,7 @@ public class FreeSwitchCdrService {
             log.info("更新现有CDR记录: {}", uuid);
         } else {
             cdr = FreeSwitchCdrEntity.builder()
-                    .uuid(uuid)
+                    .uid(uuid)
                     .callerIdNumber(callerNumber)
                     .destinationNumber(destinationNumber)
                     .context(context)

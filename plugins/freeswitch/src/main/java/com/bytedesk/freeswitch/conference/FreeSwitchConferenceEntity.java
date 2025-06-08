@@ -51,19 +51,16 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 会议室描述
      */
-    @Column
     private String description;
 
     /**
      * 会议室密码
      */
-    @Column
     private String password;
 
     /**
      * 最大参与者数量
      */
-    @Column
     private Integer maxMembers;
 
     /**
