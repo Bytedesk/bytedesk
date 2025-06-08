@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.bytedesk</groupId>
+		<artifactId>modules</artifactId>
+		<version>${revision}</version>
+	</parent>
+
+	<groupId>com.bytedesk</groupId>
+	<artifactId>bytedesk-module-ai</artifactId>
+	<version>${revision}</version>
+
+	<name>bytedesk-module-ai</name>
+	<description>https://www.bytedesk.com</description>
+
+	<properties>
+		<ollama4j.version>1.0.100</ollama4j.version>
+		<!-- <spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version> -->
+		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
+		<jsonp.version>1.18.3</jsonp.version>
+		<!-- <selenium.version>4.30.0</selenium.version> -->
+		<ai.djl.version>0.32.0</ai.djl.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-retry -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-retry</artifactId>
+			<version>${spring-ai.version}</version>
+			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
+			<exclusions>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- rag -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-advisors-vector-store</artifactId>
+			<version>${spring-ai.version}</version>
+			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
+			<exclusions>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-rag -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-rag</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- llm -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-openai</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-ollama -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-ollama</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- vector store -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-elasticsearch -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- mcp -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-mcp-client</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-mcp-server</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-core</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-kbase</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+
+		<!--  开始：运行 Embedding 模型依赖   -->
+		<!-- https://github.com/deepjavalibrary/djl-demo -->
+		<!-- https://docs.djl.ai/master/docs/quick_start.html -->
+		<!-- <dependency>
+			<groupId>ai.djl</groupId>
+			<artifactId>api</artifactId>
+			<version>${ai.djl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ai.djl.huggingface</groupId>
+			<artifactId>tokenizers</artifactId>
+			<version>${ai.djl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ai.djl</groupId>
+			<artifactId>model-zoo</artifactId>
+			<version>${ai.djl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ai.djl.pytorch</groupId>
+			<artifactId>pytorch-engine</artifactId>
+			<version>${ai.djl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ai.djl.onnxruntime</groupId>
+			<artifactId>onnxruntime-engine</artifactId>
+			<version>${ai.djl.version}</version>
+		</dependency> -->
+		<!--  结束：运行 Embedding 模型依赖   -->
+
+		<!-- https://java2ai.com/docs/1.0.0-M5.1/overview/?spm=5176.29160081.0.0.2856aa5cNBNg4X -->
+		<!-- https://github.com/alibaba/spring-ai-alibaba/blob/main/README-zh.md -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter -->
+		<!-- <dependency>
+			<groupId>com.alibaba.cloud.ai</groupId>
+			<artifactId>spring-ai-alibaba-starter</artifactId>
+			<version>${spring-ai-alibaba.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
+
+		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
+		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
+		<!--
+		https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
+		<!-- <dependency>
+			<groupId>cn.bigmodel.openapi</groupId>
+			<artifactId>oapi-java-sdk</artifactId>
+			<version>${zhipuai.version}</version>
+		</dependency> -->
+
+		<!-- https://ollama4j.github.io/ollama4j/intro -->
+		<!-- https://central.sonatype.com/artifact/io.github.ollama4j/ollama4j/overview -->
+		<dependency>
+			<groupId>io.github.ollama4j</groupId>
+			<artifactId>ollama4j</artifactId>
+			<version>${ollama4j.version}</version>
+		</dependency>
+
+		<!-- 抓取网页时使用 -->
+		<!-- https://jsoup.org/download -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsonp.version}</version>
+		</dependency>
+
+		<!-- Open Manus -->
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<!--
+		https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk/examples/java/src/test/java/dev/selenium/actions_api/ActionsTest.java -->
+		<!-- <dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-api</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-remote-driver</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-manager</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-http</artifactId>
+			<version>${selenium.version}</version>
+		</dependency> -->
+
+		<!-- 添加Chrome 134版本对应的DevTools支持 -->
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-devtools-v134 -->
+		<!-- <dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-devtools-v134</artifactId>
+			<version>${selenium.version}</version>
+		</dependency> -->
+
+
+		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- 添加Spring AI Chat Observation依赖 -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-autoconfigure-model-chat-observation</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
+
+		<!-- 添加Micrometer依赖 -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-observation</artifactId>
+		</dependency>
+
+
+	</dependencies>
+
+	<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<!-- <plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin> -->
+		</plugins>
+	</build>
+
+	<repositories>
+		<!-- https://java2ai.com/docs/dev/get-started/ -->
+		<!-- <repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository> -->
+		<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
+		<!-- https://repo.spring.io/ui/native/snapshot/org/springframework/ai/ -->
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>https://repo.spring.io/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<name>Central Portal Snapshots</name>
+			<id>central-portal-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+</project>

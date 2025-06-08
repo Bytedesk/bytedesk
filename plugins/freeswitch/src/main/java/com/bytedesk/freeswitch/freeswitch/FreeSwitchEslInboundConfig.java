@@ -113,6 +113,7 @@ public class FreeSwitchEslInboundConfig {
      */
     private void handleEvent(EslEvent event) {
         String eventName = event.getEventName();
+        log.trace("处理事件: {} / {}", eventName, event.getEventHeaders());
         
         switch(eventName) {
             case "CHANNEL_CREATE":
