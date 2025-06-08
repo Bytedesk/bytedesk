@@ -86,4 +86,11 @@ public class FreeSwitchConferenceRequest extends BaseRequest {
     public String getModeratorPin() {
         return this.password;
     }
+
+    /**
+     * 检查是否设置了密码保护
+     */
+    public Boolean getPasswordProtected() {
+        return password != null && !password.trim().isEmpty();
+    }
 }

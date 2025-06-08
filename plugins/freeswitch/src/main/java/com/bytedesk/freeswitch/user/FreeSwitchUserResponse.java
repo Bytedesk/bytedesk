@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-06-09 10:00:00
+ * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 10:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,13 @@
  */
 package com.bytedesk.freeswitch.user;
 
+import com.bytedesk.core.base.BaseResponse;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -24,15 +27,12 @@ import java.time.LocalDateTime;
  * FreeSwitch用户响应实体
  */
 @Data
-@Builder
-@NoArgsConstructor
+@SuperBuilder
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class FreeSwitchUserResponse {
-
-    /**
-     * ID
-     */
-    private Long id;
+@NoArgsConstructor
+public class FreeSwitchUserResponse extends BaseResponse {
 
     /**
      * 用户名（SIP用户名）
@@ -85,16 +85,6 @@ public class FreeSwitchUserResponse {
     private String remarks;
 
     /**
-     * 创建时间
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updatedAt;
-
-    /**
      * SIP地址
      */
     private String sipAddress;
@@ -104,35 +94,4 @@ public class FreeSwitchUserResponse {
      */
     private Boolean online;
 
-    /**
-     * 从实体创建响应对象
-     */
-    public static FreeSwitchUserResponse fromEntity(FreeSwitchUserEntity entity) {
-        return FreeSwitchUserResponse.builder()
-                .id(entity.getId())
-                .username(entity.getUsername())
-                .domain(entity.getDomain())
-                .displayName(entity.getDisplayName())
-                .email(entity.getEmail())
-                .accountcode(entity.getAccountcode())
-                .enabled(entity.getEnabled())
-                .lastRegister(entity.getLastRegister())
-                .registerIp(entity.getRegisterIp())
-                .userAgent(entity.getUserAgent())
-                .remarks(entity.getRemarks())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .sipAddress(entity.getSipAddress())
-                .online(entity.isOnline())
-                .build();
-    }
-
-    /**
-     * 从实体创建响应对象（隐藏密码）
-     */
-    public static FreeSwitchUserResponse fromEntitySafe(FreeSwitchUserEntity entity) {
-        FreeSwitchUserResponse response = fromEntity(entity);
-        // 不返回密码信息
-        return response;
-    }
 }
