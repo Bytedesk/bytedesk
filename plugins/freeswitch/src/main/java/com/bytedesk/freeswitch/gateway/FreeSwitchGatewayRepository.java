@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.repository;
+package com.bytedesk.freeswitch.gateway;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +24,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.freeswitch.model.FreeSwitchGatewayEntity;
+import com.bytedesk.freeswitch.gateway.FreeSwitchGatewayEntity;
 
 /**
  * FreeSwitch网关仓库接口
@@ -115,6 +115,11 @@ public interface FreeSwitchGatewayRepository extends JpaRepository<FreeSwitchGat
      */
     @Query("SELECT COUNT(g) FROM FreeSwitchGatewayEntity g WHERE g.enabled = true AND g.status = 'UP'")
     long countOnlineGateways();
+
+    /**
+     * 统计指定状态和启用状态的网关数量
+     */
+    long countByStatusAndEnabledTrue(String status);
 
     /**
      * 统计需要注册的网关数量

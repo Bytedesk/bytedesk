@@ -11,9 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.model;
-
-import java.time.LocalDateTime;
+package com.bytedesk.freeswitch.conference;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -29,8 +27,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * FreeSwitch用户实体
- * 对应数据库表：freeswitch_users
+ * FreeSwitch会议室实体
+ * 对应数据库表：freeswitch_conferences
  */
 @Entity
 @Data
@@ -39,45 +37,33 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({FreeSwitchUserEntityListener.class})
-@Table(name = "freeswitch_users")
-public class FreeSwitchUserEntity extends BaseEntity {
+@EntityListeners({FreeSwitchConferenceEntityListener.class})
+@Table(name = "freeswitch_conferences")
+public class FreeSwitchConferenceEntity extends BaseEntity {
 
     /**
-     * 用户名（SIP用户名）
+     * 会议室名称
      */
-    @Column(name = "username", nullable = false, unique = true, length = 50)
-    private String username;
+    @Column(name = "conference_name", nullable = false, unique = true, length = 100)
+    private String conferenceName;
 
     /**
-     * SIP域名
+     * 会议室描述
      */
-    @Column(name = "domain", nullable = false, length = 100)
-    private String domain;
+    @Column(name = "description", length = 255)
+    private String description;
 
     /**
-     * 密码
+     * 会议室密码
      */
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", length = 50)
     private String password;
 
     /**
-     * 显示名称
+     * 最大参与者数量
      */
-    @Column(name = "display_name", length = 100)
-    private String displayName;
-
-    /**
-     * 邮箱
-     */
-    @Column(name = "email", length = 100)
-    private String email;
-
-    /**
-     * 账户代码
-     */
-    @Column(name = "accountcode", length = 50)
-    private String accountcode;
+    @Column(name = "max_members")
+    private Integer maxMembers;
 
     /**
      * 是否启用
@@ -86,22 +72,28 @@ public class FreeSwitchUserEntity extends BaseEntity {
     private Boolean enabled = true;
 
     /**
-     * 最后注册时间
+     * 是否录音
      */
-    @Column(name = "last_register")
-    private LocalDateTime lastRegister;
+    @Column(name = "record_enabled", nullable = false)
+    private Boolean recordEnabled = false;
 
     /**
-     * 注册IP地址
+     * 录音文件路径
      */
-    @Column(name = "register_ip", length = 45)
-    private String registerIp;
+    @Column(name = "record_path", length = 500)
+    private String recordPath;
 
     /**
-     * 用户代理
+     * 创建者
      */
-    @Column(name = "user_agent", length = 255)
-    private String userAgent;
+    @Column(name = "creator", length = 100)
+    private String creator;
+
+    /**
+     * 会议室配置参数（JSON格式）
+     */
+    @Column(name = "config_json", columnDefinition = "TEXT")
+    private String configJson;
 
     /**
      * 备注
@@ -110,17 +102,16 @@ public class FreeSwitchUserEntity extends BaseEntity {
     private String remarks;
 
     /**
-     * 获取完整的SIP地址
+     * 检查会议室是否有密码保护
      */
-    public String getSipAddress() {
-        return username + "@" + domain;
+    public boolean isPasswordProtected() {
+        return password != null && !password.trim().isEmpty();
     }
 
     /**
-     * 检查用户是否在线
+     * 检查会议室是否已满
      */
-    public boolean isOnline() {
-        return enabled && lastRegister != null && 
-               lastRegister.isAfter(LocalDateTime.now().minusMinutes(5));
+    public boolean isFull(int currentMembers) {
+        return maxMembers != null && currentMembers >= maxMembers;
     }
 }
