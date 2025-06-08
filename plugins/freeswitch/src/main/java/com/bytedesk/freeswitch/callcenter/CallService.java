@@ -13,7 +13,9 @@
  */
 package com.bytedesk.freeswitch.callcenter;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.freeswitch.esl.client.inbound.Client;
@@ -23,6 +25,10 @@ import org.springframework.stereotype.Service;
 
 // import com.bytedesk.freeswitch.freeswitch.FreeSwitchProperties;
 import com.bytedesk.freeswitch.freeswitch.FreeSwitchService;
+import com.bytedesk.freeswitch.model.FreeSwitchCdrEntity;
+import com.bytedesk.freeswitch.model.FreeSwitchUserEntity;
+import com.bytedesk.freeswitch.service.FreeSwitchCdrService;
+import com.bytedesk.freeswitch.service.FreeSwitchUserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +46,8 @@ public class CallService {
     // private final FreeSwitchProperties freeSwitchProperties;
     private final FreeSwitchService freeSwitchService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final FreeSwitchCdrService cdrService;
+    private final FreeSwitchUserService userService;
     
     // 存储活动呼叫信息
     private final Map<String, CallInfo> activeCallMap = new ConcurrentHashMap<>();
@@ -277,6 +285,10 @@ public class CallService {
     public void handleCallStart(String callerId, String destination, String uuid) {
         log.info("处理呼叫开始: {} -> {} (UUID: {})", callerId, destination, uuid);
         
+        // 更新用户最后注册时间
+        updateUserLastRegistration(callerId);
+        updateUserLastRegistration(destination);
+        
         // 查找匹配的呼叫
         for (Map.Entry<String, CallInfo> entry : activeCallMap.entrySet()) {
             CallInfo callInfo = entry.getValue();
@@ -348,6 +360,9 @@ public class CallService {
                 callInfo.setEndTime(System.currentTimeMillis());
                 callInfo.setHangupCause(hangupCause);
                 activeCallMap.put(entry.getKey(), callInfo);
+                
+                // 保存CDR记录到数据库（如果还没有保存的话）
+                saveCdrRecord(callInfo, hangupCause);
                 
                 // 通知用户
                 notifyCallEvent(callInfo.getFromUser(), "call_ended", callInfo);
@@ -448,5 +463,54 @@ public class CallService {
      */
     public Map<String, CallInfo> getAllActiveCalls() {
         return new java.util.HashMap<>(activeCallMap);
+    }
+    
+    /**
+     * 更新用户最后注册时间
+     */
+    private void updateUserLastRegistration(String username) {
+        try {
+            Optional<FreeSwitchUserEntity> userOptional = userService.findByUsername(username);
+            if (userOptional.isPresent()) {
+                userService.updateLastRegistration(username, LocalDateTime.now());
+                log.debug("已更新用户最后注册时间: {}", username);
+            }
+        } catch (Exception e) {
+            log.error("更新用户最后注册时间失败: {} - {}", username, e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 保存CDR记录到数据库
+     */
+    private void saveCdrRecord(CallInfo callInfo, String hangupCause) {
+        try {
+            // 检查是否已经存在CDR记录
+            Optional<FreeSwitchCdrEntity> existingCdrOptional = cdrService.findByUuid(callInfo.getUuid());
+            if (!existingCdrOptional.isPresent()) {
+                // 创建新的CDR记录
+                FreeSwitchCdrEntity cdr = new FreeSwitchCdrEntity();
+                cdr.setUuid(callInfo.getUuid());
+                cdr.setCallerIdNumber(callInfo.getFromUser());
+                cdr.setDestinationNumber(callInfo.getToUser());
+                cdr.setStartStamp(LocalDateTime.now().minusSeconds(
+                    (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
+                
+                if (callInfo.getAnswerTime() > 0) {
+                    cdr.setAnswerStamp(LocalDateTime.now().minusSeconds(
+                        (System.currentTimeMillis() - callInfo.getAnswerTime()) / 1000));
+                }
+                
+                cdr.setEndStamp(LocalDateTime.now());
+                cdr.setDuration((int) ((System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
+                cdr.setHangupCause(hangupCause);
+                cdr.setDirection("outbound"); // 默认设置，可根据实际情况调整
+                
+                cdrService.createCdr(cdr);
+                log.debug("已保存CDR记录: UUID {}", callInfo.getUuid());
+            }
+        } catch (Exception e) {
+            log.error("保存CDR记录失败: UUID {} - {}", callInfo.getUuid(), e.getMessage(), e);
+        }
     }
 }
