@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/freeswitch/cdr")
+@RequestMapping("/freeswitch/api/v1/cdr")
 @AllArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
 public class FreeSwitchCdrController {
