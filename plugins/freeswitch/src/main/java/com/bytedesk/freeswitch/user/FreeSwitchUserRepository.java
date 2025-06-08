@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.repository;
+package com.bytedesk.freeswitch.user;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.freeswitch.model.FreeSwitchUserEntity;
+import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
 
 /**
  * FreeSwitch用户仓库接口
@@ -47,7 +47,7 @@ public interface FreeSwitchUserRepository extends JpaRepository<FreeSwitchUserEn
     /**
      * 根据邮箱查找用户
      */
-    Optional<FreeSwitchUserEntity> findByEmail(String email);
+    List<FreeSwitchUserEntity> findByEmail(String email);
 
     /**
      * 查找启用的用户
@@ -58,6 +58,11 @@ public interface FreeSwitchUserRepository extends JpaRepository<FreeSwitchUserEn
      * 根据域名查找用户
      */
     List<FreeSwitchUserEntity> findByDomain(String domain);
+
+    /**
+     * 根据域名查找用户（分页）
+     */
+    Page<FreeSwitchUserEntity> findByDomain(String domain, Pageable pageable);
 
     /**
      * 根据账户代码查找用户
@@ -73,6 +78,21 @@ public interface FreeSwitchUserRepository extends JpaRepository<FreeSwitchUserEn
      * 检查用户名和域名组合是否存在
      */
     boolean existsByUsernameAndDomain(String username, String domain);
+
+    /**
+     * 查找在线用户（最近指定时间内有注册记录）
+     */
+    List<FreeSwitchUserEntity> findByEnabledTrueAndLastRegisterAfter(LocalDateTime cutoffTime);
+
+    /**
+     * 统计域名下的用户数量
+     */
+    long countByDomain(String domain);
+
+    /**
+     * 统计在线用户数量
+     */
+    long countByEnabledTrueAndLastRegisterAfter(LocalDateTime cutoffTime);
 
     /**
      * 查找在线用户（最近5分钟内有注册记录）
