@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * FreeSwitch会议服务类
@@ -61,6 +62,20 @@ public class FreeSwitchConferenceService {
      */
     public Optional<FreeSwitchConferenceEntity> findById(Long id) {
         return conferenceRepository.findById(id);
+    }
+
+    /**
+     * 分页查询所有会议室
+     */
+    public Page<FreeSwitchConferenceEntity> findAll(Pageable pageable) {
+        return conferenceRepository.findAll(pageable);
+    }
+
+    /**
+     * 根据会议室名称模糊查询
+     */
+    public Page<FreeSwitchConferenceEntity> findByConferenceNameContaining(String keyword, Pageable pageable) {
+        return conferenceRepository.findByConferenceNameContainingIgnoreCase(keyword, pageable);
     }
 
     /**
@@ -155,6 +170,51 @@ public class FreeSwitchConferenceService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 根据ID删除会议室
+     */
+    @Transactional
+    public void deleteById(Long id) {
+        conferenceRepository.deleteById(id);
+        log.info("删除会议室: ID = {}", id);
+    }
+
+    /**
+     * 切换会议室状态
+     */
+    @Transactional
+    public void toggleStatus(Long id) {
+        Optional<FreeSwitchConferenceEntity> conferenceOpt = conferenceRepository.findById(id);
+        if (conferenceOpt.isPresent()) {
+            FreeSwitchConferenceEntity conference = conferenceOpt.get();
+            conference.setEnabled(!conference.getEnabled());
+            conferenceRepository.save(conference);
+            log.info("切换会议室状态: {} -> {}", conference.getConferenceName(), conference.getEnabled() ? "启用" : "禁用");
+        } else {
+            throw new RuntimeException("会议室不存在: " + id);
+        }
+    }
+
+    /**
+     * 根据启用状态查找会议室
+     */
+    public List<FreeSwitchConferenceEntity> findByEnabled(Boolean enabled) {
+        if (enabled) {
+            return conferenceRepository.findByEnabledTrue();
+        } else {
+            return conferenceRepository.findByEnabledFalse();
+        }
+    }
+
+    /**
+     * 查找最大成员数量大于等于指定值的会议室
+     */
+    public List<FreeSwitchConferenceEntity> findByMaxMembersGreaterThanEqual(Integer minCapacity) {
+        return conferenceRepository.findAll().stream()
+                .filter(conference -> conference.getMaxMembers() != null && conference.getMaxMembers() >= minCapacity)
+                .collect(Collectors.toList());
     }
 
     /**

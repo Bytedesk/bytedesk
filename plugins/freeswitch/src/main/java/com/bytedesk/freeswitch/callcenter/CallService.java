@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 
 // import com.bytedesk.freeswitch.freeswitch.FreeSwitchProperties;
 import com.bytedesk.freeswitch.freeswitch.FreeSwitchService;
-import com.bytedesk.freeswitch.model.FreeSwitchCdrEntity;
-import com.bytedesk.freeswitch.model.FreeSwitchUserEntity;
-import com.bytedesk.freeswitch.service.FreeSwitchCdrService;
-import com.bytedesk.freeswitch.service.FreeSwitchUserService;
+import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
+import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
+import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
+import com.bytedesk.freeswitch.user.FreeSwitchUserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

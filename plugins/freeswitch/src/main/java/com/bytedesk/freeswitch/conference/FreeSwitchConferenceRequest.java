@@ -79,4 +79,11 @@ public class FreeSwitchConferenceRequest extends BaseRequest {
      * 备注
      */
     private String remarks;
+
+    /**
+     * 获取主持人密码（兼容性方法）
+     */
+    public String getModeratorPin() {
+        return this.password;
+    }
 }
