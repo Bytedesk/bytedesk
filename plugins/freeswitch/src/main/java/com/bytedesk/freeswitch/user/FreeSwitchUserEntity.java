@@ -22,6 +22,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -46,19 +47,19 @@ public class FreeSwitchUserEntity extends BaseEntity {
     /**
      * 用户名（SIP用户名）
      */
-    @Column(name = "username", nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
     /**
      * SIP域名
      */
-    @Column(name = "domain", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String domain;
 
     /**
      * 密码
      */
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(nullable = false, length = 255)
     private String password;
 
     /**
@@ -70,19 +71,20 @@ public class FreeSwitchUserEntity extends BaseEntity {
     /**
      * 邮箱
      */
-    @Column(name = "email", length = 100)
+    @Column(length = 100)
     private String email;
 
     /**
      * 账户代码
      */
-    @Column(name = "accountcode", length = 50)
+    @Column(length = 50)
     private String accountcode;
 
     /**
      * 是否启用
      */
-    @Column(name = "enabled", nullable = false)
+    @Builder.Default
+    @Column(name = "is_enabled", nullable = false)
     private Boolean enabled = true;
 
     /**
@@ -106,7 +108,7 @@ public class FreeSwitchUserEntity extends BaseEntity {
     /**
      * 备注
      */
-    @Column(name = "remarks", length = 500)
+    @Column(length = 500)
     private String remarks;
 
     /**

@@ -20,6 +20,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -50,13 +51,13 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 会议室描述
      */
-    @Column(name = "description", length = 255)
+    @Column(length = 255)
     private String description;
 
     /**
      * 会议室密码
      */
-    @Column(name = "password", length = 50)
+    @Column(length = 50)
     private String password;
 
     /**
@@ -68,13 +69,15 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 是否启用
      */
-    @Column(name = "enabled", nullable = false)
+    @Builder.Default
+    @Column(name = "is_enabled", nullable = false)
     private Boolean enabled = true;
 
     /**
      * 是否录音
      */
-    @Column(name = "record_enabled", nullable = false)
+    @Builder.Default
+    @Column(name = "is_record_enabled", nullable = false)
     private Boolean recordEnabled = false;
 
     /**
@@ -86,7 +89,7 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 创建者
      */
-    @Column(name = "creator", length = 100)
+    @Column(length = 100)
     private String creator;
 
     /**
@@ -98,7 +101,7 @@ public class FreeSwitchConferenceEntity extends BaseEntity {
     /**
      * 备注
      */
-    @Column(name = "remarks", length = 500)
+    @Column(length = 500)
     private String remarks;
 
     /**
