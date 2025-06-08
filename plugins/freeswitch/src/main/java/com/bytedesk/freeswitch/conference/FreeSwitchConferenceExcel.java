@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.freeswitch.user;
+package com.bytedesk.freeswitch.conference;
 
 import java.time.LocalDateTime;
 
@@ -22,44 +22,43 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import lombok.Data;
 
 /**
- * FreeSwitch用户Excel导出类
+ * FreeSwitch会议室Excel导出类
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class FreeSwitchUserExcel {
+public class FreeSwitchConferenceExcel {
 
-    @ExcelProperty(index = 0, value = "用户名")
+    @ExcelProperty(index = 0, value = "会议室名称")
     @ColumnWidth(20)
-    private String username;
+    private String conferenceName;
 
-    @ExcelProperty(index = 1, value = "域名")
-    @ColumnWidth(20)
-    private String domain;
+    @ExcelProperty(index = 1, value = "描述")
+    @ColumnWidth(30)
+    private String description;
 
-    @ExcelProperty(index = 2, value = "显示名称")
-    @ColumnWidth(20)
-    private String displayName;
+    @ExcelProperty(index = 2, value = "最大成员数")
+    @ColumnWidth(15)
+    private Integer maxMembers;
 
-    @ExcelProperty(index = 3, value = "邮箱")
-    @ColumnWidth(25)
-    private String email;
-
-    @ExcelProperty(index = 4, value = "账户代码")
-    @ColumnWidth(20)
-    private String accountcode;
-
-    @ExcelProperty(index = 5, value = "是否启用")
+    @ExcelProperty(index = 3, value = "是否启用")
     @ColumnWidth(15)
     private Boolean enabled;
 
-    @ExcelProperty(index = 6, value = "SIP端口")
+    @ExcelProperty(index = 4, value = "是否录音")
     @ColumnWidth(15)
-    private Integer sipPort;
+    private Boolean recordEnabled;
 
-    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "最后注册时间")
-    @ColumnWidth(25)
-    private LocalDateTime lastRegister;
+    @ExcelProperty(index = 5, value = "是否有密码")
+    @ColumnWidth(15)
+    private Boolean passwordProtected;
+
+    @ExcelProperty(index = 6, value = "主持人PIN")
+    @ColumnWidth(20)
+    private String moderatorPin;
+
+    @ExcelProperty(index = 7, value = "参会者PIN")
+    @ColumnWidth(20)
+    private String participantPin;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")

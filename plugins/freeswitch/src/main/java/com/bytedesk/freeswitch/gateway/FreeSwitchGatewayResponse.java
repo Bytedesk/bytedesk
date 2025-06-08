@@ -13,26 +13,23 @@
  */
 package com.bytedesk.freeswitch.gateway;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.bytedesk.core.base.BaseResponse;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * FreeSwitch网关响应实体
  */
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FreeSwitchGatewayResponse {
-
-    /**
-     * ID
-     */
-    private Long id;
+@EqualsAndHashCode(callSuper = true)
+public class FreeSwitchGatewayResponse extends BaseResponse {
 
     /**
      * 网关名称
