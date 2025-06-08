@@ -13,27 +13,28 @@
  */
 package com.bytedesk.freeswitch.gateway;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.bytedesk.core.base.BaseRequest;
+
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * FreeSwitch网关请求实体
  */
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FreeSwitchGatewayRequest {
+@EqualsAndHashCode(callSuper = true)
+public class FreeSwitchGatewayRequest extends BaseRequest {
 
     /**
      * 网关名称
      */
-    @NotBlank(message = "网关名称不能为空")
     @Size(max = 100, message = "网关名称长度不能超过100字符")
     private String gatewayName;
 
@@ -46,21 +47,18 @@ public class FreeSwitchGatewayRequest {
     /**
      * SIP服务器地址
      */
-    @NotBlank(message = "SIP服务器地址不能为空")
     @Size(max = 255, message = "SIP服务器地址长度不能超过255字符")
     private String proxy;
 
     /**
      * 用户名
      */
-    @NotBlank(message = "用户名不能为空")
     @Size(max = 100, message = "用户名长度不能超过100字符")
     private String username;
 
     /**
      * 密码
      */
-    @NotBlank(message = "密码不能为空")
     @Size(max = 255, message = "密码长度不能超过255字符")
     private String password;
 
@@ -79,19 +77,20 @@ public class FreeSwitchGatewayRequest {
     /**
      * 注册
      */
-    @NotNull(message = "注册标志不能为空")
+    @lombok.Builder.Default
     private Boolean register = true;
 
     /**
      * 注册传输协议
      */
     @Size(max = 20, message = "注册传输协议长度不能超过20字符")
+    @lombok.Builder.Default
     private String registerTransport = "udp";
 
     /**
      * 是否启用
      */
-    @NotNull(message = "启用标志不能为空")
+    @lombok.Builder.Default
     private Boolean enabled = true;
 
     /**
@@ -104,4 +103,11 @@ public class FreeSwitchGatewayRequest {
      */
     @Size(max = 500, message = "备注长度不能超过500字符")
     private String remarks;
+
+    // 以下字段用于搜索，创建/更新时不需要验证
+
+    /**
+     * 网关状态 - 用于搜索
+     */
+    private String status;
 }

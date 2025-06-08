@@ -92,16 +92,6 @@ public class FreeSwitchGatewayResponse extends BaseResponse {
     private String remarks;
 
     /**
-     * 创建时间
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updatedAt;
-
-    /**
      * 是否在线
      */
     private Boolean online;
@@ -111,7 +101,7 @@ public class FreeSwitchGatewayResponse extends BaseResponse {
      */
     public static FreeSwitchGatewayResponse fromEntity(FreeSwitchGatewayEntity entity) {
         return FreeSwitchGatewayResponse.builder()
-                .id(entity.getId())
+                .uid(entity.getUid())
                 .gatewayName(entity.getGatewayName())
                 .description(entity.getDescription())
                 .proxy(entity.getProxy())
