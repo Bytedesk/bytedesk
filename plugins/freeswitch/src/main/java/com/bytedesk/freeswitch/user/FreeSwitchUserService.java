@@ -13,6 +13,9 @@
  */
 package com.bytedesk.freeswitch.user;
 
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
+import com.bytedesk.freeswitch.user.FreeSwitchUserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -250,5 +253,21 @@ public class FreeSwitchUserService {
             return user.getEnabled() && user.getPassword().equals(password);
         }
         return false;
+    }
+
+    /**
+     * 更新用户最后注册时间
+     */
+    @Transactional
+    public void updateLastRegistration(String username, LocalDateTime lastRegistration) {
+        Optional<FreeSwitchUserEntity> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isPresent()) {
+            FreeSwitchUserEntity user = userOpt.get();
+            user.setLastRegister(lastRegistration);
+            userRepository.save(user);
+            log.debug("更新用户 {} 最后注册时间: {}", username, lastRegistration);
+        } else {
+            log.warn("用户不存在，无法更新注册时间: {}", username);
+        }
     }
 }

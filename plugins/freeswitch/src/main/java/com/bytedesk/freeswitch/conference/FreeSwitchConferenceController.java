@@ -1,1 +1,240 @@
-package com.bytedesk.freeswitch.conference;import com.bytedesk.core.utils.JsonResult;import lombok.AllArgsConstructor;import lombok.extern.slf4j.Slf4j;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;import org.springframework.data.domain.Page;import org.springframework.data.domain.PageRequest;import org.springframework.data.domain.Pageable;import org.springframework.data.domain.Sort;import org.springframework.http.ResponseEntity;import org.springframework.web.bind.annotation.*;import javax.validation.Valid;import java.util.List;import java.util.Optional;/** * FreeSwitch会议室管理REST API控制器 */@Slf4j@RestController@RequestMapping("/freeswitch/api/v1/conferences")@AllArgsConstructor@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")public class FreeSwitchConferenceController {    private final FreeSwitchConferenceService conferenceService;    /**     * 创建会议室     */    @PostMapping    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> createConference(            @Valid @RequestBody FreeSwitchConferenceRequest request) {                try {            FreeSwitchConferenceEntity created = conferenceService.createConference(                    request.getConferenceName(),                    request.getDescription(),                    request.getModeratorPin(),                    request.getMaxMembers()            );                        FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(created);            return ResponseEntity.ok(JsonResult.success("会议室创建成功", response));        } catch (Exception e) {            log.error("创建会议室失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400, (FreeSwitchConferenceResponse) null));        }    }    /**     * 分页查询会议室列表     */    @GetMapping    public ResponseEntity<JsonResult<Page<FreeSwitchConferenceResponse>>> listConferences(            @RequestParam(defaultValue = "0") int page,            @RequestParam(defaultValue = "20") int size,            @RequestParam(defaultValue = "createdAt") String sortBy,            @RequestParam(defaultValue = "desc") String sortDirection,            @RequestParam(required = false) String keyword) {                try {            Sort.Direction direction = Sort.Direction.fromString(sortDirection);            Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));                        Page<FreeSwitchConferenceEntity> entities;            if (keyword != null && !keyword.trim().isEmpty()) {                entities = conferenceService.findByConferenceNameContaining(keyword.trim(), pageable);            } else {                entities = conferenceService.findAll(pageable);            }                        Page<FreeSwitchConferenceResponse> responses = entities.map(FreeSwitchConferenceResponse::fromEntity);            return ResponseEntity.ok(JsonResult.success("查询成功", responses));        } catch (Exception e) {            log.error("查询会议室列表失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));        }    }    /**     * 根据ID获取会议室详情     */    @GetMapping("/{id}")    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> getConference(@PathVariable Long id) {        try {            Optional<FreeSwitchConferenceEntity> entity = conferenceService.findById(id);            if (entity.isPresent()) {                FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(entity.get());                return ResponseEntity.ok(JsonResult.success("查询成功", response));            } else {                return ResponseEntity.notFound().build();            }        } catch (Exception e) {            log.error("获取会议室详情失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));        }    }    /**     * 根据名称获取会议室详情     */    @GetMapping("/by-name/{name}")    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> getConferenceByName(@PathVariable String name) {        try {            Optional<FreeSwitchConferenceEntity> entity = conferenceService.findByConferenceName(name);            if (entity.isPresent()) {                FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(entity.get());                return ResponseEntity.ok(JsonResult.success("查询成功", response));            } else {                return ResponseEntity.notFound().build();            }        } catch (Exception e) {            log.error("根据名称获取会议室详情失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));        }    }    /**     * 更新会议室信息     */    @PutMapping("/{id}")    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> updateConference(            @PathVariable Long id,            @Valid @RequestBody FreeSwitchConferenceRequest request) {                try {            FreeSwitchConferenceEntity updated = conferenceService.updateConference(                    id,                    request.getConferenceName(),                    request.getDescription(),                    request.getModeratorPin(),                    request.getMaxMembers(),                    request.getEnabled()            );                        FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(updated);            return ResponseEntity.ok(JsonResult.success("会议室更新成功", response));        } catch (Exception e) {            log.error("更新会议室失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400, (FreeSwitchConferenceResponse) null));        }    }    /**     * 删除会议室     */    @DeleteMapping("/{id}")    public ResponseEntity<JsonResult<String>> deleteConference(@PathVariable Long id) {        try {            conferenceService.deleteById(id);            return ResponseEntity.ok(JsonResult.success("会议室删除成功", "会议室删除成功"));        } catch (Exception e) {            log.error("删除会议室失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400, "删除失败"));        }    }    /**     * 切换会议室状态     */    @PatchMapping("/{id}/toggle-status")    public ResponseEntity<JsonResult<String>> toggleConferenceStatus(@PathVariable Long id) {        try {            conferenceService.toggleStatus(id);            return ResponseEntity.ok(JsonResult.success("会议室状态切换成功", "会议室状态切换成功"));        } catch (Exception e) {            log.error("切换会议室状态失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage(), 400, "状态切换失败"));        }    }    /**     * 验证会议室访问权限     */    @PostMapping("/{name}/validate-access")    public ResponseEntity<JsonResult<Boolean>> validateAccess(            @PathVariable String name,            @RequestParam String pin) {                try {            boolean hasAccess = conferenceService.validateAccess(name, pin);            return ResponseEntity.ok(JsonResult.success(hasAccess ? "访问验证成功" : "访问验证失败", hasAccess));        } catch (Exception e) {            log.error("验证会议室访问失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));        }    }    /**     * 获取所有启用的会议室     */    @GetMapping("/enabled")    public ResponseEntity<JsonResult<List<FreeSwitchConferenceResponse>>> getEnabledConferences() {        try {            List<FreeSwitchConferenceEntity> entities = conferenceService.findByEnabled(true);            List<FreeSwitchConferenceResponse> responses = entities.stream()                    .map(FreeSwitchConferenceResponse::fromEntity)                    .toList();            return ResponseEntity.ok(JsonResult.success("查询成功", responses));        } catch (Exception e) {            log.error("获取启用会议室列表失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));        }    }    /**     * 根据最大成员数查询会议室     */    @GetMapping("/by-capacity")    public ResponseEntity<JsonResult<List<FreeSwitchConferenceResponse>>> getConferencesByCapacity(            @RequestParam Integer minCapacity) {                try {            List<FreeSwitchConferenceEntity> entities = conferenceService.findByMaxMembersGreaterThanEqual(minCapacity);            List<FreeSwitchConferenceResponse> responses = entities.stream()                    .map(FreeSwitchConferenceResponse::fromEntity)                    .toList();            return ResponseEntity.ok(JsonResult.success("查询成功", responses));        } catch (Exception e) {            log.error("根据容量查询会议室失败", e);            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));        }    }}
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-06-09 10:00:00
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-06-09 10:00:00
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.freeswitch.conference;
+
+import com.bytedesk.core.utils.JsonResult;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * FreeSwitch会议室管理REST API控制器
+ */
+@Slf4j
+@RestController
+@RequestMapping("/freeswitch/api/v1/conferences")
+@AllArgsConstructor
+@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
+public class FreeSwitchConferenceController {
+
+    private final FreeSwitchConferenceService conferenceService;
+
+    /**
+     * 创建会议室
+     */
+    @PostMapping
+    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> createConference(
+            @Valid @RequestBody FreeSwitchConferenceRequest request) {
+        
+        try {
+            FreeSwitchConferenceEntity created = conferenceService.createConference(
+                    request.getConferenceName(),
+                    request.getDescription(),
+                    request.getPassword(),
+                    request.getMaxMembers()
+            );
+            
+            FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(created);
+            return ResponseEntity.ok(JsonResult.success("会议室创建成功", response));
+        } catch (Exception e) {
+            log.error("创建会议室失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 分页查询会议室列表
+     */
+    @GetMapping
+    public ResponseEntity<JsonResult<Page<FreeSwitchConferenceResponse>>> listConferences(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(required = false) String keyword) {
+        
+        try {
+            Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+            
+            Page<FreeSwitchConferenceEntity> entities;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                entities = conferenceService.findByConferenceNameContaining(keyword.trim(), pageable);
+            } else {
+                entities = conferenceService.findAll(pageable);
+            }
+            
+            Page<FreeSwitchConferenceResponse> responses = entities.map(FreeSwitchConferenceResponse::fromEntity);
+            return ResponseEntity.ok(JsonResult.success("查询成功", responses));
+        } catch (Exception e) {
+            log.error("查询会议室列表失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 根据ID获取会议室详情
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> getConference(@PathVariable Long id) {
+        try {
+            Optional<FreeSwitchConferenceEntity> entity = conferenceService.findById(id);
+            if (entity.isPresent()) {
+                FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(entity.get());
+                return ResponseEntity.ok(JsonResult.success("查询成功", response));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("获取会议室详情失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 根据名称获取会议室详情
+     */
+    @GetMapping("/by-name/{name}")
+    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> getConferenceByName(@PathVariable String name) {
+        try {
+            Optional<FreeSwitchConferenceEntity> entity = conferenceService.findByConferenceName(name);
+            if (entity.isPresent()) {
+                FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(entity.get());
+                return ResponseEntity.ok(JsonResult.success("查询成功", response));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("根据名称获取会议室详情失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 更新会议室信息
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<JsonResult<FreeSwitchConferenceResponse>> updateConference(
+            @PathVariable Long id,
+            @Valid @RequestBody FreeSwitchConferenceRequest request) {
+        
+        try {
+            FreeSwitchConferenceEntity updated = conferenceService.updateConference(
+                    id,
+                    request.getConferenceName(),
+                    request.getDescription(),
+                    request.getPassword(),
+                    request.getMaxMembers(),
+                    request.getRecordEnabled()
+            );
+            
+            FreeSwitchConferenceResponse response = FreeSwitchConferenceResponse.fromEntity(updated);
+            return ResponseEntity.ok(JsonResult.success("会议室更新成功", response));
+        } catch (Exception e) {
+            log.error("更新会议室失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 删除会议室
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<JsonResult<String>> deleteConference(@PathVariable Long id) {
+        try {
+            conferenceService.deleteById(id);
+            return ResponseEntity.ok(JsonResult.success("会议室删除成功", "会议室删除成功"));
+        } catch (Exception e) {
+            log.error("删除会议室失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 切换会议室状态
+     */
+    @PatchMapping("/{id}/toggle-status")
+    public ResponseEntity<JsonResult<String>> toggleConferenceStatus(@PathVariable Long id) {
+        try {
+            conferenceService.toggleStatus(id);
+            return ResponseEntity.ok(JsonResult.success("会议室状态切换成功", "会议室状态切换成功"));
+        } catch (Exception e) {
+            log.error("切换会议室状态失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 验证会议室访问权限
+     */
+    @PostMapping("/{name}/validate-access")
+    public ResponseEntity<JsonResult<Boolean>> validateAccess(
+            @PathVariable String name,
+            @RequestParam String pin) {
+        
+        try {
+            boolean hasAccess = conferenceService.validateAccess(name, pin);
+            return ResponseEntity.ok(JsonResult.success(hasAccess ? "访问验证成功" : "访问验证失败", hasAccess));
+        } catch (Exception e) {
+            log.error("验证会议室访问权限失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 获取所有启用的会议室
+     */
+    @GetMapping("/enabled")
+    public ResponseEntity<JsonResult<List<FreeSwitchConferenceResponse>>> getEnabledConferences() {
+        try {
+            List<FreeSwitchConferenceEntity> entities = conferenceService.findByEnabled(true);
+            List<FreeSwitchConferenceResponse> responses = entities.stream()
+                    .map(FreeSwitchConferenceResponse::fromEntity)
+                    .toList();
+            return ResponseEntity.ok(JsonResult.success("查询成功", responses));
+        } catch (Exception e) {
+            log.error("获取启用会议室列表失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 根据最大成员数查询会议室
+     */
+    @GetMapping("/by-capacity")
+    public ResponseEntity<JsonResult<List<FreeSwitchConferenceResponse>>> getConferencesByCapacity(
+            @RequestParam Integer minCapacity) {
+        
+        try {
+            List<FreeSwitchConferenceEntity> entities = conferenceService.findByMaxMembersGreaterThanEqual(minCapacity);
+            List<FreeSwitchConferenceResponse> responses = entities.stream()
+                    .map(FreeSwitchConferenceResponse::fromEntity)
+                    .toList();
+            return ResponseEntity.ok(JsonResult.success("查询成功", responses));
+        } catch (Exception e) {
+            log.error("根据容量查询会议室失败", e);
+            return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        }
+    }
+}
