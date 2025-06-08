@@ -90,7 +90,7 @@ public class FreeSwitchNumberRestService extends BaseRestServiceWithExcel<FreeSw
         }
 
         // 检查用户名是否已存在
-        if (freeSwitchNumberRepository.existsByNumbernameAndDomain(request.getUsername(), request.getDomain())) {
+        if (freeSwitchNumberRepository.existsByUsernameAndDomain(request.getUsername(), request.getDomain())) {
             throw new RuntimeException("用户名已存在: " + request.getUsername() + "@" + request.getDomain());
         }
 

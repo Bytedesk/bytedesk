@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 22:46:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,11 +36,6 @@ public interface FreeSwitchCdrRepository extends JpaRepository<FreeSwitchCdrEnti
      * 根据UID查找CDR记录
      */
     Optional<FreeSwitchCdrEntity> findByUid(String uid);
-
-    /**
-     * 根据UUID查找CDR记录
-     */
-    Optional<FreeSwitchCdrEntity> findByUuid(String uuid);
 
     /**
      * 根据主叫号码查找CDR记录
@@ -133,7 +128,7 @@ public interface FreeSwitchCdrRepository extends JpaRepository<FreeSwitchCdrEnti
     /**
      * 检查UUID是否存在
      */
-    boolean existsByUuid(String uuid);
+    boolean existsByUid(String uid);
 
     /**
      * 删除指定日期之前的CDR记录

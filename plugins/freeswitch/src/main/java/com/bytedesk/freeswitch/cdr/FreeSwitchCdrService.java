@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:02:44
+ * @LastEditTime: 2025-06-08 22:44:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class FreeSwitchCdrService {
                 cdr.getUid(), cdr.getCallerIdNumber(), cdr.getDestinationNumber());
         
         // 检查UUID是否已存在
-        if (cdrRepository.existsByUuid(cdr.getUid())) {
+        if (cdrRepository.existsByUid(cdr.getUid())) {
             log.warn("CDR记录已存在: {}", cdr.getUid());
             return cdr;
         }
@@ -82,8 +82,8 @@ public class FreeSwitchCdrService {
     /**
      * 根据UUID查找CDR记录
      */
-    public Optional<FreeSwitchCdrEntity> findByUuid(String uuid) {
-        return cdrRepository.findByUuid(uuid);
+    public Optional<FreeSwitchCdrEntity> findByUid(String uuid) {
+        return cdrRepository.findByUid(uuid);
     }
 
     /**
@@ -182,7 +182,7 @@ public class FreeSwitchCdrService {
                                LocalDateTime endStamp, Integer duration, Integer billsec, 
                                String hangupCause, String direction) {
         
-        Optional<FreeSwitchCdrEntity> existingCdr = cdrRepository.findByUuid(uuid);
+        Optional<FreeSwitchCdrEntity> existingCdr = cdrRepository.findByUid(uuid);
         
         FreeSwitchCdrEntity cdr;
         if (existingCdr.isPresent()) {
@@ -215,7 +215,7 @@ public class FreeSwitchCdrService {
      */
     @Transactional
     public void updateCdrAnswerTime(String uuid, LocalDateTime answerTime) {
-        Optional<FreeSwitchCdrEntity> optionalCdr = cdrRepository.findByUuid(uuid);
+        Optional<FreeSwitchCdrEntity> optionalCdr = cdrRepository.findByUid(uuid);
         if (optionalCdr.isPresent()) {
             FreeSwitchCdrEntity cdr = optionalCdr.get();
             cdr.setAnswerStamp(answerTime);
@@ -231,7 +231,7 @@ public class FreeSwitchCdrService {
      */
     @Transactional
     public void updateCdrEndTime(String uuid, LocalDateTime endTime, String hangupCause) {
-        Optional<FreeSwitchCdrEntity> optionalCdr = cdrRepository.findByUuid(uuid);
+        Optional<FreeSwitchCdrEntity> optionalCdr = cdrRepository.findByUid(uuid);
         if (optionalCdr.isPresent()) {
             FreeSwitchCdrEntity cdr = optionalCdr.get();
             cdr.setEndStamp(endTime);

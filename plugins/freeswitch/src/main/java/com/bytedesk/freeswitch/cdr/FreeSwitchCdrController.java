@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 19:52:14
+ * @LastEditTime: 2025-06-08 22:47:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -93,9 +93,9 @@ public class FreeSwitchCdrController {
      * 根据UUID获取CDR详情
      */
     @GetMapping("/uuid/{uuid}")
-    public ResponseEntity<?> getCdrByUuid(@PathVariable String uuid) {
+    public ResponseEntity<?> getCdrByUid(@PathVariable String uid) {
         try {
-            Optional<FreeSwitchCdrEntity> cdr = cdrService.findByUuid(uuid);
+            Optional<FreeSwitchCdrEntity> cdr = cdrService.findByUid(uid);
             if (cdr.isPresent()) {
                 return ResponseEntity.ok(JsonResult.success(cdr.get()));
             } else {
