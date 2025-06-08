@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 18:46:14
+ * @LastEditTime: 2025-06-08 18:57:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,9 @@ import com.bytedesk.core.uid.UidUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.ObjectOptimisticLockingFailureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FreeSwitch网关REST服务
@@ -46,6 +49,8 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
     private final ModelMapper modelMapper;
     
     private final AuthService authService;
+
+    private static final Logger log = LoggerFactory.getLogger(FreeSwitchGatewayRestService.class);
 
     @Override
     @Cacheable(value = "gateway", key = "#request.orgUid + ':' + #request.page + ':' + #request.size")
@@ -167,7 +172,50 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
         return convertToResponse(gatewayOptional.get());
     }
 
-    private FreeSwitchGatewayResponse convertToResponse(FreeSwitchGatewayEntity entity) {
+    @Override
+    public Page<FreeSwitchGatewayEntity> queryByOrgEntity(FreeSwitchGatewayRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.Direction.DESC, "updatedAt");
+        Specification<FreeSwitchGatewayEntity> spec = FreeSwitchGatewaySpecification.search(request);
+        return gatewayRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public void delete(FreeSwitchGatewayRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
+    public FreeSwitchGatewayEntity doSave(FreeSwitchGatewayEntity entity) {
+        return gatewayRepository.save(entity);
+    }
+
+    @Override
+    public FreeSwitchGatewayEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchGatewayEntity entity) {
+        log.warn("FreeSwitch Gateway保存时发生乐观锁异常 uid: {}, version: {}", entity.getUid(), entity.getVersion());
+        try {
+            Optional<FreeSwitchGatewayEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                FreeSwitchGatewayEntity latestEntity = latest.get();
+                return doSave(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    @Override
+    public FreeSwitchGatewayExcel convertToExcel(FreeSwitchGatewayEntity entity) {
+        return modelMapper.map(entity, FreeSwitchGatewayExcel.class);
+    }
+
+    @Override
+    public Optional<FreeSwitchGatewayEntity> findByUid(String uid) {
+        return gatewayRepository.findByUid(uid);
+    }
+
+    @Override
+    public FreeSwitchGatewayResponse convertToResponse(FreeSwitchGatewayEntity entity) {
         return modelMapper.map(entity, FreeSwitchGatewayResponse.class);
     }
 }
