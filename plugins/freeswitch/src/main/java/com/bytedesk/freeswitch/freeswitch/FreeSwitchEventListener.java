@@ -31,9 +31,8 @@ public class FreeSwitchEventListener implements IEslEventListener {
     @Override
     public void eventReceived(EslEvent eslEvent) {
             String eventName = eslEvent.getEventName();
-        // String eventSubclass = eslEvent.getEventSubclass();
         
-        log.debug("收到FreeSwitch事件: {} / {}", eventName);
+        log.debug("收到FreeSwitch事件: {} / {}", eventName, eslEvent.getEventHeaders());
         
         // 处理不同类型的事件
         switch(eventName) {

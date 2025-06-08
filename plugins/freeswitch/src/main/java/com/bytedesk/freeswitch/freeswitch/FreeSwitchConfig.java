@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:14:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 13:15:20
+ * @LastEditTime: 2025-06-08 13:42:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FreeSwitchConfig {
         
     private final FreeSwitchProperties freeSwitchProperties;
-    @Lazy
+    
     private final FreeSwitchEventListener freeSwitchEventListener;
 
     /**
@@ -59,10 +58,20 @@ public class FreeSwitchConfig {
             
             // 订阅所有事件
             client.setEventSubscriptions("plain", "all");
+
+            //这里必须检查，防止网络抖动时，连接断开
+            if (client.canSend()) {
+                log.info("连接成功，准备发起呼叫...");
+                //（异步）向1000用户发起呼叫，用户接通后，播放音乐/tmp/demo1.wav
+                String callResult = client.sendAsyncApiCommand("originate", "user/1000 &playback(/tmp/demo.wav)");
+                log.info("api uuid:" + callResult);
+            }
             
             log.info("FreeSwitch ESL连接成功");
         } catch (InboundConnectionFailure e) {
-            log.error("FreeSwitch ESL连接失败: {}", e.getMessage(), e);
+            // 处理连接失败的情况
+            e.printStackTrace();
+            log.error("FreeSwitch ESL连接失败: {}, {}", e.getMessage(), e);
         }
         
         return client;

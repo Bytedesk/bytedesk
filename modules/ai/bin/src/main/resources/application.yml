@@ -1,0 +1,21 @@
+spring:
+  ai:
+    dashscope:
+      chat:
+        enabled: true  # 控制是否启用阿里云百炼相关功能
+    vectorstore:
+      weaviate:
+        enabled: false  # 禁用 Weaviate
+      redis:
+        enabled: true   # 启用 Redis
+      default-model: bge-m3:latest
+    zhipuai:
+      chat:
+        enabled: true  # 控制是否启用智谱AI相关功能
+
+# 其他配置...
+
+# AI提供商配置
+bytedesk:
+  ai:
+    provider: volcengine  # 可选: baidu, deepseek, gitee, siliconFlow, tencent, volcengine
