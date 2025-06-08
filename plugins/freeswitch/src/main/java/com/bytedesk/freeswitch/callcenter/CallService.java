@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:31:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 12:45:42
+ * @LastEditTime: 2025-06-08 19:57:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,11 +23,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-// import com.bytedesk.freeswitch.freeswitch.FreeSwitchProperties;
-import com.bytedesk.freeswitch.freeswitch.FreeSwitchService;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
 import com.bytedesk.freeswitch.user.FreeSwitchUserEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
+import com.bytedesk.freeswitch.config.FreeSwitchService;
 import com.bytedesk.freeswitch.user.FreeSwitchUserService;
 
 import lombok.RequiredArgsConstructor;

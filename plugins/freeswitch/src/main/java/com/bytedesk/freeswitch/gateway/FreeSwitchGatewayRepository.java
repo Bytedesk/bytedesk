@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-06-08 19:55:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,14 +24,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.bytedesk.freeswitch.gateway.FreeSwitchGatewayEntity;
-
 /**
  * FreeSwitch网关仓库接口
  */
 @Repository
 public interface FreeSwitchGatewayRepository extends JpaRepository<FreeSwitchGatewayEntity, Long>, 
         JpaSpecificationExecutor<FreeSwitchGatewayEntity> {
+
+    Optional<FreeSwitchGatewayEntity> findByUid(String uid);
 
     /**
      * 根据网关名称查找网关
