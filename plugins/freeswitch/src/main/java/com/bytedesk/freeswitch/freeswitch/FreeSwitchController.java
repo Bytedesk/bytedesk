@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-07 16:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-07 16:00:00
+ * @LastEditTime: 2025-06-08 12:12:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/freeswitch")
+@RequestMapping("/test/api/freeswitch")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class FreeSwitchController {
@@ -36,6 +36,7 @@ public class FreeSwitchController {
     private final FreeSwitchService freeSwitchService;
 
     /**
+     * http://127.0.0.1:9003/test/api/freeswitch/status
      * 获取FreeSwitch状态
      */
     @GetMapping("/status")
@@ -59,6 +60,7 @@ public class FreeSwitchController {
     }
 
     /**
+     * http://127.0.0.1:9003/test/api/freeswitch/call/originate?caller=sip:1001@14.103.165.199&destination=sip:1002@14.103.165.199
      * 发起呼叫
      */
     @PostMapping("/call/originate")
