@@ -1,0 +1,12 @@
+# 配置详情请参考：https://docs.halo.run/zh/developer-guide/theme/config-files
+id: halo_kbdoc
+name: 知识库
+author:
+  name: jackning
+  website: https://weikefu.net
+description: Quick starter theme for halo
+logo: https://avatars.githubusercontent.com/u/48195280?s=200&v=4
+website: https://github.com/halo-dev/halo-theme-quick-starter
+repo: https://github.com/halo-dev/halo-theme-quick-starter
+version: 1.0.0
+require: 1.4.2

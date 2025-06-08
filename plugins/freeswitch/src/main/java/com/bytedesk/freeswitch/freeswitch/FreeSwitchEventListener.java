@@ -3,9 +3,13 @@ package com.bytedesk.freeswitch.freeswitch;
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.callcenter.CallService;
+import com.bytedesk.freeswitch.callcenter.event.CallAnsweredEvent;
+import com.bytedesk.freeswitch.callcenter.event.CallHangupEvent;
+import com.bytedesk.freeswitch.callcenter.event.CallStartEvent;
+import com.bytedesk.freeswitch.callcenter.event.DtmfEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class FreeSwitchEventListener implements IEslEventListener {
 
-    private final CallService callService;
+    private final ApplicationEventPublisher eventPublisher;
     
     /**
      * 处理FreeSwitch事件
@@ -75,8 +79,8 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         log.info("通道创建: 主叫 {} 被叫 {} UUID {}", callerId, destination, uuid);
         
-        // 调用通话服务处理
-        callService.handleCallStart(callerId, destination, uuid);
+        // 发布通话开始事件
+        eventPublisher.publishEvent(new CallStartEvent(this, uuid, callerId, destination));
     }
     
     /**
@@ -87,8 +91,8 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         log.info("通道应答: UUID {}", uuid);
         
-        // 调用通话服务处理
-        callService.handleCallAnswered(uuid);
+        // 发布通话应答事件
+        eventPublisher.publishEvent(new CallAnsweredEvent(this, uuid));
     }
     
     /**
@@ -100,8 +104,8 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         log.info("通道挂断: UUID {} 原因 {}", uuid, hangupCause);
         
-        // 调用通话服务处理
-        callService.handleCallEnd(uuid, hangupCause);
+        // 发布通话挂断事件
+        eventPublisher.publishEvent(new CallHangupEvent(this, uuid, hangupCause));
     }
     
     /**
@@ -114,7 +118,9 @@ public class FreeSwitchEventListener implements IEslEventListener {
         log.info("DTMF按键: UUID {} 键值 {}", uuid, digit);
         
         // 调用通话服务处理
-        callService.handleDtmf(uuid, digit);
+        // callService.handleDtmf(uuid, digit);
+        // 发布DTMF事件
+        eventPublisher.publishEvent(new DtmfEvent(this, uuid, digit));
     }
     
     /**
