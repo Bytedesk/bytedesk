@@ -1,6 +1,5 @@
 package com.bytedesk.freeswitch.controller;
 
-import com.bytedesk.core.rbac.annotation.CurrentUser;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.freeswitch.dto.*;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/freeswitch/conferences")
+@RequestMapping("/freeswitch/api/v1/conferences")
 @AllArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
 public class FreeSwitchConferenceController {

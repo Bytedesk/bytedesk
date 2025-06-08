@@ -1,6 +1,5 @@
 package com.bytedesk.freeswitch.controller;
 
-import com.bytedesk.core.rbac.annotation.CurrentUser;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.freeswitch.dto.*;
@@ -24,7 +23,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/freeswitch/users")
+@RequestMapping("/freeswitch/api/v1/users")
 @AllArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
 public class FreeSwitchUserController {
@@ -38,7 +37,7 @@ public class FreeSwitchUserController {
     @PostMapping
     public ResponseEntity<JsonResult<FreeSwitchUserDto>> createUser(
             @Valid @RequestBody CreateFreeSwitchUserRequest request,
-            @CurrentUser UserEntity currentUser) {
+            UserEntity currentUser) {
         
         try {
             FreeSwitchUserEntity entity = dtoMapper.toUserEntity(request);
