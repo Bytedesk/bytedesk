@@ -90,7 +90,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         // 创建CDR记录
         try {
             FreeSwitchCdrEntity cdr = new FreeSwitchCdrEntity();
-            cdr.setUuid(uuid);
+            cdr.setUid(uuid);
             cdr.setCallerIdNumber(callerId);
             cdr.setDestinationNumber(destination);
             cdr.setStartStamp(LocalDateTime.now());
