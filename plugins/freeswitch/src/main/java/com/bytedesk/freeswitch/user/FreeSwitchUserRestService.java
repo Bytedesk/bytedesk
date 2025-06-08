@@ -1,16 +1,3 @@
-/*
- * @Author: jackning 270580156@qq.com
- * @Date: 2025-06-08 10:00:00
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 10:00:00
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- * 
- * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
- */
 package com.bytedesk.freeswitch.user;
 
 import java.util.Optional;
@@ -30,7 +17,6 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,25 +36,32 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
 
     @Override
     public Page<FreeSwitchUserEntity> queryByOrgEntity(FreeSwitchUserRequest request) {
-
-        Pageable pageable = Utils.getPageable(request);
+        Pageable pageable = request.getPageable();
         Specification<FreeSwitchUserEntity> specification = FreeSwitchUserSpecification.search(request);
-
         return freeSwitchUserRepository.findAll(specification, pageable);
     }
 
     @Override
+    public Page<FreeSwitchUserResponse> queryByOrg(FreeSwitchUserRequest request) {
+        Page<FreeSwitchUserEntity> entities = queryByOrgEntity(request);
+        return entities.map(this::convertToResponse);
+    }
+
     public Page<FreeSwitchUserEntity> queryByUserEntity(FreeSwitchUserRequest request) {
-
-        UserEntity user = authService.getCurrentUser();
+        UserEntity user = authService.getUser();
         request.setOrgUid(user.getOrgUid());
-
         return queryByOrgEntity(request);
     }
 
     @Override
+    public Page<FreeSwitchUserResponse> queryByUser(FreeSwitchUserRequest request) {
+        Page<FreeSwitchUserEntity> entities = queryByUserEntity(request);
+        return entities.map(this::convertToResponse);
+    }
+
+    @Override
     public Optional<FreeSwitchUserEntity> findByUid(String uid) {
-        return freeSwitchUserRepository.findByUidAndDeleted(uid, false);
+        return freeSwitchUserRepository.findByUid(uid);
     }
 
     @Override
@@ -76,7 +69,6 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
         return modelMapper.map(entity, FreeSwitchUserResponse.class);
     }
 
-    @Override
     public FreeSwitchUserEntity convertToEntity(FreeSwitchUserRequest request) {
         return modelMapper.map(request, FreeSwitchUserEntity.class);
     }
@@ -88,13 +80,12 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
 
     @Override
     public FreeSwitchUserResponse create(FreeSwitchUserRequest request) {
-
-        UserEntity user = authService.getCurrentUser();
-        if (StringUtils.hasText(request.getOrgUid())) {
+        UserEntity user = authService.getUser();
+        if (!StringUtils.hasText(request.getOrgUid())) {
             request.setOrgUid(user.getOrgUid());
         }
         
-        if (StringUtils.hasText(request.getUid())) {
+        if (!StringUtils.hasText(request.getUid())) {
             request.setUid(uidUtils.getCacheSerialUid());
         }
 
@@ -117,7 +108,6 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
 
     @Override
     public FreeSwitchUserResponse update(FreeSwitchUserRequest request) {
-
         Optional<FreeSwitchUserEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
             throw new RuntimeException("FreeSwitch用户不存在");
@@ -155,9 +145,13 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
         try {
             return freeSwitchUserRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
+            return handleOptimisticLockingFailureException(e, entity);
         }
-        return null;
+    }
+
+    @Override
+    public FreeSwitchUserEntity doSave(FreeSwitchUserEntity entity) {
+        return freeSwitchUserRepository.save(entity);
     }
 
     @Override
@@ -170,6 +164,11 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
     }
 
     @Override
+    public void delete(FreeSwitchUserRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
     @Cacheable(value = "freeswitch_user", key = "#uid", unless = "#result == null")
     public FreeSwitchUserResponse queryByUid(FreeSwitchUserRequest request) {
         Optional<FreeSwitchUserEntity> optional = findByUid(request.getUid());
@@ -177,6 +176,27 @@ public class FreeSwitchUserRestService extends BaseRestServiceWithExcel<FreeSwit
             return convertToResponse(optional.get());
         }
         throw new RuntimeException("FreeSwitch用户不存在");
+    }
+
+    @Override
+    public FreeSwitchUserEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchUserEntity entity) {
+        log.warn("FreeSwitch用户保存时发生乐观锁异常 uid: {}, version: {}", entity.getUid(), entity.getVersion());
+        // 重新查询最新版本并重试
+        try {
+            Optional<FreeSwitchUserEntity> latest = findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                FreeSwitchUserEntity latestEntity = latest.get();
+                // 将当前修改应用到最新版本
+                latestEntity.setPassword(entity.getPassword());
+                latestEntity.setEnabled(entity.getEnabled());
+                latestEntity.setDisplayName(entity.getDisplayName());
+                latestEntity.setEmail(entity.getEmail());
+                return doSave(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
 }

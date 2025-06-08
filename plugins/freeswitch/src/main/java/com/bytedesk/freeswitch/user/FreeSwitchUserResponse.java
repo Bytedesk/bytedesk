@@ -94,4 +94,31 @@ public class FreeSwitchUserResponse extends BaseResponse {
      */
     private Boolean online;
 
+    /**
+     * 从实体安全转换为响应对象
+     */
+    public static FreeSwitchUserResponse fromEntitySafe(FreeSwitchUserEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        
+        return FreeSwitchUserResponse.builder()
+                .uid(entity.getUid())
+                .username(entity.getUsername())
+                .domain(entity.getDomain())
+                .displayName(entity.getDisplayName())
+                .email(entity.getEmail())
+                .accountcode(entity.getAccountcode())
+                .enabled(entity.getEnabled())
+                .lastRegister(entity.getLastRegister())
+                .registerIp(entity.getRegisterIp())
+                .userAgent(entity.getUserAgent())
+                .remarks(entity.getRemarks())
+                .sipAddress(entity.getSipAddress())
+                .online(entity.isOnline())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+
 }

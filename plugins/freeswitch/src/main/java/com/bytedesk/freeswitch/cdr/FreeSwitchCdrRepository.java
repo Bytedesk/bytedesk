@@ -33,6 +33,11 @@ public interface FreeSwitchCdrRepository extends JpaRepository<FreeSwitchCdrEnti
         JpaSpecificationExecutor<FreeSwitchCdrEntity> {
 
     /**
+     * 根据UID查找CDR记录
+     */
+    Optional<FreeSwitchCdrEntity> findByUid(String uid);
+
+    /**
      * 根据UUID查找CDR记录
      */
     Optional<FreeSwitchCdrEntity> findByUuid(String uuid);
