@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 11:10:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:20:28
+ * @LastEditTime: 2025-06-09 08:41:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,10 +14,6 @@
 package com.bytedesk.core.gray_release;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -44,25 +40,25 @@ public class GrayReleaseStrategy {
      * 自动调整灰度比例
      * 每小时执行一次
      */
-    @Scheduled(cron = "0 0 * * * *")
-    public void autoAdjustRollout() {
-        List<GrayReleaseFeature> features = Arrays.asList(GrayReleaseFeature.values());
-        LocalDateTime end = LocalDateTime.now();
-        LocalDateTime start = end.minusHours(1);
+    // @Scheduled(cron = "0 0 * * * *")
+    // public void autoAdjustRollout() {
+    //     List<GrayReleaseFeature> features = Arrays.asList(GrayReleaseFeature.values());
+    //     // LocalDateTime end = LocalDateTime.now();
+    //     // LocalDateTime start = end.minusHours(1);
 
-        for (GrayReleaseFeature feature : features) {
-            try {
-                adjustFeatureRollout(feature, start, end);
-            } catch (Exception e) {
-                log.error("Failed to adjust rollout for feature: {}", feature.getCode(), e);
-            }
-        }
-    }
+    //     for (GrayReleaseFeature feature : features) {
+    //         try {
+    //             // adjustFeatureRollout(feature, start, end);
+    //         } catch (Exception e) {
+    //             log.error("Failed to adjust rollout for feature: {}", feature.getCode(), e);
+    //         }
+    //     }
+    // }
 
     /**
      * 调整单个功能的灰度比例
      */
-    private void adjustFeatureRollout(GrayReleaseFeature feature, 
+    public void adjustFeatureRollout(GrayReleaseFeature feature, 
             LocalDateTime start, LocalDateTime end) {
         
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(feature, start, end);
@@ -101,4 +97,5 @@ public class GrayReleaseStrategy {
         return stats.getTotalUsage() >= MIN_SAMPLE_SIZE && 
                stats.getSuccessRate() >= SUCCESS_RATE_THRESHOLD;
     }
+
 }
