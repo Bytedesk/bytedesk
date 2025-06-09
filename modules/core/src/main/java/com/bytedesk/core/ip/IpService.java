@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-06 12:40:50
+ * @LastEditTime: 2025-06-09 10:18:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class IpService {
     }
 
     // TODO: cache区分org
-    @Cacheable(value = "ip", key = "#ip-#orgUid")
+    @Cacheable(value = "ip", key = "#ip+ '-' + #orgUid")
     public Boolean isBlocked(String ip, String orgUid) {
         // TODO: 暂时不验证
         return false;

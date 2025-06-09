@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 19:32:04
+ * @LastEditTime: 2025-06-09 10:19:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -535,7 +535,7 @@ public class ThreadRestService
         return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
-    @Cacheable(value = "thread", key = "#user.uid-#pageable.getPageNumber()", unless = "#result == null")
+    @Cacheable(value = "thread", key = "#user.uid + '-' + #pageable.getPageNumber()", unless = "#result == null")
     public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }

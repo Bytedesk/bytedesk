@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-20 14:31:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-24 16:26:46
+ * @LastEditTime: 2025-06-09 10:08:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,12 +14,9 @@
 package com.bytedesk.kbase.quick_reply;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
@@ -40,19 +37,19 @@ public class QuickReplyEventListener {
 
     private final QuickReplyRestService quickReplyService;
 
-    @Order(7)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        // User user = organization.getUser();
-        log.info("quick_reply - organization created: {}", organization.getName());
-        // 为保证执行顺序，迁移到KbaseEventListener中
-        // String orgUid = organization.getUid();
-        // 创建快捷用语
-        // quickReplyRestService.initQuickReply(orgUid);
-        // 创建快捷用语分类
-        // quickReplyRestService.initQuickReplyCategory(orgUid);
-    }
+    // @Order(7)
+    // @EventListener
+    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
+    //     // User user = organization.getUser();
+    //     log.info("quick_reply - organization created: {}", organization.getName());
+    //     // 为保证执行顺序，迁移到KbaseEventListener中
+    //     // String orgUid = organization.getUid();
+    //     // 创建快捷用语
+    //     // quickReplyRestService.initQuickReply(orgUid);
+    //     // 创建快捷用语分类
+    //     // quickReplyRestService.initQuickReplyCategory(orgUid);
+    // }
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {

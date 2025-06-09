@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 12:08:33
+ * @LastEditTime: 2025-06-09 10:21:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.LanguageEnum;
@@ -48,13 +49,14 @@ import lombok.extern.slf4j.Slf4j;
 public class AgentEventListener {
 
     private final AgentRestService agentRestService;
-    private final KbaseRestService knowledgebaseService;
+    private final KbaseRestService kbaseRestService;
     private final UidUtils uidUtils;
     private final IMessageSendService messageSendService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
     @Order(6)
     @EventListener
+    @Transactional
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
@@ -69,6 +71,7 @@ public class AgentEventListener {
     // 新创建客服，创建默认知识库
     // 因为依赖关系的原因，无法将该方法放到kbase事件监听中，所以放在此处
     @EventListener
+    @Transactional
     public void onAgentCreateEvent(AgentCreateEvent event) {
         // AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
         AgentEntity agent = event.getAgent();
@@ -83,7 +86,7 @@ public class AgentEventListener {
                 .agentUid(agent.getUid())
                 .orgUid(agent.getOrgUid())
                 .build();
-        knowledgebaseService.create(kbaseQuickReply);
+        kbaseRestService.create(kbaseQuickReply);
     }
 
     @EventListener

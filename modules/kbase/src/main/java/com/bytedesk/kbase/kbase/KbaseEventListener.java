@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 15:48:32
+ * @LastEditTime: 2025-06-09 10:12:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,7 +59,7 @@ public class KbaseEventListener {
         public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
                 OrganizationEntity organization = (OrganizationEntity) event.getSource();
                 String orgUid = organization.getUid();
-                log.info("onOrganizationCreateEvent: orgUid {}", orgUid);
+                log.info("kbase - organization created {}", orgUid);
                 // 初始化知识库
                 kbaseService.initKbase(orgUid);
                 // 初始化快捷回复分类
