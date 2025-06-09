@@ -60,7 +60,7 @@ public class SpringAIServiceRegistry {
     public void init() {
         // 在初始化时注册所有可用的服务
         registerService(LlmConsts.DEEPSEEK, springAIDeepseekService.orElse(null));
-        registerService(LlmConsts.ZHIPU, springAIZhipuaiService.orElse(null));
+        registerService(LlmConsts.ZHIPUAI, springAIZhipuaiService.orElse(null));
         registerService(LlmConsts.DASHSCOPE, springAIDashscopeService.orElse(null));
         registerService(LlmConsts.OLLAMA, springAIOllamaService.orElse(null));
         registerService(LlmConsts.SILICONFLOW, springAISiliconFlowService.orElse(null));

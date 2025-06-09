@@ -14,7 +14,7 @@
             "type": "REASONING"
         }
     ],
-    "zhipu": [
+    "zhipuai": [
         {
             "name": "glm-zero-preview",
             "nickname": "GLM-Zero-Preview",

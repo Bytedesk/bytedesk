@@ -148,7 +148,7 @@ public class RobotService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         
         // 获取提供商名称，默认为智谱AI
-        String provider = LlmConsts.ZHIPU;
+        String provider = LlmConsts.ZHIPUAI;
         if (robot.getLlm() != null) {
             provider = robot.getLlm().getProvider().toLowerCase();
         }
@@ -158,10 +158,10 @@ public class RobotService {
             springAIServiceRegistry.getServiceByProviderName(provider)
                 .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } catch (IllegalArgumentException e) {
-            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmConsts.ZHIPU);
+            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmConsts.ZHIPUAI);
             // 如果找不到指定的提供商，尝试使用默认的智谱AI
             try {
-                springAIServiceRegistry.getServiceByProviderName(LlmConsts.ZHIPU)
+                springAIServiceRegistry.getServiceByProviderName(LlmConsts.ZHIPUAI)
                     .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
             } catch (Exception ex) {
                 log.error("使用默认AI服务提供商失败", ex);
