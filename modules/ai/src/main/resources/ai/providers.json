@@ -6,7 +6,7 @@
         "webUrl": "https://ollama.com/",
         "status": "PRODUCTION"
     },
-    "zhipu": {
+    "zhipuai": {
         "nickname": "智谱",
         "logo": "zhipu.png",    
         "apiUrl": "https://open.bigmodel.cn/api/paas/v4/",
