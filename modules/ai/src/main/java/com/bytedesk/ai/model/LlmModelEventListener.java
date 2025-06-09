@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.provider.LlmProviderCreateEvent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
@@ -36,6 +37,7 @@ public class LlmModelEventListener {
     private final LlmProviderRestService llmProviderRestService;
 
     @EventListener
+    @Transactional
     public void onLlmProviderCreateEvent(LlmProviderCreateEvent event) {
         // LlmProviderCreateEvent lpm = event.getObject();
         LlmProviderEntity lpmEntity = event.getLlmProvider();

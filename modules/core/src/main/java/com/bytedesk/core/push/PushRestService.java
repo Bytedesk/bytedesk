@@ -254,18 +254,6 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         return convertToResponse(savedPush);
     }
 
-    // public Boolean validateEmailCode(String email, String code) {
-    //     return validateCode(email, code);
-    // }
-
-    // public Boolean validateSmsCode(String mobile, String code) {
-    //     return validateCode(mobile, code);
-    // }
-
-    
-
-    // @Cacheable(value = "push", key = "#receiver-#status-#type", unless = "#result
-    // == null")
     public Optional<PushEntity> findByStatusAndReceiverAndContent(PushStatusEnum status, String receiver,
             String content) {
         return pushRepository.findByStatusAndReceiverAndContent(status.name(), receiver, content);

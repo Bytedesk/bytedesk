@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 10:21:30
+ * @LastEditTime: 2025-06-09 10:21:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,12 +81,12 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return repository.findByNameAndLevelAndOrgUidAndDeletedFalse(name, LevelEnum.ORGANIZATION.name(), orgUid);
     }
 
-    @Cacheable(value = "provider", key = "#name-#level", unless = "#result == null")
+    @Cacheable(value = "provider", key = "#name + '-' + #level", unless = "#result == null")
     public List<LlmProviderEntity> findByName(String name, String level) {
         return repository.findByNameAndLevelAndDeletedFalse(name, level);
     }
 
-    public List<LlmProviderEntity> findByStatusAndLevelAndDeletedFalse(String status, String level) {
+    public List<LlmProviderEntity> findByStatusAndLevel(String status, String level) {
         return repository.findByStatusAndLevelAndDeletedFalse(status, level);
     }
 

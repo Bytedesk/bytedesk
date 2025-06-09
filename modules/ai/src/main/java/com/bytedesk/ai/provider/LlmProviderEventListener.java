@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-12 22:11:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-19 17:36:30
+ * @LastEditTime: 2025-06-09 10:09:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,9 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -35,15 +37,17 @@ public class LlmProviderEventListener {
 
     private final ModelMapper modelMapper;
 
+    @Order(9)
     @EventListener
+    @Transactional
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
-        log.info("robot - organization created: {}", orgUid);
+        log.info("llm provider - organization created: {}", orgUid);
         // 
         String status = LlmProviderStatusEnum.PRODUCTION.name();
         String level = LevelEnum.PLATFORM.name();
-        List<LlmProviderEntity> providers = llmProviderRestService.findByStatusAndLevelAndDeletedFalse(status, level);
+        List<LlmProviderEntity> providers = llmProviderRestService.findByStatusAndLevel(status, level);
         // 遍历providers，复制provider，设置orgUid，保存到数据库
         for (LlmProviderEntity provider : providers) {
             LlmProviderRequest providerRequest = modelMapper.map(provider, LlmProviderRequest.class);

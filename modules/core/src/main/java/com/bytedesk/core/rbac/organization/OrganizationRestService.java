@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-05 07:24:01
+ * @LastEditTime: 2025-06-09 10:31:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,10 +77,10 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
         //
         if (existsByName(organizationRequest.getName())) {
-            throw new RuntimeException("Organization with name: " + organizationRequest.getName() + " already exists.");
+            throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在.");
         }
         if (existsByCode(organizationRequest.getCode())) {
-            throw new RuntimeException("Organization with code: " + organizationRequest.getCode() + " already exists.");
+            throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在.");
         }
         //
         UserEntity authUser = authService.getUser();
