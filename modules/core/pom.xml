@@ -289,6 +289,16 @@
 			<version>5.8.36</version>
 		</dependency> -->
 
+		<!-- Emoji -->
+		<!-- https://github.com/vdurmont/emoji-java -->
+		 <!-- https://www.webfx.com/tools/emoji-cheat-sheet/ -->
+		<!-- https://mvnrepository.com/artifact/com.vdurmont/emoji-java -->
+		<dependency>
+			<groupId>com.vdurmont</groupId>
+			<artifactId>emoji-java</artifactId>
+			<version>5.1.1</version>
+		</dependency>
+
 
 		<!-- 上传图片到阿里云OSS -->
 		<!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
