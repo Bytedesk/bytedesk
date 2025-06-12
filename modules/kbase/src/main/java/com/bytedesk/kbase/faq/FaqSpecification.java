@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 10:11:08
+ * @LastEditTime: 2025-06-12 13:04:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,6 +57,14 @@ public class FaqSpecification extends BaseSpecification {
                 LocalDateTime now = LocalDateTime.now();
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), now));
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), now));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = "%" + request.getSearchText() + "%";
+                Predicate titlePredicate = criteriaBuilder.like(root.get("question"), searchText);
+                Predicate contentPredicate = criteriaBuilder.like(root.get("answer"), searchText);
+                // Predicate shortCutPredicate = criteriaBuilder.like(root.get("shortCut"), searchText);
+                predicates.add(criteriaBuilder.or(titlePredicate, contentPredicate));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
