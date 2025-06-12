@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 11:53:37
+ * @LastEditTime: 2025-06-12 14:05:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -136,19 +136,11 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
             entity.setTitle(request.getTitle());
             entity.setContent(request.getContent());
             entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+            entity.setShortCut(request.getShortCut());
 
             return convertToResponse(save(entity));
         } else {
             throw new RuntimeException("quick_reply not found");
-        }
-    }
-
-    @Override
-    public QuickReplyEntity save(QuickReplyEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
         }
     }
 
