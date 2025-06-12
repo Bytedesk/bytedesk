@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 10:11:51
+ * @LastEditTime: 2025-06-12 13:04:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,6 +56,15 @@ public class ArticleSpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = "%" + request.getSearchText() + "%";
+                Predicate titlePredicate = criteriaBuilder.like(root.get("title"), searchText);
+                Predicate contentHtmlPredicate = criteriaBuilder.like(root.get("contentHtml"), searchText);
+                Predicate contentMarkdownPredicate = criteriaBuilder.like(root.get("contentMarkdown"), searchText);
+                // Predicate shortCutPredicate = criteriaBuilder.like(root.get("shortCut"), searchText);
+                predicates.add(criteriaBuilder.or(titlePredicate, contentHtmlPredicate, contentMarkdownPredicate));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
