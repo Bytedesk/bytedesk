@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 15:04:43
+ * @LastEditTime: 2025-06-12 14:32:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ public enum MessageTypeEnum {
     QUOTATION, // 引用消息
     KICKOFF, // kickoff other clients
     SHAKE, // shake window
-    // FAQ, // 点击查看常见问题
+    FAQ, // 常见问题
     FAQ_QUESTION, // 常见问题问题
     FAQ_ANSWER, // 常见问题答案
     // FAQ_UP, // 常见问题答案评价:UP
@@ -64,7 +64,7 @@ public enum MessageTypeEnum {
     // QA_ANSWER, // 问答对答案
     // QA_UP, // 问答对答案评价:UP
     // QA_DOWN, // 问答对答案评价:DOWN
-    // ROBOT, // 机器人
+    ROBOT, // 机器人
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
     STREAM, // 流式消息TEXT，大模型回复
@@ -72,6 +72,7 @@ public enum MessageTypeEnum {
     STREAM_END, // 流式消息结束
     // ROBOT_UP, // 机器人答案评价:UP
     // ROBOT_DOWN, // 机器人答案评价:DOWN
+    ARTICLE, // 文章
     RATE, // 访客主动评价
     RATE_INVITE, // 客服邀请评价
     RATE_SUBMIT, // 访客提交评价
@@ -108,7 +109,6 @@ public enum MessageTypeEnum {
     INVITE_ORGANIZATION_ACCEPT,
     INVITE_ORGANIZATION_TIMEOUT,
     INVITE_ORGANIZATION_CANCEL,
-    ARTICLE,
     WEBRTC_AUDIO_INVITE,
     WEBRTC_VIDEO_INVITE,
     WEBRTC_AUDIO_INVITE_REJECT,
