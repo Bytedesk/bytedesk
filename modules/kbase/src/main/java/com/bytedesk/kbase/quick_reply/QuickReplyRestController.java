@@ -51,7 +51,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     @Override
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
 
-        List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
+        // List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
         
         return ResponseEntity.ok(JsonResult.success(quickReplyList));
     }
