@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 18:09:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-28 16:40:03
+ * @LastEditTime: 2025-06-12 15:39:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,15 @@ public class FaqMessageExtra extends MessageExtra {
     private static final long serialVersionUID = 1L;
     // 
     private String faqUid;
+    // 
+    private List<String> images;
+    // 
+    private List<String> attachments;
+    // 
+    private List<FaqAnswer> answerList;
+    // 
     private List<FaqResponseSimple> relatedFaqs;
+    // 
 
     public static FaqMessageExtra fromJson(String json) {
         return JSON.parseObject(json, FaqMessageExtra.class);
