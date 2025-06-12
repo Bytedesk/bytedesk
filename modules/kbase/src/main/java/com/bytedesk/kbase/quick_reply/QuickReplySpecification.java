@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 11:45:26
+ * @LastEditTime: 2025-06-12 11:46:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,13 +53,17 @@ public class QuickReplySpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
             }
             if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
-                // 包含如下所有结果：
+                // 包含下面两种情况的所有结果：
                 // 如果 agentUid 不为空，则必须满足 agentUid 等于 request.getAgentUid()，而且level === Level agent
                 // 如果 orgUid 不为空，则必须满足 orgUid === request.getOrgUid()，而且 level === Level organization
-
-                
-                
-                
+                if (StringUtils.hasText(request.getAgentUid())) {
+                    predicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
+                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.AGENT.name()));
+                }
+                if (StringUtils.hasText(request.getOrgUid())) {
+                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
+                }
             } else {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
