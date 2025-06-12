@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 11:44:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 10:09:25
+ * @LastEditTime: 2025-06-12 15:00:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 
@@ -31,6 +32,26 @@ public class AgentSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // nickname
+            if (StringUtils.hasText(request.getNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
+            }
+            // mobile
+            if (StringUtils.hasText(request.getMobile())) {
+                predicates.add(criteriaBuilder.like(root.get("mobile"), "%" + request.getMobile() + "%"));
+            }
+            // email
+            if (StringUtils.hasText(request.getEmail())) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + request.getEmail() + "%"));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("nickname"), "%" + request.getSearchText() + "%"),
+                    criteriaBuilder.like(root.get("mobile"), "%" + request.getSearchText() + "%"),
+                    criteriaBuilder.like(root.get("email"), "%" + request.getSearchText() + "%")
+                ));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

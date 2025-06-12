@@ -112,7 +112,7 @@ public class ArticleRequest extends BaseRequest {
     private String userUid;
 
     // 
-    private String searchText;
+    // private String searchText;
     
     // used for client query
     private String componentType;

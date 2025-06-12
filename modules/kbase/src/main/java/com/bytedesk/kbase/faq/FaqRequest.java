@@ -136,7 +136,7 @@ public class FaqRequest extends BaseRequest {
     private String user;
 
     // 
-    private String searchText;
+    // private String searchText;
 
     // used for client query
     private String componentType;

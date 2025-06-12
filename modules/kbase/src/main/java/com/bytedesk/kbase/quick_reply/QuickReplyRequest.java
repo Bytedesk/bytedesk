@@ -72,7 +72,7 @@ public class QuickReplyRequest extends BaseRequest {
     private String vectorStatus = QuickReplyStatusEnum.NEW.name();
 
     // 
-    private String searchText;
+    // private String searchText;
 
     // used for client query
     private String componentType;
