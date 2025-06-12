@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 09:44:55
+ * @LastEditTime: 2025-06-12 09:45:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.kbase.quick_reply;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,10 +41,6 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.kbase.KbaseRestService;
-import com.bytedesk.kbase.kbase.KbaseTypeEnum;
-
 import lombok.AllArgsConstructor;
 
 @Service
@@ -61,7 +55,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
 
     private final CategoryRestService categoryRestService;
 
-    private final KbaseRestService kbaseRestService;
+    // private final KbaseRestService kbaseRestService;
 
     private final AuthService authService;
 
@@ -236,55 +230,55 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         return quickReplyExcel;
     }
 
-    private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KbaseEntity> kbList) {
+    // private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KbaseEntity> kbList) {
 
-        List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
-        //
-        Iterator<KbaseEntity> kbPlatformIterator = kbList.iterator();
-        while (kbPlatformIterator.hasNext()) {
-            KbaseEntity kb = kbPlatformIterator.next();
-            //
-            QuickReplyResponseAgent quickReplyKb = QuickReplyResponseAgent.builder()
-                    .key(kb.getUid())
-                    .title(kb.getName())
-                    .content(kb.getDescriptionHtml())
-                    .type(QuickReplyTypeEnum.KB.name())
-                    .level(kb.getLevel())
-                    .platform(kb.getPlatform())
-                    .build();
-            //
-            List<CategoryEntity> categoryList = categoryRestService.findByKbUid(kb.getUid());
-            Iterator<CategoryEntity> iterator = categoryList.iterator();
-            while (iterator.hasNext()) {
-                CategoryEntity category = iterator.next();
-                //
-                QuickReplyResponseAgent quickReplyCategory = QuickReplyResponseAgent.builder()
-                        .key(category.getUid())
-                        .title(category.getName())
-                        .type(QuickReplyTypeEnum.CATEGORY.name())
-                        .build();
-                //
-                List<QuickReplyEntity> quickReplies = quickReplyRepository.findByCategoryUid(category.getUid());
-                Iterator<QuickReplyEntity> quickRepliesIterator = quickReplies.iterator();
-                while (quickRepliesIterator.hasNext()) {
-                    QuickReplyEntity quickReply = quickRepliesIterator.next();
-                    //
-                    QuickReplyResponseAgent quickReplyAgent = QuickReplyResponseAgent.builder()
-                            .key(quickReply.getUid())
-                            .title(quickReply.getTitle())
-                            .content(quickReply.getContent())
-                            .type(quickReply.getType())
-                            .build();
-                    quickReplyCategory.getChildren().add(quickReplyAgent);
-                }
-                quickReplyKb.getChildren().add(quickReplyCategory);
+    //     List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
+    //     //
+    //     Iterator<KbaseEntity> kbPlatformIterator = kbList.iterator();
+    //     while (kbPlatformIterator.hasNext()) {
+    //         KbaseEntity kb = kbPlatformIterator.next();
+    //         //
+    //         QuickReplyResponseAgent quickReplyKb = QuickReplyResponseAgent.builder()
+    //                 .key(kb.getUid())
+    //                 .title(kb.getName())
+    //                 .content(kb.getDescriptionHtml())
+    //                 .type(QuickReplyTypeEnum.KB.name())
+    //                 .level(kb.getLevel())
+    //                 .platform(kb.getPlatform())
+    //                 .build();
+    //         //
+    //         List<CategoryEntity> categoryList = categoryRestService.findByKbUid(kb.getUid());
+    //         Iterator<CategoryEntity> iterator = categoryList.iterator();
+    //         while (iterator.hasNext()) {
+    //             CategoryEntity category = iterator.next();
+    //             //
+    //             QuickReplyResponseAgent quickReplyCategory = QuickReplyResponseAgent.builder()
+    //                     .key(category.getUid())
+    //                     .title(category.getName())
+    //                     .type(QuickReplyTypeEnum.CATEGORY.name())
+    //                     .build();
+    //             //
+    //             List<QuickReplyEntity> quickReplies = quickReplyRepository.findByCategoryUid(category.getUid());
+    //             Iterator<QuickReplyEntity> quickRepliesIterator = quickReplies.iterator();
+    //             while (quickRepliesIterator.hasNext()) {
+    //                 QuickReplyEntity quickReply = quickRepliesIterator.next();
+    //                 //
+    //                 QuickReplyResponseAgent quickReplyAgent = QuickReplyResponseAgent.builder()
+    //                         .key(quickReply.getUid())
+    //                         .title(quickReply.getTitle())
+    //                         .content(quickReply.getContent())
+    //                         .type(quickReply.getType())
+    //                         .build();
+    //                 quickReplyCategory.getChildren().add(quickReplyAgent);
+    //             }
+    //             quickReplyKb.getChildren().add(quickReplyCategory);
 
-            }
-            quickReplyList.add(quickReplyKb);
-        }
-        //
-        return quickReplyList;
-    }
+    //         }
+    //         quickReplyList.add(quickReplyKb);
+    //     }
+    //     //
+    //     return quickReplyList;
+    // }
 
     // 快捷回复分类
     public void initQuickReplyCategory(String orgUid) {
