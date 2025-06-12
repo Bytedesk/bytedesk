@@ -13,8 +13,6 @@
  */
 package com.bytedesk.kbase.quick_reply;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,8 +50,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
 
         // List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
+        Page<QuickReplyResponse> page = quickReplyRestService.queryByUser(request);
         
-        return ResponseEntity.ok(JsonResult.success(quickReplyList));
+        return ResponseEntity.ok(JsonResult.success(page));
     }
     
     // @PreAuthorize("hasAuthority('KBASE_CREATE')")
