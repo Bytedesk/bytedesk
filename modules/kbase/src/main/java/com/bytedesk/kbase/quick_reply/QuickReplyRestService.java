@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 09:45:58
+ * @LastEditTime: 2025-06-12 11:29:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -231,7 +231,6 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
     }
 
     // private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KbaseEntity> kbList) {
-
     //     List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
     //     //
     //     Iterator<KbaseEntity> kbPlatformIterator = kbList.iterator();
@@ -272,7 +271,6 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
     //                 quickReplyCategory.getChildren().add(quickReplyAgent);
     //             }
     //             quickReplyKb.getChildren().add(quickReplyCategory);
-
     //         }
     //         quickReplyList.add(quickReplyKb);
     //     }
