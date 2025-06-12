@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 09:19:56
+ * @LastEditTime: 2025-06-12 11:45:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,18 @@ public class QuickReplySpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
             }
             if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
-
+                // 如果 agentUid 不为空，则必须满足 agentUid 等于 request.getAgentUid()，而且level === Level agent
+                // 或者 orgUid === request.getOrgUid()，而且 level === Level organization
+                if (StringUtils.hasText(request.getAgentUid())) {
+                    predicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
+                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.AGENT.name()));
+                } else if (StringUtils.hasText(request.getOrgUid())) {
+                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
+                } else {
+                    // 如果 agentUid 和 orgUid 都为空，则不添加任何条件
+                }
+                
             } else {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }

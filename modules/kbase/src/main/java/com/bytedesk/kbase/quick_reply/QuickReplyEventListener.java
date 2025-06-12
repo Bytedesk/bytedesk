@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-20 14:31:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:08:23
+ * @LastEditTime: 2025-06-12 11:30:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,7 @@ public class QuickReplyEventListener {
 
     private final QuickReplyRestService quickReplyService;
 
+    // 迁移到kbaseInitializer中
     // @Order(7)
     // @EventListener
     // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
