@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 11:29:31
+ * @LastEditTime: 2025-06-12 11:53:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,8 +55,6 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
 
     private final CategoryRestService categoryRestService;
 
-    // private final KbaseRestService kbaseRestService;
-
     private final AuthService authService;
 
     @Override
@@ -85,26 +83,21 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
 
     // @Cacheable(value = "quickreply", key = "#request.agentUid", unless = "#result == null")
     // public List<QuickReplyResponseAgent> query(QuickReplyRequest request) {
-
     //     List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
-
     //     // 当前用户快捷回复/常用语
     //     List<KbaseEntity> agentKbase = kbaseRestService.findByLevelAndTypeAndAgentUid(LevelEnum.AGENT,
     //             KbaseTypeEnum.QUICKREPLY,
     //             request.getAgentUid());
     //     quickReplyList.addAll(transformToQuickReplyResponseAgent(agentKbase));
-
     //     // 当前组织快捷回复/常用语
     //     List<KbaseEntity> orgKbase = kbaseRestService.findByLevelAndTypeAndOrgUid(LevelEnum.ORGANIZATION,
     //             KbaseTypeEnum.QUICKREPLY,
     //             request.getOrgUid());
     //     quickReplyList.addAll(transformToQuickReplyResponseAgent(orgKbase));
-
     //     // 平台快捷回复/常用语
     //     List<KbaseEntity> platformKbase = kbaseRestService.findByLevelAndType(LevelEnum.PLATFORM,
     //             KbaseTypeEnum.QUICKREPLY);
     //     quickReplyList.addAll(transformToQuickReplyResponseAgent(platformKbase));
-
     //     return quickReplyList;
     // }
 
