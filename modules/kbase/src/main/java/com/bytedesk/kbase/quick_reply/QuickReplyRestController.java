@@ -55,8 +55,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         
         return ResponseEntity.ok(JsonResult.success(quickReplyList));
     }
-
-
+    
     // @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @ActionAnnotation(title = "快捷回复", action = "新建", description = "create quick_reply")
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 18:19:06
+ * @LastEditTime: 2025-06-12 09:19:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.constant.TypeConsts;
+
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +32,8 @@ public class QuickReplySpecification extends BaseSpecification {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             //
             // type
             if (StringUtils.hasText(request.getType())) {
@@ -47,6 +50,11 @@ public class QuickReplySpecification extends BaseSpecification {
             }
             if (StringUtils.hasText(request.getKbUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            }
+            if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
+
+            } else {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {
