@@ -56,13 +56,25 @@ public class QuickReplySpecification extends BaseSpecification {
                 // 包含下面两种情况的所有结果：
                 // 如果 agentUid 不为空，则必须满足 agentUid 等于 request.getAgentUid()，而且level === Level agent
                 // 如果 orgUid 不为空，则必须满足 orgUid === request.getOrgUid()，而且 level === Level organization
+                List<Predicate> orPredicates = new ArrayList<>();
+                
                 if (StringUtils.hasText(request.getAgentUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
-                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.AGENT.name()));
+                    List<Predicate> agentPredicates = new ArrayList<>();
+                    agentPredicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
+                    agentPredicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.AGENT.name()));
+                    orPredicates.add(criteriaBuilder.and(agentPredicates.toArray(new Predicate[0])));
                 }
+                
                 if (StringUtils.hasText(request.getOrgUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
+                    List<Predicate> orgPredicates = new ArrayList<>();
+                    orgPredicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                    orgPredicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
+                    orPredicates.add(criteriaBuilder.and(orgPredicates.toArray(new Predicate[0])));
+                }
+                
+                // 如果有条件，则添加OR连接的条件组
+                if (!orPredicates.isEmpty()) {
+                    predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
                 }
             } else {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
