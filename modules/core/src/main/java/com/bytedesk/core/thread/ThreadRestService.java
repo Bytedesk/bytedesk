@@ -63,10 +63,6 @@ public class ThreadRestService
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    // private final CategoryRestService categoryService;
-
-    // private final TagRestService tagRestService;
-
     @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
         Pageable pageable = request.getPageable();
