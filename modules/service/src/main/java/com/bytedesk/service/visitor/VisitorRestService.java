@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:17:59
+ * @LastEditTime: 2025-06-12 16:23:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -156,6 +156,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         visitor.setMobile(request.getMobile());
         visitor.setEmail(request.getEmail());
         visitor.setNote(request.getNote());
+        // visitor.setTagList(request.getTagList()); // 标签列表不在这里更新，使用 updateTagList 方法更新
         // 
         VisitorEntity savedVisitor = save(visitor);
         if (savedVisitor == null) {

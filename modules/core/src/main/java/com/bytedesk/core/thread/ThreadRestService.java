@@ -244,6 +244,7 @@ public class ThreadRestService
         thread.setStar(threadRequest.getStar());
         thread.setFolded(threadRequest.getFolded());
         thread.setContent(threadRequest.getContent());
+        // thread.setTagList(threadRequest.getTagList());  // 标签列表不在这里更新，使用 updateTagList 方法更新
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
