@@ -53,17 +53,12 @@ public class QuickReplySpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
             }
             if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
+                // 包含如下所有结果：
                 // 如果 agentUid 不为空，则必须满足 agentUid 等于 request.getAgentUid()，而且level === Level agent
-                // 或者 orgUid === request.getOrgUid()，而且 level === Level organization
-                if (StringUtils.hasText(request.getAgentUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("agentUid"), request.getAgentUid()));
-                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.AGENT.name()));
-                } else if (StringUtils.hasText(request.getOrgUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-                    predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
-                } else {
-                    // 如果 agentUid 和 orgUid 都为空，则不添加任何条件
-                }
+                // 如果 orgUid 不为空，则必须满足 orgUid === request.getOrgUid()，而且 level === Level organization
+
+                
+                
                 
             } else {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
