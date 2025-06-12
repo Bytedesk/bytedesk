@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 15:07:04
+ * @LastEditTime: 2025-06-12 15:25:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,7 +118,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             FaqEntity entity = optionalEntity.get();
             entity.increaseClickCount();
             //
-            FaqEntity savedEntity = faqRepository.save(entity);
+            FaqEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
@@ -135,7 +135,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             FaqEntity entity = optionalEntity.get();
             entity.increaseClickCount();
             //
-            FaqEntity savedEntity = faqRepository.save(entity);
+            FaqEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update click count");
             }
@@ -163,8 +163,10 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
             }
             //
             return faqResponse;
+
+        } else {
+            throw new RuntimeException("faq not found");
         }
-        return null;
     }
 
     @Cacheable(value = "faq", key = "#uid", unless = "#result == null")
@@ -602,7 +604,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     //     try {
     //         // 加载JSON文件中的FAQ数据
     //         FaqConfiguration config = faqJsonLoader.loadFaqs();
-
     //         // 创建5个示例多答案数据
     //         List<FaqAnswer> answerList = new ArrayList<>();
     //         for (int i = 1; i <= 5; i++) {
@@ -611,14 +612,12 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     //             answer.setAnswer("VIP " + i + " 专属回答：这是针对不同会员等级的答案示例");
     //             answerList.add(answer);
     //         }
-
     //         // 准备5个相关问题的UID列表
     //         List<String> relatedFaqUids = new ArrayList<>();
     //         for (int i = 5; i < 10; i++) {
     //             String relatedUid = Utils.formatUid(orgUid, "faq_00" + i);
     //             relatedFaqUids.add(relatedUid);
     //         }
-
     //         int count = 0;
     //         // 遍历并保存每个FAQ
     //         for (Faq faq : config.getFaqs()) {
@@ -641,7 +640,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     //             update(request);
     //             count++;
     //         }
-
     //         log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
     //     } catch (Exception e) {
     //         log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);

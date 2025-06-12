@@ -60,9 +60,7 @@ public class FaqRestControllerVisitor {
     public ResponseEntity<?> clickFaq(FaqRequest request) {
         
         FaqResponse faq = faqRestService.clickFaq(request);
-        if (faq == null) {
-            return ResponseEntity.ok(JsonResult.error("faq not found"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(faq));
     }
     
