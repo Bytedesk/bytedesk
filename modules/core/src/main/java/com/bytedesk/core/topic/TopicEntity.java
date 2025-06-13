@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 16:08:18
+ * @LastEditTime: 2025-06-13 18:34:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,27 +50,10 @@ public class TopicEntity extends BaseEntityNoOrg {
     @Convert(converter = StringSetConverter.class)
     private Set<String> topics = new HashSet<>();
 
-    // 管理员监控的topic
-    @Builder.Default
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    @Convert(converter = StringSetConverter.class)
-    private Set<String> monitorTopics = new HashSet<>();
-
-    // 每个用户仅存在一条记录
-    // user, no need map, just uid
-    // 用户uid或者robotUid
-    // @NotBlank
-    // @Column(unique = true)
-    // private String userUid;
-
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
     // @Builder.Default
     // private Integer qos = 1;
-
-    // @Builder.Default
-    // @Column(name = "is_subscribed")
-    // private Boolean subscribed = false;
-
+    
     /**
      * topic通配符说明：
      * 单层通配符"+"：只能匹配一层主题。例如，"aaa/+"可以匹配"aaa/bbb"，但不能匹配"aaa/bbb/ccc"。
@@ -89,6 +72,4 @@ public class TopicEntity extends BaseEntityNoOrg {
     @Convert(converter = StringSetConverter.class)
     private Set<String> clientIds = new HashSet<>();
 
-    /** 描述 */
-    // private String description;
 }

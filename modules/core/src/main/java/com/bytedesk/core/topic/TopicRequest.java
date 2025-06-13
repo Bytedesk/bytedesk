@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:15:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 15:12:17
+ * @LastEditTime: 2025-06-13 18:34:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,22 +39,10 @@ public class TopicRequest extends BaseRequest {
     @Builder.Default
     private Set<String> topics = new HashSet<>();
     
-    // @NotBlank
-    // private String userUid;
-
-    /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
-    // @Builder.Default
-    // private Integer qos = 1;
-
-    // private Boolean subscribed;
-
-    // private Boolean wildcard;
-
     /**
      * current online clientIds
      */
     @Builder.Default
     private Set<String> clientIds = new HashSet<>();
-    // private List<String> clientIds = new ArrayList<>();
     
 }
