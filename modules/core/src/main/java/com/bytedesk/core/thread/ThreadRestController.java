@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 19:26:33
+ * @LastEditTime: 2025-06-13 12:38:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -119,7 +119,6 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Operation(summary = "根据UID查询会话", description = "通过唯一标识符查询会话")
     @Override
     public ResponseEntity<?> queryByUid(ThreadRequest request) {
-
         Optional<ThreadResponse> threadOptional = threadRestService.queryByThreadUid(request);
         if (threadOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
@@ -204,6 +203,26 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
+    // update/hide
+    @Operation(summary = "更新会话隐藏状态", description = "设置或取消会话隐藏")
+    @PostMapping("/update/hide")
+    public ResponseEntity<?> updateHide(@RequestBody ThreadRequest request) {
+        
+        ThreadResponse threadResponse = threadRestService.updateHide(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    // update/folded
+    @Operation(summary = "更新会话折叠状态", description = "设置或取消会话折叠")
+    @PostMapping("/update/fold")
+    public ResponseEntity<?> updateFold(@RequestBody ThreadRequest request) {
+        
+        ThreadResponse threadResponse = threadRestService.updateFold(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
     /**
      * 更新会话用户信息
      * 
@@ -260,6 +279,16 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     public ResponseEntity<?> updateUnreadCount(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadRestService.updateUnreadCount(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    // update/note
+    @Operation(summary = "更新会话备注", description = "更新会话的备注信息")
+    @PostMapping("/update/note")
+    public ResponseEntity<?> updateNote(@RequestBody ThreadRequest request) {
+        
+        ThreadResponse threadResponse = threadRestService.updateNote(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }

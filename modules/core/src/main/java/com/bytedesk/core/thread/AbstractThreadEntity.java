@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 10:57:43
+ * @LastEditTime: 2025-06-13 12:38:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -105,8 +105,8 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     
     // 类似微信折叠会话
     @Builder.Default
-    @Column(name = "is_folded")
-    private Boolean folded = false;
+    @Column(name = "is_fold")
+    private Boolean fold = false;
 
     // 自动关闭
     @Builder.Default

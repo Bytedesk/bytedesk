@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 12:14:26
+ * @LastEditTime: 2025-06-13 12:16:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -232,8 +232,8 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         throw new RuntimeException("Failed to update group by uid: " + request.getUid());
     }
 
-    // update/nickname
-    public GroupResponse updateNickname(GroupRequest request) {
+    // update/name
+    public GroupResponse updateGroupName(GroupRequest request) {
         // 
         Optional<GroupEntity> groupOptional = findByUid(request.getUid());
         if (groupOptional.isPresent()) {
@@ -243,12 +243,33 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
             // 
             GroupEntity saved = save(group);
             if (saved == null) {
-                throw new RuntimeException("Failed to update group nickname");
+                throw new RuntimeException("Failed to update group name");
+            }
+            // TODO: 更新thread user nickname
+            return convertToResponse(saved);
+        }
+        // 
+        throw new RuntimeException("Failed to update group name by uid: " + request.getUid());
+    }
+
+    // update/topTip
+    public GroupResponse updateGroupTopTip(GroupRequest request) {
+        // 
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
+        if (groupOptional.isPresent()) {
+            GroupEntity group = groupOptional.get();
+            // 
+            group.setShowTopTip(request.getShowTopTip());
+            group.setTopTip(request.getTopTip());
+            // 
+            GroupEntity saved = save(group);
+            if (saved == null) {
+                throw new RuntimeException("Failed to update group top tip");
             }
             return convertToResponse(saved);
         }
         // 
-        throw new RuntimeException("Failed to update group nickname by uid: " + request.getUid());
+        throw new RuntimeException("Failed to update group top tip by uid: " + request.getUid());
     }
 
     // invite

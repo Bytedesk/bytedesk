@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 10:39:09
+ * @LastEditTime: 2025-06-13 12:39:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -275,7 +275,7 @@ public class ThreadRestService
         thread.setMute(threadRequest.getMute());
         thread.setHide(threadRequest.getHide());
         thread.setStar(threadRequest.getStar());
-        thread.setFolded(threadRequest.getFolded());
+        thread.setFold(threadRequest.getFold());
         thread.setContent(threadRequest.getContent());
         // thread.setTagList(threadRequest.getTagList());  // 标签列表不在这里更新，使用 updateTagList 方法更新
         //
@@ -287,7 +287,7 @@ public class ThreadRestService
     }
 
     // update top
-    public ThreadResponse updateTop(ThreadRequest threadRequest) {
+    public ThreadResponse updateTop(ThreadRequest threadRequest) {  
         if (!StringUtils.hasText(threadRequest.getUid())) {
             throw new RuntimeException("thread uid is required");
         }
@@ -349,6 +349,48 @@ public class ThreadRestService
         return convertToResponse(updateThread);
     }
 
+    // update hide
+    public ThreadResponse updateHide(ThreadRequest threadRequest) {
+        if (!StringUtils.hasText(threadRequest.getUid())) {
+            throw new RuntimeException("thread uid is required");
+        }
+        //
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+        }
+        //
+        ThreadEntity thread = threadOptional.get();
+        thread.setHide(threadRequest.getHide());
+        //
+        ThreadEntity updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return convertToResponse(updateThread);
+    }
+
+    // update folded
+    public ThreadResponse updateFold(ThreadRequest threadRequest) {
+        if (!StringUtils.hasText(threadRequest.getUid())) {
+            throw new RuntimeException("thread uid is required");
+        }
+        //
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+        }
+        //
+        ThreadEntity thread = threadOptional.get();
+        thread.setFold(threadRequest.getFold());
+        //
+        ThreadEntity updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return convertToResponse(updateThread);
+    }
+
     // update user info
     public ThreadResponse updateUser(ThreadRequest threadRequest) {
         if (!StringUtils.hasText(threadRequest.getUid())) {
@@ -361,7 +403,7 @@ public class ThreadRestService
         }
         //
         ThreadEntity thread = threadOptional.get();
-        thread.setUser(threadRequest.getUser().toJson()); // JSON.toJSONString(threadRequest.getUser())
+        thread.setUser(threadRequest.getUser().toJson());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -445,6 +487,27 @@ public class ThreadRestService
         //
         ThreadEntity thread = threadOptional.get();
         thread.setStatus(threadRequest.getStatus());
+        //
+        ThreadEntity updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return convertToResponse(updateThread);
+    }
+
+    // update/note
+    public ThreadResponse updateNote(ThreadRequest threadRequest) {
+        if (!StringUtils.hasText(threadRequest.getUid())) {
+            throw new RuntimeException("thread uid is required");
+        }
+        //
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+        }
+        //
+        ThreadEntity thread = threadOptional.get();
+        thread.setNote(threadRequest.getNote());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -621,7 +684,7 @@ public class ThreadRestService
                 latestEntity.setUnread(entity.getUnread() != null ? entity.getUnread() : latestEntity.getUnread());
                 latestEntity.setMute(entity.getMute() != null ? entity.getMute() : latestEntity.getMute());
                 latestEntity.setHide(entity.getHide() != null ? entity.getHide() : latestEntity.getHide());
-                latestEntity.setFolded(entity.getFolded() != null ? entity.getFolded() : latestEntity.getFolded());
+                latestEntity.setFold(entity.getFold() != null ? entity.getFold() : latestEntity.getFold());
                 latestEntity.setAutoClose(entity.getAutoClose() != null ? entity.getAutoClose() : latestEntity.getAutoClose());
                 
                 // Preserve metadata
