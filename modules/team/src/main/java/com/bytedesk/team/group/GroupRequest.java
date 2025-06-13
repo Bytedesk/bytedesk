@@ -65,6 +65,5 @@ public class GroupRequest extends BaseRequest {
     @Builder.Default
     private List<String> robotUids = new ArrayList<>();
 
-    // invite/remove member by uid
-    // private String memberUid;
+    // Using memberUids list for invite/remove/join/leave operations
 }

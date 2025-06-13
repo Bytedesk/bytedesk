@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 11:25:48
+ * @LastEditTime: 2025-06-13 11:39:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -240,32 +240,39 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             // 
-            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
-            if (!memberOptional.isPresent()) {
-                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            if (request.getMemberUids() == null || request.getMemberUids().isEmpty()) {
+                throw new RuntimeException("No members to invite");
             }
-            group.getMembers().add(memberOptional.get());
+            
+            for (String memberUid : request.getMemberUids()) {
+                Optional<MemberEntity> memberOptional = memberRestService.findByUid(memberUid);
+                if (!memberOptional.isPresent()) {
+                    throw new RuntimeException("Failed to find member by uid: " + memberUid);
+                }
+                group.getMembers().add(memberOptional.get());
+                
+                // 订阅topic
+                String user = UserProtobuf.builder()
+                        .uid(group.getUid())
+                        .nickname(group.getName())
+                        .avatar(group.getAvatar())
+                        .build()
+                        .toJson();
+                String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+                String orgUid = group.getOrgUid();
+                log.info("Creating group member thread for user: {}, topic: {}, orgUid: {}", user, topic, orgUid);
+                threadRestService.createGroupMemberThread(user, topic, orgUid, memberOptional.get().getUser());
+            }
             //
             GroupEntity saved = save(group);
             if (saved == null) {
-                throw new RuntimeException("Failed to invite user to group");
+                throw new RuntimeException("Failed to invite users to group");
             }
-            // 订阅topic
-            String user = UserProtobuf.builder()
-                    .uid(group.getUid())
-                    .nickname(group.getName())
-                    .avatar(group.getAvatar())
-                    .build()
-                    .toJson();
-            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
-            String orgUid = group.getOrgUid();
-            log.info("Creating group member thread for user: {}, topic: {}, orgUid: {}", user, topic, orgUid);
-            threadRestService.createGroupMemberThread(user, topic, orgUid, memberOptional.get().getUser());
             // 
             return convertToResponse(saved);
         }
         // 
-        throw new RuntimeException("Failed to invite user to group by uid: " + request.getUid());
+        throw new RuntimeException("Failed to invite users to group by uid: " + request.getUid());
     }
 
     // join
@@ -275,33 +282,34 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             // 
-            // UserEntity user = authService.getUser();
-            // if (user == null) {
-            //     throw new RuntimeException("Group invite user is null");
-            // }
-            // 
-            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
-            if (!memberOptional.isPresent()) {
-                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            if (request.getMemberUids() == null || request.getMemberUids().isEmpty()) {
+                throw new RuntimeException("No members to join");
             }
-            group.getMembers().add(memberOptional.get());
+            
+            for (String memberUid : request.getMemberUids()) {
+                Optional<MemberEntity> memberOptional = memberRestService.findByUid(memberUid);
+                if (!memberOptional.isPresent()) {
+                    throw new RuntimeException("Failed to find member by uid: " + memberUid);
+                }
+                group.getMembers().add(memberOptional.get());
+                
+                // 订阅topic
+                String user = UserProtobuf.builder()
+                        .uid(group.getUid())
+                        .nickname(group.getName())
+                        .avatar(group.getAvatar())
+                        .build()
+                        .toJson();
+                String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+                String orgUid = group.getOrgUid();
+                log.info("Creating group member thread for user: {}, topic: {}, orgUid: {}", user, topic, orgUid);
+                threadRestService.createGroupMemberThread(user, topic, orgUid, memberOptional.get().getUser());
+            }
             //
             GroupEntity saved = save(group);
             if (saved == null) {
                 throw new RuntimeException("Failed to join group");
             }
-            // 订阅topic
-            String user = UserProtobuf.builder()
-                    .uid(group.getUid())
-                    .nickname(group.getName())
-                    .avatar(group.getAvatar())
-                    .build()
-                    .toJson();
-            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
-            String orgUid = group.getOrgUid();
-            log.info("Creating group member thread for user: {}, topic: {}, orgUid: {}", user, topic, orgUid);
-            threadRestService.createGroupMemberThread(user, topic, orgUid, memberOptional.get().getUser());
-
             return convertToResponse(saved);
         }
         // 
@@ -315,25 +323,32 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             // 
-            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
-            if (!memberOptional.isPresent()) {
-                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            if (request.getMemberUids() == null || request.getMemberUids().isEmpty()) {
+                throw new RuntimeException("No members to remove");
             }
-            // 从group members中移除成员
-            group.getMembers().remove(memberOptional.get());
+            
+            for (String memberUid : request.getMemberUids()) {
+                Optional<MemberEntity> memberOptional = memberRestService.findByUid(memberUid);
+                if (!memberOptional.isPresent()) {
+                    throw new RuntimeException("Failed to find member by uid: " + memberUid);
+                }
+                // 从group members中移除成员
+                group.getMembers().remove(memberOptional.get());
+                
+                // 删除订阅topic
+                String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+                threadRestService.removeGroupMemberThread(topic, memberOptional.get().getUser());
+            }
             //
             GroupEntity saved = save(group);
             if (saved == null) {
-                throw new RuntimeException("Failed to remove user from group");
+                throw new RuntimeException("Failed to remove users from group");
             }
-            // 删除订阅topic
-            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
-            threadRestService.removeGroupMemberThread(topic, memberOptional.get().getUser());
             // 
             return convertToResponse(group);
         }
         // 
-        throw new RuntimeException("Failed to remove user from group by uid: " + request.getUid());
+        throw new RuntimeException("Failed to remove users from group by uid: " + request.getUid());
     }
 
     // leave
@@ -343,21 +358,27 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             // 
-            // 
-            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
-            if (!memberOptional.isPresent()) {
-                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            if (request.getMemberUids() == null || request.getMemberUids().isEmpty()) {
+                throw new RuntimeException("No members to leave");
             }
-            // 从group members中移除成员
-            group.getMembers().remove(memberOptional.get());
+            
+            for (String memberUid : request.getMemberUids()) {
+                Optional<MemberEntity> memberOptional = memberRestService.findByUid(memberUid);
+                if (!memberOptional.isPresent()) {
+                    throw new RuntimeException("Failed to find member by uid: " + memberUid);
+                }
+                // 从group members中移除成员
+                group.getMembers().remove(memberOptional.get());
+                
+                // 删除订阅topic
+                String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+                threadRestService.removeGroupMemberThread(topic, memberOptional.get().getUser());
+            }
             //
             GroupEntity saved = save(group);
             if (saved == null) {
-                throw new RuntimeException("Failed to remove user from group");
+                throw new RuntimeException("Failed to remove users from group");
             }
-            // 删除订阅topic
-            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
-            threadRestService.removeGroupMemberThread(topic, memberOptional.get().getUser());
             // 
             return convertToResponse(group);
         }
