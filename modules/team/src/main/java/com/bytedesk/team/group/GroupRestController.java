@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 11:36:56
+ * @LastEditTime: 2025-06-13 11:42:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -94,7 +94,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "群组", action = "invite", description = "invite group")
+    @ActionAnnotation(title = "群组", action = "invite", description = "invite members to group")
     @PostMapping("/invite")
     public ResponseEntity<?> inviteMembers(@RequestBody GroupRequest request) {
         
@@ -112,7 +112,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "群组", action = "remove", description = "remove group")
+    @ActionAnnotation(title = "群组", action = "remove", description = "remove members from group")
     @PostMapping("/remove")
     public ResponseEntity<?> removeMembers(@RequestBody GroupRequest request) {
         
