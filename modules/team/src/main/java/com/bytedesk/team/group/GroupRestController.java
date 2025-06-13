@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 11:05:27
+ * @LastEditTime: 2025-06-13 11:36:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,7 +96,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
 
     @ActionAnnotation(title = "群组", action = "invite", description = "invite group")
     @PostMapping("/invite")
-    public ResponseEntity<?> invite(@RequestBody GroupRequest request) {
+    public ResponseEntity<?> inviteMembers(@RequestBody GroupRequest request) {
         
         GroupResponse group = groupRestService.invite(request);
 
@@ -105,7 +105,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     
     @ActionAnnotation(title = "群组", action = "join", description = "join group")
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody GroupRequest request) {
+    public ResponseEntity<?> joinGroup(@RequestBody GroupRequest request) {
         
         GroupResponse group = groupRestService.join(request);
 
@@ -114,7 +114,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
 
     @ActionAnnotation(title = "群组", action = "remove", description = "remove group")
     @PostMapping("/remove")
-    public ResponseEntity<?> remove(@RequestBody GroupRequest request) {
+    public ResponseEntity<?> removeMembers(@RequestBody GroupRequest request) {
         
         GroupResponse group = groupRestService.remove(request);
 
@@ -123,7 +123,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
 
     @ActionAnnotation(title = "群组", action = "leave", description = "leave group")
     @PostMapping("/leave")
-    public ResponseEntity<?> leave(@RequestBody GroupRequest request) {
+    public ResponseEntity<?> leaveGroup(@RequestBody GroupRequest request) {
         
         GroupResponse group = groupRestService.leave(request);
 
@@ -132,7 +132,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
 
     @ActionAnnotation(title = "群组", action = "dismiss", description = "dismiss group")
     @PostMapping("/dismiss")
-    public ResponseEntity<?> dismiss(@RequestBody GroupRequest request) {
+    public ResponseEntity<?> dismissGroup(@RequestBody GroupRequest request) {
 
         groupRestService.dismiss(request);
         

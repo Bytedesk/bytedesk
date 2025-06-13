@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 11:00:48
+ * @LastEditTime: 2025-06-13 11:25:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -121,22 +122,30 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
         
+        log.info("pagination params - pageSize: {}, currentPage: {}, startItem: {}, totalSize: {}", 
+            pageSize, currentPage, startItem, group.getMembers().size());
+        
         List<MemberEntity> memberList = group.getMembers();
+        log.info("memberList before filter: {}", memberList);
         // 如果 request.searchText 不为空，则需要根据nickname过滤成员
-        if (request.getSearchText() != null && !request.getSearchText().isEmpty()) {
+        if (StringUtils.hasText(request.getSearchText())) {
             memberList = memberList.stream()
-                        .filter(member -> member.getUser().getNickname().contains(request.getSearchText()))
+                        .filter(member -> member.getNickname() != null && 
+                            member.getNickname().toLowerCase().contains(request.getSearchText().toLowerCase()))
                     .collect(Collectors.toList());
         }
+        log.info("memberList after filter: {}", memberList);
         List<MemberProtobuf> content;
         
         if (memberList.size() < startItem) {
             content = List.of();
+            log.info("memberList startItem is greater than memberList size: {}", content);
         } else {
             int toIndex = Math.min(startItem + pageSize, memberList.size());
             content = memberList.subList(startItem, toIndex).stream()
                     .map(member -> modelMapper.map(member, MemberProtobuf.class))
                     .collect(Collectors.toList());
+            log.info("memberList content: {}", content);
         }
         
         return new org.springframework.data.domain.PageImpl<>(
