@@ -21,6 +21,24 @@ upload/*
 logs/*
 target/
 
+# Large files and media
+*.jar
+*.mp4
+*.mov
+*.avi
+*.wmv
+*.flv
+*.psd
+*.ai
+*.iso
+*.dmg
+*.gz
+*.7z
+*.pdf
+*.db
+deploy/ziOdjamB
+deploy/z*
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /starter/logs
