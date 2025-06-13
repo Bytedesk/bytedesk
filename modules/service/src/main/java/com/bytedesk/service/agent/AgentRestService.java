@@ -52,8 +52,8 @@ import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
-import com.bytedesk.team.member.MemberEntity;
-import com.bytedesk.team.member.MemberRestService;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.MemberRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

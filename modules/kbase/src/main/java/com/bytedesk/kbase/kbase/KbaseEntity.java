@@ -23,7 +23,7 @@ import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.team.member.MemberEntity;
+import com.bytedesk.core.member.MemberEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

@@ -3,6 +3,6 @@
  * 处理HTTP请求，实现RESTful API接口
  */
 @NonNullApi
-package com.bytedesk.team.controller;
+package com.bytedesk.core.controller;
 
 import org.springframework.lang.NonNullApi;

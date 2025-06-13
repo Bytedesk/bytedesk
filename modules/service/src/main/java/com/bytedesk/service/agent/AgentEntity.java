@@ -27,7 +27,7 @@ import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
-import com.bytedesk.team.member.MemberEntity;
+import com.bytedesk.core.member.MemberEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

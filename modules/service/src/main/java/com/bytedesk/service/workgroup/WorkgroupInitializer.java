@@ -26,7 +26,7 @@ import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.agent.AgentInitializer;
-import com.bytedesk.team.member.MemberInitializer;
+import com.bytedesk.core.member.MemberInitializer;
 
 import lombok.AllArgsConstructor;
 

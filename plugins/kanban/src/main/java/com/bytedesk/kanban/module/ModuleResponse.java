@@ -17,7 +17,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kanban.todo_list.TodoListResponse;
-import com.bytedesk.team.member.MemberProtobuf;
+import com.bytedesk.core.member.MemberProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

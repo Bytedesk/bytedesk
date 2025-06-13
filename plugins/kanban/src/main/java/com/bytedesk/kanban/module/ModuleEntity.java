@@ -19,7 +19,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kanban.todo_list.TodoListEntity;
-import com.bytedesk.team.member.MemberEntity;
+import com.bytedesk.core.member.MemberEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
