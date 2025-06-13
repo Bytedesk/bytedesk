@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 18:35:29
+ * @LastEditTime: 2025-06-13 18:42:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,15 +47,11 @@ public class TopicEventListener {
     @EventListener
     public void onTopicCreateEvent(TopicCreateEvent event) {
         log.info("topic onTopicCreateEvent: {}", event);
-        // 注意：来自member和department的创建事件，大量事件会导致topicService.create()方法被调用多次，
-        // 导致乐观锁冲突。所以，将事件缓存起来，然后定时刷新到数据库中
-        // topicService.create(event.getTopic(), event.getUserUid());
         //
         TopicRequest request = TopicRequest.builder()
                 .topic(event.getTopic())
                 .userUid(event.getUserUid())
                 .build();
-        // request.getTopics().add(event.getTopic());
         topicCacheService.pushRequest(request);
     }
 
