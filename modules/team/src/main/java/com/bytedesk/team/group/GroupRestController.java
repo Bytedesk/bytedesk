@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 10:46:53
+ * @LastEditTime: 2025-06-13 11:05:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,7 +68,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
      * @param request 包含群组uid和分页参数
      * @return 成员列表分页结果
      */
-    @GetMapping("/members")
+    @GetMapping("/query/members")
     public ResponseEntity<?> queryMembers(GroupRequest request) {
         
         Page<MemberProtobuf> page = groupRestService.queryGroupMembers(request);

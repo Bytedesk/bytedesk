@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 10:47:05
+ * @LastEditTime: 2025-06-13 11:00:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -122,10 +122,12 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         int startItem = currentPage * pageSize;
         
         List<MemberEntity> memberList = group.getMembers();
-        // 如果 request.searchText 不为空，则需要过滤成员
-        
-
-
+        // 如果 request.searchText 不为空，则需要根据nickname过滤成员
+        if (request.getSearchText() != null && !request.getSearchText().isEmpty()) {
+            memberList = memberList.stream()
+                        .filter(member -> member.getUser().getNickname().contains(request.getSearchText()))
+                    .collect(Collectors.toList());
+        }
         List<MemberProtobuf> content;
         
         if (memberList.size() < startItem) {
