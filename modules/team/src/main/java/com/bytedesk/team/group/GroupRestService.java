@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 09:53:03
+ * @LastEditTime: 2025-06-13 10:40:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -264,22 +264,21 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             // 
-            // UserEntity user = authService.getUser();
-            // if (user == null) {
-            //     throw new RuntimeException("Group remove user is null");
-            // }
+            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
+            if (!memberOptional.isPresent()) {
+                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            }
+            // 从group members中移除成员
+            group.getMembers().remove(memberOptional.get());
+            //
+            GroupEntity saved = save(group);
+            if (saved == null) {
+                throw new RuntimeException("Failed to remove user from group");
+            }
+            // 删除订阅topic
+            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+            threadRestService.removeGroupMemberThread(topic, memberOptional.get().getUser());
             // 
-            // MemberEntity member = memberService.findByUserAndGroup(user, group);
-            // if (member != null) {
-            //     group.getMembers().remove(member);
-            //     // 
-            //     GroupEntity saved = save(group);
-            //     return convertToResponse(saved);
-            // } else {
-            //     throw new RuntimeException("Member not found in group: " + request.getUid());
-            // }
-            // todo：删除订阅topic
-
             return convertToResponse(group);
         }
         // 
@@ -293,22 +292,22 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             // 
-            UserEntity user = authService.getUser();
-            if (user == null) {
-                throw new RuntimeException("Group leave user is null");
-            }
             // 
-            // MemberEntity member = memberService.findByUserAndGroup(user, group);
-            // if (member != null) {
-            //     group.getMembers().remove(member);
-            //     // 
-            //     GroupEntity saved = save(group);
-            //     return convertToResponse(saved);
-            // } else {
-            //     throw new RuntimeException("Member not found in group: " + request.getUid());
-            // }
-            // todo：删除订阅topic
-
+            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
+            if (!memberOptional.isPresent()) {
+                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            }
+            // 从group members中移除成员
+            group.getMembers().remove(memberOptional.get());
+            //
+            GroupEntity saved = save(group);
+            if (saved == null) {
+                throw new RuntimeException("Failed to remove user from group");
+            }
+            // 删除订阅topic
+            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+            threadRestService.removeGroupMemberThread(topic, memberOptional.get().getUser());
+            // 
             return convertToResponse(group);
         }
         // 
@@ -323,8 +322,9 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
             group.setStatus(GroupStatusEnum.DISMISSED.name());
             //
             GroupEntity saved = save(group);
-            // 解散相关会话thread
-            // threadService.dismissByTopic(TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid());
+            if (saved == null) {
+                throw new RuntimeException("Failed to dismiss group");
+            }
             return convertToResponse(saved);
         }
         // 

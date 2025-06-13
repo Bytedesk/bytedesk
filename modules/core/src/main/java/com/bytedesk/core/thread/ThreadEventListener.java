@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 16:59:42
+ * @LastEditTime: 2025-06-13 10:42:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,6 @@ public class ThreadEventListener {
     private final TopicService topicService;
 
     private final TopicCacheService topicCacheService;
-
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -138,18 +137,26 @@ public class ThreadEventListener {
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
+        // UserEntity user = thread.getOwner();
         log.info("thread onThreadCloseEvent: {}", thread.getUid());
-        TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
+        // TopicRequest request = TopicRequest.builder()
+        //             .topic(thread.getTopic())
+        //             .userUid(user.getUid())
+        //             .build();
+        // topicService.remove(request);
     }
 
     @EventListener
     public void onThreadRemoveTopicEvent(ThreadRemoveTopicEvent event) {
         ThreadEntity thread = event.getThread();
+        UserEntity user = thread.getOwner();
         // UserEntity user = thread.getOwner();
         log.info("thread ThreadRemoveTopicEvent: {}", thread.getUid());
+        TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
+        topicService.remove(request);
     }
 
 
