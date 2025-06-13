@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 13:10:21
+ * @LastEditTime: 2025-06-13 16:31:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,16 +48,14 @@ public class MemberRequest extends BaseRequest {
     @NotBlank
     private String nickname;
 
-    @Builder.Default
-    private String avatar = AvatarConsts.getDefaultAvatarUrl();
+    private String avatar;
 
     /**
      * 用于筛选成员的关键词，可以是昵称等
      */
     private String keyword;
 
-    @Builder.Default
-    private String description = I18Consts.I18N_USER_DESCRIPTION;
+    private String description;
 
     private String password;
 
@@ -78,8 +76,7 @@ public class MemberRequest extends BaseRequest {
 
     private Boolean inviteAccepted;
 
-    @Builder.Default
-    private String status = MemberStatusEnum.INVITING.name();
+    private String status;
 
     @Builder.Default
 	private Set<String> roleUids = new HashSet<>(); 

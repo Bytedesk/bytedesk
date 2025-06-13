@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-01 09:17:53
+ * @LastEditTime: 2025-06-13 16:06:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -219,14 +219,14 @@ public class ThreadSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
                 String searchText = request.getSearchText();
-                String pinyinText = BdPinyinUtils.toPinYin(searchText);
+                // String pinyinText = BdPinyinUtils.toPinYin(searchText);
 
                 orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + searchText + "%"));
 
                 // 添加拼音搜索
-                orPredicates.add(criteriaBuilder.like(root.get("contentPinyin"), "%" + pinyinText + "%"));
-                orPredicates.add(criteriaBuilder.like(root.get("userPinyin"), "%" + pinyinText + "%"));
+                // orPredicates.add(criteriaBuilder.like(root.get("contentPinyin"), "%" + pinyinText + "%"));
+                // orPredicates.add(criteriaBuilder.like(root.get("userPinyin"), "%" + pinyinText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }

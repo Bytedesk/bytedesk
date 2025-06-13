@@ -213,7 +213,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    // update/folded
+    // update/fold
     @Operation(summary = "更新会话折叠状态", description = "设置或取消会话折叠")
     @PostMapping("/update/fold")
     public ResponseEntity<?> updateFold(@RequestBody ThreadRequest request) {

@@ -196,6 +196,8 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         // modelMapper.map(memberRequest, member);
         member.setDeptUid(request.getDeptUid());
         member.setNickname(request.getNickname());
+        member.setAvatar(request.getAvatar());
+        member.setDescription(request.getDescription());
         member.setEmail(request.getEmail());
         member.setMobile(request.getMobile());
         member.setJobTitle(request.getJobTitle());

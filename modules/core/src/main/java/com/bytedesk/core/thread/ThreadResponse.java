@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-16 18:24:45
+ * @LastEditTime: 2025-06-13 13:19:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,7 +72,7 @@ public class ThreadResponse extends BaseResponse {
 
     private Integer star;
 
-    private Boolean folded;
+    private Boolean fold;
 
     private Boolean autoClose;
 

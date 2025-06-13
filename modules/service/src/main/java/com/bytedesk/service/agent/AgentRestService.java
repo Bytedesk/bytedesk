@@ -104,6 +104,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public AgentResponse query(AgentRequest request) {
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = findByUserUidAndOrgUid(user.getUid(), request.getOrgUid());
+        if (!agentOptional.isPresent()) {
+            return null;
+        }
         return convertToResponse(agentOptional.get());
     }
 

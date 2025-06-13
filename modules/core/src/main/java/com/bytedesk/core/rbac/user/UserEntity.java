@@ -96,6 +96,9 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
+
+	// TODO: 一个用户可以属于多个组织
+
 	
 	// 同一时刻，用户只能在一个组织下，用户可以切换组织
 	@ManyToOne(fetch = FetchType.EAGER)

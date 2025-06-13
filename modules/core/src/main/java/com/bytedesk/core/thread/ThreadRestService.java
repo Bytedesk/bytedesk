@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 12:39:21
+ * @LastEditTime: 2025-06-13 13:22:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -192,6 +192,16 @@ public class ThreadRestService
         }
     }
 
+    // 当前群组更新昵称的时候，更新群组会话的昵称
+    public void updateGroupMemberThread(String user, String topic, UserEntity owner) {
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, owner);
+        if (threadOptional.isPresent()) {
+            ThreadEntity thread = threadOptional.get();
+            thread.setUser(user);
+            save(thread);
+        }
+    }
+
     /** 文件助手会话：file/{user_uid} */
     public ThreadResponse createFileAssistantThread(UserEntity user) {
         //
@@ -370,7 +380,7 @@ public class ThreadRestService
         return convertToResponse(updateThread);
     }
 
-    // update folded
+    // update fold
     public ThreadResponse updateFold(ThreadRequest threadRequest) {
         if (!StringUtils.hasText(threadRequest.getUid())) {
             throw new RuntimeException("thread uid is required");

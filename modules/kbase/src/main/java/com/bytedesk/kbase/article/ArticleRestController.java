@@ -21,15 +21,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.article.elastic.ArticleElasticSearchResult;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
+import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.bytedesk.core.annotation.ActionAnnotation;
 
 @RestController
 @RequestMapping("/api/v1/article")
@@ -39,6 +42,8 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     private final ArticleRestService articleRestService;
 
     private final ArticleElasticService articleElasticService;
+
+    private final ArticleVectorService articleVectorService;
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -116,6 +121,46 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
             "文章",
             "Article"
         );
+    }
+
+    // update elasticsearch index
+    @ActionAnnotation(title = "文章", action = "更新索引", description = "update article index")
+    @PostMapping("/updateIndex")
+    public ResponseEntity<?> updateIndex(@RequestBody ArticleRequest request) {
+
+        articleElasticService.updateIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
+    }
+
+    // update elasticsearch vector index
+    @ActionAnnotation(title = "文章", action = "更新向量索引", description = "update article vector index")
+    @PostMapping("/updateVectorIndex")
+    public ResponseEntity<?> updateVectorIndex(@RequestBody ArticleRequest request) {
+
+        articleVectorService.updateVectorIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+    }
+
+    // update all elasticsearch index
+    @ActionAnnotation(title = "文章", action = "更新所有索引", description = "update all article index")
+    @PostMapping("/updateAllIndex")
+    public ResponseEntity<?> updateAllIndex(@RequestBody ArticleRequest request) {
+
+        articleElasticService.updateAllIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update all index success", request.getUid()));
+    }
+
+    // update all elasticsearch vector index
+    @ActionAnnotation(title = "文章", action = "更新所有向量索引", description = "update all article vector index")
+    @PostMapping("/updateAllVectorIndex")
+    public ResponseEntity<?> updateAllVectorIndex(@RequestBody ArticleRequest request) {
+
+        articleVectorService.updateAllVectorIndex(request);
+
+        return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }
 
     // 输入联想搜索faq
