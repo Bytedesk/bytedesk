@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 22:28:51
+ * @LastEditTime: 2025-06-13 11:47:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -219,7 +219,8 @@ public class PageRouteController {
 			"/admin/",
 			"/admin/{path:[^\\.]*}",
 			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}" 
+			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
 	public String admin(
 		// @PathVariable(required = false) String path, 
@@ -238,7 +239,9 @@ public class PageRouteController {
 			"/agent",
 			"/agent/",
 			"/agent/{path:[^\\.]*}",
-			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}"
+			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
 	public String agent(
 		@PathVariable(required = false) String path, 
@@ -275,7 +278,10 @@ public class PageRouteController {
 			"/agenticflow",
 			"/agenticflow/",
 			"/agenticflow/{path:[^\\.]*}",
-			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}" })
+			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
 	public String agenticflow(@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
 		return "forward:/agenticflow/index.html"; // 默认路径
@@ -293,7 +299,9 @@ public class PageRouteController {
 			"/notebase",
 			"/notebase/",
 			"/notebase/{path:[^\\.]*}",
-			"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}"
+			"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/notebase/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 	})
 	public String notebase(@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
@@ -309,7 +317,9 @@ public class PageRouteController {
 			"/kanban",
 			"/kanban/",
 			"/kanban/{path:[^\\.]*}",
-			"/kanban/{path:[^\\.]*}/{path2:[^\\.]*}"
+			"/kanban/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/kanban/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/kanban/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 	})
 	public String kanban(@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
@@ -321,7 +331,9 @@ public class PageRouteController {
 			"/reactdemo",
 			"/reactdemo/",
 			"/reactdemo/{path:[^\\.]*}",
-			"/reactdemo/{path:[^\\.]*}/{path2:[^\\.]*}"
+			"/reactdemo/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/reactdemo/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/reactdemo/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 	})
 	public String reactdemo(@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {

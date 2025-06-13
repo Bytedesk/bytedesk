@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 11:39:10
+ * @LastEditTime: 2025-06-13 12:06:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -397,6 +397,15 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
             if (saved == null) {
                 throw new RuntimeException("Failed to dismiss group");
             }
+            //  删除topic
+            List<MemberEntity> members = group.getMembers();
+            if (members != null && members.size() > 0) {
+                for (MemberEntity member : members) {
+                    String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+                    threadRestService.removeGroupMemberThread(topic, member.getUser());
+                }
+            }
+            // 
             return convertToResponse(saved);
         }
         // 
