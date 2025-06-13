@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 14:57:34
+ * @LastEditTime: 2025-06-13 09:53:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,14 +31,18 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.team.member.MemberEntity;
 import com.bytedesk.team.member.MemberRestService;
 import com.bytedesk.team.member.MemberProtobuf;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, GroupRequest, GroupResponse, GroupExcel> {
@@ -51,7 +55,9 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     private final UidUtils uidUtils;
 
-    private final MemberRestService memberService;
+    private final MemberRestService memberRestService;
+
+    private final ThreadRestService threadRestService;
 
     @Override
     public Page<GroupEntity> queryByOrgEntity(GroupRequest request) {
@@ -119,7 +125,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
             Iterator<String> it = request.getMemberUids().iterator();
             while (it.hasNext()) {
                 String memberUid = it.next();
-                Optional<MemberEntity> optionalMember = memberService.findByUid(memberUid);
+                Optional<MemberEntity> optionalMember = memberRestService.findByUid(memberUid);
                 if (optionalMember.isPresent()) {
                     group.getMembers().add(optionalMember.get());
                 } else {
@@ -127,6 +133,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
                 }
             }
         }
+        // 
         group.setCreator(creator);
         group.setOrgUid(creator.getOrgUid());
         // 
@@ -139,20 +146,186 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     @Override
     public GroupResponse update(GroupRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<GroupEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            GroupEntity group = optional.get();
+            // 
+            group.setName(request.getName());
+            group.setAvatar(request.getAvatar());
+            group.setDescription(request.getDescription());
+            // group.setType(GroupTypeEnum.fromValue(request.getType()).name());
+            // group.setStatus(GroupStatusEnum.fromValue(request.getStatus()).name());
+            // group.setExternal(request.getIsExternal());
+            // 
+            // if (request.getMemberUids() != null && request.getMemberUids().size() > 0) {
+            //     group.getMembers().clear();
+            //     Iterator<String> it = request.getMemberUids().iterator();
+            //     while (it.hasNext()) {
+            //         String memberUid = it.next();
+            //         Optional<MemberEntity> optionalMember = memberService.findByUid(memberUid);
+            //         if (optionalMember.isPresent()) {
+            //             group.getMembers().add(optionalMember.get());
+            //         } else {
+            //             throw new RuntimeException("Failed to find member by uid: " + memberUid);
+            //         }
+            //     }
+            // }
+            // 
+            GroupEntity saved = save(group);
+            if (saved == null) {
+                throw new RuntimeException("Failed to update group");
+            }
+            return convertToResponse(saved);
+        }
+        // 
+        throw new RuntimeException("Failed to update group by uid: " + request.getUid());
     }
 
-    public void dismiss(GroupRequest request) {
+
+    // invite
+    public GroupResponse invite(GroupRequest request) {
+        // 
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
+        if (groupOptional.isPresent()) {
+            GroupEntity group = groupOptional.get();
+            // 
+            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
+            if (!memberOptional.isPresent()) {
+                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            }
+            group.getMembers().add(memberOptional.get());
+            //
+            GroupEntity saved = save(group);
+            if (saved == null) {
+                throw new RuntimeException("Failed to invite user to group");
+            }
+            // 订阅topic
+            String user = UserProtobuf.builder()
+                    .uid(group.getUid())
+                    .nickname(group.getName())
+                    .avatar(group.getAvatar())
+                    .build()
+                    .toJson();
+            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+            String orgUid = group.getOrgUid();
+            log.info("Creating group member thread for user: {}, topic: {}, orgUid: {}", user, topic, orgUid);
+            threadRestService.createGroupMemberThread(user, topic, orgUid, memberOptional.get().getUser());
+            // 
+            return convertToResponse(saved);
+        }
+        // 
+        throw new RuntimeException("Failed to invite user to group by uid: " + request.getUid());
+    }
+
+    // join
+    public GroupResponse join(GroupRequest request) {
+        // 
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
+        if (groupOptional.isPresent()) {
+            GroupEntity group = groupOptional.get();
+            // 
+            // UserEntity user = authService.getUser();
+            // if (user == null) {
+            //     throw new RuntimeException("Group invite user is null");
+            // }
+            // 
+            Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
+            if (!memberOptional.isPresent()) {
+                throw new RuntimeException("Failed to find member by uid: " + request.getMemberUid());
+            }
+            group.getMembers().add(memberOptional.get());
+            //
+            GroupEntity saved = save(group);
+            if (saved == null) {
+                throw new RuntimeException("Failed to join group");
+            }
+            // 订阅topic
+            String user = UserProtobuf.builder()
+                    .uid(group.getUid())
+                    .nickname(group.getName())
+                    .avatar(group.getAvatar())
+                    .build()
+                    .toJson();
+            String topic = TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid();
+            String orgUid = group.getOrgUid();
+            log.info("Creating group member thread for user: {}, topic: {}, orgUid: {}", user, topic, orgUid);
+            threadRestService.createGroupMemberThread(user, topic, orgUid, memberOptional.get().getUser());
+
+            return convertToResponse(saved);
+        }
+        // 
+        throw new RuntimeException("Failed to join group by uid: " + request.getUid());
+    }
+
+    // remove
+    public GroupResponse remove(GroupRequest request) {
+        // 
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
+        if (groupOptional.isPresent()) {
+            GroupEntity group = groupOptional.get();
+            // 
+            // UserEntity user = authService.getUser();
+            // if (user == null) {
+            //     throw new RuntimeException("Group remove user is null");
+            // }
+            // 
+            // MemberEntity member = memberService.findByUserAndGroup(user, group);
+            // if (member != null) {
+            //     group.getMembers().remove(member);
+            //     // 
+            //     GroupEntity saved = save(group);
+            //     return convertToResponse(saved);
+            // } else {
+            //     throw new RuntimeException("Member not found in group: " + request.getUid());
+            // }
+            // todo：删除订阅topic
+
+            return convertToResponse(group);
+        }
+        // 
+        throw new RuntimeException("Failed to remove user from group by uid: " + request.getUid());
+    }
+
+    // leave
+    public GroupResponse leave(GroupRequest request) {
+        // 
+        Optional<GroupEntity> groupOptional = findByUid(request.getUid());
+        if (groupOptional.isPresent()) {
+            GroupEntity group = groupOptional.get();
+            // 
+            UserEntity user = authService.getUser();
+            if (user == null) {
+                throw new RuntimeException("Group leave user is null");
+            }
+            // 
+            // MemberEntity member = memberService.findByUserAndGroup(user, group);
+            // if (member != null) {
+            //     group.getMembers().remove(member);
+            //     // 
+            //     GroupEntity saved = save(group);
+            //     return convertToResponse(saved);
+            // } else {
+            //     throw new RuntimeException("Member not found in group: " + request.getUid());
+            // }
+            // todo：删除订阅topic
+
+            return convertToResponse(group);
+        }
+        // 
+        throw new RuntimeException("Failed to leave group by uid: " + request.getUid());
+    }
+
+    public GroupResponse dismiss(GroupRequest request) {
         // 
         Optional<GroupEntity> groupOptional = findByUid(request.getUid());
         if (groupOptional.isPresent()) {
             GroupEntity group = groupOptional.get();
             group.setStatus(GroupStatusEnum.DISMISSED.name());
             //
-            save(group);
+            GroupEntity saved = save(group);
             // 解散相关会话thread
             // threadService.dismissByTopic(TopicUtils.TOPIC_ORG_GROUP_PREFIX + group.getUid());
+            return convertToResponse(saved);
         }
         // 
         throw new RuntimeException("Failed to dismiss group by uid: " + request.getUid());

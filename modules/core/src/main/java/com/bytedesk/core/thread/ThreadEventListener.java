@@ -20,6 +20,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
+import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicService;
@@ -37,17 +38,6 @@ public class ThreadEventListener {
 
     private final TopicCacheService topicCacheService;
 
-    // private final ThreadRestService threadRestService;
-
-    // @Order(3)
-    // @EventListener
-    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-    //     // OrganizationEntity organization = (OrganizationEntity) event.getSource();
-    //     // String orgUid = organization.getUid();
-    //     // log.info("thread - organization created: {}", organization.getName());
-    //     // threadRestService.initThreadCategory(orgUid);
-    //     // threadRestService.initThreadTag(orgUid);
-    // }
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -64,6 +54,7 @@ public class ThreadEventListener {
         if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
                 || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
                 || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
+                || thread.getType().equals(ThreadTypeEnum.GROUP.name())
                 || thread.getType().equals(ThreadTypeEnum.TICKET.name())) {
             // 防止首次消息延迟，立即订阅
             String topic = thread.getTopic();
@@ -144,12 +135,19 @@ public class ThreadEventListener {
         }
     }
 
+     @EventListener
+    public void onThreadCloseEvent(ThreadCloseEvent event) {
+        ThreadEntity thread = event.getThread();
+        log.info("thread onThreadCloseEvent: {}", thread.getUid());
+    }
+
     @EventListener
     public void onThreadRemoveTopicEvent(ThreadRemoveTopicEvent event) {
         ThreadEntity thread = event.getThread();
         // UserEntity user = thread.getOwner();
         log.info("thread ThreadRemoveTopicEvent: {}", thread.getUid());
     }
+
 
 
 }

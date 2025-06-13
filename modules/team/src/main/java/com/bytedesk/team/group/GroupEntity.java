@@ -156,7 +156,7 @@ public class GroupEntity extends BaseEntity {
     }
 
     // 解除全员禁言
-    public void unmuteAll() {
+    public void unMuteAll() {
         this.muteAll = false;
     }
 
@@ -174,28 +174,4 @@ public class GroupEntity extends BaseEntity {
         this.admins.clear();
     }
 
-    // 处理邀请
-    // public void handleInvite(GroupInviteEntity invite, boolean accept) {
-    //     // if (invite.getStatus() != GroupInviteStatus.PENDING) {
-    //     //     throw new GroupOperationException("Invite is not pending");
-    //     // }
-
-    //     // if (accept) {
-    //     //     // 接受邀请
-    //     //     if (members.size() >= maxMembers) {
-    //     //         throw new GroupOperationException("Group is full");
-    //     //     }
-            
-    //     //     MemberEntity member = MemberEntity.builder()
-    //     //         .user(invite.getInvitee())
-    //     //         .group(this)
-    //     //         .joinTime(LocalDateTime.now())
-    //     //         .build();
-    //     //     members.add(member);
-    //     //     invite.setStatus(GroupInviteStatus.ACCEPTED);
-    //     // } else {
-    //     //     // 拒绝邀请
-    //     //     invite.setStatus(GroupInviteStatus.REJECTED);
-    //     // }
-    // }
 }

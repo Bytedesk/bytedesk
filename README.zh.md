@@ -248,6 +248,10 @@ BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOlBMQVRGT1JNOjo=
 - <img src="./images/wechat_mp.jpg" width="100">
 - 订阅号
 - <img src="./images/wechatai_mp.jpg" width="100">
+- 软著
+- <img src="./images/copyright.png" width="100">
+- 商标
+- <img src="./images/trademark.jpg" width="100">
 
 ## License
 

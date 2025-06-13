@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 14:56:42
+ * @LastEditTime: 2025-06-12 20:29:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
-// import com.bytedesk.core.annotation.I18nApi;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.team.member.MemberProtobuf;
@@ -99,33 +98,37 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @ActionAnnotation(title = "群组", action = "invite", description = "invite group")
     @PostMapping("/invite")
     public ResponseEntity<?> invite(@RequestBody GroupRequest request) {
-        // TODO: 待完善
-        // groupService.invite(request);
-        return ResponseEntity.ok(JsonResult.success());
+        
+        GroupResponse group = groupRestService.invite(request);
+
+        return ResponseEntity.ok(JsonResult.success(group));
     }
     
     @ActionAnnotation(title = "群组", action = "join", description = "join group")
     @PostMapping("/join")
     public ResponseEntity<?> join(@RequestBody GroupRequest request) {
-        // TODO: 待完善
-        // groupService.join(request);
-        return ResponseEntity.ok(JsonResult.success());
+        
+        GroupResponse group = groupRestService.join(request);
+
+        return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @ActionAnnotation(title = "群组", action = "kick", description = "kick group")
-    @PostMapping("/kick")
-    public ResponseEntity<?> kick(@RequestBody GroupRequest request) {
-        // TODO: 待完善, 将用户踢出/移出群组
-        // groupService.kick(request);
-        return ResponseEntity.ok(JsonResult.success());
+    @ActionAnnotation(title = "群组", action = "remove", description = "remove group")
+    @PostMapping("/remove")
+    public ResponseEntity<?> remove(@RequestBody GroupRequest request) {
+        
+        GroupResponse group = groupRestService.remove(request);
+
+        return ResponseEntity.ok(JsonResult.success(group));
     }
 
     @ActionAnnotation(title = "群组", action = "leave", description = "leave group")
     @PostMapping("/leave")
     public ResponseEntity<?> leave(@RequestBody GroupRequest request) {
-        // TODO: 待完善
-        // groupService.leave(request);
-        return ResponseEntity.ok(JsonResult.success());
+        
+        GroupResponse group = groupRestService.leave(request);
+
+        return ResponseEntity.ok(JsonResult.success(group));
     }
 
     @ActionAnnotation(title = "群组", action = "dismiss", description = "dismiss group")

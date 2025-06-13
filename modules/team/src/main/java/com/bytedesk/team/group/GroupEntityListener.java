@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:44:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-28 14:48:48
+ * @LastEditTime: 2025-06-13 10:01:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,47 +14,41 @@
 package com.bytedesk.team.group;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
-// import jakarta.persistence.PostPersist;
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.team.group.event.GroupCreateEvent;
+import com.bytedesk.team.group.event.GroupUpdateEvent;
+
+import jakarta.persistence.PostPersist;
 // import jakarta.persistence.PostRemove;
-// import jakarta.persistence.PostUpdate;
+import jakarta.persistence.PostUpdate;
 // import jakarta.persistence.PrePersist;
 // import jakarta.persistence.PreRemove;
 // import jakarta.persistence.PreUpdate;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @Component
 public class GroupEntityListener {
 
-    // @PrePersist
-    // public void prePersist(Group group) {
-    //     log.info("prePersist {}", group.getUid());
-    // }
+    @PostPersist
+    public void postPersist(GroupEntity group) {
+        GroupEntity clonedGroup = SerializationUtils.clone(group);
+        log.info("GroupEntityListener postPersist {}", clonedGroup.getUid());
+        // 
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new GroupCreateEvent(this, clonedGroup));
+    }
 
-    // @PostPersist
-    // public void postPersist(Group group) {
-    //     log.info("postPersist {}", group.getUid());
-    // }
-
-    // @PreUpdate
-    // public void preUpdate(Group group) {
-    //     log.info("preUpdate {}", group.getUid());
-    // }
-
-    // @PostUpdate
-    // public void postUpdate(Group group) {
-    //     log.info("postUpdate {}", group.getUid());
-    // }
-
-    // @PreRemove
-    // public void preRemove(Group group) {
-    //     log.info("preRemove {}", group.getUid());
-    // }
-
-    // @PostRemove
-    // public void postRemove(Group group) {
-    //     log.info("postRemove {}", group.getUid());
-    // }
+    @PostUpdate
+    public void postUpdate(GroupEntity group) {
+        GroupEntity clonedGroup = SerializationUtils.clone(group);
+        log.info("GroupEntityListener postUpdate {}", clonedGroup.getUid());
+        // 
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new GroupUpdateEvent(this, clonedGroup));
+    }
 
 }

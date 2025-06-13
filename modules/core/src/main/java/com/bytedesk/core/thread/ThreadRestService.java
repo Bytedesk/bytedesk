@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:19:04
+ * @LastEditTime: 2025-06-13 10:34:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
@@ -40,6 +39,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
+import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -114,7 +114,7 @@ public class ThreadRestService
         thread.setUid(uidUtils.getUid());
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         //
-        String user = JSON.toJSONString(request.getUser());
+        String user = request.getUser().toJson();
         log.info("request {}, user {}", request.toString(), user);
         thread.setUser(user);
         //
@@ -132,24 +132,48 @@ public class ThreadRestService
 
     // 在group会话创建之后，自动为group成员members创建会话
     // 同事群组会话：org/group/{group_uid}
-    public ThreadResponse createGroupMemberThread(ThreadEntity thread, UserEntity owner) {
+    // public ThreadResponse createGroupMemberThread(ThreadEntity thread, UserEntity owner) {
+    //     //
+    //     Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(thread.getTopic(), owner);
+    //     if (threadOptional.isPresent()) {
+    //         return convertToResponse(threadOptional.get());
+    //     }
+    //     ThreadEntity groupThread = ThreadEntity.builder()
+    //             .uid(uidUtils.getUid())
+    //             .type(thread.getType())
+    //             .topic(thread.getTopic())
+    //             .unreadCount(0)
+    //             .status(thread.getStatus())
+    //             .client(ClientEnum.SYSTEM.name())
+    //             .user(thread.getUser())
+    //             .owner(owner)
+    //             .orgUid(thread.getOrgUid())
+    //             .build();
+    //     ThreadEntity updateThread = save(groupThread);
+    //     if (updateThread == null) {
+    //         throw new RuntimeException("thread save failed");
+    //     }
+    //     return convertToResponse(updateThread);
+    // }
+
+    public ThreadResponse createGroupMemberThread(String user, String topic, String orgUid, UserEntity owner) {
         //
-        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(thread.getTopic(), owner);
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         }
 
         ThreadEntity groupThread = ThreadEntity.builder()
-                .type(thread.getType())
-                .topic(thread.getTopic())
+                .uid(uidUtils.getUid())
+                .type(ThreadTypeEnum.GROUP.name())
+                .topic(topic)
                 .unreadCount(0)
-                .status(thread.getStatus())
+                .status(ThreadProcessStatusEnum.CHATTING.name())
                 .client(ClientEnum.SYSTEM.name())
-                .user(thread.getUser())
+                .user(user)
                 .owner(owner)
+                .orgUid(orgUid)
                 .build();
-        groupThread.setUid(uidUtils.getUid());
-        groupThread.setOrgUid(thread.getOrgUid());
 
         ThreadEntity updateThread = save(groupThread);
         if (updateThread == null) {
@@ -157,6 +181,15 @@ public class ThreadRestService
         }
 
         return convertToResponse(updateThread);
+    }
+
+    public void removeGroupMemberThread(String user, String topic, String orgUid, UserEntity owner) {
+        Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, owner);
+        if (threadOptional.isPresent()) {
+            deleteByUid(threadOptional.get().getUid());
+            // 
+            bytedeskEventPublisher.publishEvent(new ThreadRemoveTopicEvent(this,threadOptional.get()));
+        }
     }
 
     /** 文件助手会话：file/{user_uid} */
@@ -179,7 +212,7 @@ public class ThreadRestService
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
-                .user(JSON.toJSONString(userSimple))
+                .user(userSimple.toJson())
                 .userUid(user.getUid())
                 .owner(user)
                 .build();
@@ -212,7 +245,7 @@ public class ThreadRestService
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .client(ClientEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
-                .user(JSON.toJSONString(userSimple))
+                .user(userSimple.toJson())
                 .userUid(user.getUid())
                 .owner(user)
                 .build();
@@ -328,7 +361,7 @@ public class ThreadRestService
         }
         //
         ThreadEntity thread = threadOptional.get();
-        thread.setUser(JSON.toJSONString(threadRequest.getUser()));
+        thread.setUser(threadRequest.getUser().toJson()); // JSON.toJSONString(threadRequest.getUser())
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {

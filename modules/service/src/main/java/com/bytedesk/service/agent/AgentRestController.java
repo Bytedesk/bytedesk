@@ -69,6 +69,9 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
         AgentResponse agentResponse = agentRestService.query(request);
+        if (agentResponse == null) {
+            return ResponseEntity.ok(JsonResult.error("agent not found"));
+        }
         
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }

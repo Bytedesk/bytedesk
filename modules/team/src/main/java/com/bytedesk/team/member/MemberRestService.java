@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 15:25:45
+ * @LastEditTime: 2025-06-13 09:03:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,7 +72,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
 
     private final AuthService authService;
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     private final DepartmentRestService departmentRestService;
 
@@ -441,7 +441,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     public ThreadEntity createMemberReverseThread(ThreadEntity thread) {
         // 
         String reverseUid = new StringBuffer(thread.getUid()).reverse().toString();
-        Optional<ThreadEntity> reverseThreadOptional = threadService.findByUid(reverseUid);
+        Optional<ThreadEntity> reverseThreadOptional = threadRestService.findByUid(reverseUid);
         if (reverseThreadOptional.isPresent()) {
             return reverseThreadOptional.get();
         }
@@ -493,7 +493,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
 
         // 保存反向线程并返回结果
-        ThreadEntity savedThread = threadService.save(reverseThread);
+        ThreadEntity savedThread = threadRestService.save(reverseThread);
         if (savedThread == null) {
             throw new RuntimeException("reverseThread save error");
         }
