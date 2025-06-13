@@ -135,10 +135,14 @@ public class ThreadEventListener {
         }
     }
 
-     @EventListener
+    @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         log.info("thread onThreadCloseEvent: {}", thread.getUid());
+        TopicRequest request = TopicRequest.builder()
+                    .topic(thread.getTopic())
+                    .userUid(user.getUid())
+                    .build();
     }
 
     @EventListener
