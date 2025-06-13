@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.organization_apply;
+package com.bytedesk.core.rbac.organization_apply;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

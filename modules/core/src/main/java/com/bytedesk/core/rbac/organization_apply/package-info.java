@@ -1,5 +1,5 @@
 
 @NonNullApi
-package com.bytedesk.core.organization_apply;
+package com.bytedesk.core.rbac.organization_apply;
 
 import org.springframework.lang.NonNullApi;
