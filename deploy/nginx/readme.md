@@ -418,6 +418,8 @@ sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_80.conf /etc/nginx/sites-en
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_443.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_80.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_443.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_80.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_443.conf /etc/nginx/sites-enabled/
 ```
 
 ## 使配置生效
