@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 10:46:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:50:34
+ * @LastEditTime: 2025-06-14 13:12:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,11 @@ public class GroupSpecification extends BaseSpecification {
             // 
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            }
+            //
+            // 如果userUid不为空，则查询该用户所在的群组
+            if (StringUtils.hasText(request.getUserUid())) {
+                predicates.add(criteriaBuilder.equal(root.join("members").get("user").get("uid"), request.getUserUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
