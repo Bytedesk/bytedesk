@@ -425,10 +425,16 @@ sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_443.conf /etc/nginx/sites-e
 ## 使配置生效
 
 ```bash
+# 检查nginx配置文件是否有语法错误
+sudo nginx -t
 # 重新加载nginx配置
 sudo nginx -s reload
 # 或
 sudo systemctl reload nginx
+# 查看访问日志
+tail -f /var/log/nginx/access.log
+# 查看报错日志
+tail -f /var/log/nginx/error.log
 ```
 
 ## 对外开放端口
