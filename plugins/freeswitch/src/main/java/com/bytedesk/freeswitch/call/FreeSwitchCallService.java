@@ -168,6 +168,13 @@ public class FreeSwitchCallService {
     }
     
     /**
+     * 根据主叫号码查询呼叫列表
+     */
+    public List<FreeSwitchCallEntity> getCallsByCallerNumber(String callerNumber) {
+        return callRepository.findByCallerNumber(callerNumber);
+    }
+    
+    /**
      * 获取呼叫统计信息
      */
     public CallStatistics getCallStatistics(LocalDateTime startTime, LocalDateTime endTime) {
@@ -194,4 +201,4 @@ public class FreeSwitchCallService {
     public void cleanupOldCalls(LocalDateTime before) {
         callRepository.deleteByStartTimeBefore(before);
     }
-} 
+}

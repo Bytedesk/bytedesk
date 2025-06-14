@@ -49,7 +49,7 @@ public interface FreeSwitchCallRepository extends JpaRepository<FreeSwitchCallEn
     /**
      * 根据主叫号码查找呼叫列表
      */
-    List<FreeSwitchCallEntity> findByCallerId(String callerId);
+    List<FreeSwitchCallEntity> findByCallerNumber(String callerNumber);
     
     /**
      * 根据被叫号码查找呼叫列表
