@@ -3,9 +3,9 @@ package com.bytedesk.freeswitch.call.event;
 /**
  * 通话应答事件
  */
-public class CallAnsweredEvent extends CallEvent {
+public class FreeSwitchCallAnsweredEvent extends FreeSwitchCallEvent {
     
-    public CallAnsweredEvent(Object source, String uuid) {
+    public FreeSwitchCallAnsweredEvent(Object source, String uuid) {
         super(source, uuid, CallEventType.CALL_ANSWERED);
     }
 }

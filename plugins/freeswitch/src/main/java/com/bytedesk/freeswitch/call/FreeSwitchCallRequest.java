@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:17:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-07 09:35:39
+ * @LastEditTime: 2025-06-14 12:27:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ import lombok.Data;
  * 呼叫信息
  */
 @Data
-public class CallInfo {
+public class FreeSwitchCallRequest {
 
     /**
      * 呼叫ID

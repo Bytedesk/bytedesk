@@ -21,9 +21,9 @@ import java.util.Map;
 @RequestMapping("/api/v1/call")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
-public class CallController {
+public class FreeSwitchCallController {
     
-    private final CallService callService;
+    private final FreeSwitchCallService callService;
 
     /**
      * 发起呼叫

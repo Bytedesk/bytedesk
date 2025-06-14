@@ -8,10 +8,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.call.event.CallAnsweredEvent;
-import com.bytedesk.freeswitch.call.event.CallHangupEvent;
-import com.bytedesk.freeswitch.call.event.CallStartEvent;
-import com.bytedesk.freeswitch.call.event.DtmfEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchCallAnsweredEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchCallHangupEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchCallStartEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchDtmfEvent;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
 // import com.bytedesk.freeswitch.number.FreeSwitchNumberService;
@@ -106,7 +106,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         updateUserOnlineStatus(destination, true);
         
         // 发布通话开始事件
-        eventPublisher.publishEvent(new CallStartEvent(this, uuid, callerId, destination));
+        eventPublisher.publishEvent(new FreeSwitchCallStartEvent(this, uuid, callerId, destination));
     }
     
     /**
@@ -126,7 +126,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         }
         
         // 发布通话应答事件
-        eventPublisher.publishEvent(new CallAnsweredEvent(this, uuid));
+        eventPublisher.publishEvent(new FreeSwitchCallAnsweredEvent(this, uuid));
     }
     
     /**
@@ -147,7 +147,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         }
         
         // 发布通话挂断事件
-        eventPublisher.publishEvent(new CallHangupEvent(this, uuid, hangupCause));
+        eventPublisher.publishEvent(new FreeSwitchCallHangupEvent(this, uuid, hangupCause));
     }
     
     /**
@@ -162,7 +162,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         // 调用通话服务处理
         // callService.handleDtmf(uuid, digit);
         // 发布DTMF事件
-        eventPublisher.publishEvent(new DtmfEvent(this, uuid, digit));
+        eventPublisher.publishEvent(new FreeSwitchDtmfEvent(this, uuid, digit));
     }
     
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 12:45:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:34:36
+ * @LastEditTime: 2025-06-14 12:29:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,10 +17,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.call.event.CallAnsweredEvent;
-import com.bytedesk.freeswitch.call.event.CallHangupEvent;
-import com.bytedesk.freeswitch.call.event.CallStartEvent;
-import com.bytedesk.freeswitch.call.event.DtmfEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchCallAnsweredEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchCallHangupEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchCallStartEvent;
+import com.bytedesk.freeswitch.call.event.FreeSwitchDtmfEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,9 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
-public class CallEventListener {
+public class FreeSwitchCallEventListener {
 
-    private final CallService callService;
+    private final FreeSwitchCallService callService;
     // private final FreeSwitchCdrService cdrService; // 暂时未使用，保留以备后续扩展
     // private final FreeSwitchNumberService userService;
 
@@ -42,7 +42,7 @@ public class CallEventListener {
      * 监听通话开始事件
      */
     @EventListener
-    public void handleCallStartEvent(CallStartEvent event) {
+    public void handleCallStartEvent(FreeSwitchCallStartEvent event) {
         log.info("接收到通话开始事件: UUID {} 主叫 {} 被叫 {}", 
                 event.getUuid(), event.getCallerId(), event.getDestination());
         
@@ -62,7 +62,7 @@ public class CallEventListener {
      * 监听通话应答事件
      */
     @EventListener
-    public void handleCallAnsweredEvent(CallAnsweredEvent event) {
+    public void handleCallAnsweredEvent(FreeSwitchCallAnsweredEvent event) {
         log.info("接收到通话应答事件: UUID {}", event.getUuid());
         
         try {
@@ -79,7 +79,7 @@ public class CallEventListener {
      * 监听通话挂断事件
      */
     @EventListener
-    public void handleCallHangupEvent(CallHangupEvent event) {
+    public void handleCallHangupEvent(FreeSwitchCallHangupEvent event) {
         log.info("接收到通话挂断事件: UUID {} 原因 {}", 
                 event.getUuid(), event.getHangupCause());
         
@@ -97,7 +97,7 @@ public class CallEventListener {
      * 监听DTMF事件
      */
     @EventListener
-    public void handleDtmfEvent(DtmfEvent event) {
+    public void handleDtmfEvent(FreeSwitchDtmfEvent event) {
         log.info("接收到DTMF事件: UUID {} 按键 {}", 
                 event.getUuid(), event.getDtmfDigit());
         

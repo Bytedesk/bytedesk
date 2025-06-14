@@ -1,3 +1,16 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-06-14 11:27:22
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-06-14 12:23:47
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.freeswitch.call;
 
 import java.time.LocalDateTime;
@@ -19,7 +32,7 @@ public interface FreeSwitchCallRepository extends JpaRepository<FreeSwitchCallEn
     /**
      * 根据呼叫UUID查找呼叫
      */
-    Optional<FreeSwitchCallEntity> findByUuid(String uuid);
+    Optional<FreeSwitchCallEntity> findByCallUuid(String callUuid);
     
     /**
      * 根据呼叫状态查找呼叫列表
@@ -34,12 +47,12 @@ public interface FreeSwitchCallRepository extends JpaRepository<FreeSwitchCallEn
     /**
      * 根据坐席ID查找呼叫列表
      */
-    List<FreeSwitchCallEntity> findByAgentId(String agentId);
+    List<FreeSwitchCallEntity> findByAgentId(Long agentId);
     
     /**
-     * 根据当前队列查找呼叫列表
+     * 根据队列ID查找呼叫列表
      */
-    List<FreeSwitchCallEntity> findByCurrentQueue(String queueName);
+    List<FreeSwitchCallEntity> findByQueueId(Long queueId);
     
     /**
      * 根据时间范围查找呼叫列表
@@ -54,7 +67,7 @@ public interface FreeSwitchCallRepository extends JpaRepository<FreeSwitchCallEn
     /**
      * 根据被叫号码查找呼叫列表
      */
-    List<FreeSwitchCallEntity> findByDestination(String destination);
+    List<FreeSwitchCallEntity> findByCalleeNumber(String calleeNumber);
     
     /**
      * 分页查询呼叫列表

@@ -7,12 +7,12 @@ import org.springframework.context.ApplicationEvent;
  * 通话事件基类
  */
 @Getter
-public abstract class CallEvent extends ApplicationEvent {
+public abstract class FreeSwitchCallEvent extends ApplicationEvent {
     
     private final String uuid;
     private final CallEventType eventType;
     
-    public CallEvent(Object source, String uuid, CallEventType eventType) {
+    public FreeSwitchCallEvent(Object source, String uuid, CallEventType eventType) {
         super(source);
         this.uuid = uuid;
         this.eventType = eventType;
