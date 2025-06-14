@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 09:55:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 11:37:46
+ * @LastEditTime: 2025-06-14 13:16:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,25 +36,19 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class GroupRequest extends BaseRequest {
 
-    @Builder.Default
-    private String name = I18Consts.I18N_GROUP_NAME;
+    private String name;
 
-    @Builder.Default
-    private String avatar = AvatarConsts.getDefaultGroupAvatarUrl();
+    private String avatar;
 
-    @Builder.Default
-    private String description = I18Consts.I18N_GROUP_DESCRIPTION;
+    private String description;
 
-    @Builder.Default
-    private Boolean showTopTip = false;
+    private Boolean showTopTip;
 
     private String topTip;
 
-    @Builder.Default
-    private Boolean isExternal = false;
+    private Boolean isExternal;
 
-    @Builder.Default
-    private GroupStatusEnum status = GroupStatusEnum.NORMAL;
+    private GroupStatusEnum status;
 
     @Builder.Default
     private List<String> memberUids = new ArrayList<>();
@@ -65,5 +59,4 @@ public class GroupRequest extends BaseRequest {
     @Builder.Default
     private List<String> robotUids = new ArrayList<>();
 
-    // Using memberUids list for invite/remove/join/leave operations
 }

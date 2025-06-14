@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 12:38:35
+ * @LastEditTime: 2025-06-14 13:35:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -103,7 +102,21 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     public ResponseEntity<?> queryByThreadTopic(ThreadRequest request) {
 
         Optional<ThreadResponse> threadOptional = threadRestService.queryByTopic(request);
-        //
+        if (threadOptional.isPresent()) {
+            return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
+        }
+        return ResponseEntity.ok(JsonResult.error("not found"));
+    }
+
+    /**
+     * 主要用于查询 某个成员 的 某个群组会话
+     * @param request
+     * @return
+     */
+    @Operation(summary = "根据主题和用户查询会话", description = "通过主题和用户查找相关会话")
+    @GetMapping("/query/topic/owner")
+    public ResponseEntity<?> queryByTopicAndOwner(ThreadRequest request) {
+        Optional<ThreadResponse> threadOptional = threadRestService.queryByTopicAndOwner(request);
         if (threadOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
         }
