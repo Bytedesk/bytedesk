@@ -42,7 +42,7 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
     // private final AuthService authService;
 
     @Override
-    @Cacheable(value = "gateway", key = "#request.orgUid + ':' + #request.page + ':' + #request.size")
+    @Cacheable(value = "gateway", key = "#request.orgUid + ':' + #request.pageNumber + ':' + #request.pageSize")
     public Page<FreeSwitchGatewayResponse> queryByOrg(FreeSwitchGatewayRequest request) {
         Pageable pageable = request.getPageable();
         Specification<FreeSwitchGatewayEntity> spec = FreeSwitchGatewaySpecification.search(request);
@@ -51,7 +51,7 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
     }
 
     @Override
-    @Cacheable(value = "gateway", key = "#request.userUid + ':' + #request.page + ':' + #request.size")
+    @Cacheable(value = "gateway", key = "#request.userUid + ':' + #request.pageNumber + ':' + #request.pageSize")
     public Page<FreeSwitchGatewayResponse> queryByUser(FreeSwitchGatewayRequest request) {
         
         // 设置当前用户的组织UID
