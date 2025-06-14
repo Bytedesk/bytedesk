@@ -8,10 +8,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.freeswitch.callcenter.event.CallAnsweredEvent;
-import com.bytedesk.freeswitch.callcenter.event.CallHangupEvent;
-import com.bytedesk.freeswitch.callcenter.event.CallStartEvent;
-import com.bytedesk.freeswitch.callcenter.event.DtmfEvent;
+import com.bytedesk.freeswitch.call.event.CallAnsweredEvent;
+import com.bytedesk.freeswitch.call.event.CallHangupEvent;
+import com.bytedesk.freeswitch.call.event.CallStartEvent;
+import com.bytedesk.freeswitch.call.event.DtmfEvent;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
 // import com.bytedesk.freeswitch.number.FreeSwitchNumberService;
