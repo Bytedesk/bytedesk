@@ -100,6 +100,21 @@ public class FreeSwitchCallRequest extends BaseRequest {
     private String notes;
     
     /**
+     * 呼叫ID
+     */
+    private String callId;
+
+    /**
+     * DTMF按键值
+     */
+    private String digit;
+
+    /**
+     * 静音状态
+     */
+    private Boolean mute;
+    
+    /**
      * 获取通话时长（秒）
      */
     public int getDuration() {

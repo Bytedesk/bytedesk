@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:31:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 12:44:49
+ * @LastEditTime: 2025-06-14 13:01:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -55,11 +55,12 @@ public class FreeSwitchCallService {
     /**
      * 发起呼叫
      *
-     * @param fromUser 主叫用户ID
-     * @param toUser   被叫用户ID
+     * @param request 呼叫请求
      * @return 呼叫ID
      */
-    public String makeCall(String fromUser, String toUser) {
+    public String makeCall(FreeSwitchCallRequest request) {
+        String fromUser = request.getCallerNumber();
+        String toUser = request.getCalleeNumber();
         log.info("发起呼叫: 从 {} 到 {}", fromUser, toUser);
         
         try {
@@ -71,22 +72,19 @@ public class FreeSwitchCallService {
                 String callId = String.format("%s-%s-%d", fromUser, toUser, System.currentTimeMillis());
                 
                 // 创建呼叫信息对象
-                FreeSwitchCallRequest callInfo = new FreeSwitchCallRequest();
-                callInfo.setCallUuid(String.format("%s-%s-%d", fromUser, toUser, System.currentTimeMillis()));
-                callInfo.setCallerNumber(fromUser);
-                callInfo.setCalleeNumber(toUser);
-                callInfo.setStartTime(System.currentTimeMillis());
-                callInfo.setStatus("CALLING");
-                callInfo.setType("OUTBOUND");
+                request.setCallUuid(String.format("%s-%s-%d", fromUser, toUser, System.currentTimeMillis()));
+                request.setStartTime(System.currentTimeMillis());
+                request.setStatus("CALLING");
+                request.setType("OUTBOUND");
                 
                 // 存储呼叫信息
-                activeCallMap.put(callId, callInfo);
+                activeCallMap.put(callId, request);
                 userCallMap.put(fromUser, callId);
                 userCallMap.put(toUser, callId);
                 
                 // 通知用户有新的呼叫
-                notifyCallEvent(toUser, "incoming_call", callInfo);
-                notifyCallEvent(fromUser, "outgoing_call", callInfo);
+                notifyCallEvent(toUser, "incoming_call", request);
+                notifyCallEvent(fromUser, "outgoing_call", request);
                 
                 return callId;
             } else {
@@ -102,10 +100,11 @@ public class FreeSwitchCallService {
     /**
      * 应答呼叫
      *
-     * @param callId 呼叫ID
+     * @param request 呼叫请求
      * @return 是否成功
      */
-    public boolean answerCall(String callId) {
+    public boolean answerCall(FreeSwitchCallRequest request) {
+        String callId = request.getCallId();
         log.info("应答呼叫: {}", callId);
         
         try {
@@ -141,10 +140,11 @@ public class FreeSwitchCallService {
     /**
      * 拒绝呼叫
      *
-     * @param callId 呼叫ID
+     * @param request 呼叫请求
      * @return 是否成功
      */
-    public boolean rejectCall(String callId) {
+    public boolean rejectCall(FreeSwitchCallRequest request) {
+        String callId = request.getCallId();
         log.info("拒绝呼叫: {}", callId);
         
         try {
@@ -179,10 +179,11 @@ public class FreeSwitchCallService {
     /**
      * 结束呼叫
      *
-     * @param callId 呼叫ID
+     * @param request 呼叫请求
      * @return 是否成功
      */
-    public boolean endCall(String callId) {
+    public boolean endCall(FreeSwitchCallRequest request) {
+        String callId = request.getCallId();
         log.info("结束呼叫: {}", callId);
         
         try {
@@ -218,11 +219,12 @@ public class FreeSwitchCallService {
     /**
      * 发送DTMF按键
      *
-     * @param callId 呼叫ID
-     * @param digit  按键值
+     * @param request 呼叫请求
      * @return 是否成功
      */
-    public boolean sendDtmf(String callId, String digit) {
+    public boolean sendDtmf(FreeSwitchCallRequest request) {
+        String callId = request.getCallId();
+        String digit = request.getDigit();
         log.info("发送DTMF: {} 按键 {}", callId, digit);
         
         try {
@@ -246,11 +248,12 @@ public class FreeSwitchCallService {
     /**
      * 静音/取消静音
      *
-     * @param callId 呼叫ID
-     * @param mute   是否静音
+     * @param request 呼叫请求
      * @return 是否成功
      */
-    public boolean toggleMute(String callId, boolean mute) {
+    public boolean toggleMute(FreeSwitchCallRequest request) {
+        String callId = request.getCallId();
+        boolean mute = request.getMute();
         log.info("{}静音: {}", mute ? "开启" : "关闭", callId);
         
         try {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-03 14:30:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 12:40:47
+ * @LastEditTime: 2025-06-14 13:01:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,8 +14,10 @@
 package com.bytedesk.freeswitch.call;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,135 +44,137 @@ public class FreeSwitchCallRestController extends BaseRestController<FreeSwitchC
 
     private final FreeSwitchCallService callService;
 
+    private final FreeSwitchCallRestService callRestService;
+
     @Override
     public ResponseEntity<?> queryByOrg(FreeSwitchCallRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        
+        Page<FreeSwitchCallResponse> page = callRestService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(FreeSwitchCallRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+
+        Page<FreeSwitchCallResponse> page = callRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
     public ResponseEntity<?> queryByUid(FreeSwitchCallRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        Optional<FreeSwitchCallEntity> entity = callRestService.findByUid(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success(entity));
     }
 
     @Override
     public ResponseEntity<?> create(FreeSwitchCallRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        FreeSwitchCallResponse entity = callRestService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(entity));
     }
 
     @Override
     public ResponseEntity<?> update(FreeSwitchCallRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        FreeSwitchCallResponse entity = callRestService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(entity));
     }
 
     @Override
     public ResponseEntity<?> delete(FreeSwitchCallRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        callRestService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     @Override
     public Object export(FreeSwitchCallRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
-    }
+        
+        // callRestService.export(request, response);
 
-    
+        return JsonResult.success();
+    }
 
     /**
      * 发起呼叫
      */
     @PostMapping("/make")
-    public ResponseEntity<?> makeCall(@RequestBody Map<String, String> request) {
-        String fromUser = request.get("fromUser");
-        String toUser = request.get("toUser");
+    public ResponseEntity<?> makeCall(@RequestBody FreeSwitchCallRequest request) {
+        log.info("API 发起呼叫: {} -> {}", request.getCallerNumber(), request.getCalleeNumber());
         
-        log.info("API 发起呼叫: {} -> {}", fromUser, toUser);
-        
-        String callId = callService.makeCall(fromUser, toUser);
+        String callId = callService.makeCall(request);
         if (callId != null) {
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "callId", callId
-            ));
+            return ResponseEntity.ok(JsonResult.success(Map.of("callId", callId)));
         } else {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "发起呼叫失败"
-            ));
+            return ResponseEntity.badRequest().body(JsonResult.error("发起呼叫失败"));
         }
     }
 
     /**
      * 应答呼叫
      */
-    @PostMapping("/{callId}/answer")
-    public ResponseEntity<?> answerCall(@PathVariable String callId) {
-        log.info("API 应答呼叫: {}", callId);
+    @PostMapping("/answer")
+    public ResponseEntity<?> answerCall(@RequestBody FreeSwitchCallRequest request) {
+        log.info("API 应答呼叫: {}", request.getCallId());
         
-        boolean success = callService.answerCall(callId);
-        return ResponseEntity.ok(Map.of("success", success));
+        boolean success = callService.answerCall(request);
+        
+        return ResponseEntity.ok(JsonResult.success(success));
     }
 
     /**
      * 拒绝呼叫
      */
-    @PostMapping("/{callId}/reject")
-    public ResponseEntity<?> rejectCall(@PathVariable String callId) {
-        log.info("API 拒绝呼叫: {}", callId);
+    @PostMapping("/reject")
+    public ResponseEntity<?> rejectCall(@RequestBody FreeSwitchCallRequest request) {
+        log.info("API 拒绝呼叫: {}", request.getCallId());
         
-        boolean success = callService.rejectCall(callId);
-        return ResponseEntity.ok(Map.of("success", success));
+        boolean success = callService.rejectCall(request);
+
+        return ResponseEntity.ok(JsonResult.success(success));
     }
 
     /**
      * 结束呼叫
      */
-    @PostMapping("/{callId}/end")
-    public ResponseEntity<?> endCall(@PathVariable String callId) {
-        log.info("API 结束呼叫: {}", callId);
+    @PostMapping("/end")
+    public ResponseEntity<?> endCall(@RequestBody FreeSwitchCallRequest request) {
+        log.info("API 结束呼叫: {}", request.getCallId());
         
-        boolean success = callService.endCall(callId);
-        return ResponseEntity.ok(Map.of("success", success));
+        boolean success = callService.endCall(request);
+
+        return ResponseEntity.ok(JsonResult.success(success));
     }
 
     /**
      * 发送DTMF
      */
-    @PostMapping("/{callId}/dtmf")
-    public ResponseEntity<?> sendDtmf(
-            @PathVariable String callId,
-            @RequestBody Map<String, String> request) {
-        String digit = request.get("digit");
+    @PostMapping("/dtmf")
+    public ResponseEntity<?> sendDtmf(@RequestBody FreeSwitchCallRequest request) {
+        log.info("API 发送DTMF: {} 按键 {}", request.getCallId(), request.getDigit());
         
-        log.info("API 发送DTMF: {} 按键 {}", callId, digit);
-        
-        boolean success = callService.sendDtmf(callId, digit);
-        return ResponseEntity.ok(Map.of("success", success));
+        boolean success = callService.sendDtmf(request);
+
+        return ResponseEntity.ok(JsonResult.success(success));
     }
 
     /**
      * 开关静音
      */
-    @PostMapping("/{callId}/mute")
-    public ResponseEntity<?> toggleMute(
-            @PathVariable String callId,
-            @RequestBody Map<String, Boolean> request) {
-        boolean mute = request.get("mute");
+    @PostMapping("/mute")
+    public ResponseEntity<?> toggleMute(@RequestBody FreeSwitchCallRequest request) {
+        log.info("API {}静音: {}", request.getMute() ? "开启" : "关闭", request.getCallId());
         
-        log.info("API {}静音: {}", mute ? "开启" : "关闭", callId);
-        
-        boolean success = callService.toggleMute(callId, mute);
-        return ResponseEntity.ok(Map.of("success", success));
+        boolean success = callService.toggleMute(request);
+
+        return ResponseEntity.ok(JsonResult.success(success));
     }
     
 
