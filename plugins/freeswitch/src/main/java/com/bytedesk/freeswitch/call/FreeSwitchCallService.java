@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:31:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 12:29:09
+ * @LastEditTime: 2025-06-14 12:44:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,11 +72,12 @@ public class FreeSwitchCallService {
                 
                 // 创建呼叫信息对象
                 FreeSwitchCallRequest callInfo = new FreeSwitchCallRequest();
-                callInfo.setCallId(callId);
-                callInfo.setFromUser(fromUser);
-                callInfo.setToUser(toUser);
+                callInfo.setCallUuid(String.format("%s-%s-%d", fromUser, toUser, System.currentTimeMillis()));
+                callInfo.setCallerNumber(fromUser);
+                callInfo.setCalleeNumber(toUser);
                 callInfo.setStartTime(System.currentTimeMillis());
                 callInfo.setStatus("CALLING");
+                callInfo.setType("OUTBOUND");
                 
                 // 存储呼叫信息
                 activeCallMap.put(callId, callInfo);
@@ -116,19 +117,19 @@ public class FreeSwitchCallService {
             
             // 更新呼叫状态
             callInfo.setStatus("ANSWERED");
-            callInfo.setAnswerTime(System.currentTimeMillis());
+            callInfo.setStartTime(System.currentTimeMillis());
             
             // 存储更新后的呼叫信息
             activeCallMap.put(callId, callInfo);
             
             // 如果呼叫尚未应答，则发送应答命令
-            if (callInfo.getUuid() != null) {
-                freeSwitchService.answer(callInfo.getUuid());
+            if (callInfo.getCallUuid() != null) {
+                freeSwitchService.answer(callInfo.getCallUuid());
             }
             
             // 通知用户呼叫已应答
-            notifyCallEvent(callInfo.getFromUser(), "call_answered", callInfo);
-            notifyCallEvent(callInfo.getToUser(), "call_answered", callInfo);
+            notifyCallEvent(callInfo.getCallerNumber(), "call_answered", callInfo);
+            notifyCallEvent(callInfo.getCalleeNumber(), "call_answered", callInfo);
             
             return true;
         } catch (Exception e) {
@@ -158,12 +159,12 @@ public class FreeSwitchCallService {
             callInfo.setEndTime(System.currentTimeMillis());
             
             // 如果呼叫UUID存在，则挂断
-            if (callInfo.getUuid() != null) {
-                eslClient.sendSyncApiCommand("uuid_kill", callInfo.getUuid());
+            if (callInfo.getCallUuid() != null) {
+                eslClient.sendSyncApiCommand("uuid_kill", callInfo.getCallUuid());
             }
             
             // 通知用户呼叫已拒绝
-            notifyCallEvent(callInfo.getFromUser(), "call_rejected", callInfo);
+            notifyCallEvent(callInfo.getCallerNumber(), "call_rejected", callInfo);
             
             // 清理呼叫信息
             cleanupCall(callId);
@@ -196,13 +197,13 @@ public class FreeSwitchCallService {
             callInfo.setEndTime(System.currentTimeMillis());
             
             // 如果呼叫UUID存在，则挂断
-            if (callInfo.getUuid() != null) {
-                eslClient.sendSyncApiCommand("uuid_kill", callInfo.getUuid());
+            if (callInfo.getCallUuid() != null) {
+                eslClient.sendSyncApiCommand("uuid_kill", callInfo.getCallUuid());
             }
             
             // 通知用户呼叫已结束
-            notifyCallEvent(callInfo.getFromUser(), "call_ended", callInfo);
-            notifyCallEvent(callInfo.getToUser(), "call_ended", callInfo);
+            notifyCallEvent(callInfo.getCallerNumber(), "call_ended", callInfo);
+            notifyCallEvent(callInfo.getCalleeNumber(), "call_ended", callInfo);
             
             // 清理呼叫信息
             cleanupCall(callId);
@@ -226,14 +227,14 @@ public class FreeSwitchCallService {
         
         try {
             FreeSwitchCallRequest callInfo = activeCallMap.get(callId);
-            if (callInfo == null || callInfo.getUuid() == null) {
+            if (callInfo == null || callInfo.getCallUuid() == null) {
                 log.warn("找不到呼叫信息或UUID: {}", callId);
                 return false;
             }
             
             // 发送DTMF命令
             eslClient.sendSyncApiCommand("uuid_send_dtmf", 
-                String.format("%s %s", callInfo.getUuid(), digit));
+                String.format("%s %s", callInfo.getCallUuid(), digit));
             
             return true;
         } catch (Exception e) {
@@ -254,7 +255,7 @@ public class FreeSwitchCallService {
         
         try {
             FreeSwitchCallRequest callInfo = activeCallMap.get(callId);
-            if (callInfo == null || callInfo.getUuid() == null) {
+            if (callInfo == null || callInfo.getCallUuid() == null) {
                 log.warn("找不到呼叫信息或UUID: {}", callId);
                 return false;
             }
@@ -262,7 +263,7 @@ public class FreeSwitchCallService {
             // 发送静音/取消静音命令
             String command = mute ? "uuid_audio mute" : "uuid_audio unmute";
             eslClient.sendSyncApiCommand(command, 
-                String.format("%s read", callInfo.getUuid()));
+                String.format("%s read", callInfo.getCallUuid()));
             
             return true;
         } catch (Exception e) {
@@ -290,11 +291,11 @@ public class FreeSwitchCallService {
             FreeSwitchCallRequest callInfo = entry.getValue();
             
             // 检查是否匹配
-            if ((callInfo.getFromUser().equals(callerId) && callInfo.getToUser().equals(destination)) ||
-                (callInfo.getToUser().equals(callerId) && callInfo.getFromUser().equals(destination))) {
+            if ((callInfo.getCallerNumber().equals(callerId) && callInfo.getCalleeNumber().equals(destination)) ||
+                (callInfo.getCalleeNumber().equals(callerId) && callInfo.getCallerNumber().equals(destination))) {
                 
                 // 更新UUID
-                callInfo.setUuid(uuid);
+                callInfo.setCallUuid(uuid);
                 activeCallMap.put(entry.getKey(), callInfo);
                 
                 log.info("已关联UUID到呼叫: {} -> UUID {}", entry.getKey(), uuid);
@@ -318,15 +319,15 @@ public class FreeSwitchCallService {
             FreeSwitchCallRequest callInfo = entry.getValue();
             
             // 检查UUID是否匹配
-            if (uuid.equals(callInfo.getUuid())) {
+            if (uuid.equals(callInfo.getCallUuid())) {
                 // 更新状态
                 callInfo.setStatus("ANSWERED");
-                callInfo.setAnswerTime(System.currentTimeMillis());
+                callInfo.setStartTime(System.currentTimeMillis());
                 activeCallMap.put(entry.getKey(), callInfo);
                 
                 // 通知用户
-                notifyCallEvent(callInfo.getFromUser(), "call_answered", callInfo);
-                notifyCallEvent(callInfo.getToUser(), "call_answered", callInfo);
+                notifyCallEvent(callInfo.getCallerNumber(), "call_answered", callInfo);
+                notifyCallEvent(callInfo.getCalleeNumber(), "call_answered", callInfo);
                 
                 log.info("通话已应答: {}", entry.getKey());
                 return;
@@ -350,19 +351,19 @@ public class FreeSwitchCallService {
             FreeSwitchCallRequest callInfo = entry.getValue();
             
             // 检查UUID是否匹配
-            if (uuid.equals(callInfo.getUuid())) {
+            if (uuid.equals(callInfo.getCallUuid())) {
                 // 更新状态
                 callInfo.setStatus("ENDED");
                 callInfo.setEndTime(System.currentTimeMillis());
-                callInfo.setHangupCause(hangupCause);
+                callInfo.setNotes(hangupCause);
                 activeCallMap.put(entry.getKey(), callInfo);
                 
                 // 保存CDR记录到数据库（如果还没有保存的话）
                 saveCdrRecord(callInfo, hangupCause);
                 
                 // 通知用户
-                notifyCallEvent(callInfo.getFromUser(), "call_ended", callInfo);
-                notifyCallEvent(callInfo.getToUser(), "call_ended", callInfo);
+                notifyCallEvent(callInfo.getCallerNumber(), "call_ended", callInfo);
+                notifyCallEvent(callInfo.getCalleeNumber(), "call_ended", callInfo);
                 
                 // 清理呼叫
                 cleanupCall(entry.getKey());
@@ -389,11 +390,11 @@ public class FreeSwitchCallService {
             FreeSwitchCallRequest callInfo = entry.getValue();
             
             // 检查UUID是否匹配
-            if (uuid.equals(callInfo.getUuid())) {
+            if (uuid.equals(callInfo.getCallUuid())) {
                 // 通知用户
-                notifyCallEvent(callInfo.getFromUser(), "dtmf_received", 
+                notifyCallEvent(callInfo.getCallerNumber(), "dtmf_received", 
                     Map.of("callId", entry.getKey(), "digit", digit));
-                notifyCallEvent(callInfo.getToUser(), "dtmf_received", 
+                notifyCallEvent(callInfo.getCalleeNumber(), "dtmf_received", 
                     Map.of("callId", entry.getKey(), "digit", digit));
                 
                 return;
@@ -428,10 +429,10 @@ public class FreeSwitchCallService {
     private void cleanupCall(String callId) {
         FreeSwitchCallRequest callInfo = activeCallMap.remove(callId);
         if (callInfo != null) {
-            userCallMap.remove(callInfo.getFromUser());
-            userCallMap.remove(callInfo.getToUser());
-            if (callInfo.getUuid() != null) {
-                uuidCallMap.remove(callInfo.getUuid());
+            userCallMap.remove(callInfo.getCallerNumber());
+            userCallMap.remove(callInfo.getCalleeNumber());
+            if (callInfo.getCallUuid() != null) {
+                uuidCallMap.remove(callInfo.getCallUuid());
             }
         }
     }
@@ -482,31 +483,31 @@ public class FreeSwitchCallService {
     private void saveCdrRecord(FreeSwitchCallRequest callInfo, String hangupCause) {
         try {
             // 检查是否已经存在CDR记录
-            Optional<FreeSwitchCdrEntity> existingCdrOptional = cdrService.findByUid(callInfo.getUuid());
+            Optional<FreeSwitchCdrEntity> existingCdrOptional = cdrService.findByUid(callInfo.getCallUuid());
             if (!existingCdrOptional.isPresent()) {
                 // 创建新的CDR记录
                 FreeSwitchCdrEntity cdr = new FreeSwitchCdrEntity();
-                cdr.setUid(callInfo.getUuid());
-                cdr.setCallerIdNumber(callInfo.getFromUser());
-                cdr.setDestinationNumber(callInfo.getToUser());
+                cdr.setUid(callInfo.getCallUuid());
+                cdr.setCallerIdNumber(callInfo.getCallerNumber());
+                cdr.setDestinationNumber(callInfo.getCalleeNumber());
                 cdr.setStartStamp(LocalDateTime.now().minusSeconds(
                     (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 
-                if (callInfo.getAnswerTime() > 0) {
+                if (callInfo.getStartTime() > 0) {
                     cdr.setAnswerStamp(LocalDateTime.now().minusSeconds(
-                        (System.currentTimeMillis() - callInfo.getAnswerTime()) / 1000));
+                        (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 }
                 
                 cdr.setEndStamp(LocalDateTime.now());
                 cdr.setDuration((int) ((System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 cdr.setHangupCause(hangupCause);
-                cdr.setDirection("outbound"); // 默认设置，可根据实际情况调整
+                cdr.setDirection(callInfo.getType().toLowerCase());
                 
                 cdrService.createCdr(cdr);
-                log.debug("已保存CDR记录: UUID {}", callInfo.getUuid());
+                log.debug("已保存CDR记录: UUID {}", callInfo.getCallUuid());
             }
         } catch (Exception e) {
-            log.error("保存CDR记录失败: UUID {} - {}", callInfo.getUuid(), e.getMessage(), e);
+            log.error("保存CDR记录失败: UUID {} - {}", callInfo.getCallUuid(), e.getMessage(), e);
         }
     }
 }

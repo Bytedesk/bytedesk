@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-05-24 10:17:41
+ * @Date: 2025-06-14 12:42:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 12:42:02
+ * @LastEditTime: 2025-06-14 12:42:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,18 +13,15 @@
  */
 package com.bytedesk.freeswitch.call;
 
-import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * 呼叫信息
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FreeSwitchCallRequest extends BaseRequest {
-
+public class FreeSwitchCallResponse extends BaseResponse {
+    
     /**
      * 呼叫UUID
      */
@@ -98,14 +95,4 @@ public class FreeSwitchCallRequest extends BaseRequest {
      * 备注
      */
     private String notes;
-    
-    /**
-     * 获取通话时长（秒）
-     */
-    public int getDuration() {
-        if (endTime > 0 && startTime > 0) {
-            return (int) ((endTime - startTime) / 1000);
-        }
-        return 0;
-    }
 }

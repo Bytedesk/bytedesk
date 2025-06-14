@@ -1,18 +1,24 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-06-14 11:27:49
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-06-14 12:45:23
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 package com.bytedesk.freeswitch.call;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.bytedesk.freeswitch.queue.FreeSwitchQueueService;
-import com.bytedesk.freeswitch.statistic.CallStatistics;
-
+import com.bytedesk.core.base.BaseRestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,190 +28,70 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FreeSwitchCallRestService {
+public class FreeSwitchCallRestService extends BaseRestService<FreeSwitchCallEntity, FreeSwitchCallRequest, FreeSwitchCallResponse> {
     
-    private final FreeSwitchCallRepository callRepository;
+    // private final FreeSwitchCallRepository callRepository;
     // private final FreeSwitchAgentService agentService;
-    private final FreeSwitchQueueService queueService;
+    // private final FreeSwitchQueueService queueService;
     
-    /**
-     * 创建呼叫记录
-     */
-    @Transactional
-    public FreeSwitchCallEntity createCall(FreeSwitchCallEntity call) {
-        // call.setStatus(FreeSwitchCallEntity.CallStatus.INIT);
-        call.setStartTime(LocalDateTime.now());
-        call.setCreatedAt(LocalDateTime.now());
-        call.setUpdatedAt(LocalDateTime.now());
-        
-        return callRepository.save(call);
+    @Override
+    public Page<FreeSwitchCallResponse> queryByOrg(FreeSwitchCallRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
-    
-    /**
-     * 更新呼叫状态
-     */
-    @Transactional
-    public FreeSwitchCallEntity updateCallStatus(String uuid, FreeSwitchCallEntity.CallStatus status) {
-        FreeSwitchCallEntity call = callRepository.findByCallUuid(uuid)
-            .orElseThrow(() -> new RuntimeException("呼叫不存在: " + uuid));
-            
-        call.setStatus(status);
-        call.setUpdatedAt(LocalDateTime.now());
-        
-        // 如果呼叫结束，更新结束时间和通话时长
-        if (status == FreeSwitchCallEntity.CallStatus.COMPLETED 
-            || status == FreeSwitchCallEntity.CallStatus.FAILED 
-            || status == FreeSwitchCallEntity.CallStatus.ABANDONED) {
-            call.setEndTime(LocalDateTime.now());
-            if (call.getStartTime() != null) {
-                call.setDuration((int) ChronoUnit.SECONDS.between(call.getStartTime(), call.getEndTime()));
-            }
-        }
-        
-        return callRepository.save(call);
+
+    @Override
+    public Page<FreeSwitchCallResponse> queryByUser(FreeSwitchCallRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
-    
-    /**
-     * 分配坐席
-     */
-    @Transactional
-    public FreeSwitchCallEntity assignAgent(String uuid, String agentId) {
-        FreeSwitchCallEntity call = callRepository.findByCallUuid(uuid)
-            .orElseThrow(() -> new RuntimeException("呼叫不存在: " + uuid));
-            
-        // FreeSwitchAgentEntity agent = agentService.getAgent(agentId)
-        //     .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
-            
-        // call.setAgentId(agentId);
-        call.setStatus(FreeSwitchCallEntity.CallStatus.RINGING);
-        call.setUpdatedAt(LocalDateTime.now());
-        
-        return callRepository.save(call);
+
+    @Override
+    public Optional<FreeSwitchCallEntity> findByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
     }
-    
-    /**
-     * 将呼叫加入队列
-     */
-    @Transactional
-    public FreeSwitchCallEntity enqueueCall(String uuid, String queueName) {
-        FreeSwitchCallEntity call = callRepository.findByCallUuid(uuid)
-            .orElseThrow(() -> new RuntimeException("呼叫不存在: " + uuid));
-            
-        queueService.enqueueCall(call, queueName);
-        call.setUpdatedAt(LocalDateTime.now());
-        
-        return callRepository.save(call);
+
+    @Override
+    public FreeSwitchCallResponse create(FreeSwitchCallRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
-    
-    /**
-     * 将呼叫从队列中移除
-     */
-    @Transactional
-    public FreeSwitchCallEntity dequeueCall(String uuid) {
-        FreeSwitchCallEntity call = callRepository.findByCallUuid(uuid)
-            .orElseThrow(() -> new RuntimeException("呼叫不存在: " + uuid));
-            
-        queueService.dequeueCall(call);
-        call.setUpdatedAt(LocalDateTime.now());
-        
-        return callRepository.save(call);
+
+    @Override
+    public FreeSwitchCallResponse update(FreeSwitchCallRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
-    
-    /**
-     * 获取呼叫信息
-     */
-    public Optional<FreeSwitchCallEntity> getCall(String uuid) {
-        return callRepository.findByCallUuid(uuid);
+
+    @Override
+    protected FreeSwitchCallEntity doSave(FreeSwitchCallEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'doSave'");
     }
-    
-    /**
-     * 获取所有呼叫
-     */
-    public List<FreeSwitchCallEntity> getAllCalls() {
-        return callRepository.findAll();
+
+    @Override
+    public void deleteByUid(String uid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
     }
-    
-    /**
-     * 分页查询呼叫列表
-     */
-    public Page<FreeSwitchCallEntity> getCalls(Pageable pageable) {
-        return callRepository.findAll(pageable);
+
+    @Override
+    public void delete(FreeSwitchCallRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
-    
-    /**
-     * 根据状态查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByStatus(FreeSwitchCallEntity.CallStatus status) {
-        return callRepository.findByStatus(status);
+
+    @Override
+    public FreeSwitchCallEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            FreeSwitchCallEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
-    
-    /**
-     * 根据类型查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByType(FreeSwitchCallEntity.CallType type) {
-        return callRepository.findByType(type);
-    }
-    
-    /**
-     * 根据坐席ID查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByAgent(Long agentId) {
-        return callRepository.findByAgentId(agentId);
-    }
-    
-    /**
-     * 根据队列ID查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByQueue(Long queueId) {
-        return callRepository.findByQueueId(queueId);
-    }
-    
-    /**
-     * 根据时间范围查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
-        return callRepository.findByStartTimeBetween(startTime, endTime);
-    }
-    
-    /**
-     * 根据主叫号码查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByCallerNumber(String callerNumber) {
-        return callRepository.findByCallerNumber(callerNumber);
-    }
-    
-    /**
-     * 根据被叫号码查询呼叫列表
-     */
-    public List<FreeSwitchCallEntity> getCallsByCallee(String calleeNumber) {
-        return callRepository.findByCalleeNumber(calleeNumber);
-    }
-    
-    /**
-     * 获取呼叫统计信息
-     */
-    public CallStatistics getCallStatistics(LocalDateTime startTime, LocalDateTime endTime) {
-        // long totalCalls = callRepository.countCallsInTimeRange(startTime, endTime);
-        // long answeredCalls = callRepository.countAnsweredCallsInTimeRange(startTime, endTime);
-        // long totalDuration = callRepository.sumDurationInTimeRange(startTime, endTime);
-        // long totalWaitTime = callRepository.sumWaitTimeInTimeRange(startTime, endTime);
-        
-        return CallStatistics.builder()
-            // .totalCalls(totalCalls)
-            // .answeredCalls(answeredCalls)
-            // .totalDuration(totalDuration)
-            // .totalWaitTime(totalWaitTime)
-            // .avgDuration(totalCalls > 0 ? (double) totalDuration / totalCalls : 0)
-            // .avgWaitTime(totalCalls > 0 ? (double) totalWaitTime / totalCalls : 0)
-            // .answerRate(totalCalls > 0 ? (double) answeredCalls / totalCalls * 100 : 0)
-            .build();
-    }
-    
-    /**
-     * 清理历史呼叫记录
-     */
-    @Transactional
-    public void cleanupOldCalls(LocalDateTime before) {
-        callRepository.deleteByStartTimeBefore(before);
+
+    @Override
+    public FreeSwitchCallResponse convertToResponse(FreeSwitchCallEntity entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
     }
 }
