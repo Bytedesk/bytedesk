@@ -3,18 +3,22 @@
 本包提供 FreeSwitch 集成的通话详单（CDR）管理功能。
 
 ## 概述
+
 通话详单包实现了 FreeSwitch 通话记录系统，支持：
+
 - 通话详单记录和跟踪
 - 通话时长和计费管理
 - 通话质量监控
 - 通话历史分析
 
 ## 核心组件
+
 - `FreeSwitchCdrEntity`: 通话详单配置实体
 - `FreeSwitchCdrService`: 通话详单管理服务
 - `FreeSwitchCdrController`: REST API 接口
 
 ## 功能特性
+
 1. 通话详单记录
    - 主叫和被叫信息跟踪
    - 通话时长和计费时间记录
@@ -34,6 +38,7 @@
    - JSON 格式的扩展信息
 
 ## 使用示例
+
 ```java
 // 示例：创建新的通话详单记录
 FreeSwitchCdrEntity cdr = FreeSwitchCdrEntity.builder()
@@ -49,6 +54,7 @@ FreeSwitchCdrEntity cdr = FreeSwitchCdrEntity.builder()
 ```
 
 ## 最佳实践
+
 1. 定期备份通话详单数据
 2. 实现适当的通话详单数据保留策略
 3. 监控通话质量指标
@@ -56,6 +62,7 @@ FreeSwitchCdrEntity cdr = FreeSwitchCdrEntity.builder()
 5. 维护通话录音存储
 
 ## 相关文档
+
 - [FreeSwitch 通话详单文档](https://freeswitch.org/confluence/display/FREESWITCH/XML+CDR)
 - [通话详单格式参考](https://freeswitch.org/confluence/display/FREESWITCH/XML+CDR+Format)
-- [通话录音指南](https://freeswitch.org/confluence/display/FREESWITCH/Recording) 
+- [通话录音指南](https://freeswitch.org/confluence/display/FREESWITCH/Recording)
