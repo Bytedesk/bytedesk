@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 13:30:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 16:31:21
+ * @LastEditTime: 2025-06-16 09:56:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

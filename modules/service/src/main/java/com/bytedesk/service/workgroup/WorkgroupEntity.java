@@ -73,7 +73,12 @@ import lombok.experimental.SuperBuilder;
     "handler",
 })
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
-@Table(name = "bytedesk_service_workgroup")
+@Table(
+    name = "bytedesk_service_workgroup",
+    indexes = {
+        @Index(name = "idx_workgroup_uid", columnList = "uuid")
+    }
+)
 public class WorkgroupEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

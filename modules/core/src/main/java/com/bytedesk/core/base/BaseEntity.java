@@ -54,6 +54,14 @@ import java.time.LocalDateTime;
  * config in properties
  * @see https://docs.spring.io/spring-data/jpa/reference/auditing.html
  * @author im.bytedesk.com
+ * 
+ * 注意: 所有继承此类的实体类应该在@Table注解中添加uuid字段的索引，例如:
+ * @Table(
+ *   name = "your_table_name",
+ *   indexes = {
+ *     @Index(name = "idx_your_table_uid", columnList = "uuid")
+ *   }
+ * )
  */
 @Getter
 @Setter

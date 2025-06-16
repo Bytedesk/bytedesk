@@ -30,6 +30,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -51,7 +52,12 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ KbaseEntityListener.class })
-@Table(name = "bytedesk_kbase")
+@Table(
+    name = "bytedesk_kbase",
+    indexes = {
+        @Index(name = "idx_kbase_uid", columnList = "uuid")
+    }
+)
 public class KbaseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
