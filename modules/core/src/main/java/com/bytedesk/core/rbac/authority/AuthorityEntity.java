@@ -37,7 +37,12 @@ import jakarta.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners({AuthorityEntityListener.class})
-@Table(name = "bytedesk_core_authority")
+@Table(
+    name = "bytedesk_core_authority",
+    indexes = {
+        @Index(name = "idx_authority_uid", columnList = "uuid")
+    }
+)
 public class AuthorityEntity extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;

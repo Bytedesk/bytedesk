@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.role;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,12 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ RoleEntityListener.class })
-@Table(name = "bytedesk_core_role")
+@Table(
+    name = "bytedesk_core_role",
+    indexes = {
+        @Index(name = "idx_role_uid", columnList = "uuid")
+    }
+)
 public class RoleEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;

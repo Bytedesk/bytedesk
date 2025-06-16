@@ -20,6 +20,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -44,7 +45,12 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ UserEntityListener.class })
-@Table(name = "bytedesk_core_user")
+@Table(
+    name = "bytedesk_core_user",
+    indexes = {
+        @Index(name = "idx_user_uid", columnList = "uuid")
+    }
+)
 public class UserEntity extends BaseEntityNoOrg {
 
 	private static final long serialVersionUID = 1L;

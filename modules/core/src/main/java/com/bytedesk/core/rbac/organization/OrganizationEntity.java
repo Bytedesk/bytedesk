@@ -23,6 +23,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,12 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ OrganizationEntityListener.class })
-@Table(name = "bytedesk_core_organization")
+@Table(
+    name = "bytedesk_core_organization",
+    indexes = {
+        @Index(name = "idx_organization_uid", columnList = "uuid")
+    }
+)
 public class OrganizationEntity extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
