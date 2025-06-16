@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 10:42:28
+ * @LastEditTime: 2025-06-16 09:10:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.topic.TopicUtils;
 
@@ -37,6 +38,8 @@ public class ThreadEventListener {
     private final TopicService topicService;
 
     private final TopicCacheService topicCacheService;
+
+    private final TopicRestService topicRestService;
 
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
@@ -156,7 +159,7 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-        topicService.remove(request);
+        topicRestService.remove(request);
     }
 
 

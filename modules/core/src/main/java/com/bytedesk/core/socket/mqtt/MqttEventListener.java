@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 10:44:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 14:49:34
+ * @LastEditTime: 2025-06-16 07:45:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,6 @@ public class MqttEventListener {
         final String uid = clientId.split("/")[0];
         log.info("topic onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         //
-        // topicService.addClientId(clientId);
         topicCacheService.pushClientId(clientId);
     }
 
@@ -54,7 +53,6 @@ public class MqttEventListener {
         final String uid = clientId.split("/")[0];
         log.info("topic onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         //
-        // topicService.removeClientId(clientId);
         // 暂不删除
         // topicCacheService.removeClientId(clientId);
     }

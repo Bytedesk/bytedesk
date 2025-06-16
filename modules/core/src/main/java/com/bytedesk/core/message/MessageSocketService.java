@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-26 10:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 11:48:20
+ * @LastEditTime: 2025-06-16 08:58:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicEntity;
-import com.bytedesk.core.topic.TopicService;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.socket.mqtt.MqttMessageIdService;
@@ -53,7 +53,7 @@ public class MessageSocketService {
 
     private final MqttSessionService mqttSessionService;
 
-    private final TopicService topicService;
+    private final TopicRestService topicRestService;
 
     // 发送消息给stomp访客端
     public void sendJsonMessage(@NonNull String messageJson) {
@@ -111,7 +111,7 @@ public class MessageSocketService {
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
         // log.debug("doSendToSubscribers: topic={}", topic);
-        Set<TopicEntity> topicSet = topicService.findByTopic(topic);
+        Set<TopicEntity> topicSet = topicRestService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
         topicSet.forEach(topicElement -> {
             Set<String> clientIdSet = topicElement.getClientIds();
