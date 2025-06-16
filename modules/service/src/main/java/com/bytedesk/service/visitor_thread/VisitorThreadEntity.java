@@ -17,6 +17,7 @@ import com.bytedesk.core.thread.AbstractThreadEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,7 +35,11 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_service_visitor_thread")
+@Table(name = "bytedesk_service_visitor_thread"
+, indexes = {
+    @Index(name = "idx_visitor_thread_topic", columnList = "thread_topic")
+}
+)
 public class VisitorThreadEntity extends AbstractThreadEntity {
 
     private static final long serialVersionUID = 1L;

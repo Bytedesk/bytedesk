@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 17:53:25
+ * @LastEditTime: 2025-06-16 13:34:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,23 +108,16 @@ public class VisitorThreadService
         //
         String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
-        
+        // 
+        String extra = "";
         // 处理微信相关额外信息
         if (visitorRequest.isWeChat()) {
-            String weChatExtra = visitorRequest.getWeChatThreadExtra();
-            
-            // 如果是企业微信客服，直接使用WeChatWorkThreadExtra
-            if (ClientEnum.WECHAT_WORK.name().equals(visitorRequest.getClient()) && StringUtils.hasText(weChatExtra)) {
-                // 企业微信直接设置extra为weChatExtra
-                extra = weChatExtra;
-                
-                log.info("企业微信客服创建线程：直接设置thread.extra: {}", weChatExtra);
-            } else {
-                // 普通微信，直接设置
-                extra = weChatExtra;
-            }
+            extra = visitorRequest.getWeChatThreadExtra();
+        } else if (visitorRequest.isMeta()) {
+            extra = visitorRequest.getMetaThreadExtra();
+        } else {
+            extra = ServiceConvertUtils
+                .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         }
         
         //
@@ -151,17 +144,10 @@ public class VisitorThreadService
         //
         if (visitorRequest.isWeChat()) {
             String weChatExtra = visitorRequest.getWeChatThreadExtra();
-            
-            // 如果是企业微信客服，直接使用WeChatWorkThreadExtra
-            if (ClientEnum.WECHAT_WORK.name().equals(visitorRequest.getClient()) && StringUtils.hasText(weChatExtra)) {
-                // 企业微信直接设置extra为weChatExtra
-                thread.setExtra(weChatExtra);
-                
-                log.info("企业微信客服线程：直接设置thread.extra: {}", weChatExtra);
-            } else {
-                // 普通微信，直接设置
-                thread.setExtra(weChatExtra);
-            }
+            thread.setExtra(weChatExtra);
+        } else if (visitorRequest.isMeta()) {
+            String metaExtra = visitorRequest.getMetaThreadExtra();
+            thread.setExtra(metaExtra);
         } else {
             String extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());

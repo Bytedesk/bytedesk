@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 12:19:48
+ * @LastEditTime: 2025-06-16 13:25:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,10 +53,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EntityListeners({ ThreadEntityListener.class })
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "messages"})
-@Table(name = "bytedesk_core_thread"
-// , uniqueConstraints = {
-    // @UniqueConstraint(columnNames = {"topic", "owner_id"}) // 同一个用户，针对某service thread 创建多个ticket，并对应多个ticket thread
-// }
+@Table(name = "bytedesk_core_thread", indexes = {
+    @Index(name = "idx_thread_topic", columnList = "thread_topic")
+}
 )
 public class ThreadEntity extends AbstractThreadEntity {
 
