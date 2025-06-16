@@ -230,12 +230,10 @@ services:
       MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
-      # 对话配置
-      # SPRING_AI_MODEL_CHAT: none
+      # 默认对话配置
       SPRING_AI_MODEL_CHAT: ollama
       # SPRING_AI_MODEL_CHAT: zhipuai
-      # 向量模型
-      # SPRING_AI_MODEL_EMBEDDING: none
+      # 默认向量模型
       SPRING_AI_MODEL_EMBEDDING: ollama
       # SPRING_AI_MODEL_EMBEDDING: zhipuai
       # ollama
