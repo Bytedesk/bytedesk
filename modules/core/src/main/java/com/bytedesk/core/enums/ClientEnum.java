@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 09:03:22
+ * @LastEditTime: 2025-06-16 11:11:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,11 +77,15 @@ public enum ClientEnum {
     EMAIL,           // 邮件
     SMS,             // 短信
     PHONE,           // 电话
+    
+    // Meta
+    MESSENGER,       // Facebook Messenger
+    INSTAGRAM,       // Instagram
+    WHATSAPP,        // WhatsApp
     //
     // 海外社交媒体
     TWITTER,         // Twitter/X
     FACEBOOK,        // Facebook
-    INSTAGRAM,       // Instagram
     LINKEDIN,        // LinkedIn
     YOUTUBE,         // YouTube
     TIKTOK,          // TikTok
@@ -90,7 +94,6 @@ public enum ClientEnum {
     SNAPCHAT,        // Snapchat
     //
     // 海外即时通讯
-    WHATSAPP,        // WhatsApp
     TELEGRAM,        // Telegram
     LINE,            // LINE
     KAKAO,           // KakaoTalk
@@ -98,7 +101,6 @@ public enum ClientEnum {
     SIGNAL,          // Signal
     DISCORD,         // Discord
     SLACK,           // Slack
-    MESSENGER,       // Facebook Messenger
     //
     // 海外电商
     AMAZON,          // 亚马逊
