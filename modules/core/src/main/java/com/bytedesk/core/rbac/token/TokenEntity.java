@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 15:56:54
+ * @LastEditTime: 2025-06-16 21:25:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,8 +72,6 @@ public class TokenEntity extends BaseEntityNoOrg {
 
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;
-
-    // 父类中 userUid 唯一标识所属用户
 
     // 验证token是否有效
     public Boolean isValid() {
