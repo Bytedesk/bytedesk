@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 08:49:50
+ * @LastEditTime: 2025-06-16 13:02:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -125,6 +125,18 @@ public class VisitorRequest extends BaseRequest {
 		return this.client.toLowerCase().contains(ClientEnum.WECHAT_WORK.name().toLowerCase());
 	}
 
+
+	public void setWorkgroupType() {
+		this.type = String.valueOf(ThreadTypeEnum.WORKGROUP.getValue());
+	}
+
+	public void setAgentType() {
+		this.type = String.valueOf(ThreadTypeEnum.AGENT.getValue());
+	}
+
+	public void setRobotType() {
+		this.type = String.valueOf(ThreadTypeEnum.ROBOT.getValue());
+	}
 
 	public ThreadTypeEnum formatType() {
 		int typeInt;
