@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 23:44:16
+ * @LastEditTime: 2025-06-17 16:19:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -232,10 +232,10 @@ public class BytedeskProperties {
     @Data
     public static class Features {
         private Boolean javaAi = false;
-        private Boolean pythonAi = true;
+        // private Boolean pythonAi = true;
         private String emailType = "javamail";
-        private Date startDate;
-        private Integer freeDays = 30;
+        // private Date startDate;
+        // private Integer freeDays = 30;
         private String avatarBaseUrl;
     }
 
@@ -372,9 +372,9 @@ public class BytedeskProperties {
         return features.getJavaAi();
     }
 
-    public Boolean getPythonAi() {
-        return features.getPythonAi();
-    }
+    // public Boolean getPythonAi() {
+    //     return features.getPythonAi();
+    // }
 
     public String getEmailType() {
         return features.getEmailType();
