@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 13:33:01
+ * @LastEditTime: 2025-06-17 11:05:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,6 +113,9 @@ public class VisitorRequest extends BaseRequest {
 
 	private String metaThreadExtra;
 	
+	// telegram extra
+	private String telegramThreadExtra;
+	
 	public Boolean isWeChat() {
 		// 忽略大小写
 		return this.client.toLowerCase().contains(ClientEnum.WECHAT.name().toLowerCase());
@@ -131,6 +134,14 @@ public class VisitorRequest extends BaseRequest {
 		return this.client.toLowerCase().contains(ClientEnum.WECHAT_WORK.name().toLowerCase());
 	}
 
+	/**
+	 * 判断是否为Telegram客户端
+	 * @return true 如果为Telegram客户端，否则为 false
+	 */
+	public Boolean isTelegram() {
+		// 忽略大小写
+		return this.client.toLowerCase().contains(ClientEnum.TELEGRAM.name().toLowerCase());
+	}
 
 	public void setWorkgroupType() {
 		this.type = String.valueOf(ThreadTypeEnum.WORKGROUP.getValue());
