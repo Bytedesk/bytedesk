@@ -25,7 +25,7 @@ Listed course START -->
 		<!-- Title -->
 		<div class="row mb-4">
 			<div class="col-lg-8 mx-auto text-center">
-				<h2>微语开源套件：九合一</h2>
+				<h2>微语开源套件：N合一</h2>
 				<p class="mb-0">开源、免费，私有部署，所有数据存储在您自己的服务器上</p>
 			</div>
 		</div>
@@ -137,8 +137,41 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/coding.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins" class="stretched-link" target="_blank">插件模块</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="stretched-link" target="_blank">插件模块</a></h5>
 					<span class="mb-0">扩展能力，支持第三方插件开发和集成，自定义业务流程、API对接，插件商店，一键安装</span>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/data-science.svg" alt="">
+					</div>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="stretched-link" target="_blank">呼叫中心</a></h5>
+					<span class="mb-0">AI智能外呼，自动语音识别，智能语音合成，多线路接入，通话录音，质检分析，支持FreeSWITCH</span>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/online.svg" alt="">
+					</div>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched-link" target="_blank">视频客服</a></h5>
+					<span class="mb-0">WebRTC视频通话，屏幕共享，远程协助，视频录制，AI视频分析，支持移动端和PC端</span>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/engineering.svg" alt="">
+					</div>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="stretched-link" target="_blank">视频会议</a></h5>
+					<span class="mb-0">多人视频会议，会议室管理，会议录制，白板协作，聊天互动，支持Jitsi Meet集成</span>
 				</div>
 			</div>
 			

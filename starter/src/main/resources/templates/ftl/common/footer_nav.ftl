@@ -95,6 +95,20 @@
 					<div class="col-6 col-lg-3">
 						<a href="https://demo.weiyuai.cn/plugins/kanban/" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
 					</div>
+
+					<!-- 第三行 -->
+					<div class="col-6 col-lg-3">
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="text-reset d-inline-block mb-1" target="_blank">插件模块</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="text-reset d-inline-block mb-1" target="_blank">呼叫中心</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank">视频客服</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="text-reset d-inline-block mb-1" target="_blank">视频会议</a>
+					</div>
 				</div>
 			</div>
 		</div><!-- Row END -->
