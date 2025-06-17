@@ -35,13 +35,11 @@ public class BdDateUtils {
     private static final String timeFormat = "HH:mm:ss";
 
     public static String formatDatetimeNow() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeFormat);
-        return dateFormatter.format(new Date());
+        return new SimpleDateFormat(datetimeFormat).format(new Date());
     }
 
     public static String formatDatetimeToString(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat(datetimeFormat);
-        return formatter.format(date);
+        return new SimpleDateFormat(datetimeFormat).format(date);
     }
 
     /**
@@ -83,13 +81,11 @@ public class BdDateUtils {
     }
 
     public static String formatDatetimeUid() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeUidFormat);
-        return dateFormatter.format(new Date());
+        return new SimpleDateFormat(datetimeUidFormat).format(new Date());
     }
 
     public static String formatToday() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat);
-        return dateFormatter.format(new Date());
+        return new SimpleDateFormat(dateFormat).format(new Date());
     }
 
     public static Date formatStringToTime(String time) {
@@ -106,23 +102,19 @@ public class BdDateUtils {
     }
 
     public static String formatTimeToString(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat(timeFormat);
-        return formatter.format(date);
+        return new SimpleDateFormat(timeFormat).format(date);
     }
 
     public static String formatDateSlashNow() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormatSlash);
-        return dateFormatter.format(new Date());
+        return new SimpleDateFormat(dateFormatSlash).format(new Date());
     }
 
     public static String formatDateSlashNowNoZero() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormatSlashNoZero);
-        return dateFormatter.format(new Date());
+        return new SimpleDateFormat(dateFormatSlashNoZero).format(new Date());
     }
 
     public static String formatDateToString(Date date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
-        return simpleDateFormat.format(date);
+        return new SimpleDateFormat(dateFormat).format(date);
     }
 
     public static Date formatStringToDate(String date) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 18:38:21
+ * @LastEditTime: 2025-06-17 17:24:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,6 +44,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -107,8 +108,16 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	@Override
 	public UploadResponse update(UploadRequest request) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'update'");
+		Optional<UploadEntity> uploadOptional = findByUid(request.getUid());
+		if (uploadOptional.isPresent()) {
+			UploadEntity upload = uploadOptional.get();
+			modelMapper.map(request, upload);
+			// 保存
+			UploadEntity updatedUpload = save(upload);
+			return convertToResponse(updatedUpload);
+		} else {
+			throw new RuntimeException("Upload with uid '" + request.getUid() + "' not found");
+		}
 	}
 
 	@Override
@@ -138,9 +147,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	// 给出图片URL地址，将其保存到本地
     public String storeFromUrl(String url, String fileName) {
+		// fileName添加前缀: 20240916144702_, // 例如：20240916144702_身份证-背面.jpg
+		fileName = BdDateUtils.formatDatetimeUid() + "_" + fileName;
+		// storeFromUrl url: https://api.telegram.org/file/bot7968513107:AAHuHmMSQM_4CeO46bAr0FmLH5ryvzzJ2dQ/photos/file_2.jpg, fileName: 20250617172223_file_2.jpg
+		log.info("storeFromUrl url: {}, fileName: {}", url, fileName);
         // 根据当前日期创建文件夹，格式如：2021/03/15
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        String currentDateFolder = LocalDate.now().format(formatter);
+        String currentDateFolder = BdDateUtils.formatDateSlashNow();
 
         try {
             // 构建包含日期文件夹的文件路径
