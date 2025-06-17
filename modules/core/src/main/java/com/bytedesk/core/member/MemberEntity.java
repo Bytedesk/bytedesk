@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 18:06:31
+ * @LastEditTime: 2025-06-17 18:09:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,4 +82,22 @@ public class MemberEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
+    /**
+     * 重写 equals 方法，仅使用基类中的 uid 字段进行比较
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseEntity that = (BaseEntity) o;
+        return Objects.equals(getUid(), that.getUid());
+    }
+
+    /**
+     * 重写 hashCode 方法，仅使用基类中的 uid 字段
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUid());
+    }
 }
