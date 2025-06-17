@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -42,7 +42,7 @@ public class QueueTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    // @MockBean
     private VisitorRestService visitorRestService;
 
     private static final String ORG_UID = "df_org_uid";
