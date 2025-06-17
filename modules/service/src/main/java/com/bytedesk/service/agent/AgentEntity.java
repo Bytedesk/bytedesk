@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 16:34:24
+ * @LastEditTime: 2025-06-17 09:05:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -89,10 +89,6 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "is_connected")
     private Boolean connected = false;
 
-    @Builder.Default
-    @Column(name = "is_enabled")
-    private Boolean enabled = true;
-
     // 留言设置
     @Embedded
     @Builder.Default
@@ -131,6 +127,11 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // 是否启用，状态：启用/禁用
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
 
     // org member
     @ManyToOne(fetch = FetchType.LAZY)

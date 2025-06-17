@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:18:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:46:33
+ * @LastEditTime: 2025-06-17 09:08:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,5 +84,7 @@ public class WorkgroupResponse extends BaseResponse {
 
     // agent away count
     private Long awayAgentCount;
+
+    private Boolean enabled;
 
 }

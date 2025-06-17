@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 11:02:56
+ * @LastEditTime: 2025-06-17 09:08:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,6 +68,8 @@ public class WorkgroupRequest extends BaseRequest {
 
     @Builder.Default
     private QueueSettingsRequest queueSettings = new QueueSettingsRequest();
+
+    private Boolean enabled;
 
     // @Builder.Default
     // private InviteSettings inviteSettings = new InviteSettings();

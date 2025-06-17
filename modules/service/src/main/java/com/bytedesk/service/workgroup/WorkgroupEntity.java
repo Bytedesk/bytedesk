@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:11:45
+ * @LastEditTime: 2025-06-17 09:06:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,6 +141,11 @@ public class WorkgroupEntity extends BaseEntity {
     // 意图识别
     @ManyToOne(fetch = FetchType.LAZY)
     private IntentionSettingsEntity intentionSetting;
+
+    // 是否启用，状态：启用/禁用
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
 
     /**
      * 获取可用客服
