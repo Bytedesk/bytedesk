@@ -70,30 +70,30 @@
 				<div class="row g-3">
 					<!-- 第一行 -->
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/team" class="text-reset d-inline-block mb-1" target="_blank">企业IM</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/team" class="text-reset d-inline-block mb-1" target="_blank">企业IM</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/service" class="text-reset d-inline-block mb-1" target="_blank">在线客服</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="text-reset d-inline-block mb-1" target="_blank">在线客服</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/ai" class="text-reset d-inline-block mb-1" target="_blank">AI Agent</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ai" class="text-reset d-inline-block mb-1" target="_blank">AI Agent</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/kbase" class="text-reset d-inline-block mb-1" target="_blank">企业知识库</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kbase" class="text-reset d-inline-block mb-1" target="_blank">企业知识库</a>
 					</div>
 
 					<!-- 第二行 -->
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/voc" class="text-reset d-inline-block mb-1" target="_blank">客户之声</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="text-reset d-inline-block mb-1" target="_blank">客户之声</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/ticket" class="text-reset d-inline-block mb-1" target="_blank">工单系统</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="text-reset d-inline-block mb-1" target="_blank">工单系统</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/plugins/kanban/" class="text-reset d-inline-block mb-1" target="_blank">工作流</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="text-reset d-inline-block mb-1" target="_blank">工作流</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://demo.weiyuai.cn/plugins/kanban/" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
 					</div>
 
 					<!-- 第三行 -->

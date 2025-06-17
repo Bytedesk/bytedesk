@@ -40,7 +40,7 @@ Listed course START -->
 						<img src="assets/images/element/coding.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/team" class="stretched-link" target="_blank">企业IM + </a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/team" class="stretched-link" target="_blank">企业IM + </a></h5>
 					<span class="mb-0">AI群聊助手，AI会话总结，聊天记录监控。按照中大型团队架构使用规模设计，支持数万人同时在线</span>
 				</div>
 			</div>
@@ -53,7 +53,7 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/service" class="stretched-link" target="_blank">在线客服</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="stretched-link" target="_blank">在线客服</a></h5>
 					<span class="mb-0">多渠道对接、多账号聚合，私域管理，AI意图识别，AI智能质检、支持人工坐席兜底，数十项在线客服通用功能。
 						来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
 					</span>
@@ -68,7 +68,7 @@ Listed course START -->
 						<img src="assets/images/element/online.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/ai" class="stretched-link" target="_blank">AI Agent</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ai" class="stretched-link" target="_blank">AI Agent</a></h5>
 					<span class="mb-0">对接Ollama/DeepSeek/智谱/Qwen通义千问等大模型，支持私有部署/Api调用大模型.</span>
 				</div>
 			</div>
@@ -81,7 +81,7 @@ Listed course START -->
 						<img src="assets/images/element/engineering.svg" alt="">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/kbase" class="stretched-link" target="_blank">企业知识库/帮助中心</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kbase" class="stretched-link" target="_blank">企业知识库/帮助中心</a></h5>
 					<span class="mb-0">内部客服中心，AI写作助手，AI知识库问答，自动撰写内容，内部知识库管理、文档管理、对外知识库、帮助文档、内容公告</span>
 				</div>
 			</div>
@@ -93,7 +93,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/voc" class="stretched-link" target="_blank">客户之声</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="stretched-link" target="_blank">客户之声</a></h5>
 					<span class="mb-0">AI回复助手，社交媒体评论抓取、第三方平台评论同步、意见反馈、服务投诉、调查问卷</span>
 				</div>
 			</div>
@@ -104,7 +104,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/medical.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/ticket" class="stretched-link" target="_blank">工单系统</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="stretched-link" target="_blank">工单系统</a></h5>
 					<span class="mb-0">AI工单助手，自动创建工单，自动分配工单，自动关闭工单</span>
 				</div>
 			</div>
@@ -115,7 +115,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/artist.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins/kanban/" class="stretched-link" target="_blank">工作流</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="stretched-link" target="_blank">工作流</a></h5>
 					<span class="mb-0">AI智能体，自动执行数据操作，自定义工作流、流程编排，Function Calling/Mcp</span>
 				</div>
 			</div>
@@ -126,7 +126,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/home.svg" alt="">
 					</div>
-					<h5 class="mb-1"><a href="https://demo.weiyuai.cn/plugins/kanban/" class="stretched-link" target="_blank">项目管理</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="stretched-link" target="_blank">项目管理</a></h5>
 					<span class="mb-0">看板、日报、任务管理</span>
 				</div>
 			</div>
