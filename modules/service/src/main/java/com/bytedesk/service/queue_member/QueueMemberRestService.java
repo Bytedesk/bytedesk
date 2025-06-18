@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 17:06:15
+ * @LastEditTime: 2025-06-18 15:01:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,8 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -71,23 +73,18 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         return queryByOrg(request);
     }
 
-    // @Cacheable(value = "counter", key = "#uid")
+    @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
         return queueMemberRepository.findByUid(uid);
     }
 
-    // @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
+    @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
     public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRepository.findByThreadUid(threadUid);
     }
 
-    // save
-    // public QueueMemberEntity save(QueueMemberEntity entity) {
-    //     return doSave(entity);
-    // }
-
-    // @CachePut(value = "queue_member", key = "#entity.uid")
+    @CachePut(value = "queue_member", key = "#entity.uid")
     @Override
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 13:25:13
+ * @LastEditTime: 2025-06-18 15:05:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -96,6 +96,11 @@ public class ThreadEntity extends AbstractThreadEntity {
         return getStatus().equals(ThreadProcessStatusEnum.CHATTING.name());
     }
 
+    // TIMEOUT
+    public Boolean isTimeout() {
+        return getStatus().equals(ThreadProcessStatusEnum.TIMEOUT.name());
+    }
+
     //
     public Boolean isClosed() {
         return getStatus().equals(ThreadProcessStatusEnum.CLOSED.name());
@@ -159,6 +164,11 @@ public class ThreadEntity extends AbstractThreadEntity {
         return this;
     }
 
+    public ThreadEntity setTimeout() {
+        setStatus(ThreadProcessStatusEnum.TIMEOUT.name());
+        return this;
+    }
+
     public ThreadEntity setClose() {
         setStatus(ThreadProcessStatusEnum.CLOSED.name());
         return this;
@@ -177,10 +187,6 @@ public class ThreadEntity extends AbstractThreadEntity {
     public UserProtobuf getAgentProtobuf() {
         return JSON.parseObject(getAgent(), UserProtobuf.class);
     }
-
-    // public Boolean isAgentRobot() {
-    //     return getAgentProtobuf() != null && getAgentProtobuf().getType().equals(UserTypeEnum.ROBOT.name());
-    // }
 
     public UserProtobuf getRobotProtobuf() {
         return JSON.parseObject(getRobot(), UserProtobuf.class);

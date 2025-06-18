@@ -24,6 +24,7 @@ public enum ThreadProcessStatusEnum {
     OFFLINE, // 客服离线
     QUEUING, // 排队中
     CHATTING, // 对话中
+    TIMEOUT, // 超时未处理
     CLOSED, // 会话已结束
     ;
 

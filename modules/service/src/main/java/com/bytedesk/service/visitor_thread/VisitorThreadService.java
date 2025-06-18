@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 17:59:22
+ * @LastEditTime: 2025-06-18 15:15:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,7 +107,7 @@ public class VisitorThreadService
         //
         String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
-        // 
+        //
         String extra = "";
         // 处理微信相关额外信息
         if (visitorRequest.isWeChat()) {
@@ -118,9 +118,9 @@ public class VisitorThreadService
             extra = visitorRequest.getTelegramThreadExtra();
         } else {
             extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         }
-        
+
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -325,30 +325,46 @@ public class VisitorThreadService
                     // 判断是否超时未回复
                     if (diffInMinutes > agent.getTimeoutRemindTime()) {
                         // 更新会话超时提醒时间
-                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
+                                .findByThreadUid(thread.getUid());
                         if (queueMemberOpt.isPresent()) {
                             QueueMemberEntity queueMember = queueMemberOpt.get();
                             // 判断是否首次超时
                             if (!queueMember.getAgentTimeout()) {
-                                // 只设置首次超时时间，后续不再更新
-                                if (queueMember.getAgentTimeoutAt() == null) {
-                                    queueMember.setAgentTimeoutAt(LocalDateTime.now());
-                                    queueMember.setAgentTimeout(true);
+                                // 判断 visitorLastMessageAt; 访客最后发送消息时间 和 agentLastMessageAt; 客服最后回复时间
+                                // 如果 访客最后发送消息时间不为空，但是客服最后回复时间为空，则认为超时未回复
+                                if (queueMember.getVisitorLastMessageAt() != null && (queueMember.getAgentLastResponseAt() == null)) {
+                                    // 发送会话超时提醒
+                                    sendRemindMessage(queueMember, thread, agent);
+                                } else if (queueMember.getVisitorLastMessageAt() != null && queueMember.getAgentLastResponseAt() != null) {
+                                    // 如果访客最后发送消息时间 大于 客服最后回复时间，则认为超时未回复
+                                    if (queueMember.getVisitorLastMessageAt().isAfter(queueMember.getAgentLastResponseAt())) {
+                                        // 发送会话超时提醒
+                                        sendRemindMessage(queueMember, thread, agent);
+                                    }
                                 }
-                                // 更新超时次数
-                                queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
-                                // 保存队列成员信息
-                                queueMemberRestService.save(queueMember);
-                                // 发送会话超时提醒
-                                MessageProtobuf messageProtobuf = MessageUtils.createAgentReplyTimeoutMessage(thread,
-                                        agent.getTimeoutRemindTip());
-                                messageSendService.sendProtobufMessage(messageProtobuf);
                             }
                         }
                     }
                 }
             }
         });
+    }
+
+    private void sendRemindMessage(QueueMemberEntity queueMember, ThreadEntity thread, AgentEntity agent) {
+        // 只设置首次超时时间，后续不再更新
+        if (queueMember.getAgentTimeoutAt() == null) {
+            queueMember.setAgentTimeoutAt(LocalDateTime.now());
+            queueMember.setAgentTimeout(true);
+        }
+        // 更新超时次数
+        queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
+        // 保存队列成员信息
+        queueMemberRestService.save(queueMember);
+        // 发送会话超时提醒
+        MessageProtobuf messageProtobuf = MessageUtils.createAgentReplyTimeoutMessage(thread,
+                agent.getTimeoutRemindTip());
+        messageSendService.sendProtobufMessage(messageProtobuf);
     }
 
     @Override
