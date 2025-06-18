@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 17:37:50
+ * @LastEditTime: 2025-06-18 11:48:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,14 +38,25 @@ public enum MessageTypeEnum {
     HOT, // 热门话题
     SHORTCUT, // 快捷路径
     ORDER, // 订单
+    // 
     POLL, // 投票
     POLL_SUBMIT, // 投票提交
+    // 
     FORM, // 表单：询前表单
     FORM_SUBMIT, // 表单提交
+    // 选择消息
+    CHOICE, // 客服发送选项消息，让访客选择
+    CHOICE_SUBMIT, // 选择提交
+    // 确认消息
+    CONFIRM, // 客服发送确认消息，让访客确认：是、否
+    CONFIRM_SUBMIT, // 确认提交
+    // 
     LEAVE_MSG, // 留言
     LEAVE_MSG_SUBMIT, // 留言提交
+    // 
     TICKET, // 工单消息
     TICKET_SUBMIT, // 工单提交
+    // 
     TYPING, // 正在输入
     PROCESSING, // 正在处理，等待大模型回复中
     STICKER, // 贴纸
@@ -60,13 +71,7 @@ public enum MessageTypeEnum {
     FAQ, // 常见问题
     FAQ_QUESTION, // 常见问题问题
     FAQ_ANSWER, // 常见问题答案
-    // FAQ_UP, // 常见问题答案评价:UP
-    // FAQ_DOWN, // 常见问题答案评价:DOWN
-    // QA, // 点击查看问答对
-    // QA_QUESTION, // 问答对问题
-    // QA_ANSWER, // 问答对答案
-    // QA_UP, // 问答对答案评价:UP
-    // QA_DOWN, // 问答对答案评价:DOWN
+    //
     ROBOT, // 机器人
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
@@ -76,17 +81,21 @@ public enum MessageTypeEnum {
     // ROBOT_UP, // 机器人答案评价:UP
     // ROBOT_DOWN, // 机器人答案评价:DOWN
     ARTICLE, // 文章
+    // 
     RATE, // 访客主动评价
     RATE_INVITE, // 客服邀请评价
     RATE_SUBMIT, // 访客提交评价
     RATE_CANCEL, // 访客取消评价
+    // 
     AUTO_CLOSED, // 自动关闭
     AGENT_CLOSED, // 客服关闭
+    // 
     TRANSFER,
     TRANSFER_REJECT,
     TRANSFER_ACCEPT,
     TRANSFER_TIMEOUT,
     TRANSFER_CANCEL,
+    // 
     INVITE,
     INVITE_REJECT,
     INVITE_ACCEPT,
@@ -112,6 +121,7 @@ public enum MessageTypeEnum {
     INVITE_ORGANIZATION_ACCEPT,
     INVITE_ORGANIZATION_TIMEOUT,
     INVITE_ORGANIZATION_CANCEL,
+    // 
     WEBRTC_AUDIO_INVITE,
     WEBRTC_VIDEO_INVITE,
     WEBRTC_AUDIO_INVITE_REJECT,
