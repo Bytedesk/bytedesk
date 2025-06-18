@@ -115,7 +115,7 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: "true"
       # BYTEDESK_EDITION: ENTERPRISE
-      BYTEDESK_VERSION: 0.8.3
+      BYTEDESK_VERSION: 0.8.4
       BYTEDESK_APPKEY: ZjoyMDI1LTA2LTIxOkVOVEVSUFJJU0U6Og==
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: "false"
