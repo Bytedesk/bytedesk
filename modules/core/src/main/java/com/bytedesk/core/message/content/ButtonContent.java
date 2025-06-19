@@ -39,6 +39,52 @@ import java.util.stream.Collectors;
  * - account_link: 登录按钮
  * - account_unlink: 注销按钮
  * - extension: 扩展按钮
+ * 
+ * 使用示例：
+ * 
+ * 1. 创建网页按钮：
+ *    ButtonContent webButton = ButtonContent.createWebUrlButton("访问网站", "https://example.com", "full");
+ * 
+ * 2. 创建回发按钮：
+ *    ButtonContent postbackButton = ButtonContent.createPostbackButton("开始", "GET_STARTED_PAYLOAD");
+ * 
+ * 3. 创建电话按钮：
+ *    ButtonContent phoneButton = ButtonContent.createPhoneButton("联系我们", "+1234567890");
+ * 
+ * 4. 创建游戏按钮：
+ *    ButtonContent gameButton = ButtonContent.createGamePlayButtonWithPlayer("开始游戏", "{\"game_id\":\"123\"}", "player_456");
+ * 
+ * 5. 验证按钮配置：
+ *    List<ButtonContent> buttons = Arrays.asList(webButton, postbackButton, phoneButton);
+ *    ButtonContent.ValidationResult result = ButtonContent.validateButtons(buttons);
+ *    if (result.isValid()) {
+ *        // 按钮配置有效
+ *    } else {
+ *        // 处理错误
+ *        System.out.println(result.getErrorMessage());
+ *    }
+ * 
+ * 6. 转换为Map格式（用于API调用）：
+ *    List<Map<String, Object>> buttonMaps = ButtonContent.toMapList(buttons);
+ *    metaMessageService.sendButtonTemplateMessage(pageId, recipientId, text, buttonMaps, token);
+ * 
+ * 7. 使用Builder模式创建复杂按钮：
+ *    ButtonContent complexButton = ButtonContent.builder()
+ *        .type("web_url")
+ *        .title("复杂按钮")
+ *        .url("https://example.com")
+ *        .webviewHeightRatio("tall")
+ *        .messengerExtensions(true)
+ *        .fallbackUrl("https://fallback.com")
+ *        .build();
+ * 
+ * 优势：
+ * - 类型安全：编译时检查按钮类型
+ * - 配置验证：自动验证必填字段
+ * - 代码可读性：清晰的API设计
+ * - 维护性：集中管理按钮配置
+ * - 扩展性：易于添加新的按钮类型
+ * - 兼容性：自动转换为Map格式
  */
 @Getter
 @Setter
