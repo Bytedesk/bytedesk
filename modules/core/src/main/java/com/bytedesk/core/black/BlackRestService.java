@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 17:15:12
+ * @LastEditTime: 2025-06-19 13:01:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,11 +30,11 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-
-import lombok.AllArgsConstructor;
+        
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, BlackRequest, BlackResponse, BlackExcel> {
 
     private final BlackRepository repository;
