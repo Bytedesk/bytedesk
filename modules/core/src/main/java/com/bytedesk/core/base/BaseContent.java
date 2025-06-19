@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-06-17 15:43:37
+ * @Date: 2025-06-19 16:16:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-19 16:20:48
+ * @LastEditTime: 2025-06-19 16:17:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,11 +11,13 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.message.content;
+package com.bytedesk.core.base;
 
-import com.bytedesk.core.base.BaseContent;
+import java.io.Serializable;
 
-import lombok.AllArgsConstructor;
+import com.alibaba.fastjson2.JSON;
+
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,14 +26,14 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-public class VideoContent extends BaseContent {
-    private String url;
-    private String coverUrl;
-    private String duration;
-    private String width;
-    private String height;
-    private String format;
-    private String label;
-} 
+@MappedSuperclass
+public abstract class BaseContent implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
+    
+}

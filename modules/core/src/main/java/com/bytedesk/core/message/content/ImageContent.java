@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-17 15:40:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 15:44:04
+ * @LastEditTime: 2025-06-19 16:19:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,18 +13,20 @@
  */
 package com.bytedesk.core.message.content;
 
-import java.io.Serializable;
+import com.bytedesk.core.base.BaseContent;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImageContent implements Serializable {
+public class ImageContent extends BaseContent {
 
     private String url;
 
