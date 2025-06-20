@@ -109,8 +109,10 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 		<!-- 生产环境，spring ai 官方推荐使用 webflux 版本 client：
-		 For production deployment, we recommend using the WebFlux-based SSE connection with the spring-ai-starter-mcp-client-webflux-->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client-webflux -->
+		 For production deployment, we recommend using the WebFlux-based SSE connection with the
+		spring-ai-starter-mcp-client-webflux-->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client-webflux -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
@@ -122,6 +124,14 @@
 			<artifactId>spring-ai-starter-mcp-server</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+
+		<!-- https://github.com/alibaba/spring-ai-alibaba -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
+		<!-- <dependency>
+			<groupId>com.alibaba.cloud.ai</groupId>
+			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+			<version>${spring-ai-alibaba.version}</version>
+		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
@@ -287,6 +297,14 @@
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
 				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!-- https://github.com/alibaba/spring-ai-alibaba -->
+			<dependency>
+				<groupId>com.alibaba.cloud.ai</groupId>
+				<artifactId>spring-ai-alibaba-bom</artifactId>
+				<version>${spring-ai-alibaba.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
