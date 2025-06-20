@@ -48,7 +48,7 @@
 					<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
 					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/voc" target="_blank">客户之声</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/forum" target="_blank">客户社区</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./helpcenter/df_hc_uid" target="_blank">帮助中心</a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./helpcenter/df_org_uid_df_kb_hc_uid" target="_blank">帮助中心</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./architecture.html" target="_blank">架构</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank">下载</a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./about.html" target="_blank">关于</a></li>
