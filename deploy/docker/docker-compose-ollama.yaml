@@ -134,7 +134,6 @@ services:
       SERVER_PORT: 9003
       # bytedesk config
       BYTEDESK_DEBUG: "true"
-      # BYTEDESK_EDITION: ENTERPRISE
       BYTEDESK_VERSION: 0.8.4
       BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OkVOVEVSUFJJU0U6Og==
       # enable custom config: name, logo, description
