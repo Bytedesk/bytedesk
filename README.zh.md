@@ -183,8 +183,10 @@ http://127.0.0.1:9003/
 默认密码: admin
 ```
 
+## 试用
+
 ```bash
-# 社区版
+# 社区版 永久有效
 bytedesk.appkey=ZjoyMDI1LTA3LTE5OkNPTU1VTklUWTo6
 BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OkNPTU1VTklUWTo6
 # 企业版 试用

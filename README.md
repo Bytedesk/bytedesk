@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-19 17:03:54
+ * @LastEditTime: 2025-06-20 17:21:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -191,6 +191,8 @@ http://127.0.0.1:9003/
 demo username: admin@email.com
 demo password: admin
 ```
+
+## Appkey
 
 ```bash
 # Community
