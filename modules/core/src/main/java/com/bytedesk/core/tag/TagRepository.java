@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-11 09:23:20
+ * @LastEditTime: 2025-06-20 12:52:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,8 @@ public interface TagRepository extends JpaRepository<TagEntity, Long>, JpaSpecif
     Optional<TagEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
+
+    Optional<TagEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     // Boolean existsByPlatform(String platform);
 }

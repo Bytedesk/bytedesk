@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:49:42
+ * @LastEditTime: 2025-06-20 12:54:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -83,15 +84,28 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
         return tagRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "tag", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
+    public Optional<TagEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
+        return tagRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+    }
+
     public Boolean existsByUid(String uid) {
         return tagRepository.existsByUid(uid);
     }
 
+    @Transactional
     @Override
     public TagResponse create(TagRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
+        }
+        // 检查name+orgUid+type是否已经存在
+        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
+            Optional<TagEntity> tag = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+            if (tag.isPresent()) {
+                return convertToResponse(tag.get());
+            }
         }
         // 
         UserEntity user = authService.getUser();
@@ -111,6 +125,7 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
         return convertToResponse(savedEntity);
     }
 
+    @Transactional
     @Override
     public TagResponse update(TagRequest request) {
         Optional<TagEntity> optional = tagRepository.findByUid(request.getUid());
@@ -153,6 +168,7 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
         return null;
     }
 
+    @Transactional
     @Override
     public void deleteByUid(String uid) {
         Optional<TagEntity> optional = tagRepository.findByUid(uid);
