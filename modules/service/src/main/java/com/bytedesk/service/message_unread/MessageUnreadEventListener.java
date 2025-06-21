@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 11:23:30
+ * @LastEditTime: 2025-06-21 12:46:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageUnreadEventListener {
 
-    private final MessageUnreadService messageUnreadService;
+    private final MessageUnreadRestService messageUnreadService;
 
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {

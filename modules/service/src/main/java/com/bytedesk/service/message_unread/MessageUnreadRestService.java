@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 11:33:13
+ * @LastEditTime: 2025-06-21 12:54:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
@@ -35,45 +40,55 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
+public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
 
     private final MessageUnreadRepository messageUnreadRepository;
 
     private final ModelMapper modelMapper;
 
+    private final AuthService authService;
+
     @Override
     public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Pageable pageable = request.getPageable();
+        Specification<MessageUnreadEntity> specs = MessageUnreadSpecification.search(request);
+        Page<MessageUnreadEntity> page = messageUnreadRepository.findAll(specs, pageable);
+        return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<MessageUnreadResponse> queryByUser(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        //
+        return queryByOrg(request);
     }
 
     @Override
     public Optional<MessageUnreadEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return messageUnreadRepository.findByUid(uid);
     }
 
     @Override
     public MessageUnreadResponse create(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        MessageUnreadEntity messageUnread = modelMapper.map(request, MessageUnreadEntity.class);
+        messageUnreadRepository.save(messageUnread);
+        return convertToResponse(messageUnread);
     }
 
     @Override
     public MessageUnreadResponse update(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        MessageUnreadEntity messageUnread = modelMapper.map(request, MessageUnreadEntity.class);
+        messageUnreadRepository.save(messageUnread);
+        return convertToResponse(messageUnread);
     }
 
     // 拉取的同时从数据库中删除，所以不需要缓存
     @Transactional
-    // @Cacheable(value = "message_unread", key = "#userUid", unless = "#result == null")
+    @Cacheable(value = "message_unread", key = "#userUid", unless = "#result == null")
     public List<MessageResponse> getMessages(String userUid) {
         List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
         delete(userUid);
@@ -88,7 +103,6 @@ public class MessageUnreadService extends BaseRestService<MessageUnreadEntity, M
         messageUnreadRepository.save(messageUnread);
     }
 
-    // @Caching(evict = { @CacheEvict(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void delete(String userUid) {
         try {

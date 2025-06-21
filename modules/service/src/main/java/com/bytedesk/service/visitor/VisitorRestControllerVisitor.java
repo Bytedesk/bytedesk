@@ -45,12 +45,11 @@ import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.service.message_unread.MessageUnreadService;
+import com.bytedesk.service.message_unread.MessageUnreadRestService;
 // import com.bytedesk.service.utils.KeepAliveHelper;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +65,7 @@ public class VisitorRestControllerVisitor {
 
     private final VisitorRestService visitorRestService;
 
-    private final MessageUnreadService messageUnreadService;
+    private final MessageUnreadRestService messageUnreadService;
 
     private final IMessageSendService messageSendService;
 
