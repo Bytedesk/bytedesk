@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 16:45:33
+ * @LastEditTime: 2025-06-21 11:36:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -80,7 +80,7 @@ public class VisitorRestControllerVisitor {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
+    // @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @PostMapping("/init")
     public ResponseEntity<?> init(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
@@ -102,7 +102,7 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(user));
     }
 
-    @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
+    // @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
     @PostMapping("/thread")
     public ResponseEntity<?> requestThread(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
@@ -117,7 +117,7 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
 
-    @VisitorAnnotation(title = "visitor", action = "browse", description = "visitor browse")
+    // @VisitorAnnotation(title = "visitor", action = "browse", description = "visitor browse")
     @PostMapping("/browse")
     public ResponseEntity<?> browse(VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
@@ -148,7 +148,7 @@ public class VisitorRestControllerVisitor {
      * @param request 查询请求
      * @return 分页消息列表
      */
-    @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
+    // @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
     @GetMapping("/message/thread/topic")
     public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
 
@@ -163,7 +163,7 @@ public class VisitorRestControllerVisitor {
      * @param request 查询请求
      * @return 分页消息列表
      */
-    @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
+    // @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
     @GetMapping("/message/thread/uid")
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
 
@@ -173,13 +173,35 @@ public class VisitorRestControllerVisitor {
     }
 
     // 访客拉取未读消息
-    @VisitorAnnotation(title = "visitor", action = "getMessageUnread", description = "get unread messages")
+    // @VisitorAnnotation(title = "visitor", action = "getMessageUnread", description = "get unread messages")
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
         
         List<MessageResponse> messages = messageUnreadService.getMessages(request.getUid());
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
+    }
+
+    // message/unread/count
+    // @VisitorAnnotation(title = "visitor", action = "getMessageUnreadCount", description = "get unread messages count")
+    @GetMapping("/message/unread/count")
+    public ResponseEntity<?> getMessageUnreadCount(VisitorRequest request) {
+
+        int count = messageUnreadService.getUnreadCount(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success("get unread messages count success", count));
+    }
+
+    // post /message/unread/count/clear
+    @PostMapping("/message/unread/count/clear")
+    public ResponseEntity<?> clearMessageUnreadCount(VisitorRequest request) {
+
+        messageUnreadService.clearUnreadCount(request.getUid());
+
+        // 看下是否清空了
+        int count = messageUnreadService.getUnreadCount(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
     }
 
     // 访客发送http消息
@@ -278,7 +300,6 @@ public class VisitorRestControllerVisitor {
 
         return ResponseEntity.ok(JsonResult.success("sync success"));
     }
-
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {

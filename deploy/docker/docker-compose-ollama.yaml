@@ -358,6 +358,7 @@ services:
       # SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: "true"
       # wechat config
       WECHAT_PAY_ENABLED: "false"
+      WECHAT_PAY_CERTPATH: ''
       # 阿里云短信服务的签名，可以在控制台找到，如是中文，请转为Unicode
       ALIYUN_SMS_SIGNNAME: ''
       #阿里云短信服务的模板Code，可以在控制台找到

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-30 10:23:48
+ * @LastEditTime: 2025-06-21 11:37:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ public class VisitorEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 
-	// 前端自定义uid，用于区别于自动生成uid
+	// 用户自定义uid，用于区别于自动生成uid
 	private String visitorUid;
 
 	private String nickname;

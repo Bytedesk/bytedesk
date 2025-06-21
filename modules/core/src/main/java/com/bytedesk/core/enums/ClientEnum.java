@@ -20,6 +20,7 @@ public enum ClientEnum {
     WEB_PC, // pc端
     WEB_H5, // h5端
     WEB_VISITOR, // 访客端
+    WEB_FLOAT, // 悬浮窗
     WEB_ADMIN, // 管理端
     // 
     IOS,
