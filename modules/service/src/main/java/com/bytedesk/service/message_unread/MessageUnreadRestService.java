@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 18:02:16
+ * @LastEditTime: 2025-06-21 21:18:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
+public class MessageUnreadRestService
+        extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
 
     private final MessageUnreadRepository messageUnreadRepository;
 
@@ -98,17 +99,32 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void create(MessageEntity message) {
+
         // 检查是否已经存在相同的未读消息记录
         Optional<MessageUnreadEntity> existing = messageUnreadRepository.findByUid(message.getUid());
         if (existing.isPresent()) {
             log.debug("Message unread already exists for message: {}", message.getUid());
             return;
         }
-        
-        MessageUnreadEntity messageUnread = modelMapper.map(message, MessageUnreadEntity.class);
-        // messageUnread.setUserUid(userUid);
+
+        // 创建新的 MessageUnreadEntity，避免复制 version 字段
+        MessageUnreadEntity messageUnread = MessageUnreadEntity.builder()
+                .uid(message.getUid())
+                .type(message.getType())
+                .status(message.getStatus())
+                .content(message.getContent())
+                .extra(message.getExtra())
+                .client(message.getClient())
+                .user(message.getUser())
+                .userUid(message.getUserUid())
+                .orgUid(message.getOrgUid())
+                .level(message.getLevel())
+                .platform(message.getPlatform())
+                .build();
+
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
         log.info("create message unread: {}", savedMessageUnread);
+
     }
 
     @Transactional
@@ -116,22 +132,38 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         try {
             messageUnreadRepository.deleteByUserUid(userUid);
         } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("Optimistic locking failure when deleting message unread for user: {}, retrying...", userUid);
             // 重试机制
             retryDelete(userUid);
+        } catch (Exception e) {
+            log.error("Error deleting message unread for user: {}", userUid, e);
+            // 对于删除失败，我们选择记录错误而不是抛出异常
+            // 因为未读消息的删除失败不会影响核心业务逻辑
         }
     }
 
     private void retryDelete(String userUid) {
-        messageUnreadRepository.deleteByUserUid(userUid);
+        try {
+            messageUnreadRepository.deleteByUserUid(userUid);
+        } catch (Exception e) {
+            log.error("Retry delete failed for user: {}", userUid, e);
+        }
     }
 
-    // @Cacheable(value = "message_unread_count", key = "#userUid", unless = "#result == null")
+    // @Cacheable(value = "message_unread_count", key = "#userUid", unless =
+    // "#result == null")
     public int getUnreadCount(String userUid) {
         return messageUnreadRepository.countByUserUid(userUid);
     }
 
     public void clearUnreadCount(String userUid) {
-        messageUnreadRepository.deleteByUserUid(userUid);
+        try {
+            messageUnreadRepository.deleteByUserUid(userUid);
+        } catch (Exception e) {
+            log.error("Error clearing unread count for user: {}", userUid, e);
+            // 对于清除未读消息失败，我们选择记录错误而不是抛出异常
+            // 因为未读消息的清除失败不会影响核心业务逻辑
+        }
     }
 
     @Override
@@ -144,21 +176,35 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
             MessageUnreadEntity entity) {
         try {
             log.warn("Optimistic locking failure for MessageUnreadEntity: {}, retrying...", entity.getUid());
-            
+
             // 检查是否已经存在相同的记录
             Optional<MessageUnreadEntity> existing = messageUnreadRepository.findByUid(entity.getUid());
             if (existing.isPresent()) {
-                log.info("MessageUnreadEntity already exists, skipping creation: {}", entity.getUid());
+                log.info("MessageUnreadEntity already exists, returning existing entity: {}", entity.getUid());
                 return existing.get();
             }
-            
-            // 如果不存在，重新尝试保存
+
+            // 如果不存在，重新尝试保存，但使用新的实体避免版本冲突
             log.info("Retrying to save MessageUnreadEntity: {}", entity.getUid());
-            return messageUnreadRepository.save(entity);
-            
+            MessageUnreadEntity newEntity = MessageUnreadEntity.builder()
+                    .uid(entity.getUid())
+                    .type(entity.getType())
+                    .status(entity.getStatus())
+                    .content(entity.getContent())
+                    .extra(entity.getExtra())
+                    .client(entity.getClient())
+                    .user(entity.getUser())
+                    .userUid(entity.getUserUid())
+                    .orgUid(entity.getOrgUid())
+                    .level(entity.getLevel())
+                    .platform(entity.getPlatform())
+                    .build();
+
+            return messageUnreadRepository.save(newEntity);
+
         } catch (Exception ex) {
-            log.error("Failed to handle optimistic locking exception for MessageUnreadEntity {}: {}", 
-                     entity.getUid(), ex.getMessage(), ex);
+            log.error("Failed to handle optimistic locking exception for MessageUnreadEntity {}: {}",
+                    entity.getUid(), ex.getMessage(), ex);
             // 对于未读消息，如果处理失败，我们选择忽略而不是抛出异常
             // 因为未读消息的丢失不会影响核心业务逻辑
             return null;
@@ -193,6 +239,5 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
 
         return messageResponse;
     }
-
 
 }

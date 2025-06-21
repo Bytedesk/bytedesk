@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 17:55:20
+ * @LastEditTime: 2025-06-21 21:14:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,7 @@ public class MessageUnreadEventListener {
             log.error("Error processing message create event for message {}: {}", 
                      event.getMessage() != null ? event.getMessage().getUid() : "unknown", e.getMessage(), e);
             // 不重新抛出异常，避免影响其他事件处理
+            // 对于未读消息处理失败，我们选择记录错误而不是中断消息流程
         }
     }
 
