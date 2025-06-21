@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 18:46:00
+ * @LastEditTime: 2025-06-21 14:52:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,6 +32,7 @@ import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
+import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -48,24 +49,24 @@ public class ServiceConvertUtils {
         return modelMapper.map(visitor, VisitorResponse.class);
     }
 
-    // public static UserProtobuf convertToUserProtobuf(VisitorEntity visitor) {
-    //     return modelMapper.map(visitor, UserProtobuf.class);
-    // }
+    public static VisitorProtobuf convertToVisitorProtobuf(VisitorEntity visitor) {
+        return modelMapper.map(visitor, VisitorProtobuf.class);
+    }
 
-    public static UserProtobuf convertToVisitorProtobuf(VisitorResponse visitor) {
-        UserProtobuf userProtobuf = modelMapper.map(visitor, UserProtobuf.class);
+    public static VisitorProtobuf convertToVisitorProtobuf(VisitorResponse visitor) {
+        VisitorProtobuf userProtobuf = modelMapper.map(visitor, VisitorProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
         return userProtobuf;
     }
 
-    public static UserProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
-        UserProtobuf userProtobuf = modelMapper.map(visitorRequest, UserProtobuf.class);
+    public static VisitorProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
+        VisitorProtobuf userProtobuf = modelMapper.map(visitorRequest, VisitorProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
         return userProtobuf;
     }
 
     public static String convertToVisitorProtobufJSONString(VisitorRequest visitorRequest) {
-        UserProtobuf userProtobuf = convertToVisitorProtobuf(visitorRequest);
+        VisitorProtobuf userProtobuf = convertToVisitorProtobuf(visitorRequest);
         return userProtobuf.toJson();
     }
 

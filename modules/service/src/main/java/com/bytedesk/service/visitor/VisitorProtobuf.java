@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 14:34:42
+ * @LastEditTime: 2025-06-21 14:53:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,13 +41,15 @@ public class VisitorProtobuf implements Serializable {
 
 	private String uid;
 
+    private String visitorUid;
+
     private String nickname;
 
     private String avatar;
 
     // ROBOT/AGENT/SYSTEM/USER/VISITOR/WORKGROUP
     @Builder.Default
-    private String type = UserTypeEnum.USER.name();
+    private String type = UserTypeEnum.VISITOR.name();
 
     private String extra;
 
@@ -57,24 +59,6 @@ public class VisitorProtobuf implements Serializable {
 
     public String toJson() {
         return JSON.toJSONString(this);
-    }
-
-    public static VisitorProtobuf getSystemUser() {
-        return VisitorProtobuf.builder()
-                .uid(BytedeskConsts.DEFAULT_SYSTEM_UID)
-                .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
-                .avatar(AvatarConsts.getDefaultSystemNotificationAvatarUrl())
-                .type(UserTypeEnum.SYSTEM.name())
-                .build();
-    }
-
-    public static VisitorProtobuf getFileAssistantUser() {
-        return VisitorProtobuf.builder()
-                .uid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID)
-                .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
-                .avatar(AvatarConsts.getDefaultFileAssistantAvatarUrl())
-                .type(UserTypeEnum.SYSTEM.name())
-                .build();
     }
 
 }
