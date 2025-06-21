@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 13:13:18
+ * @LastEditTime: 2025-06-21 14:32:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,10 +95,9 @@ public class VisitorRestControllerVisitor {
         }
         // 
         VisitorResponse visitor = visitorRestService.create(visitorRequest);
-        // 
-        UserProtobuf user = ServiceConvertUtils.convertToVisitorProtobuf(visitor);
+        // UserProtobuf user = ServiceConvertUtils.convertToVisitorProtobuf(visitor);
         //
-        return ResponseEntity.ok(JsonResult.success(user));
+        return ResponseEntity.ok(JsonResult.success(visitor));
     }
 
     // @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
