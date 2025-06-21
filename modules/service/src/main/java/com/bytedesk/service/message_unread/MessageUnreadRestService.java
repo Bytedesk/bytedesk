@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 21:18:26
+ * @LastEditTime: 2025-06-21 21:34:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,8 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageUnreadRestService
-        extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
+public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
 
     private final MessageUnreadRepository messageUnreadRepository;
 
@@ -123,14 +122,13 @@ public class MessageUnreadRestService
                 .build();
 
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
-        log.info("create message unread: {}", savedMessageUnread);
-
+        log.info("create message unread: {}", savedMessageUnread.getContent());
     }
 
     @Transactional
     public void delete(String userUid) {
         try {
-            messageUnreadRepository.deleteByUserUid(userUid);
+            // messageUnreadRepository.deleteByUserUid(userUid);
         } catch (ObjectOptimisticLockingFailureException e) {
             log.warn("Optimistic locking failure when deleting message unread for user: {}, retrying...", userUid);
             // 重试机制
@@ -144,21 +142,20 @@ public class MessageUnreadRestService
 
     private void retryDelete(String userUid) {
         try {
-            messageUnreadRepository.deleteByUserUid(userUid);
+            // messageUnreadRepository.deleteByUserUid(userUid);
         } catch (Exception e) {
             log.error("Retry delete failed for user: {}", userUid, e);
         }
     }
 
-    // @Cacheable(value = "message_unread_count", key = "#userUid", unless =
-    // "#result == null")
+    // @Cacheable(value = "message_unread_count", key = "#userUid", unless = "#result == null")
     public int getUnreadCount(String userUid) {
         return messageUnreadRepository.countByUserUid(userUid);
     }
 
     public void clearUnreadCount(String userUid) {
         try {
-            messageUnreadRepository.deleteByUserUid(userUid);
+            // messageUnreadRepository.deleteByUserUid(userUid);
         } catch (Exception e) {
             log.error("Error clearing unread count for user: {}", userUid, e);
             // 对于清除未读消息失败，我们选择记录错误而不是抛出异常
