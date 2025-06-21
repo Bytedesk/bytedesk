@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 11:41:24
+ * @LastEditTime: 2025-06-21 17:16:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,71 +57,71 @@ public class ThreadProtobuf implements Serializable {
     }
 
     public Boolean isMember() {
-    	return ThreadTypeEnum.MEMBER.equals(type);
+        return ThreadTypeEnum.MEMBER.equals(getType());
     }
 
     public Boolean isNew() {
-        return getStatus().equals(ThreadProcessStatusEnum.NEW);
+        return ThreadProcessStatusEnum.NEW.equals(getStatus());
     }
 
     // ROBOTING
     public Boolean isRoboting() {
-        return getStatus().equals(ThreadProcessStatusEnum.ROBOTING);
+        return ThreadProcessStatusEnum.ROBOTING.equals(getStatus());
     }
 
     // LLMING
     public Boolean isLlmIng() {
-        return getStatus().equals(ThreadProcessStatusEnum.LLMING);
+        return ThreadProcessStatusEnum.LLMING.equals(getStatus());
     }
 
     // queuing
     public Boolean isQueuing() {
-        return getStatus().equals(ThreadProcessStatusEnum.QUEUING);
+        return ThreadProcessStatusEnum.QUEUING.equals(getStatus());
     }
 
     // is offline
     public Boolean isOffline() {
-        return getStatus().equals(ThreadProcessStatusEnum.OFFLINE);
+        return ThreadProcessStatusEnum.OFFLINE.equals(getStatus());
     }
 
     public Boolean isChatting() {
-        return getStatus().equals(ThreadProcessStatusEnum.CHATTING);
+        return ThreadProcessStatusEnum.CHATTING.equals(getStatus());
     }
 
     //
     public Boolean isClosed() {
-        return getStatus().equals(ThreadProcessStatusEnum.CLOSED);
+        return ThreadProcessStatusEnum.CLOSED.equals(getStatus());
     }
     
     public Boolean isCustomerService() {
-        return getType().equals(ThreadTypeEnum.AGENT)
-                || getType().equals(ThreadTypeEnum.WORKGROUP)
-                || getType().equals(ThreadTypeEnum.ROBOT)
-                || getType().equals(ThreadTypeEnum.UNIFIED);
+        return ThreadTypeEnum.AGENT.equals(getType())
+                || ThreadTypeEnum.WORKGROUP.equals(getType())
+                || ThreadTypeEnum.ROBOT.equals(getType())
+                || ThreadTypeEnum.UNIFIED.equals(getType());
     }
 
     public Boolean isRobotType() {
-        return getType().equals(ThreadTypeEnum.ROBOT);
+        return ThreadTypeEnum.ROBOT.equals(getType());
     }
 
     public Boolean isWorkgroupType() {
-        return getType().equals(ThreadTypeEnum.WORKGROUP);
+        return ThreadTypeEnum.WORKGROUP.equals(getType());
     }
 
     public Boolean isAgentType() {
-        return getType().equals(ThreadTypeEnum.AGENT);
+        return ThreadTypeEnum.AGENT.equals(getType());
     }
 
     public Boolean isUnifiedType() {
-        return getType().equals(ThreadTypeEnum.UNIFIED);
+        return ThreadTypeEnum.UNIFIED.equals(getType());
     }
 
     public Boolean isWeChatMp() {
-        return getClient().equals(ClientEnum.WECHAT_MP);
+        return ClientEnum.WECHAT_MP.equals(getClient());
     }
 
     public Boolean isWeChatMini() {
-        return getClient().equals(ClientEnum.WECHAT_MINI);
+        return ClientEnum.WECHAT_MINI.equals(getClient());
     }
 
     // public static ThreadProtobuf fromEntity(ThreadEntity thread) {

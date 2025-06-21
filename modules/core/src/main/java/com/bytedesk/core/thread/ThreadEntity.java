@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-18 15:05:22
+ * @LastEditTime: 2025-06-21 17:18:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,72 +69,72 @@ public class ThreadEntity extends AbstractThreadEntity {
     private List<MessageEntity> messages = new ArrayList<>();
 
     public Boolean isNew() {
-        return getStatus().equals(ThreadProcessStatusEnum.NEW.name());
+        return ThreadProcessStatusEnum.NEW.name().equals(getStatus());
     }
 
     // ROBOTING
     public Boolean isRoboting() {
-        return getStatus().equals(ThreadProcessStatusEnum.ROBOTING.name());
+        return ThreadProcessStatusEnum.ROBOTING.name().equals(getStatus());
     }
 
     // LLMING
     public Boolean isLlmIng() {
-        return getStatus().equals(ThreadProcessStatusEnum.LLMING.name());
+        return ThreadProcessStatusEnum.LLMING.name().equals(getStatus());
     }
 
     // queuing
     public Boolean isQueuing() {
-        return getStatus().equals(ThreadProcessStatusEnum.QUEUING.name());
+        return ThreadProcessStatusEnum.QUEUING.name().equals(getStatus());
     }
 
     // is offline
     public Boolean isOffline() {
-        return getStatus().equals(ThreadProcessStatusEnum.OFFLINE.name());
+        return ThreadProcessStatusEnum.OFFLINE.name().equals(getStatus());
     }
 
     public Boolean isChatting() {
-        return getStatus().equals(ThreadProcessStatusEnum.CHATTING.name());
+        return ThreadProcessStatusEnum.CHATTING.name().equals(getStatus());
     }
 
     // TIMEOUT
     public Boolean isTimeout() {
-        return getStatus().equals(ThreadProcessStatusEnum.TIMEOUT.name());
+        return ThreadProcessStatusEnum.TIMEOUT.name().equals(getStatus());
     }
 
     //
     public Boolean isClosed() {
-        return getStatus().equals(ThreadProcessStatusEnum.CLOSED.name());
+        return ThreadProcessStatusEnum.CLOSED.name().equals(getStatus());
     }
     
     public Boolean isCustomerService() {
-        return getType().equals(ThreadTypeEnum.AGENT.name())
-                || getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                || getType().equals(ThreadTypeEnum.ROBOT.name())
-                || getType().equals(ThreadTypeEnum.UNIFIED.name());
+        return ThreadTypeEnum.AGENT.name().equals(getType())
+                || ThreadTypeEnum.WORKGROUP.name().equals(getType())
+                || ThreadTypeEnum.ROBOT.name().equals(getType())
+                || ThreadTypeEnum.UNIFIED.name().equals(getType());
     }
 
     public Boolean isRobotType() {
-        return getType().equals(ThreadTypeEnum.ROBOT.name());
+        return ThreadTypeEnum.ROBOT.name().equals(getType());
     }
 
     public Boolean isWorkgroupType() {
-        return getType().equals(ThreadTypeEnum.WORKGROUP.name());
+        return ThreadTypeEnum.WORKGROUP.name().equals(getType());
     }
 
     public Boolean isAgentType() {
-        return getType().equals(ThreadTypeEnum.AGENT.name());
+        return ThreadTypeEnum.AGENT.name().equals(getType());
     }
 
     public Boolean isUnifiedType() {
-        return getType().equals(ThreadTypeEnum.UNIFIED.name());
+        return ThreadTypeEnum.UNIFIED.name().equals(getType());
     }
 
     public Boolean isWeChatMp() {
-        return getClient().equals(ClientEnum.WECHAT_MP.name());
+        return ClientEnum.WECHAT_MP.name().equals(getClient());
     }
 
     public Boolean isWeChatMini() {
-        return getClient().equals(ClientEnum.WECHAT_MINI.name());
+        return ClientEnum.WECHAT_MINI.name().equals(getClient());
     }
 
     // ---------------------------
@@ -204,8 +204,8 @@ public class ThreadEntity extends AbstractThreadEntity {
     // 如果robot.type == UserTypeEnum.ROBOT.name() && agent.type == UserTypeEnum.AGENT.name()
     public Boolean isRobotToAgent() {
         return getRobotProtobuf() != null && getAgentProtobuf() != null
-                && getRobotProtobuf().getType().equals(UserTypeEnum.ROBOT.name())
-                && getAgentProtobuf().getType().equals(UserTypeEnum.AGENT.name());
+                && UserTypeEnum.ROBOT.name().equals(getRobotProtobuf().getType())
+                && UserTypeEnum.AGENT.name().equals(getAgentProtobuf().getType());
     }
 
     // 获取全部消息数量

@@ -82,30 +82,30 @@ public class UserProtobuf implements Serializable {
 
     // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
     public Boolean isRobot() {
-        return getType().equalsIgnoreCase(UserTypeEnum.ROBOT.name());
+        return UserTypeEnum.ROBOT.name().equalsIgnoreCase(getType());
     }
 
     // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
     public Boolean isVisitor() {
-        return getType().equalsIgnoreCase(UserTypeEnum.VISITOR.name());
+        return UserTypeEnum.VISITOR.name().equalsIgnoreCase(getType());
     }
 
     public Boolean isUser() {
-        return getType().equalsIgnoreCase(UserTypeEnum.USER.name());
+        return UserTypeEnum.USER.name().equalsIgnoreCase(getType());
     }
 
     public Boolean isMember() {
-        return getType().equalsIgnoreCase(UserTypeEnum.MEMBER.name());
+        return UserTypeEnum.MEMBER.name().equalsIgnoreCase(getType());
     }
 
     // 是否系统消息
     public Boolean isSystem() {
-        return getType().equalsIgnoreCase(UserTypeEnum.SYSTEM.name());
+        return UserTypeEnum.SYSTEM.name().equalsIgnoreCase(getType());
     }
 
     // 是否客服消息
     public Boolean isAgent() {
-        return getType().equalsIgnoreCase(UserTypeEnum.AGENT.name());
+        return UserTypeEnum.AGENT.name().equalsIgnoreCase(getType());
     }
 
 }
