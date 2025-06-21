@@ -241,8 +241,10 @@ BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OlBMQVRGT1JNOjo=
 
 <!-- - [Email](mailto:270580156@qq.com) -->
 <!-- - [微信](./images/wechat.png) -->
-- 微语技术支持群：
-- <img src="./images/wechat_group.jpg" width="200">
+- 微信，扫码加好友拉群，备注：微语
+- <img src="./images/wechat.png" width="100">
+<!-- - 微语技术支持群：
+- <img src="./images/wechat_group.jpg" width="100"> -->
 - 服务号
 - <img src="./images/wechat_mp.jpg" width="100">
 - 订阅号
