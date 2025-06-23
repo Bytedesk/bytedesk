@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:39:58
+ * @LastEditTime: 2025-06-23 10:51:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,15 +85,6 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         return convertToResponse(savedMessageUnread);
     }
 
-    // 拉取的同时从数据库中删除，所以不需要缓存
-    @Transactional
-    public List<MessageResponse> getMessages(VisitorRequest request) {
-        // List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
-        // delete(userUid);
-        // return messageUnreadList.stream().map(ServiceConvertUtils::convertToMessageResponse).toList();
-        return null;
-    }
-
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void create(MessageEntity message) {
@@ -124,34 +115,10 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         log.info("create message unread: {}", savedMessageUnread.getContent());
     }
 
-    // @Transactional
-    // public void delete(String userUid) {
-    //     try {
-    //         // messageUnreadRepository.deleteByUserUid(userUid);
-    //     } catch (ObjectOptimisticLockingFailureException e) {
-    //         log.warn("Optimistic locking failure when deleting message unread for user: {}, retrying...", userUid);
-    //         // 重试机制
-    //         retryDelete(userUid);
-    //     } catch (Exception e) {
-    //         log.error("Error deleting message unread for user: {}", userUid, e);
-    //         // 对于删除失败，我们选择记录错误而不是抛出异常
-    //         // 因为未读消息的删除失败不会影响核心业务逻辑
-    //     }
-    // }
-
-    // private void retryDelete(String userUid) {
-    //     try {
-    //         // messageUnreadRepository.deleteByUserUid(userUid);
-    //     } catch (Exception e) {
-    //         log.error("Retry delete failed for user: {}", userUid, e);
-    //     }
-    // }
-
-    // @Cacheable(value = "message_unread_count", key = "#userUid", unless = "#result == null")
-    public int getUnreadCount(VisitorRequest request) {
+    public int getUnreadCount(MessageUnreadRequest request) {
         // return messageUnreadRepository.countByUserUid(userUid);
 
-        return 0;
+        return 0;   
     }
 
     public void clearUnreadCount(String userUid) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:40:17
+ * @LastEditTime: 2025-06-23 10:50:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,6 +44,9 @@ import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.message_unanswered.MessageUnansweredResponse;
+import com.bytedesk.service.message_unread.MessageUnreadRequest;
+import com.bytedesk.service.message_unread.MessageUnreadResponse;
 import com.bytedesk.service.message_unread.MessageUnreadRestService;
 import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
@@ -128,7 +131,7 @@ public class VisitorRestControllerVisitor {
     }
 
     @GetMapping("/ping")
-    public ResponseEntity<?> ping(VisitorRequest request) {
+    public ResponseEntity<?> ping(MessageUnreadRequest request) {
 
         visitorRestService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
 
@@ -170,9 +173,9 @@ public class VisitorRestControllerVisitor {
     // 访客拉取未读消息
     // @VisitorAnnotation(title = "visitor", action = "getMessageUnread", description = "get unread messages")
     @GetMapping("/message/unread")
-    public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
+    public ResponseEntity<?> getMessageUnread(MessageUnreadRequest request) {
         
-        List<MessageResponse> messages = messageUnreadService.getMessages(request);
+        Page<MessageUnreadResponse> messages = messageUnreadService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
     }
@@ -180,7 +183,7 @@ public class VisitorRestControllerVisitor {
     // message/unread/count
     // @VisitorAnnotation(title = "visitor", action = "getMessageUnreadCount", description = "get unread messages count")
     @GetMapping("/message/unread/count")
-    public ResponseEntity<?> getMessageUnreadCount(VisitorRequest request) {
+    public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
 
         int count = messageUnreadService.getUnreadCount(request);
 
@@ -189,7 +192,7 @@ public class VisitorRestControllerVisitor {
 
     // post /message/unread/count/clear
     @PostMapping("/message/unread/count/clear")
-    public ResponseEntity<?> clearMessageUnreadCount(VisitorRequest request) {
+    public ResponseEntity<?> clearMessageUnreadCount(MessageUnreadRequest request) {
 
         messageUnreadService.clearUnreadCount(request.getUid());
 

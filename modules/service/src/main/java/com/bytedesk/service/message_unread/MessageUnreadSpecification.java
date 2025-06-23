@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-21 12:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:24:13
+ * @LastEditTime: 2025-06-23 11:00:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,9 +30,13 @@ public class MessageUnreadSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
 
-            // userUid
-            if (StringUtils.hasText(request.getUserUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+            // 拉取访客未读消息，使用系统自动生成uid
+            // uid 是系统自动生成访客uid
+            if (StringUtils.hasText(request.getUid())) {
+                // threadTopic contains uid
+                predicates.add(criteriaBuilder.like(root.get("threadTopic"), "%" + request.getUid() + "%"));
+                // 而且 user not contains uid
+                predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + request.getUid() + "%")));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

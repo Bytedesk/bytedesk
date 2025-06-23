@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 21:31:12
+ * @LastEditTime: 2025-06-23 10:53:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,4 +32,5 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
     void deleteByUserUid(String userUid);
 
     int countByUserUid(String userUid);
+
 }

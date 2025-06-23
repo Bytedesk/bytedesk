@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:15:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 17:54:42
+ * @LastEditTime: 2025-06-23 10:53:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,4 +38,8 @@ import lombok.experimental.SuperBuilder;
 public class MessageUnreadEntity extends AbstractMessageEntity  {
 
     private static final long serialVersionUID = 1L;
+
+    private String threadUid;
+
+    private String threadTopic;
 }
