@@ -135,24 +135,6 @@ public class MessageUnreadRestService
             String orgUid = extraObject.getOrgUid();
             messageUnread.setOrgUid(orgUid);
         }
-
-        // 创建新的 MessageUnreadEntity，避免复制 version 字段
-        // MessageUnreadEntity messageUnread = MessageUnreadEntity.builder()
-        //         .uid(message.getUid())
-        //         .type(message.getType().name())
-        //         .status(message.getStatus())
-        //         .content(message.getContent())
-        //         .extra(message.getExtra())
-        //         .client(message.getClient())
-        //         .user(message.getUser())
-        //         .threadUid(message.getThread().getUid())
-        //         .threadTopic(message.getThread().getTopic())
-        //         .userUid(message.getUserUid())
-        //         .orgUid(message.getOrgUid())
-        //         .level(message.getLevel())
-        //         .platform(message.getPlatform())
-        //         .build();
-
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
         log.info("create message unread: uid {}, content {}", savedMessageUnread.getContent());
     }
