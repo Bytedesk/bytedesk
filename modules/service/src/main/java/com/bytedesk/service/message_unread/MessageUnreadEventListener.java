@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 21:14:38
+ * @LastEditTime: 2025-06-23 10:25:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,22 +78,13 @@ public class MessageUnreadEventListener {
     public void onMessageUpdateEvent(MessageUpdateEvent event) {
         try {
             MessageEntity message = event.getMessage();
-            if (MessageTypeEnum.STREAM.name().equalsIgnoreCase(message.getType()) || 
-                MessageTypeEnum.NOTICE.name().equalsIgnoreCase(message.getType()) || 
-                MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
-                return;
-            }
-            if (ClientEnum.SYSTEM.name().equalsIgnoreCase(message.getClient())) {
-                return;
-            }
             log.info("message unread update event: {} {} {}", message.getUid(), message.getType(), message.getContent());
             //
-            // String threadTopic = message.getThread().getTopic();
-            MessageStatusEnum messageState = MessageStatusEnum.fromValue(message.getStatus());
-            if (messageState.ordinal() < MessageStatusEnum.DELIVERED.ordinal()) {
-                return;
-            }
             // 删除已读消息
+            if (MessageTypeEnum.READ.name().equalsIgnoreCase(message.getType())) {
+                // message.getContent() 代表 已读消息的uid
+                messageUnreadService.deleteByUid(message.getContent());
+            }
             
         } catch (Exception e) {
             log.error("Error processing message update event for message {}: {}", 

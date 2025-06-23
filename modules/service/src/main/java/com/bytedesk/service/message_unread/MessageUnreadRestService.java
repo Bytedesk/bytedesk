@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 21:34:17
+ * @LastEditTime: 2025-06-23 10:39:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,14 +25,13 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.service.utils.ServiceConvertUtils;
+import com.bytedesk.service.visitor.VisitorRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,11 +87,10 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
 
     // 拉取的同时从数据库中删除，所以不需要缓存
     @Transactional
-    @Cacheable(value = "message_unread", key = "#userUid", unless = "#result == null")
-    public List<MessageResponse> getMessages(String userUid) {
-        List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
-        delete(userUid);
-        return messageUnreadList.stream().map(this::convertToMessageResponse).toList();
+    public List<MessageResponse> getMessages(VisitorRequest request) {
+        // List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
+        // delete(userUid);
+        // return messageUnreadList.stream().map(ServiceConvertUtils::convertToMessageResponse).toList();
     }
 
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
@@ -125,32 +123,34 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         log.info("create message unread: {}", savedMessageUnread.getContent());
     }
 
-    @Transactional
-    public void delete(String userUid) {
-        try {
-            // messageUnreadRepository.deleteByUserUid(userUid);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            log.warn("Optimistic locking failure when deleting message unread for user: {}, retrying...", userUid);
-            // 重试机制
-            retryDelete(userUid);
-        } catch (Exception e) {
-            log.error("Error deleting message unread for user: {}", userUid, e);
-            // 对于删除失败，我们选择记录错误而不是抛出异常
-            // 因为未读消息的删除失败不会影响核心业务逻辑
-        }
-    }
+    // @Transactional
+    // public void delete(String userUid) {
+    //     try {
+    //         // messageUnreadRepository.deleteByUserUid(userUid);
+    //     } catch (ObjectOptimisticLockingFailureException e) {
+    //         log.warn("Optimistic locking failure when deleting message unread for user: {}, retrying...", userUid);
+    //         // 重试机制
+    //         retryDelete(userUid);
+    //     } catch (Exception e) {
+    //         log.error("Error deleting message unread for user: {}", userUid, e);
+    //         // 对于删除失败，我们选择记录错误而不是抛出异常
+    //         // 因为未读消息的删除失败不会影响核心业务逻辑
+    //     }
+    // }
 
-    private void retryDelete(String userUid) {
-        try {
-            // messageUnreadRepository.deleteByUserUid(userUid);
-        } catch (Exception e) {
-            log.error("Retry delete failed for user: {}", userUid, e);
-        }
-    }
+    // private void retryDelete(String userUid) {
+    //     try {
+    //         // messageUnreadRepository.deleteByUserUid(userUid);
+    //     } catch (Exception e) {
+    //         log.error("Retry delete failed for user: {}", userUid, e);
+    //     }
+    // }
 
     // @Cacheable(value = "message_unread_count", key = "#userUid", unless = "#result == null")
-    public int getUnreadCount(String userUid) {
-        return messageUnreadRepository.countByUserUid(userUid);
+    public int getUnreadCount(VisitorRequest request) {
+        // return messageUnreadRepository.countByUserUid(userUid);
+
+        return 0;
     }
 
     public void clearUnreadCount(String userUid) {
@@ -210,14 +210,15 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
 
     @Override
     public void deleteByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Optional<MessageUnreadEntity> messageUnreadEntityOptional = findByUid(uid);
+        if (messageUnreadEntityOptional.isPresent()) {
+            messageUnreadRepository.delete(messageUnreadEntityOptional.get());
+        }
     }
 
     @Override
     public void delete(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        deleteByUid(request.getUid());
     }
 
     @Override
@@ -225,16 +226,6 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         return modelMapper.map(entity, MessageUnreadResponse.class);
     }
 
-    public MessageResponse convertToMessageResponse(MessageUnreadEntity message) {
-        MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
-
-        UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
-        if (user.getExtra() == null) {
-            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
-        }
-        messageResponse.setUser(user);
-
-        return messageResponse;
-    }
+    
 
 }

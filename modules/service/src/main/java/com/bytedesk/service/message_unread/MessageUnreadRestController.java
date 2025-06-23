@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:38:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 12:54:18
+ * @LastEditTime: 2025-06-23 10:27:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.service.message_unread;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -52,32 +53,42 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
 
     @Override
     public ResponseEntity<?> queryByUid(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        Optional<MessageUnreadEntity> messageUnread = messageUnreadService.findByUid(request.getUid());
+
+        return ResponseEntity.ok(JsonResult.success("get unread message success", messageUnread));
     }
 
     @Override
     public ResponseEntity<?> create(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        
+        MessageUnreadResponse messageUnread = messageUnreadService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success("create unread message success", messageUnread));
     }
 
     @Override
     public ResponseEntity<?> update(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
+        MessageUnreadResponse messageUnread = messageUnreadService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success("update unread message success", messageUnread));
     }
 
     @Override
     public ResponseEntity<?> delete(MessageUnreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        
+        messageUnreadService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success("delete unread message success"));
     }
 
     @Override
     public Object export(MessageUnreadRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        //
+        // messageUnreadService.export(request, response);
+
+        return JsonResult.success("export unread messages success");
     }
     
 

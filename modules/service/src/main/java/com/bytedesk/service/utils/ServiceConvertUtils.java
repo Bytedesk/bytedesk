@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 14:52:45
+ * @LastEditTime: 2025-06-23 10:21:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,7 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
+import com.bytedesk.service.message_unread.MessageUnreadEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
@@ -84,7 +85,7 @@ public class ServiceConvertUtils {
         return messageProtobuf;
     }
 
-    public static MessageResponse convertToMessageResponse(MessageEntity lastMessage, ThreadEntity thread) {
+    public static MessageResponse convertToMessageResponse(MessageEntity lastMessage) {
         //
         MessageResponse messageResponse = modelMapper.map(lastMessage, MessageResponse.class);
         //
@@ -97,6 +98,18 @@ public class ServiceConvertUtils {
         return messageResponse;
     }
 
+    public static MessageResponse convertToMessageResponse(MessageUnreadEntity message) {
+        MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
+
+        UserProtobuf user = JSON.parseObject(message.getUser(), UserProtobuf.class);
+        if (user.getExtra() == null) {
+            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+        }
+        messageResponse.setUser(user);
+
+        return messageResponse;
+    }
+    
     //
     public static AgentResponse convertToAgentResponse(AgentEntity agent) {
         return modelMapper.map(agent, AgentResponse.class);
