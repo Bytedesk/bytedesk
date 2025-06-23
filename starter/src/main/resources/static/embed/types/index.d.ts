@@ -32,6 +32,7 @@ export declare interface BytedeskConfig {
     isPreload?: boolean;
     forceRefresh?: boolean;
     baseUrl?: string;
+    apiUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -54,6 +55,7 @@ export declare interface BytedeskConfig {
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
+    onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
 
 declare class BytedeskWeb {
@@ -69,13 +71,21 @@ declare class BytedeskWeb {
     private loopCount;
     private loopTimer;
     constructor(config: BytedeskConfig);
+    private setupApiUrl;
     private getDefaultConfig;
     init(): void;
+    _getUnreadMessageCount(): Promise<number>;
+    getUnreadMessageCount(): Promise<number>;
+    private showUnreadBadge;
+    private clearUnreadBadge;
+    clearMessageUnread(): Promise<number>;
     private createBubble;
     private getSupportText;
     private createChatWindow;
     private generateChatUrl;
     private setupMessageListener;
+    private handleLocalStorageData;
+    sendMessageToIframe(message: any): void;
     preload(): void;
     showChat(config?: Partial<BytedeskConfig>): void;
     hideChat(): void;

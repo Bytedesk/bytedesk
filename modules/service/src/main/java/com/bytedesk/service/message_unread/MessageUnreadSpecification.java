@@ -22,7 +22,9 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 
 import jakarta.persistence.criteria.Predicate;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MessageUnreadSpecification extends BaseSpecification {
 
     public static Specification<MessageUnreadEntity> search(MessageUnreadRequest request) {
@@ -33,6 +35,7 @@ public class MessageUnreadSpecification extends BaseSpecification {
             // 拉取访客未读消息，使用系统自动生成uid
             // uid 是系统自动生成访客uid
             if (StringUtils.hasText(request.getUid())) {
+                log.info("search message unread by uid: {}", request.getUid());
                 // threadTopic contains uid
                 predicates.add(criteriaBuilder.like(root.get("threadTopic"), "%" + request.getUid() + "%"));
                 // 而且 user not contains uid

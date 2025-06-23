@@ -32,6 +32,7 @@ declare interface BytedeskConfig {
     isPreload?: boolean;
     forceRefresh?: boolean;
     baseUrl?: string;
+    apiUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -54,6 +55,7 @@ declare interface BytedeskConfig {
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
+    onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
 
 export declare const BytedeskSvelte: (node: HTMLElement, config: BytedeskConfig & {

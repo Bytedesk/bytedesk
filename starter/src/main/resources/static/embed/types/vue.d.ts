@@ -14,12 +14,14 @@ default: string;
 };
 }>, () => VNode<RendererNode, RendererElement, {
 [key: string]: any;
-}>, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<ExtractPropTypes<    {
+}>, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, "init"[], "init", PublicProps, Readonly<ExtractPropTypes<    {
 locale: {
 type: StringConstructor;
 default: string;
 };
-}>> & Readonly<{}>, {
+}>> & Readonly<{
+onInit?: ((...args: any[]) => any) | undefined;
+}>, {
 locale: string;
 }, {}, {}, {}, string, ComponentProvideOptions, true, {}, any>;
 

@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.visitor;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,7 +43,6 @@ import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.service.message_unanswered.MessageUnansweredResponse;
 import com.bytedesk.service.message_unread.MessageUnreadRequest;
 import com.bytedesk.service.message_unread.MessageUnreadResponse;
 import com.bytedesk.service.message_unread.MessageUnreadRestService;
@@ -188,10 +186,9 @@ public class VisitorRestControllerVisitor {
 
     // 清空当前用户所有未读消息
     @PostMapping("/message/unread/clear")
-    public ResponseEntity<?> clearMessageUnread(MessageUnreadRequest request) {
-
+    public ResponseEntity<?> clearMessageUnread(@RequestBody MessageUnreadRequest request) {
+        // 
         messageUnreadService.clearUnreadMessages(request);
-
         // 看下是否清空了
         long count = messageUnreadService.getUnreadCount(request);
 

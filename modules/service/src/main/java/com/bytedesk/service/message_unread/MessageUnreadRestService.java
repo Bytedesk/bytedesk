@@ -137,8 +137,20 @@ public class MessageUnreadRestService
     }
 
     // 这里的uid是：系统自动生成访客uid
+    @Transactional
     public void clearUnreadMessages(MessageUnreadRequest request) {
-        messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(request.getUid(), request.getUid());
+        try {
+            String uid = request.getUid();
+            log.info("Clearing unread messages for uid: {}", uid);
+            
+            // 删除符合条件的未读消息
+            messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
+            
+            log.info("Successfully cleared unread messages for uid: {}", uid);
+        } catch (Exception e) {
+            log.error("Failed to clear unread messages for uid {}: {}", request.getUid(), e.getMessage(), e);
+            throw new RuntimeException("Failed to clear unread messages", e);
+        }
     }
 
     @Override

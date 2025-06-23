@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:14:03
+ * @LastEditTime: 2025-06-23 12:23:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEntity, Long>, JpaSpecificationExecutor<MessageUnreadEntity> {
@@ -26,6 +28,7 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
 
     boolean existsByUid(String uid);
 
-    // 根据主题和用户UID删除未读消息
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteByThreadTopicContainsAndUserNotContains(String uid1, String uid2);
 }
