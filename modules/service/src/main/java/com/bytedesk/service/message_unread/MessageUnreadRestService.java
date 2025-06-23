@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:07:36
+ * @LastEditTime: 2025-06-23 12:15:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,7 +138,7 @@ public class MessageUnreadRestService
 
     // 这里的uid是：系统自动生成访客uid
     public void clearUnreadMessages(MessageUnreadRequest request) {
-        messageUnreadRepository.deleteByThreadTopicContains(request.getUid());
+        messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(request.getUid(), request.getUid());
     }
 
     @Override

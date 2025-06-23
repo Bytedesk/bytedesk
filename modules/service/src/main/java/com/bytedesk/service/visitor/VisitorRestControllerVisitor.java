@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:07:11
+ * @LastEditTime: 2025-06-23 12:16:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,7 +79,6 @@ public class VisitorRestControllerVisitor {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    // @VisitorAnnotation(title = "visitor", action = "init", description = "init visitor")
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @PostMapping("/init")
     public ResponseEntity<?> init(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
@@ -100,7 +99,6 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(visitor));
     }
 
-    // @VisitorAnnotation(title = "visitor", action = "requestThread", description = "request thread")
     @PostMapping("/thread")
     public ResponseEntity<?> requestThread(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
@@ -115,7 +113,6 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
 
-    // @VisitorAnnotation(title = "visitor", action = "browse", description = "visitor browse")
     @PostMapping("/browse")
     public ResponseEntity<?> browse(VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
         //
@@ -180,7 +177,7 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
     }
 
-    // @VisitorAnnotation(title = "visitor", action = "getMessageUnreadCount", description = "get unread messages count")
+    // 获取未读消息数
     @GetMapping("/message/unread/count")
     public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
 
@@ -189,8 +186,9 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success("get unread messages count success", count));
     }
 
-    @PostMapping("/message/unread/count/clear")
-    public ResponseEntity<?> clearMessageUnreadCount(MessageUnreadRequest request) {
+    // 清空当前用户所有未读消息
+    @PostMapping("/message/unread/clear")
+    public ResponseEntity<?> clearMessageUnread(MessageUnreadRequest request) {
 
         messageUnreadService.clearUnreadMessages(request);
 
