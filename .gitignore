@@ -50,6 +50,7 @@ application-dev-pg-private.properties
 application-dev-oracle.properties
 application-local.properties
 application-docker.properties
+application-byte.properties
 projects/*
 liangshibao/*
 tiku/*
