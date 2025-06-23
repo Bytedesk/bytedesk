@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:02:21
+ * @LastEditTime: 2025-06-23 12:07:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,9 @@
  */
 package com.bytedesk.service.message_unread;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,18 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessagePersistService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.service.utils.ServiceConvertUtils;
-import com.bytedesk.service.visitor.VisitorRequest;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,7 +90,6 @@ public class MessageUnreadRestService
         return convertToResponse(savedMessageUnread);
     }
 
-    // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
     @Transactional
     public void create(MessageProtobuf messageProtobuf) {
         //
@@ -144,14 +136,9 @@ public class MessageUnreadRestService
         return page.getTotalElements();
     }
 
-    public void clearUnreadCount(String userUid) {
-        try {
-            // messageUnreadRepository.deleteByUserUid(userUid);
-        } catch (Exception e) {
-            log.error("Error clearing unread count for user: {}", userUid, e);
-            // 对于清除未读消息失败，我们选择记录错误而不是抛出异常
-            // 因为未读消息的清除失败不会影响核心业务逻辑
-        }
+    // 这里的uid是：系统自动生成访客uid
+    public void clearUnreadMessages(MessageUnreadRequest request) {
+        messageUnreadRepository.deleteByThreadTopicContains(request.getUid());
     }
 
     @Override

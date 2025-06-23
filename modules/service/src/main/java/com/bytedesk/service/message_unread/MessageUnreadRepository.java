@@ -25,4 +25,6 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
     Optional<MessageUnreadEntity> findByUid(String uid);
 
     boolean existsByUid(String uid);
+
+    void deleteByThreadTopicContains(String uid);
 }
