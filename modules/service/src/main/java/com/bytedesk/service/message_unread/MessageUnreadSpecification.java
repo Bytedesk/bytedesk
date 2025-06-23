@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-21 12:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 15:07:01
+ * @LastEditTime: 2025-06-23 15:08:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ public class MessageUnreadSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + request.getUid() + "%")));
             }
 
-            // userUid
+            // 客服端加载未读，根据用户订阅的threadTopic加载
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

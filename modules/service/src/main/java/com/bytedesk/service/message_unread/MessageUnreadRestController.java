@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:38:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 13:38:13
+ * @LastEditTime: 2025-06-23 15:10:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,17 +39,17 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Override
     public ResponseEntity<?> queryByOrg(MessageUnreadRequest request) {
         
-        Page<MessageUnreadResponse> page = messageUnreadService.queryByOrg(request);
+        Page<MessageUnreadResponse> messagePage = messageUnreadService.queryByOrg(request);
 
-        return ResponseEntity.ok(JsonResult.success("get unread messages success", page));
+        return ResponseEntity.ok(JsonResult.success("get unread messages success", messagePage));
     }
 
     @Override
     public ResponseEntity<?> queryByUser(MessageUnreadRequest request) {
 
-        Page<MessageUnreadResponse> messageList = messageUnreadService.queryByUser(request);
+        Page<MessageUnreadResponse> messagePage = messageUnreadService.queryByUser(request);
 
-        return ResponseEntity.ok(JsonResult.success("get unread messages success", messageList));
+        return ResponseEntity.ok(JsonResult.success("get unread messages success", messagePage));
     }
 
     @Override
