@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:51:32
+ * @LastEditTime: 2025-06-23 11:03:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -96,6 +96,11 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
             return;
         }
 
+        if (message.getThread() == null) {
+            log.warn("Message thread is null for message: {}", message.getUid());
+            return;
+        }
+
         // 创建新的 MessageUnreadEntity，避免复制 version 字段
         MessageUnreadEntity messageUnread = MessageUnreadEntity.builder()
                 .uid(message.getUid())
@@ -105,6 +110,8 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
                 .extra(message.getExtra())
                 .client(message.getClient())
                 .user(message.getUser())
+                .threadUid(message.getThread().getUid())
+                .threadTopic(message.getThread().getTopic())
                 .userUid(message.getUserUid())
                 .orgUid(message.getOrgUid())
                 .level(message.getLevel())
@@ -112,7 +119,7 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
                 .build();
 
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
-        log.info("create message unread: {}", savedMessageUnread.getContent());
+        log.info("create message unread: uid {}, content {}", savedMessageUnread.getContent());
     }
 
     public int getUnreadCount(MessageUnreadRequest request) {
