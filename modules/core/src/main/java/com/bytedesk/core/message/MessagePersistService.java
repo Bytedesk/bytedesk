@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 11:38:24
+ * @LastEditTime: 2025-06-23 13:14:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -131,53 +131,6 @@ public class MessagePersistService {
             dealWithMessageReceipt(type, messageProtobuf);
             return true;
         }
-
-        //
-        // if (MessageTypeEnum.RATE_SUBMIT.equals(type)
-        //         || MessageTypeEnum.RATE_CANCEL.equals(type)) {
-        //     // 如果是客服邀请评价/主动评价，则content为邀请/主动评价消息的uid
-        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
-        //         dealWithRateMessage(type, messageProtobuf);
-        //         return true;
-        //     }
-        // }
-
-        //
-        // if (MessageTypeEnum.LEAVE_MSG_SUBMIT.equals(type)) {
-        //     // content为留言提示消息的uid
-        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
-        //         dealWithMessageLeave(type, messageProtobuf);
-        //         return true;
-        //     }
-        // }
-
-        // FAQ
-
-        //
-        // if (MessageTypeEnum.FAQ_UP.equals(type)
-        //         || MessageTypeEnum.FAQ_DOWN.equals(type)) {
-        //     // content为被评价的faq消息的uid
-        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
-        //         dealWithFaqRateMessage(type, messageProtobuf);
-        //         return true;
-        //     }
-        // }
-
-        // QA
-        // if (MessageTypeEnum.QA.equals(type)) {
-        //     dealWithQaMessage(messageProtobuf);
-        //     return true;
-        // }
-
-        //
-        // if (MessageTypeEnum.ROBOT_UP.equals(type)
-        //         || MessageTypeEnum.ROBOT_DOWN.equals(type)) {
-        //     // content为邀请评价消息的uid
-        //     if (StringUtils.hasText(messageProtobuf.getContent())) {
-        //         dealWithRobotRateMessage(type, messageProtobuf);
-        //         return true;
-        //     }
-        // }
 
         //
         if (MessageTypeEnum.TRANSFER_ACCEPT.equals(type)
