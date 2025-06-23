@@ -91,6 +91,7 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         // List<MessageUnreadEntity> messageUnreadList = messageUnreadRepository.findByUserUid(userUid);
         // delete(userUid);
         // return messageUnreadList.stream().map(ServiceConvertUtils::convertToMessageResponse).toList();
+        return null;
     }
 
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})

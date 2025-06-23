@@ -132,7 +132,7 @@ public class VisitorRestControllerVisitor {
 
         visitorRestService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
 
-        int count = messageUnreadService.getUnreadCount(request.getUid());
+        int count = messageUnreadService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("pong", count));
     }
@@ -172,7 +172,7 @@ public class VisitorRestControllerVisitor {
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(VisitorRequest request) {
         
-        List<MessageResponse> messages = messageUnreadService.getMessages(request.getUid());
+        List<MessageResponse> messages = messageUnreadService.getMessages(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
     }
@@ -194,7 +194,7 @@ public class VisitorRestControllerVisitor {
         messageUnreadService.clearUnreadCount(request.getUid());
 
         // 看下是否清空了
-        int count = messageUnreadService.getUnreadCount(request.getUid());
+        int count = messageUnreadService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
     }
