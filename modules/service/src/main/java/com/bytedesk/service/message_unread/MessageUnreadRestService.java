@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 11:03:58
+ * @LastEditTime: 2025-06-23 11:43:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageExtra;
+import com.bytedesk.core.message.MessagePersistService;
+import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -39,9 +44,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
+public class MessageUnreadRestService
+        extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
 
     private final MessageUnreadRepository messageUnreadRepository;
+
+    private final MessagePersistService messagePersistService;
 
     private final ModelMapper modelMapper;
 
@@ -71,6 +79,10 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
         return messageUnreadRepository.findByUid(uid);
     }
 
+    public Boolean existsByUid(String uid) {
+        return messageUnreadRepository.existsByUid(uid);
+    }
+
     @Override
     public MessageUnreadResponse create(MessageUnreadRequest request) {
         MessageUnreadEntity messageUnread = modelMapper.map(request, MessageUnreadEntity.class);
@@ -87,36 +99,59 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
 
     // @Caching(put = {@CachePut(value = "message_unread", key = "#userUid"),})
     @Transactional
-    public void create(MessageEntity message) {
+    public void create(MessageProtobuf messageProtobuf) {
+        //
+        MessageTypeEnum type = messageProtobuf.getType();
+        String threadUid = messageProtobuf.getThread().getUid();
+        String threadTopic = messageProtobuf.getThread().getTopic();
 
-        // 检查是否已经存在相同的未读消息记录
-        Optional<MessageUnreadEntity> existing = messageUnreadRepository.findByUid(message.getUid());
-        if (existing.isPresent()) {
-            log.debug("Message unread already exists for message: {}", message.getUid());
+        // 返回true表示该消息是系统通知，不应该保存到数据库
+        if (messagePersistService.dealWithMessageNotification(type, messageProtobuf)) {
             return;
         }
-
-        if (message.getThread() == null) {
-            log.warn("Message thread is null for message: {}", message.getUid());
+        //
+        String uid = messageProtobuf.getUid();
+        if (existsByUid(uid)) {
+            // 流式消息单独处理下
+            if (MessageTypeEnum.STREAM.equals(type)) {
+                return;
+            }
+            log.info("message already exists, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
+            //
             return;
+        }
+        //
+        MessageUnreadEntity messageUnread = modelMapper.map(messageProtobuf, MessageUnreadEntity.class);
+        if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
+            messageUnread.setStatus(MessageStatusEnum.SUCCESS.name());
+        }
+        messageUnread.setThreadUid(threadUid);
+        messageUnread.setThreadTopic(threadTopic);
+        messageUnread.setUser(messageProtobuf.getUser().toJson());
+        messageUnread.setUserUid(messageProtobuf.getUser().getUid());
+        //
+        MessageExtra extraObject = MessageExtra.fromJson(messageProtobuf.getExtra());
+        if (extraObject != null) {
+            String orgUid = extraObject.getOrgUid();
+            messageUnread.setOrgUid(orgUid);
         }
 
         // 创建新的 MessageUnreadEntity，避免复制 version 字段
-        MessageUnreadEntity messageUnread = MessageUnreadEntity.builder()
-                .uid(message.getUid())
-                .type(message.getType())
-                .status(message.getStatus())
-                .content(message.getContent())
-                .extra(message.getExtra())
-                .client(message.getClient())
-                .user(message.getUser())
-                .threadUid(message.getThread().getUid())
-                .threadTopic(message.getThread().getTopic())
-                .userUid(message.getUserUid())
-                .orgUid(message.getOrgUid())
-                .level(message.getLevel())
-                .platform(message.getPlatform())
-                .build();
+        // MessageUnreadEntity messageUnread = MessageUnreadEntity.builder()
+        //         .uid(message.getUid())
+        //         .type(message.getType().name())
+        //         .status(message.getStatus())
+        //         .content(message.getContent())
+        //         .extra(message.getExtra())
+        //         .client(message.getClient())
+        //         .user(message.getUser())
+        //         .threadUid(message.getThread().getUid())
+        //         .threadTopic(message.getThread().getTopic())
+        //         .userUid(message.getUserUid())
+        //         .orgUid(message.getOrgUid())
+        //         .level(message.getLevel())
+        //         .platform(message.getPlatform())
+        //         .build();
 
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
         log.info("create message unread: uid {}, content {}", savedMessageUnread.getContent());
@@ -125,7 +160,7 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
     public int getUnreadCount(MessageUnreadRequest request) {
         // return messageUnreadRepository.countByUserUid(userUid);
 
-        return 0;   
+        return 0;
     }
 
     public void clearUnreadCount(String userUid) {
@@ -200,7 +235,5 @@ public class MessageUnreadRestService extends BaseRestService<MessageUnreadEntit
     public MessageUnreadResponse convertToResponse(MessageUnreadEntity entity) {
         return modelMapper.map(entity, MessageUnreadResponse.class);
     }
-
-    
 
 }
