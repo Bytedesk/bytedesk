@@ -55,7 +55,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Override
     public ResponseEntity<?> queryByUid(MessageUnreadRequest request) {
         
-        Optional<MessageUnreadEntity> messageUnread = messageUnreadService.findByUid(request.getUid());
+        MessageUnreadResponse messageUnread = messageUnreadService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread message success", messageUnread));
     }
