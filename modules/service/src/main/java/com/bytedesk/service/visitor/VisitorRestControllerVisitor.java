@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:50:17
+ * @LastEditTime: 2025-06-23 12:02:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -135,7 +135,7 @@ public class VisitorRestControllerVisitor {
 
         visitorRestService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
 
-        int count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("pong", count));
     }
@@ -180,24 +180,22 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
     }
 
-    // message/unread/count
     // @VisitorAnnotation(title = "visitor", action = "getMessageUnreadCount", description = "get unread messages count")
     @GetMapping("/message/unread/count")
     public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
 
-        int count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages count success", count));
     }
 
-    // post /message/unread/count/clear
     @PostMapping("/message/unread/count/clear")
     public ResponseEntity<?> clearMessageUnreadCount(MessageUnreadRequest request) {
 
         messageUnreadService.clearUnreadCount(request.getUid());
 
         // 看下是否清空了
-        int count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
     }
