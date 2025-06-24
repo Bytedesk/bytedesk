@@ -19,6 +19,7 @@ import com.bytedesk.core.upload.UploadEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -50,8 +51,7 @@ public class MaterialEntity extends BaseEntity {
     @Column(name = "material_type")
     private String type = MaterialTypeEnum.CUSTOMER.name();
 
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UploadEntity upload;
 
 }
