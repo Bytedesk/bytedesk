@@ -98,7 +98,7 @@ class q {
     }, this.config.inviteConfig.delay || 3e3);
   }
   async _getUnreadMessageCount() {
-    return import("../../apis/message/index.js").then(async ({ getMessageUnreadCount: t }) => {
+    return import("../../apis/message/index.js").then(async ({ getUnreadMessageCount: t }) => {
       var l, c, f, d, h;
       const e = String((l = this.config.chatConfig) == null ? void 0 : l.uid), i = localStorage.getItem(S), o = localStorage.getItem(M), n = {
         uid: i || "",
@@ -142,8 +142,8 @@ class q {
     t && t.remove();
   }
   // 清空未读消息数
-  async clearMessageUnread() {
-    return import("../../apis/message/index.js").then(async ({ clearMessageUnread: t }) => {
+  async clearUnreadMessages() {
+    return import("../../apis/message/index.js").then(async ({ clearUnreadMessages: t }) => {
       var l, c;
       const e = String((l = this.config.chatConfig) == null ? void 0 : l.uid), i = localStorage.getItem(S), o = localStorage.getItem(M), n = {
         uid: i || "",

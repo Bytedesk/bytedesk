@@ -78,7 +78,7 @@ declare class BytedeskWeb {
     getUnreadMessageCount(): Promise<number>;
     private showUnreadBadge;
     private clearUnreadBadge;
-    clearMessageUnread(): Promise<number>;
+    clearUnreadMessages(): Promise<number>;
     private createBubble;
     private getSupportText;
     private createChatWindow;

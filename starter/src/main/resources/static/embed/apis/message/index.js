@@ -19,6 +19,6 @@ async function o(e) {
   });
 }
 export {
-  o as clearMessageUnread,
-  s as getMessageUnreadCount
+  o as clearUnreadMessages,
+  s as getUnreadMessageCount
 };
