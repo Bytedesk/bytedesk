@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 11:45:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-24 18:06:52
+ * @LastEditTime: 2025-06-24 22:02:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 
@@ -31,11 +32,30 @@ public class CustomerSpecification extends BaseSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            //
-            // if (StringUtils.hasText(request.getNickname())) {
-
+            // nickname
+            if (StringUtils.hasText(request.getNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
+            }
+            // email
+            if (StringUtils.hasText(request.getEmail())) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + request.getEmail() + "%"));
+            }
+            // mobile
+            if (StringUtils.hasText(request.getMobile())) {
+                predicates.add(criteriaBuilder.like(root.get("mobile"), "%" + request.getMobile() + "%"));
+            }
+            // tagList
+            // if (request.getTagList() != null && !request.getTagList().isEmpty()) {
+            //     predicates.add(root.get("tagList").in(request.getTagList()));
             // }
-            //
+            // extra
+            // if (StringUtils.hasText(request.getExtra())) {
+            //     predicates.add(criteriaBuilder.like(root.get("extra"), "%" + request.getExtra() + "%"));
+            // }
+            // notes
+            if (StringUtils.hasText(request.getNotes())) {
+                predicates.add(criteriaBuilder.like(root.get("notes"), "%" + request.getNotes() + "%"));
+            }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
