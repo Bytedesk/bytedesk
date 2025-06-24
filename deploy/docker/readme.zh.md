@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 09:21:23
+ * @LastEditTime: 2025-06-24 10:29:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,6 +64,8 @@ docker compose -p bytedesk -f docker-compose-ollama.yaml restart
 ```bash
 # 1. 停止当前服务
 docker compose -p bytedesk -f docker-compose-ollama.yaml down
+# 或
+docker stop bytedesk redis-bytedesk elasticsearch-bytedesk ollama-bytedesk mysql-bytedesk artemis-bytedesk
 
 # 2. 拉取最新镜像
 docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
@@ -83,7 +85,10 @@ docker compose -p bytedesk -f docker-compose-ollama.yaml up -d --force-recreate 
 # 1. 停止所有服务
 docker compose -p bytedesk -f docker-compose-ollama.yaml down
 
-# 2. 删除MySQL数据卷（谨慎操作，会删除所有数据库数据）
+# 1. 强制删除MySQL容器（即使它已经退出）
+docker rm -f mysql-bytedesk
+
+# 2. 现在可以删除数据卷了
 docker volume rm bytedesk_mysql_data
 
 # 3. 重新启动服务（会自动创建新的数据卷和数据库）
