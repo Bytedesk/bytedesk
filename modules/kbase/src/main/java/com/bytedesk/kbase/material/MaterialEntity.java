@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-07 18:13:29
+ * @LastEditTime: 2025-06-24 13:05:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,8 +15,11 @@ package com.bytedesk.kbase.material;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.upload.UploadEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -47,11 +50,8 @@ public class MaterialEntity extends BaseEntity {
     @Column(name = "material_type")
     private String type = MaterialTypeEnum.CUSTOMER.name();
 
-    @Builder.Default
-    @Column(name = "material_color")
-    private String color = "red";
 
-    @Builder.Default
-    @Column(name = "material_order")
-    private Integer order = 0;
+    @ManyToOne
+    private UploadEntity upload;
+
 }
