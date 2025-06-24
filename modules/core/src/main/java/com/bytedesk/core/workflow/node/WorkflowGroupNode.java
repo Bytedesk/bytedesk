@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 17:02:28
+ * @LastEditTime: 2025-06-24 17:23:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,7 @@
  */
 package com.bytedesk.core.workflow.node;
 
-import java.util.List;
-
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseEdge;
 import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
