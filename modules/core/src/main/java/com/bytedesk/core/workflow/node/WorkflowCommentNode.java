@@ -13,26 +13,28 @@
  */
 package com.bytedesk.core.workflow.node;
 
+import java.util.Map;
+
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class WorkflowTextNode extends BaseNode {
+public class WorkflowCommentNode extends BaseNode {
 
-    private String text;
-
-    public static WorkflowTextNode fromJson(String json) {
-        return JSON.parseObject(json, WorkflowTextNode.class);
+    // 注释节点特有的字段
+    private Map<String, Object> size; // width, height
+    private String note;
+    
+    public static WorkflowCommentNode fromJson(String json) {
+        return JSON.parseObject(json, WorkflowCommentNode.class);
     }
     
-}
+} 

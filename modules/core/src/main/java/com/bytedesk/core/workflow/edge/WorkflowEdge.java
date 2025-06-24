@@ -11,28 +11,24 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.workflow.node;
+package com.bytedesk.core.workflow.edge;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
+import com.bytedesk.core.base.BaseEdge;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class WorkflowTextNode extends BaseNode {
+public class WorkflowEdge extends BaseEdge {
 
-    private String text;
-
-    public static WorkflowTextNode fromJson(String json) {
-        return JSON.parseObject(json, WorkflowTextNode.class);
+    public static WorkflowEdge fromJson(String json) {
+        return JSON.parseObject(json, WorkflowEdge.class);
     }
     
-}
+} 

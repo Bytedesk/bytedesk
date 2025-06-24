@@ -19,20 +19,16 @@ import com.bytedesk.core.base.BaseNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class WorkflowTextNode extends BaseNode {
+public class WorkflowStartNode extends BaseNode {
 
-    private String text;
-
-    public static WorkflowTextNode fromJson(String json) {
-        return JSON.parseObject(json, WorkflowTextNode.class);
+    public static WorkflowStartNode fromJson(String json) {
+        return JSON.parseObject(json, WorkflowStartNode.class);
     }
     
-}
+} 

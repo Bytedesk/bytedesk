@@ -19,20 +19,22 @@ import com.bytedesk.core.base.BaseNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class WorkflowTextNode extends BaseNode {
+public class WorkflowLLMNode extends BaseNode {
 
-    private String text;
-
-    public static WorkflowTextNode fromJson(String json) {
-        return JSON.parseObject(json, WorkflowTextNode.class);
+    // LLM节点特有的字段
+    private String modelType;
+    private Double temperature;
+    private String systemPrompt;
+    private String prompt;
+    
+    public static WorkflowLLMNode fromJson(String json) {
+        return JSON.parseObject(json, WorkflowLLMNode.class);
     }
     
-}
+} 
