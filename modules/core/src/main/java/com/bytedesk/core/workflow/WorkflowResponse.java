@@ -36,6 +36,8 @@ public class WorkflowResponse extends BaseResponse {
 
     private String description;
 
+    private String type;
+
     private String categoryUid;
 
     private String currentNode;
