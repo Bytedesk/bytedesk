@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 10:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-21 10:05:48
+ * @LastEditTime: 2025-06-24 13:47:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticketflow;
+package com.bytedesk.ticket.ticket_flow;
 
 import com.bytedesk.core.base.BaseEntity;
 

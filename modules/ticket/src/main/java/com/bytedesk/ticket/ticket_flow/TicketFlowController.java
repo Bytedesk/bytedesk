@@ -1,4 +1,4 @@
-package com.bytedesk.ticket.ticketflow;
+package com.bytedesk.ticket.ticket_flow;
 
 import java.util.List;
 import java.util.Map;
