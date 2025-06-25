@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 08:33:54
+ * @LastEditTime: 2025-06-25 08:35:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.customer;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,8 +72,23 @@ public class CustomerRestController extends BaseRestController<CustomerRequest> 
         schema = @Schema(implementation = CustomerResponse.class)))
     @Override
     public ResponseEntity<?> queryByUid(CustomerRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        CustomerResponse response = customerService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // query/visitorUid
+    @Operation(summary = "查询访客下的客户", description = "根据访客UID查询客户列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = CustomerResponse.class)))
+    @GetMapping("/query/visitorUid")
+    public ResponseEntity<?> queryByVisitorUid(CustomerRequest request) {
+        
+        CustomerResponse response = customerService.queryByVisitorUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 20:47:23
+ * @LastEditTime: 2025-06-25 08:36:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>, JpaSpecificationExecutor<CustomerEntity> {
 
     Optional<CustomerEntity> findByUid(String uid);
-    // Collection<CustomerNameOnly> findByNickname(String name);
-    
-    // swagger can't decide, Tweak configuration to get to unambiguous paths
-    // using a dynamic projection parameter
-    // <T> Collection<T> findByName(String name, Class<T> type);
+
+    Optional<CustomerEntity> findByVisitorUid(String visitorUid);
+
+    boolean existsByVisitorUid(String visitorUid);
 }
