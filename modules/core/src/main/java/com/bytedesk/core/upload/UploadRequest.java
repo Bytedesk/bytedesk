@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-18 12:06:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 16:38:21
+ * @LastEditTime: 2025-06-25 17:28:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,4 +57,11 @@ public class UploadRequest extends BaseRequest {
     private String visitorAvatar; // 游客头像
     // 
     private String extra; // 额外附加信息
+
+    // 水印相关字段
+    private Boolean addWatermark; // 是否添加水印
+    private String watermarkText; // 水印文字
+    private String watermarkPosition; // 水印位置
+    private Integer watermarkFontSize; // 水印字体大小
+    private String watermarkColor; // 水印颜色
 }

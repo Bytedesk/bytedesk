@@ -1,0 +1,35 @@
+# 水印配置示例
+bytedesk:
+  watermark:
+    # 是否启用水印功能
+    enabled: true
+    
+    # 水印文字
+    text: "bytedesk.com"
+    
+    # 水印位置: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER
+    position: BOTTOM_RIGHT
+    
+    # 字体大小
+    fontSize: 24
+    
+    # 字体名称
+    fontName: "Arial"
+    
+    # 水印颜色 (RGBA格式: R,G,B,A)
+    color: "255,255,255,128"
+    
+    # 透明度 (0.0-1.0)
+    opacity: 0.5
+    
+    # 边距
+    margin: 20
+    
+    # 是否只对图片文件添加水印
+    imageOnly: true
+    
+    # 最小图片尺寸（像素），小于此尺寸的图片不添加水印
+    minImageSize: 100
+    
+    # 最大图片尺寸（像素），大于此尺寸的图片不添加水印
+    maxImageSize: 5000 

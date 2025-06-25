@@ -44,5 +44,28 @@ public class UploadRestControllerVisitor {
         
         return ResponseEntity.ok(JsonResult.success("upload success", response));
     }
+
+    // 文件上传（支持水印控制）
+    @PostMapping("/file/watermark")
+    public ResponseEntity<?> uploadWithWatermark(
+            @RequestParam("file") MultipartFile file, 
+            UploadRequest request,
+            @RequestParam(value = "addWatermark", defaultValue = "true") boolean addWatermark,
+            @RequestParam(value = "watermarkText", required = false) String watermarkText,
+            @RequestParam(value = "watermarkPosition", required = false) String watermarkPosition) {
+        
+        // 设置水印相关参数
+        if (watermarkText != null && !watermarkText.trim().isEmpty()) {
+            request.setWatermarkText(watermarkText);
+        }
+        if (watermarkPosition != null && !watermarkPosition.trim().isEmpty()) {
+            request.setWatermarkPosition(watermarkPosition);
+        }
+        request.setAddWatermark(addWatermark);
+        
+        UploadResponse response = uploadService.handleFileUpload(file, request);
+        
+        return ResponseEntity.ok(JsonResult.success("upload success", response));
+    }
     
 }
