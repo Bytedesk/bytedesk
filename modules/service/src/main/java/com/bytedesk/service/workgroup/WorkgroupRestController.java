@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:25:55
+ * @LastEditTime: 2025-06-25 11:25:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,9 +73,6 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
         
         WorkgroupResponse workgroup = workgroupRestService.queryByUid(request);
-        if (workgroup == null) {
-            return ResponseEntity.ok(JsonResult.error("not found"));
-        }
 
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }

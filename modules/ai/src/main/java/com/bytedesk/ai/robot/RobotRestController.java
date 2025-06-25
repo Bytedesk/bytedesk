@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:25:47
+ * @LastEditTime: 2025-06-25 11:25:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,9 +79,6 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     public ResponseEntity<?> queryByUid(RobotRequest request) {
 
         RobotResponse robot = robotRestService.queryByUid(request);
-        if (robot == null) {
-            return ResponseEntity.ok(JsonResult.error("not found"));
-        }
 
         return ResponseEntity.ok(JsonResult.success(robot));
     }

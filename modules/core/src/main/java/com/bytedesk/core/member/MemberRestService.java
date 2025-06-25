@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 09:03:23
+ * @LastEditTime: 2025-06-25 11:24:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -120,7 +120,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     public MemberResponse queryByUid(MemberRequest request) {
         Optional<MemberEntity> memberOptional = findByUid(request.getUid());
         if (!memberOptional.isPresent()) {
-            return null;
+            throw new RuntimeException("Member not found");
         }
         return convertToResponse(memberOptional.get());
     }

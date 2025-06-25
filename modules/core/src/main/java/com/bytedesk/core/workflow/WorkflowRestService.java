@@ -66,10 +66,10 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     @Override
     public WorkflowResponse queryByUid(WorkflowRequest request) {
         Optional<WorkflowEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
+        if (!optional.isPresent()) {
+            throw new RuntimeException("Workflow not found");
         }
-        return null;
+        return convertToResponse(optional.get());
     }
     
     @Cacheable(value = "workflow", key = "#uid", unless="#result==null")

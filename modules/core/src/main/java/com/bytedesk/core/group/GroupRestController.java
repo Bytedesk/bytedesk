@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:26:42
+ * @LastEditTime: 2025-06-25 11:24:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,9 +75,6 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     public ResponseEntity<?> queryByUid(GroupRequest request) {
         
         GroupResponse group = groupRestService.queryByUid(request);
-        if (group == null) {
-            return ResponseEntity.ok(JsonResult.error("not found"));
-        }
         
         return ResponseEntity.ok(JsonResult.success(group));
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:20:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 18:50:29
+ * @LastEditTime: 2025-06-25 11:26:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,6 +62,18 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest> 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @Operation(summary = "查询指定LLM模型", description = "根据UID查询LLM模型详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = LlmModelResponse.class)))
+    @Override
+    public ResponseEntity<?> queryByUid(LlmModelRequest request) {
+        
+        LlmModelResponse result = llmModelRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
     @Operation(summary = "创建LLM模型", description = "创建新的LLM模型")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
@@ -104,13 +116,5 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest> 
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Operation(summary = "查询指定LLM模型", description = "根据UID查询LLM模型详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = LlmModelResponse.class)))
-    @Override
-    public ResponseEntity<?> queryByUid(LlmModelRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 }

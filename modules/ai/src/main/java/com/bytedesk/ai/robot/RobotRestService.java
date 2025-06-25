@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 09:07:04
+ * @LastEditTime: 2025-06-25 11:25:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -127,11 +127,10 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     @Override
     public RobotResponse queryByUid(RobotRequest request) {
         Optional<RobotEntity> robotOptional = robotRepository.findByUid(request.getUid());
-        if (robotOptional.isPresent()) {
-            return convertToResponse(robotOptional.get());
-        } else {
+        if (!robotOptional.isPresent()) {
             throw new RuntimeException("robot not found by uid: " + request.getUid());
         }
+        return convertToResponse(robotOptional.get());
     }
 
     @Transactional

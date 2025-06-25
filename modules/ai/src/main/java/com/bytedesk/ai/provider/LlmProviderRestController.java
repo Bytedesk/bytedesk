@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:31:26
+ * @LastEditTime: 2025-06-25 11:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,6 +65,19 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询指定LLM提供商", description = "根据UID查询LLM提供商详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = LlmProviderResponse.class)))
+    @Override
+    public ResponseEntity<?> queryByUid(LlmProviderRequest request) {
+        
+        LlmProviderResponse response = llmProviderRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+
     @Operation(summary = "创建LLM提供商", description = "创建新的LLM提供商")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
@@ -107,16 +120,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Operation(summary = "查询指定LLM提供商", description = "根据UID查询LLM提供商详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = LlmProviderResponse.class)))
-    @Override
-    public ResponseEntity<?> queryByUid(LlmProviderRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
     @Operation(summary = "获取LLM提供商默认配置", description = "获取LLM提供商的默认配置信息")
     @ApiResponse(responseCode = "200", description = "获取成功",
         content = @Content(mediaType = "application/json", 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 10:55:10
+ * @LastEditTime: 2025-06-25 11:29:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -63,10 +64,23 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @Operation(summary = "查询指定工作流", description = "根据UID查询工作流详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkflowResponse.class)))
+    @Override
+    public ResponseEntity<?> queryByUid(WorkflowRequest request) {
+        
+        WorkflowResponse workflow = workflowRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(workflow));
+    }
+
     @Operation(summary = "创建工作流", description = "创建新的工作流")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @ActionAnnotation(title = "工作流", action = "新建", description = "create workflow")
     @Override
     public ResponseEntity<?> create(WorkflowRequest request) {
         
@@ -79,6 +93,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @ActionAnnotation(title = "工作流", action = "更新", description = "update workflow")
     @Override
     public ResponseEntity<?> update(WorkflowRequest request) {
         
@@ -89,6 +104,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
 
     @Operation(summary = "删除工作流", description = "删除指定的工作流")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @ActionAnnotation(title = "工作流", action = "删除", description = "delete workflow")
     @Override
     public ResponseEntity<?> delete(WorkflowRequest request) {
         
@@ -98,20 +114,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     }
 
     @Operation(summary = "导出工作流", description = "导出工作流数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @ApiResponse(responseCode = "200", description = "导出成功")        
+    @ActionAnnotation(title = "工作流", action = "导出", description = "export workflow")
     @Override
     public Object export(WorkflowRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Operation(summary = "查询指定工作流", description = "根据UID查询工作流详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = WorkflowResponse.class)))
-    @Override
-    public ResponseEntity<?> queryByUid(WorkflowRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 13:12:27
+ * @LastEditTime: 2025-06-25 11:24:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,11 +95,10 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     public GroupResponse queryByUid(GroupRequest request) {
         Optional<GroupEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        } else {
+        if (!optional.isPresent()) {
             throw new RuntimeException("Failed to query group by uid: " + request.getUid());
         }
+        return convertToResponse(optional.get());
     }
 
     /**

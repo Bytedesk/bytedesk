@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 10:48:44
+ * @LastEditTime: 2025-06-25 11:25:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,8 +82,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         if (!workgroupOptional.isPresent()) {
             throw new RuntimeException(request.getUid() + " is not found.");
         }
-        WorkgroupEntity workgroup = workgroupOptional.get();
-        return convertToResponse(workgroup);
+        return convertToResponse(workgroupOptional.get());
     }
 
     @Transactional

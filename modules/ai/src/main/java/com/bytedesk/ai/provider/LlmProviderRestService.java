@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:21:31
+ * @LastEditTime: 2025-06-25 11:26:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,6 +68,15 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         request.setUserUid(user.getUid());
         // 
         return queryByOrg(request);
+    }
+
+    @Override
+    public LlmProviderResponse queryByUid(LlmProviderRequest request) {
+        Optional<LlmProviderEntity> optional = repository.findByUid(request.getUid());
+        if (!optional.isPresent()) {
+            throw new RuntimeException("provider not found");
+        }
+        return convertToResponse(optional.get());
     }
 
     @Cacheable(value = "provider", key = "#uid", unless = "#result == null")
@@ -212,11 +221,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return modelMapper.map(entity, LlmProviderResponse.class);
     }
 
-    @Override
-    public LlmProviderResponse queryByUid(LlmProviderRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     public LlmProviderConfigDefault getLlmProviderConfigDefault() {
         return LlmConfigUtils.getLlmProviderConfigDefault(environment);
