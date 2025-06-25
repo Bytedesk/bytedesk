@@ -65,7 +65,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_CREATE')")
+    @ActionAnnotation(title = "文件分块", action = "新建", description = "create chunk")
     @Override
     public ResponseEntity<?> create(ChunkRequest request) {
         
@@ -74,7 +74,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
+    @ActionAnnotation(title = "文件分块", action = "更新", description = "update chunk")
     @Override
     public ResponseEntity<?> update(ChunkRequest request) {
         
@@ -83,7 +83,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    @ActionAnnotation(title = "文件分块", action = "删除", description = "delete chunk")
     @Override
     public ResponseEntity<?> delete(ChunkRequest request) {
         
@@ -110,7 +110,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    @ActionAnnotation(title = "文件分块", action = "导出", description = "export chunk")
     @Override
     public Object export(ChunkRequest request, HttpServletResponse response) {
         return exportTemplate(

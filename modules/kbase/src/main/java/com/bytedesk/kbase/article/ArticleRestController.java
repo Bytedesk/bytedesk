@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:25:33
+ * @LastEditTime: 2025-06-25 09:33:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,7 +76,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_CREATE')")
+    @ActionAnnotation(title = "文章", action = "新建", description = "create article")
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleRequest request) {
 
@@ -85,7 +85,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
+    @ActionAnnotation(title = "文章", action = "更新", description = "update article")
     @Override
     public ResponseEntity<?> update(@RequestBody ArticleRequest request) {
 
@@ -94,7 +94,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    @ActionAnnotation(title = "文章", action = "删除", description = "delete article")
     @Override
     public ResponseEntity<?> delete(@RequestBody ArticleRequest request) {
 
@@ -103,6 +103,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @ActionAnnotation(title = "文章", action = "导出", description = "export article")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(ArticleRequest request, HttpServletResponse response) {

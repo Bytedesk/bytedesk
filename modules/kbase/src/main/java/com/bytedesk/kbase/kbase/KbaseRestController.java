@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:24:27
+ * @LastEditTime: 2025-06-25 09:34:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.kbase.kbase;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -64,6 +64,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
+    @ActionAnnotation(title = "知识库", action = "新建", description = "create kbase")
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
@@ -73,6 +74,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @ActionAnnotation(title = "知识库", action = "更新", description = "update kbase")
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
@@ -82,6 +84,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @ActionAnnotation(title = "知识库", action = "删除", description = "delete kbase")
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
@@ -91,6 +94,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @ActionAnnotation(title = "知识库", action = "导出", description = "export kbase")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override
     public Object export(KbaseRequest request, HttpServletResponse response) {

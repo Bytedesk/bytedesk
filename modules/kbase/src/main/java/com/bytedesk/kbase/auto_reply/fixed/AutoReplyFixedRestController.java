@@ -52,6 +52,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = "自动回复", action = "新建", description = "create autoReplyFixed")
     @Override
     public ResponseEntity<?> create(AutoReplyFixedRequest request) {
         
@@ -60,6 +61,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = "自动回复", action = "更新", description = "update autoReplyFixed")
     @Override
     public ResponseEntity<?> update(AutoReplyFixedRequest request) {
         
@@ -68,6 +70,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = "自动回复", action = "删除", description = "delete autoReplyFixed")
     @Override
     public ResponseEntity<?> delete(AutoReplyFixedRequest request) {
         
@@ -87,7 +90,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @ActionAnnotation(title = "自动回复", action = "导出", description = "export autoReply")
+    @ActionAnnotation(title = "自动回复", action = "导出", description = "export autoReplyFixed")
     @GetMapping("/export")
     public Object export(AutoReplyFixedRequest request, HttpServletResponse response) {
         return exportTemplate(

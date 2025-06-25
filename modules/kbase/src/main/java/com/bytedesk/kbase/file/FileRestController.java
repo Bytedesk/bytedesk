@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(files));
     }
 
+    @ActionAnnotation(title = "文件", action = "新建", description = "create file")
     @Override
     public ResponseEntity<?> create(FileRequest request) {
         
@@ -59,6 +61,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(file));
     }
 
+    @ActionAnnotation(title = "文件", action = "更新", description = "update file")
     @Override
     public ResponseEntity<?> update(FileRequest request) {
         
@@ -67,6 +70,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(file));
     }
 
+    @ActionAnnotation(title = "文件", action = "删除", description = "delete file")
     @Override
     public ResponseEntity<?> delete(FileRequest request) {
         
@@ -93,6 +97,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(file));
     }
 
+    @ActionAnnotation(title = "文件", action = "导出", description = "export file")
     @Override
     public Object export(FileRequest request, HttpServletResponse response) {
         return exportTemplate(

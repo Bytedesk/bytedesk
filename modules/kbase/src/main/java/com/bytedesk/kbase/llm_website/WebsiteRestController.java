@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -50,6 +51,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         return ResponseEntity.ok(JsonResult.success(websites));
     }
 
+    @ActionAnnotation(title = "知识库网站", action = "新建", description = "create website")
     @Override
     public ResponseEntity<?> create(WebsiteRequest request) {
         
@@ -58,6 +60,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
+    @ActionAnnotation(title = "知识库网站", action = "更新", description = "update website")
     @Override
     public ResponseEntity<?> update(WebsiteRequest request) {
         
@@ -66,6 +69,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
+    @ActionAnnotation(title = "知识库网站", action = "删除", description = "delete website")
     @Override
     public ResponseEntity<?> delete(WebsiteRequest request) {
         
@@ -92,6 +96,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
+    @ActionAnnotation(title = "知识库网站", action = "导出", description = "export website")
     @Override
     public Object export(WebsiteRequest request, HttpServletResponse response) {
         return exportTemplate(

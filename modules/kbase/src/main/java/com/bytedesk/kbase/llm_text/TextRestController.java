@@ -58,7 +58,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_CREATE')")
+    @ActionAnnotation(title = "知识库文本", action = "新建", description = "create text")
     @Override
     public ResponseEntity<?> create(TextRequest request) {
         
@@ -67,7 +67,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
+    @ActionAnnotation(title = "知识库文本", action = "更新", description = "update text")
     @Override
     public ResponseEntity<?> update(TextRequest request) {
         
@@ -76,7 +76,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    @ActionAnnotation(title = "知识库文本", action = "删除", description = "delete text")
     @Override
     public ResponseEntity<?> delete(TextRequest request) {
         
@@ -102,7 +102,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
         return ResponseEntity.ok(JsonResult.success(textResponse));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    @ActionAnnotation(title = "知识库文本", action = "导出", description = "export text")
     @Override
     public Object export(TextRequest request, HttpServletResponse response) {
         return exportTemplate(

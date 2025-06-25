@@ -72,8 +72,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     }
 
     @ActionAnnotation(title = "常见问题", action = "新建", description = "create faq")
-    @Override
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
+    @Override
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
 
         FaqResponse Faq = faqRestService.create(request);
@@ -82,8 +82,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     }
 
     @ActionAnnotation(title = "常见问题", action = "更新", description = "update faq")
-    @Override
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
+    @Override
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
 
         FaqResponse Faq = faqRestService.update(request);
@@ -92,8 +92,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     }
 
     @ActionAnnotation(title = "常见问题", action = "删除", description = "delete faq")
-    @Override
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
+    @Override
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
 
         faqRestService.delete(request);
@@ -123,8 +123,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     }
 
     @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")
-    @GetMapping("/export")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    @GetMapping("/export")
     public Object export(FaqRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
