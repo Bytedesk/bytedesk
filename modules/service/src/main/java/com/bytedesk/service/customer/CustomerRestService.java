@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 08:47:27
+ * @LastEditTime: 2025-06-25 09:50:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -111,10 +111,10 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
             updatedEntity.setNickname(request.getNickname());
             updatedEntity.setEmail(request.getEmail());
             updatedEntity.setMobile(request.getMobile());
+            updatedEntity.setDescription(request.getDescription());
             updatedEntity.setNotes(request.getNotes());
             updatedEntity.setTagList(request.getTagList());
             updatedEntity.setExtra(request.getExtra());
-            updatedEntity.setVisitorUid(request.getVisitorUid());
             // 
             CustomerEntity savedEntity = doSave(updatedEntity);
             if (savedEntity == null) {
