@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 17:02:28
+ * @LastEditTime: 2025-06-25 11:06:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,6 +19,7 @@ import java.util.Map;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.bytedesk.core.base.BaseNode;
+import com.bytedesk.core.base.NodeMeta;
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
 
 /**
@@ -90,20 +91,62 @@ public class WorkflowUtils {
     /**
      * 获取节点的元数据信息
      */
-    public static Map<String, Object> getNodeMeta(BaseNode node) {
-        if (node.getMeta() != null) {
-            return JSON.parseObject(node.getMeta(), new TypeReference<Map<String, Object>>() {});
-        }
-        return null;
+    public static NodeMeta getNodeMeta(BaseNode node) {
+        return node.getMeta();
     }
     
     /**
      * 设置节点的元数据信息
      */
-    public static void setNodeMeta(BaseNode node, Map<String, Object> meta) {
-        if (meta != null) {
-            node.setMeta(JSON.toJSONString(meta));
+    public static void setNodeMeta(BaseNode node, NodeMeta meta) {
+        node.setMeta(meta);
+    }
+    
+    /**
+     * 从Map创建NodeMeta对象
+     */
+    public static NodeMeta createNodeMetaFromMap(Map<String, Object> metaMap) {
+        if (metaMap == null) {
+            return null;
         }
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Object> positionMap = (Map<String, Object>) metaMap.get("position");
+        if (positionMap == null) {
+            return null;
+        }
+        
+        Double x = positionMap.get("x") instanceof Number ? 
+            ((Number) positionMap.get("x")).doubleValue() : null;
+        Double y = positionMap.get("y") instanceof Number ? 
+            ((Number) positionMap.get("y")).doubleValue() : null;
+        
+        NodeMeta.Position position = NodeMeta.Position.builder()
+                .x(x)
+                .y(y)
+                .build();
+        
+        return NodeMeta.builder()
+                .position(position)
+                .build();
+    }
+    
+    /**
+     * 将NodeMeta转换为Map
+     */
+    public static Map<String, Object> nodeMetaToMap(NodeMeta meta) {
+        if (meta == null || meta.getPosition() == null) {
+            return null;
+        }
+        
+        Map<String, Object> metaMap = new java.util.HashMap<>();
+        Map<String, Object> positionMap = new java.util.HashMap<>();
+        
+        positionMap.put("x", meta.getPosition().getX());
+        positionMap.put("y", meta.getPosition().getY());
+        metaMap.put("position", positionMap);
+        
+        return metaMap;
     }
     
 } 

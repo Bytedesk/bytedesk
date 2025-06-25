@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-19 16:16:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 17:13:25
+ * @LastEditTime: 2025-06-25 11:05:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,7 +48,7 @@ public abstract class BaseNode implements Serializable {
     
     private List<BaseEdge> outEdges;
 
-    private String meta;
+    private NodeMeta meta;
 
     // 新增字段，对应JSON中的data部分
     private NodeData data;
