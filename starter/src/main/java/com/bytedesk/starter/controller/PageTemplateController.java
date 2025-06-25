@@ -52,7 +52,7 @@ public class PageTemplateController {
         pageService.about();
         pageService.contact();
         pageService.privacy();
-        pageService.protocol();
+        pageService.terms();
 
         return JsonResult.success("generate html success", 200, true);
     }
