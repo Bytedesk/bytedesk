@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-25 11:08:42
+ * @LastEditTime: 2025-06-25 08:33:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,6 +65,17 @@ public class CustomerRestController extends BaseRestController<CustomerRequest> 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "查询指定客户", description = "根据UID查询客户详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = CustomerResponse.class)))
+    @Override
+    public ResponseEntity<?> queryByUid(CustomerRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+
+
     @Operation(summary = "创建客户", description = "创建新的客户")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
@@ -113,16 +124,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest> 
         );
     }
 
-    @Operation(summary = "查询指定客户", description = "根据UID查询客户详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = CustomerResponse.class)))
-    @Override
-    public ResponseEntity<?> queryByUid(CustomerRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
     
     
 }
