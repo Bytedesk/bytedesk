@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:20:27
+ * @LastEditTime: 2025-06-25 10:05:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,10 +24,14 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class WorkflowRestService extends BaseRestService<WorkflowEntity, WorkflowRequest, WorkflowResponse> {
@@ -37,6 +41,8 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final AuthService authService;
 
     @Override
     public Page<WorkflowResponse> queryByOrg(WorkflowRequest request) {
@@ -48,10 +54,24 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     public Page<WorkflowResponse> queryByUser(WorkflowRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByUser(request);
     }
 
+    @Override
+    public WorkflowResponse queryByUid(WorkflowRequest request) {
+        Optional<WorkflowEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        }
+        return null;
+    }
+    
     @Cacheable(value = "workflow", key = "#uid", unless="#result==null")
     @Override
     public Optional<WorkflowEntity> findByUid(String uid) {
@@ -60,10 +80,9 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     public WorkflowResponse create(WorkflowRequest request) {
-        
         WorkflowEntity entity = modelMapper.map(request, WorkflowEntity.class);
         entity.setUid(uidUtils.getUid());
-
+        // 
         WorkflowEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create workflow failed");
@@ -96,7 +115,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<WorkflowEntity> optional = workflowRepository.findByUid(uid);
+        Optional<WorkflowEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -113,8 +132,25 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     public WorkflowEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WorkflowEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            Optional<WorkflowEntity> latest = workflowRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                WorkflowEntity latestEntity = latest.get();
+                latestEntity.setName(entity.getName());
+                latestEntity.setDescription(entity.getDescription());
+                // latestEntity.setStatus(entity.getStatus());
+                // latestEntity.setType(entity.getType());
+                latestEntity.setContent(entity.getContent());
+                latestEntity.setCurrentNode(entity.getCurrentNode());
+                latestEntity.setCategoryUid(entity.getCategoryUid());
+                // 
+                return workflowRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
     @Override
@@ -122,10 +158,5 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return modelMapper.map(entity, WorkflowResponse.class);
     }
 
-    @Override
-    public WorkflowResponse queryByUid(WorkflowRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
     
 }
