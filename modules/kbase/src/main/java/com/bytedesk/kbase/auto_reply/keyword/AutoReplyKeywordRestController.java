@@ -29,6 +29,13 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "关键词回复管理", description = "关键词回复管理相关接口")
 @RestController
 @RequestMapping("/api/v1/autoreply/keyword")
 @AllArgsConstructor
@@ -36,6 +43,10 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
 
     private final AutoReplyKeywordRestService keywordRestService;
 
+    @Operation(summary = "查询组织下的关键词回复", description = "根据组织ID查询关键词回复列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(AutoReplyKeywordRequest request) {
@@ -45,6 +56,10 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询用户下的关键词回复", description = "根据用户ID查询关键词回复列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @Override
     public ResponseEntity<?> queryByUser(AutoReplyKeywordRequest request) {
         
@@ -53,6 +68,10 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "创建关键词回复", description = "创建新的关键词回复")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @ActionAnnotation(title = "关键词", action = "新建", description = "create keyword")
     @Override
     public ResponseEntity<?> create(@RequestBody AutoReplyKeywordRequest request) {
@@ -62,6 +81,10 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "更新关键词回复", description = "更新关键词回复信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @ActionAnnotation(title = "关键词", action = "更新", description = "update keyword")
     @Override
     public ResponseEntity<?> update(@RequestBody AutoReplyKeywordRequest request) {
@@ -71,6 +94,8 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "删除关键词回复", description = "删除指定的关键词回复")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = "关键词", action = "删除", description = "delete keyword")
     @Override
     public ResponseEntity<?> delete(@RequestBody AutoReplyKeywordRequest request) {
@@ -80,6 +105,10 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
 
+    @Operation(summary = "启用关键词回复", description = "启用或禁用关键词回复")
+    @ApiResponse(responseCode = "200", description = "操作成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @ActionAnnotation(title = "关键词", action = "启用", description = "enable keyword")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody AutoReplyKeywordRequest request) {
@@ -89,6 +118,8 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "导出关键词回复", description = "导出关键词回复数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @ActionAnnotation(title = "关键词", action = "导出", description = "export keyword")
     @GetMapping("/export")
     public Object export(AutoReplyKeywordRequest request, HttpServletResponse response) {

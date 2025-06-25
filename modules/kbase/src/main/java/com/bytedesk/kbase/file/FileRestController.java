@@ -27,6 +27,13 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "文件管理", description = "文件管理相关接口")
 @RestController
 @RequestMapping("/api/v1/llm/file")
 @AllArgsConstructor
@@ -34,6 +41,10 @@ public class FileRestController extends BaseRestController<FileRequest> {
 
     private final FileRestService fileRestService;
 
+    @Operation(summary = "查询组织下的文件", description = "根据组织ID查询文件列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FileResponse.class)))
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(FileRequest request) {
@@ -43,6 +54,10 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(files));
     }
 
+    @Operation(summary = "查询用户下的文件", description = "根据用户ID查询文件列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FileResponse.class)))
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(FileRequest request) {
@@ -52,6 +67,10 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(files));
     }
 
+    @Operation(summary = "创建文件", description = "创建新的文件")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FileResponse.class)))
     @ActionAnnotation(title = "文件", action = "新建", description = "create file")
     @Override
     public ResponseEntity<?> create(FileRequest request) {
@@ -61,6 +80,10 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(file));
     }
 
+    @Operation(summary = "更新文件", description = "更新文件信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FileResponse.class)))
     @ActionAnnotation(title = "文件", action = "更新", description = "update file")
     @Override
     public ResponseEntity<?> update(FileRequest request) {
@@ -70,6 +93,8 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(file));
     }
 
+    @Operation(summary = "删除文件", description = "删除指定的文件")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = "文件", action = "删除", description = "delete file")
     @Override
     public ResponseEntity<?> delete(FileRequest request) {
@@ -79,7 +104,8 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // deleteAll
+    @Operation(summary = "删除所有文件", description = "删除所有文件")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody FileRequest request) {
 
@@ -88,7 +114,10 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // enable/disable file
+    @Operation(summary = "启用文件", description = "启用或禁用文件")
+    @ApiResponse(responseCode = "200", description = "操作成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FileResponse.class)))
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody FileRequest request) {
 
@@ -97,6 +126,8 @@ public class FileRestController extends BaseRestController<FileRequest> {
         return ResponseEntity.ok(JsonResult.success(file));
     }
 
+    @Operation(summary = "导出文件", description = "导出文件数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @ActionAnnotation(title = "文件", action = "导出", description = "export file")
     @Override
     public Object export(FileRequest request, HttpServletResponse response) {
@@ -116,28 +147,32 @@ public class FileRestController extends BaseRestController<FileRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    // update elasticsearch index
+    @Operation(summary = "更新文件索引", description = "更新文件的Elasticsearch索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody FileRequest request) {
         // chunkRestService.updateIndex(request);
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // update elasticsearch vector index
+    @Operation(summary = "更新文件向量索引", description = "更新文件的向量索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FileRequest request) {
         // chunkRestService.updateVectorIndex(request);
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // update elasticsearch all index
+    @Operation(summary = "更新所有文件索引", description = "更新所有文件的Elasticsearch索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody FileRequest request) {
         // chunkRestService.updateAllIndex(request);
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // update elasticsearch all vector index
+    @Operation(summary = "更新所有文件向量索引", description = "更新所有文件的向量索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FileRequest request) {
         // chunkRestService.updateAllVectorIndex(request);

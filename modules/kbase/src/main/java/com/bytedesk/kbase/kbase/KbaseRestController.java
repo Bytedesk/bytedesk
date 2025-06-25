@@ -27,6 +27,13 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "知识库管理", description = "知识库管理相关接口")
 @RestController
 @RequestMapping("/api/v1/kbase")
 @AllArgsConstructor
@@ -34,6 +41,10 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
 
     private final KbaseRestService knowledgeService;
 
+    @Operation(summary = "查询组织下的知识库", description = "根据组织ID查询知识库列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
@@ -43,6 +54,10 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询用户下的知识库", description = "根据用户ID查询知识库列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
@@ -52,6 +67,10 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询指定知识库", description = "根据UID查询知识库详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
@@ -64,6 +83,10 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
+    @Operation(summary = "创建知识库", description = "创建新的知识库")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = KbaseResponse.class)))
     @ActionAnnotation(title = "知识库", action = "新建", description = "create kbase")
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
@@ -74,6 +97,10 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @Operation(summary = "更新知识库", description = "更新知识库信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = KbaseResponse.class)))
     @ActionAnnotation(title = "知识库", action = "更新", description = "update kbase")
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
@@ -84,6 +111,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @Operation(summary = "删除知识库", description = "删除指定的知识库")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = "知识库", action = "删除", description = "delete kbase")
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
@@ -94,6 +123,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @Operation(summary = "导出知识库", description = "导出知识库数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @ActionAnnotation(title = "知识库", action = "导出", description = "export kbase")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @Override

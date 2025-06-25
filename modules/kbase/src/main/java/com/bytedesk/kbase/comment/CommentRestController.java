@@ -26,6 +26,13 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "评论管理", description = "评论管理相关接口")
 @RestController
 @RequestMapping("/api/v1/comment")
 @AllArgsConstructor
@@ -33,6 +40,10 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
 
     private final CommentRestService commentService;
 
+    @Operation(summary = "查询组织下的评论", description = "根据组织ID查询评论列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = CommentResponse.class)))
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(CommentRequest request) {
@@ -42,6 +53,10 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
+    @Operation(summary = "查询用户下的评论", description = "根据用户ID查询评论列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = CommentResponse.class)))
     @Override
     public ResponseEntity<?> queryByUser(CommentRequest request) {
         
@@ -50,6 +65,10 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
+    @Operation(summary = "创建评论", description = "创建新的评论")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = CommentResponse.class)))
     @Override
     public ResponseEntity<?> create(CommentRequest request) {
         
@@ -58,6 +77,10 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
+    @Operation(summary = "更新评论", description = "更新评论信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = CommentResponse.class)))
     @Override
     public ResponseEntity<?> update(CommentRequest request) {
         
@@ -66,6 +89,8 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
+    @Operation(summary = "删除评论", description = "删除指定的评论")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @Override
     public ResponseEntity<?> delete(CommentRequest request) {
         
@@ -74,6 +99,8 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "导出评论", description = "导出评论数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @Override
     public Object export(CommentRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

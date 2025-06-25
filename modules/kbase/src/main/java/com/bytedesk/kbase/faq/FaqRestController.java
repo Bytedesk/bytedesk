@@ -31,6 +31,13 @@ import com.bytedesk.kbase.faq.vector.FaqVectorService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "常见问题管理", description = "常见问题管理相关接口")
 @RestController
 @RequestMapping("/api/v1/faq")
 @AllArgsConstructor
@@ -42,6 +49,10 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
 
     private final FaqVectorService faqVectorService;
 
+    @Operation(summary = "查询组织下的常见问题", description = "根据组织ID查询常见问题列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FaqResponse.class)))
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
@@ -51,6 +62,10 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询用户下的常见问题", description = "根据用户ID查询常见问题列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FaqResponse.class)))
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUser(FaqRequest request) {
@@ -60,6 +75,10 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询指定常见问题", description = "根据UID查询常见问题详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FaqResponse.class)))
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUid(FaqRequest request) {
@@ -71,6 +90,10 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(faq));
     }
 
+    @Operation(summary = "创建常见问题", description = "创建新的常见问题")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FaqResponse.class)))
     @ActionAnnotation(title = "常见问题", action = "新建", description = "create faq")
     @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
@@ -81,6 +104,10 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @Operation(summary = "更新常见问题", description = "更新常见问题信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FaqResponse.class)))
     @ActionAnnotation(title = "常见问题", action = "更新", description = "update faq")
     @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
@@ -91,6 +118,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
+    @Operation(summary = "删除常见问题", description = "删除指定的常见问题")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = "常见问题", action = "删除", description = "delete faq")
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
@@ -101,7 +130,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    // deleteAll
+    @Operation(summary = "删除所有常见问题", description = "删除所有常见问题")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = "常见问题", action = "删除所有", description = "delete faq all")
     @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @PostMapping("/deleteAll")
@@ -112,7 +142,10 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // enable/disable faq
+    @Operation(summary = "启用常见问题", description = "启用或禁用常见问题")
+    @ApiResponse(responseCode = "200", description = "操作成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FaqResponse.class)))
     @ActionAnnotation(title = "常见问题", action = "启用", description = "enable faq")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody FaqRequest request) {
@@ -122,6 +155,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success(faqResponse));
     }
 
+    @Operation(summary = "导出常见问题", description = "导出常见问题数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")
     @PreAuthorize("hasAuthority('KBASE_EXPORT')")
     @GetMapping("/export")
@@ -136,7 +171,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         );
     }
 
-    // update elasticsearch index
+    @Operation(summary = "更新常见问题索引", description = "更新常见问题的Elasticsearch索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @ActionAnnotation(title = "常见问题", action = "更新索引", description = "update faq index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody FaqRequest request) {
@@ -146,7 +182,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
-    // update elasticsearch vector index
+    @Operation(summary = "更新常见问题向量索引", description = "更新常见问题的向量索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @ActionAnnotation(title = "常见问题", action = "更新向量索引", description = "update faq vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
@@ -156,7 +193,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
 
-    // update all elasticsearch index
+    @Operation(summary = "更新所有常见问题索引", description = "更新所有常见问题的Elasticsearch索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @ActionAnnotation(title = "常见问题", action = "更新所有索引", description = "update all faq index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody FaqRequest request) {
@@ -166,7 +204,8 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
         return ResponseEntity.ok(JsonResult.success("update all index success", request.getUid()));
     }
 
-    // update all elasticsearch vector index
+    @Operation(summary = "更新所有常见问题向量索引", description = "更新所有常见问题的向量索引")
+    @ApiResponse(responseCode = "200", description = "更新成功")
     @ActionAnnotation(title = "常见问题", action = "更新所有向量索引", description = "update all faq vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {
