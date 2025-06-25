@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:00:25
+ * @LastEditTime: 2025-06-25 09:21:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,17 +101,6 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
         AgentResponse agent = agentRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(agent));
-    }
-
-    @Operation(summary = "查询客服详情", description = "根据UID查询客服详细信息")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = AgentResponse.class)))
-    @ActionAnnotation(title = "客服", action = "查询", description = "query agent profile")
-    @GetMapping("/query/detail")
-    public ResponseEntity<?> queryDetail(AgentRequest request) {
-        // Implementation of queryDetail method
-        return null; // Placeholder return, actual implementation needed
     }
 
     @Operation(summary = "客服接受会话", description = "客服接受会话请求")

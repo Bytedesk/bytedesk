@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 13:23:28
+ * @LastEditTime: 2025-06-25 09:23:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,8 +79,8 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
         return queryByOrg(request);
     }
 
-    // query detail
-    public ArticleResponse queryDetail(ArticleRequest request) {
+    @Override
+    public ArticleResponse queryByUid(ArticleRequest request) {
         Optional<ArticleEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             return convertToResponse(optional.get());
@@ -204,11 +204,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
         return KbaseConvertUtils.convertToArticleResponse(entity);
     }
 
-    @Override
-    public ArticleResponse queryByUid(ArticleRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     @Override
     public ArticleExcel convertToExcel(ArticleEntity article) {

@@ -24,6 +24,13 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "工作流管理", description = "工作流管理相关接口")
 @RestController
 @RequestMapping("/api/v1/workflow")
 @AllArgsConstructor
@@ -31,6 +38,10 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
 
     private final WorkflowRestService workflowRestService;
 
+    @Operation(summary = "查询组织下的工作流", description = "根据组织ID查询工作流列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkflowResponse.class)))
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(WorkflowRequest request) {
@@ -40,6 +51,10 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @Operation(summary = "查询用户下的工作流", description = "根据用户ID查询工作流列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
     public ResponseEntity<?> queryByUser(WorkflowRequest request) {
         
@@ -48,6 +63,10 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @Operation(summary = "创建工作流", description = "创建新的工作流")
+    @ApiResponse(responseCode = "200", description = "创建成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
     public ResponseEntity<?> create(WorkflowRequest request) {
         
@@ -56,6 +75,10 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @Operation(summary = "更新工作流", description = "更新工作流信息")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
     public ResponseEntity<?> update(WorkflowRequest request) {
         
@@ -64,6 +87,8 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @Operation(summary = "删除工作流", description = "删除指定的工作流")
+    @ApiResponse(responseCode = "200", description = "删除成功")
     @Override
     public ResponseEntity<?> delete(WorkflowRequest request) {
         
@@ -72,16 +97,21 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "导出工作流", description = "导出工作流数据")
+    @ApiResponse(responseCode = "200", description = "导出成功")
     @Override
     public Object export(WorkflowRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "查询指定工作流", description = "根据UID查询工作流详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
     public ResponseEntity<?> queryByUid(WorkflowRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
-    
 }

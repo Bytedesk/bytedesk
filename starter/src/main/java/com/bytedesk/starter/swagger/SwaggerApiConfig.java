@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 09:10:42
+ * @LastEditTime: 2025-06-25 09:28:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,8 +15,6 @@ package com.bytedesk.starter.swagger;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
-// import org.springdoc.core.models.GroupedOpenApi;
-// import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -538,6 +536,66 @@ public class SwaggerApiConfig {
                 .group("message-apis")
                 .displayName("消息管理接口")
                 .pathsToMatch("/api/v1/message/**")
+                .build();
+    }
+
+    /**
+     * 机器人管理接口
+     */
+    @Bean
+    public GroupedOpenApi robotApis() {
+        return GroupedOpenApi.builder()
+                .group("robot-apis")
+                .displayName("机器人接口")
+                .pathsToMatch("/api/v1/robot/**")
+                .build();
+    }
+
+    /**
+     * LLM提供商管理接口
+     */
+    @Bean
+    public GroupedOpenApi llmProviderApis() {
+        return GroupedOpenApi.builder()
+                .group("llm-provider-apis")
+                .displayName("LLM提供商接口")
+                .pathsToMatch("/api/v1/provider/**")
+                .build();
+    }
+
+    /**
+     * LLM模型管理接口
+     */
+    @Bean
+    public GroupedOpenApi llmModelApis() {
+        return GroupedOpenApi.builder()
+                .group("llm-model-apis")
+                .displayName("LLM模型接口")
+                .pathsToMatch("/api/v1/model/**")
+                .build();
+    }
+
+    /**
+     * 工作流管理接口
+     */
+    @Bean
+    public GroupedOpenApi workflowApis() {
+        return GroupedOpenApi.builder()
+                .group("workflow-apis")
+                .displayName("工作流接口")
+                .pathsToMatch("/api/v1/workflow/**")
+                .build();
+    }
+
+    /**
+     * 文件上传管理接口
+     */
+    @Bean
+    public GroupedOpenApi uploadApis() {
+        return GroupedOpenApi.builder()
+                .group("upload-apis")
+                .displayName("文件上传接口")
+                .pathsToMatch("/api/v1/upload/**")
                 .build();
     }
 }

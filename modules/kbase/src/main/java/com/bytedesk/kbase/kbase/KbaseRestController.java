@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 14:21:09
+ * @LastEditTime: 2025-06-25 09:24:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,21 +55,13 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
     @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
 
-    // query detail
-    @PreAuthorize("hasAuthority('KBASE_READ')")
-    @GetMapping("/query/detail")
-    public ResponseEntity<?> queryDetail(KbaseRequest request) {
-
-        KbaseResponse response = knowledgeService.queryDetail(request);
-        if (response == null) {
+        KbaseResponse kbase = knowledgeService.queryByUid(request);
+        if (kbase == null) {
             return ResponseEntity.ok(JsonResult.error("not found"));
         }
 
-        return ResponseEntity.ok(JsonResult.success(response));
+        return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
     @PreAuthorize("hasAuthority('KBASE_CREATE')")

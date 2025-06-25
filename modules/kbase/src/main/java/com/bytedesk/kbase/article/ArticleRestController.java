@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:08:46
+ * @LastEditTime: 2025-06-25 09:25:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,18 +66,11 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
     public ResponseEntity<?> queryByUid(ArticleRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+        
+        ArticleResponse article = articleRestService.queryByUid(request);
 
-    // query detail
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
-    @GetMapping("/query/detail")
-    public ResponseEntity<?> queryDetail(ArticleRequest request) {
-
-        ArticleResponse article = articleRestService.queryDetail(request);
         if (article == null) {
-            return ResponseEntity.ok(JsonResult.error("article not found"));
+            return ResponseEntity.ok(JsonResult.error("not found"));
         }
 
         return ResponseEntity.ok(JsonResult.success(article));

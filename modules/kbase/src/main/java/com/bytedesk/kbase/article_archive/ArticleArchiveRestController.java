@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:38:28
+ * @LastEditTime: 2025-06-25 09:25:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,13 +50,13 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // query detail
-    @GetMapping("/query/detail")
-    public ResponseEntity<?> queryDetail(ArticleArchiveRequest request) {
+    @Override
+    public ResponseEntity<?> queryByUid(ArticleArchiveRequest request) {
 
-        ArticleArchiveResponse article_archive = article_archiveService.queryDetail(request);
+        ArticleArchiveResponse article_archive = article_archiveService.queryByUid(request);
+
         if (article_archive == null) {
-            return ResponseEntity.ok(JsonResult.error("article_archive not found"));
+            return ResponseEntity.ok(JsonResult.error("not found"));
         }
 
         return ResponseEntity.ok(JsonResult.success(article_archive));
@@ -92,10 +92,6 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(ArticleArchiveRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 }
