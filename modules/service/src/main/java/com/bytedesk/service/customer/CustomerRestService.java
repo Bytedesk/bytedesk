@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 08:38:34
+ * @LastEditTime: 2025-06-25 08:47:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,14 +17,14 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -38,6 +38,8 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final AuthService authService;
 
     @Override
     public Page<CustomerEntity> queryByOrgEntity(CustomerRequest request) {
@@ -54,13 +56,13 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
 
     @Override
     public Page<CustomerResponse> queryByUser(CustomerRequest request) {
-        // 
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<CustomerEntity> spec = CustomerSpecification.search(request);
-        Page<CustomerEntity> page = customerRepository.findAll(spec, pageable);
-        
-        return page.map(this::convertToResponse);
+       UserEntity user = authService.getCurrentUser();
+       if (user == null) {
+        throw new RuntimeException("用户未登录");
+       }
+       request.setUserUid(user.getUid());
+       // 
+       return queryByOrg(request);
     }
 
     @Override
