@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 15:25:53
+ * @LastEditTime: 2025-06-25 17:39:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.message.MessageExtra;
@@ -76,11 +77,19 @@ public class MessageUnreadRestService
     }
 
     public Boolean existsByUid(String uid) {
+        if (StringUtils.hasText(uid)) {
+            return false;
+        }
         return messageUnreadRepository.existsByUid(uid);
     }
 
     @Override
     public MessageUnreadResponse create(MessageUnreadRequest request) {
+        // 检查uid是否存在
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
+        // 
         MessageUnreadEntity messageUnread = modelMapper.map(request, MessageUnreadEntity.class);
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
         return convertToResponse(savedMessageUnread);
@@ -88,9 +97,14 @@ public class MessageUnreadRestService
 
     @Override
     public MessageUnreadResponse update(MessageUnreadRequest request) {
-        MessageUnreadEntity messageUnread = modelMapper.map(request, MessageUnreadEntity.class);
-        MessageUnreadEntity savedMessageUnread = save(messageUnread);
-        return convertToResponse(savedMessageUnread);
+        Optional<MessageUnreadEntity> messageUnreadEntityOptional = findByUid(request.getUid());
+        if (messageUnreadEntityOptional.isPresent()) {
+            MessageUnreadEntity messageUnread = messageUnreadEntityOptional.get();
+            // messageUnread.setStatus(request.getStatus());
+            // messageUnread.setExtra(request.getExtra());
+            return convertToResponse(save(messageUnread));
+        } 
+        return null;
     }
 
     @Transactional
