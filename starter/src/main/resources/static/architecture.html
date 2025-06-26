@@ -12,6 +12,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            overflow-x: hidden;
         }
         .architecture-diagram {
             width: 100%;
@@ -173,14 +174,12 @@
         .vertical-module {
             position: absolute;
             right: 20px;
-            top: 130px;
-            bottom: 130px;
-            width: 120px;
-            display: flex;
-            flex-direction: column;
+            top: 140px;
+            width: 20px;
+            z-index: 10;
         }
         .vertical-module-left {
-            right: 150px;
+            right: 70px;
         }
         .vertical-permissions {
             background-color: #f79992;
@@ -188,7 +187,15 @@
             text-orientation: mixed;
             text-align: center;
             padding: 15px 0;
-            flex: 1;
+            width: 100%;
+            font-size: 12px;
+            border: 2px solid #e74c3c;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .vertical-logging {
             background-color: #c1f7d0;
@@ -196,7 +203,15 @@
             text-orientation: mixed;
             text-align: center;
             padding: 15px 0;
-            flex: 1;
+            width: 100%;
+            font-size: 12px;
+            border: 2px solid #27ae60;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         /* 选项卡样式 */
@@ -410,6 +425,18 @@
         <!-- 分层架构图选项卡 -->
         <div id="layered-view" class="tab-content" style="display: block;">
             <div class="layered-architecture">
+                <!-- 垂直模块 - 权限控制 -->
+                <div class="vertical-module">
+                    <div class="vertical-permissions" lang="en">Permission Control</div>
+                    <div class="vertical-permissions" lang="zh">权限控制</div>
+                </div>
+                
+                <!-- 垂直模块 - 日志记录 -->
+                <div class="vertical-module vertical-module-left">
+                    <div class="vertical-logging" lang="en">Logging</div>
+                    <div class="vertical-logging" lang="zh">日志记录</div>
+                </div>
+                
                 <!-- 前端展示层 -->
                 <div class="layer layer-frontend">
                     <div class="layer-title" lang="en">Frontend Layer</div>
@@ -446,11 +473,10 @@
                         <div class="layer-component">企业IM</div>
                         <div class="layer-component">在线客服</div>
                         <div class="layer-component">AI Agent</div>
-                        <div class="layer-component">知识库/帮助中心</div>
-                        <div class="layer-component">客户之声</div>
+                        <div class="layer-component">知识库</div>
                         <div class="layer-component">工单系统</div>
                         <div class="layer-component">工作流</div>
-                        <div class="layer-component">项目管理</div>
+                        <div class="layer-component">...</div>
                     </div>
                 </div>
                 
@@ -465,8 +491,7 @@
                         <div class="layer-component">腾讯混元</div>
                         <div class="layer-component">火山引擎</div>
                         <div class="layer-component">百度千帆</div>
-                        <div class="layer-component">硅基流动</div>
-                        <div class="layer-component">... ...</div>
+                        <div class="layer-component">...</div>
                     </div>
                 </div>
                 
@@ -498,18 +523,6 @@
                         <div class="layer-component">独立服务器</div>
                         <div class="layer-component">第三方VPS主机</div>
                     </div>
-                </div>
-                
-                <!-- 垂直模块 - 权限控制 -->
-                <div class="vertical-module">
-                    <div class="vertical-permissions" lang="en">Permission Control</div>
-                    <div class="vertical-permissions" lang="zh">权限控制</div>
-                </div>
-                
-                <!-- 垂直模块 - 日志记录 -->
-                <div class="vertical-module vertical-module-left">
-                    <div class="vertical-logging" lang="en">Logging</div>
-                    <div class="vertical-logging" lang="zh">日志记录</div>
                 </div>
             </div>
         </div>
@@ -1415,9 +1428,11 @@
                 elementsEn.forEach(el => el.style.display = 'block');
                 elementsZh.forEach(el => el.style.display = 'none');
                 
-                // Update button states
-                document.getElementById('en-btn').classList.add('active');
-                document.getElementById('zh-btn').classList.remove('active');
+                // Update button states (with null checks)
+                const enBtn = document.getElementById('en-btn');
+                const zhBtn = document.getElementById('zh-btn');
+                if (enBtn) enBtn.classList.add('active');
+                if (zhBtn) zhBtn.classList.remove('active');
                 
                 // Update document language
                 document.documentElement.lang = 'en';
@@ -1427,9 +1442,11 @@
                 elementsEn.forEach(el => el.style.display = 'none');
                 elementsZh.forEach(el => el.style.display = 'block');
                 
-                // Update button states
-                document.getElementById('en-btn').classList.remove('active');
-                document.getElementById('zh-btn').classList.add('active');
+                // Update button states (with null checks)
+                const enBtn = document.getElementById('en-btn');
+                const zhBtn = document.getElementById('zh-btn');
+                if (enBtn) enBtn.classList.remove('active');
+                if (zhBtn) zhBtn.classList.add('active');
                 
                 // Update document language
                 document.documentElement.lang = 'zh';
