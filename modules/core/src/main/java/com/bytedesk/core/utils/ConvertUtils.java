@@ -205,6 +205,10 @@ public class ConvertUtils {
             BytedeskProperties bytedeskProperties) {
         // return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
         BytedeskPropertiesResponse response = modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
+        
+        // 确保使用加密后的appkey
+        response.setAppkey(bytedeskProperties.getAppkey());
+        
         // 明确设置Custom所有字段的值，确保从配置中获取
         if (bytedeskProperties.getCustom() != null) {
             response.getCustom().setShowRightCornerChat(bytedeskProperties.getCustom().getShowRightCornerChat());

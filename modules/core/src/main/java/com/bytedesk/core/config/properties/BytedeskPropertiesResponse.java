@@ -25,7 +25,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Boolean debug;
     // private String edition;
     private String version; 
-    private String appkey;
+    private String appkey; // 注意：这是加密后的appkey，前端需要先解密再解码
 
     // 
     private Custom custom;

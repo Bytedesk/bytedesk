@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 09:39:49
+ * @LastEditTime: 2025-06-26 10:48:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,8 @@ package com.bytedesk.core.config.properties;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ import lombok.Data;
 public class BytedeskProperties {
 
     public static final String CONFIG_PREFIX = "bytedesk";
+    private static final String ENCRYPTION_KEY = "bytedesk_license_key_2024"; // 16字节密钥
 
     private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
 
@@ -64,6 +66,34 @@ public class BytedeskProperties {
                     instance = this;
                 }
             }
+        }
+    }
+
+    /**
+     * 加密字符串
+     * @param plainText 明文
+     * @return 加密后的Base64字符串
+     */
+    private String encryptString(String plainText) {
+        try {
+            if (!StringUtils.hasText(plainText)) {
+                return plainText;
+            }
+            
+            // 使用简单的异或加密 + Base64编码
+            // 这是一个简化的实现，实际项目中可以使用更强的加密算法
+            byte[] keyBytes = ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8);
+            byte[] textBytes = plainText.getBytes(StandardCharsets.UTF_8);
+            byte[] encryptedBytes = new byte[textBytes.length];
+            
+            for (int i = 0; i < textBytes.length; i++) {
+                encryptedBytes[i] = (byte) (textBytes[i] ^ keyBytes[i % keyBytes.length]);
+            }
+            
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return plainText; // 加密失败时返回原值
         }
     }
 
@@ -475,5 +505,20 @@ public class BytedeskProperties {
                admin.getEmailWhitelist().contains(receiver);
     }
 
+    /**
+     * 获取加密后的appkey
+     * @return 加密后的appkey字符串
+     */
+    public String getAppkey() {
+        return encryptString(this.appkey);
+    }
+
+    /**
+     * 获取原始appkey（仅用于内部使用）
+     * @return 原始appkey字符串
+     */
+    public String getOriginalAppkey() {
+        return this.appkey;
+    }
 
 }
