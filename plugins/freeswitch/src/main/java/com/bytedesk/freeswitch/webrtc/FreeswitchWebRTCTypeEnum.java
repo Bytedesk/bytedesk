@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.webrtc;
 
-public enum FreeswitchWebRTCTypeEnum {
+public enum FreeSwitchWebRTCTypeEnum {
     THREAD,
     CUSTOMER,
     TICKET

@@ -18,9 +18,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface FreeswitchWebRTCRepository extends JpaRepository<FreeswitchWebRTCEntity, Long>, JpaSpecificationExecutor<FreeswitchWebRTCEntity> {
+public interface FreeSwitchWebRTCRepository extends JpaRepository<FreeSwitchWebRTCEntity, Long>, JpaSpecificationExecutor<FreeSwitchWebRTCEntity> {
 
-    Optional<FreeswitchWebRTCEntity> findByUid(String uid);
+    Optional<FreeSwitchWebRTCEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 

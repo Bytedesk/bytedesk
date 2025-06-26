@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FreeswitchWebRTCRequest extends BaseRequest {
+public class FreeSwitchWebRTCRequest extends BaseRequest {
 
     private String name;
 
@@ -37,7 +37,7 @@ public class FreeswitchWebRTCRequest extends BaseRequest {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     // @Builder.Default
-    // private String type = FreeswitchWebRTCTypeEnum.CUSTOMER.name();
+    // private String type = FreeSwitchWebRTCTypeEnum.CUSTOMER.name();
 
     @Builder.Default
     private String color = "red";

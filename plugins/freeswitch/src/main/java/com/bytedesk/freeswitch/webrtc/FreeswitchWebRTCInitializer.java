@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class FreeswitchWebRTCInitializer implements SmartInitializingSingleton {
+public class FreeSwitchWebRTCInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -29,7 +29,7 @@ public class FreeswitchWebRTCInitializer implements SmartInitializingSingleton {
 
     private void initPermissions() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = FreeswitchWebRTCPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = FreeSwitchWebRTCPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

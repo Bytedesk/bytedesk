@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 10:14:10
+ * @LastEditTime: 2025-06-26 17:38:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,9 +41,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({FreeswitchWebRTCEntityListener.class})
+// @EntityListeners({FreeSwitchWebRTCEntityListener.class})
 @Table(name = "bytedesk_freeswitch_webrtc")
-public class FreeswitchWebRTCEntity extends BaseEntity {
+public class FreeSwitchWebRTCEntity extends BaseEntity {
 
     /**
      * 客服名称
@@ -65,7 +65,7 @@ public class FreeswitchWebRTCEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "webrtc_type")
-    private String type = FreeswitchWebRTCTypeEnum.CUSTOMER.name();
+    private String type = FreeSwitchWebRTCTypeEnum.CUSTOMER.name();
 
     /**
      * 客服状态

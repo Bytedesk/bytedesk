@@ -15,6 +15,6 @@ package com.bytedesk.freeswitch.webrtc;
 
 import com.bytedesk.core.base.BasePermissions;
 
-public class FreeswitchWebRTCPermissions extends BasePermissions {
+public class FreeSwitchWebRTCPermissions extends BasePermissions {
 
 }

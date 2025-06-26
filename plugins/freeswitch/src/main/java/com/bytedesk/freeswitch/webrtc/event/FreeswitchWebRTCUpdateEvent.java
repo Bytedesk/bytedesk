@@ -15,20 +15,20 @@ package com.bytedesk.freeswitch.webrtc.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.freeswitch.webrtc.FreeswitchWebRTCEntity;
+import com.bytedesk.freeswitch.webrtc.FreeSwitchWebRTCEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class FreeswitchWebRTCUpdateEvent extends ApplicationEvent {
+public class FreeSwitchWebRTCUpdateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private FreeswitchWebRTCEntity webrtc;
+    private FreeSwitchWebRTCEntity webrtc;
 
-    public FreeswitchWebRTCUpdateEvent(FreeswitchWebRTCEntity webrtc) {
+    public FreeSwitchWebRTCUpdateEvent(FreeSwitchWebRTCEntity webrtc) {
         super(webrtc);
         this.webrtc = webrtc;
     }

@@ -30,34 +30,34 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/freeswitch/webrtc")
 @AllArgsConstructor
-public class FreeswitchWebRTCRestController extends BaseRestController<FreeswitchWebRTCRequest> {
+public class FreeSwitchWebRTCRestController extends BaseRestController<FreeSwitchWebRTCRequest> {
 
-    private final FreeswitchWebRTCRestService freeswitchWebRTCRestService;
+    private final FreeSwitchWebRTCRestService freeswitchWebRTCRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "视频客服", action = "组织查询", description = "query webrtc by org")
     @Override
-    public ResponseEntity<?> queryByOrg(FreeswitchWebRTCRequest request) {
+    public ResponseEntity<?> queryByOrg(FreeSwitchWebRTCRequest request) {
         
-        Page<FreeswitchWebRTCResponse> webrtcPage = freeswitchWebRTCRestService.queryByOrg(request);
+        Page<FreeSwitchWebRTCResponse> webrtcPage = freeswitchWebRTCRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(webrtcPage));
     }
 
     @ActionAnnotation(title = "视频客服", action = "用户查询", description = "query webrtc by user")
     @Override
-    public ResponseEntity<?> queryByUser(FreeswitchWebRTCRequest request) {
+    public ResponseEntity<?> queryByUser(FreeSwitchWebRTCRequest request) {
         
-        Page<FreeswitchWebRTCResponse> webrtcPage = freeswitchWebRTCRestService.queryByUser(request);
+        Page<FreeSwitchWebRTCResponse> webrtcPage = freeswitchWebRTCRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(webrtcPage));
     }
 
     @ActionAnnotation(title = "视频客服", action = "查询详情", description = "query webrtc by uid")
     @Override
-    public ResponseEntity<?> queryByUid(FreeswitchWebRTCRequest request) {
+    public ResponseEntity<?> queryByUid(FreeSwitchWebRTCRequest request) {
         
-        FreeswitchWebRTCResponse webrtc = freeswitchWebRTCRestService.queryByUid(request);
+        FreeSwitchWebRTCResponse webrtc = freeswitchWebRTCRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(webrtc));
     }
@@ -65,9 +65,9 @@ public class FreeswitchWebRTCRestController extends BaseRestController<Freeswitc
     @ActionAnnotation(title = "视频客服", action = "新建", description = "create webrtc")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(FreeswitchWebRTCRequest request) {
+    public ResponseEntity<?> create(FreeSwitchWebRTCRequest request) {
         
-        FreeswitchWebRTCResponse webrtc = freeswitchWebRTCRestService.create(request);
+        FreeSwitchWebRTCResponse webrtc = freeswitchWebRTCRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(webrtc));
     }
@@ -75,9 +75,9 @@ public class FreeswitchWebRTCRestController extends BaseRestController<Freeswitc
     @ActionAnnotation(title = "视频客服", action = "更新", description = "update webrtc")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(FreeswitchWebRTCRequest request) {
+    public ResponseEntity<?> update(FreeSwitchWebRTCRequest request) {
         
-        FreeswitchWebRTCResponse webrtc = freeswitchWebRTCRestService.update(request);
+        FreeSwitchWebRTCResponse webrtc = freeswitchWebRTCRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(webrtc));
     }
@@ -85,7 +85,7 @@ public class FreeswitchWebRTCRestController extends BaseRestController<Freeswitc
     @ActionAnnotation(title = "视频客服", action = "删除", description = "delete webrtc")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(FreeswitchWebRTCRequest request) {
+    public ResponseEntity<?> delete(FreeSwitchWebRTCRequest request) {
         
         freeswitchWebRTCRestService.delete(request);
 
@@ -96,12 +96,12 @@ public class FreeswitchWebRTCRestController extends BaseRestController<Freeswitc
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
-    public Object export(FreeswitchWebRTCRequest request, HttpServletResponse response) {
+    public Object export(FreeSwitchWebRTCRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             freeswitchWebRTCRestService,
-            FreeswitchWebRTCExcel.class,
+            FreeSwitchWebRTCExcel.class,
             "视频客服",
             "webrtc"
         );

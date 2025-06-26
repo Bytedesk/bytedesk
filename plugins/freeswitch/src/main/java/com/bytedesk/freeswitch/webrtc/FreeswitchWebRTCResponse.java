@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FreeswitchWebRTCResponse extends BaseResponse {
+public class FreeSwitchWebRTCResponse extends BaseResponse {
 
     private String name;
 

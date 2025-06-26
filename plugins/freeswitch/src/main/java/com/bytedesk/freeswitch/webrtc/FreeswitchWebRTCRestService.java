@@ -33,9 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<FreeswitchWebRTCEntity, FreeswitchWebRTCRequest, FreeswitchWebRTCResponse, FreeswitchWebRTCExcel> {
+public class FreeSwitchWebRTCRestService extends BaseRestServiceWithExcel<FreeSwitchWebRTCEntity, FreeSwitchWebRTCRequest, FreeSwitchWebRTCResponse, FreeSwitchWebRTCExcel> {
 
-    private final FreeswitchWebRTCRepository webrtcRepository;
+    private final FreeSwitchWebRTCRepository webrtcRepository;
 
     private final ModelMapper modelMapper;
 
@@ -44,20 +44,20 @@ public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<Freesw
     private final AuthService authService;
 
     @Override
-    public Page<FreeswitchWebRTCEntity> queryByOrgEntity(FreeswitchWebRTCRequest request) {
+    public Page<FreeSwitchWebRTCEntity> queryByOrgEntity(FreeSwitchWebRTCRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<FreeswitchWebRTCEntity> spec = FreeswitchWebRTCSpecification.search(request);
+        Specification<FreeSwitchWebRTCEntity> spec = FreeSwitchWebRTCSpecification.search(request);
         return webrtcRepository.findAll(spec, pageable);
     }
 
     @Override
-    public Page<FreeswitchWebRTCResponse> queryByOrg(FreeswitchWebRTCRequest request) {
-        Page<FreeswitchWebRTCEntity> page = queryByOrgEntity(request);
+    public Page<FreeSwitchWebRTCResponse> queryByOrg(FreeSwitchWebRTCRequest request) {
+        Page<FreeSwitchWebRTCEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<FreeswitchWebRTCResponse> queryByUser(FreeswitchWebRTCRequest request) {
+    public Page<FreeSwitchWebRTCResponse> queryByUser(FreeSwitchWebRTCRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");
@@ -68,14 +68,14 @@ public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<Freesw
     }
 
     @Override
-    public FreeswitchWebRTCResponse queryByUid(FreeswitchWebRTCRequest request) {
+    public FreeSwitchWebRTCResponse queryByUid(FreeSwitchWebRTCRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "webrtc", key = "#uid", unless="#result==null")
     @Override
-    public Optional<FreeswitchWebRTCEntity> findByUid(String uid) {
+    public Optional<FreeSwitchWebRTCEntity> findByUid(String uid) {
         return webrtcRepository.findByUid(uid);
     }
 
@@ -84,7 +84,7 @@ public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<Freesw
     }
 
     @Override
-    public FreeswitchWebRTCResponse create(FreeswitchWebRTCRequest request) {
+    public FreeSwitchWebRTCResponse create(FreeSwitchWebRTCRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -95,12 +95,12 @@ public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<Freesw
             request.setUserUid(user.getUid());
         }
         // 
-        FreeswitchWebRTCEntity entity = modelMapper.map(request, FreeswitchWebRTCEntity.class);
+        FreeSwitchWebRTCEntity entity = modelMapper.map(request, FreeSwitchWebRTCEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        FreeswitchWebRTCEntity savedEntity = save(entity);
+        FreeSwitchWebRTCEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create webrtc failed");
         }
@@ -108,34 +108,34 @@ public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<Freesw
     }
 
     @Override
-    public FreeswitchWebRTCResponse update(FreeswitchWebRTCRequest request) {
-        Optional<FreeswitchWebRTCEntity> optional = webrtcRepository.findByUid(request.getUid());
+    public FreeSwitchWebRTCResponse update(FreeSwitchWebRTCRequest request) {
+        Optional<FreeSwitchWebRTCEntity> optional = webrtcRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            FreeswitchWebRTCEntity entity = optional.get();
+            FreeSwitchWebRTCEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            FreeswitchWebRTCEntity savedEntity = save(entity);
+            FreeSwitchWebRTCEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update webrtc failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("FreeswitchWebRTC not found");
+            throw new RuntimeException("FreeSwitchWebRTC not found");
         }
     }
 
     @Override
-    protected FreeswitchWebRTCEntity doSave(FreeswitchWebRTCEntity entity) {
+    protected FreeSwitchWebRTCEntity doSave(FreeSwitchWebRTCEntity entity) {
         return webrtcRepository.save(entity);
     }
 
     @Override
-    public FreeswitchWebRTCEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeswitchWebRTCEntity entity) {
+    public FreeSwitchWebRTCEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FreeSwitchWebRTCEntity entity) {
         try {
-            Optional<FreeswitchWebRTCEntity> latest = webrtcRepository.findByUid(entity.getUid());
+            Optional<FreeSwitchWebRTCEntity> latest = webrtcRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                FreeswitchWebRTCEntity latestEntity = latest.get();
+                FreeSwitchWebRTCEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
@@ -151,30 +151,30 @@ public class FreeswitchWebRTCRestService extends BaseRestServiceWithExcel<Freesw
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<FreeswitchWebRTCEntity> optional = webrtcRepository.findByUid(uid);
+        Optional<FreeSwitchWebRTCEntity> optional = webrtcRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
             // webrtcRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("FreeswitchWebRTC not found");
+            throw new RuntimeException("FreeSwitchWebRTC not found");
         }
     }
 
     @Override
-    public void delete(FreeswitchWebRTCRequest request) {
+    public void delete(FreeSwitchWebRTCRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public FreeswitchWebRTCResponse convertToResponse(FreeswitchWebRTCEntity entity) {
-        return modelMapper.map(entity, FreeswitchWebRTCResponse.class);
+    public FreeSwitchWebRTCResponse convertToResponse(FreeSwitchWebRTCEntity entity) {
+        return modelMapper.map(entity, FreeSwitchWebRTCResponse.class);
     }
 
     @Override
-    public FreeswitchWebRTCExcel convertToExcel(FreeswitchWebRTCEntity entity) {
-        return modelMapper.map(entity, FreeswitchWebRTCExcel.class);
+    public FreeSwitchWebRTCExcel convertToExcel(FreeSwitchWebRTCEntity entity) {
+        return modelMapper.map(entity, FreeSwitchWebRTCExcel.class);
     }
     
     

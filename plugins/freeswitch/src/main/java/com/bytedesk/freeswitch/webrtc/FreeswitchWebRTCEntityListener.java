@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.freeswitch.webrtc.event.FreeswitchWebRTCCreateEvent;
-import com.bytedesk.freeswitch.webrtc.event.FreeswitchWebRTCUpdateEvent;
+import com.bytedesk.freeswitch.webrtc.event.FreeSwitchWebRTCCreateEvent;
+import com.bytedesk.freeswitch.webrtc.event.FreeSwitchWebRTCUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
@@ -28,24 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class FreeswitchWebRTCEntityListener {
+public class FreeSwitchWebRTCEntityListener {
 
     @PostPersist
-    public void onPostPersist(FreeswitchWebRTCEntity webrtc) {
+    public void onPostPersist(FreeSwitchWebRTCEntity webrtc) {
         log.info("onPostPersist: {}", webrtc);
-        FreeswitchWebRTCEntity cloneFreeswitchWebRTC = SerializationUtils.clone(webrtc);
+        FreeSwitchWebRTCEntity cloneFreeSwitchWebRTC = SerializationUtils.clone(webrtc);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new FreeswitchWebRTCCreateEvent(cloneFreeswitchWebRTC));
+        bytedeskEventPublisher.publishEvent(new FreeSwitchWebRTCCreateEvent(cloneFreeSwitchWebRTC));
     }
 
     @PostUpdate
-    public void onPostUpdate(FreeswitchWebRTCEntity webrtc) {
+    public void onPostUpdate(FreeSwitchWebRTCEntity webrtc) {
         log.info("onPostUpdate: {}", webrtc);
-        FreeswitchWebRTCEntity cloneFreeswitchWebRTC = SerializationUtils.clone(webrtc);
+        FreeSwitchWebRTCEntity cloneFreeSwitchWebRTC = SerializationUtils.clone(webrtc);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new FreeswitchWebRTCUpdateEvent(cloneFreeswitchWebRTC));
+        bytedeskEventPublisher.publishEvent(new FreeSwitchWebRTCUpdateEvent(cloneFreeSwitchWebRTC));
     }
     
 }

@@ -25,7 +25,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class FreeswitchWebRTCExcel {
+public class FreeSwitchWebRTCExcel {
 
     @ExcelProperty(index = 0, value = "标签名称")
     @ColumnWidth(20)

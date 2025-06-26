@@ -21,9 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class FreeswitchWebRTCEventListener {
+public class FreeSwitchWebRTCEventListener {
 
-    // private final FreeswitchWebRTCRestService webrtcRestService;
+    // private final FreeSwitchWebRTCRestService webrtcRestService;
 
     // @Order(3)
     // @EventListener
@@ -31,7 +31,7 @@ public class FreeswitchWebRTCEventListener {
     //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
     //     String orgUid = organization.getUid();
     //     log.info("thread - organization created: {}", organization.getName());
-    //     webrtcRestService.initFreeswitchWebRTCs(orgUid);
+    //     webrtcRestService.initFreeSwitchWebRTCs(orgUid);
     // }
 
  

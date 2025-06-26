@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FreeswitchWebRTCSpecification extends BaseSpecification {
+public class FreeSwitchWebRTCSpecification extends BaseSpecification {
     
-    public static Specification<FreeswitchWebRTCEntity> search(FreeswitchWebRTCRequest request) {
+    public static Specification<FreeSwitchWebRTCEntity> search(FreeSwitchWebRTCRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
