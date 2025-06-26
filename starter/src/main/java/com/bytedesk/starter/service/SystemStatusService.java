@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 16:47:59
+ * @LastEditTime: 2025-06-26 16:57:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,17 +18,20 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.core.utils.JsonResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +44,9 @@ public class SystemStatusService {
 
     @Autowired(required = false)
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired(required = false)
+    private DataSource dataSource;
 
     /**
      * 获取系统整体状态
@@ -157,16 +163,30 @@ public class SystemStatusService {
     private Map<String, Object> getDatabaseStatus() {
         Map<String, Object> dbStatus = new HashMap<>();
         
-        try {
-            // 这里可以添加实际的数据库连接测试
-            // 暂时返回模拟状态
-            dbStatus.put("status", "UP");
-            dbStatus.put("message", "数据库连接正常");
-            dbStatus.put("connectionPool", "正常");
-        } catch (Exception e) {
-            dbStatus.put("status", "DOWN");
-            dbStatus.put("message", "数据库连接异常: " + e.getMessage());
-            dbStatus.put("connectionPool", "异常");
+        if (dataSource != null) {
+            try (Connection connection = dataSource.getConnection()) {
+                DatabaseMetaData metaData = connection.getMetaData();
+                String databaseProductName = metaData.getDatabaseProductName();
+                String databaseProductVersion = metaData.getDatabaseProductVersion();
+                
+                dbStatus.put("status", "UP");
+                dbStatus.put("message", "数据库连接正常");
+                dbStatus.put("connectionPool", "正常");
+                dbStatus.put("databaseType", databaseProductName);
+                dbStatus.put("databaseVersion", databaseProductVersion);
+                dbStatus.put("url", metaData.getURL());
+                dbStatus.put("username", metaData.getUserName());
+            } catch (SQLException e) {
+                log.error("数据库连接测试失败", e);
+                dbStatus.put("status", "DOWN");
+                dbStatus.put("message", "数据库连接异常: " + e.getMessage());
+                dbStatus.put("connectionPool", "异常");
+                dbStatus.put("error", e.getSQLState() + " - " + e.getErrorCode());
+            }
+        } else {
+            dbStatus.put("status", "UNKNOWN");
+            dbStatus.put("message", "数据库未配置");
+            dbStatus.put("connectionPool", "未配置");
         }
         
         return dbStatus;
@@ -180,12 +200,24 @@ public class SystemStatusService {
         
         if (redisTemplate != null) {
             try {
-                redisTemplate.opsForValue().get("health_check");
-                redisStatus.put("status", "UP");
-                redisStatus.put("message", "Redis连接正常");
+                // 测试Redis连接
+                redisTemplate.opsForValue().set("health_check", "test");
+                String result = (String) redisTemplate.opsForValue().get("health_check");
+                redisTemplate.delete("health_check");
+                
+                if ("test".equals(result)) {
+                    redisStatus.put("status", "UP");
+                    redisStatus.put("message", "Redis连接正常");
+                    redisStatus.put("ping", "PONG");
+                } else {
+                    redisStatus.put("status", "DOWN");
+                    redisStatus.put("message", "Redis连接异常");
+                }
             } catch (Exception e) {
+                log.error("Redis连接测试失败", e);
                 redisStatus.put("status", "DOWN");
                 redisStatus.put("message", "Redis连接异常: " + e.getMessage());
+                redisStatus.put("error", e.getClass().getSimpleName());
             }
         } else {
             redisStatus.put("status", "UNKNOWN");

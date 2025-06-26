@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-27 10:00:00
+ * @LastEditTime: 2025-06-26 17:00:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Tag(name = "system-status - 系统状态")
 @RestController
-@RequestMapping("/api/system")
+@RequestMapping("/system")
 public class SystemStatusController {
 
     @Autowired
@@ -43,7 +43,7 @@ public class SystemStatusController {
 
     /**
      * 获取系统详细状态
-     * http://127.0.0.1:9003/api/system/status
+     * http://127.0.0.1:9003/system/status
      */
     @GetMapping("/status")
     @Operation(summary = "获取系统详细状态")
@@ -59,7 +59,7 @@ public class SystemStatusController {
 
     /**
      * 获取系统健康状态
-     * http://127.0.0.1:9003/api/system/health
+     * http://127.0.0.1:9003/system/health
      */
     @GetMapping("/health")
     @Operation(summary = "获取系统健康状态")
@@ -75,7 +75,7 @@ public class SystemStatusController {
 
     /**
      * 获取系统基本信息
-     * http://127.0.0.1:9003/api/system/info
+     * http://127.0.0.1:9003/system/info
      */
     @GetMapping("/info")
     @Operation(summary = "获取系统基本信息")
@@ -97,7 +97,7 @@ public class SystemStatusController {
 
     /**
      * 获取服务状态
-     * http://127.0.0.1:9003/api/system/services
+     * http://127.0.0.1:9003/system/services
      */
     @GetMapping("/services")
     @Operation(summary = "获取服务状态")

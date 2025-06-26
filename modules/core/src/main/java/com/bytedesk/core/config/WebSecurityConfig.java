@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-16 18:19:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 11:14:45
+ * @LastEditTime: 2025-06-26 17:00:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,6 +62,8 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
+                    // 系统状态监控接口允许匿名访问
+                    // .requestMatchers("/api/system/**").permitAll()
                     // SSE 端点特殊处理，在授权检查前确保有效认证
                     // .requestMatchers("/api/v1/agent/message/sse").authenticated()
                     .requestMatchers("/api/**").authenticated()
