@@ -149,6 +149,7 @@ services:
       BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: "true"
       BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
+      BYTEDESK_CUSTOM_LANG: zh-CN
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
       BYTEDESK_ADMIN_PASSWORD: admin
