@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 11:06:56
+ * @LastEditTime: 2025-06-26 11:13:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class BytedeskProperties {
 
     public static final String CONFIG_PREFIX = "bytedesk";
-    private static final String ENCRYPTION_KEY = "bytedesk_license_key"; // 16字节密钥
+    private static final String ENCRYPTION_KEY = "bytedesk_license"; // 16字节密钥
 
     private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
 
@@ -90,29 +90,6 @@ public class BytedeskProperties {
         } catch (Exception e) {
             e.printStackTrace();
             return plainText; // 加密失败时返回原值
-        }
-    }
-
-    /**
-     * AES解密字符串
-     * @param encryptedText 加密后的Base64字符串
-     * @return 解密后的明文
-     */
-    public static String decryptString(String encryptedText) {
-        try {
-            if (!StringUtils.hasText(encryptedText)) {
-                return encryptedText;
-            }
-            
-            SecretKeySpec secretKey = new SecretKeySpec(ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
-            byte[] decryptedBytes = cipher.doFinal(decodedBytes);
-            return new String(decryptedBytes, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return encryptedText; // 解密失败时返回原值
         }
     }
 
