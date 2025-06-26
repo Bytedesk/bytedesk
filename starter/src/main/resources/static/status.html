@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-26 16:44:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 17:00:25
+ * @LastEditTime: 2025-06-26 17:15:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系统状态监控 - Bytedesk</title>
+    <title>微语系统状态监控</title>
     <style>
         * {
             margin: 0;
@@ -229,8 +229,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>系统状态监控</h1>
-            <p>实时监控系统各个组件的运行状态</p>
+            <h1>微语系统状态监控</h1>
+            <p>实时监控系统各个组件的运行状态（已去除敏感信息）</p>
         </div>
 
         <div id="loading" class="loading">
@@ -244,28 +244,24 @@
 
         <div id="content" style="display: none;">
             <div class="status-grid">
-                <!-- 系统基本信息 -->
+                <!-- 系统负载信息 -->
                 <div class="status-card">
                     <h3>
                         <span class="status-indicator status-up"></span>
-                        系统信息
+                        系统负载
                     </h3>
-                    <div id="system-info">
+                    <div id="load-info">
                         <div class="status-item">
                             <span class="status-label">运行时间</span>
                             <span class="status-value" id="uptime">-</span>
                         </div>
                         <div class="status-item">
-                            <span class="status-label">操作系统</span>
-                            <span class="status-value" id="os">-</span>
+                            <span class="status-label">系统负载</span>
+                            <span class="status-value" id="load-average">-</span>
                         </div>
                         <div class="status-item">
                             <span class="status-label">CPU核心数</span>
                             <span class="status-value" id="processors">-</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">系统负载</span>
-                            <span class="status-value" id="load-average">-</span>
                         </div>
                     </div>
                 </div>
@@ -338,50 +334,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- 数据库状态 -->
-                <div class="status-card">
-                    <h3>
-                        <span class="status-indicator status-up" id="db-status-indicator"></span>
-                        数据库状态
-                    </h3>
-                    <div id="database-info">
-                        <div class="status-item">
-                            <span class="status-label">连接状态</span>
-                            <span class="status-value" id="db-status">-</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">数据库类型</span>
-                            <span class="status-value" id="db-type">-</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">数据库版本</span>
-                            <span class="status-value" id="db-version">-</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">连接池</span>
-                            <span class="status-value" id="db-pool">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Redis状态 -->
-                <div class="status-card">
-                    <h3>
-                        <span class="status-indicator status-unknown" id="redis-status-indicator"></span>
-                        Redis状态
-                    </h3>
-                    <div id="redis-info">
-                        <div class="status-item">
-                            <span class="status-label">连接状态</span>
-                            <span class="status-value" id="redis-status">-</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-label">Ping测试</span>
-                            <span class="status-value" id="redis-ping">-</span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="timestamp">
@@ -434,12 +386,15 @@
             // 更新时间戳
             document.getElementById('last-update').textContent = data.timestamp;
             
-            // 更新系统信息
-            if (data.system) {
+            // 更新负载信息
+            if (data.load) {
+                document.getElementById('load-average').textContent = data.load.loadAverage;
+                document.getElementById('processors').textContent = data.load.processors;
+            }
+            
+            // 更新运行时间
+            if (data.uptime) {
                 document.getElementById('uptime').textContent = data.uptime;
-                document.getElementById('os').textContent = data.system.os;
-                document.getElementById('processors').textContent = data.system.processors;
-                document.getElementById('load-average').textContent = data.system.loadAverage;
             }
             
             // 更新内存信息
@@ -483,22 +438,6 @@
                 if (data.services.messageQueue) {
                     document.getElementById('mq-status').textContent = data.services.messageQueue.status;
                 }
-            }
-            
-            // 更新数据库状态
-            if (data.database) {
-                document.getElementById('db-status').textContent = data.database.status;
-                document.getElementById('db-type').textContent = data.database.databaseType || '-';
-                document.getElementById('db-version').textContent = data.database.databaseVersion || '-';
-                document.getElementById('db-pool').textContent = data.database.connectionPool;
-                updateStatusIndicator('db-status-indicator', data.database.status);
-            }
-            
-            // 更新Redis状态
-            if (data.redis) {
-                document.getElementById('redis-status').textContent = data.redis.status;
-                document.getElementById('redis-ping').textContent = data.redis.ping || '-';
-                updateStatusIndicator('redis-status-indicator', data.redis.status);
             }
             
             showContent();

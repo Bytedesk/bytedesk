@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 17:00:36
+ * @LastEditTime: 2025-06-26 17:04:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,7 +85,7 @@ public class SystemStatusController {
             Map<String, Object> info = Map.of(
                 "timestamp", status.get("timestamp"),
                 "uptime", status.get("uptime"),
-                "system", status.get("system"),
+                "load", status.get("load"),
                 "memory", status.get("memory")
             );
             return ResponseEntity.ok(JsonResult.success("系统信息", info));
@@ -105,9 +105,7 @@ public class SystemStatusController {
         try {
             Map<String, Object> status = systemStatusService.getSystemStatus();
             Map<String, Object> services = Map.of(
-                "services", status.get("services"),
-                "database", status.get("database"),
-                "redis", status.get("redis")
+                "services", status.get("services")
             );
             return ResponseEntity.ok(JsonResult.success("服务状态", services));
         } catch (Exception e) {

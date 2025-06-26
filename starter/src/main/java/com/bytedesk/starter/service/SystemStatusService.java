@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 16:57:36
+ * @LastEditTime: 2025-06-26 17:18:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,19 +18,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,12 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SystemStatusService {
 
-    @Autowired(required = false)
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired(required = false)
-    private DataSource dataSource;
-
     /**
      * 获取系统整体状态
      */
@@ -58,19 +45,13 @@ public class SystemStatusService {
         status.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         status.put("uptime", getUptime());
         
-        // 系统状态
-        status.put("system", getSystemInfo());
+        // 系统负载
+        status.put("load", getLoadInfo());
         status.put("memory", getMemoryInfo());
         status.put("threads", getThreadInfo());
         
         // 服务状态
         status.put("services", getServicesStatus());
-        
-        // 数据库状态
-        status.put("database", getDatabaseStatus());
-        
-        // Redis状态
-        status.put("redis", getRedisStatus());
         
         return status;
     }
@@ -89,19 +70,17 @@ public class SystemStatusService {
     }
 
     /**
-     * 获取系统信息
+     * 获取系统负载信息
      */
-    private Map<String, Object> getSystemInfo() {
-        Map<String, Object> systemInfo = new HashMap<>();
+    private Map<String, Object> getLoadInfo() {
+        Map<String, Object> loadInfo = new HashMap<>();
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         
-        systemInfo.put("os", osBean.getName() + " " + osBean.getVersion());
-        systemInfo.put("arch", osBean.getArch());
-        systemInfo.put("processors", osBean.getAvailableProcessors());
-        systemInfo.put("loadAverage", String.format("%.2f", osBean.getSystemLoadAverage()));
-        systemInfo.put("status", "UP");
+        loadInfo.put("loadAverage", String.format("%.2f", osBean.getSystemLoadAverage()));
+        loadInfo.put("processors", osBean.getAvailableProcessors());
+        loadInfo.put("status", "UP");
         
-        return systemInfo;
+        return loadInfo;
     }
 
     /**
@@ -158,76 +137,6 @@ public class SystemStatusService {
     }
 
     /**
-     * 获取数据库状态
-     */
-    private Map<String, Object> getDatabaseStatus() {
-        Map<String, Object> dbStatus = new HashMap<>();
-        
-        if (dataSource != null) {
-            try (Connection connection = dataSource.getConnection()) {
-                DatabaseMetaData metaData = connection.getMetaData();
-                String databaseProductName = metaData.getDatabaseProductName();
-                String databaseProductVersion = metaData.getDatabaseProductVersion();
-                
-                dbStatus.put("status", "UP");
-                dbStatus.put("message", "数据库连接正常");
-                dbStatus.put("connectionPool", "正常");
-                dbStatus.put("databaseType", databaseProductName);
-                dbStatus.put("databaseVersion", databaseProductVersion);
-                dbStatus.put("url", metaData.getURL());
-                dbStatus.put("username", metaData.getUserName());
-            } catch (SQLException e) {
-                log.error("数据库连接测试失败", e);
-                dbStatus.put("status", "DOWN");
-                dbStatus.put("message", "数据库连接异常: " + e.getMessage());
-                dbStatus.put("connectionPool", "异常");
-                dbStatus.put("error", e.getSQLState() + " - " + e.getErrorCode());
-            }
-        } else {
-            dbStatus.put("status", "UNKNOWN");
-            dbStatus.put("message", "数据库未配置");
-            dbStatus.put("connectionPool", "未配置");
-        }
-        
-        return dbStatus;
-    }
-
-    /**
-     * 获取Redis状态
-     */
-    private Map<String, Object> getRedisStatus() {
-        Map<String, Object> redisStatus = new HashMap<>();
-        
-        if (redisTemplate != null) {
-            try {
-                // 测试Redis连接
-                redisTemplate.opsForValue().set("health_check", "test");
-                String result = (String) redisTemplate.opsForValue().get("health_check");
-                redisTemplate.delete("health_check");
-                
-                if ("test".equals(result)) {
-                    redisStatus.put("status", "UP");
-                    redisStatus.put("message", "Redis连接正常");
-                    redisStatus.put("ping", "PONG");
-                } else {
-                    redisStatus.put("status", "DOWN");
-                    redisStatus.put("message", "Redis连接异常");
-                }
-            } catch (Exception e) {
-                log.error("Redis连接测试失败", e);
-                redisStatus.put("status", "DOWN");
-                redisStatus.put("message", "Redis连接异常: " + e.getMessage());
-                redisStatus.put("error", e.getClass().getSimpleName());
-            }
-        } else {
-            redisStatus.put("status", "UNKNOWN");
-            redisStatus.put("message", "Redis未配置");
-        }
-        
-        return redisStatus;
-    }
-
-    /**
      * 格式化字节数
      */
     private String formatBytes(long bytes) {
@@ -253,20 +162,6 @@ public class SystemStatusService {
         if ("WARNING".equals(memory.get("status"))) {
             isHealthy = false;
             message = "内存使用率过高";
-        }
-        
-        // 检查数据库状态
-        Map<String, Object> database = (Map<String, Object>) status.get("database");
-        if ("DOWN".equals(database.get("status"))) {
-            isHealthy = false;
-            message = "数据库连接异常";
-        }
-        
-        // 检查Redis状态
-        Map<String, Object> redis = (Map<String, Object>) status.get("redis");
-        if ("DOWN".equals(redis.get("status"))) {
-            isHealthy = false;
-            message = "Redis连接异常";
         }
         
         health.put("status", isHealthy ? "UP" : "DOWN");
