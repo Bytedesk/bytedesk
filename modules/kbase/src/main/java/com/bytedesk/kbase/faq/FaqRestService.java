@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 15:40:17
+ * @LastEditTime: 2025-06-26 12:30:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -685,6 +685,9 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                         .build();
         // 
         String content = faqResponse.getAnswer();
+        if (StringUtils.hasText(faqResponse.getAnswerHtml())) {
+            content = faqResponse.getAnswerHtml();
+        }
         String extra = answerExtra.toJson();
         // 插入答案消息
         String answerUser = threadEntity.getRobot();
