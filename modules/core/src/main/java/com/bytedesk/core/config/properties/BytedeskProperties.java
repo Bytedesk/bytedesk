@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 10:48:58
+ * @LastEditTime: 2025-06-26 11:06:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,6 +25,8 @@ import org.springframework.util.StringUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 @Data
 @Component
@@ -32,7 +34,7 @@ import lombok.Data;
 public class BytedeskProperties {
 
     public static final String CONFIG_PREFIX = "bytedesk";
-    private static final String ENCRYPTION_KEY = "bytedesk_license_key_2024"; // 16字节密钥
+    private static final String ENCRYPTION_KEY = "bytedesk_license_key"; // 16字节密钥
 
     private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
 
@@ -70,30 +72,47 @@ public class BytedeskProperties {
     }
 
     /**
-     * 加密字符串
+     * AES加密字符串
      * @param plainText 明文
      * @return 加密后的Base64字符串
      */
-    private String encryptString(String plainText) {
+    public static String encryptString(String plainText) {
         try {
             if (!StringUtils.hasText(plainText)) {
                 return plainText;
             }
             
-            // 使用简单的异或加密 + Base64编码
-            // 这是一个简化的实现，实际项目中可以使用更强的加密算法
-            byte[] keyBytes = ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8);
-            byte[] textBytes = plainText.getBytes(StandardCharsets.UTF_8);
-            byte[] encryptedBytes = new byte[textBytes.length];
-            
-            for (int i = 0; i < textBytes.length; i++) {
-                encryptedBytes[i] = (byte) (textBytes[i] ^ keyBytes[i % keyBytes.length]);
-            }
-            
+            SecretKeySpec secretKey = new SecretKeySpec(ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
             e.printStackTrace();
             return plainText; // 加密失败时返回原值
+        }
+    }
+
+    /**
+     * AES解密字符串
+     * @param encryptedText 加密后的Base64字符串
+     * @return 解密后的明文
+     */
+    public static String decryptString(String encryptedText) {
+        try {
+            if (!StringUtils.hasText(encryptedText)) {
+                return encryptedText;
+            }
+            
+            SecretKeySpec secretKey = new SecretKeySpec(ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
+            byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return encryptedText; // 解密失败时返回原值
         }
     }
 
@@ -510,6 +529,7 @@ public class BytedeskProperties {
      * @return 加密后的appkey字符串
      */
     public String getAppkey() {
+        // 原始appkey已经是Base64编码的许可证信息，直接AES加密
         return encryptString(this.appkey);
     }
 
