@@ -158,10 +158,14 @@ public class SystemStatusService {
         String message = "系统运行正常";
         
         // 检查内存使用率
-        Map<String, Object> memory = (Map<String, Object>) status.get("memory");
-        if ("WARNING".equals(memory.get("status"))) {
-            isHealthy = false;
-            message = "内存使用率过高";
+        Object memoryObj = status.get("memory");
+        if (memoryObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> memory = (Map<String, Object>) memoryObj;
+            if ("WARNING".equals(memory.get("status"))) {
+                isHealthy = false;
+                message = "内存使用率过高";
+            }
         }
         
         health.put("status", isHealthy ? "UP" : "DOWN");
