@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 17:39:03
+ * @LastEditTime: 2025-06-27 16:21:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -149,6 +149,10 @@ public class MessageUnreadRestService
     }
 
     public long getUnreadCount(MessageUnreadRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            return 0;
+        }
+        // 
         Page<MessageUnreadResponse> page = queryByOrg(request);
         return page.getTotalElements();
     }
