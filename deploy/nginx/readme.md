@@ -411,15 +411,24 @@ server {
 ```bash
 # 删除默认的软连接（可选）
 sudo unlink /etc/nginx/sites-enabled/default
-# 创建软连接
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_80.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_443.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_80.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_443.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_80.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_443.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_80.conf /etc/nginx/sites-enabled/
+
+# 方法1：使用 && 连接多个命令
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_80.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_443.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_80.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_api_443.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_80.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_443.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_80.conf /etc/nginx/sites-enabled/ && \
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_443.conf /etc/nginx/sites-enabled/
+
+# 方法2：使用 for 循环（推荐）
+for conf in weiyuai_cn_80 weiyuai_cn_443 weiyuai_cn_api_80 weiyuai_cn_api_443 weiyuai_cn_demo_80 weiyuai_cn_demo_443 weiyuai_cn_sip_80 weiyuai_cn_sip_443; do
+  sudo ln -s /etc/nginx/sites-available/${conf}.conf /etc/nginx/sites-enabled/
+done
+
+# 方法3：使用通配符（如果文件名有规律）
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_*.conf /etc/nginx/sites-enabled/
 ```
 
 ## 使配置生效
