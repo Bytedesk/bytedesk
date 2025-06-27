@@ -281,9 +281,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        // kownledgebaseRequestHelpdoc.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID));
-        // kownledgebaseRequestHelpdoc.setType(KbaseTypeEnum.HELPCENTER.name());
-        // kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
 
         // 初始化内部知识库 NOTEBASE
@@ -295,9 +292,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        // kownledgebaseRequestNotebase.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_NOTEBASE_UID));
-        // kownledgebaseRequestNotebase.setType(KbaseTypeEnum.NOTEBASE.name());
-        // kownledgebaseRequestNotebase.setOrgUid(orgUid);
         create(kownledgebaseRequestNotebase);
 
         // 初始化LLM知识库
@@ -309,9 +303,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        // kownledgebaseRequestLlm.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
-        // kownledgebaseRequestLlm.setType(KbaseTypeEnum.LLM.name());
-        // kownledgebaseRequestLlm.setOrgUid(orgUid);
         create(kownledgebaseRequestLlm);
 
         // 初始化关键词知识库
@@ -323,9 +314,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        // kownledgebaseRequestKeyword.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_KEYWORD_UID));
-        // kownledgebaseRequestKeyword.setType(KbaseTypeEnum.KEYWORD.name());
-        // kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
 
         // 初始化自动回复知识库
@@ -348,9 +336,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        // kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
-        // kownledgebaseRequestQuickReply.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID));
-        // kownledgebaseRequestQuickReply.setOrgUid(orgUid);
         create(kownledgebaseRequestQuickReply);
 
         // 初始化敏感词/屏蔽词知识库
@@ -362,9 +347,6 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        // kownledgebaseRequestTaboo.setType(KbaseTypeEnum.TABOO.name());
-        // kownledgebaseRequestTaboo.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID));
-        // kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
     }
 
