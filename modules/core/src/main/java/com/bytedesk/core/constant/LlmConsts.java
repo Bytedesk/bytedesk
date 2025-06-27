@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-27 10:24:51
+ * @LastEditTime: 2025-06-27 10:35:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,26 +41,49 @@ public class LlmConsts {
     public static final String GEMINI = "gemini";
     public static final String AIHUBMIX = "aihubmix";
 
+    // 默认 Ollama
+    // // 默认文字对话模型提供商
+    // public static final String DEFAULT_CHAT_PROVIDER = OLLAMA;
+    // // 默认文字对话模型
+    // public static final String DEFAULT_CHAT_MODEL = "qwen3:0.6b";
+    // // 默认Vision提供商
+    // public static final String DEFAULT_VISION_PROVIDER = OLLAMA;
+    // // 默认Vision模型
+    // public static final String DEFAULT_VISION_MODEL = "llava:latest";
+    // // 默认Speech提供商
+    // public static final String DEFAULT_SPEECH_PROVIDER = OLLAMA;
+    // // 默认Speech模型
+    // public static final String DEFAULT_SPEECH_MODEL = "mxbai-tts:latest";
+    // // 默认Embedding提供商
+    // public static final String DEFAULT_EMBEDDING_PROVIDER = OLLAMA;
+    // // 默认Embedding模型
+    // public static final String DEFAULT_EMBEDDING_MODEL = "bge-m3:latest";
+    // // 默认Rerank提供商
+    // public static final String DEFAULT_RERANK_PROVIDER = OLLAMA;
+    // // 默认Rerank模型
+    // public static final String DEFAULT_RERANK_MODEL = "linux6200/bge-reranker-v2-m3:latest";
+
+    // 默认 智谱AI
     // 默认文字对话模型提供商
-    public static final String DEFAULT_CHAT_PROVIDER = OLLAMA;
+    public static final String DEFAULT_CHAT_PROVIDER = ZHIPUAI;
     // 默认文字对话模型
-    public static final String DEFAULT_CHAT_MODEL = "qwen3:0.6b";
+    public static final String DEFAULT_CHAT_MODEL = "glm-4-flash";
     // 默认Vision提供商
-    public static final String DEFAULT_VISION_PROVIDER = OLLAMA;
+    public static final String DEFAULT_VISION_PROVIDER = ZHIPUAI;
     // 默认Vision模型
     public static final String DEFAULT_VISION_MODEL = "llava:latest";
     // 默认Speech提供商
-    public static final String DEFAULT_SPEECH_PROVIDER = OLLAMA;
+    public static final String DEFAULT_SPEECH_PROVIDER = ZHIPUAI;
     // 默认Speech模型
     public static final String DEFAULT_SPEECH_MODEL = "mxbai-tts:latest";
     // 默认Embedding提供商
-    public static final String DEFAULT_EMBEDDING_PROVIDER = OLLAMA;
+    public static final String DEFAULT_EMBEDDING_PROVIDER = ZHIPUAI;
     // 默认Embedding模型
-    public static final String DEFAULT_EMBEDDING_MODEL = "bge-m3:latest";
+    public static final String DEFAULT_EMBEDDING_MODEL = "embedding-2";
     // 默认Rerank提供商
-    public static final String DEFAULT_RERANK_PROVIDER = OLLAMA;
+    public static final String DEFAULT_RERANK_PROVIDER = ZHIPUAI;
     // 默认Rerank模型
     public static final String DEFAULT_RERANK_MODEL = "linux6200/bge-reranker-v2-m3:latest";
-
+    
     
 }
