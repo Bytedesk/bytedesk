@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-09 09:29:30
+ * @LastEditTime: 2025-06-27 11:12:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,7 +70,7 @@ public class SpringAIRagController {
 
     private final EmbeddingModel embeddingModel;
 
-    private final ChatModel chatModel;
+    private final ChatModel bytedeskZhipuaiChatModel;
 
     private final ObservationRegistry observationRegistry;
 
@@ -91,7 +91,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
         // 使用chatClient，添加ObservationRegistry
-        ChatResponse response = ChatClient.builder(chatModel, observationRegistry, null)
+        ChatResponse response = ChatClient.builder(bytedeskZhipuaiChatModel, observationRegistry, null)
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -111,7 +111,7 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
-        ChatClient chatClient = ChatClient.builder(chatModel)
+        ChatClient chatClient = ChatClient.builder(bytedeskZhipuaiChatModel)
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(SearchRequest.builder().build())
                         .build())
@@ -146,7 +146,7 @@ public class SpringAIRagController {
         // .build())
                 .build();
 
-        String answer = ChatClient.builder(chatModel)
+        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -167,7 +167,7 @@ public class SpringAIRagController {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
-                        .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
+                        .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
                         .build())
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                         .similarityThreshold(0.50)
@@ -175,7 +175,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
 
-        String answer = ChatClient.builder(chatModel)
+        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -210,13 +210,13 @@ public class SpringAIRagController {
         // conversation history and a follow-up query into a standalone query that
         // captures the essence of the conversation.
         CompressionQueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(chatModel)
+        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -245,13 +245,13 @@ public class SpringAIRagController {
         // to provide better results when querying a target system, such as a vector
         // store or a web search engine.
         QueryTransformer queryTransformer = RewriteQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(chatModel)
+        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -276,14 +276,14 @@ public class SpringAIRagController {
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
         QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
                 .targetLanguage("english")
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(chatModel)
+        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -306,14 +306,14 @@ public class SpringAIRagController {
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                .chatClientBuilder(ChatClient.builder(chatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
                 .numberOfQueries(3)
                 // .includeOriginal(false)
                 .build();
         List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
         // 使用chatClient
-        String answer = ChatClient.builder(chatModel)
+        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -397,7 +397,7 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> observedChat(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
             
-        ChatClient chatClient = ChatClient.builder(chatModel, observationRegistry, null)
+        ChatClient chatClient = ChatClient.builder(bytedeskZhipuaiChatModel, observationRegistry, null)
                 .build();
                 
         ChatResponse response = chatClient.prompt()
