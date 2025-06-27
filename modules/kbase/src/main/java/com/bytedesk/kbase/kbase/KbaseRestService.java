@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:25:13
+ * @LastEditTime: 2025-06-27 10:27:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -272,105 +272,99 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     // 初始化知识库
     public void initKbase(String orgUid) {
 
-        // 平台-初始化快捷回复知识库
-        // KbaseRequest kownledgebaseRequestQuickReplyPlatform = KbaseRequest.builder()
-        // .name(KbaseConsts.KB_QUICKREPLY_NAME)
-        // .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
-        // .language(LanguageEnum.ZH_CN.name())
-        // .level(LevelEnum.PLATFORM.name())
-        // .build();
-        // kownledgebaseRequestQuickReplyPlatform.setUid(BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID);
-        // kownledgebaseRequestQuickReplyPlatform.setType(KbaseTypeEnum.QUICKREPLY.name());
-        // // 方便超级管理员加载，避免重新写一个接口拉取
-        // kownledgebaseRequestQuickReplyPlatform.setOrgUid(orgUid);
-        // create(kownledgebaseRequestQuickReplyPlatform);
-
         // 初始化帮助文档知识库
         KbaseRequest kownledgebaseRequestHelpdoc = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID))
+                .type(KbaseTypeEnum.HELPCENTER.name())
                 .name(KbaseConsts.KB_HELPCENTER_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestHelpdoc.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID));
-        kownledgebaseRequestHelpdoc.setType(KbaseTypeEnum.HELPCENTER.name());
-        kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
+        // kownledgebaseRequestHelpdoc.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID));
+        // kownledgebaseRequestHelpdoc.setType(KbaseTypeEnum.HELPCENTER.name());
+        // kownledgebaseRequestHelpdoc.setOrgUid(orgUid);
         create(kownledgebaseRequestHelpdoc);
 
         // 初始化内部知识库 NOTEBASE
         KbaseRequest kownledgebaseRequestNotebase = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_NOTEBASE_UID))
+                .type(KbaseTypeEnum.NOTEBASE.name())
                 .name(KbaseConsts.KB_NOTEBASE_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestNotebase.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_NOTEBASE_UID));
-        kownledgebaseRequestNotebase.setType(KbaseTypeEnum.NOTEBASE.name());
-        kownledgebaseRequestNotebase.setOrgUid(orgUid);
+        // kownledgebaseRequestNotebase.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_NOTEBASE_UID));
+        // kownledgebaseRequestNotebase.setType(KbaseTypeEnum.NOTEBASE.name());
+        // kownledgebaseRequestNotebase.setOrgUid(orgUid);
         create(kownledgebaseRequestNotebase);
 
         // 初始化LLM知识库
         KbaseRequest kownledgebaseRequestLlm = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID))
+                .type(KbaseTypeEnum.LLM.name())
                 .name(KbaseConsts.KB_LLM_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestLlm.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
-        kownledgebaseRequestLlm.setType(KbaseTypeEnum.LLM.name());
-        kownledgebaseRequestLlm.setOrgUid(orgUid);
+        // kownledgebaseRequestLlm.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID));
+        // kownledgebaseRequestLlm.setType(KbaseTypeEnum.LLM.name());
+        // kownledgebaseRequestLlm.setOrgUid(orgUid);
         create(kownledgebaseRequestLlm);
 
         // 初始化关键词知识库
         KbaseRequest kownledgebaseRequestKeyword = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_KEYWORD_UID))
+                .type(KbaseTypeEnum.KEYWORD.name())
                 .name(KbaseConsts.KB_KEYWORD_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestKeyword.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_KEYWORD_UID));
-        kownledgebaseRequestKeyword.setType(KbaseTypeEnum.KEYWORD.name());
-        kownledgebaseRequestKeyword.setOrgUid(orgUid);
+        // kownledgebaseRequestKeyword.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_KEYWORD_UID));
+        // kownledgebaseRequestKeyword.setType(KbaseTypeEnum.KEYWORD.name());
+        // kownledgebaseRequestKeyword.setOrgUid(orgUid);
         create(kownledgebaseRequestKeyword);
-
-        // 初始化FAQ知识库
-        // KbaseRequest kownledgebaseRequestFaq = KbaseRequest.builder()
-        //         .name(KbaseConsts.KB_FAQ_NAME)
-        //         .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
-        //         .language(LanguageEnum.ZH_CN.name())
-        //         .build();
-        // kownledgebaseRequestFaq.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID));
-        // kownledgebaseRequestFaq.setType(KbaseTypeEnum.FAQ.name());
-        // kownledgebaseRequestFaq.setOrgUid(orgUid);
-        // create(kownledgebaseRequestFaq);
 
         // 初始化自动回复知识库
         KbaseRequest kownledgebaseRequestAutoReply = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID))
+                .type(KbaseTypeEnum.AUTOREPLY.name())
                 .name(KbaseConsts.KB_AUTOREPLY_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestAutoReply.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID));
-        kownledgebaseRequestAutoReply.setType(KbaseTypeEnum.AUTOREPLY.name());
-        kownledgebaseRequestAutoReply.setOrgUid(orgUid);
         create(kownledgebaseRequestAutoReply);
 
         // 初始化快捷回复知识库
         KbaseRequest kownledgebaseRequestQuickReply = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
+                .type(KbaseTypeEnum.QUICKREPLY.name())
                 .name(KbaseConsts.KB_QUICKREPLY_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
-        kownledgebaseRequestQuickReply.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID));
-        kownledgebaseRequestQuickReply.setOrgUid(orgUid);
+        // kownledgebaseRequestQuickReply.setType(KbaseTypeEnum.QUICKREPLY.name());
+        // kownledgebaseRequestQuickReply.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID));
+        // kownledgebaseRequestQuickReply.setOrgUid(orgUid);
         create(kownledgebaseRequestQuickReply);
 
         // 初始化敏感词/屏蔽词知识库
         KbaseRequest kownledgebaseRequestTaboo = KbaseRequest.builder()
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID))
+                .type(KbaseTypeEnum.TABOO.name())
                 .name(KbaseConsts.KB_TABOO_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
+                .orgUid(orgUid)
                 .build();
-        kownledgebaseRequestTaboo.setType(KbaseTypeEnum.TABOO.name());
-        kownledgebaseRequestTaboo.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID));
-        kownledgebaseRequestTaboo.setOrgUid(orgUid);
+        // kownledgebaseRequestTaboo.setType(KbaseTypeEnum.TABOO.name());
+        // kownledgebaseRequestTaboo.setUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID));
+        // kownledgebaseRequestTaboo.setOrgUid(orgUid);
         create(kownledgebaseRequestTaboo);
     }
 
