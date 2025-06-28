@@ -112,7 +112,7 @@
 
 					<#--  第四行  -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/editor.html" class="text-reset d-inline-block mb-1" target="_blank">AI文档编辑器</a>
+						<a href="https://www.weiyuai.cn/editor.html" class="text-reset d-inline-block mb-1" target="_blank">AI文档</a>
 					</div>
 				</div>
 			</div>

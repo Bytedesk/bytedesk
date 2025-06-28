@@ -25,7 +25,7 @@ Hero Section START -->
 		<!-- Title -->
 		<div class="row mb-5">
 			<div class="col-lg-10 mx-auto text-center">
-				<h1 class="display-5 fw-bold mb-4">微语AI文档编辑器</h1>
+				<h1 class="display-5 fw-bold mb-4">微语AI文档</h1>
 				<p class="lead mb-4">革命性的AI驱动文档编辑体验，支持Word、Excel、PPT等多种格式，让您的文档创作更加智能高效</p>
 				<div class="d-flex flex-wrap justify-content-center gap-3">
 					<a href="#features" class="btn btn-primary btn-lg">立即体验</a>
@@ -284,7 +284,7 @@ Benefits START -->
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col-lg-8 mx-auto text-center">
-				<h2 class="fw-bold">为什么选择微语AI文档编辑器？</h2>
+				<h2 class="fw-bold">为什么选择微语AI文档？</h2>
 				<p class="mb-0">基于行业最佳实践，为您提供无与伦比的文档编辑体验</p>
 			</div>
 		</div>
@@ -451,13 +451,13 @@ CTA Section START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/08.svg" class="position-relative" alt="AI文档编辑器">
+				<img src="assets/images/element/08.svg" class="position-relative" alt="AI文档">
 			</div>
 
 			<div class="col-md-5 position-relative z-index-9">
 				<!-- Title -->
 				<h2 class="fw-bold mb-4">开启智能文档编辑新时代</h2>
-				<p class="mb-4">立即体验微语AI文档编辑器，让人工智能成为您的文档编辑助手。提升工作效率，释放创造力。</p>
+				<p class="mb-4">立即体验微语AI文档，让人工智能成为您的文档编辑助手。提升工作效率，释放创造力。</p>
 				
 				<!-- CTA buttons -->
 				<div class="d-flex flex-column flex-sm-row gap-3">
