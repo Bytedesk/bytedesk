@@ -241,7 +241,7 @@ BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OlBMQVRGT1JNOjo=
 
 <!-- - [Email](mailto:270580156@qq.com) -->
 <!-- - [微信](./images/wechat.png) -->
-- 首先star，然后，扫码加微信，发star截图，然后会被拉入群，备注：微语
+- 扫码加微信，入群，备注：微语
 - <img src="./images/wechat.png" width="100">
 <!-- - 微语技术支持群：
 - <img src="./images/wechat_group.jpg" width="100"> -->
