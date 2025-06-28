@@ -109,6 +109,11 @@
 					<div class="col-6 col-lg-3">
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="text-reset d-inline-block mb-1" target="_blank">视频会议</a>
 					</div>
+
+					<#--  第四行  -->
+					<div class="col-6 col-lg-3">
+						<a href="https://www.weiyuai.cn/editor.html" class="text-reset d-inline-block mb-1" target="_blank">微语AI文档编辑器</a>
+					</div>
 				</div>
 			</div>
 		</div><!-- Row END -->

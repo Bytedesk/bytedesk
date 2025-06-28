@@ -38,22 +38,11 @@ public class PageTemplateService {
     private static final String htmlSavePath = "/templates/";
     private static final String templatePath = "/templates/ftl/";
     //
-    private static final String htmlSavePlanPath = "/templates/plan/";
-    private static final String templatePlanPath = "/templates/ftl/plan/";
+    // private static final String htmlSavePlanPath = "/templates/plan/";
+    // private static final String templatePlanPath = "/templates/ftl/plan/";
 
     @Autowired
     Configuration configuration;
-
-    public void index() {
-        toHtml("index");
-    }
-
-    public void plan() {
-        toHtmlPlan("ai");
-        // toHtmlPlan("cs");
-        // toHtmlPlan("im-com");
-        // toHtmlPlan("im-social");
-    }
 
     public void toHtml(String tempName) {
 
@@ -87,38 +76,38 @@ public class PageTemplateService {
         }
     }
 
-    private void toHtmlPlan(String tempName) {
+    // private void toHtmlPlan(String tempName) {
 
-        try {
-            // 设置模板路径
-            String classpath = this.getClass().getResource("/").getPath();
-            configuration.setDirectoryForTemplateLoading(new File(classpath + templatePlanPath));
-            // 加载模板
-            Template template = configuration.getTemplate(tempName + ".ftl");
-            // 数据模型
-            Map<String, Object> map = new HashMap<>();
-            // map.put("myTitle", "页面静态化(PageStatic)");
-            // map.put("tableList", getList());
-            // map.put("imgList", getImgList());
-            // 静态化页面内容
-            String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
-            // log.info("content:{}", content);
-            InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
-            // 输出文件
-            checkAndCreateFolder(classpath, htmlSavePlanPath);
-            String savePath = classpath + htmlSavePlanPath + tempName + ".html";
-            // /Users/ningjinpeng/Desktop/git/private/weiyu/server/starter/target/classes/templates/
-            log.info("savePath {}", savePath);
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
-            IOUtils.copy(inputStream, fileOutputStream);
-            // 关闭流
-            inputStream.close();
-            fileOutputStream.close();
+    //     try {
+    //         // 设置模板路径
+    //         String classpath = this.getClass().getResource("/").getPath();
+    //         configuration.setDirectoryForTemplateLoading(new File(classpath + templatePlanPath));
+    //         // 加载模板
+    //         Template template = configuration.getTemplate(tempName + ".ftl");
+    //         // 数据模型
+    //         Map<String, Object> map = new HashMap<>();
+    //         // map.put("myTitle", "页面静态化(PageStatic)");
+    //         // map.put("tableList", getList());
+    //         // map.put("imgList", getImgList());
+    //         // 静态化页面内容
+    //         String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
+    //         // log.info("content:{}", content);
+    //         InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
+    //         // 输出文件
+    //         checkAndCreateFolder(classpath, htmlSavePlanPath);
+    //         String savePath = classpath + htmlSavePlanPath + tempName + ".html";
+    //         // /Users/ningjinpeng/Desktop/git/private/weiyu/server/starter/target/classes/templates/
+    //         log.info("savePath {}", savePath);
+    //         FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
+    //         IOUtils.copy(inputStream, fileOutputStream);
+    //         // 关闭流
+    //         inputStream.close();
+    //         fileOutputStream.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     public void checkAndCreateFolder(String classpath, String folderPath) {
         File directory = new File(classpath + folderPath);

@@ -79,7 +79,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-primary bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/chat.svg" alt="AI对话编辑" style="width: 40px; height: 40px;">
+						<i class="fas fa-comments text-primary fa-2x"></i>
 					</div>
 					<h5 class="mb-3">AI对话编辑</h5>
 					<p class="mb-0">通过自然语言对话方式，指导AI修改文档内容、调整格式、优化结构，让编辑变得如同聊天般简单</p>
@@ -90,7 +90,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/data-science.svg" alt="多格式支持" style="width: 40px; height: 40px;">
+						<i class="fas fa-file-alt text-success fa-2x"></i>
 					</div>
 					<h5 class="mb-3">多格式支持</h5>
 					<p class="mb-0">完美兼容Microsoft Office格式：Word (.docx)、Excel (.xlsx)、PowerPoint (.pptx)，无缝对接现有工作流程</p>
@@ -101,7 +101,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/microphone.svg" alt="语音转文字" style="width: 40px; height: 40px;">
+						<i class="fas fa-microphone text-warning fa-2x"></i>
 					</div>
 					<h5 class="mb-3">语音转文字</h5>
 					<p class="mb-0">支持多种音频格式上传，高精度语音识别技术，快速将会议录音、采访音频转换为文字内容</p>
@@ -112,7 +112,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-info bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/spell-check.svg" alt="智能校对" style="width: 40px; height: 40px;">
+						<i class="fas fa-spell-check text-info fa-2x"></i>
 					</div>
 					<h5 class="mb-3">智能文字校对</h5>
 					<p class="mb-0">AI驱动的语法检查、拼写纠错、标点修正，确保文档内容准确无误，提升专业度</p>
@@ -123,7 +123,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-purple bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/expand.svg" alt="内容扩展" style="width: 40px; height: 40px;">
+						<i class="fas fa-expand-arrows-alt fa-2x" style="color: #6f42c1;"></i>
 					</div>
 					<h5 class="mb-3">智能内容扩展</h5>
 					<p class="mb-0">基于上下文理解，智能扩展文章内容，丰富表达层次，让简短的要点变成详细的论述</p>
@@ -134,7 +134,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-secondary bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/rewrite.svg" alt="文字改写" style="width: 40px; height: 40px;">
+						<i class="fas fa-pen-fancy text-secondary fa-2x"></i>
 					</div>
 					<h5 class="mb-3">智能文字改写</h5>
 					<p class="mb-0">多种改写风格选择：正式、轻松、学术、商务等，保持原意的同时优化表达方式</p>
@@ -145,7 +145,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-dark bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/format.svg" alt="格式化" style="width: 40px; height: 40px;">
+						<i class="fas fa-align-left text-dark fa-2x"></i>
 					</div>
 					<h5 class="mb-3">智能格式化</h5>
 					<p class="mb-0">自动调整段落结构、标题层级、列表格式，生成美观专业的文档布局</p>
@@ -156,7 +156,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-danger bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/edit.svg" alt="逐段编辑" style="width: 40px; height: 40px;">
+						<i class="fas fa-edit text-danger fa-2x"></i>
 					</div>
 					<h5 class="mb-3">精准逐段编辑</h5>
 					<p class="mb-0">支持选中特定段落进行针对性修改，保持其他内容不变，实现精确的局部编辑</p>
@@ -167,7 +167,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
-						<img src="assets/images/element/design.svg" alt="样式定制" style="width: 40px; height: 40px;">
+						<i class="fas fa-palette text-success fa-2x"></i>
 					</div>
 					<h5 class="mb-3">样式智能定制</h5>
 					<p class="mb-0">通过对话方式调整字体、颜色、间距、对齐方式等样式属性，所见即所得的编辑体验</p>
@@ -341,7 +341,7 @@ Benefits START -->
 			<div class="col-md-6 col-lg-4">
 				<div class="d-flex align-items-start">
 					<div class="flex-shrink-0 bg-purple bg-opacity-10 rounded-circle p-3 me-3">
-						<i class="fas fa-cloud text-purple"></i>
+						<i class="fas fa-cloud" style="color: #6f42c1;"></i>
 					</div>
 					<div>
 						<h5>云端协作</h5>
