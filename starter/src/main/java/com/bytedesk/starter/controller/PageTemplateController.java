@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-12 21:12:15
+ * @LastEditTime: 2025-06-28 13:22:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/temp")
 public class PageTemplateController {
 
-    private PageTemplateService pageService;
+    private PageTemplateService pageTemplateService;
 
     /**
      * generate html static file
@@ -46,13 +46,13 @@ public class PageTemplateController {
     @GetMapping("/static")
     public JsonResult<?> staticize() {
 
-        pageService.index();
-        // pageService.plan();
-        pageService.download();
-        pageService.about();
-        pageService.contact();
-        pageService.privacy();
-        pageService.terms();
+        pageTemplateService.toHtml("index");
+        pageTemplateService.toHtml("download");
+        pageTemplateService.toHtml("editor");
+        pageTemplateService.toHtml("about");
+        pageTemplateService.toHtml("contact");
+        pageTemplateService.toHtml("privacy");
+        pageTemplateService.toHtml("terms");
 
         return JsonResult.success("generate html success", 200, true);
     }
