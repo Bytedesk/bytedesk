@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-28 13:22:32
+ * @LastEditTime: 2025-06-29 12:08:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -346,7 +346,7 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/privacy
 	 * http://127.0.0.1:9003/terms
 	 */
-	@GetMapping({ "/{page:download|contact|about|privacy|terms|editor}", "/{page:download|contact|about|privacy|terms|editor}.html" })
+	@GetMapping({ "/{page:download|contact|about|privacy|terms|office}", "/{page:download|contact|about|privacy|terms|office}.html" })
 	public String handlePageRoutes(@PathVariable String page) {
 		return page;
 	}
