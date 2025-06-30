@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 17:26:27
+ * @LastEditTime: 2025-06-30 12:06:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,7 +73,8 @@ public enum ClientEnum {
     // 企业渠道
     DINGTALK,        // 钉钉
     FEISHU,          // 飞书
-    WECOM,           // 企业微信
+    LARK,            // 飞书（Lark）
+    CUSTOM,          // 自定义渠道
     //
     // 其他渠道
     EMAIL,           // 邮件
@@ -236,8 +237,8 @@ public enum ClientEnum {
                 return "钉钉";
             case FEISHU:
                 return "飞书";
-            case WECOM:
-                return "企业微信";
+            case LARK:
+                return "飞书（Lark）";
             case EMAIL:
                 return "邮件";
             case SMS:
