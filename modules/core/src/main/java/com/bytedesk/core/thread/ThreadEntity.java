@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 17:18:27
+ * @LastEditTime: 2025-06-30 09:55:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -62,7 +62,6 @@ public class ThreadEntity extends AbstractThreadEntity {
     private static final long serialVersionUID = 1L;
 
     // 一对多关系，一个thread可以对应多个message
-    // cascade = CascadeType.ALL, orphanRemoval = true, 
     @Builder.Default
     @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
     @JsonManagedReference
