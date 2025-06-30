@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-06 17:49:21
+ * @LastEditTime: 2025-06-30 10:22:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,16 @@
  */
 package com.bytedesk.core.webhook;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -27,6 +34,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 支持消息/客户留资信息秒级同步到企微/lark/飞书/钉钉或者其他CRM系统
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -45,7 +55,13 @@ public class WebhookEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "webhook_type")
-    private String type = WebhookTypeEnum.CUSTOMER.name();
+    private String type = WebhookTypeEnum.WECHAT_WORK.name();
+
+    // 接收的消息类型
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> messageType = new ArrayList<>();
 
     // webhook url
     @Column(name = "webhook_url")

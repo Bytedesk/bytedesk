@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:12
+ * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-30 10:25:27
+ * @LastEditTime: 2025-06-30 10:11:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,38 +11,51 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.webhook;
+package com.bytedesk.core.webhook_message;
 
-
-import java.util.List;
-
-import com.bytedesk.core.base.BaseResponse;
-
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+// import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 支持消息/客户留资信息秒级同步到企微/lark/飞书/钉钉或者其他CRM系统-推送记录
+ */
+@Entity
 @Data
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebhookResponse extends BaseResponse {
+// @EntityListeners({WebhookMessageEntityListener.class})
+@Table(name = "bytedesk_core_webhook_message")
+public class WebhookMessageEntity extends BaseEntity {
 
     private String name;
 
-    private String description;
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
-    private String type;
+    @Builder.Default
+    @Column(name = "webhook_type")
+    private String type = WebhookMessageTypeEnum.CUSTOMER.name();
 
-    private List<String> messageType;
-
+    // webhook url
+    @Column(name = "webhook_url")
     private String url;
 
+    // webhook secret
+    @Column(name = "webhook_secret")
     private String secret;
-
+    
 }

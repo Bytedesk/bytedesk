@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-06 17:22:26
+ * @LastEditTime: 2025-06-30 10:25:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,8 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.webhook;
+
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
@@ -38,6 +40,9 @@ public class WebhookRequest extends BaseRequest {
 
     // @Builder.Default
     // private String type = WebhookTypeEnum.CUSTOMER.name();
+
+     // 接收的消息类型
+    private List<String> messageType;
 
     private String url;
 
