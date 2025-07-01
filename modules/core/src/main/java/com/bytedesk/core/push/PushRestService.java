@@ -34,7 +34,6 @@ import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
-import com.bytedesk.core.push.email.PushServiceImplEmail;
 import com.bytedesk.core.push.sms.PushServiceImplSms;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
