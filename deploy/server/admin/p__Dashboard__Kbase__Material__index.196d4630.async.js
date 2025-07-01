@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[1048],{12246:function(e,n,i){i.r(n);var s=i(31549);n.default=function(){return(0,s.jsxs)("div",{children:[(0,s.jsx)("h1",{children:"素材库"}),(0,s.jsx)("p",{children:"This is the Material page content."})]})}}}]);
