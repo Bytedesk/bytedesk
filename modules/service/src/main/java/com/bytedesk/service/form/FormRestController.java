@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-25 11:08:54
+ * @LastEditTime: 2025-07-02 10:54:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 public class FormRestController extends BaseRestController<FormRequest> {
 
-    private final FormRestService formService;
+    private final FormRestService formRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "查询组织下的表单", description = "根据组织ID查询表单列表")
@@ -46,7 +46,7 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> queryByOrg(FormRequest request) {
         
-        Page<FormResponse> form = formService.queryByOrg(request);
+        Page<FormResponse> form = formRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(form));
     }
@@ -58,7 +58,19 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> queryByUser(FormRequest request) {
         
-        Page<FormResponse> form = formService.queryByUser(request);
+        Page<FormResponse> form = formRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(form));
+    }
+
+    @Operation(summary = "查询指定表单", description = "根据UID查询表单详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FormResponse.class)))
+    @Override
+    public ResponseEntity<?> queryByUid(FormRequest request) {
+        
+        FormResponse form = formRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(form));
     }
@@ -70,7 +82,7 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> create(FormRequest request) {
         
-        FormResponse ticket_process = formService.create(request);
+        FormResponse ticket_process = formRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(ticket_process));
     }
@@ -82,7 +94,7 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> update(FormRequest request) {
         
-        FormResponse ticket_process = formService.update(request);
+        FormResponse ticket_process = formRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(ticket_process));
     }
@@ -92,7 +104,7 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> delete(FormRequest request) {
         
-        formService.delete(request);
+        formRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -105,14 +117,6 @@ public class FormRestController extends BaseRestController<FormRequest> {
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Operation(summary = "查询指定表单", description = "根据UID查询表单详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = FormResponse.class)))
-    @Override
-    public ResponseEntity<?> queryByUid(FormRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
     
 }
