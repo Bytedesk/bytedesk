@@ -39,6 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class WorkflowRestController extends BaseRestController<WorkflowRequest> {
 
     private final WorkflowRestService workflowRestService;
+    private final WorkflowService workflowService;
 
     @Operation(summary = "查询组织下的工作流", description = "根据组织ID查询工作流列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -130,7 +131,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @PostMapping("/execute")
     public ResponseEntity<?> execute(WorkflowRequest request) {
         
-        WorkflowResponse workflow = workflowRestService.execute(request);
+        WorkflowResponse workflow = workflowService.execute(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
