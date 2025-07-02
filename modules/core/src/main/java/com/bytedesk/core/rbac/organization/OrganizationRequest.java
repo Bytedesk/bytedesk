@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 16:02:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-07 14:16:17
+ * @LastEditTime: 2025-07-02 14:07:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,5 +63,11 @@ public class OrganizationRequest extends BaseRequest {
 
     // 认证失败原因
     private String rejectReason;
+
+    // 是否会员
+    private Boolean vip;
+
+    // 会员截止日期
+    private Date vipExpireDate;
 
 }
