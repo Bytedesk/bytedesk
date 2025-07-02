@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:35:31
+ * @LastEditTime: 2025-07-02 11:01:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,9 +34,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({TagEntityListener.class})
-@Table(name = "bytedesk_core_tag")
-public class TagEntity extends BaseEntity {
+// @EntityListeners({FormResultEntityListener.class})
+@Table(name = "bytedesk_form_result")
+public class FormResultEntity extends BaseEntity {
 
     private String name;
 
@@ -44,14 +44,7 @@ public class TagEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     @Builder.Default
-    @Column(name = "tag_type")
-    private String type = TagTypeEnum.CUSTOMER.name();
+    @Column(name = "form_type")
+    private String type = FormResultTypeEnum.CUSTOMER.name();
 
-    @Builder.Default
-    @Column(name = "tag_color")
-    private String color = "red";
-
-    @Builder.Default
-    @Column(name = "tag_order")
-    private Integer order = 0;
 }

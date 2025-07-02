@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 10:55:14
+ * @LastEditTime: 2025-07-02 11:08:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,7 +83,7 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
 
         FormEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create ticket_process failed");
+            throw new RuntimeException("Create form failed");
         }
         return convertToResponse(savedEntity);
     }
@@ -97,7 +97,7 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
             //
             FormEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update ticket_process failed");
+                throw new RuntimeException("Update form failed");
             }
             return convertToResponse(savedEntity);
         }

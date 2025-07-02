@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 09:59:29
+ * @Date: 2025-02-25 12:31:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 10:01:00
+ * @LastEditTime: 2025-02-25 12:31:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,26 +11,25 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.form_result.event;
+package com.bytedesk.core.workflow_result.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.tag.TagEntity;
+import com.bytedesk.core.workflow_result.WorkflowResultEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TagUpdateEvent extends ApplicationEvent {
+public class WorkflowResultDeleteEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TagEntity tag;
+    private WorkflowResultEntity tag;
 
-    public TagUpdateEvent(TagEntity tag) {
+    public WorkflowResultDeleteEvent(WorkflowResultEntity tag) {
         super(tag);
         this.tag = tag;
     }
-
 }

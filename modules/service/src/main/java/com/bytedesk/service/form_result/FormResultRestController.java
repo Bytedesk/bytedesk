@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 12:39:37
+ * @LastEditTime: 2025-07-02 11:01:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,36 +28,36 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/tag")
+@RequestMapping("/api/v1/form/result")
 @AllArgsConstructor
-public class TagRestController extends BaseRestController<TagRequest> {
+public class FormResultRestController extends BaseRestController<FormResultRequest> {
 
-    private final TagRestService tagRestService;
+    private final FormResultRestService tagRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
     @Override
-    public ResponseEntity<?> queryByOrg(TagRequest request) {
+    public ResponseEntity<?> queryByOrg(FormResultRequest request) {
         
-        Page<TagResponse> tags = tagRestService.queryByOrg(request);
+        Page<FormResultResponse> tags = tagRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
     @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
     @Override
-    public ResponseEntity<?> queryByUser(TagRequest request) {
+    public ResponseEntity<?> queryByUser(FormResultRequest request) {
         
-        Page<TagResponse> tags = tagRestService.queryByUser(request);
+        Page<FormResultResponse> tags = tagRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
     @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
     @Override
-    public ResponseEntity<?> queryByUid(TagRequest request) {
+    public ResponseEntity<?> queryByUid(FormResultRequest request) {
         
-        TagResponse tag = tagRestService.queryByUid(request);
+        FormResultResponse tag = tagRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
@@ -65,9 +65,9 @@ public class TagRestController extends BaseRestController<TagRequest> {
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(TagRequest request) {
+    public ResponseEntity<?> create(FormResultRequest request) {
         
-        TagResponse tag = tagRestService.create(request);
+        FormResultResponse tag = tagRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
@@ -75,9 +75,9 @@ public class TagRestController extends BaseRestController<TagRequest> {
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(TagRequest request) {
+    public ResponseEntity<?> update(FormResultRequest request) {
         
-        TagResponse tag = tagRestService.update(request);
+        FormResultResponse tag = tagRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
@@ -85,7 +85,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(TagRequest request) {
+    public ResponseEntity<?> delete(FormResultRequest request) {
         
         tagRestService.delete(request);
 
@@ -96,12 +96,12 @@ public class TagRestController extends BaseRestController<TagRequest> {
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
-    public Object export(TagRequest request, HttpServletResponse response) {
+    public Object export(FormResultRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             tagRestService,
-            TagExcel.class,
+            FormResultExcel.class,
             "标签",
             "tag"
         );

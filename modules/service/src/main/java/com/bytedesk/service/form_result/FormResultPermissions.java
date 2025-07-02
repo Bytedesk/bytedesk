@@ -15,6 +15,6 @@ package com.bytedesk.service.form_result;
 
 import com.bytedesk.core.base.BasePermissions;
 
-public class TagPermissions extends BasePermissions {
+public class FormResultPermissions extends BasePermissions {
 
 }

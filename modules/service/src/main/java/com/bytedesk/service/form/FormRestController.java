@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 10:54:52
+ * @LastEditTime: 2025-07-02 11:08:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,9 +82,9 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> create(FormRequest request) {
         
-        FormResponse ticket_process = formRestService.create(request);
+        FormResponse form = formRestService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(ticket_process));
+        return ResponseEntity.ok(JsonResult.success(form));
     }
 
     @Operation(summary = "更新表单", description = "更新表单信息")
@@ -94,9 +94,9 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> update(FormRequest request) {
         
-        FormResponse ticket_process = formRestService.update(request);
+        FormResponse form = formRestService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(ticket_process));
+        return ResponseEntity.ok(JsonResult.success(form));
     }
 
     @Operation(summary = "删除表单", description = "删除指定的表单")

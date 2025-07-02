@@ -15,20 +15,20 @@ package com.bytedesk.service.form_result.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.tag.TagEntity;
+import com.bytedesk.service.form_result.FormResultEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TagCreateEvent extends ApplicationEvent {
+public class FormResultCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TagEntity tag;
+    private FormResultEntity tag;
 
-    public TagCreateEvent(TagEntity tag) {
+    public FormResultCreateEvent(FormResultEntity tag) {
         super(tag);
         this.tag = tag;
     }

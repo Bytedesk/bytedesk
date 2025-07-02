@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TagSpecification extends BaseSpecification {
+public class FormResultSpecification extends BaseSpecification {
     
-    public static Specification<TagEntity> search(TagRequest request) {
+    public static Specification<FormResultEntity> search(FormResultRequest request) {
         log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
             request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {

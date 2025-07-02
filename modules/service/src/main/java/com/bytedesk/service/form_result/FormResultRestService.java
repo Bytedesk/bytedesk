@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:05:26
+ * @LastEditTime: 2025-07-02 11:02:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.tag;
+package com.bytedesk.service.form_result;
 
 import java.util.Optional;
 
@@ -25,22 +25,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagRequest, TagResponse, TagExcel> {
+public class FormResultRestService extends BaseRestServiceWithExcel<FormResultEntity, FormResultRequest, FormResultResponse, FormResultExcel> {
 
-    private final TagRepository tagRepository;
+    private final FormResultRepository tagRepository;
 
     private final ModelMapper modelMapper;
 
@@ -49,20 +45,20 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
     private final AuthService authService;
 
     @Override
-    public Page<TagEntity> queryByOrgEntity(TagRequest request) {
+    public Page<FormResultEntity> queryByOrgEntity(FormResultRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<TagEntity> spec = TagSpecification.search(request);
+        Specification<FormResultEntity> spec = FormResultSpecification.search(request);
         return tagRepository.findAll(spec, pageable);
     }
 
     @Override
-    public Page<TagResponse> queryByOrg(TagRequest request) {
-        Page<TagEntity> page = queryByOrgEntity(request);
+    public Page<FormResultResponse> queryByOrg(FormResultRequest request) {
+        Page<FormResultEntity> page = queryByOrgEntity(request);
         return page.map(this::convertToResponse);
     }
 
     @Override
-    public Page<TagResponse> queryByUser(TagRequest request) {
+    public Page<FormResultResponse> queryByUser(FormResultRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");
@@ -73,24 +69,19 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
     }
 
     @Override
-    public TagResponse queryByUid(TagRequest request) {
-        Optional<TagEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            TagEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Tag not found");
-        }
+    public FormResultResponse queryByUid(FormResultRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
-    public Optional<TagEntity> findByUid(String uid) {
+    public Optional<FormResultEntity> findByUid(String uid) {
         return tagRepository.findByUid(uid);
     }
 
     @Cacheable(value = "tag", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<TagEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
+    public Optional<FormResultEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
         return tagRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
 
@@ -100,14 +91,14 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
 
     @Transactional
     @Override
-    public TagResponse create(TagRequest request) {
+    public FormResultResponse create(FormResultRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
         if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<TagEntity> tag = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+            Optional<FormResultEntity> tag = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
             if (tag.isPresent()) {
                 return convertToResponse(tag.get());
             }
@@ -118,12 +109,12 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
             request.setUserUid(user.getUid());
         }
         // 
-        TagEntity entity = modelMapper.map(request, TagEntity.class);
+        FormResultEntity entity = modelMapper.map(request, FormResultEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        TagEntity savedEntity = save(entity);
+        FormResultEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create tag failed");
         }
@@ -132,34 +123,34 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
 
     @Transactional
     @Override
-    public TagResponse update(TagRequest request) {
-        Optional<TagEntity> optional = tagRepository.findByUid(request.getUid());
+    public FormResultResponse update(FormResultRequest request) {
+        Optional<FormResultEntity> optional = tagRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            TagEntity entity = optional.get();
+            FormResultEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            TagEntity savedEntity = save(entity);
+            FormResultEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update tag failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Tag not found");
+            throw new RuntimeException("FormResult not found");
         }
     }
 
     @Override
-    protected TagEntity doSave(TagEntity entity) {
+    protected FormResultEntity doSave(FormResultEntity entity) {
         return tagRepository.save(entity);
     }
 
     @Override
-    public TagEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TagEntity entity) {
+    public FormResultEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FormResultEntity entity) {
         try {
-            Optional<TagEntity> latest = tagRepository.findByUid(entity.getUid());
+            Optional<FormResultEntity> latest = tagRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                TagEntity latestEntity = latest.get();
+                FormResultEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
@@ -176,46 +167,30 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<TagEntity> optional = tagRepository.findByUid(uid);
+        Optional<FormResultEntity> optional = tagRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
             // tagRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Tag not found");
+            throw new RuntimeException("FormResult not found");
         }
     }
 
     @Override
-    public void delete(TagRequest request) {
+    public void delete(FormResultRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public TagResponse convertToResponse(TagEntity entity) {
-        return modelMapper.map(entity, TagResponse.class);
+    public FormResultResponse convertToResponse(FormResultEntity entity) {
+        return modelMapper.map(entity, FormResultResponse.class);
     }
 
     @Override
-    public TagExcel convertToExcel(TagEntity entity) {
-        return modelMapper.map(entity, TagExcel.class);
-    }
-    
-    public void initTags(String orgUid) {
-        // log.info("initThreadTag");
-        for (String tag : TagInitData.getAllTags()) {
-            TagRequest tagRequest = TagRequest.builder()
-                    .uid(Utils.formatUid(orgUid, tag))
-                    .name(tag)
-                    .order(0)
-                    .type(TagTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(tagRequest);
-        }
+    public FormResultExcel convertToExcel(FormResultEntity entity) {
+        return modelMapper.map(entity, FormResultExcel.class);
     }
     
 }
