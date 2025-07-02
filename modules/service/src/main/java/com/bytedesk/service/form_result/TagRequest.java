@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 10:57:32
+ * @LastEditTime: 2025-06-20 14:24:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.form;
+package com.bytedesk.service.form_result;
 
 import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
@@ -27,9 +27,16 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FormRequest extends BaseRequest {
+public class TagRequest extends BaseRequest {
 
     private String name;
 
     private String description;
+
+    // @Builder.Default
+    // private String type = TagTypeEnum.CUSTOMER.name();
+
+    private String color;
+
+    private Integer order;
 }

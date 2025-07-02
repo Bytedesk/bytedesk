@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 14:17:43
+ * @LastEditTime: 2025-07-02 10:57:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,14 +49,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_service_form")
 public class FormEntity extends BaseEntity {
 
-    @Column(name = "form_name")
     private String name;
 
-    @Column(name = "form_key", unique = true)
-    private String key;
-
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)    
-    private String description;    
+    private String description;
 
     // @Builder.Default    
     // @Column(name = "form_type")    
@@ -67,72 +62,52 @@ public class FormEntity extends BaseEntity {
     @Column(name = "form_status")
     private String status = FormStatusEnum.DRAFT.name();
     
-    // 表单版本号
-    // @Builder.Default
-    // @Column(name = "version")
-    // private String version = "1.0";
-    
     // 是否为模板
     @Builder.Default
     @Column(name = "is_template")
-    private Boolean isTemplate = false;
+    private Boolean template = false;
     
     // 表单结构定义，存储为JSON格式
     @Lob
-    @Column(name = "form_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String formSchema;
     
     // 表单发布时间
-    @Column(name = "publish_time")
     private LocalDateTime publishTime;
     
     // 表单过期时间
-    @Column(name = "expire_time")
     private LocalDateTime expireLength;
     
     // 表单布局类型：单列、双列、响应式等
     @Builder.Default
-    @Column(name = "layout_type")
     private String layoutType = "SINGLE_COLUMN";
     
     // 表单样式配置，JSON格式
-    @Column(name = "style_config", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String styleConfig;
     
     // 提交后跳转URL
-    @Column(name = "redirect_url")
     private String redirectUrl;
     
     // 提交后显示的消息
-    @Column(name = "submit_message", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String submitMessage;
     
     // 是否允许匿名提交
     @Builder.Default
-    @Column(name = "allow_anonymous")
     private Boolean allowAnonymous = true;
     
     // 表单访问权限设置，JSON格式
-    @Column(name = "access_control", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String accessControl;
     
     // 提交次数限制，0表示不限制
     @Builder.Default
-    @Column(name = "submission_limit")
     private Integer submissionLimit = 0;
     
     // 提交总数统计
     @Builder.Default
-    @Column(name = "submission_count")
     private Integer submissionCount = 0;
-    
-    // 所属组织/部门ID
-    // @Column(name = "organization_id")
-    // private String organizationId;
-    
-    // 创建者ID
-    // @Column(name = "creator_id")
-    // private String creatorId;
     
     // 标签
     @Builder.Default

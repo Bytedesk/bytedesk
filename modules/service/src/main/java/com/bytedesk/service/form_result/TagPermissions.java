@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:04
+ * @Date: 2024-11-05 16:58:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 10:57:32
+ * @LastEditTime: 2025-05-06 11:55:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,25 +11,10 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.form;
+package com.bytedesk.service.form_result;
 
-import com.bytedesk.core.base.BaseRequest;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.base.BasePermissions;
 
-@Data
-@SuperBuilder
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
-@NoArgsConstructor
-public class FormRequest extends BaseRequest {
+public class TagPermissions extends BasePermissions {
 
-    private String name;
-
-    private String description;
 }
