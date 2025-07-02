@@ -48,9 +48,14 @@ public class ExcelDownloadController {
         try {
             Resource resource = resourceLoader.getResource(EXCEL_PATH + filename);
             if (resource.exists()) {
+                // 处理中文文件名，使用UTF-8编码并使用RFC 5987标准
+                String encodedFilename = java.net.URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+                String contentDisposition = String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s", 
+                    filename, encodedFilename);
+                
                 return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .body(resource);
             } else {
                 return ResponseEntity.notFound().build();

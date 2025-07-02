@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
@@ -83,6 +82,7 @@
                     </td>
                     <td>
                         <a th:href="@{'/excel/download/' + ${file.name}}" class="file-link">下载</a>
+                        <a th:href="@{'/excel/' + ${file.name}}" class="file-link" target="_blank" style="margin-left: 10px;">查看</a>
                     </td>
                 </tr>
             </tbody>

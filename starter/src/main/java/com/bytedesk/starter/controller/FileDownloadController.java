@@ -29,17 +29,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/files")
+@RequestMapping("/file")
 public class FileDownloadController {
 
     private final ResourceLoader resourceLoader;
-    private static final String FILES_PATH = "classpath:static/files/";
+    private static final String FILES_PATH = "classpath:static/file/";
 
     public FileDownloadController(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
-    // 直接查看文件: http://127.0.0.1:9003/files/example.pdf
+    // 直接查看文件: http://127.0.0.1:9003/file/example.pdf
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> viewFile(@PathVariable String filename) {
         try {
@@ -56,15 +56,20 @@ public class FileDownloadController {
         }
     }
 
-    // 下载文件: http://127.0.0.1:9003/files/download/example.pdf
+    // 下载文件: http://127.0.0.1:9003/file/download/example.pdf
     @GetMapping("/download/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
             Resource resource = resourceLoader.getResource(FILES_PATH + filename);
             if (resource.exists()) {
+                // 处理中文文件名，使用UTF-8编码并使用RFC 5987标准
+                String encodedFilename = java.net.URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+                String contentDisposition = String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s", 
+                    filename, encodedFilename);
+                
                 return ResponseEntity.ok()
                     .contentType(getMediaTypeForFile(filename))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
@@ -101,14 +106,14 @@ public class FileDownloadController {
         }
     }
 
-    // List all files: http://127.0.0.1:9003/files/download
+    // List all file: http://127.0.0.1:9003/file/download
     @GetMapping({"/download", "/download/"})
     public String listFiles(Model model) {
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
             Resource[] resources = resolver.getResources(FILES_PATH + "**/*.*");
             
-            List<FileInfo> files = Arrays.stream(resources)
+            List<FileInfo> file = Arrays.stream(resources)
                 .filter(resource -> !resource.getFilename().startsWith("."))
                 .map(resource -> {
                     try {
@@ -124,8 +129,8 @@ public class FileDownloadController {
                 })
                 .collect(Collectors.toList());
             
-            model.addAttribute("files", files);
-            return "files/list";
+            model.addAttribute("fileList", file);
+            return "file/list";
         } catch (IOException e) {
             model.addAttribute("error", "无法读取文件列表");
             return "error";
