@@ -206,6 +206,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- monitoring -->
+		<!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
 		<!-- /////////////////////////////////////开源模块//////////////////////////////////////// -->
 
 		<!--  -->
@@ -273,7 +280,6 @@
 		<!--
 		//////////////////////////////////Plugin模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
 
-
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		 <!-- https://github.com/spring-projects/spring-statemachine -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-starter -->
@@ -282,18 +288,6 @@
             <artifactId>spring-statemachine-starter</artifactId>
             <version>4.0.0</version>
         </dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-jpa -->
-		<!-- <dependency>
-			<groupId>org.springframework.statemachine</groupId>
-			<artifactId>spring-statemachine-data-jpa</artifactId>
-			<version>4.0.0</version>
-		</dependency> -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-data-redis -->
-		<!-- <dependency>
-			<groupId>org.springframework.statemachine</groupId>
-			<artifactId>spring-statemachine-data-redis</artifactId>
-			<version>4.0.0</version>
-		</dependency> -->
 		<!-- 替换上面的 spring-statemachine https://mvnrepository.com/artifact/com.alibaba.cola/cola-component-statemachine -->
 		<dependency>
 			<groupId>com.alibaba.cola</groupId>
@@ -316,70 +310,18 @@
 			<version>2.0.53</version>
 		</dependency>
 
-		<!-- for transforming LocalDateTime -->
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
-		<!-- <dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>${jackson.version}</version>
-		</dependency> -->
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
-        <!-- <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency> -->
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-        <!-- <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency> -->
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
-        <!-- <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency> -->
-
-		<!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-openapi3-jakarta-spring-boot-starter -->
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-            <version>4.5.0</version>
-        </dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.6.0</version>
-		</dependency> -->
-		<!-- <dependency>
+			<version>${springdoc.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webflux-ui -->
+		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webflux-api</artifactId>
-			<version>2.6.0</version>
-		</dependency> -->
-		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-security -->
-		<!-- <dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-security</artifactId>
-			<version>1.8.0</version>
-		</dependency> -->
-
-		<!-- https://github.com/codecentric/spring-boot-admin -->
-		<!-- https://docs.spring-boot-admin.com/current/server.html -->
-		<!-- <dependency>
-			<groupId>de.codecentric</groupId>
-			<artifactId>spring-boot-admin-starter-server</artifactId>
-			<version>3.2.0</version>
-		</dependency> -->
-		<!-- https://docs.spring-boot-admin.com/current/client.html -->
-		<!-- <dependency>
-			<groupId>de.codecentric</groupId>
-			<artifactId>spring-boot-admin-starter-client</artifactId>
-			<version>3.2.0</version>
-		</dependency> -->
+			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+			<version>${springdoc.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
 		<dependency>
@@ -419,58 +361,11 @@
 			<version>2.10.1</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-		<!-- <dependency>
-			<groupId>com.google.protobuf</groupId>
-			<artifactId>protobuf-java</artifactId>
-			<version>4.28.2</version>
-		</dependency> -->
-
-		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
-		<!-- <dependency>
-			<groupId>com.google.protobuf</groupId>
-			<artifactId>protobuf-java-util</artifactId>
-			<version>4.28.2</version>
-		</dependency> -->
-
-		<!--
-		https://mvnrepository.com/artifact/com.googlecode.protobuf-java-format/protobuf-java-format -->
-		<!-- <dependency>
-			<groupId>com.googlecode.protobuf-java-format</groupId>
-			<artifactId>protobuf-java-format</artifactId>
-			<version>1.4</version>
-		</dependency> -->
-
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-		<!-- https://wizardforcel.gitbooks.io/guava-tutorial/content/1.html -->
-		<!-- https://github.com/google/guava/wiki -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>33.3.1-jre</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-		<!-- <dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.14.0</version>
-		</dependency> -->
-
-		<!-- 定时任务 -->
-		<!-- https://mvnrepository.com/artifact/com.xuxueli/xxl-job-core -->
-		<!-- <dependency>
-			<groupId>com.xuxueli</groupId>
-			<artifactId>xxl-job-core</artifactId>
-			<version>2.4.1</version>
-		</dependency> -->
-
 		<!-- aliyun sms -->
 		<!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
 		<dependency>
 			<groupId>com.aliyun</groupId>
 			<artifactId>aliyun-java-sdk-core</artifactId>
-			<!-- <version>4.6.4</version> -->
 			<version>4.5.13</version>
 		</dependency>
 
@@ -479,7 +374,6 @@
 		<dependency>
 			<groupId>com.aliyun</groupId>
 			<artifactId>aliyun-java-sdk-dm</artifactId>
-			<!-- <version>3.3.2</version> -->
 			<version>3.3.1</version>
 		</dependency>
 
@@ -488,7 +382,7 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>easyexcel</artifactId>
-			<version>4.0.1</version>
+			<version>4.0.3</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-3-starter -->
@@ -497,31 +391,7 @@
 			<artifactId>druid-spring-boot-3-starter</artifactId>
 			<version>1.2.23</version>
 		</dependency>
-
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
-
-		<!-- monitoring -->
-		<!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus -->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
-		</dependency>
-
-		<!-- apijson auto generate crud api -->
-		<!-- http://apijson.cn/doc/zh/ -->
-		<!-- https://jitpack.io/#Tencent/APIJSON/7.0.0 -->
-		<!-- <dependency>
-			<groupId>com.github.Tencent</groupId>
-			<artifactId>APIJSON</artifactId>
-			<version>7.0.0</version>
-		</dependency> -->
-
-		<!-- 配置文件敏感信息加密 https://github.com/ulisesbocchio/jasypt-spring-boot -->
-		<!-- <dependency>
-			<groupId>com.github.ulisesbocchio</groupId>
-			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>3.0.5</version>
-		</dependency> -->
 
 		<!-- 验证码 -->
 		<!-- https://mvnrepository.com/artifact/pro.fessional/kaptcha -->
@@ -544,22 +414,6 @@
 			<artifactId>jedis</artifactId>
 			<version>5.2.0</version>
 		</dependency>
-
-		<!-- redis search https://github.com/redis/lettucemod -->
-		<!-- https://mvnrepository.com/artifact/com.redis/lettucemod-spring -->
-		<!-- <dependency>
-			<groupId>com.redis</groupId>
-			<artifactId>lettucemod-spring</artifactId>
-			<version>4.1.0</version>
-		</dependency> -->
-
-		<!-- https://github.com/redis/redis-om-spring?tab=readme-ov-file -->
-		<!-- https://mvnrepository.com/artifact/com.redis.om/redis-om-spring -->
-		<!-- <dependency>
-			<groupId>com.redis.om</groupId>
-			<artifactId>redis-om-spring</artifactId>
-			<version>0.9.7</version>
-		</dependency> -->
 
 		<!-- jedis pool config -->
 		<dependency>
@@ -626,13 +480,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- 添加 okhttp 依赖，确保版本兼容 -->
-		<!-- <dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.12.0</version>
-		</dependency> -->
-		
 	</dependencies>
 
 
