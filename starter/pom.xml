@@ -139,6 +139,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-batch</artifactId>
+		</dependency>
+
 		<!-- support docker -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-docker-compose -->
 		<!-- https://hub.docker.com/r/jackning/bytedesk -->
