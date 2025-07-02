@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-02 10:11:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:53:03
+ * @LastEditTime: 2025-07-02 12:08:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,6 +60,7 @@ public class WorkflowVariableEntity extends BaseEntity {
     /**
      * 变量类型
      */
+    @Column(name = "variable_type")
     private String type;
     
     /**
@@ -86,5 +87,6 @@ public class WorkflowVariableEntity extends BaseEntity {
      * 是否为系统变量
      */
     @Builder.Default
+    @Column(name = "is_system")
     private Boolean system = false;
 }
