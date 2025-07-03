@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 15:16:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 16:23:33
+ * @LastEditTime: 2025-07-03 17:03:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,8 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
@@ -91,7 +93,7 @@ public class ChunkElasticService {
         
         try {
             // 将ChunkEntity转换为ChunkElastic对象
-            ChunkElastic chunkElastic = ChunkEntityElasticConverter.toElastic(chunk);
+            ChunkElastic chunkElastic = ChunkElastic.fromEntity(chunk);
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(chunkElastic);
@@ -458,6 +460,60 @@ public class ChunkElasticService {
         } catch (Exception e) {
             log.error("联想Chunks时发生错误: {}", e.getMessage(), e);
             return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * 应用启动时自动检查和创建索引
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        log.info("应用启动完成，开始检查和创建Elasticsearch索引...");
+        
+        try {
+            // 获取所有Chunk实体
+            List<ChunkEntity> allChunks = chunkRestService.findAll();
+            log.info("共找到 {} 个Chunk实体，将进行索引检查", allChunks.size());
+            
+            for (ChunkEntity chunk : allChunks) {
+                try {
+                    // 检查并索引每个Chunk
+                    indexChunk(chunk);
+                } catch (Exception e) {
+                    log.error("检查和索引Chunk时发生错误: {}, 错误消息: {}", chunk.getUid(), e.getMessage(), e);
+                }
+            }
+            
+            log.info("Elasticsearch索引检查和创建完成");
+        } catch (Exception e) {
+            log.error("应用启动时索引检查失败: {}", e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 检查并创建单个Chunk的索引
+     * @param chunk 要检查的Chunk实体
+     */
+    public void checkAndCreateIndex(ChunkEntity chunk) {
+        try {
+            // 检查文档是否已存在
+            boolean exists = elasticsearchOperations.exists(chunk.getUid(), ChunkElastic.class);
+            
+            if (exists) {
+                log.info("Chunk索引已存在: {}", chunk.getUid());
+            } else {
+                log.info("为Chunk创建新索引: {}", chunk.getUid());
+                
+                // 将ChunkEntity转换为ChunkElastic对象
+                ChunkElastic chunkElastic = ChunkElastic.fromEntity(chunk);
+                
+                // 将文档索引到Elasticsearch
+                elasticsearchOperations.save(chunkElastic);
+                
+                log.info("Chunk索引创建成功: {}", chunk.getUid());
+            }
+        } catch (Exception e) {
+            log.error("检查和创建Chunk索引时发生错误: {}, 错误消息: {}", chunk.getUid(), e.getMessage(), e);
         }
     }
 }

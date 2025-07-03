@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 17:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 16:23:41
+ * @LastEditTime: 2025-07-03 17:02:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,7 +108,7 @@ public class TextElasticService {
             }
             
             // 将TextEntity转换为TextElastic对象
-            TextElastic textElastic = TextEntityElasticConverter.toElastic(text);
+            TextElastic textElastic = TextElastic.fromEntity(text);
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(textElastic);
