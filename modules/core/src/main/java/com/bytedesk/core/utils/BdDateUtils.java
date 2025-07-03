@@ -50,21 +50,12 @@ public class BdDateUtils {
         if (ZonedDateTime == null) {
             return null;
         }
-        // 使用 DateTimeFormatter 直接格式化 ZonedDateTime
-        // return ZonedDateTime.format(DateTimeFormatter.ofPattern(datetimeFormat));
-        
         // 使用应用配置的时区
         // 使用应用配置的时区
         ZonedDateTime zonedDateTime = java.time.ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), LocaleContextHolder.getTimeZone().toZoneId());
         // 或者固定使用中国时区
         // ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), ZoneId.of("Asia/Shanghai"));
         return DateTimeFormatter.ofPattern(datetimeFormat).format(zonedDateTime);
-        //     Date date = Date.from(ZonedDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        //     SimpleDateFormat formatter = new SimpleDateFormat(datetimeFormat);
-        //     return formatter.format(date);
-        // } catch (Exception e) {
-        //     return null;
-        // }
     }
 
     public static Date formatStringToDateTime(String date) {

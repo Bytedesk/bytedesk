@@ -25,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "freeswitch_call")
+@Table(name = "bytedesk_freeswitch_call")
 public class FreeSwitchCallEntity extends BaseEntity {
 
     /**
