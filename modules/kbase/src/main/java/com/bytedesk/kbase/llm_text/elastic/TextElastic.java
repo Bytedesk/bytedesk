@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_text.elastic;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,11 +56,11 @@ public class TextElastic {
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
 
-    @Field(type = FieldType.Date)
-    private String startDate;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private ZonedDateTime startDate;
 
-    @Field(type = FieldType.Date)
-    private String endDate;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private ZonedDateTime endDate;
 
     @Field(type = FieldType.Keyword)
     private String categoryUid;
@@ -91,13 +90,11 @@ public class TextElastic {
                 .status(entity.getElasticStatus())
                 .tagList(entity.getTagList())
                 .enabled(entity.getEnabled())
-                .startDate(entity.getStartDate() != null ? entity.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-                .endDate(entity.getEndDate() != null ? entity.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+                // .startDate(entity.getStartDate())
+                // .endDate(entity.getEndDate())
                 .categoryUid(entity.getCategoryUid())
                 .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
                 .docIdList(entity.getDocIdList())
-                // .createdBy(entity.getCreatedBy())
-                // .updatedBy(entity.getUpdatedBy())
                 .build();
     }
     

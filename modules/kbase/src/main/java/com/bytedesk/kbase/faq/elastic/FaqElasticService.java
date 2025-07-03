@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 20:01:29
+ * @LastEditTime: 2025-07-03 20:02:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,8 +13,6 @@
  */
 package com.bytedesk.kbase.faq.elastic;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +31,6 @@ import com.bytedesk.kbase.faq.FaqRequest;
 import com.bytedesk.kbase.faq.FaqRestService;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import lombok.RequiredArgsConstructor;
@@ -189,8 +186,8 @@ public class FaqElasticService {
             // 添加过滤条件：启用状态
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
 
-            // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
-            // LocalDateTime currentTime = LocalDateTime.now();
+            // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
+            // ZonedDateTime currentTime = ZonedDateTime.now();
             // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
 
             // // 创建startDate范围查询
@@ -293,8 +290,8 @@ public class FaqElasticService {
                 log.warn("添加question字段查询时出错: {}", e.getMessage());
             }
 
-            // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
-            // LocalDateTime currentTime = LocalDateTime.now();
+            // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
+            // ZonedDateTime currentTime = ZonedDateTime.now();
             // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
 
             // // 创建startDate范围查询

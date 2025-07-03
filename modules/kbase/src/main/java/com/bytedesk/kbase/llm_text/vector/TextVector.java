@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:18:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 08:59:27
+ * @LastEditTime: 2025-07-03 20:10:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_text.vector;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -22,8 +21,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.bytedesk.kbase.llm_text.TextEntity;
-
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,11 +77,11 @@ public class TextVector {
     private List<String> docIdList;
     
     // 有效日期范围
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime startDate;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private ZonedDateTime startDate;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime endDate;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private ZonedDateTime endDate;
     
     // 状态字段
     @Field(type = FieldType.Keyword)
@@ -113,8 +110,8 @@ public class TextVector {
             .kbUid(kbUid)
             .categoryUid(text.getCategoryUid())
             .enabled(text.getEnabled())
-            .startDate(text.getStartDate())
-            .endDate(text.getEndDate())
+            // .startDate(text.getStartDate())
+            // .endDate(text.getEndDate())
             .status(text.getElasticStatus())
             .vectorStatus(text.getVectorStatus())
             .docIdList(text.getDocIdList())

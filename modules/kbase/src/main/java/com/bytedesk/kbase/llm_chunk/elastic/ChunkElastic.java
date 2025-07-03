@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 15:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 17:03:18
+ * @LastEditTime: 2025-07-03 20:08:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_chunk.elastic;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,11 +57,11 @@ public class ChunkElastic {
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
     
-    @Field(type = FieldType.Date)
-    private String startDate;
-    
-    @Field(type = FieldType.Date)
-    private String endDate;
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private ZonedDateTime startDate;
+
+    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    // private ZonedDateTime endDate;
     
     @Field(type = FieldType.Keyword)
     private String docId;
@@ -95,16 +94,12 @@ public class ChunkElastic {
                 .type(entity.getType())
                 .tagList(entity.getTagList())
                 .enabled(entity.getEnabled())
-                .startDate(entity.getStartDate() != null ? entity.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-                .endDate(entity.getEndDate() != null ? entity.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+                // .startDate(entity.getStartDate())
+                // .endDate(entity.getEndDate())
                 .docId(entity.getDocId())
                 .fileUid(entity.getFile() != null ? entity.getFile().getUid() : null)
                 .categoryUid(entity.getCategoryUid())
                 .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
-                // .createdAt(entity.getCreatedAt())
-                // .updatedAt(entity.getUpdatedAt())
-                // .createdBy(entity.getCreatedBy())
-                // .updatedBy(entity.getUpdatedBy())
                 .build();
     }
     
