@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.file;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,12 +70,12 @@ public class FileEntity extends BaseEntity {
 
      // 有效开始日期
     @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
+    private ZonedDateTime startDate = ZonedDateTime.now();
 
     // 有效结束日期
     // 当前 + 100 年
     @Builder.Default
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
 
     @Builder.Default
     private String elasticStatus = ChunkStatusEnum.NEW.name();

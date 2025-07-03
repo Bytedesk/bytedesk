@@ -1,6 +1,6 @@
 package com.bytedesk.freeswitch.config;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
@@ -91,7 +91,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
             cdr.setUid(uuid);
             cdr.setCallerIdNumber(callerId);
             cdr.setDestinationNumber(destination);
-            cdr.setStartStamp(LocalDateTime.now());
+            cdr.setStartStamp(ZonedDateTime.now());
             cdr.setDirection("outbound"); // 默认为outbound，可根据实际情况调整
             cdr.setHangupCause(""); // 初始为空
             
@@ -119,7 +119,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         // 更新CDR记录 - 设置应答时间
         try {
-            cdrService.updateCdrAnswerTime(uuid, LocalDateTime.now());
+            cdrService.updateCdrAnswerTime(uuid, ZonedDateTime.now());
             log.debug("已更新CDR应答时间: UUID {}", uuid);
         } catch (Exception e) {
             log.error("更新CDR应答时间失败: UUID {} - {}", uuid, e.getMessage(), e);
@@ -140,7 +140,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         // 更新CDR记录 - 设置结束时间和挂断原因
         try {
-            cdrService.updateCdrEndTime(uuid, LocalDateTime.now(), hangupCause);
+            cdrService.updateCdrEndTime(uuid, ZonedDateTime.now(), hangupCause);
             log.debug("已更新CDR结束时间: UUID {} 原因 {}", uuid, hangupCause);
         } catch (Exception e) {
             log.error("更新CDR结束时间失败: UUID {} - {}", uuid, e.getMessage(), e);
@@ -185,7 +185,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
             // Optional<FreeSwitchNumberEntity> userOptional = userService.findByUsername(username);
             // if (userOptional.isPresent()) {
             //     if (online) {
-            //         userService.updateLastRegistration(username, LocalDateTime.now());
+            //         userService.updateLastRegistration(username, ZonedDateTime.now());
             //     }
             //     log.debug("已更新用户在线状态: {} -> {}", username, online);
             // }

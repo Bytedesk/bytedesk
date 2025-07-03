@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.keyword;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -48,10 +48,10 @@ public class AutoReplyKeywordResponse extends BaseResponse {
     private Integer replyCount;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     private Boolean enabled;
 
@@ -61,5 +61,5 @@ public class AutoReplyKeywordResponse extends BaseResponse {
 
     private String kbUid; // 对应知识库
     
-    // private LocalDateTime updatedAt; 
+    // private ZonedDateTime updatedAt; 
 }

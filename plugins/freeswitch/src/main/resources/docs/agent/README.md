@@ -67,7 +67,7 @@ AgentStatusEntity status = AgentStatusEntity.builder()
     .agent(agent)
     .status("ONLINE")
     .reason("Ready to take calls")
-    .startTime(LocalDateTime.now())
+    .startTime(ZonedDateTime.now())
     .build();
 
 // Example: Assigning skills to agent

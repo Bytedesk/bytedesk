@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.routing_strategy;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -163,7 +163,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
         // 更新排队状态，待优化
-        queueMemberEntity.setAgentAcceptedAt(LocalDateTime.now());
+        queueMemberEntity.setAgentAcceptedAt(ZonedDateTime.now());
         queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         // 
@@ -235,7 +235,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         // if (messageOptional.isPresent()) {
         //     MessageEntity message = messageOptional.get();
-        //     if (message.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(30))) {
+        //     if (message.getCreatedAt().isAfter(ZonedDateTime.now().minusMinutes(30))) {
         //         // 距离当前时间不超过30分钟，则直接使用之前的消息
         //         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
         //         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);

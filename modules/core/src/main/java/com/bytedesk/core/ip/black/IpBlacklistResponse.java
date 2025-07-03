@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.ip.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -32,8 +32,8 @@ public class IpBlacklistResponse extends BaseResponse {
     // 
     private String ip;
     private String ipLocation;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private ZonedDateTime startTime;
+    private ZonedDateTime endTime;
     private String reason;
     // 
     private String blackUid;

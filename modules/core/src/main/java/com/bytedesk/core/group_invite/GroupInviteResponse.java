@@ -40,5 +40,5 @@ public class GroupInviteResponse extends BaseResponse {
 
     private Integer order;
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 }

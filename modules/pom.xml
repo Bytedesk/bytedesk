@@ -211,7 +211,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- for transforming LocalDateTime -->
+        <!-- for transforming ZonedDateTime -->
         <!--
         https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
         <dependency>

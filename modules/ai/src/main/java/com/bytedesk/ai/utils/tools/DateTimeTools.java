@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ai.utils.tools;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
@@ -35,18 +35,18 @@ public class DateTimeTools {
         TimeZone timeZone = LocaleContextHolder.getTimeZone();
         log.info("timeZone: {}", timeZone);
         // 将当前时间转换为指定时区的日期时间
-        return LocalDateTime.now().atZone(timeZone.toZoneId()).toString();
+        return ZonedDateTime.now().atZone(timeZone.toZoneId()).toString();
     }
 
     @Tool(description = "Set a user alarm for the given time")
     void setAlarm(@ToolParam(description = "Time in ISO-8601 format") String time) {
-        LocalDateTime alarmTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_DATE_TIME);
+        ZonedDateTime alarmTime = ZonedDateTime.parse(time, DateTimeFormatter.ISO_DATE_TIME);
         log.info("Alarm set for " + alarmTime);
     }
 
     // MethodToolCallback
     String getCurrentDateTimeMethodToolCallback() {
-        return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+        return ZonedDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 
 }

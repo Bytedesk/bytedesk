@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.kbase;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -94,10 +94,10 @@ public class KbaseResponse extends BaseResponse {
     private Boolean published;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     // 大模型知识库-嵌入向量提供者
     private String embeddingProvider;

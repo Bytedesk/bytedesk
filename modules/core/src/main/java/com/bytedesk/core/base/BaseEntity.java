@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 18:05:00
+ * @LastEditTime: 2025-07-03 12:02:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,9 +29,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.utils.BdDateUtils;
 
-// import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.AllArgsConstructor;
@@ -41,9 +40,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-// import java.time.ZonedDateTime;
-// import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Date -> ZonedDateTime ？
@@ -95,12 +93,14 @@ public abstract class BaseEntity implements Serializable {
     // @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
     @CreatedDate
-    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime createdAt;
 
     // @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime updatedAt;
 
     // soft delete
 	@Builder.Default
@@ -123,11 +123,11 @@ public abstract class BaseEntity implements Serializable {
     private String platform = PlatformEnum.BYTEDESK.name();
 
     public String getCreatedAtString() {
-        return BdDateUtils.formatDatetimeToString(createdAt);
+        return createdAt != null ? createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
     }
 
     public String getUpdatedAtString() {
-        return BdDateUtils.formatDatetimeToString(updatedAt);
+        return updatedAt != null ? updatedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
     }
     
 }

@@ -50,7 +50,7 @@ package com.bytedesk.core.black;
 //         //     BlackEntity black = blackOpt.get();
 //         //     // 检查黑名单是否在有效期内
 //         //     if (black.getEndTime() == null ||
-//         //             black.getEndTime().isAfter(LocalDateTime.now())) {
+//         //             black.getEndTime().isAfter(ZonedDateTime.now())) {
 //         //         response.sendError(
 //         //                 HttpServletResponse.SC_FORBIDDEN,
 //         //                 "Access denied for visitor: " + uid + " in org: " + orgUid);

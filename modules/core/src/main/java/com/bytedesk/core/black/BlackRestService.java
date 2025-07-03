@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,7 +75,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
         return repository.findByUid(uid);
     }
 
-    public List<BlackEntity> findByEndTimeBefore(LocalDateTime endTime) {
+    public List<BlackEntity> findByEndTimeBefore(ZonedDateTime endTime) {
         return repository.findByEndTimeBeforeAndDeletedFalse(endTime);
     }
     // 根据黑名单用户uid查询

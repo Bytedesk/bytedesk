@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.cdr;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +65,7 @@ public interface FreeSwitchCdrRepository extends JpaRepository<FreeSwitchCdrEnti
     /**
      * 查找指定时间范围内的CDR记录
      */
-    List<FreeSwitchCdrEntity> findByStartStampBetween(LocalDateTime startTime, LocalDateTime endTime);
+    List<FreeSwitchCdrEntity> findByStartStampBetween(ZonedDateTime startTime, ZonedDateTime endTime);
 
     /**
      * 查找成功接通的通话记录
@@ -93,19 +93,19 @@ public interface FreeSwitchCdrRepository extends JpaRepository<FreeSwitchCdrEnti
      * 统计指定时间范围内的通话数量
      */
     @Query("SELECT COUNT(c) FROM FreeSwitchCdrEntity c WHERE c.startStamp BETWEEN :startTime AND :endTime")
-    long countCallsInTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    long countCallsInTimeRange(@Param("startTime") ZonedDateTime startTime, @Param("endTime") ZonedDateTime endTime);
 
     /**
      * 统计指定时间范围内成功接通的通话数量
      */
     @Query("SELECT COUNT(c) FROM FreeSwitchCdrEntity c WHERE c.startStamp BETWEEN :startTime AND :endTime AND c.answerStamp IS NOT NULL")
-    long countAnsweredCallsInTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    long countAnsweredCallsInTimeRange(@Param("startTime") ZonedDateTime startTime, @Param("endTime") ZonedDateTime endTime);
 
     /**
      * 计算指定时间范围内的总通话时长
      */
     @Query("SELECT COALESCE(SUM(c.billsec), 0) FROM FreeSwitchCdrEntity c WHERE c.startStamp BETWEEN :startTime AND :endTime AND c.answerStamp IS NOT NULL")
-    long sumBillSecInTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    long sumBillSecInTimeRange(@Param("startTime") ZonedDateTime startTime, @Param("endTime") ZonedDateTime endTime);
 
     /**
      * 查找最近的通话记录
@@ -133,5 +133,5 @@ public interface FreeSwitchCdrRepository extends JpaRepository<FreeSwitchCdrEnti
     /**
      * 删除指定日期之前的CDR记录
      */
-    void deleteByStartStampBefore(LocalDateTime cutoffDate);
+    void deleteByStartStampBefore(ZonedDateTime cutoffDate);
 }

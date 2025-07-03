@@ -50,5 +50,5 @@ public class ActionResponse extends BaseResponse {
 
     private UserProtobuf user;
 
-    // public LocalDateTime createdAt;
+    // public ZonedDateTime createdAt;
 }

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_website;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -48,10 +48,10 @@ public class WebsiteResponse extends BaseResponse {
     private List<String> tagList;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     private Boolean enabled;
 

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.article;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,10 +92,10 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     private String editor = BytedeskConsts.EMPTY_STRING;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     // 是否需要审核
     @Column(name = "need_audit")

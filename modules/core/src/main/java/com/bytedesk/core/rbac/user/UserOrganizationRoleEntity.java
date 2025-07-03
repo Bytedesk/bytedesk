@@ -14,7 +14,7 @@
 package com.bytedesk.core.rbac.user;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,8 +72,8 @@ public class UserOrganizationRoleEntity implements Serializable  {
     private Set<RoleEntity> roles = new HashSet<>();
     
     // 用户角色有效期
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
 
     // 可能还有其他字段，如权限等
 

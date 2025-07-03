@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * FreeSwitch通话详单请求实体
@@ -72,11 +72,11 @@ public class FreeSwitchCdrRequest extends BaseRequest {
     /**
      * 开始日期
      */
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     /**
      * 结束日期
      */
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
 }

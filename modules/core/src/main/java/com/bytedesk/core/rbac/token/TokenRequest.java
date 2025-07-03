@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.rbac.token;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.enums.ClientEnum;
@@ -43,7 +43,7 @@ public class TokenRequest extends BaseRequest {
     @Builder.Default
     private String type = TokenTypeEnum.LOGIN.name();
 
-    private LocalDateTime expiresAt;
+    private ZonedDateTime expiresAt;
 
     @Builder.Default
     private Boolean revoked = false;

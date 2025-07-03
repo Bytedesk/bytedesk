@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:28:38
+ * @LastEditTime: 2025-07-03 12:14:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +74,7 @@ public class VisitorThreadEventListener {
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setSystemCloseAt(LocalDateTime.now());
+                queueMember.setSystemCloseAt(ZonedDateTime.now());
                 queueMember.setSystemClose(true);
                 queueMemberRestService.save(queueMember);
                 if (queueMember.getAgentOffline()) {
@@ -116,7 +116,7 @@ public class VisitorThreadEventListener {
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setAgentClosedAt(LocalDateTime.now());
+                queueMember.setAgentClosedAt(ZonedDateTime.now());
                 queueMember.setAgentClose(true);
                 queueMemberRestService.save(queueMember);
             }
@@ -158,13 +158,12 @@ public class VisitorThreadEventListener {
         // 触发器逻辑
         // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
         threads.forEach(thread -> {
-            // LocalDateTime转为时间戳需借助ZoneId和系统默认时区
+            // Convert ZonedDateTime to timestamp using ZoneId and system default timezone
             long currentTimeMillis = System.currentTimeMillis();
-            long updatedAtMillis = thread.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long updatedAtMillis = thread.getUpdatedAt().toInstant().toEpochMilli();
             long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
-            // 转换为分钟
+            // Convert to seconds
             long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
-            //
             String topic = thread.getTopic();
             // log.info("visitor_thread quartz one min event thread: " + thread.getUid());
             if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.visitor_thread;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -297,9 +297,9 @@ public class VisitorThreadService
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
-            // LocalDateTime转为时间戳需借助ZoneId和系统默认时区
+            // ZonedDateTime转为时间戳需借助ZoneId和系统默认时区
             long currentTimeMillis = System.currentTimeMillis();
-            long updatedAtMillis = thread.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long updatedAtMillis = thread.getUpdatedAt().toInstant().toEpochMilli();
             long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
@@ -354,7 +354,7 @@ public class VisitorThreadService
     private void sendRemindMessage(QueueMemberEntity queueMember, ThreadEntity thread, AgentEntity agent) {
         // 只设置首次超时时间，后续不再更新
         if (queueMember.getAgentTimeoutAt() == null) {
-            queueMember.setAgentTimeoutAt(LocalDateTime.now());
+            queueMember.setAgentTimeoutAt(ZonedDateTime.now());
             queueMember.setAgentTimeout(true);
         }
         // 更新超时次数

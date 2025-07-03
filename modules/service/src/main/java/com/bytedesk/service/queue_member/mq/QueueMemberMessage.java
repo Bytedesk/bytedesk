@@ -14,7 +14,7 @@
 package com.bytedesk.service.queue_member.mq;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import com.alibaba.fastjson2.annotation.JSONField;
@@ -79,16 +79,16 @@ public class QueueMemberMessage implements Serializable {
      * 时间戳更新
      */
     @JSONField(ordinal = 9, format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime visitorLastMessageAt;
+    private ZonedDateTime visitorLastMessageAt;
     
     @JSONField(ordinal = 10, format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime agentLastResponseAt;
+    private ZonedDateTime agentLastResponseAt;
     
     @JSONField(ordinal = 11, format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime robotLastResponseAt;
+    private ZonedDateTime robotLastResponseAt;
     
     @JSONField(ordinal = 12, format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime workgroupLastResponseAt;
+    private ZonedDateTime workgroupLastResponseAt;
     
     /**
      * 状态更新

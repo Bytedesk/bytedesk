@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -665,8 +665,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 .client(threadEntity.getClient())
                 .user(user)
                 .orgUid(threadEntity.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .thread(threadEntity)
                 .extra(extra)
                 .build();
@@ -705,8 +705,8 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 .client(ClientEnum.SYSTEM.name())
                 .user(answerUser)
                 .orgUid(threadEntity.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .thread(threadEntity)
                 .extra(extra)
                 .build();

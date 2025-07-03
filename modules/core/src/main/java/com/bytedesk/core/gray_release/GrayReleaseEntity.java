@@ -1,6 +1,6 @@
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
@@ -55,10 +55,10 @@ public class GrayReleaseEntity extends BaseEntity {
 
     // 灰度时间
     @Column(name = "gray_release_start_time")
-    private LocalDateTime startTime; // 灰度开始时间
+    private ZonedDateTime startTime; // 灰度开始时间
 
     @Column(name = "gray_release_end_time")
-    private LocalDateTime endTime; // 灰度结束时间
+    private ZonedDateTime endTime; // 灰度结束时间
 
     // 灰度状态
     @Builder.Default
@@ -89,7 +89,7 @@ public class GrayReleaseEntity extends BaseEntity {
         }
 
         // 4. 检查灰度时间
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         if (startTime != null && now.isBefore(startTime)) {
             return false; // 灰度未开始
         }

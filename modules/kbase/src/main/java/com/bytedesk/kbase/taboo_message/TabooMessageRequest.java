@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.taboo_message;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -41,9 +41,9 @@ public class TabooMessageRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
     
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();

@@ -20,7 +20,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,9 +28,9 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
     Optional<QueueMemberEntity> findByUid(String uid);
 
-    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndResolved(String orgUid, LocalDateTime startTime, LocalDateTime endTime, boolean resolved);
+    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndResolved(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime, boolean resolved);
     
-    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndAgentAcceptType(String orgUid, LocalDateTime startTime, LocalDateTime endTime, String acceptType);
+    List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndAgentAcceptType(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime, String acceptType);
     // 修改查询方法，使用 JPQL 通过关联的 Thread 实体的 uid 字段查询
     @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid")
     Optional<QueueMemberEntity> findByThreadUid(@Param("threadUid") String threadUid);
@@ -125,7 +125,7 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 //     @Modifying
 //     int cleanupExpiredMembers(
 //         @Param("queueUid") String queueUid,
-//         @Param("beforeTime") LocalDateTime beforeTime);
+//         @Param("beforeTime") ZonedDateTime beforeTime);
 
 //     // 添加新的查询方法，通过线程UID和队列UID查询队列成员
 //     @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid AND qm.queue.uid = :queueUid")

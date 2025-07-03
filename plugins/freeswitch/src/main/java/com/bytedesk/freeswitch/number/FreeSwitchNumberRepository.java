@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.number;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +85,7 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
     /**
      * 查找在线用户（最近指定时间内有注册记录）
      */
-    List<FreeSwitchNumberEntity> findByEnabledTrueAndLastRegisterAfter(LocalDateTime cutoffTime);
+    List<FreeSwitchNumberEntity> findByEnabledTrueAndLastRegisterAfter(ZonedDateTime cutoffTime);
 
     /**
      * 统计域名下的用户数量
@@ -95,13 +95,13 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
     /**
      * 统计在线用户数量
      */
-    long countByEnabledTrueAndLastRegisterAfter(LocalDateTime cutoffTime);
+    long countByEnabledTrueAndLastRegisterAfter(ZonedDateTime cutoffTime);
 
     /**
      * 查找在线用户（最近5分钟内有注册记录）
      */
     @Query("SELECT u FROM FreeSwitchNumberEntity u WHERE u.enabled = true AND u.lastRegister > :cutoffTime")
-    List<FreeSwitchNumberEntity> findOnlineNumbers(@Param("cutoffTime") LocalDateTime cutoffTime);
+    List<FreeSwitchNumberEntity> findOnlineNumbers(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     /**
      * 根据用户名模糊搜索
@@ -122,7 +122,7 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
      * 统计在线用户数量
      */
     @Query("SELECT COUNT(u) FROM FreeSwitchNumberEntity u WHERE u.enabled = true AND u.lastRegister > :cutoffTime")
-    long countOnlineNumbers(@Param("cutoffTime") LocalDateTime cutoffTime);
+    long countOnlineNumbers(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     /**
      * 更新用户最后注册时间和IP
@@ -130,6 +130,6 @@ public interface FreeSwitchNumberRepository extends JpaRepository<FreeSwitchNumb
     @Query("UPDATE FreeSwitchNumberEntity u SET u.lastRegister = :registerTime, u.registerIp = :registerIp WHERE u.username = :username AND u.domain = :domain")
     int updateLastRegister(@Param("username") String username, 
                           @Param("domain") String domain,
-                          @Param("registerTime") LocalDateTime registerTime, 
+                          @Param("registerTime") ZonedDateTime registerTime, 
                           @Param("registerIp") String registerIp);
 }

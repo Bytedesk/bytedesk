@@ -39,7 +39,7 @@ public class VisitorThreadResponse extends BaseResponse {
 
     // private String extra;
 
-	// private LocalDateTime createdAt;
+	// private ZonedDateTime createdAt;
 
     // private UserProtobuf user;
 

@@ -33,5 +33,5 @@ public class UrlResponse extends BaseResponse {
 
     private String userUid;
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 }

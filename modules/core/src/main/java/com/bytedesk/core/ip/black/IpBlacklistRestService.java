@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.ip.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +85,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
         return ipBlacklistRepository.findByIpAndDeletedFalse(ip);
     }
 
-    public List<IpBlacklistEntity> findByEndTimeBefore(LocalDateTime dateTime) {
+    public List<IpBlacklistEntity> findByEndTimeBefore(ZonedDateTime dateTime) {
         return ipBlacklistRepository.findByEndTimeBeforeAndDeletedFalse(dateTime);
     }
 
@@ -93,7 +93,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     public void addToBlacklistSystem(String ip) {
         //
         String ipLocation = ipService.getIpLocation(ip);
-        LocalDateTime endTime = LocalDateTime.now().plusHours(BLOCK_HOURS);
+        ZonedDateTime endTime = ZonedDateTime.now().plusHours(BLOCK_HOURS);
         // 
         IpBlacklistRequest request = IpBlacklistRequest.builder()
                 .ip(ip)

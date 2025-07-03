@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.keyword;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,9 +54,9 @@ public class AutoReplyKeywordRequest extends BaseRequest {
     @Builder.Default
     private Integer replyCount = 0;
     
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     private Boolean enabled;
 

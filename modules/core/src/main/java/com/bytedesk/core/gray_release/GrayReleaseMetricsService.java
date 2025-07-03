@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class GrayReleaseMetricsService {
                 .userUid(userUid)
                 .feature(feature.getCode())
                 .success(success)
-                .timestamp(LocalDateTime.now())
+                .timestamp(ZonedDateTime.now())
                 .build();
             
             grayReleaseRepository.save(metrics);
@@ -55,7 +55,7 @@ public class GrayReleaseMetricsService {
      * 获取功能的使用统计
      */
     public GrayReleaseFeatureStatistics getFeatureStatistics(GrayReleaseFeature feature, 
-            LocalDateTime start, LocalDateTime end) {
+            ZonedDateTime start, ZonedDateTime end) {
         
         List<GrayReleaseMetrics> metrics = grayReleaseRepository
             .findByFeatureAndTimestampBetween(feature.getCode(), start, end);

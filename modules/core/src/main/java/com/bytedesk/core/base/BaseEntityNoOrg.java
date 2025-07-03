@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 16:58:21
+ * @LastEditTime: 2025-07-03 12:02:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,9 +39,9 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 // import java.time.ZonedDateTime;
-// import java.time.LocalDateTime;
+// import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * Date -> ZonedDateTime ？
@@ -83,12 +84,14 @@ public abstract class BaseEntityNoOrg implements Serializable {
     // @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
     @CreatedDate
-    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime createdAt;
 
     // @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime updatedAt;
 
 	@Builder.Default
 	@Column(name = "is_deleted")

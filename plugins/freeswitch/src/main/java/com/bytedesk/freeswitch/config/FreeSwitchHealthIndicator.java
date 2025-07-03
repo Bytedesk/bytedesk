@@ -15,7 +15,7 @@ package com.bytedesk.freeswitch.config;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.boot.actuate.health.Health;
@@ -95,7 +95,7 @@ public class FreeSwitchHealthIndicator implements HealthIndicator {
      * 获取当前时间字符串
      */
     private String getCurrentTime() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     /**

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.ip.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,5 +26,5 @@ public interface IpBlacklistRepository extends JpaRepository<IpBlacklistEntity, 
 
     Optional<IpBlacklistEntity> findByUidAndDeletedFalse(String uid);
 
-    List<IpBlacklistEntity> findByEndTimeBeforeAndDeletedFalse(LocalDateTime endTime);
+    List<IpBlacklistEntity> findByEndTimeBeforeAndDeletedFalse(ZonedDateTime endTime);
 } 

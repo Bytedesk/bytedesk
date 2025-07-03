@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,12 +123,12 @@ public class TicketSpecification extends BaseSpecification {
             
             // 处理日期范围查询
             if (StringUtils.hasText(request.getStartDate())) {
-                LocalDateTime startDate = LocalDateTime.parse(request.getStartDate(), formatter);
+                ZonedDateTime startDate = ZonedDateTime.parse(request.getStartDate(), formatter);
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate));
             }
 
             if (StringUtils.hasText(request.getEndDate())) {
-                LocalDateTime endDate = LocalDateTime.parse(request.getEndDate(), formatter);
+                ZonedDateTime endDate = ZonedDateTime.parse(request.getEndDate(), formatter);
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate));
             }
 

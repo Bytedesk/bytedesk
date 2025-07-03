@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -48,7 +48,7 @@ public class GrayReleaseMetrics extends BaseEntity {
     private Boolean success;     // 是否成功
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;  // 记录时间
+    private ZonedDateTime timestamp;  // 记录时间
 
     @Column(length = 512)
     private String errorMessage;  // 错误信息（如果有）

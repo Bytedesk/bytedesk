@@ -81,7 +81,7 @@ public class JmsArtemisConfig {
 		// NOTE: 我们不在这里定义类型映射，而是在消费者端使用自定义解析逻辑
 		// 这样可以避免模块间的直接依赖
 		
-		// ObjectMapper objectMapper， for transforming localDateTime to json
+		// ObjectMapper objectMapper， for transforming ZonedDateTime to json
 		// converter.setObjectMapper(objectMapper);
 		return converter;
 	}

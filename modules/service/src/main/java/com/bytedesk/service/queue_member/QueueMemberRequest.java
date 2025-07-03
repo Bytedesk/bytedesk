@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -60,26 +60,26 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer queueNumber = 0;  // 排队号码
 
     @Builder.Default
-    private LocalDateTime visitorEnqueueAt = LocalDateTime.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = ZonedDateTime.now();  // 加入时间
 
-    private LocalDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
+    private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
-    private LocalDateTime visitorLastMessageAt;  // 访客最后发送消息时间
+    private ZonedDateTime visitorLastMessageAt;  // 访客最后发送消息时间
 
-    private LocalDateTime visitorLeavedAt;  // 离开时间
+    private ZonedDateTime visitorLeavedAt;  // 离开时间
 
     private String agentAcceptType;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime agentAcceptedAt;  // 开始服务时间
+    private ZonedDateTime agentAcceptedAt;  // 开始服务时间
 
     @Builder.Default
     private Boolean agentFirstResponse = false;  // 是否首次响应
 
-    private LocalDateTime agentFirstResponseAt;  // 首次人工响应时间
+    private ZonedDateTime agentFirstResponseAt;  // 首次人工响应时间
 
-    private LocalDateTime agentLastResponseAt;  // 最后响应时间
+    private ZonedDateTime agentLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime agentClosedAt;  // 结束时间
+    private ZonedDateTime agentClosedAt;  // 结束时间
 
     @Builder.Default
     private Integer agentAvgResponseLength = 0;  // 平均响应时间(秒)
@@ -97,7 +97,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Boolean agentTimeout = false; // 是否超时
 
     // 机器人对话超时时间
-    private LocalDateTime robotTimeoutAt;
+    private ZonedDateTime robotTimeoutAt;
 
     // -----------------
     
@@ -105,7 +105,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer systemMessageCount = 0;  // 系统消息数量
 
     // 人工对话超时时间
-    private LocalDateTime agentTimeoutAt;
+    private ZonedDateTime agentTimeoutAt;
 
 
     @Builder.Default
@@ -117,7 +117,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Boolean rated = false;
 
     // 评分时间
-    private LocalDateTime rateAt;  // 评分时间
+    private ZonedDateTime rateAt;  // 评分时间
 
     // 是否已解决
     @Builder.Default
@@ -127,7 +127,7 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Boolean messageLeave = false;
 
-    private LocalDateTime messageLeaveAt;  // 留言时间
+    private ZonedDateTime messageLeaveAt;  // 留言时间
 
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
@@ -177,5 +177,5 @@ public class QueueMemberRequest extends BaseRequest {
     private Boolean robotToAgent = false;
 
     // 机器人转人工时间
-    private LocalDateTime robotToAgentAt;
+    private ZonedDateTime robotToAgentAt;
 }

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ticket.thread.delegate;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Date;
 
@@ -120,7 +120,7 @@ public class ThreadHumanIdleTimeoutServiceDelegate implements JavaDelegate {
                 QueueMemberEntity queueMember = optionalQueueMember.get();
                 
                 // 设置人工客服超时时间和超时标志
-                queueMember.setAgentTimeoutAt(LocalDateTime.now());
+                queueMember.setAgentTimeoutAt(ZonedDateTime.now());
                 queueMember.setAgentTimeout(true);
                 
                 // 保存更新

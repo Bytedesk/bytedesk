@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.quick_reply.vector;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -66,10 +66,10 @@ public class QuickReplyVector extends BaseEntity {
     private Integer clickCount;
 
     @Field(type = FieldType.Date)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     @Field(type = FieldType.Date)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     @Field(type = FieldType.Keyword)
     private String categoryUid;

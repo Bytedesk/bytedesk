@@ -1,6 +1,6 @@
 package com.bytedesk.voc.feedback.stats;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,7 +20,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public FeedbackStats getOverallStats(LocalDateTime startTime, LocalDateTime endTime) {
+    public FeedbackStats getOverallStats(ZonedDateTime startTime, ZonedDateTime endTime) {
         FeedbackStats stats = new FeedbackStats();
         
         // 获取总数
@@ -43,7 +43,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
     }
 
     @Override
-    public FeedbackStats getUserStats(Long userId, LocalDateTime startTime, LocalDateTime endTime) {
+    public FeedbackStats getUserStats(Long userId, ZonedDateTime startTime, ZonedDateTime endTime) {
         FeedbackStats stats = new FeedbackStats();
         
         // 获取用户反馈总数
@@ -62,7 +62,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
     }
 
     @Override
-    public Map<String, Long> getTypeDistribution(LocalDateTime startTime, LocalDateTime endTime) {
+    public Map<String, Long> getTypeDistribution(ZonedDateTime startTime, ZonedDateTime endTime) {
         String sql = """
             SELECT type, COUNT(*) as count 
             FROM bytedesk_voc_feedback 
@@ -78,7 +78,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
     }
 
     @Override
-    public Map<String, Long> getStatusDistribution(LocalDateTime startTime, LocalDateTime endTime) {
+    public Map<String, Long> getStatusDistribution(ZonedDateTime startTime, ZonedDateTime endTime) {
         String sql = """
             SELECT status, COUNT(*) as count 
             FROM bytedesk_voc_feedback 
@@ -94,7 +94,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
     }
 
     @Override
-    public Map<String, Double> getResponseTimeTrend(LocalDateTime startTime, LocalDateTime endTime) {
+    public Map<String, Double> getResponseTimeTrend(ZonedDateTime startTime, ZonedDateTime endTime) {
         String sql = """
             SELECT 
                 DATE(created_at) as date,
@@ -116,7 +116,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
     }
 
     @Override
-    public byte[] exportStatsReport(LocalDateTime startTime, LocalDateTime endTime, String format) {
+    public byte[] exportStatsReport(ZonedDateTime startTime, ZonedDateTime endTime, String format) {
         // 获取统计数据
         FeedbackStats stats = getOverallStats(startTime, endTime);
         Map<String, Long> typeDistribution = getTypeDistribution(startTime, endTime);
@@ -145,7 +145,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
         return new byte[0];
     }
 
-    private Long getTotalCount(LocalDateTime startTime, LocalDateTime endTime) {
+    private Long getTotalCount(ZonedDateTime startTime, ZonedDateTime endTime) {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM bytedesk_voc_feedback WHERE created_at BETWEEN ? AND ?",
             Long.class,
@@ -154,7 +154,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
         );
     }
 
-    private Long getStatusCount(String status, LocalDateTime startTime, LocalDateTime endTime) {
+    private Long getStatusCount(String status, ZonedDateTime startTime, ZonedDateTime endTime) {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM bytedesk_voc_feedback WHERE status = ? AND created_at BETWEEN ? AND ?",
             Long.class,
@@ -164,17 +164,17 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
         );
     }
 
-    private Double getAverageResponseTime(LocalDateTime startTime, LocalDateTime endTime) {
+    private Double getAverageResponseTime(ZonedDateTime startTime, ZonedDateTime endTime) {
         // TODO: 实现响应时间计算
         return 0.0;
     }
 
-    private Double getAverageResolutionTime(LocalDateTime startTime, LocalDateTime endTime) {
+    private Double getAverageResolutionTime(ZonedDateTime startTime, ZonedDateTime endTime) {
         // TODO: 实现解决时间计算
         return 0.0;
     }
 
-    private Long getUserTotalCount(Long userId, LocalDateTime startTime, LocalDateTime endTime) {
+    private Long getUserTotalCount(Long userId, ZonedDateTime startTime, ZonedDateTime endTime) {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM bytedesk_voc_feedback WHERE user_id = ? AND created_at BETWEEN ? AND ?",
             Long.class,
@@ -182,7 +182,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
         );
     }
 
-    private Long getUserStatusCount(Long userId, String status, LocalDateTime startTime, LocalDateTime endTime) {
+    private Long getUserStatusCount(Long userId, String status, ZonedDateTime startTime, ZonedDateTime endTime) {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM bytedesk_voc_feedback WHERE user_id = ? AND status = ? AND created_at BETWEEN ? AND ?",
             Long.class,
@@ -190,7 +190,7 @@ public class FeedbackStatsServiceImpl implements FeedbackStatsService {
         );
     }
 
-    private Map<String, Long> getUserTypeDistribution(Long userId, LocalDateTime startTime, LocalDateTime endTime) {
+    private Map<String, Long> getUserTypeDistribution(Long userId, ZonedDateTime startTime, ZonedDateTime endTime) {
         String sql = """
             SELECT type, COUNT(*) as count 
             FROM bytedesk_voc_feedback 

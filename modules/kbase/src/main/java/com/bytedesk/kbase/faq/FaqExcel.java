@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -71,12 +71,12 @@ public class FaqExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "有效开始日期")
     @ColumnWidth(25)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "有效结束日期")
     @ColumnWidth(25)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     @ExcelProperty(value = "扩展问答")
     @ColumnWidth(20)

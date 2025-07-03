@@ -31,5 +31,5 @@ public class ClipboardResponse extends BaseResponse {
 
     private MessageTypeEnum type;
 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 }

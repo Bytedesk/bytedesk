@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 15:22:19
+ * @LastEditTime: 2025-07-03 12:04:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,8 @@
  */
 package com.bytedesk.core.message;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
@@ -40,7 +41,7 @@ public class MessageUtils {
                 .type(MessageTypeEnum.NOTICE)
                 .content(content)
                 .status(MessageStatusEnum.SUCCESS)
-                .createdAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
                 .client(ClientEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(system)
@@ -60,7 +61,7 @@ public class MessageUtils {
                 .type(type)
                 .content(content)
                 .status(MessageStatusEnum.SUCCESS)
-                .createdAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
                 .client(ClientEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(sender)
@@ -129,8 +130,8 @@ public class MessageUtils {
                 .client(ClientEnum.SYSTEM.name())
                 .user(user)
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .thread(thread)
                 .extra(extra)
                 .build();

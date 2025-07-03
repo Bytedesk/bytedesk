@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -61,15 +61,15 @@ public class BlackExcel  extends BaseExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "开始时间")
     @ColumnWidth(25)
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "结束时间")
     @ColumnWidth(25)
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "拉黑时间")
     @ColumnWidth(25)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 }

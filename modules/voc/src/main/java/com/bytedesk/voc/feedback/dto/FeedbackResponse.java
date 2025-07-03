@@ -1,6 +1,6 @@
 package com.bytedesk.voc.feedback.dto;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.Data;
 
 @Data
@@ -13,6 +13,6 @@ public class FeedbackResponse {
     private Long assignedTo;
     private Integer replyCount;
     private Integer likeCount;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
 } 

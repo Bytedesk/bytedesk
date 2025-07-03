@@ -73,9 +73,9 @@ public class ServiceSettingsEntity extends BaseEntity {
     // @Builder.Default
     // private String topTip = I18Consts.I18N_TOP_TIP;
 
-    // private LocalDateTime topTipStart;
+    // private ZonedDateTime topTipStart;
 
-    // private LocalDateTime topTipEnd;
+    // private ZonedDateTime topTipEnd;
 
     // // 满意度评价设置--------------------------------------------------
     // // show rate btn on chat toolbar

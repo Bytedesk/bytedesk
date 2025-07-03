@@ -14,7 +14,7 @@
 package com.bytedesk.service.queue_member;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
@@ -116,7 +116,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now();
             
             // 更新首次消息时间（如果尚未设置）
             if (queueMember.getVisitorFirstMessageAt() == null) {
@@ -161,7 +161,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now();
             
             // 更新客服消息计数
             queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
@@ -229,7 +229,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now();
             
             // 更新首次机器人消息时间（如果尚未设置）
             if (queueMember.getRobotFirstResponseAt() == null) {
@@ -295,7 +295,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now();
             
             // 更新系统消息计数
             queueMember.setSystemMessageCount(queueMember.getSystemMessageCount() + 1);

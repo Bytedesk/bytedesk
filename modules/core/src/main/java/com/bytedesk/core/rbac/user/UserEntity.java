@@ -1,6 +1,6 @@
 package com.bytedesk.core.rbac.user;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -152,8 +152,8 @@ public class UserEntity extends BaseEntityNoOrg {
             });
         
         // 2. 设置角色有效期
-        uor.setStartDate(LocalDateTime.now());
-        uor.setEndDate(LocalDateTime.now().plusYears(100));
+        uor.setStartDate(ZonedDateTime.now());
+        uor.setEndDate(ZonedDateTime.now().plusYears(100));
         
         // 3. 检查是否已存在该角色ID
         Long roleId = role.getId();

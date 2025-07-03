@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,8 +124,8 @@ public class GrayReleaseController {
             @PathVariable String feature,
             @RequestParam(required = false) Integer hours) {
         
-        LocalDateTime end = LocalDateTime.now();
-        LocalDateTime start = end.minusHours(hours != null ? hours : 24);
+        ZonedDateTime end = ZonedDateTime.now();
+        ZonedDateTime start = end.minusHours(hours != null ? hours : 24);
         
         GrayReleaseFeature grayFeature = GrayReleaseFeature.getByCode(feature);
         if (grayFeature == null) {

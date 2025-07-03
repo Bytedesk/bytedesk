@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 16:23:17
+ * @LastEditTime: 2025-07-03 12:05:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,8 @@ import com.bytedesk.core.rbac.role.RoleEntity;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
+// import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Set;
 
@@ -54,8 +55,8 @@ public class UserDetailsImpl implements UserDetails {
     private String device;
     // 
     private String orgUid;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt; 
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt; 
     // 
     private OrganizationEntity currentOrganization;
     private Set<UserOrganizationRoleEntity> userOrganizationRoles;
@@ -83,8 +84,8 @@ public class UserDetailsImpl implements UserDetails {
             String client,
             String device,
             String orgUid,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
+            ZonedDateTime createdAt,
+            ZonedDateTime updatedAt,
             // 
             Collection<? extends GrantedAuthority> authorities,
             OrganizationEntity currentOrganization,

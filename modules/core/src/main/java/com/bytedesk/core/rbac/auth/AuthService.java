@@ -14,7 +14,7 @@
  */
 package com.bytedesk.core.rbac.auth;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
@@ -142,9 +142,9 @@ public class AuthService {
             .build();
         // 只有当client中含有web字样时，expiresAt有效期24小时，否则为365天
         if (client.toLowerCase().contains("web")) {
-            tokenRequest.setExpiresAt(LocalDateTime.now().plusDays(30)); // 默认30天过期
+            tokenRequest.setExpiresAt(ZonedDateTime.now().plusDays(30)); // 默认30天过期
         } else {
-            tokenRequest.setExpiresAt(LocalDateTime.now().plusDays(365)); // 其他客户端默认365天过期
+            tokenRequest.setExpiresAt(ZonedDateTime.now().plusDays(365)); // 其他客户端默认365天过期
         }
         
         tokenRestService.create(tokenRequest);

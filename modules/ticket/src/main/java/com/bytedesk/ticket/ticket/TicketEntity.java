@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -119,10 +119,10 @@ public class TicketEntity extends BaseEntity {
     private Boolean verified = false;
 
     // 解决时间
-    private LocalDateTime resolvedTime;
+    private ZonedDateTime resolvedTime;
 
     // 关闭时间
-    private LocalDateTime closedTime;
+    private ZonedDateTime closedTime;
 
     // 工单会话client
     private String client;

@@ -79,7 +79,7 @@ public class SpringAIToolsController {
         // what day tomorrow is.
         log.info("response: {}", response);
         log.info("currentDateTime: {}, ZonedDateTime: {}, ZoneId: {}",
-                BdDateUtils.getCurrentLocalDateTime(),
+                BdDateUtils.getCurrentZonedDateTime(),
                 BdDateUtils.getCurrentZonedDateTime(),
                 BdDateUtils.getCurrentZoneId());
 

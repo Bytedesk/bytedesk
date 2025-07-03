@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ai.robot_message;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.enums.ClientEnum;
@@ -34,7 +34,7 @@ public class RobotMessageUtils {
                         .user(robot.toUserProtobuf())
                         .client(ClientEnum.SYSTEM)
                         .extra(messageProtobuf.getExtra())
-                        .createdAt(LocalDateTime.now())
+                        .createdAt(ZonedDateTime.now())
                         .build();
         }
 
@@ -58,7 +58,7 @@ public class RobotMessageUtils {
         // .user(user)
         // .client(ClientEnum.ROBOT)
         // .extra(JSONObject.toJSONString(extraObject))
-        // .createdAt(LocalDateTime.now())
+        // .createdAt(ZonedDateTime.now())
         // .build();
         // return message;
         // }

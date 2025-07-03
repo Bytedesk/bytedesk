@@ -50,7 +50,7 @@ public class TicketProcessResponse extends BaseResponse {
 
     private String orgUid;
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 }

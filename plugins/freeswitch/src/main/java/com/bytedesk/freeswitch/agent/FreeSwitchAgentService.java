@@ -1,6 +1,6 @@
 package com.bytedesk.freeswitch.agent;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +31,8 @@ public class FreeSwitchAgentService {
         
         agent.setStatus(FreeSwitchAgentEntity.AgentStatus.OFFLINE);
         agent.setMode(FreeSwitchAgentEntity.AgentMode.MANUAL);
-        agent.setCreatedAt(LocalDateTime.now());
-        agent.setUpdatedAt(LocalDateTime.now());
+        agent.setCreatedAt(ZonedDateTime.now());
+        agent.setUpdatedAt(ZonedDateTime.now());
         
         return agentRepository.save(agent);
     }
@@ -48,7 +48,7 @@ public class FreeSwitchAgentService {
         existingAgent.setName(agent.getName());
         existingAgent.setSkills(agent.getSkills());
         existingAgent.setNotes(agent.getNotes());
-        existingAgent.setUpdatedAt(LocalDateTime.now());
+        existingAgent.setUpdatedAt(ZonedDateTime.now());
         
         return agentRepository.save(existingAgent);
     }
@@ -84,8 +84,8 @@ public class FreeSwitchAgentService {
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
         agent.setStatus(status);
-        agent.setLastStatusChange(LocalDateTime.now());
-        agent.setUpdatedAt(LocalDateTime.now());
+        agent.setLastStatusChange(ZonedDateTime.now());
+        agent.setUpdatedAt(ZonedDateTime.now());
         
         return agentRepository.save(agent);
     }
@@ -99,7 +99,7 @@ public class FreeSwitchAgentService {
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
         agent.setMode(mode);
-        agent.setUpdatedAt(LocalDateTime.now());
+        agent.setUpdatedAt(ZonedDateTime.now());
         
         return agentRepository.save(agent);
     }
@@ -113,7 +113,7 @@ public class FreeSwitchAgentService {
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
         agent.setSkills(skills);
-        agent.setUpdatedAt(LocalDateTime.now());
+        agent.setUpdatedAt(ZonedDateTime.now());
         
         return agentRepository.save(agent);
     }

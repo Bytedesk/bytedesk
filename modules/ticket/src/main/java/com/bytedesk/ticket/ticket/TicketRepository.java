@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,17 +27,17 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
     Optional<TicketEntity> findByProcessInstanceId(String processInstanceId);
 
     List<TicketEntity> findByWorkgroupUidContainingAndCreatedAtBetween(
-        String workgroupUid, LocalDateTime startTime, LocalDateTime endTime);
+        String workgroupUid, ZonedDateTime startTime, ZonedDateTime endTime);
         
     List<TicketEntity> findByDepartmentUidAndCreatedAtBetween(
-            String departmentUid, LocalDateTime startTime, LocalDateTime endTime);
+            String departmentUid, ZonedDateTime startTime, ZonedDateTime endTime);
 
     List<TicketEntity> findByAssigneeContainingAndCreatedAtBetween(
-        String assigneeUid, LocalDateTime startTime, LocalDateTime endTime);
+        String assigneeUid, ZonedDateTime startTime, ZonedDateTime endTime);
 
     // orgUid, startTime, endTime
     List<TicketEntity> findByOrgUidAndCreatedAtBetween(
-        String orgUid, LocalDateTime startTime, LocalDateTime endTime);
+        String orgUid, ZonedDateTime startTime, ZonedDateTime endTime);
 
     long countByStatus(String status);
     long countByStatusNot(String status);

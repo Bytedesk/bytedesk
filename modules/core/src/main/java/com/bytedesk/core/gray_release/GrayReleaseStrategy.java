@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -43,8 +43,8 @@ public class GrayReleaseStrategy {
     // @Scheduled(cron = "0 0 * * * *")
     // public void autoAdjustRollout() {
     //     List<GrayReleaseFeature> features = Arrays.asList(GrayReleaseFeature.values());
-    //     // LocalDateTime end = LocalDateTime.now();
-    //     // LocalDateTime start = end.minusHours(1);
+    //     // ZonedDateTime end = ZonedDateTime.now();
+    //     // ZonedDateTime start = end.minusHours(1);
 
     //     for (GrayReleaseFeature feature : features) {
     //         try {
@@ -59,7 +59,7 @@ public class GrayReleaseStrategy {
      * 调整单个功能的灰度比例
      */
     public void adjustFeatureRollout(GrayReleaseFeature feature, 
-            LocalDateTime start, LocalDateTime end) {
+            ZonedDateTime start, ZonedDateTime end) {
         
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(feature, start, end);
         
@@ -89,8 +89,8 @@ public class GrayReleaseStrategy {
      * 检查是否可以启动灰度发布
      */
     public Boolean canStartRollout(GrayReleaseFeature feature) {
-        LocalDateTime end = LocalDateTime.now();
-        LocalDateTime start = end.minusDays(1);
+        ZonedDateTime end = ZonedDateTime.now();
+        ZonedDateTime start = end.minusDays(1);
         
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(feature, start, end);
         

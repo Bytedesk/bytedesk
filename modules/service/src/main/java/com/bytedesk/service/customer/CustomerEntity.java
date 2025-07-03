@@ -95,13 +95,13 @@ public class CustomerEntity extends BaseEntity {
     // 跟进信息
     // private String owner; // 负责人ID
     // private String ownerName; // 负责人姓名
-    // private LocalDateTime lastContactTime; // 最后联系时间
-    // private LocalDateTime nextContactTime; // 下次联系时间
+    // private ZonedDateTime lastContactTime; // 最后联系时间
+    // private ZonedDateTime nextContactTime; // 下次联系时间
     
     // 交易相关
     // private Double totalAmount; // 累计消费金额
     // private Integer dealCount; // 成交次数
-    // private LocalDateTime lastDealTime; // 最后成交时间
+    // private ZonedDateTime lastDealTime; // 最后成交时间
 
     // 标签
     @Builder.Default

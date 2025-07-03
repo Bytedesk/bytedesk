@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -299,8 +299,8 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
                 .name("测试chunk")
                 .content("测试chunk内容")
                 .enabled(true)
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now().plusDays(1))
+                .startDate(ZonedDateTime.now())
+                .endDate(ZonedDateTime.now().plusDays(1))
                 .orgUid(orgUid)
                 .build();
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.kbase;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,9 +140,9 @@ public class KbaseRequest extends BaseRequest {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
     
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     // 大模型知识库-嵌入向量提供者
     @Builder.Default

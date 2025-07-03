@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -170,7 +170,7 @@ public class MessageLeaveRestService extends
             MessageLeaveEntity messageLeave = messageLeaveOptional.get();
             messageLeave.setReply(request.getReply());
             messageLeave.setReplyImages(request.getReplyImages());
-            messageLeave.setRepliedAt(LocalDateTime.now());
+            messageLeave.setRepliedAt(ZonedDateTime.now());
             messageLeave.setReplyUser(user.toProtobuf().toJson());
             messageLeave.setStatus(MessageLeaveStatusEnum.REPLIED.name());
             // 

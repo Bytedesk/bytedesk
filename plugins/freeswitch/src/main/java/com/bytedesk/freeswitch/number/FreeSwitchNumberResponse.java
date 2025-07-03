@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * FreeSwitch用户响应实体
@@ -67,7 +67,7 @@ public class FreeSwitchNumberResponse extends BaseResponse {
     /**
      * 最后注册时间
      */
-    private LocalDateTime lastRegister;
+    private ZonedDateTime lastRegister;
 
     /**
      * 注册IP地址

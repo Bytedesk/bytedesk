@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.form;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,10 +73,10 @@ public class FormEntity extends BaseEntity {
     private String formSchema;
     
     // 表单发布时间
-    private LocalDateTime publishTime;
+    private ZonedDateTime publishTime;
     
     // 表单过期时间
-    private LocalDateTime expireLength;
+    private ZonedDateTime expireLength;
     
     // 表单布局类型：单列、双列、响应式等
     @Builder.Default

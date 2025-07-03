@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.agent;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -75,7 +75,7 @@ public class FreeSwitchAgentEntity extends BaseEntity {
     /**
      * 最后状态变更时间
      */
-    private LocalDateTime lastStatusChange;
+    private ZonedDateTime lastStatusChange;
     
     /**
      * 当前处理的呼叫UUID

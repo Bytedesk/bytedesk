@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_website;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -57,12 +57,12 @@ public class WebsiteRequest extends BaseRequest {
 
     // 有效开始日期
     @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
+    private ZonedDateTime startDate = ZonedDateTime.now();
 
     // 有效结束日期
     // 当前 + 100 年
     @Builder.Default
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
 
     private String categoryUid; // 所属分类
 

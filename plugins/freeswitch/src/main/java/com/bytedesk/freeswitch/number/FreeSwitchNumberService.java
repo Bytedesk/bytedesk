@@ -21,7 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,7 +160,7 @@ public class FreeSwitchNumberService {
         Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByUsernameAndDomain(username, domain);
         if (userOpt.isPresent()) {
             FreeSwitchNumberEntity user = userOpt.get();
-            user.setLastRegister(LocalDateTime.now());
+            user.setLastRegister(ZonedDateTime.now());
             user.setRegisterIp(registerIp);
             user.setUserAgent(userAgent);
             userRepository.save(user);
@@ -186,7 +186,7 @@ public class FreeSwitchNumberService {
      * 获取在线用户列表
      */
     public List<FreeSwitchNumberEntity> findOnlineNumbers() {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5);
+        ZonedDateTime cutoffTime = ZonedDateTime.now().minusMinutes(5);
         return userRepository.findByEnabledTrueAndLastRegisterAfter(cutoffTime);
     }
 
@@ -222,7 +222,7 @@ public class FreeSwitchNumberService {
      * 获取在线的用户数量
      */
     public long countOnline() {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5);
+        ZonedDateTime cutoffTime = ZonedDateTime.now().minusMinutes(5);
         return userRepository.countByEnabledTrueAndLastRegisterAfter(cutoffTime);
     }
 
@@ -256,7 +256,7 @@ public class FreeSwitchNumberService {
      * 更新用户最后注册时间
      */
     @Transactional
-    public void updateLastRegistration(String username, LocalDateTime lastRegistration) {
+    public void updateLastRegistration(String username, ZonedDateTime lastRegistration) {
         Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent()) {
             FreeSwitchNumberEntity user = userOpt.get();

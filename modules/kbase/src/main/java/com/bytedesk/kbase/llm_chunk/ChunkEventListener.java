@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -79,8 +79,8 @@ public class ChunkEventListener {
 					.userUid(fileResponse.getUserUid())
 					.orgUid(fileResponse.getOrgUid())
 					.enabled(true) // 使用文件的启用状态，默认为true
-					.startDate(LocalDateTime.now()) // 使用文件的开始日期，默认为当前时间
-					.endDate(LocalDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
+					.startDate(ZonedDateTime.now()) // 使用文件的开始日期，默认为当前时间
+					.endDate(ZonedDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
 					.build();
 			chunkRestService.create(splitRequest);
 		}

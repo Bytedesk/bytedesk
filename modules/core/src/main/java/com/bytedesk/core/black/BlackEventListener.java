@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class BlackEventListener {
      @EventListener
     public void onQuartzDay0Event(QuartzDay0Event event) {
         // 每天0点，检查到期的黑名单，并清理
-        blackRestService.findByEndTimeBefore(LocalDateTime.now()).forEach(black -> {
+        blackRestService.findByEndTimeBefore(ZonedDateTime.now()).forEach(black -> {
             blackRestService.deleteByUid(black.getUid());
         });
     }

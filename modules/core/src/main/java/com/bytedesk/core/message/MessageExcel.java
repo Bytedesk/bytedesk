@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.message;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -41,7 +41,7 @@ public class MessageExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
     @ColumnWidth(20)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
 
 }

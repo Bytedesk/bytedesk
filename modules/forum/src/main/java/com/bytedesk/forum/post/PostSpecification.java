@@ -2,7 +2,7 @@ package com.bytedesk.forum.post;
 
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +40,12 @@ public class PostSpecification {
             // 日期范围搜索
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             if (criteria.getStartDate() != null && !criteria.getStartDate().isEmpty()) {
-                LocalDateTime startDate = LocalDateTime.parse(criteria.getStartDate(), formatter);
+                ZonedDateTime startDate = ZonedDateTime.parse(criteria.getStartDate(), formatter);
                 predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startDate));
             }
             
             if (criteria.getEndDate() != null && !criteria.getEndDate().isEmpty()) {
-                LocalDateTime endDate = LocalDateTime.parse(criteria.getEndDate(), formatter);
+                ZonedDateTime endDate = ZonedDateTime.parse(criteria.getEndDate(), formatter);
                 predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), endDate));
             }
             

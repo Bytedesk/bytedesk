@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Component
 public class TicketCloseDelegate implements JavaDelegate {
@@ -33,7 +33,7 @@ public class TicketCloseDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         TicketEntity ticket = (TicketEntity) execution.getVariable("ticket");
         ticket.setStatus("已关闭");
-        ticket.setUpdatedAt(LocalDateTime.now());
+        ticket.setUpdatedAt(ZonedDateTime.now());
         
         // 发送通知
         notificationService.notifyTicketClosed(ticket);

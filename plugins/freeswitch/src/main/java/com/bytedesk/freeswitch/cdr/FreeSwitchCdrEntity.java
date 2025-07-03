@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.cdr;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -66,17 +66,17 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     /**
      * 通话开始时间
      */
-    private LocalDateTime startStamp;
+    private ZonedDateTime startStamp;
 
     /**
      * 通话接通时间
      */
-    private LocalDateTime answerStamp;
+    private ZonedDateTime answerStamp;
 
     /**
      * 通话结束时间
      */
-    private LocalDateTime endStamp;
+    private ZonedDateTime endStamp;
 
     /**
      * 通话总时长（秒）

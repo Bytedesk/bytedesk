@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.thread;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,12 +46,12 @@ public class ThreadSpecification extends BaseSpecification {
             // 仅当mergeByTopic为true时才应用topic合并逻辑
             if (Boolean.TRUE.equals(request.getMergeByTopic())) {
                 // 创建子查询获取每个topic的最新记录的updatedAt时间
-                Subquery<LocalDateTime> maxDateSubquery = query.subquery(LocalDateTime.class);
+                Subquery<ZonedDateTime> maxDateSubquery = query.subquery(ZonedDateTime.class);
                 var subRoot = maxDateSubquery.from(ThreadEntity.class);
 
-                // 明确指定类型为 LocalDateTime
-                Path<LocalDateTime> updatedAtPath = subRoot.get("updatedAt");
-                Expression<LocalDateTime> maxExpression = criteriaBuilder.greatest(updatedAtPath);
+                // 明确指定类型为 ZonedDateTime
+                Path<ZonedDateTime> updatedAtPath = subRoot.get("updatedAt");
+                Expression<ZonedDateTime> maxExpression = criteriaBuilder.greatest(updatedAtPath);
 
                 maxDateSubquery.select(maxExpression)
                         .where(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
@@ -59,11 +59,11 @@ public class ThreadSpecification extends BaseSpecification {
                 // 如果ownerUid不为空，优先选择owner不为空的记录
                 if (StringUtils.hasText(request.getOwnerUid())) {
                     // 创建子查询来获取同一topic中匹配ownerUid的最新记录
-                    Subquery<LocalDateTime> ownerMaxDateSubquery = query.subquery(LocalDateTime.class);
+                    Subquery<ZonedDateTime> ownerMaxDateSubquery = query.subquery(ZonedDateTime.class);
                     var ownerSubRoot = ownerMaxDateSubquery.from(ThreadEntity.class);
 
-                    Path<LocalDateTime> ownerUpdatedAtPath = ownerSubRoot.get("updatedAt");
-                    Expression<LocalDateTime> ownerMaxExpression = criteriaBuilder.greatest(ownerUpdatedAtPath);
+                    Path<ZonedDateTime> ownerUpdatedAtPath = ownerSubRoot.get("updatedAt");
+                    Expression<ZonedDateTime> ownerMaxExpression = criteriaBuilder.greatest(ownerUpdatedAtPath);
 
                     ownerMaxDateSubquery.select(ownerMaxExpression)
                             .where(criteriaBuilder.and(

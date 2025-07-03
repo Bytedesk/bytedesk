@@ -49,7 +49,7 @@ public class TodoListResponse extends BaseResponse {
 
     private String moduleUid;
 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 }

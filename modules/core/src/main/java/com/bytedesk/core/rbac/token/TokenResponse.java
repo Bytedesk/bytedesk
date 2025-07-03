@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.rbac.token;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -40,7 +40,7 @@ public class TokenResponse extends BaseResponse {
 
     private String type;
 
-    private LocalDateTime expiresAt;
+    private ZonedDateTime expiresAt;
 
     private Boolean revoked;
 

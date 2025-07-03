@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.cdr;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,7 +117,7 @@ public class FreeSwitchCdrService {
     /**
      * 根据时间范围查找CDR记录
      */
-    public List<FreeSwitchCdrEntity> findByTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
+    public List<FreeSwitchCdrEntity> findByTimeRange(ZonedDateTime startTime, ZonedDateTime endTime) {
         return cdrRepository.findByStartStampBetween(startTime, endTime);
     }
 
@@ -145,7 +145,7 @@ public class FreeSwitchCdrService {
     /**
      * 获取通话统计信息
      */
-    public CallStatistics getCallStatistics(LocalDateTime startTime, LocalDateTime endTime) {
+    public CallStatistics getCallStatistics(ZonedDateTime startTime, ZonedDateTime endTime) {
         long totalCalls = cdrRepository.countCallsInTimeRange(startTime, endTime);
         long answeredCalls = cdrRepository.countAnsweredCallsInTimeRange(startTime, endTime);
         long totalDuration = cdrRepository.sumBillSecInTimeRange(startTime, endTime);
@@ -168,7 +168,7 @@ public class FreeSwitchCdrService {
      */
     @Transactional
     public void cleanupOldCdrs(int daysToKeep) {
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(daysToKeep);
+        ZonedDateTime cutoffDate = ZonedDateTime.now().minusDays(daysToKeep);
         cdrRepository.deleteByStartStampBefore(cutoffDate);
         log.info("清理了{}天前的CDR记录", daysToKeep);
     }
@@ -178,8 +178,8 @@ public class FreeSwitchCdrService {
      */
     @Transactional
     public void processCdrEvent(String uuid, String callerNumber, String destinationNumber, 
-                               String context, LocalDateTime startStamp, LocalDateTime answerStamp, 
-                               LocalDateTime endStamp, Integer duration, Integer billsec, 
+                               String context, ZonedDateTime startStamp, ZonedDateTime answerStamp, 
+                               ZonedDateTime endStamp, Integer duration, Integer billsec, 
                                String hangupCause, String direction) {
         
         Optional<FreeSwitchCdrEntity> existingCdr = cdrRepository.findByUid(uuid);
@@ -214,7 +214,7 @@ public class FreeSwitchCdrService {
      * 更新CDR应答时间
      */
     @Transactional
-    public void updateCdrAnswerTime(String uuid, LocalDateTime answerTime) {
+    public void updateCdrAnswerTime(String uuid, ZonedDateTime answerTime) {
         Optional<FreeSwitchCdrEntity> optionalCdr = cdrRepository.findByUid(uuid);
         if (optionalCdr.isPresent()) {
             FreeSwitchCdrEntity cdr = optionalCdr.get();
@@ -230,7 +230,7 @@ public class FreeSwitchCdrService {
      * 更新CDR结束时间和挂断原因
      */
     @Transactional
-    public void updateCdrEndTime(String uuid, LocalDateTime endTime, String hangupCause) {
+    public void updateCdrEndTime(String uuid, ZonedDateTime endTime, String hangupCause) {
         Optional<FreeSwitchCdrEntity> optionalCdr = cdrRepository.findByUid(uuid);
         if (optionalCdr.isPresent()) {
             FreeSwitchCdrEntity cdr = optionalCdr.get();

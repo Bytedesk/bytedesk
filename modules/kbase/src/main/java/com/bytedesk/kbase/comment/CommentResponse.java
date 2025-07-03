@@ -53,8 +53,8 @@ public class CommentResponse extends BaseResponse {
     // 评论者
     private String user;
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 
 }

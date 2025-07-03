@@ -1,6 +1,6 @@
 package com.bytedesk.freeswitch.call;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -61,12 +61,12 @@ public class FreeSwitchCallEntity extends BaseEntity {
     /**
      * 呼叫开始时间
      */
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
     
     /**
      * 呼叫结束时间
      */
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
     
     /**
      * 呼叫时长（秒）

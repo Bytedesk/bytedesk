@@ -22,7 +22,7 @@ import com.bytedesk.ticket.ticket.TicketEntity;
 
 import org.flowable.dmn.api.DmnDecisionService;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,8 +57,8 @@ public class TicketSLAService {
     public Boolean isSLABreached(TicketEntity ticket) {
         Map<String, Object> sla = determineSLA(ticket.getCategoryUid(), ticket.getPriority());
         
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime createdAt = ticket.getCreatedAt();
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime createdAt = ticket.getCreatedAt();
         
         // 检查响应时间
         // if (ticket.getFirstResponseTime() == null) {
@@ -86,7 +86,7 @@ public class TicketSLAService {
      */
     public void recordFirstResponse(TicketEntity ticket) {
         // if (ticket.getFirstResponseTime() == null) {
-        //     ticket.setFirstResponseTime(LocalDateTime.now());
+        //     ticket.setFirstResponseTime(ZonedDateTime.now());
         //     ticketRepository.save(ticket);
         // }
     }

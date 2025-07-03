@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * FreeSwitch通话详单响应实体
@@ -92,17 +92,17 @@ public class FreeSwitchCdrResponse extends BaseResponse {
     /**
      * 开始时间戳
      */
-    private LocalDateTime startStamp;
+    private ZonedDateTime startStamp;
 
     /**
      * 接听时间戳
      */
-    private LocalDateTime answerStamp;
+    private ZonedDateTime answerStamp;
 
     /**
      * 结束时间戳
      */
-    private LocalDateTime endStamp;
+    private ZonedDateTime endStamp;
 
     /**
      * 主叫IP地址

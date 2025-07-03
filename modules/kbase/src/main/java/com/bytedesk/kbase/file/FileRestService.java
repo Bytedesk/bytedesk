@@ -270,8 +270,8 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
         //         .fileUrl("https://www.bytedesk.com")
         //         .content("文件内容")
         //         .enabled(true)
-        //         .startDate(LocalDateTime.now())
-        //         .endDate(LocalDateTime.now().plusDays(1))
+        //         .startDate(ZonedDateTime.now())
+        //         .endDate(ZonedDateTime.now().plusDays(1))
         //         .orgUid(orgUid)
         //         .build();
         // Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);

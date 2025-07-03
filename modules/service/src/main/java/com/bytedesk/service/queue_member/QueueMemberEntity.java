@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 16:48:44
+ * @LastEditTime: 2025-07-03 12:06:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,8 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
@@ -95,16 +96,16 @@ public class QueueMemberEntity extends BaseEntity {
      * 统计访客消息总数
      */
     @Builder.Default
-    private LocalDateTime visitorEnqueueAt = LocalDateTime.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = ZonedDateTime.now();  // 加入时间
 
-    private LocalDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
+    private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
-    private LocalDateTime visitorLastMessageAt;  // 访客最后发送消息时间
+    private ZonedDateTime visitorLastMessageAt;  // 访客最后发送消息时间
 
     @Builder.Default
     private Integer visitorMessageCount = 0;  // 访客消息数量
 
-    private LocalDateTime visitorLeavedAt;  // 离开时间
+    private ZonedDateTime visitorLeavedAt;  // 离开时间
 
     @Builder.Default
     private Integer visitorPriority = 0;  // 优先级(0-100)
@@ -120,16 +121,16 @@ public class QueueMemberEntity extends BaseEntity {
      */
     private String agentAcceptType ;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime agentAcceptedAt;  // 开始服务时间
+    private ZonedDateTime agentAcceptedAt;  // 开始服务时间
 
     @Builder.Default
     private Boolean agentFirstResponse = false;  // 人工客服是否首次响应
 
-    private LocalDateTime agentFirstResponseAt;  // 首次响应时间
+    private ZonedDateTime agentFirstResponseAt;  // 首次响应时间
 
-    private LocalDateTime agentLastResponseAt;  // 最后响应时间
+    private ZonedDateTime agentLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime agentClosedAt;  // 结束时间
+    private ZonedDateTime agentClosedAt;  // 结束时间
 
     @Builder.Default
     @Column(name = "is_agent_close")
@@ -149,7 +150,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private Integer agentMessageCount = 0;  // 客服消息数量
 
-    private LocalDateTime agentTimeoutAt; // 人工对话超时时间
+    private ZonedDateTime agentTimeoutAt; // 人工对话超时时间
 
     @Builder.Default
     @Column(name = "is_agent_timeout")
@@ -170,17 +171,17 @@ public class QueueMemberEntity extends BaseEntity {
      */
     private String robotAcceptType ;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime robotAcceptedAt;  // 开始服务时间
+    private ZonedDateTime robotAcceptedAt;  // 开始服务时间
     
     @Builder.Default
     @Column(name = "is_robot_first_response")
     private Boolean robotFirstResponse = false;  // 机器人客服是否首次响应
 
-    private LocalDateTime robotFirstResponseAt;  // 首次响应时间
+    private ZonedDateTime robotFirstResponseAt;  // 首次响应时间
 
-    private LocalDateTime robotLastResponseAt;  // 最后响应时间
+    private ZonedDateTime robotLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime robotClosedAt;  // 结束时间
+    private ZonedDateTime robotClosedAt;  // 结束时间
 
     @Builder.Default
     private Integer robotAvgResponseLength = 0;  // 平均响应时间(秒)
@@ -192,7 +193,7 @@ public class QueueMemberEntity extends BaseEntity {
     private Integer robotMessageCount = 0;  // 客服消息数量
 
     // 机器人对话超时时间
-    private LocalDateTime robotTimeoutAt;
+    private ZonedDateTime robotTimeoutAt;
 
     @Builder.Default
     @Column(name = "is_robot_timeout")
@@ -200,11 +201,11 @@ public class QueueMemberEntity extends BaseEntity {
 
     //-------------------------------
 
-    private LocalDateTime systemFirstResponseAt;  // 系统首次响应时间
+    private ZonedDateTime systemFirstResponseAt;  // 系统首次响应时间
 
-    private LocalDateTime systemLastResponseAt;  // 系统最后响应时间
+    private ZonedDateTime systemLastResponseAt;  // 系统最后响应时间
 
-    private LocalDateTime systemCloseAt;  // 系统结束时间，即：autoCloseTime
+    private ZonedDateTime systemCloseAt;  // 系统结束时间，即：autoCloseTime
 
     @Builder.Default
     @Column(name = "is_system_close")
@@ -220,7 +221,7 @@ public class QueueMemberEntity extends BaseEntity {
     private Boolean rated = false;
 
     // 评分时间
-    private LocalDateTime rateAt;  // 评分时间
+    private ZonedDateTime rateAt;  // 评分时间
 
     // 是否已解决
     @Builder.Default
@@ -232,7 +233,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_message_leave")
     private Boolean messageLeave = false;
 
-    private LocalDateTime messageLeaveAt;  // 留言时间
+    private ZonedDateTime messageLeaveAt;  // 留言时间
 
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
@@ -272,7 +273,7 @@ public class QueueMemberEntity extends BaseEntity {
     private Boolean robotToAgent = false;
 
     // 机器人转人工时间
-    private LocalDateTime robotToAgentAt;  // 机器人转人工时间
+    private ZonedDateTime robotToAgentAt;  // 机器人转人工时间
 
     // 人工转人工
     @Builder.Default
@@ -295,28 +296,28 @@ public class QueueMemberEntity extends BaseEntity {
         if (robotAcceptedAt != null) {
             return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
         }
-        LocalDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : LocalDateTime.now();
+        ZonedDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : ZonedDateTime.now();
         return Duration.between(visitorEnqueueAt, endWaitLength).getSeconds();
     }
 
     public void manualAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
-        this.agentAcceptedAt = LocalDateTime.now();
+        this.agentAcceptedAt = ZonedDateTime.now();
     }
 
     public void agentAutoAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
-        this.agentAcceptedAt = LocalDateTime.now();
+        this.agentAcceptedAt = ZonedDateTime.now();
     }
 
     public void robotAutoAcceptThread() {
         this.robotAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
-        this.robotAcceptedAt = LocalDateTime.now();
+        this.robotAcceptedAt = ZonedDateTime.now();
     }
 
     public void transferRobotToAgent() {
         this.robotToAgent = true;
-        this.robotToAgentAt = LocalDateTime.now();
+        this.robotToAgentAt = ZonedDateTime.now();
     }
 
 

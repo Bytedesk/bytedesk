@@ -67,6 +67,6 @@ public class QuartzResponse extends BaseResponse {
     // private String orgUid;
 
     // 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 }
 

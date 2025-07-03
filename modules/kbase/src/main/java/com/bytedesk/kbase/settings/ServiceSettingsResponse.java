@@ -14,7 +14,7 @@
 package com.bytedesk.kbase.settings;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -43,9 +43,9 @@ public class ServiceSettingsResponse implements Serializable {
 
     private String topTip;
 
-    private LocalDateTime topTipStart;
+    private ZonedDateTime topTipStart;
 
-    private LocalDateTime topTipEnd;
+    private ZonedDateTime topTipEnd;
 
     // show rate btn on chat toolbar
     private Boolean showRateBtn;

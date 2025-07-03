@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq.elastic;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -65,17 +65,17 @@ public class FaqElastic {
 
     // startDate
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // endDate
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
     
     // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
     
     // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
     
     @Field(type = FieldType.Integer)
     private Integer viewCount;

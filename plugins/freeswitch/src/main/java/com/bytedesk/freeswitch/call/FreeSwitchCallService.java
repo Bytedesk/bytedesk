@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.call;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -472,7 +472,7 @@ public class FreeSwitchCallService {
         try {
             // Optional<FreeSwitchNumberEntity> userOptional = userService.findByUsername(username);
             // if (userOptional.isPresent()) {
-            //     userService.updateLastRegistration(username, LocalDateTime.now());
+            //     userService.updateLastRegistration(username, ZonedDateTime.now());
             //     log.debug("已更新用户最后注册时间: {}", username);
             // }
         } catch (Exception e) {
@@ -493,15 +493,15 @@ public class FreeSwitchCallService {
                 cdr.setUid(callInfo.getCallUuid());
                 cdr.setCallerIdNumber(callInfo.getCallerNumber());
                 cdr.setDestinationNumber(callInfo.getCalleeNumber());
-                cdr.setStartStamp(LocalDateTime.now().minusSeconds(
+                cdr.setStartStamp(ZonedDateTime.now().minusSeconds(
                     (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 
                 if (callInfo.getStartTime() > 0) {
-                    cdr.setAnswerStamp(LocalDateTime.now().minusSeconds(
+                    cdr.setAnswerStamp(ZonedDateTime.now().minusSeconds(
                         (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 }
                 
-                cdr.setEndStamp(LocalDateTime.now());
+                cdr.setEndStamp(ZonedDateTime.now());
                 cdr.setDuration((int) ((System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 cdr.setHangupCause(hangupCause);
                 cdr.setDirection(callInfo.getType().toLowerCase());

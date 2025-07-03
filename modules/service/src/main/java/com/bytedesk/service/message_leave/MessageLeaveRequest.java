@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.message_leave;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class MessageLeaveRequest extends BaseRequest {
     private List<String> replyAttachments = new ArrayList<>();
 
     // 回复时间
-    private LocalDateTime repliedAt;
+    private ZonedDateTime repliedAt;
 
     private String status;
     

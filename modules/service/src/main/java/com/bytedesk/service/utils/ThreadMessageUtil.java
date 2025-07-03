@@ -29,7 +29,7 @@ import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceTrigger;
 import com.bytedesk.service.agent.AgentEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 // 可以根据需要选择是否使用 @Component 注解
 // 如果该方法不需要被Spring容器管理，则不需要此注解
@@ -46,8 +46,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -69,8 +69,8 @@ public class ThreadMessageUtil {
                 .user(thread.getRobot())
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .build();
         //
         return message;
@@ -89,8 +89,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -111,8 +111,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 // .threadUid(thread.getUid())
                 // .topic(thread.getTopic())
                 .thread(thread)
@@ -133,8 +133,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(user.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 // .threadUid(thread.getUid())
                 // .topic(thread.getTopic())
                 .thread(thread)
@@ -155,8 +155,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(user.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 // .threadUid(thread.getUid())
                 // .topic(thread.getTopic())
                 .thread(thread)
@@ -179,8 +179,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 // .threadUid(thread.getUid())
                 // .topic(thread.getTopic())
                 .thread(thread)
@@ -203,8 +203,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 // .threadUid(thread.getUid())
                 // .topic(thread.getTopic())
                 .thread(thread)

@@ -75,7 +75,7 @@ public class SpringAIVectorStoreService {
 		// List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		
 		// 获取当前时间，用于内存中过滤日期
-		// LocalDateTime currentTime = LocalDateTime.now();
+		// ZonedDateTime currentTime = ZonedDateTime.now();
 		
 		// // 在内存中过滤日期范围
 		// List<Document> dateFilteredDocuments = similarDocuments.stream()
@@ -85,7 +85,7 @@ public class SpringAIVectorStoreService {
 		// 			if (startDateObj != null) {
 		// 				try {
 		// 					String startDateStr = String.valueOf(startDateObj);
-		// 					LocalDateTime startDate = LocalDateTime.parse(startDateStr);
+		// 					ZonedDateTime startDate = ZonedDateTime.parse(startDateStr);
 		// 					if (startDate.isAfter(currentTime)) {
 		// 						return false; // 如果开始日期在当前时间之后，则过滤掉
 		// 					}
@@ -99,7 +99,7 @@ public class SpringAIVectorStoreService {
 		// 			if (endDateObj != null) {
 		// 				try {
 		// 					String endDateStr = String.valueOf(endDateObj);
-		// 					LocalDateTime endDate = LocalDateTime.parse(endDateStr);
+		// 					ZonedDateTime endDate = ZonedDateTime.parse(endDateStr);
 		// 					if (endDate.isBefore(currentTime)) {
 		// 						return false; // 如果结束日期在当前时间之前，则过滤掉
 		// 					}

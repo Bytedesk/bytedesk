@@ -14,7 +14,7 @@
 package com.bytedesk.core.base;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -40,9 +40,9 @@ public abstract class BaseResponse implements Serializable {
 
     private String platform;
 
-    protected LocalDateTime createdAt;
+    protected ZonedDateTime createdAt;
     
-    protected LocalDateTime updatedAt;
+    protected ZonedDateTime updatedAt;
 
     public String getCreatedAt() {
         return BdDateUtils.formatDatetimeToString(createdAt);

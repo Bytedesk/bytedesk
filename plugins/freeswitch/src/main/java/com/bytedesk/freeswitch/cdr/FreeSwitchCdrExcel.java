@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.cdr;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -67,21 +67,21 @@ public class FreeSwitchCdrExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "开始时间")
     @ColumnWidth(25)
-    private LocalDateTime startStamp;
+    private ZonedDateTime startStamp;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "接听时间")
     @ColumnWidth(25)
-    private LocalDateTime answerStamp;
+    private ZonedDateTime answerStamp;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "结束时间")
     @ColumnWidth(25)
-    private LocalDateTime endStamp;
+    private ZonedDateTime endStamp;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
     @ColumnWidth(25)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
 }

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.file;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -59,12 +59,12 @@ public class FileExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "有效开始日期")
     @ColumnWidth(25)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "有效结束日期")
     @ColumnWidth(25)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     @ExcelProperty(value = "知识库")
     @ColumnWidth(20)
@@ -73,5 +73,5 @@ public class FileExcel {
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间")
     @ColumnWidth(25)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 }

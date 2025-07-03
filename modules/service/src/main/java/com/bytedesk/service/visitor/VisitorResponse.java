@@ -64,7 +64,7 @@ public class VisitorResponse extends BaseResponse {
 	// private String client;
 	private ClientEnum client;
 
-	// private LocalDateTime updatedAt;
+	// private ZonedDateTime updatedAt;
 
 	private String status;
 

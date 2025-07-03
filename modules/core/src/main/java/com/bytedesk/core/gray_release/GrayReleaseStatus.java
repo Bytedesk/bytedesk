@@ -1,6 +1,6 @@
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -45,10 +45,10 @@ public class GrayReleaseStatus {
     private double failureRate;       // 失败率
 
     @Column(name = "gray_start_time")
-    private LocalDateTime startTime;  // 开始时间
+    private ZonedDateTime startTime;  // 开始时间
 
     @Column(name = "gray_end_time")
-    private LocalDateTime endTime;    // 结束时间
+    private ZonedDateTime endTime;    // 结束时间
 
     // 状态常量
     public static final String STATUS_PENDING = "pending";     // 待发布

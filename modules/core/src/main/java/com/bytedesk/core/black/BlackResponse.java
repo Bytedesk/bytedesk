@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -56,10 +56,10 @@ public class BlackResponse extends BaseResponse {
     private String userAvatar;
 
     // 开始时间
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     // 结束时间
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
 
     // 被拉黑是的 会话uid
     private String threadUid;

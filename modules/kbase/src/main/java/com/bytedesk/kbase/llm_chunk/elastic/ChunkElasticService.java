@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk.elastic;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -201,7 +201,7 @@ public class ChunkElasticService {
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
             
             // 添加时间过滤
-            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             String nowStr = now.format(formatter);
             
@@ -363,7 +363,7 @@ public class ChunkElasticService {
             }
             
             // 添加时间过滤
-            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             String nowStr = now.format(formatter);
             

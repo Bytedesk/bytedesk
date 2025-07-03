@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
@@ -53,7 +53,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "入队时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
-    private LocalDateTime visitorEnqueueAt;
+    private ZonedDateTime visitorEnqueueAt;
 
     @ExcelProperty(value = "状态")
     @ColumnWidth(20)
@@ -66,7 +66,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "机器人接入时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
-    private LocalDateTime robotAcceptedAt;
+    private ZonedDateTime robotAcceptedAt;
 
     @ExcelProperty(value = "机器人转人工")
     @ColumnWidth(20)
@@ -75,7 +75,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "转人工时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
-    private LocalDateTime robotToAgentAt;
+    private ZonedDateTime robotToAgentAt;
 
     @ExcelProperty(value = "客服昵称")
     @ColumnWidth(20)
@@ -92,7 +92,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "接入时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
-    private LocalDateTime agentAcceptedAt;
+    private ZonedDateTime agentAcceptedAt;
 
     @ExcelProperty(value = "是否已解决")
     @ColumnWidth(20)
@@ -105,7 +105,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "评分时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
-    private LocalDateTime rateAt;
+    private ZonedDateTime rateAt;
 
     @ExcelProperty(value = "是否已小结")
     @ColumnWidth(20)
@@ -130,7 +130,7 @@ public class QueueMemberExcel extends BaseExcel {
     // @ExcelProperty(value = "留言时间")
     // @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     // @ColumnWidth(25)
-    // private LocalDateTime messageLeaveAt;
+    // private ZonedDateTime messageLeaveAt;
 
     @ExcelProperty(value = "客户端")
     @ColumnWidth(20)

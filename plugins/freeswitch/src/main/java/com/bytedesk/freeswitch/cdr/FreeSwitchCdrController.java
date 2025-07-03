@@ -26,7 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,8 +53,8 @@ public class FreeSwitchCdrController {
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(required = false) String callerNumber,
             @RequestParam(required = false) String destinationNumber,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") ZonedDateTime startTime,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") ZonedDateTime endTime,
             @AuthenticationPrincipal UserEntity currentUser) {
         
         try {
@@ -207,8 +207,8 @@ public class FreeSwitchCdrController {
      */
     @GetMapping("/statistics")
     public ResponseEntity<?> getCallStatistics(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") ZonedDateTime startTime,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") ZonedDateTime endTime) {
         
         try {
             FreeSwitchCdrService.CallStatistics statistics = cdrService.getCallStatistics(startTime, endTime);

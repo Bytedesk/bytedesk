@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.comment;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +52,9 @@ public class CommentRequest extends BaseRequest {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
     
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     // @Builder.Default
     // private String level = LevelEnum.ORGANIZATION.name();

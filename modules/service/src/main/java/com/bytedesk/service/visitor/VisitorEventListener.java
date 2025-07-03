@@ -14,7 +14,7 @@
 package com.bytedesk.service.visitor;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,7 +77,7 @@ public class VisitorEventListener {
         visitorList.forEach(visitor -> {
             // log.info("visitor: {}", visitor.getUid());
             // 使用Duration计算时间差
-            if (Duration.between(visitor.getUpdatedAt(), LocalDateTime.now()).toMillis() > 5 * 60 * 1000) {
+            if (Duration.between(visitor.getUpdatedAt(), ZonedDateTime.now()).toMillis() > 5 * 60 * 1000) {
                 // if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 *
                 // 1000) {
                 // log.info("visitor: {} offline", visitor.getUid());
@@ -90,7 +90,7 @@ public class VisitorEventListener {
     public void onQuartzDay0Event(QuartzDay0Event event) {
         log.info("visitor quartz day 0 event");
         // 每天0点，检查到期的黑名单，并清理
-        ipBlacklistRestService.findByEndTimeBefore(LocalDateTime.now()).forEach(ipBlacklist -> {
+        ipBlacklistRestService.findByEndTimeBefore(ZonedDateTime.now()).forEach(ipBlacklist -> {
             // 修改访客状态
             visitorRestService.updateStatus(ipBlacklist.getBlackUid(), VisitorStatusEnum.OFFLINE.name());
             // 删除黑名单

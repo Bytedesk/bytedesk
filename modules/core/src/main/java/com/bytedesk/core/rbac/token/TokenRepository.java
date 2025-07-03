@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.rbac.token;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,5 +38,5 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
      * @param now 当前时间
      * @return 有效令牌列表
      */
-    List<TokenEntity> findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(String userUid, String type, LocalDateTime now);
+    List<TokenEntity> findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(String userUid, String type, ZonedDateTime now);
 }

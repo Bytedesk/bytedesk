@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.fixed;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -44,9 +44,9 @@ public class AutoReplyFixedRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
     
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     private String categoryUid;
 

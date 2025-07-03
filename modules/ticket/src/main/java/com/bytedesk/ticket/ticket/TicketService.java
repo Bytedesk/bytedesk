@@ -49,7 +49,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -723,7 +723,7 @@ public class TicketService {
 
             // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
-            ticket.setResolvedTime(LocalDateTime.now());
+            ticket.setResolvedTime(ZonedDateTime.now());
             ticketRestService.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
@@ -795,7 +795,7 @@ public class TicketService {
             if (request.getVerified()) {
                 ticket.setStatus(TicketStatusEnum.VERIFIED_OK.name());
                 ticket.setVerified(true);
-                ticket.setClosedTime(LocalDateTime.now());
+                ticket.setClosedTime(ZonedDateTime.now());
             } else {
                 ticket.setStatus(TicketStatusEnum.REOPENED.name());
                 ticket.setVerified(false);
@@ -860,7 +860,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLOSED.name());
-        ticket.setClosedTime(LocalDateTime.now()); // 添加关闭时间记录
+        ticket.setClosedTime(ZonedDateTime.now()); // 添加关闭时间记录
         ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);

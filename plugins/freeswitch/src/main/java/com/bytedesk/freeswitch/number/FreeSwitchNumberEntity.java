@@ -13,7 +13,7 @@
  */
 package com.bytedesk.freeswitch.number;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 
@@ -85,7 +85,7 @@ public class FreeSwitchNumberEntity extends BaseEntity {
     /**
      * 最后注册时间
      */
-    private LocalDateTime lastRegister;
+    private ZonedDateTime lastRegister;
 
     /**
      * 注册IP地址
@@ -114,6 +114,6 @@ public class FreeSwitchNumberEntity extends BaseEntity {
      */
     public boolean isOnline() {
         return enabled && lastRegister != null && 
-               lastRegister.isAfter(LocalDateTime.now().minusMinutes(5));
+               lastRegister.isAfter(ZonedDateTime.now().minusMinutes(5));
     }
 }

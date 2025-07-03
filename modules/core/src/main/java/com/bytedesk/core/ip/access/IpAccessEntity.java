@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
@@ -43,7 +43,7 @@ public class IpAccessEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String params; // 访问的参数
 
-    private LocalDateTime accessTime;
+    private ZonedDateTime accessTime;
     private Integer accessCount; // 访问次数
-    private LocalDateTime lastAccessTime;
+    private ZonedDateTime lastAccessTime;
 } 

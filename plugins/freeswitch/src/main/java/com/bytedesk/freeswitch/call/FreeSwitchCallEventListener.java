@@ -116,7 +116,7 @@ public class FreeSwitchCallEventListener {
     private void updateUserActivity(String username) {
         try {
             // if (userService.findByUsername(username).isPresent()) {
-            //     userService.updateLastRegistration(username, LocalDateTime.now());
+            //     userService.updateLastRegistration(username, ZonedDateTime.now());
             //     log.debug("已更新用户活动时间: {}", username);
             // }
         } catch (Exception e) {

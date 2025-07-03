@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.taboo_message;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -44,16 +44,16 @@ public class TabooMessageResponse extends BaseResponse {
     private Boolean enabled;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     private String categoryUid;
 
     private String kbUid; // 对应知识库
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 }

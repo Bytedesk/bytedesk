@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,11 +104,11 @@ public class FaqRequest extends BaseRequest {
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
-    private LocalDateTime startDate = LocalDateTime.now();
+    private ZonedDateTime startDate = ZonedDateTime.now();
 
     // 当前 + 100 年
     @Builder.Default
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
 
     private String categoryUid;
 

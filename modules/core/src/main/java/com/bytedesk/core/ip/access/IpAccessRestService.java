@@ -29,7 +29,7 @@ import com.bytedesk.core.base.BaseRestService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -59,7 +59,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
         // 检查是否在黑名单中且未过期
         Optional<IpBlacklistEntity> blacklist = ipBlacklistService.findByIp(ip);
-        if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(LocalDateTime.now())) {
+        if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(ZonedDateTime.now())) {
             return true;
         }
 
@@ -77,8 +77,8 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
         int retryCount = 0;
         while (retryCount < MAX_RETRY_COUNT) {
             try {
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime oneMinuteAgo = now.minusMinutes(1);
+                ZonedDateTime now = ZonedDateTime.now();
+                ZonedDateTime oneMinuteAgo = now.minusMinutes(1);
 
                 // 获取最近一分钟的访问记录
                 Optional<IpAccessEntity> accessOptional = ipAccessRepository
@@ -141,7 +141,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 IpAccessEntity fresh = refreshedEntity.get();
                 // 更新访问计数和最后访问时间
                 fresh.setAccessCount(fresh.getAccessCount() + 1);
-                fresh.setLastAccessTime(LocalDateTime.now());
+                fresh.setLastAccessTime(ZonedDateTime.now());
                 ipAccessRepository.save(fresh);
 
                 // 如果访问次数超过限制，加入黑名单

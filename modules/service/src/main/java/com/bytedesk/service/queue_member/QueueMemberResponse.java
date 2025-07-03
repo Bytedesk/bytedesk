@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
@@ -57,16 +57,16 @@ public class QueueMemberResponse extends BaseResponse {
      * 统计访客消息总数
      */
     @Builder.Default
-    private LocalDateTime visitorEnqueueAt = LocalDateTime.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = ZonedDateTime.now();  // 加入时间
 
-    private LocalDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
+    private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
-    private LocalDateTime visitorLastMessageAt;  // 访客最后发送消息时间
+    private ZonedDateTime visitorLastMessageAt;  // 访客最后发送消息时间
 
     @Builder.Default
     private Integer visitorMessageCount = 0;  // 访客消息数量
 
-    private LocalDateTime visitorLeavedAt;  // 离开时间
+    private ZonedDateTime visitorLeavedAt;  // 离开时间
 
     @Builder.Default
     private Integer visitorPriority = 0;  // 优先级(0-100)
@@ -82,16 +82,16 @@ public class QueueMemberResponse extends BaseResponse {
      */
     private String agentAcceptType;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime agentAcceptedAt;  // 开始服务时间
+    private ZonedDateTime agentAcceptedAt;  // 开始服务时间
 
     @Builder.Default
     private Boolean agentFirstResponse = false;  // 人工客服是否首次响应
 
-    private LocalDateTime agentFirstResponseAt;  // 首次响应时间
+    private ZonedDateTime agentFirstResponseAt;  // 首次响应时间
 
-    private LocalDateTime agentLastResponseAt;  // 最后响应时间
+    private ZonedDateTime agentLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime agentClosedAt;  // 结束时间
+    private ZonedDateTime agentClosedAt;  // 结束时间
     
     @Builder.Default
     private Boolean agentClose = false;  // 是否客服手动结束
@@ -110,7 +110,7 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Integer agentMessageCount = 0;  // 客服消息数量
 
-    private LocalDateTime agentTimeoutAt; // 人工对话超时时间
+    private ZonedDateTime agentTimeoutAt; // 人工对话超时时间
 
     @Builder.Default
     private Boolean agentTimeout = false; // 是否超时
@@ -129,16 +129,16 @@ public class QueueMemberResponse extends BaseResponse {
      */
     private String robotAcceptType;  // 接入方式：自动、手动，不设置默认
 
-    private LocalDateTime robotAcceptedAt;  // 开始服务时间
+    private ZonedDateTime robotAcceptedAt;  // 开始服务时间
     
     @Builder.Default
     private Boolean robotFirstResponse = false;  // 机器人客服是否首次响应
 
-    private LocalDateTime robotFirstResponseAt;  // 首次响应时间
+    private ZonedDateTime robotFirstResponseAt;  // 首次响应时间
 
-    private LocalDateTime robotLastResponseAt;  // 最后响应时间
+    private ZonedDateTime robotLastResponseAt;  // 最后响应时间
 
-    private LocalDateTime robotClosedAt;  // 结束时间
+    private ZonedDateTime robotClosedAt;  // 结束时间
 
     @Builder.Default
     private Integer robotAvgResponseLength = 0;  // 平均响应时间(秒)
@@ -150,17 +150,17 @@ public class QueueMemberResponse extends BaseResponse {
     private Integer robotMessageCount = 0;  // 客服消息数量
 
     // 机器人对话超时时间
-    private LocalDateTime robotTimeoutAt;
+    private ZonedDateTime robotTimeoutAt;
 
     @Builder.Default
     private Boolean robotTimeout = false; // 是否超时
 
     // -----------------
-    private LocalDateTime systemFirstResponseAt;  // 系统首次响应时间
+    private ZonedDateTime systemFirstResponseAt;  // 系统首次响应时间
 
-    private LocalDateTime systemLastResponseAt;  // 系统最后响应时间
+    private ZonedDateTime systemLastResponseAt;  // 系统最后响应时间
 
-    private LocalDateTime systemCloseAt;  // 系统结束时间
+    private ZonedDateTime systemCloseAt;  // 系统结束时间
 
     @Builder.Default
     private Boolean systemClose = false;  // 是否系统自动结束
@@ -174,7 +174,7 @@ public class QueueMemberResponse extends BaseResponse {
     private Boolean rated = false;
 
     // 评分时间
-    private LocalDateTime rateAt;  // 评分时间
+    private ZonedDateTime rateAt;  // 评分时间
 
     // 是否已解决
     @Builder.Default
@@ -184,7 +184,7 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private Boolean messageLeave = false;
 
-    private LocalDateTime messageLeaveAt;  // 留言时间
+    private ZonedDateTime messageLeaveAt;  // 留言时间
 
     // 直接在小结表里面根据threadUid查询是否已经小结
     // 是否已经小结
@@ -217,7 +217,7 @@ public class QueueMemberResponse extends BaseResponse {
     private Boolean robotToAgent = false;
 
     // 机器人转人工时间
-    private LocalDateTime robotToAgentAt;
+    private ZonedDateTime robotToAgentAt;
 
     // 人工转人工
     // transfer status

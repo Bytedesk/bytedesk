@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class FaqSpecification extends BaseSpecification {
             if (request.getOnlyLoadValid() != null && request.getOnlyLoadValid()) {
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), true));
                 // 当前时间 > startDate && 当前时间 < endDate
-                LocalDateTime now = LocalDateTime.now();
+                ZonedDateTime now = ZonedDateTime.now();
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), now));
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), now));
             }

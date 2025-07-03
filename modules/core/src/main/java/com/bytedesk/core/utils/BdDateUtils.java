@@ -2,9 +2,8 @@ package com.bytedesk.core.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,26 +42,24 @@ public class BdDateUtils {
     }
 
     /**
-     * 将 LocalDateTime 转换为格式化的日期时间字符串
-     * @param localDateTime LocalDateTime对象
+     * 将 ZonedDateTime 转换为格式化的日期时间字符串
+     * @param ZonedDateTime ZonedDateTime对象
      * @return 格式化的日期时间字符串 (yyyy-MM-dd HH:mm:ss)
      */
-    public static String formatDatetimeToString(LocalDateTime localDateTime) {
-        if (localDateTime == null) {
+    public static String formatDatetimeToString(ZonedDateTime ZonedDateTime) {
+        if (ZonedDateTime == null) {
             return null;
         }
-        // 使用 DateTimeFormatter 直接格式化 LocalDateTime
-        // return localDateTime.format(DateTimeFormatter.ofPattern(datetimeFormat));
+        // 使用 DateTimeFormatter 直接格式化 ZonedDateTime
+        // return ZonedDateTime.format(DateTimeFormatter.ofPattern(datetimeFormat));
         
         // 使用应用配置的时区
-        // ZonedDateTime zonedDateTime = localDateTime.atZone(LocaleContextHolder.getTimeZone().toZoneId());
+        // 使用应用配置的时区
+        ZonedDateTime zonedDateTime = java.time.ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), LocaleContextHolder.getTimeZone().toZoneId());
         // 或者固定使用中国时区
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Shanghai"));
+        // ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), ZoneId.of("Asia/Shanghai"));
         return DateTimeFormatter.ofPattern(datetimeFormat).format(zonedDateTime);
-        
-        // 或者如果一定要使用 SimpleDateFormat，可以这样转换：
-        // try {
-        //     Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        //     Date date = Date.from(ZonedDateTime.atZone(ZoneId.systemDefault()).toInstant());
         //     SimpleDateFormat formatter = new SimpleDateFormat(datetimeFormat);
         //     return formatter.format(date);
         // } catch (Exception e) {
@@ -200,20 +197,16 @@ public class BdDateUtils {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
     
-    public static LocalDateTime parseLocalDateTime(String dateTime) {
-        return LocalDateTime.parse(dateTime, BdDateUtils.getDateTimeFormatter());
+    public static ZonedDateTime parseZonedDateTime(String dateTime) {
+        return ZonedDateTime.parse(dateTime, BdDateUtils.getDateTimeFormatter());
     }
 
-    public static LocalDateTime parseLocalDateTime(String dateTime, DateTimeFormatter formatter) {
-        return LocalDateTime.parse(dateTime, formatter);
+    public static ZonedDateTime parseZonedDateTime(String dateTime, DateTimeFormatter formatter) {
+        return ZonedDateTime.parse(dateTime, formatter);
     }
-
-    public static String getCurrentLocalDateTime() {
-        return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
-    }
-
-    public static ZonedDateTime getCurrentZonedDateTime() {
-        return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId());
+    
+    public static String getCurrentZonedDateTime() {
+        return ZonedDateTime.now(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 
     public static ZoneId getCurrentZoneId() {

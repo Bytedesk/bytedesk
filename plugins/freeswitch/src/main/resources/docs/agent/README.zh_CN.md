@@ -67,7 +67,7 @@ AgentStatusEntity status = AgentStatusEntity.builder()
     .agent(agent)
     .status("ONLINE")
     .reason("准备接听电话")
-    .startTime(LocalDateTime.now())
+    .startTime(ZonedDateTime.now())
     .build();
 
 // 示例：分配坐席技能

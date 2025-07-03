@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.quick_reply;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,10 +75,10 @@ public class QuickReplyEntity extends BaseEntity {
     private Integer clickCount = 0;
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     private String categoryUid; // 文章分类
 

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.article.elastic;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -174,8 +174,8 @@ public class ArticleElasticService {
         // 添加过滤条件：发布状态
         boolQueryBuilder.filter(QueryBuilders.term().field("published").value(true).build()._toQuery());
         
-        // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
-        LocalDateTime currentTime = LocalDateTime.now();
+        // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
+        ZonedDateTime currentTime = ZonedDateTime.now();
         String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
         
         // 创建startDate范围查询

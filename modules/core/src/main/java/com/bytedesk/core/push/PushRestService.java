@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:17:17
+ * @LastEditTime: 2025-07-03 12:05:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -312,10 +312,10 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         pendingPushes.forEach(push -> {
             // 计算两个日期之间的毫秒差
             // long diffInMilliseconds = Math.abs(new Date().getTime() - push.getUpdatedAt().getTime());
-            // 将LocalDateTime转换为时间戳
+            // 将ZonedDateTime转换为时间戳
             long currentTimeMillis = System.currentTimeMillis();
-            ZoneId systemZone = ZoneId.systemDefault(); // 获取系统默认时区
-            long updatedAtMillis = push.getUpdatedAt().atZone(systemZone).toInstant().toEpochMilli();
+            // ZoneId systemZone = ZoneId.systemDefault(); // 获取系统默认时区
+            long updatedAtMillis = push.getUpdatedAt().toInstant().toEpochMilli();
             long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
 
             // 转换为分钟

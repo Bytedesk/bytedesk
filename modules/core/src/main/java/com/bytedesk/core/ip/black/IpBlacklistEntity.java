@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.ip.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -41,12 +41,12 @@ public class IpBlacklistEntity extends BaseEntity {
     // 开始时间
     @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime startTime = LocalDateTime.now();
+    private ZonedDateTime startTime = ZonedDateTime.now();
 
     // 结束时间
     @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime endTime = LocalDateTime.now().plusHours(24);
+    private ZonedDateTime endTime = ZonedDateTime.now().plusHours(24);
     
     // 
     private String reason;

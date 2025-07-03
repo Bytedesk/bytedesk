@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.gray_release;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,8 +68,8 @@ public class GrayReleaseService {
     public void monitorFeature(GrayReleaseFeature feature) {
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(
             feature,
-            LocalDateTime.now().minusHours(24),
-            LocalDateTime.now()
+            ZonedDateTime.now().minusHours(24),
+            ZonedDateTime.now()
         );
         
         if (stats.getFailureRate() > 0.1) {
@@ -102,7 +102,7 @@ public class GrayReleaseService {
             .enabled(true)
             .percentage(0)
             .status(GrayReleaseStatus.STATUS_PENDING)
-            .startTime(LocalDateTime.now())
+            .startTime(ZonedDateTime.now())
             .build();
 
         // 更新缓存
@@ -139,7 +139,7 @@ public class GrayReleaseService {
         status.setPercentage(targetPercentage);
         if (targetPercentage >= 100) {
             status.setStatus(GrayReleaseStatus.STATUS_COMPLETED);
-            status.setEndTime(LocalDateTime.now());
+            status.setEndTime(ZonedDateTime.now());
         }
 
         // 更新缓存
@@ -202,7 +202,7 @@ public class GrayReleaseService {
 
         status.setStatus(GrayReleaseStatus.STATUS_COMPLETED);
         status.setPercentage(100);
-        status.setEndTime(LocalDateTime.now());
+        status.setEndTime(ZonedDateTime.now());
         featureStatusCache.put(feature, status);
         
         log.info("Completed rollout for feature: {}", feature);
@@ -233,8 +233,8 @@ public class GrayReleaseService {
         }
 
         // 缓存未命中，从数据库加载
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime dayStart = now.minusDays(1);
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime dayStart = now.minusDays(1);
         
         // 获取最近24小时的统计数据
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(

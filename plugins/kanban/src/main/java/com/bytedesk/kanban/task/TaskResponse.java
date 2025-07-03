@@ -52,7 +52,7 @@ public class TaskResponse extends BaseResponse {
 
     private String todoListUid;
 
-    // private LocalDateTime createdAt;
+    // private ZonedDateTime createdAt;
 
-    // private LocalDateTime updatedAt;
+    // private ZonedDateTime updatedAt;
 }

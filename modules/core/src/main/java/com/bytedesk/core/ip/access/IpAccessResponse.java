@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.ip.access;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -35,8 +35,8 @@ public class IpAccessResponse extends BaseResponse {
     private String endpoint;  // 访问的接口
     private String params; // 访问的参数
 
-    private LocalDateTime accessTime;
+    private ZonedDateTime accessTime;
     private Integer accessCount; // 访问次数
-    private LocalDateTime lastAccessTime;
+    private ZonedDateTime lastAccessTime;
     // 
 }

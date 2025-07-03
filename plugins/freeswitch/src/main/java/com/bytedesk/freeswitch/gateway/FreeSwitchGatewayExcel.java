@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * FreeSwitch网关Excel导出实体
@@ -84,12 +84,12 @@ public class FreeSwitchGatewayExcel {
     @ExcelProperty("创建时间")
     @ColumnWidth(20)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @ExcelProperty("更新时间")
     @ColumnWidth(20)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     /**
      * 从实体转换为Excel对象

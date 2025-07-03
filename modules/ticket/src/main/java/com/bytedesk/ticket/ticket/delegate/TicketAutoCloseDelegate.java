@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.ticket.TicketEntity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Component
 public class TicketAutoCloseDelegate implements JavaDelegate {
@@ -28,6 +28,6 @@ public class TicketAutoCloseDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         TicketEntity ticket = (TicketEntity) execution.getVariable("ticket");
         ticket.setStatus("已自动关闭");
-        ticket.setUpdatedAt(LocalDateTime.now());
+        ticket.setUpdatedAt(ZonedDateTime.now());
     }
 } 

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.rbac.token;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.enums.ClientEnum;
@@ -61,7 +61,7 @@ public class TokenEntity extends BaseEntityNoOrg {
     @Column(name = "token_type")
     private String type = TokenTypeEnum.LOGIN.name();
 
-    private LocalDateTime expiresAt;
+    private ZonedDateTime expiresAt;
 
     @Builder.Default
     @Column(name = "is_revoked")
@@ -75,7 +75,7 @@ public class TokenEntity extends BaseEntityNoOrg {
 
     // 验证token是否有效
     public Boolean isValid() {
-        return !revoked && expiresAt.isAfter(LocalDateTime.now());
+        return !revoked && expiresAt.isAfter(ZonedDateTime.now());
     }
 
     // 撤销token
@@ -84,7 +84,7 @@ public class TokenEntity extends BaseEntityNoOrg {
     }
 
     // 刷新token过期时间
-    public void refresh(LocalDateTime newExpiresAt) {
+    public void refresh(ZonedDateTime newExpiresAt) {
         this.expiresAt = newExpiresAt;
     }
 

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +72,7 @@ public class FaqBulkIndexTester {
             });
         }
         
-        log.info("批量索引测试任务已提交，时间: {}", LocalDateTime.now());
+        log.info("批量索引测试任务已提交，时间: {}", ZonedDateTime.now());
     }
     
     /**

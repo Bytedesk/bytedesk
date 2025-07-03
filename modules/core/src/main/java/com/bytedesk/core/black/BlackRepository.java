@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.black;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public interface BlackRepository extends JpaRepository<BlackEntity, String>, Jpa
 
     Optional<BlackEntity> findFirstByBlackUidAndDeletedFalse(String blackUid);
 
-    List<BlackEntity> findByEndTimeBeforeAndDeletedFalse(LocalDateTime endTime);
+    List<BlackEntity> findByEndTimeBeforeAndDeletedFalse(ZonedDateTime endTime);
 
     Optional<BlackEntity> findByBlackUidAndOrgUidAndDeletedFalse(String blackUid, String orgUid);
 }

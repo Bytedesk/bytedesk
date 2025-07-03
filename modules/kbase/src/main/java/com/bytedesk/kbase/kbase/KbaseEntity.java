@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.kbase;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,10 +148,10 @@ public class KbaseEntity extends BaseEntity {
     private String language = LanguageEnum.ZH_CN.name();
 
     // 有效开始日期
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // 有效结束日期
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
