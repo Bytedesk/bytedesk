@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 19:28:43
+ * @LastEditTime: 2025-07-03 20:01:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq.elastic;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,9 +98,6 @@ public class FaqElasticService {
                 }
             }
             
-            // 确保索引配置正确（设置正确的副本数等）
-            ensureIndexTemplate();
-
             // 转换为Elasticsearch文档
             FaqElastic faqElastic = FaqElastic.fromFaqEntity(faq);
 
@@ -192,23 +189,23 @@ public class FaqElasticService {
             // 添加过滤条件：启用状态
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
 
-            // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
-            ZonedDateTime currentTime = ZonedDateTime.now();
-            String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
+            // LocalDateTime currentTime = LocalDateTime.now();
+            // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
 
-            // 创建startDate范围查询
-            DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-                    .field("startDate")
-                    .lte(currentTimeStr)
-                    .build();
-            boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+            // // 创建startDate范围查询
+            // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+            //         .field("startDate")
+            //         .lte(currentTimeStr)
+            //         .build();
+            // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
 
-            // 创建endDate范围查询
-            DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-                    .field("endDate")
-                    .gte(currentTimeStr)
-                    .build();
-            boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+            // // 创建endDate范围查询
+            // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+            //         .field("endDate")
+            //         .gte(currentTimeStr)
+            //         .build();
+            // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
 
             // 添加可选的过滤条件：知识库、分类、组织
             if (kbUid != null && !kbUid.isEmpty()) {
@@ -295,6 +292,24 @@ public class FaqElasticService {
             } catch (Exception e) {
                 log.warn("添加question字段查询时出错: {}", e.getMessage());
             }
+
+            // 添加日期范围过滤 - 将LocalDateTime转换为ISO格式的字符串
+            // LocalDateTime currentTime = LocalDateTime.now();
+            // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
+
+            // // 创建startDate范围查询
+            // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+            //         .field("startDate")
+            //         .lte(currentTimeStr)
+            //         .build();
+            // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+
+            // // 创建endDate范围查询
+            // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+            //         .field("endDate")
+            //         .gte(currentTimeStr)
+            //         .build();
+            // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
 
             // 添加可选的过滤条件：知识库、组织
             try {
@@ -396,31 +411,6 @@ public class FaqElasticService {
             
             // 返回空列表而不是抛出异常，避免影响整个服务
             return new ArrayList<>();
-        }
-    }
-
-    /**
-     * 确保索引模板设置正确的副本数
-     * 
-     * 此方法在indexFaq中被调用，确保索引配置正确
-     */
-    private void ensureIndexTemplate() {
-        try {
-            // 获取索引名称
-            String indexName = FaqElastic.class
-                .getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class)
-                .indexName();
-            
-            log.info("确保索引 {} 配置正确", indexName);
-            
-            // 通过配置确保单节点环境下索引的副本数为0
-            // 这可以通过在application.properties或application.yml中设置
-            // spring.elasticsearch.index-settings.number_of_replicas=0 来实现
-            // 或者通过启动时的系统参数
-            
-            log.debug("索引设置检查完成: {}", indexName);
-        } catch (Exception e) {
-            log.warn("处理索引设置时发生错误: {}", e.getMessage());
         }
     }
 

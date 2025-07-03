@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 19:31:10
+ * @LastEditTime: 2025-07-03 20:01:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.faq.elastic;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -99,8 +100,8 @@ public class FaqElastic {
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
-            .startDate(faq.getStartDate())
-            .endDate(faq.getEndDate())
+            .startDate(faq.getStartDate() != null ? faq.getStartDate().toLocalDateTime() : null)
+            .endDate(faq.getEndDate() != null ? faq.getEndDate().toLocalDateTime() : null)
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())
