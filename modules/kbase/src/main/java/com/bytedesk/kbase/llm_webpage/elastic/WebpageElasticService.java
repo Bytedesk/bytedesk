@@ -334,6 +334,157 @@ public class WebpageElasticService {
     }
     
     /**
+     * 搜索网页内容 - 私有辅助方法，处理搜索和联想的共同逻辑
+     * 
+     * @param query 搜索关键词
+     * @param kbUid 知识库UID（可选）
+     * @param categoryUid 分类UID（可选）
+     * @param orgUid 组织UID（可选）
+     * @param isSuggest 是否为输入联想模式
+     * @param maxResults 最大结果数，为null则不限制
+     * @return 搜索结果列表
+     */
+    private List<WebpageElasticSearchResult> searchWebpageInternal(
+            String query, 
+            String kbUid, 
+            String categoryUid, 
+            String orgUid, 
+            boolean isSuggest,
+            Integer maxResults) {
+        
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        try {
+            // 构建查询条件
+            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+            
+            // 根据搜索模式构建不同的查询
+            if (isSuggest) {
+                // 联想模式 - 使用前缀匹配
+                // 添加前缀匹配查询，主要针对标题字段
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("title")
+                    .query(query)
+                    .boost(3.0f)
+                    .build()._toQuery());
+                    
+                // 在描述中查找
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("description")
+                    .query(query)
+                    .boost(2.0f)
+                    .build()._toQuery());
+                    
+                // 在内容中查找
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("content")
+                    .query(query)
+                    .boost(1.0f)
+                    .build()._toQuery());
+                
+                // 在标签中查找
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("tagList")
+                    .query(query)
+                    .boost(1.0f)
+                    .build()._toQuery());
+            } else {
+                // 完整搜索模式 - 使用多字段匹配
+                MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
+                    .fields("title^3", "description^2", "content", "tagList")
+                    .query(query)
+                    .fuzziness("AUTO")
+                    .build();
+                
+                boolQueryBuilder.must(multiMatchQuery._toQuery());
+            }
+            
+            // 添加过滤条件：启用状态
+            boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+            
+            // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
+            ZonedDateTime currentTime = ZonedDateTime.now();
+            String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            
+            // 创建startDate范围查询
+            DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+                .field("startDate")
+                .lte(currentTimeStr)
+                .build();
+            boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+            
+            // 创建endDate范围查询
+            DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+                .field("endDate")
+                .gte(currentTimeStr)
+                .build();
+            boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+            
+            // 添加可选的过滤条件：知识库、分类、组织
+            if (kbUid != null && !kbUid.isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
+            }
+            
+            if (categoryUid != null && !categoryUid.isEmpty() && !isSuggest) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
+            }
+            
+            if (orgUid != null && !orgUid.isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+            }
+            
+            // 构建最终查询
+            var searchQueryBuilder = NativeQuery.builder()
+                    .withQuery(boolQueryBuilder.build()._toQuery());
+            
+            // 如果指定了最大结果数，则添加限制
+            if (maxResults != null && maxResults > 0) {
+                searchQueryBuilder.withMaxResults(maxResults);
+            }
+            
+            // 设置字段
+            if (isSuggest) {
+                searchQueryBuilder.withFields("title", "description", "tagList");
+            }
+            
+            Query searchQuery = searchQueryBuilder.build();
+            
+            // 执行搜索
+            SearchHits<WebpageElastic> searchHits = elasticsearchOperations.search(
+                searchQuery, 
+                WebpageElastic.class
+            );
+            log.debug("搜索完成，命中数: {}", searchHits.getTotalHits());
+            
+            // 解析结果
+            List<WebpageElasticSearchResult> resultList = new ArrayList<>();
+            for (SearchHit<WebpageElastic> hit : searchHits) {
+                WebpageElastic webpageElastic = hit.getContent();
+                float score = hit.getScore();
+                
+                // 创建结果对象
+                WebpageElasticSearchResult result = WebpageElasticSearchResult.builder()
+                    .webpageElastic(webpageElastic)
+                    .score(score)
+                    .build();
+                
+                // 为结果添加高亮标记
+                applySimpleHighlighting(result, query);
+                
+                resultList.add(result);
+            }
+            
+            return resultList;
+        } catch (Exception e) {
+            log.error("网页搜索失败: query={}, 错误类型={}, 错误消息={}", 
+                query, e.getClass().getName(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
      * 简单地为搜索结果添加高亮标记
      * @param result 搜索结果
      * @param query 搜索查询
