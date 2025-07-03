@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:55:52
+ * @LastEditTime: 2025-07-03 15:19:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,13 +38,13 @@ public class FaqElastic {
     @Id
     private String uid;
     
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    @Field(type = FieldType.Text)
     private String question;
     
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    @Field(type = FieldType.Text)
     private String answer;
     
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    @Field(type = FieldType.Text)
     private List<String> similarQuestions;
     
     @Field(type = FieldType.Keyword)
@@ -63,18 +63,12 @@ public class FaqElastic {
     private Boolean enabled;
 
     // startDate
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Date)
     private String startDate;
 
     // endDate
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Date)
     private String endDate;
-    
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime createdAt;
-    
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime updatedAt;
     
     @Field(type = FieldType.Integer)
     private Integer viewCount;

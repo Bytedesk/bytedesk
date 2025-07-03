@@ -42,7 +42,7 @@ public class ChunkElastic {
     @Field(type = FieldType.Keyword)
     private String name;
     
-    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
+    @Field(type = FieldType.Text)
     private String content;
     
     @Field(type = FieldType.Keyword)
@@ -54,10 +54,10 @@ public class ChunkElastic {
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
     
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Date)
     private String startDate;
     
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Date)
     private String endDate;
     
     @Field(type = FieldType.Keyword)
@@ -71,16 +71,4 @@ public class ChunkElastic {
     
     @Field(type = FieldType.Keyword)
     private String kbaseUid;
-    
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime createdAt;
-    
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime updatedAt;
-    
-    // @Field(type = FieldType.Keyword)
-    // private String createdBy;
-    
-    // @Field(type = FieldType.Keyword)
-    // private String updatedBy;
 }
