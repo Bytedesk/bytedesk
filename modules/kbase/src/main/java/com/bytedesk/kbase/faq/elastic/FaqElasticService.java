@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 20:02:29
+ * @LastEditTime: 2025-07-03 22:05:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -350,9 +350,11 @@ public class FaqElasticService {
         String query = request.getQuestion();
         String kbUid = request.getKbUid();
         String orgUid = request.getOrgUid();
+        String categoryUid = request.getCategoryUid();
         
-        List<FaqElasticSearchResult> results = searchFaqInternal(query, kbUid, null, orgUid, true, 10);
+        List<FaqElasticSearchResult> results = searchFaqInternal(query, kbUid, categoryUid, orgUid, true, 10);
         log.info("FAQ输入联想成功，返回结果数: {}", results.size());
         return results;
     }
+
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 17:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 17:09:44
+ * @LastEditTime: 2025-07-03 22:02:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -286,23 +286,23 @@ public class TextElasticService {
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
             
             // 添加时间过滤
-            ZonedDateTime now = ZonedDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            String nowStr = now.format(formatter);
+            // ZonedDateTime now = ZonedDateTime.now();
+            // DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+            // String nowStr = now.format(formatter);
             
-            // 有效期过滤 - 开始日期
-            DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-                .field("startDate")
-                .lte(nowStr)
-                .build();
-            boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+            // // 有效期过滤 - 开始日期
+            // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+            //     .field("startDate")
+            //     .lte(nowStr)
+            //     .build();
+            // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
             
-            // 有效期过滤 - 结束日期
-            DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-                .field("endDate")
-                .gte(nowStr)
-                .build();
-            boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+            // // 有效期过滤 - 结束日期
+            // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+            //     .field("endDate")
+            //     .gte(nowStr)
+            //     .build();
+            // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
             
             // 添加可选的过滤条件：知识库、分类、组织
             if (kbUid != null && !kbUid.isEmpty()) {
