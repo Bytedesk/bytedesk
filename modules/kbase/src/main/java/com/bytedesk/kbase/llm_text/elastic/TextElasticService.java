@@ -193,153 +193,7 @@ public class TextElasticService {
      */
     public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        
-        if (query == null || query.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        
-        try {
-            // 首先检查索引是否存在
-            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
-            if (!indexExists) {
-                log.warn("索引不存在: {}，请先创建索引", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
-                return new ArrayList<>();
-            }
-            
-            // 转义正则表达式特殊字符
-            query = Pattern.quote(query);
-
-            // 构建查询条件
-            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-            
-            // 关键词匹配查询
-            // 在内容和名称字段中搜索
-            MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
-                .query(query)
-                .fields("content^3", "name^2")
-                .fuzziness("AUTO")
-                .build();
-            boolQueryBuilder.must(multiMatchQuery._toQuery());
-            
-            // 添加过滤条件：启用状态
-            boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
-            
-            // 添加时间过滤
-            ZonedDateTime now = ZonedDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            String nowStr = now.format(formatter);
-            
-            // 有效期过滤 - 开始日期
-            DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-                .field("startDate")
-                .lte(nowStr)
-                .build();
-            boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
-            
-            // 有效期过滤 - 结束日期
-            DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-                .field("endDate")
-                .gte(nowStr)
-                .build();
-            boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
-            
-            // 添加可选的过滤条件：知识库、分类、组织
-            if (kbUid != null && !kbUid.isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("kbaseUid").value(kbUid).build()._toQuery());
-            }
-            
-            if (categoryUid != null && !categoryUid.isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
-            }
-            
-            if (orgUid != null && !orgUid.trim().isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
-            }
-            
-            // 构建查询
-            NativeQuery searchQuery = NativeQuery.builder()
-                .withQuery(boolQueryBuilder.build()._toQuery())
-                .withMaxResults(10)
-                .build();
-            
-            // 执行搜索
-            SearchHits<TextElastic> searchHits = 
-                elasticsearchOperations.search(searchQuery, TextElastic.class);
-            log.info("搜索结果数量: {}", searchHits.getTotalHits());
-            
-            List<TextElasticSearchResult> results = new ArrayList<>();
-            
-            // 处理搜索结果
-            for (SearchHit<TextElastic> hit : searchHits) {
-                TextElastic textElastic = hit.getContent();
-                float score = hit.getScore();
-                
-                // 创建结果对象
-                TextElasticSearchResult result = TextElasticSearchResult.builder()
-                    .textElastic(textElastic)
-                    .score(score)
-                    .build();
-                
-                // 手动添加内容高亮
-                String content = textElastic.getContent();
-                if (content != null && !content.trim().isEmpty() && query != null && !query.isEmpty()) {
-                    // 在包含查询词的部分手动添加高亮标签
-                    if (content.toLowerCase().contains(query.toLowerCase())) {
-                        int index = content.toLowerCase().indexOf(query.toLowerCase());
-                        int start = Math.max(0, index - 50);
-                        int end = Math.min(content.length(), index + query.length() + 50);
-                        String snippet = content.substring(start, end);
-                        
-                        // 添加高亮标记 - 对特殊正则表达式字符进行转义
-                        String queryEscaped = Pattern.quote(query);
-                        String highlighted = snippet.replaceAll(
-                            "(?i)" + queryEscaped,
-                            "<em>" + query + "</em>"
-                        );
-                        
-                        result.setHighlightedContent(highlighted);
-                    } else {
-                        // 如果没有直接匹配，使用前100个字符
-                        result.setHighlightedContent(content.length() > 100 ? 
-                            content.substring(0, 100) + "..." : content);
-                    }
-                }
-                
-                // 手动添加名称高亮
-                String title = textElastic.getTitle();
-                if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
-                    // 在包含查询词的部分手动添加高亮标签
-                    if (title.toLowerCase().contains(query.toLowerCase())) {
-                        int index = title.toLowerCase().indexOf(query.toLowerCase());
-                        int start = Math.max(0, index - 20);
-                        int end = Math.min(title.length(), index + query.length() + 20);
-                        String snippet = title.substring(start, end);
-                        
-                        // 添加高亮标记 - 对特殊正则表达式字符进行转义
-                        String queryEscaped = Pattern.quote(query);
-                        String highlighted = snippet.replaceAll(
-                            "(?i)" + queryEscaped,
-                            "<em>" + query + "</em>"
-                        );
-                        
-                        result.setHighlightedName(highlighted);
-                    } else {
-                        result.setHighlightedName(title);
-                    }
-                } else if (title != null) {
-                    result.setHighlightedName(title);
-                }
-                
-                results.add(result);
-            }
-            
-            return results;
-        } catch (Exception e) {
-            log.error("Elasticsearch搜索Texts失败: query={}, kbUid={}, categoryUid={}, orgUid={}, error={}", 
-                query, kbUid, categoryUid, orgUid, e.getMessage(), e);
-            // 返回空列表而不是抛出异常，避免影响整个服务
-            return new ArrayList<>();
-        }
+        return searchTextsInternal(query, kbUid, categoryUid, orgUid, false, 10);
     }
 
     /**
@@ -499,4 +353,207 @@ public class TextElasticService {
         }
     }
 
+    /**
+     * 搜索Text内容 - 私有辅助方法，处理搜索和联想的共同逻辑
+     * 
+     * @param query 搜索关键词
+     * @param kbUid 知识库UID（可选）
+     * @param categoryUid 分类UID（可选）
+     * @param orgUid 组织UID（可选）
+     * @param isSuggest 是否为输入联想模式
+     * @param maxResults 最大结果数，为null则不限制
+     * @return 搜索结果列表
+     */
+    private List<TextElasticSearchResult> searchTextsInternal(
+            String query, 
+            String kbUid, 
+            String categoryUid, 
+            String orgUid, 
+            boolean isSuggest,
+            Integer maxResults) {
+        
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        try {
+            // 首先检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+            if (!indexExists) {
+                log.warn("索引不存在: {}，请先创建索引", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                return new ArrayList<>();
+            }
+            
+            // 转义正则表达式特殊字符
+            String queryEscaped = Pattern.quote(query);
+            
+            // 构建查询条件
+            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+            
+            // 根据搜索模式构建不同的查询
+            if (isSuggest) {
+                // 联想模式 - 使用前缀匹配
+                // 在内容中查找前缀匹配
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("content")
+                    .query(query)
+                    .boost(3.0f)
+                    .build()._toQuery());
+                    
+                // 在名称中查找前缀匹配
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("name")
+                    .query(query)
+                    .boost(2.0f)
+                    .build()._toQuery());
+                    
+                // 在标签中查找
+                boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
+                    .field("tagList")
+                    .query(query)
+                    .boost(1.0f)
+                    .build()._toQuery());
+            } else {
+                // 完整搜索模式 - 使用多字段匹配
+                MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
+                    .query(query)
+                    .fields("content^3", "name^2")
+                    .fuzziness("AUTO")
+                    .build();
+                boolQueryBuilder.must(multiMatchQuery._toQuery());
+            }
+            
+            // 添加过滤条件：启用状态
+            boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+            
+            // 添加时间过滤
+            ZonedDateTime now = ZonedDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+            String nowStr = now.format(formatter);
+            
+            // 有效期过滤 - 开始日期
+            DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
+                .field("startDate")
+                .lte(nowStr)
+                .build();
+            boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
+            
+            // 有效期过滤 - 结束日期
+            DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
+                .field("endDate")
+                .gte(nowStr)
+                .build();
+            boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+            
+            // 添加可选的过滤条件：知识库、分类、组织
+            if (kbUid != null && !kbUid.isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("kbaseUid").value(kbUid).build()._toQuery());
+            }
+            
+            if (categoryUid != null && !categoryUid.isEmpty() && !isSuggest) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
+            }
+            
+            if (orgUid != null && !orgUid.trim().isEmpty()) {
+                boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+            }
+            
+            // 构建最终查询
+            var searchQueryBuilder = NativeQuery.builder()
+                    .withQuery(boolQueryBuilder.build()._toQuery());
+            
+            // 如果指定了最大结果数，则添加限制
+            if (maxResults != null && maxResults > 0) {
+                searchQueryBuilder.withMaxResults(maxResults);
+            }
+            
+            Query searchQuery = searchQueryBuilder.build();
+            
+            // 执行搜索
+            SearchHits<TextElastic> searchHits = 
+                elasticsearchOperations.search(searchQuery, TextElastic.class);
+            log.debug("搜索完成，命中数: {}", searchHits.getTotalHits());
+            
+            List<TextElasticSearchResult> results = new ArrayList<>();
+            
+            // 处理搜索结果
+            for (SearchHit<TextElastic> hit : searchHits) {
+                TextElastic textElastic = hit.getContent();
+                float score = hit.getScore();
+                
+                // 创建结果对象
+                TextElasticSearchResult result = TextElasticSearchResult.builder()
+                    .textElastic(textElastic)
+                    .score(score)
+                    .build();
+                
+                // 处理高亮
+                applyHighlighting(result, query, textElastic);
+                
+                results.add(result);
+            }
+            
+            return results;
+        } catch (Exception e) {
+            log.error("Text搜索失败: query={}, 错误类型={}, 错误消息={}", 
+                query, e.getClass().getName(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * 为搜索结果添加高亮
+     */
+    private void applyHighlighting(TextElasticSearchResult result, String query, TextElastic textElastic) {
+        // 转义正则表达式特殊字符
+        String queryEscaped = Pattern.quote(query);
+        
+        // 手动添加内容高亮
+        String content = textElastic.getContent();
+        if (content != null && !content.trim().isEmpty() && query != null && !query.isEmpty()) {
+            // 在包含查询词的部分手动添加高亮标签
+            if (content.toLowerCase().contains(query.toLowerCase())) {
+                int index = content.toLowerCase().indexOf(query.toLowerCase());
+                int start = Math.max(0, index - 50);
+                int end = Math.min(content.length(), index + query.length() + 50);
+                String snippet = content.substring(start, end);
+                
+                // 添加高亮标记
+                String highlighted = snippet.replaceAll(
+                    "(?i)" + queryEscaped,
+                    "<em>" + query + "</em>"
+                );
+                
+                result.setHighlightedContent(highlighted);
+            } else {
+                // 如果没有直接匹配，使用前100个字符
+                result.setHighlightedContent(content.length() > 100 ? 
+                    content.substring(0, 100) + "..." : content);
+            }
+        }
+        
+        // 手动添加名称高亮
+        String title = textElastic.getTitle();
+        if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
+            // 在包含查询词的部分手动添加高亮标签
+            if (title.toLowerCase().contains(query.toLowerCase())) {
+                int index = title.toLowerCase().indexOf(query.toLowerCase());
+                int start = Math.max(0, index - 20);
+                int end = Math.min(title.length(), index + query.length() + 20);
+                String snippet = title.substring(start, end);
+                
+                // 添加高亮标记
+                String highlighted = snippet.replaceAll(
+                    "(?i)" + queryEscaped,
+                    "<em>" + query + "</em>"
+                );
+                
+                result.setHighlightedName(highlighted);
+            } else {
+                result.setHighlightedName(title);
+            }
+        } else if (title != null) {
+            result.setHighlightedName(title);
+        }
+    }
 }

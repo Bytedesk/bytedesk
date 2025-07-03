@@ -153,17 +153,29 @@ public class FaqElasticService {
     }
 
     /**
-     * 搜索FAQ内容
+     * 搜索FAQ内容 - 私有辅助方法，处理两种搜索场景的共同逻辑
      * 
-     * @param query       搜索关键词
-     * @param kbUid       知识库UID（可选）
+     * @param query 搜索关键词
+     * @param kbUid 知识库UID（可选）
      * @param categoryUid 分类UID（可选）
-     * @param orgUid      组织UID（可选）
-     * @return 带权重的搜索结果列表和元数据
+     * @param orgUid 组织UID（可选）
+     * @param isSuggest 是否为输入联想模式
+     * @param maxResults 最大结果数，为null则不限制
+     * @return 搜索结果列表
      */
-    public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid) {
-        log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-
+    private List<FaqElasticSearchResult> searchFaqInternal(
+            String query, 
+            String kbUid, 
+            String categoryUid, 
+            String orgUid, 
+            boolean isSuggest,
+            Integer maxResults) {
+        
+        if (!StringUtils.hasText(query)) {
+            log.info("查询为空，直接返回空结果");
+            return new ArrayList<>();
+        }
+        
         try {
             // 首先检查索引是否存在
             boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
@@ -175,145 +187,47 @@ public class FaqElasticService {
 
             // 构建查询条件
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-
-            // 关键词查询 - 在question和answer字段中搜索
-            MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
-                    .query(query)
-                    .fields("question^3", "answer", "similarQuestions^2", "tagList^1.5") // 字段权重
-                    .build();
-            boolQueryBuilder.must(multiMatchQuery._toQuery());
-
-            // 添加过滤条件：启用状态
-            boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
-
-            // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
-            // ZonedDateTime currentTime = ZonedDateTime.now();
-            // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
-
-            // // 创建startDate范围查询
-            // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-            //         .field("startDate")
-            //         .lte(currentTimeStr)
-            //         .build();
-            // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
-
-            // // 创建endDate范围查询
-            // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-            //         .field("endDate")
-            //         .gte(currentTimeStr)
-            //         .build();
-            // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
-
-            // 添加可选的过滤条件：知识库、分类、组织
-            if (kbUid != null && !kbUid.isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
-            }
-
-            if (categoryUid != null && !categoryUid.isEmpty()) {
-                boolQueryBuilder
-                        .filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
-            }
-
-            if (orgUid != null && !orgUid.isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
-            }
-
-            // 构建最终查询
-            Query searchQuery = NativeQuery.builder()
-                    .withQuery(boolQueryBuilder.build()._toQuery())
-                    .build();
-
-            // 执行搜索 - 使用FaqElastic类型
-            SearchHits<FaqElastic> searchHits = elasticsearchOperations.search(
-                    searchQuery,
-                    FaqElastic.class);
-
-            // 解析结果 - 返回带权重的FaqElastic对象
-            List<FaqElasticSearchResult> faqElasticResultList = new ArrayList<>();
-            for (SearchHit<FaqElastic> hit : searchHits) {
-                FaqElastic faqElastic = hit.getContent();
-                float score = hit.getScore();
-                // 创建结果对象
-                FaqElasticSearchResult result = FaqElasticSearchResult.builder()
-                        .faqElastic(faqElastic)
-                        .score(score)
-                        .build();
-                faqElasticResultList.add(result);
-            }
-
-            return faqElasticResultList;
-        } catch (Exception e) {
-            log.error("Elasticsearch搜索FAQ失败: query={}, kbUid={}, categoryUid={}, orgUid={}, error={}",
-                    query, kbUid, categoryUid, orgUid, e.getMessage(), e);
-            // 返回空列表而不是抛出异常，避免影响整个服务
-            return new ArrayList<>();
-        }
-    }
-
-    // 用户在输入过程中，给出输入联想
-    public List<FaqElasticSearchResult> suggestFaq(FaqRequest request) {
-        log.info("FAQ输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}",
-                request.getQuestion(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
-
-        String query = request.getQuestion();
-        String kbUid = request.getKbUid();
-        String orgUid = request.getOrgUid();
-        
-        // 验证查询参数
-        if (!StringUtils.hasText(query)) {
-            log.info("查询为空，直接返回空结果");
-            return new ArrayList<>();
-        }
-
-        try {
-            // 首先检查索引是否存在
-            boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
-            if (!indexExists) {
-                log.warn("索引不存在: {}，请先创建索引", FaqElastic.class
-                        .getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
-                return new ArrayList<>();
-            }
-
-            // 构建更安全的查询 - 简化查询结构以提高成功率
-            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-
+            
+            // 根据搜索模式构建不同的查询
             try {
-                // 添加前缀匹配查询，主要针对问题字段
-                // 使用更简单的匹配查询而不是matchPhrasePrefix，以减少可能的错误
-                boolQueryBuilder.should(QueryBuilders.match()
-                        .field("question")
-                        .query(query)
-                        .build()._toQuery());
-                
-                log.debug("添加question字段的match查询: {}", query);
+                if (isSuggest) {
+                    // 输入联想模式 - 主要匹配问题字段
+                    boolQueryBuilder.should(QueryBuilders.match()
+                            .field("question")
+                            .query(query)
+                            .build()._toQuery());
+                    
+                    // 设置最小匹配数
+                    boolQueryBuilder.minimumShouldMatch("1");
+                    
+                    log.debug("添加question字段的match查询: {}", query);
+                } else {
+                    // 完整搜索模式 - 在多个字段中搜索
+                    MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
+                            .query(query)
+                            .fields("question^3", "answer", "similarQuestions^2", "tagList^1.5") // 字段权重
+                            .build();
+                    boolQueryBuilder.must(multiMatchQuery._toQuery());
+                    
+                    // 添加过滤条件：启用状态
+                    boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+                }
             } catch (Exception e) {
-                log.warn("添加question字段查询时出错: {}", e.getMessage());
+                log.warn("添加查询条件时出错: {}", e.getMessage());
             }
-
-            // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
-            // ZonedDateTime currentTime = ZonedDateTime.now();
-            // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
-
-            // // 创建startDate范围查询
-            // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-            //         .field("startDate")
-            //         .lte(currentTimeStr)
-            //         .build();
-            // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
-
-            // // 创建endDate范围查询
-            // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-            //         .field("endDate")
-            //         .gte(currentTimeStr)
-            //         .build();
-            // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
-
-            // 添加可选的过滤条件：知识库、组织
+            
+            // 添加可选的过滤条件：知识库、分类、组织
             try {
                 if (StringUtils.hasText(kbUid)) {
                     boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
                     log.debug("添加kbUid过滤条件: {}", kbUid);
                 }
+                
+                if (StringUtils.hasText(categoryUid) && !isSuggest) {
+                    boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
+                    log.debug("添加categoryUid过滤条件: {}", categoryUid);
+                }
+                
                 if (StringUtils.hasText(orgUid)) {
                     boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
                     log.debug("添加orgUid过滤条件: {}", orgUid);
@@ -322,39 +236,33 @@ public class FaqElasticService {
                 log.warn("添加过滤条件时出错: {}", e.getMessage());
             }
 
-            // 使用最小值查询 - 至少应该匹配一个条件
-            boolQueryBuilder.minimumShouldMatch("1");
-
-            // 构建查询，确保仅包含必要的部分
-            NativeQuery searchQuery = null;
-            try {
-                searchQuery = NativeQuery.builder()
-                        .withQuery(boolQueryBuilder.build()._toQuery())
-                        .withMaxResults(10) // 限制结果数量
-                        .build();
-                log.debug("构建查询成功: {}", searchQuery);
-            } catch (Exception e) {
-                log.error("构建查询失败: {}", e.getMessage());
-                return new ArrayList<>();
+            // 构建最终查询
+            var searchQueryBuilder = NativeQuery.builder()
+                    .withQuery(boolQueryBuilder.build()._toQuery());
+            
+            // 如果指定了最大结果数，则添加限制
+            if (maxResults != null && maxResults > 0) {
+                searchQueryBuilder.withMaxResults(maxResults);
             }
+            
+            NativeQuery searchQuery = searchQueryBuilder.build();
+            log.debug("构建查询成功: {}", searchQuery);
 
-            // 执行搜索 - 添加异常处理
+            // 执行搜索
             SearchHits<FaqElastic> searchHits;
             try {
-                log.debug("开始执行Elasticsearch搜索");
                 searchHits = elasticsearchOperations.search(searchQuery, FaqElastic.class);
                 log.debug("搜索完成，命中数: {}", searchHits.getTotalHits());
             } catch (Exception e) {
                 log.error("执行Elasticsearch搜索失败: {}", e.getMessage(), e);
-                // 尝试记录更详细的错误信息
                 if (e.getCause() != null) {
                     log.error("根本原因: {}", e.getCause().getMessage());
                 }
                 return new ArrayList<>();
             }
 
-            // 处理结果，返回FaqElasticSearchResult对象列表
-            List<FaqElasticSearchResult> faqElasticResultList = new ArrayList<>();
+            // 处理结果
+            List<FaqElasticSearchResult> resultList = new ArrayList<>();
             for (SearchHit<FaqElastic> hit : searchHits) {
                 try {
                     FaqElastic faqElastic = hit.getContent();
@@ -364,51 +272,87 @@ public class FaqElasticService {
                     }
                     
                     float score = hit.getScore();
-
+                    
                     // 创建结果对象
                     FaqElasticSearchResult result = FaqElasticSearchResult.builder()
                             .faqElastic(faqElastic)
                             .score(score)
                             .build();
-
-                    // 手动添加高亮 - 使用更安全的方式
-                    String question = faqElastic.getQuestion();
-                    if (question != null && !question.trim().isEmpty() && query != null && !query.isEmpty()) {
-                        try {
-                            // 在包含查询词的部分手动添加高亮标签
-                            if (question.toLowerCase().contains(query.toLowerCase())) {
-                                int startIdx = question.toLowerCase().indexOf(query.toLowerCase());
-                                int endIdx = startIdx + query.length();
-                                String highlightedQuestion = question.substring(0, startIdx) +
-                                        "<em>" + question.substring(startIdx, endIdx) + "</em>" +
-                                        question.substring(endIdx);
-                                result.setHighlightedQuestion(highlightedQuestion);
-                            } else {
-                                result.setHighlightedQuestion(question);
-                            }
-                        } catch (Exception e) {
-                            log.warn("处理高亮时出错: {}", e.getMessage());
-                            result.setHighlightedQuestion(question);
-                        }
-                    } else if (question != null) {
-                        result.setHighlightedQuestion(question);
+                    
+                    // 如果是输入联想模式，添加高亮
+                    if (isSuggest) {
+                        addHighlight(result, query, faqElastic.getQuestion());
                     }
-
-                    faqElasticResultList.add(result);
+                    
+                    resultList.add(result);
                 } catch (Exception e) {
                     log.warn("处理搜索结果时出错: {}", e.getMessage());
                 }
             }
-
-            log.info("FAQ输入联想成功，返回结果数: {}", faqElasticResultList.size());
-            return faqElasticResultList;
+            
+            return resultList;
         } catch (Exception e) {
-            log.error("FAQ输入联想失败: query={}, 错误类型={}, 错误消息={}", 
+            log.error("FAQ搜索失败: query={}, 错误类型={}, 错误消息={}", 
                     query, e.getClass().getName(), e.getMessage(), e);
             
             // 返回空列表而不是抛出异常，避免影响整个服务
             return new ArrayList<>();
         }
     }
+    
+    /**
+     * 为搜索结果添加高亮
+     */
+    private void addHighlight(FaqElasticSearchResult result, String query, String question) {
+        if (question != null && !question.trim().isEmpty() && query != null && !query.isEmpty()) {
+            try {
+                // 在包含查询词的部分手动添加高亮标签
+                if (question.toLowerCase().contains(query.toLowerCase())) {
+                    int startIdx = question.toLowerCase().indexOf(query.toLowerCase());
+                    int endIdx = startIdx + query.length();
+                    String highlightedQuestion = question.substring(0, startIdx) +
+                            "<em>" + question.substring(startIdx, endIdx) + "</em>" +
+                            question.substring(endIdx);
+                    result.setHighlightedQuestion(highlightedQuestion);
+                } else {
+                    result.setHighlightedQuestion(question);
+                }
+            } catch (Exception e) {
+                log.warn("处理高亮时出错: {}", e.getMessage());
+                result.setHighlightedQuestion(question);
+            }
+        } else if (question != null) {
+            result.setHighlightedQuestion(question);
+        }
+    }
 
+    /**
+     * 搜索FAQ内容
+     * 
+     * @param query       搜索关键词
+     * @param kbUid       知识库UID（可选）
+     * @param categoryUid 分类UID（可选）
+     * @param orgUid      组织UID（可选）
+     * @return 带权重的搜索结果列表和元数据
+     */
+    public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid) {
+        log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
+        return searchFaqInternal(query, kbUid, categoryUid, orgUid, false, null);
+    }
+
+    /**
+     * 用户在输入过程中，给出输入联想
+     */
+    public List<FaqElasticSearchResult> suggestFaq(FaqRequest request) {
+        log.info("FAQ输入联想: query={}, kbUid={}, categoryUid={}, orgUid={}",
+                request.getQuestion(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
+
+        String query = request.getQuestion();
+        String kbUid = request.getKbUid();
+        String orgUid = request.getOrgUid();
+        
+        List<FaqElasticSearchResult> results = searchFaqInternal(query, kbUid, null, orgUid, true, 10);
+        log.info("FAQ输入联想成功，返回结果数: {}", results.size());
+        return results;
+    }
 }
