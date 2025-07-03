@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 13:23:14
+ * @LastEditTime: 2025-07-03 16:34:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,15 +100,15 @@ public class FaqElasticService {
         try {
             // 检查并设置索引模板，确保单节点环境下不设置副本
             String templateName = "bytedesk_kbase_faq_template";
-            String templateJson = """
-                {
-                    "index_patterns": ["bytedesk_kbase_faq*"],
-                    "settings": {
-                        "number_of_shards": 1,
-                        "number_of_replicas": 0
-                    }
-                }
-                """;
+            // String templateJson = """
+            //     {
+            //         "index_patterns": ["bytedesk_kbase_faq*"],
+            //         "settings": {
+            //             "number_of_shards": 1,
+            //             "number_of_replicas": 0
+            //         }
+            //     }
+            //     """;
             
             // 这里可以添加索引模板设置逻辑
             // 由于Spring Data Elasticsearch的限制，我们通过手动设置索引设置来处理

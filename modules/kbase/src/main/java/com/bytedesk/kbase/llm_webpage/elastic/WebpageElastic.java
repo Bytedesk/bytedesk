@@ -13,10 +13,11 @@
  */
 package com.bytedesk.kbase.llm_webpage.elastic;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+
+import com.bytedesk.core.utils.BdDateUtils;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -99,8 +100,8 @@ public class WebpageElastic {
             .kbUid(kbUid)
             .categoryUid(webpage.getCategoryUid())
             .enabled(webpage.getEnabled())
-            .startDate(webpage.getStartDate() != null ? webpage.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-            .endDate(webpage.getEndDate() != null ? webpage.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .startDate(webpage.getStartDate() != null ? BdDateUtils.formatDatetimeToString(webpage.getStartDate()) : null)
+            .endDate(webpage.getEndDate() != null ? BdDateUtils.formatDatetimeToString(webpage.getEndDate()) : null)
             .viewCount(webpage.getViewCount())
             .clickCount(webpage.getClickCount())
             .build();

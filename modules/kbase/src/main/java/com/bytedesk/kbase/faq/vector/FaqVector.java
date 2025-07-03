@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:13:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:55:58
+ * @LastEditTime: 2025-07-03 16:49:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,12 @@
  */
 package com.bytedesk.kbase.faq.vector;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -78,11 +80,11 @@ public class FaqVector {
     private List<String> docIdList;
     
     // 有效日期范围
-    @Field(type = FieldType.Keyword)
-    private String startDate;
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private LocalDateTime startDate;
 
-    @Field(type = FieldType.Keyword)
-    private String endDate;
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private LocalDateTime endDate;
     
     // 统计数据
     @Field(type = FieldType.Integer)
@@ -117,8 +119,8 @@ public class FaqVector {
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
-            .startDate(faq.getStartDate() != null ? faq.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-            .endDate(faq.getEndDate() != null ? faq.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .startDate(faq.getStartDate() != null ? faq.getStartDate().toLocalDateTime() : null)
+            .endDate(faq.getEndDate() != null ? faq.getEndDate().toLocalDateTime() : null)
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())

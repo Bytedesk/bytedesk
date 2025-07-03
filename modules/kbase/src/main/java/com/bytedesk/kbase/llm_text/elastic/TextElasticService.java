@@ -28,6 +28,8 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.llm_text.TextRequest;
@@ -79,16 +81,32 @@ public class TextElasticService {
      * @param text 要索引的Text实体
      */
     public void indexText(TextEntity text) {
-        // 检查文档是否已存在
-        boolean exists = elasticsearchOperations.exists(text.getUid(), TextElastic.class);
-        
-        if (exists) {
-            log.info("更新已存在的Text索引: {}", text.getUid());
-        } else {
-            log.info("为Text创建新索引: {}", text.getUid());
-        }
-        
         try {
+            // 首先检查索引是否存在，如果不存在则创建
+            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+            if (!indexExists) {
+                log.info("索引不存在: {}，正在创建...", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                // 创建索引
+                boolean created = elasticsearchOperations.indexOps(TextElastic.class).create();
+                // 创建映射
+                boolean mapped = elasticsearchOperations.indexOps(TextElastic.class).putMapping();
+                log.info("索引创建结果: {}, 映射创建结果: {}", created, mapped);
+                
+                if (!(created && mapped)) {
+                    log.error("索引创建失败，无法继续索引文档: {}", text.getUid());
+                    return;
+                }
+            }
+            
+            // 检查文档是否已存在
+            boolean exists = elasticsearchOperations.exists(text.getUid(), TextElastic.class);
+            
+            if (exists) {
+                log.info("更新已存在的Text索引: {}", text.getUid());
+            } else {
+                log.info("为Text创建新索引: {}", text.getUid());
+            }
+            
             // 将TextEntity转换为TextElastic对象
             TextElastic textElastic = TextEntityElasticConverter.toElastic(text);
             
@@ -184,6 +202,13 @@ public class TextElasticService {
         }
         
         try {
+            // 首先检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+            if (!indexExists) {
+                log.warn("索引不存在: {}，请先创建索引", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                return new ArrayList<>();
+            }
+            
             // 转义正则表达式特殊字符
             query = Pattern.quote(query);
 
@@ -334,6 +359,13 @@ public class TextElasticService {
         }
         
         try {
+            // 首先检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+            if (!indexExists) {
+                log.warn("索引不存在: {}，请先创建索引", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                return new ArrayList<>();
+            }
+            
             // 转义正则表达式特殊字符
             query = Pattern.quote(query);
 
@@ -467,6 +499,44 @@ public class TextElasticService {
         } catch (Exception e) {
             log.error("Text联想时发生错误: {}", e.getMessage(), e);
             return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * 检查索引是否存在，如果不存在则尝试创建
+     * @return 是否存在或创建成功
+     */
+    public boolean checkAndCreateIndex() {
+        try {
+            // 检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+            if (!indexExists) {
+                log.info("索引不存在: {}，正在创建...", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                // 创建索引
+                boolean created = elasticsearchOperations.indexOps(TextElastic.class).create();
+                // 创建映射
+                boolean mapped = elasticsearchOperations.indexOps(TextElastic.class).putMapping();
+                log.info("索引创建结果: {}, 映射创建结果: {}", created, mapped);
+                return created && mapped;
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("检查或创建索引失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+    
+    /**
+     * 应用启动时检查索引
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void checkIndicesOnStartup() {
+        log.info("应用启动，检查Elasticsearch索引...");
+        try {
+            boolean result = checkAndCreateIndex();
+            log.info("索引检查结果: {}", result ? "成功" : "失败");
+        } catch (Exception e) {
+            log.error("应用启动时检查索引失败: {}", e.getMessage(), e);
         }
     }
 }
