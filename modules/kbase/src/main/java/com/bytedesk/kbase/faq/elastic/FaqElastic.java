@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 18:02:59
+ * @LastEditTime: 2025-07-03 19:31:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,12 +13,12 @@
  */
 package com.bytedesk.kbase.faq.elastic;
 
-// import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
-// import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -64,11 +64,11 @@ public class FaqElastic {
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
 
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime startDate;
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private ZonedDateTime startDate;
 
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime endDate;
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
+    private ZonedDateTime endDate;
     
     @Field(type = FieldType.Integer)
     private Integer viewCount;
@@ -99,8 +99,8 @@ public class FaqElastic {
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
-            // .startDate(faq.getStartDate())
-            // .endDate(faq.getEndDate())
+            .startDate(faq.getStartDate())
+            .endDate(faq.getEndDate())
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())

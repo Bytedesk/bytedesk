@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 18:03:19
+ * @LastEditTime: 2025-07-03 19:28:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -266,7 +266,7 @@ public class FaqElasticService {
         String orgUid = request.getOrgUid();
         
         // 验证查询参数
-        if (query == null || query.trim().isEmpty()) {
+        if (!StringUtils.hasText(query)) {
             log.info("查询为空，直接返回空结果");
             return new ArrayList<>();
         }
