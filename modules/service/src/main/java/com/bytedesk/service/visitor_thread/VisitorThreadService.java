@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 14:27:13
+ * @LastEditTime: 2025-07-03 14:49:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,6 +49,7 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -296,10 +297,16 @@ public class VisitorThreadService
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
-            // ZonedDateTime转为时间戳需借助ZoneId和系统默认时区
-            long currentTimeMillis = System.currentTimeMillis();
-            long updatedAtMillis = thread.getUpdatedAt().toInstant().toEpochMilli();
-            long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
+            // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
+            long currentTimeMillis = BdDateUtils.toTimestamp(ZonedDateTime.now());
+            long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
+            // 移除Math.abs()，确保时间顺序正确
+            long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
+            // 如果updatedAt在未来，说明时间有问题，跳过处理
+            if (diffInMilliseconds < 0) {
+                log.warn("Thread {} updatedAt is in the future, skipping auto close check", thread.getUid());
+                return;
+            }
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
             // log.info("before autoCloseThread threadUid {} threadType {} threadId {}

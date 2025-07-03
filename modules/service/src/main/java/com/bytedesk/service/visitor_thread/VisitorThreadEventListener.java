@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:14:47
+ * @LastEditTime: 2025-07-03 14:46:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,7 @@ import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -157,10 +158,16 @@ public class VisitorThreadEventListener {
         // 触发器逻辑
         // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
         threads.forEach(thread -> {
-            // Convert ZonedDateTime to timestamp using ZoneId and system default timezone
-            long currentTimeMillis = System.currentTimeMillis();
-            long updatedAtMillis = thread.getUpdatedAt().toInstant().toEpochMilli();
-            long diffInMilliseconds = Math.abs(currentTimeMillis - updatedAtMillis);
+            // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
+            long currentTimeMillis = BdDateUtils.toTimestamp(ZonedDateTime.now());
+            long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
+            // 移除Math.abs()，确保时间顺序正确
+            long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
+            // 如果updatedAt在未来，说明时间有问题，跳过处理
+            if (diffInMilliseconds < 0) {
+                log.warn("Thread {} updatedAt is in the future, skipping proactive trigger check", thread.getUid());
+                return;
+            }
             // Convert to seconds
             long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
             String topic = thread.getTopic();

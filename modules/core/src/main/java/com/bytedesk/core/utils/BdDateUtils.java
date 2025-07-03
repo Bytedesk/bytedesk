@@ -213,7 +213,7 @@ public class BdDateUtils {
     
     /**
      * 将ZonedDateTime转换为时间戳（毫秒）
-     * 使用中国时区进行转换
+     * 使用中国时区(Asia/Shanghai)进行转换
      * @param zonedDateTime ZonedDateTime对象
      * @return 时间戳（毫秒）
      */
@@ -221,6 +221,7 @@ public class BdDateUtils {
         if (zonedDateTime == null) {
             return null;
         }
+        // 使用中国时区进行转换，确保时间戳基于Asia/Shanghai时区
         return zonedDateTime.toInstant().atZone(getDisplayZoneId()).toInstant().toEpochMilli();
     }
 
