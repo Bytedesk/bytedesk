@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:13:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 16:49:32
+ * @LastEditTime: 2025-07-03 17:07:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq.vector;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -81,10 +81,10 @@ public class FaqVector {
     
     // 有效日期范围
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
     
     // 统计数据
     @Field(type = FieldType.Integer)
@@ -119,8 +119,8 @@ public class FaqVector {
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
-            .startDate(faq.getStartDate() != null ? faq.getStartDate().toLocalDateTime() : null)
-            .endDate(faq.getEndDate() != null ? faq.getEndDate().toLocalDateTime() : null)
+            .startDate(faq.getStartDate())
+            .endDate(faq.getEndDate())
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-22 17:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 16:54:47
+ * @LastEditTime: 2025-07-03 17:07:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.faq.elastic;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -66,11 +66,11 @@ public class FaqElastic {
 
     // startDate
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     // endDate
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
     
     @Field(type = FieldType.Integer)
     private Integer viewCount;
@@ -101,8 +101,8 @@ public class FaqElastic {
             .kbUid(kbUid)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
-            .startDate(faq.getStartDate() != null ? faq.getStartDate().toLocalDateTime() : null)
-            .endDate(faq.getEndDate() != null ? faq.getEndDate().toLocalDateTime() : null)
+            .startDate(faq.getStartDate())
+            .endDate(faq.getEndDate())
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())

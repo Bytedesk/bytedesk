@@ -464,56 +464,40 @@ public class ChunkElasticService {
     }
     
     /**
-     * 应用启动时自动检查和创建索引
+     * 检查索引是否存在，如果不存在则尝试创建
+     * @return 是否存在或创建成功
      */
-    @EventListener(ApplicationReadyEvent.class)
-    public void onApplicationReady() {
-        log.info("应用启动完成，开始检查和创建Elasticsearch索引...");
-        
+    public boolean checkAndCreateIndex() {
         try {
-            // 获取所有Chunk实体
-            List<ChunkEntity> allChunks = chunkRestService.findAll();
-            log.info("共找到 {} 个Chunk实体，将进行索引检查", allChunks.size());
-            
-            for (ChunkEntity chunk : allChunks) {
-                try {
-                    // 检查并索引每个Chunk
-                    indexChunk(chunk);
-                } catch (Exception e) {
-                    log.error("检查和索引Chunk时发生错误: {}, 错误消息: {}", chunk.getUid(), e.getMessage(), e);
-                }
+            // 检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+            if (!indexExists) {
+                log.info("索引不存在: {}，正在创建...", ChunkElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                // 创建索引
+                boolean created = elasticsearchOperations.indexOps(ChunkElastic.class).create();
+                // 创建映射
+                boolean mapped = elasticsearchOperations.indexOps(ChunkElastic.class).putMapping();
+                log.info("索引创建结果: {}, 映射创建结果: {}", created, mapped);
+                return created && mapped;
             }
-            
-            log.info("Elasticsearch索引检查和创建完成");
+            return true;
         } catch (Exception e) {
-            log.error("应用启动时索引检查失败: {}", e.getMessage(), e);
+            log.error("检查或创建索引失败: {}", e.getMessage(), e);
+            return false;
         }
     }
     
     /**
-     * 检查并创建单个Chunk的索引
-     * @param chunk 要检查的Chunk实体
+     * 应用启动时检查索引
      */
-    public void checkAndCreateIndex(ChunkEntity chunk) {
+    @EventListener(ApplicationReadyEvent.class)
+    public void checkIndicesOnStartup() {
+        log.info("应用启动，检查Chunk的Elasticsearch索引...");
         try {
-            // 检查文档是否已存在
-            boolean exists = elasticsearchOperations.exists(chunk.getUid(), ChunkElastic.class);
-            
-            if (exists) {
-                log.info("Chunk索引已存在: {}", chunk.getUid());
-            } else {
-                log.info("为Chunk创建新索引: {}", chunk.getUid());
-                
-                // 将ChunkEntity转换为ChunkElastic对象
-                ChunkElastic chunkElastic = ChunkElastic.fromEntity(chunk);
-                
-                // 将文档索引到Elasticsearch
-                elasticsearchOperations.save(chunkElastic);
-                
-                log.info("Chunk索引创建成功: {}", chunk.getUid());
-            }
+            boolean result = checkAndCreateIndex();
+            log.info("Chunk索引检查结果: {}", result ? "成功" : "失败");
         } catch (Exception e) {
-            log.error("检查和创建Chunk索引时发生错误: {}, 错误消息: {}", chunk.getUid(), e.getMessage(), e);
+            log.error("应用启动时检查Chunk索引失败: {}", e.getMessage(), e);
         }
     }
 }
