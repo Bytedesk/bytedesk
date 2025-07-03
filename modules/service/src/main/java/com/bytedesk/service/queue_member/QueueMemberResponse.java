@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 14:49:32
+ * @LastEditTime: 2025-07-03 14:36:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.ThreadTransferStatusEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.queue.QueueResponse;
 
 import lombok.AllArgsConstructor;
@@ -228,4 +229,85 @@ public class QueueMemberResponse extends BaseResponse {
     // invite status
     @Builder.Default
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+
+    // ZonedDateTime 字段的格式化 getter 方法
+    public String getVisitorEnqueueAt() {
+        return BdDateUtils.formatDatetimeToString(visitorEnqueueAt);
+    }
+
+    public String getVisitorFirstMessageAt() {
+        return BdDateUtils.formatDatetimeToString(visitorFirstMessageAt);
+    }
+
+    public String getVisitorLastMessageAt() {
+        return BdDateUtils.formatDatetimeToString(visitorLastMessageAt);
+    }
+
+    public String getVisitorLeavedAt() {
+        return BdDateUtils.formatDatetimeToString(visitorLeavedAt);
+    }
+
+    public String getAgentAcceptedAt() {
+        return BdDateUtils.formatDatetimeToString(agentAcceptedAt);
+    }
+
+    public String getAgentFirstResponseAt() {
+        return BdDateUtils.formatDatetimeToString(agentFirstResponseAt);
+    }
+
+    public String getAgentLastResponseAt() {
+        return BdDateUtils.formatDatetimeToString(agentLastResponseAt);
+    }
+
+    public String getAgentClosedAt() {
+        return BdDateUtils.formatDatetimeToString(agentClosedAt);
+    }
+
+    public String getAgentTimeoutAt() {
+        return BdDateUtils.formatDatetimeToString(agentTimeoutAt);
+    }
+
+    public String getRobotAcceptedAt() {
+        return BdDateUtils.formatDatetimeToString(robotAcceptedAt);
+    }
+
+    public String getRobotFirstResponseAt() {
+        return BdDateUtils.formatDatetimeToString(robotFirstResponseAt);
+    }
+
+    public String getRobotLastResponseAt() {
+        return BdDateUtils.formatDatetimeToString(robotLastResponseAt);
+    }
+
+    public String getRobotClosedAt() {
+        return BdDateUtils.formatDatetimeToString(robotClosedAt);
+    }
+
+    public String getRobotTimeoutAt() {
+        return BdDateUtils.formatDatetimeToString(robotTimeoutAt);
+    }
+
+    public String getSystemFirstResponseAt() {
+        return BdDateUtils.formatDatetimeToString(systemFirstResponseAt);
+    }
+
+    public String getSystemLastResponseAt() {
+        return BdDateUtils.formatDatetimeToString(systemLastResponseAt);
+    }
+
+    public String getSystemCloseAt() {
+        return BdDateUtils.formatDatetimeToString(systemCloseAt);
+    }
+
+    public String getRateAt() {
+        return BdDateUtils.formatDatetimeToString(rateAt);
+    }
+
+    public String getMessageLeaveAt() {
+        return BdDateUtils.formatDatetimeToString(messageLeaveAt);
+    }
+
+    public String getRobotToAgentAt() {
+        return BdDateUtils.formatDatetimeToString(robotToAgentAt);
+    }
 }

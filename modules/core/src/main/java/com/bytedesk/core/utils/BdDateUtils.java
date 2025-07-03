@@ -33,6 +33,16 @@ public class BdDateUtils {
 
     private static final String timeFormat = "HH:mm:ss";
 
+    private static String displayZoneId = "Asia/Shanghai";
+
+    public static void setDisplayZoneId(String zoneId) {
+        displayZoneId = zoneId;
+    }
+
+    public static ZoneId getDisplayZoneId() {
+        return ZoneId.of(displayZoneId != null ? displayZoneId : "Asia/Shanghai");
+    }
+
     public static String formatDatetimeNow() {
         return new SimpleDateFormat(datetimeFormat).format(new Date());
     }
@@ -43,18 +53,16 @@ public class BdDateUtils {
 
     /**
      * 将 ZonedDateTime 转换为格式化的日期时间字符串
-     * @param ZonedDateTime ZonedDateTime对象
+     * 使用中国时区进行转换，与toTimestamp方法保持一致
+     * @param zonedDateTime ZonedDateTime对象
      * @return 格式化的日期时间字符串 (yyyy-MM-dd HH:mm:ss)
      */
-    public static String formatDatetimeToString(ZonedDateTime ZonedDateTime) {
-        if (ZonedDateTime == null) {
+    public static String formatDatetimeToString(ZonedDateTime zonedDateTime) {
+        if (zonedDateTime == null) {
             return null;
         }
-        // 使用应用配置的时区
-        ZonedDateTime zonedDateTime = java.time.ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), LocaleContextHolder.getTimeZone().toZoneId());
-        // 或者固定使用中国时区
-        // ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), ZoneId.of("Asia/Shanghai"));
-        return DateTimeFormatter.ofPattern(datetimeFormat).format(zonedDateTime);
+        ZonedDateTime chinaTime = zonedDateTime.toInstant().atZone(getDisplayZoneId());
+        return DateTimeFormatter.ofPattern(datetimeFormat).format(chinaTime);
     }
 
     public static Date formatStringToDateTime(String date) {
@@ -203,5 +211,17 @@ public class BdDateUtils {
         return LocaleContextHolder.getTimeZone().toZoneId();
     }
     
+    /**
+     * 将ZonedDateTime转换为时间戳（毫秒）
+     * 使用中国时区进行转换
+     * @param zonedDateTime ZonedDateTime对象
+     * @return 时间戳（毫秒）
+     */
+    public static Long toTimestamp(ZonedDateTime zonedDateTime) {
+        if (zonedDateTime == null) {
+            return null;
+        }
+        return zonedDateTime.toInstant().atZone(getDisplayZoneId()).toInstant().toEpochMilli();
+    }
 
 }

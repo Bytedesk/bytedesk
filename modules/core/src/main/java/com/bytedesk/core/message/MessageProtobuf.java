@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 14:15:45
+ * @LastEditTime: 2025-07-03 14:26:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,17 +81,8 @@ public class MessageProtobuf implements Serializable {
         return JSON.toJSONString(this);
     }
 
-	// public static MessageProtobuf fromEntity(MessageEntity message) {
-	// 	return MessageProtobuf.builder()
-	// 			.uid(message.getUid())
-	// 			.type(message.getType())
-	// 			.content(message.getContent())
-	// 			.status(message.getStatus())
-	// 			.createdAt(message.getCreatedAt())
-	// 			.client(message.getClient())
-	// 			.thread(ThreadProtobuf.fromEntity(message.getThread()))
-	// 			.user(UserProtobuf.fromEntity(message.getUser()))
-	// 			.extra(message.getExtra())
-	// 			.build();
-	// }
+	// 将createdAt转换为时间戳
+    public Long getTimestamp() {
+        return BdDateUtils.toTimestamp(this.createdAt);
+    }
 }
