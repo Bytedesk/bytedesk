@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 17:56:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 17:02:58
+ * @LastEditTime: 2025-07-03 17:09:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,9 +28,6 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-
 import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.llm_text.TextRequest;
 import com.bytedesk.kbase.llm_text.TextRestService;
@@ -501,42 +498,5 @@ public class TextElasticService {
             return new ArrayList<>();
         }
     }
-    
-    /**
-     * 检查索引是否存在，如果不存在则尝试创建
-     * @return 是否存在或创建成功
-     */
-    public boolean checkAndCreateIndex() {
-        try {
-            // 检查索引是否存在
-            boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
-            if (!indexExists) {
-                log.info("索引不存在: {}，正在创建...", TextElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
-                // 创建索引
-                boolean created = elasticsearchOperations.indexOps(TextElastic.class).create();
-                // 创建映射
-                boolean mapped = elasticsearchOperations.indexOps(TextElastic.class).putMapping();
-                log.info("索引创建结果: {}, 映射创建结果: {}", created, mapped);
-                return created && mapped;
-            }
-            return true;
-        } catch (Exception e) {
-            log.error("检查或创建索引失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-    
-    /**
-     * 应用启动时检查索引
-     */
-    @EventListener(ApplicationReadyEvent.class)
-    public void checkIndicesOnStartup() {
-        log.info("应用启动，检查Elasticsearch索引...");
-        try {
-            boolean result = checkAndCreateIndex();
-            log.info("索引检查结果: {}", result ? "成功" : "失败");
-        } catch (Exception e) {
-            log.error("应用启动时检查索引失败: {}", e.getMessage(), e);
-        }
-    }
+
 }

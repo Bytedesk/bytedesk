@@ -82,14 +82,30 @@ public class ChunkElasticService {
      * @param chunk 要索引的Chunk实体
      */
     public void indexChunk(ChunkEntity chunk) {
+        // 首先检查索引是否存在，如果不存在则创建
+        boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+        if (!indexExists) {
+            log.info("索引不存在: {}，正在创建...", ChunkElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+            // 创建索引
+            boolean created = elasticsearchOperations.indexOps(ChunkElastic.class).create();
+            // 创建映射
+            boolean mapped = elasticsearchOperations.indexOps(ChunkElastic.class).putMapping();
+            log.info("索引创建结果: {}, 映射创建结果: {}", created, mapped);
+            
+            if (!(created && mapped)) {
+                log.error("索引创建失败，无法继续索引文档: {}", chunk.getUid());
+                return;
+            }
+        }
+
         // 检查文档是否已存在
         boolean exists = elasticsearchOperations.exists(chunk.getUid(), ChunkElastic.class);
-        
-        if (exists) {
-            log.info("更新已存在的Chunk索引: {}", chunk.getUid());
-        } else {
-            log.info("为Chunk创建新索引: {}", chunk.getUid());
-        }
+            
+            if (exists) {
+                log.info("更新已存在的Chunk索引: {}", chunk.getUid());
+            } else {
+                log.info("为Chunk创建新索引: {}", chunk.getUid());
+            }
         
         try {
             // 将ChunkEntity转换为ChunkElastic对象
@@ -187,6 +203,13 @@ public class ChunkElasticService {
         }
         
         try {
+            // 首先检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+            if (!indexExists) {
+                log.warn("索引不存在: {}，请先创建索引", ChunkElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                return new ArrayList<>();
+            }
+            
             // 构建查询条件
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
             
@@ -329,6 +352,13 @@ public class ChunkElasticService {
         }
         
         try {
+            // 首先检查索引是否存在
+            boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+            if (!indexExists) {
+                log.warn("索引不存在: {}，请先创建索引", ChunkElastic.class.getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                return new ArrayList<>();
+            }
+            
             // 构建查询条件
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
             
