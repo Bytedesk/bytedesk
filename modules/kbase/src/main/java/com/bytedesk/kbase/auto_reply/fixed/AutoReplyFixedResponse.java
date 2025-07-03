@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 16:10:26
+ * @LastEditTime: 2025-07-03 13:34:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,4 +52,13 @@ public class AutoReplyFixedResponse extends BaseResponse {
     private String categoryUid; // 文章分类
 
     private String kbUid; // 对应知识库
+
+    // 
+    public String getStartDate() {
+        return BdDateUtils.formatDatetimeToString(startDate);
+    }
+
+    public String getEndDate() {
+        return BdDateUtils.formatDatetimeToString(endDate);
+    }
 }

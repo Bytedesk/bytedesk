@@ -306,7 +306,9 @@ public class ChunkElasticService {
             
             return chunkElasticResultList;
         } catch (Exception e) {
-            log.error("搜索Chunks时发生错误: {}", e.getMessage(), e);
+            log.error("Elasticsearch搜索Chunks失败: query={}, kbUid={}, categoryUid={}, orgUid={}, error={}", 
+                query, kbUid, categoryUid, orgUid, e.getMessage(), e);
+            // 返回空列表而不是抛出异常，避免影响整个服务
             return new ArrayList<>();
         }
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 14:15:04
+ * @LastEditTime: 2025-07-03 13:32:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -109,4 +110,13 @@ public class KbaseResponse extends BaseResponse {
     private String userUid;
     
     private List<UserProtobuf> members;
+
+    // 
+    public String getStartDate() {
+        return BdDateUtils.formatDatetimeToString(startDate);
+    }
+
+    public String getEndDate() {
+        return BdDateUtils.formatDatetimeToString(endDate);
+    }
 }

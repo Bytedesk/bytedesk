@@ -288,11 +288,18 @@ public class TextElasticService {
                 if (title != null && !title.trim().isEmpty() && query != null && !query.isEmpty()) {
                     // 在包含查询词的部分手动添加高亮标签
                     if (title.toLowerCase().contains(query.toLowerCase())) {
+                        int index = title.toLowerCase().indexOf(query.toLowerCase());
+                        int start = Math.max(0, index - 20);
+                        int end = Math.min(title.length(), index + query.length() + 20);
+                        String snippet = title.substring(start, end);
+                        
+                        // 添加高亮标记 - 对特殊正则表达式字符进行转义
                         String queryEscaped = Pattern.quote(query);
-                        String highlighted = title.replaceAll(
+                        String highlighted = snippet.replaceAll(
                             "(?i)" + queryEscaped,
                             "<em>" + query + "</em>"
                         );
+                        
                         result.setHighlightedName(highlighted);
                     } else {
                         result.setHighlightedName(title);
@@ -304,11 +311,11 @@ public class TextElasticService {
                 results.add(result);
             }
             
-            log.info("搜索Text完成，找到{}条结果", results.size());
             return results;
-            
         } catch (Exception e) {
-            log.error("搜索Text时发生错误: {}", e.getMessage(), e);
+            log.error("Elasticsearch搜索Texts失败: query={}, kbUid={}, categoryUid={}, orgUid={}, error={}", 
+                query, kbUid, categoryUid, orgUid, e.getMessage(), e);
+            // 返回空列表而不是抛出异常，避免影响整个服务
             return new ArrayList<>();
         }
     }
