@@ -498,7 +498,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         //
         if (searchResultList.isEmpty()) {
             // 直接返回未找到相关问题答案
-            String answer = robot.getLlm().getDefaultReply(); // RobotConsts.ROBOT_UNMATCHED;
+            String answer = robot.getLlm().getDefaultReply();
             processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
                     emitter);
             return;
