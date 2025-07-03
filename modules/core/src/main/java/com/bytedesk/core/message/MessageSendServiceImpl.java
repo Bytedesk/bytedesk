@@ -15,7 +15,6 @@ package com.bytedesk.core.message;
 
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
@@ -33,7 +32,7 @@ public class MessageSendServiceImpl implements IMessageSendService {
 
     @Override
     public void sendProtobufMessage(MessageProtobuf messageProtobuf) {
-        String json = JSON.toJSONString(messageProtobuf);
+        String json = messageProtobuf.toJson(); 
         // log.debug("sendProtobufMessage: {}", json);
         publishMessageJsonEvent(json);
     }

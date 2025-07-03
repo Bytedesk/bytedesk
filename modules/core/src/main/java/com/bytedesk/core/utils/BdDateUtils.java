@@ -51,7 +51,6 @@ public class BdDateUtils {
             return null;
         }
         // 使用应用配置的时区
-        // 使用应用配置的时区
         ZonedDateTime zonedDateTime = java.time.ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), LocaleContextHolder.getTimeZone().toZoneId());
         // 或者固定使用中国时区
         // ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(ZonedDateTime.toInstant(), ZoneId.of("Asia/Shanghai"));

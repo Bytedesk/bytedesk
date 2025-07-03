@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 10:04:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:04:54
+ * @LastEditTime: 2025-07-03 14:00:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,6 @@ public class MessageService {
     public String processMessageJson(String messageJson) {
 
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJson); 
-        //JSON.parseObject(messageJson, MessageProtobuf.class);
 
         // 收到消息，更新消息状态为发送成功
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {

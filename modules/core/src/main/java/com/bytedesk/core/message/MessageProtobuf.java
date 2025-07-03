@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:04:29
+ * @LastEditTime: 2025-07-03 14:15:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,9 +19,11 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 import com.alibaba.fastjson2.JSON;
+// import com.alibaba.fastjson2.annotation.JSONField;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,6 +64,14 @@ public class MessageProtobuf implements Serializable {
 	private UserProtobuf user;
 
 	private String extra;
+
+	/**
+	 * 获取格式化的创建时间字符串，用于前端解析
+	 * @return 格式化的时间字符串 (yyyy-MM-dd HH:mm:ss)
+	 */
+	public String getCreatedAt() {
+		return BdDateUtils.formatDatetimeToString(createdAt);
+	}
 
 	public static MessageProtobuf fromJson(String user) {
         return JSON.parseObject(user, MessageProtobuf.class);

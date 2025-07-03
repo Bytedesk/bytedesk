@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 12:28:24
+ * @LastEditTime: 2025-07-03 13:59:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -200,7 +200,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             log.info("force agent transfer to agent {}", agentEntity.getUid());
             // 只有接待客服是robot接待时，前端才会显示转人工按钮，转人工
             bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            // 
             queueMemberEntity.transferRobotToAgent();
             // 使用MQ异步处理转人工操作
             Map<String, Object> updates = new HashMap<>();
