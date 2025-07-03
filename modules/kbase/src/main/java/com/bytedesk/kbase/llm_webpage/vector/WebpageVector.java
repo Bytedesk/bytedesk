@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 09:50:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 09:50:23
+ * @LastEditTime: 2025-07-03 12:56:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,10 @@
  */
 package com.bytedesk.kbase.llm_webpage.vector;
 
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -82,11 +81,11 @@ public class WebpageVector {
     private List<String> docIdList;
     
     // 有效日期范围
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime startDate;
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
     
     // 统计数据
     @Field(type = FieldType.Integer)
@@ -116,8 +115,8 @@ public class WebpageVector {
             .kbUid(kbUid)
             .categoryUid(webpage.getCategoryUid())
             .enabled(webpage.getEnabled())
-            .startDate(webpage.getStartDate())
-            .endDate(webpage.getEndDate())
+            .startDate(webpage.getStartDate() != null ? webpage.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .endDate(webpage.getEndDate() != null ? webpage.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .viewCount(webpage.getViewCount())
             .clickCount(webpage.getClickCount())
             .docIdList(webpage.getDocIdList())

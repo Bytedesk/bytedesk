@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:10:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:18:45
+ * @LastEditTime: 2025-07-03 12:55:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,11 +13,10 @@
  */
 package com.bytedesk.kbase.article.elastic;
 
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -81,11 +80,11 @@ public class ArticleElastic {
     @Field(type = FieldType.Keyword)
     private String categoryUid;
     
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime startDate;
+    @Field(type = FieldType.Keyword)
+    private String startDate;
     
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
     
     @Field(type = FieldType.Integer)
     private Integer readCount;
@@ -113,8 +112,8 @@ public class ArticleElastic {
             .orgUid(article.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(article.getCategoryUid())
-            .startDate(article.getStartDate())
-            .endDate(article.getEndDate())
+            .startDate(article.getStartDate() != null ? article.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .endDate(article.getEndDate() != null ? article.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .readCount(article.getReadCount())
             .likeCount(article.getLikeCount())
             .build();

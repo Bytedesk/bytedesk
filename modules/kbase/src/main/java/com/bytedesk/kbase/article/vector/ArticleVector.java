@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 17:13:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:34:08
+ * @LastEditTime: 2025-07-03 12:55:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.article.vector;
 
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -22,8 +22,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.bytedesk.kbase.article.ArticleEntity;
-
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -82,11 +80,11 @@ public class ArticleVector {
     private float[] contentEmbedding;
     
     // 有效日期范围
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime startDate;
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
     
     // 统计数据
     @Field(type = FieldType.Integer)
@@ -114,8 +112,8 @@ public class ArticleVector {
             .categoryUid(article.getCategoryUid())
             .enabled(article.getPublished()) // 使用published字段作为enabled
             .top(article.getTop())
-            .startDate(article.getStartDate())
-            .endDate(article.getEndDate())
+            .startDate(article.getStartDate() != null ? article.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .endDate(article.getEndDate() != null ? article.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .readCount(article.getReadCount())
             .likeCount(article.getLikeCount())
             // .docIdList(article.getDocIdList())

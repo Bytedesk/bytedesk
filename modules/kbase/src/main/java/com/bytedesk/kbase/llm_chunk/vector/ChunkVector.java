@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:18:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 08:59:03
+ * @LastEditTime: 2025-07-03 12:56:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk.vector;
 
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -22,8 +22,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
-
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -81,11 +79,11 @@ public class ChunkVector {
     private String fileUid;
     
     // 有效日期范围
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime startDate;
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
     
     // 状态字段
     @Field(type = FieldType.Keyword)
@@ -122,8 +120,8 @@ public class ChunkVector {
             .enabled(chunk.getEnabled())
             .docId(chunk.getDocId())
             .fileUid(fileUid)
-            .startDate(chunk.getStartDate())
-            .endDate(chunk.getEndDate())
+            .startDate(chunk.getStartDate() != null ? chunk.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .endDate(chunk.getEndDate() != null ? chunk.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .status(chunk.getElasticStatus())
             .vectorStatus(chunk.getVectorStatus())
             .build();

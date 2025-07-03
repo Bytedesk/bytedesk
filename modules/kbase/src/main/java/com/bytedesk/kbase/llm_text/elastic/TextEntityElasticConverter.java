@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 18:10:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 08:59:41
+ * @LastEditTime: 2025-07-03 12:56:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text.elastic;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +43,8 @@ public class TextEntityElasticConverter {
                 .status(entity.getElasticStatus())
                 .tagList(entity.getTagList())
                 .enabled(entity.getEnabled())
-                .startDate(entity.getStartDate())
-                .endDate(entity.getEndDate())
+                .startDate(entity.getStartDate() != null ? entity.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+                .endDate(entity.getEndDate() != null ? entity.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
                 .categoryUid(entity.getCategoryUid())
                 .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
                 .docIdList(entity.getDocIdList())

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 13:23:59
+ * @LastEditTime: 2025-07-03 12:56:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.quick_reply.elastic;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -64,11 +63,11 @@ public class QuickReplyElastic extends BaseEntity {
     @Field(type = FieldType.Integer)
     private Integer clickCount;
 
-    @Field(type = FieldType.Date)
-    private ZonedDateTime startDate;
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
-    @Field(type = FieldType.Date)
-    private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
 
     @Field(type = FieldType.Keyword)
     private String categoryUid;

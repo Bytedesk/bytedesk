@@ -13,11 +13,9 @@
  */
 package com.bytedesk.kbase.llm_text.elastic;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -56,12 +54,12 @@ public class TextElastic {
     private Boolean enabled;
 
      // startDate
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime startDate;
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
     // endDate
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
     
     // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     // private ZonedDateTime createdAt;
