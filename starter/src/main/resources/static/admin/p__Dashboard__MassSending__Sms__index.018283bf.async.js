@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[487],{20385:function(s,n,e){e.r(n);var i=e(31549);n.default=function(){return(0,i.jsxs)("div",{children:[(0,i.jsx)("h1",{children:"Sms Mass Sending"}),(0,i.jsx)("p",{children:"This is the Sms mass sending page."})]})}}}]);

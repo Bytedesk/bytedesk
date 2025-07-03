@@ -1,0 +1,6 @@
+{
+    "enabled": true,
+    "apiUrl": "https://api.bytedesk.com",
+    "websocketUrl": "wss://api.bytedesk.com/stomp",
+    "htmlUrl": "https://www.bytedesk.com"
+}
