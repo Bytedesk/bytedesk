@@ -30,7 +30,7 @@
 					<p><a href="mailto:270580156@qq.com">270580156@qq.com</a></p>
 					<p>添加微信请备注：微语</p>
 					<a href="/assets/images/qrcode/wechat.png" target="_blank">
-						<img src="/assets/images/qrcode/wechat.png" style="height: 80px;"/>
+						<img src="/assets/images/qrcode/wechat.png" style="height: 80px;" alt="微语微信联系方式二维码"/>
 					</a>
 				</div>
 			</div>

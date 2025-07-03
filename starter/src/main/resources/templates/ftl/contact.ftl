@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 	<#--  Header  -->
-	<#include "./common/header_meta.ftl" />
+	<#include "./common/meta_contact.ftl" />
 	<#include "./common/header_js.ftl" />
 	<#include "./common/header_css.ftl" />
 	
@@ -38,7 +38,7 @@ Download START -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
 						<#--  <a href="#"><img src="assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
 						<a href="/assets/images/qrcode/wechat.png" target="_blank">
-							<img src="/assets/images/qrcode/wechat.png"/>
+							<img src="/assets/images/qrcode/wechat.png" alt="微语微信联系方式二维码"/>
 						</a>
 					</div>
 				</div>
@@ -53,7 +53,7 @@ Download START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/07.svg" class="position-relative" alt="">
+				<img src="assets/images/element/07.svg" class="position-relative" alt="微语联系方式插图">
 			</div>
 		</div>
 	</div>

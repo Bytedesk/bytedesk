@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />
@@ -37,7 +37,7 @@ Listed course START -->
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/coding.svg" alt="">
+						<img src="assets/images/element/coding.svg" alt="企业IM图标">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/team" class="stretched-link" target="_blank">企业IM + </a></h5>
@@ -50,7 +50,7 @@ Listed course START -->
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/data-science.svg" alt="">
+						<img src="assets/images/element/data-science.svg" alt="在线客服图标">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="stretched-link" target="_blank">在线客服</a></h5>
@@ -65,7 +65,7 @@ Listed course START -->
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/online.svg" alt="">
+						<img src="assets/images/element/online.svg" alt="AI Agent图标">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ai" class="stretched-link" target="_blank">AI Agent</a></h5>
@@ -78,7 +78,7 @@ Listed course START -->
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/engineering.svg" alt="">
+						<img src="assets/images/element/engineering.svg" alt="企业知识库图标">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kbase" class="stretched-link" target="_blank">企业知识库/帮助中心</a></h5>
@@ -91,7 +91,7 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/profit.svg" alt="">
+						<img src="assets/images/element/profit.svg" alt="客户之声图标">
 					</div>
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="stretched-link" target="_blank">客户之声</a></h5>
 					<span class="mb-0">AI回复助手，社交媒体评论抓取、第三方平台评论同步、意见反馈、服务投诉、调查问卷</span>
@@ -102,7 +102,7 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/medical.svg" alt="">
+						<img src="assets/images/element/medical.svg" alt="工单系统图标">
 					</div>
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="stretched-link" target="_blank">工单系统</a></h5>
 					<span class="mb-0">AI工单助手，自动创建工单，自动分配工单，自动关闭工单</span>
@@ -113,7 +113,7 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/artist.svg" alt="">
+						<img src="assets/images/element/artist.svg" alt="工作流图标">
 					</div>
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="stretched-link" target="_blank">工作流</a></h5>
 					<span class="mb-0">AI智能体，自动执行数据操作，自定义工作流、流程编排，Function Calling/Mcp</span>
@@ -124,7 +124,7 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/home.svg" alt="">
+						<img src="assets/images/element/home.svg" alt="项目管理图标">
 					</div>
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="stretched-link" target="_blank">项目管理</a></h5>
 					<span class="mb-0">看板、日报、任务管理</span>
@@ -135,9 +135,9 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/coding.svg" alt="">
+						<img src="assets/images/element/coding.svg" alt="插件模块图标">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="stretched-link" target="_blank">插件模块</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="stretched_link" target="_blank">插件模块</a></h5>
 					<span class="mb-0">扩展能力，支持第三方插件开发和集成，自定义业务流程、API对接，插件商店，一键安装</span>
 				</div>
 			</div>
@@ -146,9 +146,9 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/data-science.svg" alt="">
+						<img src="assets/images/element/data-science.svg" alt="呼叫中心图标">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="stretched-link" target="_blank">呼叫中心</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="stretched_link" target="_blank">呼叫中心</a></h5>
 					<span class="mb-0">AI智能外呼，自动语音识别，智能语音合成，多线路接入，通话录音，质检分析，支持FreeSWITCH</span>
 				</div>
 			</div>
@@ -157,9 +157,9 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/online.svg" alt="">
+						<img src="assets/images/element/online.svg" alt="视频客服图标">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched-link" target="_blank">视频客服</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched_link" target="_blank">视频客服</a></h5>
 					<span class="mb-0">WebRTC视频通话，屏幕共享，远程协助，视频录制，AI视频分析，支持移动端和PC端</span>
 				</div>
 			</div>
@@ -168,9 +168,9 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/engineering.svg" alt="">
+						<img src="assets/images/element/engineering.svg" alt="视频会议图标">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="stretched-link" target="_blank">视频会议</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="stretched_link" target="_blank">视频会议</a></h5>
 					<span class="mb-0">多人视频会议，会议室管理，会议录制，白板协作，聊天互动，支持Jitsi Meet集成</span>
 				</div>
 			</div>
@@ -201,7 +201,7 @@ Download START -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
 						<#--  <a href="#"><img src="assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
 						<a href="/assets/images/qrcode/wechat.png" target="_blank">
-							<img src="/assets/images/qrcode/wechat.png"/>
+							<img src="/assets/images/qrcode/wechat.png" alt="微语微信联系二维码"/>
 						</a>
 					</div>
 				</div>
@@ -216,7 +216,7 @@ Download START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/07.svg" class="position-relative" alt="">
+				<img src="assets/images/element/07.svg" class="position-relative" alt="微语定制服务插图">
 			</div>
 		</div>
 	</div>

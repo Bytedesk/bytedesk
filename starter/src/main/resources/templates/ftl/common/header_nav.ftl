@@ -4,10 +4,10 @@
 	<nav class="navbar navbar-expand-lg">
 		<div class="container">
 			<!-- Logo START -->
-			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/">
-				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="logo">  -->
-				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="logo">  -->
-				<h5>微语 - 重复工作自动化</h5>
+			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="微语 - 重复工作自动化">
+				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="微语logo">  -->
+				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="微语logo">  -->
+				<h1 class="h5">微语 - 重复工作自动化</h1>
 				<#--  重复工作自动化/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
 			<!-- Logo END -->
@@ -29,7 +29,7 @@
 
 					<!-- Nav item 1 Demos -->
 					<li class="nav-item dropdown">
-						<a class="nav-link active" href="https://www.weiyuai.cn" id="demoMenu">首页</a>
+						<a class="nav-link active" href="https://www.weiyuai.cn" id="homeMenu" aria-current="page">首页</a>
 					</li>
 					<!-- Nav item 1 Demos -->
 					<#--  <li class="nav-item dropdown">

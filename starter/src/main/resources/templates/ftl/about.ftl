@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 	<#--  Header  -->
-	<#include "./common/header_meta.ftl" />
+	<#include "./common/meta_about.ftl" />
 	<#include "./common/header_js.ftl" />
 	<#include "./common/header_css.ftl" />
 	
@@ -53,7 +53,7 @@ Download START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/07.svg" class="position-relative" alt="">
+				<img src="assets/images/element/07.svg" class="position-relative" alt="微语公司介绍插图">
 			</div>
 		</div>
 	</div>
