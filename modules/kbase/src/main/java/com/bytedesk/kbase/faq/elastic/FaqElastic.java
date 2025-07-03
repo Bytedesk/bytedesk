@@ -109,8 +109,6 @@ public class FaqElastic {
             .enabled(faq.getEnabled())
             .startDate(faq.getStartDate() != null ? faq.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .endDate(faq.getEndDate() != null ? faq.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-            // .createdAt(faq.getCreatedAt())
-            // .updatedAt(faq.getUpdatedAt())
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())
