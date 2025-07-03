@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:03:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-21 10:01:12
+ * @LastEditTime: 2025-07-03 12:17:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.utils.tools;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
@@ -34,8 +35,8 @@ public class DateTimeTools {
         // 获取当前时区
         TimeZone timeZone = LocaleContextHolder.getTimeZone();
         log.info("timeZone: {}", timeZone);
-        // 将当前时间转换为指定时区的日期时间
-        return ZonedDateTime.now().atZone(timeZone.toZoneId()).toString();
+        // Convert the current time to the date and time of the specified time zone
+        return ZonedDateTime.now(ZoneId.of(timeZone.getID())).toString();
     }
 
     @Tool(description = "Set a user alarm for the given time")
@@ -46,7 +47,7 @@ public class DateTimeTools {
 
     // MethodToolCallback
     String getCurrentDateTimeMethodToolCallback() {
-        return ZonedDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+        return ZonedDateTime.now().withZoneSameInstant(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 
 }

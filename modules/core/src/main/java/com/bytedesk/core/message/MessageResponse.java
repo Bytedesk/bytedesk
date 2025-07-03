@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:30:42
+ * @LastEditTime: 2025-07-03 12:16:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,7 +77,7 @@ public class MessageResponse extends BaseResponse {
     // @JsonProperty("timestamp")
     public Long getTimestamp() {
         // 使用中国时区，与BdDateUtils保持一致
-        return this.createdAt.atZone(java.time.ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
+        return this.createdAt.toInstant().atZone(java.time.ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
     }
 
 }
