@@ -41,6 +41,7 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String logo;
         private String description;
         private Boolean showRightCornerChat;
+        private Boolean showDemo = true; // 是否显示演示
         private String privacyPolicyUrl;
         private String termsOfServiceUrl;
         private Boolean loginUsernameEnable = true;
