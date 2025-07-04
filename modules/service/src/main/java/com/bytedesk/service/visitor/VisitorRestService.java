@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 13:26:03
+ * @LastEditTime: 2025-07-04 15:17:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -192,7 +192,6 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return csThreadCreationContext.createCsThread(request);
     }
 
-    @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
     public Optional<VisitorEntity> findByUid(String uid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(uid)) {
@@ -200,7 +199,6 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         }
         return visitorRepository.findByUidAndDeleted(uid, false);
     }
-
     @Transactional
     @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
     public Optional<VisitorEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
