@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 11:14:16
+ * @LastEditTime: 2025-07-04 11:21:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,6 @@ public class MessagePersistService {
     public void persist(String messageJSON) {
         // log.info("persist: {}", messageJSON);
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
-        //JSON.parseObject(messageJSON, MessageProtobuf.class);
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
@@ -75,6 +74,11 @@ public class MessagePersistService {
         if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
+        // 手动设置 createdAt，确保时间字段正确映射
+        if (messageProtobuf.getCreatedAtDateTime() != null) {
+            message.setCreatedAt(messageProtobuf.getCreatedAtDateTime());
+        }
+        // message content: 8, createdAt: 2025-07-04T11:21:05+08:00[Asia/Shanghai], messageProtobuf createdAt: 2025-07-04 11:21:05
         log.info("message content: {}, createdAt: {}, messageProtobuf createdAt: {}", message.getContent(), message.getCreatedAt(), messageProtobuf.getCreatedAt());
         Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
         if (threadOpt.isPresent()) {
@@ -84,8 +88,6 @@ public class MessagePersistService {
             log.info("thread not found, uid: {}", threadUid);
             return;
         }
-        // message.setThreadUid(threadUid);
-        // message.setTopic(threadTopic);
         message.setUser(messageProtobuf.getUser().toJson());
         message.setUserUid(messageProtobuf.getUser().getUid());
         // 

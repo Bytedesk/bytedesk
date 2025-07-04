@@ -73,6 +73,14 @@ public class MessageProtobuf implements Serializable {
 		return BdDateUtils.formatDatetimeToString(createdAt);
 	}
 
+	/**
+	 * 获取原始的创建时间
+	 * @return ZonedDateTime 原始时间对象
+	 */
+	public ZonedDateTime getCreatedAtDateTime() {
+		return createdAt;
+	}
+
 	public static MessageProtobuf fromJson(String user) {
         return JSON.parseObject(user, MessageProtobuf.class);
     }
