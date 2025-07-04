@@ -70,15 +70,22 @@ declare class BytedeskWeb {
     private windowState;
     private loopCount;
     private loopTimer;
+    private initVisitorPromise;
+    private getUnreadMessageCountPromise;
+    private clearUnreadMessagesPromise;
     constructor(config: BytedeskConfig);
     private setupApiUrl;
     private getDefaultConfig;
-    init(): void;
-    _getUnreadMessageCount(): Promise<number>;
-    getUnreadMessageCount(): Promise<number>;
+    init(): Promise<void>;
+    _initVisitor(): Promise<any>;
+    _getUnreadMessageCount(): Promise<any>;
+    getUnreadMessageCount(): Promise<any>;
+    initVisitor(): Promise<any>;
+    clearVisitorInfo(): void;
+    forceInitVisitor(): Promise<any>;
     private showUnreadBadge;
     private clearUnreadBadge;
-    clearUnreadMessages(): Promise<number>;
+    clearUnreadMessages(): Promise<any>;
     private createBubble;
     private getSupportText;
     private createChatWindow;
@@ -112,6 +119,14 @@ declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
+    uid?: string;
+    visitorUid?: string;
+    nickname?: string;
+    avatar?: string;
+    extra?: string;
+    goodsInfo?: string;
+    orderInfo?: string;
+    vipLevel?: string;
     [key: string]: string | number | undefined;
 }
 

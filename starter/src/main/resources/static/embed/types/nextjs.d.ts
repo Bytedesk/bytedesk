@@ -70,6 +70,14 @@ declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
+    uid?: string;
+    visitorUid?: string;
+    nickname?: string;
+    avatar?: string;
+    extra?: string;
+    goodsInfo?: string;
+    orderInfo?: string;
+    vipLevel?: string;
     [key: string]: string | number | undefined;
 }
 
