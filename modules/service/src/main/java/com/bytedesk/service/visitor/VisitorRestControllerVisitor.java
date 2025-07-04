@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 09:31:19
+ * @LastEditTime: 2025-07-04 15:40:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,6 @@ import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
@@ -46,7 +45,6 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.message_unread.MessageUnreadRequest;
 import com.bytedesk.service.message_unread.MessageUnreadResponse;
 import com.bytedesk.service.message_unread.MessageUnreadRestService;
-import com.bytedesk.service.visitor.event.VisitorBrowseEvent;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -70,8 +68,6 @@ public class VisitorRestControllerVisitor {
     private final MessageRestService messageRestService;
 
     private final IpService ipService;
-
-    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final RobotService robotService;
 
@@ -107,20 +103,6 @@ public class VisitorRestControllerVisitor {
         MessageProtobuf messageProtobuf = visitorRestService.requestThread(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
-    }
-
-    @PostMapping("/browse")
-    public ResponseEntity<?> browse(VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
-        //
-        String ip = IpUtils.getIp(httpRequest);
-        if (ip != null) {
-            visitorRequest.setIp(ip);
-            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
-        }
-        //
-        bytedeskEventPublisher.publishEvent(new VisitorBrowseEvent(this, visitorRequest));
-        //
-        return ResponseEntity.ok(JsonResult.success("browse success"));
     }
 
     @GetMapping("/ping")
