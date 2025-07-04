@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:18:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 12:48:52
+ * @LastEditTime: 2025-07-04 12:59:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,9 +25,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -137,8 +135,12 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
 
     @Override
     public IpWhitelistResponse queryByUid(IpWhitelistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        Optional<IpWhitelistEntity> ipWhitelist = findByUid(request.getUid());
+        if (ipWhitelist.isPresent()) {
+            return convertToResponse(ipWhitelist.get());
+        } else {
+            throw new RuntimeException("Ip whitelist not found");
+        }
     }
     
 }
