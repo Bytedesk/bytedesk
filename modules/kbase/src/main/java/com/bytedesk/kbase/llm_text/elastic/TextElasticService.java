@@ -286,7 +286,7 @@ public class TextElasticService {
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
             
             // 添加时间过滤
-            // ZonedDateTime now = ZonedDateTime.now();
+            // ZonedDateTime now = BdDateUtils.now();
             // DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             // String nowStr = now.format(formatter);
             

@@ -25,6 +25,7 @@ import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceTrigger;
 import com.bytedesk.service.agent.AgentEntity;
@@ -46,8 +47,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -69,8 +70,8 @@ public class ThreadMessageUtil {
                 .user(thread.getRobot())
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .build();
         //
         return message;
@@ -89,8 +90,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -111,8 +112,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -131,8 +132,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(user.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -151,8 +152,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(user.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -173,8 +174,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
@@ -195,8 +196,8 @@ public class ThreadMessageUtil {
                 .client(ClientEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();

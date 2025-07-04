@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 11:10:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 08:41:00
+ * @LastEditTime: 2025-07-04 10:26:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * 灰度发布策略
@@ -43,7 +44,7 @@ public class GrayReleaseStrategy {
     // @Scheduled(cron = "0 0 * * * *")
     // public void autoAdjustRollout() {
     //     List<GrayReleaseFeature> features = Arrays.asList(GrayReleaseFeature.values());
-    //     // ZonedDateTime end = ZonedDateTime.now();
+    //     // ZonedDateTime end = BdDateUtils.now();
     //     // ZonedDateTime start = end.minusHours(1);
 
     //     for (GrayReleaseFeature feature : features) {
@@ -89,7 +90,7 @@ public class GrayReleaseStrategy {
      * 检查是否可以启动灰度发布
      */
     public Boolean canStartRollout(GrayReleaseFeature feature) {
-        ZonedDateTime end = ZonedDateTime.now();
+        ZonedDateTime end = BdDateUtils.now();
         ZonedDateTime start = end.minusDays(1);
         
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(feature, start, end);

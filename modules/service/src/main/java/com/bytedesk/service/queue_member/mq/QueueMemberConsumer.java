@@ -365,9 +365,9 @@ public class QueueMemberConsumer implements MessageListener {
                         // // 设置转人工状态
                         // member.setTransferStatus(ThreadTransferStatusEnum.ROBOT_TO_AGENT.name());
                         // // 设置机器人结束时间
-                        // member.setRobotClosedAt(ZonedDateTime.now());
+                        // member.setRobotClosedAt(BdDateUtils.now());
                         // // 设置人工开始时间
-                        // member.setAgentAcceptedAt(ZonedDateTime.now());
+                        // member.setAgentAcceptedAt(BdDateUtils.now());
                         // // 设置人工接入方式为自动
                         // member.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
                     }

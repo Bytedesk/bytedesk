@@ -34,7 +34,7 @@ public class RobotMessageUtils {
                         .user(robot.toUserProtobuf())
                         .client(ClientEnum.SYSTEM)
                         .extra(messageProtobuf.getExtra())
-                        .createdAt(ZonedDateTime.now())
+                        .createdAt(BdDateUtils.now())
                         .build();
         }
 
@@ -58,7 +58,7 @@ public class RobotMessageUtils {
         // .user(user)
         // .client(ClientEnum.ROBOT)
         // .extra(JSONObject.toJSONString(extraObject))
-        // .createdAt(ZonedDateTime.now())
+        // .createdAt(BdDateUtils.now())
         // .build();
         // return message;
         // }

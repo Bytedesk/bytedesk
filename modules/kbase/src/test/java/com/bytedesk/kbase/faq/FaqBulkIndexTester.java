@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.kbase.faq.mq.FaqMessageService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +73,7 @@ public class FaqBulkIndexTester {
             });
         }
         
-        log.info("批量索引测试任务已提交，时间: {}", ZonedDateTime.now());
+        log.info("批量索引测试任务已提交，时间: {}", BdDateUtils.now());
     }
     
     /**

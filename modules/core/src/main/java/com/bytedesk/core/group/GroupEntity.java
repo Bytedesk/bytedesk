@@ -116,7 +116,7 @@ public class GroupEntity extends BaseEntity {
         //     MemberEntity member = MemberEntity.builder()
         //         .user(user)
         //         .group(this)
-        //         .joinTime(ZonedDateTime.now())
+        //         .joinTime(BdDateUtils.now())
         //         .build();
         //     members.add(member);
         // }

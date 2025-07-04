@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 14:45:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 14:50:05
+ * @LastEditTime: 2025-07-04 10:31:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,13 +15,13 @@ package com.bytedesk.freeswitch.config;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +95,7 @@ public class FreeSwitchHealthIndicator implements HealthIndicator {
      * 获取当前时间字符串
      */
     private String getCurrentTime() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return BdDateUtils.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     /**

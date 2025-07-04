@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 11:25:53
+ * @LastEditTime: 2025-07-04 10:31:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -168,7 +170,7 @@ public class FreeSwitchCdrService {
      */
     @Transactional
     public void cleanupOldCdrs(int daysToKeep) {
-        ZonedDateTime cutoffDate = ZonedDateTime.now().minusDays(daysToKeep);
+        ZonedDateTime cutoffDate = BdDateUtils.now().minusDays(daysToKeep);
         cdrRepository.deleteByStartStampBefore(cutoffDate);
         log.info("清理了{}天前的CDR记录", daysToKeep);
     }

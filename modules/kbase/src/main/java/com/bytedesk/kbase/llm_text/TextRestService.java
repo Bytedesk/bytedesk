@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:46:10
+ * @LastEditTime: 2025-07-04 10:28:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,6 +38,7 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -306,8 +307,8 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
                 .title("初始化文本")
                 .content("初始化文本内容")
                 .enabled(true)
-                .startDate(ZonedDateTime.now())
-                .endDate(ZonedDateTime.now().plusDays(1))
+                .startDate(BdDateUtils.now())
+                .endDate(BdDateUtils.now().plusDays(1))
                 .build();
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);
         if (kbase.isPresent()) {

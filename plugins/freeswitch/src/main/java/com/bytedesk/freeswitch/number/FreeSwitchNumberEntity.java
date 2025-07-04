@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:29:40
+ * @LastEditTime: 2025-07-04 10:31:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.freeswitch.number;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -114,6 +115,6 @@ public class FreeSwitchNumberEntity extends BaseEntity {
      */
     public boolean isOnline() {
         return enabled && lastRegister != null && 
-               lastRegister.isAfter(ZonedDateTime.now().minusMinutes(5));
+               lastRegister.isAfter(BdDateUtils.now().minusMinutes(5));
     }
 }

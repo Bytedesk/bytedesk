@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-22 16:07:57
+ * @LastEditTime: 2025-07-04 10:27:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,7 @@ import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -142,9 +143,9 @@ public class AuthService {
             .build();
         // 只有当client中含有web字样时，expiresAt有效期24小时，否则为365天
         if (client.toLowerCase().contains("web")) {
-            tokenRequest.setExpiresAt(ZonedDateTime.now().plusDays(30)); // 默认30天过期
+            tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(30)); // 默认30天过期
         } else {
-            tokenRequest.setExpiresAt(ZonedDateTime.now().plusDays(365)); // 其他客户端默认365天过期
+            tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(365)); // 其他客户端默认365天过期
         }
         
         tokenRestService.create(tokenRequest);

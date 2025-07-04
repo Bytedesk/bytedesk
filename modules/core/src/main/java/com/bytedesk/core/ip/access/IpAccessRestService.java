@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 17:53:53
+ * @LastEditTime: 2025-07-04 10:26:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.ip.white.IpWhitelistRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
         // 检查是否在黑名单中且未过期
         Optional<IpBlacklistEntity> blacklist = ipBlacklistService.findByIp(ip);
-        if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(ZonedDateTime.now())) {
+        if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(BdDateUtils.now())) {
             return true;
         }
 
@@ -77,7 +78,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
         int retryCount = 0;
         while (retryCount < MAX_RETRY_COUNT) {
             try {
-                ZonedDateTime now = ZonedDateTime.now();
+                ZonedDateTime now = BdDateUtils.now();
                 ZonedDateTime oneMinuteAgo = now.minusMinutes(1);
 
                 // 获取最近一分钟的访问记录
@@ -141,7 +142,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 IpAccessEntity fresh = refreshedEntity.get();
                 // 更新访问计数和最后访问时间
                 fresh.setAccessCount(fresh.getAccessCount() + 1);
-                fresh.setLastAccessTime(ZonedDateTime.now());
+                fresh.setLastAccessTime(BdDateUtils.now());
                 ipAccessRepository.save(fresh);
 
                 // 如果访问次数超过限制，加入黑名单

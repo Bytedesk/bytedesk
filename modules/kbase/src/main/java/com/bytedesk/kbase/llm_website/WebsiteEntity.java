@@ -22,6 +22,7 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -84,12 +85,12 @@ public class WebsiteEntity extends BaseEntity {
 
     // 有效开始日期
     @Builder.Default
-    private ZonedDateTime startDate = ZonedDateTime.now();
+    private ZonedDateTime startDate = BdDateUtils.now();
 
     // 有效结束日期
     // 当前 + 100 年
     @Builder.Default
-    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = BdDateUtils.now().plusYears(100);
 
     private String categoryUid; // 所属分类
 

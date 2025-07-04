@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:40:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 15:45:41
+ * @LastEditTime: 2025-07-04 10:30:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.ticket.TicketEntity;
-
-import java.time.ZonedDateTime;
+import com.bytedesk.core.utils.BdDateUtils;
 
 @Component
 public class TicketAutoCloseDelegate implements JavaDelegate {
@@ -28,6 +27,6 @@ public class TicketAutoCloseDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         TicketEntity ticket = (TicketEntity) execution.getVariable("ticket");
         ticket.setStatus("已自动关闭");
-        ticket.setUpdatedAt(ZonedDateTime.now());
+        ticket.setUpdatedAt(BdDateUtils.now());
     }
 } 

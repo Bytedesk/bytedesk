@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 11:40:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 11:42:59
+ * @LastEditTime: 2025-07-04 10:26:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * 灰度发布控制器
@@ -124,7 +125,7 @@ public class GrayReleaseController {
             @PathVariable String feature,
             @RequestParam(required = false) Integer hours) {
         
-        ZonedDateTime end = ZonedDateTime.now();
+        ZonedDateTime end = BdDateUtils.now();
         ZonedDateTime start = end.minusHours(hours != null ? hours : 24);
         
         GrayReleaseFeature grayFeature = GrayReleaseFeature.getByCode(feature);

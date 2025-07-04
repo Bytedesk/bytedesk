@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 16:07:50
+ * @LastEditTime: 2025-07-04 10:29:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,6 +35,7 @@ import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -170,7 +171,7 @@ public class MessageLeaveRestService extends
             MessageLeaveEntity messageLeave = messageLeaveOptional.get();
             messageLeave.setReply(request.getReply());
             messageLeave.setReplyImages(request.getReplyImages());
-            messageLeave.setRepliedAt(ZonedDateTime.now());
+            messageLeave.setRepliedAt(BdDateUtils.now());
             messageLeave.setReplyUser(user.toProtobuf().toJson());
             messageLeave.setStatus(MessageLeaveStatusEnum.REPLIED.name());
             // 

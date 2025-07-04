@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:34:38
+ * @LastEditTime: 2025-07-04 10:28:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -78,12 +79,12 @@ public class TextEntity extends BaseEntity {
 
     // 有效开始日期
     @Builder.Default
-    private ZonedDateTime startDate = ZonedDateTime.now();
+    private ZonedDateTime startDate = BdDateUtils.now();
 
     // 有效结束日期
     // 当前 + 100 年
     @Builder.Default
-    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = BdDateUtils.now().plusYears(100);
 
     private String categoryUid; // 所属分类
 

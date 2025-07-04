@@ -38,6 +38,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.utils.BdDateUtils;
 
 @Entity
 @Data
@@ -70,12 +71,12 @@ public class FileEntity extends BaseEntity {
 
      // 有效开始日期
     @Builder.Default
-    private ZonedDateTime startDate = ZonedDateTime.now();
+    private ZonedDateTime startDate = BdDateUtils.now();
 
     // 有效结束日期
     // 当前 + 100 年
     @Builder.Default
-    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = BdDateUtils.now().plusYears(100);
 
     @Builder.Default
     private String elasticStatus = ChunkStatusEnum.NEW.name();

@@ -19,6 +19,7 @@ import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ public class QueueService {
             .robotQueue(queue)
             .thread(threadEntity)
             .queueNumber(queue.getNextNumber())
-            .visitorEnqueueAt(ZonedDateTime.now())
+            .visitorEnqueueAt(BdDateUtils.now())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
@@ -82,7 +83,7 @@ public class QueueService {
             .agentQueue(queue)
             .thread(threadEntity)
             .queueNumber(queue.getNextNumber())
-            .visitorEnqueueAt(ZonedDateTime.now())
+            .visitorEnqueueAt(BdDateUtils.now())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
@@ -132,7 +133,7 @@ public class QueueService {
             .workgroupQueue(workgroupQueue)            
             .thread(threadEntity)
             .queueNumber(workgroupQueue.getNextNumber())
-            .visitorEnqueueAt(ZonedDateTime.now())
+            .visitorEnqueueAt(BdDateUtils.now())
             .orgUid(threadEntity.getOrgUid())
             .build();
         // 
@@ -228,7 +229,7 @@ public class QueueService {
     //         .workgroupQueue(workgroupQueue)
     //         .thread(threadEntity)
     //         .queueNumber(queue.getNextNumber())
-    //         .enqueueTime(ZonedDateTime.now())
+    //         .enqueueTime(BdDateUtils.now())
     //         .orgUid(threadEntity.getOrgUid())
     //         .build();
     //     // 
@@ -275,7 +276,7 @@ public class QueueService {
     //     // // if (status == QueueStatusEnum.COMPLETED || 
     //     // //     status == QueueStatusEnum.CANCELLED ||
     //     // //     status == QueueStatusEnum.TIMEOUT) {
-    //     // //     queueItem.setEndTime(ZonedDateTime.now());
+    //     // //     queueItem.setEndTime(BdDateUtils.now());
     //     // // }
     //     // queueRepository.save(queueItem);
     // }
@@ -309,7 +310,7 @@ public class QueueService {
     //     //     queueMemberRepository.findByStatus(QueueMemberStatusEnum.WAITING.name());
         
     //     // 2. 检查超时
-    //     // ZonedDateTime now = ZonedDateTime.now();
+    //     // ZonedDateTime now = BdDateUtils.now();
     //     // for (QueueMemberEntity member : waitingMembers) {
     //     //     if (member.getEnqueueTime().plusMinutes(30).isBefore(now)) {
     //     //         member.updateStatus(QueueMemberStatusEnum.TIMEOUT.name(), null);

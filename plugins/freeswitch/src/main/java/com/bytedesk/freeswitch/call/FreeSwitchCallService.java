@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:31:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 13:01:30
+ * @LastEditTime: 2025-07-04 10:31:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.freeswitch.call;
 
-import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +25,8 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
 import com.bytedesk.freeswitch.config.FreeSwitchService;
+import com.bytedesk.core.utils.BdDateUtils;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -472,7 +473,7 @@ public class FreeSwitchCallService {
         try {
             // Optional<FreeSwitchNumberEntity> userOptional = userService.findByUsername(username);
             // if (userOptional.isPresent()) {
-            //     userService.updateLastRegistration(username, ZonedDateTime.now());
+            //     userService.updateLastRegistration(username, BdDateUtils.now());
             //     log.debug("已更新用户最后注册时间: {}", username);
             // }
         } catch (Exception e) {
@@ -493,15 +494,15 @@ public class FreeSwitchCallService {
                 cdr.setUid(callInfo.getCallUuid());
                 cdr.setCallerIdNumber(callInfo.getCallerNumber());
                 cdr.setDestinationNumber(callInfo.getCalleeNumber());
-                cdr.setStartStamp(ZonedDateTime.now().minusSeconds(
+                cdr.setStartStamp(BdDateUtils.now().minusSeconds(
                     (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 
                 if (callInfo.getStartTime() > 0) {
-                    cdr.setAnswerStamp(ZonedDateTime.now().minusSeconds(
+                    cdr.setAnswerStamp(BdDateUtils.now().minusSeconds(
                         (System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 }
                 
-                cdr.setEndStamp(ZonedDateTime.now());
+                cdr.setEndStamp(BdDateUtils.now());
                 cdr.setDuration((int) ((System.currentTimeMillis() - callInfo.getStartTime()) / 1000));
                 cdr.setHangupCause(hangupCause);
                 cdr.setDirection(callInfo.getType().toLowerCase());

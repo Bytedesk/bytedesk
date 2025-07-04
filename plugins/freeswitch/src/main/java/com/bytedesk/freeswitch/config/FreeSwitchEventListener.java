@@ -14,7 +14,7 @@ import com.bytedesk.freeswitch.call.event.FreeSwitchCallStartEvent;
 import com.bytedesk.freeswitch.call.event.FreeSwitchDtmfEvent;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrEntity;
 import com.bytedesk.freeswitch.cdr.FreeSwitchCdrService;
-// import com.bytedesk.freeswitch.number.FreeSwitchNumberService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +91,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
             cdr.setUid(uuid);
             cdr.setCallerIdNumber(callerId);
             cdr.setDestinationNumber(destination);
-            cdr.setStartStamp(ZonedDateTime.now());
+            cdr.setStartStamp(BdDateUtils.now());
             cdr.setDirection("outbound"); // 默认为outbound，可根据实际情况调整
             cdr.setHangupCause(""); // 初始为空
             
@@ -119,7 +119,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         // 更新CDR记录 - 设置应答时间
         try {
-            cdrService.updateCdrAnswerTime(uuid, ZonedDateTime.now());
+            cdrService.updateCdrAnswerTime(uuid, BdDateUtils.now());
             log.debug("已更新CDR应答时间: UUID {}", uuid);
         } catch (Exception e) {
             log.error("更新CDR应答时间失败: UUID {} - {}", uuid, e.getMessage(), e);
@@ -140,7 +140,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
         
         // 更新CDR记录 - 设置结束时间和挂断原因
         try {
-            cdrService.updateCdrEndTime(uuid, ZonedDateTime.now(), hangupCause);
+            cdrService.updateCdrEndTime(uuid, BdDateUtils.now(), hangupCause);
             log.debug("已更新CDR结束时间: UUID {} 原因 {}", uuid, hangupCause);
         } catch (Exception e) {
             log.error("更新CDR结束时间失败: UUID {} - {}", uuid, e.getMessage(), e);
@@ -185,7 +185,7 @@ public class FreeSwitchEventListener implements IEslEventListener {
             // Optional<FreeSwitchNumberEntity> userOptional = userService.findByUsername(username);
             // if (userOptional.isPresent()) {
             //     if (online) {
-            //         userService.updateLastRegistration(username, ZonedDateTime.now());
+            //         userService.updateLastRegistration(username, BdDateUtils.now());
             //     }
             //     log.debug("已更新用户在线状态: {} -> {}", username, online);
             // }

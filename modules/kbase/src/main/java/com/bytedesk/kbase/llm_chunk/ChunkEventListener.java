@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:48:50
+ * @LastEditTime: 2025-07-04 10:27:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,8 +80,8 @@ public class ChunkEventListener {
 					.userUid(fileResponse.getUserUid())
 					.orgUid(fileResponse.getOrgUid())
 					.enabled(true) // 使用文件的启用状态，默认为true
-					.startDate(ZonedDateTime.now()) // 使用文件的开始日期，默认为当前时间
-					.endDate(ZonedDateTime.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
+					.startDate(BdDateUtils.now()) // 使用文件的开始日期，默认为当前时间
+					.endDate(BdDateUtils.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
 					.build();
 			chunkRestService.create(splitRequest);
 		}

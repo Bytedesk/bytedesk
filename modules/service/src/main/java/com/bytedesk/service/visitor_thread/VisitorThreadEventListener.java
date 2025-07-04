@@ -74,7 +74,7 @@ public class VisitorThreadEventListener {
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setSystemCloseAt(ZonedDateTime.now());
+                queueMember.setSystemCloseAt(BdDateUtils.now());
                 queueMember.setSystemClose(true);
                 queueMemberRestService.save(queueMember);
                 if (queueMember.getAgentOffline()) {
@@ -116,7 +116,7 @@ public class VisitorThreadEventListener {
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setAgentClosedAt(ZonedDateTime.now());
+                queueMember.setAgentClosedAt(BdDateUtils.now());
                 queueMember.setAgentClose(true);
                 queueMemberRestService.save(queueMember);
             }
@@ -159,7 +159,7 @@ public class VisitorThreadEventListener {
         // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
         threads.forEach(thread -> {
             // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
-            long currentTimeMillis = BdDateUtils.toTimestamp(ZonedDateTime.now());
+            long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
             long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
             // 移除Math.abs()，确保时间顺序正确
             long diffInMilliseconds = currentTimeMillis - updatedAtMillis;

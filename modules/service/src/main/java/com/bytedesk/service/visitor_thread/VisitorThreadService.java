@@ -298,7 +298,7 @@ public class VisitorThreadService
         // log.info("autoCloseThread size {}", threads.size());
         threads.forEach(thread -> {
             // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
-            long currentTimeMillis = BdDateUtils.toTimestamp(ZonedDateTime.now());
+            long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
             long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
             // 移除Math.abs()，确保时间顺序正确
             long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
@@ -360,7 +360,7 @@ public class VisitorThreadService
     private void sendRemindMessage(QueueMemberEntity queueMember, ThreadEntity thread, AgentEntity agent) {
         // 只设置首次超时时间，后续不再更新
         if (queueMember.getAgentTimeoutAt() == null) {
-            queueMember.setAgentTimeoutAt(ZonedDateTime.now());
+            queueMember.setAgentTimeoutAt(BdDateUtils.now());
             queueMember.setAgentTimeout(true);
         }
         // 更新超时次数

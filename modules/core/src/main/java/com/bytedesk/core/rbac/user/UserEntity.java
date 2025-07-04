@@ -36,6 +36,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.utils.BdDateUtils;
 
 @Entity
 @Data
@@ -152,8 +153,8 @@ public class UserEntity extends BaseEntityNoOrg {
             });
         
         // 2. 设置角色有效期
-        uor.setStartDate(ZonedDateTime.now());
-        uor.setEndDate(ZonedDateTime.now().plusYears(100));
+        uor.setStartDate(BdDateUtils.now());
+        uor.setEndDate(BdDateUtils.now().plusYears(100));
         
         // 3. 检查是否已存在该角色ID
         Long roleId = role.getId();

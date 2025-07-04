@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * 可用于强制用户重新登录，或者刷新token
@@ -75,7 +76,7 @@ public class TokenEntity extends BaseEntityNoOrg {
 
     // 验证token是否有效
     public Boolean isValid() {
-        return !revoked && expiresAt.isAfter(ZonedDateTime.now());
+        return !revoked && expiresAt.isAfter(BdDateUtils.now());
     }
 
     // 撤销token

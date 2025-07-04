@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadInviteStatusEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
@@ -95,7 +96,7 @@ public class QueueMemberEntity extends BaseEntity {
      * 统计访客消息总数
      */
     @Builder.Default
-    private ZonedDateTime visitorEnqueueAt = ZonedDateTime.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
 
     private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
@@ -295,28 +296,28 @@ public class QueueMemberEntity extends BaseEntity {
         if (robotAcceptedAt != null) {
             return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
         }
-        ZonedDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : ZonedDateTime.now();
+        ZonedDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : BdDateUtils.now();
         return Duration.between(visitorEnqueueAt, endWaitLength).getSeconds();
     }
 
     public void manualAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
-        this.agentAcceptedAt = ZonedDateTime.now();
+        this.agentAcceptedAt = BdDateUtils.now();
     }
 
     public void agentAutoAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
-        this.agentAcceptedAt = ZonedDateTime.now();
+        this.agentAcceptedAt = BdDateUtils.now();
     }
 
     public void robotAutoAcceptThread() {
         this.robotAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
-        this.robotAcceptedAt = ZonedDateTime.now();
+        this.robotAcceptedAt = BdDateUtils.now();
     }
 
     public void transferRobotToAgent() {
         this.robotToAgent = true;
-        this.robotToAgentAt = ZonedDateTime.now();
+        this.robotToAgentAt = BdDateUtils.now();
     }
 
 

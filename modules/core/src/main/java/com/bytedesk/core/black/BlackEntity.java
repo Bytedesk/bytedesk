@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-28 22:02:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 15:21:05
+ * @LastEditTime: 2025-07-04 10:27:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -79,12 +80,12 @@ public class BlackEntity extends BaseEntity {
     // 开始时间
     @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime startTime = ZonedDateTime.now();
+    private ZonedDateTime startTime = BdDateUtils.now();
 
     // 结束时间
     @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime endTime = ZonedDateTime.now().plusHours(24);
+    private ZonedDateTime endTime = BdDateUtils.now().plusHours(24);
 
     // 被拉黑是的 会话uid
     private String threadUid;

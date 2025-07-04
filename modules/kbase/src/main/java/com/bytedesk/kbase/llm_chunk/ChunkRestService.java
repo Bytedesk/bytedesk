@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 18:40:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:22:27
+ * @LastEditTime: 2025-07-04 10:28:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,7 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -299,8 +300,8 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
                 .name("测试chunk")
                 .content("测试chunk内容")
                 .enabled(true)
-                .startDate(ZonedDateTime.now())
-                .endDate(ZonedDateTime.now().plusDays(1))
+                .startDate(BdDateUtils.now())
+                .endDate(BdDateUtils.now().plusDays(1))
                 .orgUid(orgUid)
                 .build();
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(kbUid);

@@ -47,7 +47,7 @@ public class DateTimeTools {
 
     // MethodToolCallback
     String getCurrentDateTimeMethodToolCallback() {
-        return ZonedDateTime.now().withZoneSameInstant(LocaleContextHolder.getTimeZone().toZoneId()).toString();
+        return BdDateUtils.now().withZoneSameInstant(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 
 }

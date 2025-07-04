@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 13:16:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 17:49:00
+ * @LastEditTime: 2025-07-04 10:30:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import com.bytedesk.core.black.event.BlackDeleteEvent;
 import com.bytedesk.core.ip.black.IpBlacklistRestService;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +78,7 @@ public class VisitorEventListener {
         visitorList.forEach(visitor -> {
             // log.info("visitor: {}", visitor.getUid());
             // 使用Duration计算时间差
-            if (Duration.between(visitor.getUpdatedAt(), ZonedDateTime.now()).toMillis() > 5 * 60 * 1000) {
+            if (Duration.between(visitor.getUpdatedAt(), BdDateUtils.now()).toMillis() > 5 * 60 * 1000) {
                 // if (System.currentTimeMillis() - visitor.getUpdatedAt().getTime() > 5 * 60 *
                 // 1000) {
                 // log.info("visitor: {} offline", visitor.getUid());
@@ -90,7 +91,7 @@ public class VisitorEventListener {
     public void onQuartzDay0Event(QuartzDay0Event event) {
         log.info("visitor quartz day 0 event");
         // 每天0点，检查到期的黑名单，并清理
-        ipBlacklistRestService.findByEndTimeBefore(ZonedDateTime.now()).forEach(ipBlacklist -> {
+        ipBlacklistRestService.findByEndTimeBefore(BdDateUtils.now()).forEach(ipBlacklist -> {
             // 修改访客状态
             visitorRestService.updateStatus(ipBlacklist.getBlackUid(), VisitorStatusEnum.OFFLINE.name());
             // 删除黑名单

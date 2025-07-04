@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-04 14:20:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 11:40:42
+ * @LastEditTime: 2025-07-04 10:30:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.ticket.thread.ThreadConsts;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -120,7 +121,7 @@ public class ThreadHumanIdleTimeoutServiceDelegate implements JavaDelegate {
                 QueueMemberEntity queueMember = optionalQueueMember.get();
                 
                 // 设置人工客服超时时间和超时标志
-                queueMember.setAgentTimeoutAt(ZonedDateTime.now());
+                queueMember.setAgentTimeoutAt(BdDateUtils.now());
                 queueMember.setAgentTimeout(true);
                 
                 // 保存更新

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:20:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:11:42
+ * @LastEditTime: 2025-07-04 10:25:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,6 +37,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * elasticsearch 全文检索服务
@@ -175,7 +176,7 @@ public class ArticleElasticService {
         boolQueryBuilder.filter(QueryBuilders.term().field("published").value(true).build()._toQuery());
         
         // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
-        ZonedDateTime currentTime = ZonedDateTime.now();
+        ZonedDateTime currentTime = BdDateUtils.now();
         String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
         
         // 创建startDate范围查询

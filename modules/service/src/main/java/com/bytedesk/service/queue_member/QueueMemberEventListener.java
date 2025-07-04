@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:30:56
+ * @LastEditTime: 2025-07-04 10:29:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,8 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
+import com.bytedesk.core.utils.BdDateUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -116,7 +118,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime now = BdDateUtils.now();
             
             // 更新首次消息时间（如果尚未设置）
             if (queueMember.getVisitorFirstMessageAt() == null) {
@@ -161,7 +163,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime now = BdDateUtils.now();
             
             // 更新客服消息计数
             queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
@@ -229,7 +231,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime now = BdDateUtils.now();
             
             // 更新首次机器人消息时间（如果尚未设置）
             if (queueMember.getRobotFirstResponseAt() == null) {
@@ -295,7 +297,7 @@ public class QueueMemberEventListener {
             }
             
             QueueMemberEntity queueMember = queueMemberOpt.get();
-            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime now = BdDateUtils.now();
             
             // 更新系统消息计数
             queueMember.setSystemMessageCount(queueMember.getSystemMessageCount() + 1);

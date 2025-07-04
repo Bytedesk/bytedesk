@@ -256,7 +256,7 @@ public class WebpageElasticService {
                     boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
                     
                     // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
-                    // ZonedDateTime currentTime = ZonedDateTime.now();
+                    // ZonedDateTime currentTime = BdDateUtils.now();
                     // String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
                     
                     // // 创建startDate范围查询

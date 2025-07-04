@@ -123,7 +123,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         // if (messageOptional.isPresent()) {
         //     MessageEntity message = messageOptional.get();
-        //     if (message.getCreatedAt().isAfter(ZonedDateTime.now().minusMinutes(30))) {
+        //     if (message.getCreatedAt().isAfter(BdDateUtils.now().minusMinutes(30))) {
         //         // 距离当前时间不超过30分钟，则直接使用之前的消息
         //         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
         //         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
@@ -143,7 +143,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
         // if (messageOptional.isPresent()) {
         //     MessageEntity message = messageOptional.get();
-        //     if (message.getCreatedAt().isAfter(ZonedDateTime.now().minusMinutes(30))) {
+        //     if (message.getCreatedAt().isAfter(BdDateUtils.now().minusMinutes(30))) {
         //         // 距离当前时间不超过30分钟，则直接使用之前的消息
         //         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
         //         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);

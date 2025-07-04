@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-13 10:04:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 14:00:39
+ * @LastEditTime: 2025-07-04 10:19:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,9 +13,9 @@
  */
 package com.bytedesk.core.message;
 
-import java.time.ZonedDateTime;
-
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +34,8 @@ public class MessageService {
             messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
         }
 
-        // 防止客户端时间错误，使用服务器时间戳
-        messageProtobuf.setCreatedAt(ZonedDateTime.now());
+        // 防止客户端时间错误，使用服务器时间戳，指定Asia/Shanghai时区
+        messageProtobuf.setCreatedAt(BdDateUtils.now());
 
         // 保存消息
         // Cache message for persistence

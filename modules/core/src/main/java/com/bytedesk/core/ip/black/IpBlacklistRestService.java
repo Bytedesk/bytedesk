@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 17:46:00
+ * @LastEditTime: 2025-07-04 10:26:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,7 @@ import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -93,7 +94,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     public void addToBlacklistSystem(String ip) {
         //
         String ipLocation = ipService.getIpLocation(ip);
-        ZonedDateTime endTime = ZonedDateTime.now().plusHours(BLOCK_HOURS);
+        ZonedDateTime endTime = BdDateUtils.now().plusHours(BLOCK_HOURS);
         // 
         IpBlacklistRequest request = IpBlacklistRequest.builder()
                 .ip(ip)

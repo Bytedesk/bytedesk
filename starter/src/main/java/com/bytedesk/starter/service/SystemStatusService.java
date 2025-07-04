@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 17:18:07
+ * @LastEditTime: 2025-07-04 10:32:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,11 +18,11 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class SystemStatusService {
         Map<String, Object> status = new HashMap<>();
         
         // 基本信息
-        status.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        status.put("timestamp", BdDateUtils.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         status.put("uptime", getUptime());
         
         // 系统负载

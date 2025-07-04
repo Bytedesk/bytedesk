@@ -1,11 +1,11 @@
 package com.bytedesk.freeswitch.agent;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +31,8 @@ public class FreeSwitchAgentService {
         
         agent.setStatus(FreeSwitchAgentEntity.AgentStatus.OFFLINE);
         agent.setMode(FreeSwitchAgentEntity.AgentMode.MANUAL);
-        agent.setCreatedAt(ZonedDateTime.now());
-        agent.setUpdatedAt(ZonedDateTime.now());
+        agent.setCreatedAt(BdDateUtils.now());
+        agent.setUpdatedAt(BdDateUtils.now());
         
         return agentRepository.save(agent);
     }
@@ -48,7 +48,7 @@ public class FreeSwitchAgentService {
         existingAgent.setName(agent.getName());
         existingAgent.setSkills(agent.getSkills());
         existingAgent.setNotes(agent.getNotes());
-        existingAgent.setUpdatedAt(ZonedDateTime.now());
+        existingAgent.setUpdatedAt(BdDateUtils.now());
         
         return agentRepository.save(existingAgent);
     }
@@ -84,8 +84,8 @@ public class FreeSwitchAgentService {
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
         agent.setStatus(status);
-        agent.setLastStatusChange(ZonedDateTime.now());
-        agent.setUpdatedAt(ZonedDateTime.now());
+        agent.setLastStatusChange(BdDateUtils.now());
+        agent.setUpdatedAt(BdDateUtils.now());
         
         return agentRepository.save(agent);
     }
@@ -99,7 +99,7 @@ public class FreeSwitchAgentService {
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
         agent.setMode(mode);
-        agent.setUpdatedAt(ZonedDateTime.now());
+        agent.setUpdatedAt(BdDateUtils.now());
         
         return agentRepository.save(agent);
     }
@@ -113,7 +113,7 @@ public class FreeSwitchAgentService {
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
         agent.setSkills(skills);
-        agent.setUpdatedAt(ZonedDateTime.now());
+        agent.setUpdatedAt(BdDateUtils.now());
         
         return agentRepository.save(agent);
     }

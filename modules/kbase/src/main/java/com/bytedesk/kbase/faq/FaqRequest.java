@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 13:11:21
+ * @LastEditTime: 2025-07-04 10:25:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.utils.BdDateUtils;
 
 @Data
 @SuperBuilder
@@ -104,11 +105,11 @@ public class FaqRequest extends BaseRequest {
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
-    private ZonedDateTime startDate = ZonedDateTime.now();
+    private ZonedDateTime startDate = BdDateUtils.now();
 
     // 当前 + 100 年
     @Builder.Default
-    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = BdDateUtils.now().plusYears(100);
 
     private String categoryUid;
 

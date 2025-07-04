@@ -145,6 +145,6 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     // public List<TokenEntity> findValidTokensByUserUidAndType(String userUid,
     // String type) {
     // return tokenRepository.findByUserUidAndTypeAndRevokedFalseAndExpiresAtAfter(
-    // userUid, type, ZonedDateTime.now());
+    // userUid, type, BdDateUtils.now());
     // }
 }

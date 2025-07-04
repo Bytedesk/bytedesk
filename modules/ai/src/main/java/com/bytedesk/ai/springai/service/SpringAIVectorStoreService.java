@@ -75,7 +75,7 @@ public class SpringAIVectorStoreService {
 		// List<String> contentList = similarDocuments.stream().map(Document::getText).toList();
 		
 		// 获取当前时间，用于内存中过滤日期
-		// ZonedDateTime currentTime = ZonedDateTime.now();
+		// ZonedDateTime currentTime = BdDateUtils.now();
 		
 		// // 在内存中过滤日期范围
 		// List<Document> dateFilteredDocuments = similarDocuments.stream()

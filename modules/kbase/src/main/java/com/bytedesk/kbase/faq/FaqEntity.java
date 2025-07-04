@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 13:23:40
+ * @LastEditTime: 2025-07-04 10:25:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * faq: Frequently Asked Questions
@@ -149,12 +150,12 @@ public class FaqEntity extends BaseEntity {
 
     // 有效开始日期
     @Builder.Default
-    private ZonedDateTime startDate = ZonedDateTime.now();
+    private ZonedDateTime startDate = BdDateUtils.now();
 
     // 有效结束日期
     // 当前 + 100 年
     @Builder.Default
-    private ZonedDateTime endDate = ZonedDateTime.now().plusYears(100);
+    private ZonedDateTime endDate = BdDateUtils.now().plusYears(100);
 
     // 分类
     private String categoryUid;

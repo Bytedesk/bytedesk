@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:54:36
+ * @LastEditTime: 2025-07-04 10:28:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.quick_reply.QuickReplyEntity;
-// import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
@@ -145,7 +145,7 @@ public class QuickReplyElasticService {
         boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
         
         // 添加日期范围过滤 - 将ZonedDateTime转换为ISO格式的字符串
-        ZonedDateTime currentTime = ZonedDateTime.now();
+        ZonedDateTime currentTime = BdDateUtils.now();
         String currentTimeStr = currentTime.format(DateTimeFormatter.ISO_DATE_TIME);
         
         // 创建startDate范围查询

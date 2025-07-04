@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-05 09:50:06
+ * @LastEditTime: 2025-07-04 10:30:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,6 +38,7 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -723,7 +724,7 @@ public class TicketService {
 
             // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
-            ticket.setResolvedTime(ZonedDateTime.now());
+            ticket.setResolvedTime(BdDateUtils.now());
             ticketRestService.save(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
@@ -795,7 +796,7 @@ public class TicketService {
             if (request.getVerified()) {
                 ticket.setStatus(TicketStatusEnum.VERIFIED_OK.name());
                 ticket.setVerified(true);
-                ticket.setClosedTime(ZonedDateTime.now());
+                ticket.setClosedTime(BdDateUtils.now());
             } else {
                 ticket.setStatus(TicketStatusEnum.REOPENED.name());
                 ticket.setVerified(false);
@@ -860,7 +861,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLOSED.name());
-        ticket.setClosedTime(ZonedDateTime.now()); // 添加关闭时间记录
+        ticket.setClosedTime(BdDateUtils.now()); // 添加关闭时间记录
         ticketRestService.save(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);

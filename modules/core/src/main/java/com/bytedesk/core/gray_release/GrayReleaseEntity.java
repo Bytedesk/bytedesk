@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * 灰度发布配置
@@ -89,7 +90,7 @@ public class GrayReleaseEntity extends BaseEntity {
         }
 
         // 4. 检查灰度时间
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = BdDateUtils.now();
         if (startTime != null && now.isBefore(startTime)) {
             return false; // 灰度未开始
         }

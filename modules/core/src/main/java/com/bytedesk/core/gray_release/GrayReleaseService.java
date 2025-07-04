@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-07 11:07:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:08:20
+ * @LastEditTime: 2025-07-04 10:26:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * 灰度发布服务
@@ -68,8 +69,8 @@ public class GrayReleaseService {
     public void monitorFeature(GrayReleaseFeature feature) {
         GrayReleaseFeatureStatistics stats = metricsService.getFeatureStatistics(
             feature,
-            ZonedDateTime.now().minusHours(24),
-            ZonedDateTime.now()
+            BdDateUtils.now().minusHours(24),
+            BdDateUtils.now()
         );
         
         if (stats.getFailureRate() > 0.1) {
@@ -102,7 +103,7 @@ public class GrayReleaseService {
             .enabled(true)
             .percentage(0)
             .status(GrayReleaseStatus.STATUS_PENDING)
-            .startTime(ZonedDateTime.now())
+            .startTime(BdDateUtils.now())
             .build();
 
         // 更新缓存
@@ -139,7 +140,7 @@ public class GrayReleaseService {
         status.setPercentage(targetPercentage);
         if (targetPercentage >= 100) {
             status.setStatus(GrayReleaseStatus.STATUS_COMPLETED);
-            status.setEndTime(ZonedDateTime.now());
+            status.setEndTime(BdDateUtils.now());
         }
 
         // 更新缓存
@@ -202,7 +203,7 @@ public class GrayReleaseService {
 
         status.setStatus(GrayReleaseStatus.STATUS_COMPLETED);
         status.setPercentage(100);
-        status.setEndTime(ZonedDateTime.now());
+        status.setEndTime(BdDateUtils.now());
         featureStatusCache.put(feature, status);
         
         log.info("Completed rollout for feature: {}", feature);
@@ -233,7 +234,7 @@ public class GrayReleaseService {
         }
 
         // 缓存未命中，从数据库加载
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = BdDateUtils.now();
         ZonedDateTime dayStart = now.minusDays(1);
         
         // 获取最近24小时的统计数据

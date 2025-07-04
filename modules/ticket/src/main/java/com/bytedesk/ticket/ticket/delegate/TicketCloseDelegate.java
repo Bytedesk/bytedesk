@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 15:03:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 14:17:46
+ * @LastEditTime: 2025-07-04 10:30:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,8 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
-
-import java.time.ZonedDateTime;
+import com.bytedesk.core.utils.BdDateUtils;
 
 @Component
 public class TicketCloseDelegate implements JavaDelegate {
@@ -33,7 +32,7 @@ public class TicketCloseDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         TicketEntity ticket = (TicketEntity) execution.getVariable("ticket");
         ticket.setStatus("已关闭");
-        ticket.setUpdatedAt(ZonedDateTime.now());
+        ticket.setUpdatedAt(BdDateUtils.now());
         
         // 发送通知
         notificationService.notifyTicketClosed(ticket);

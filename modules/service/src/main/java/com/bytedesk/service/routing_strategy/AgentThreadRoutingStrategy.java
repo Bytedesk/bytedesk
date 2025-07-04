@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 16:41:42
+ * @LastEditTime: 2025-07-04 10:29:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,7 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.annotation.Nonnull;
 
@@ -163,7 +164,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Failed to save thread " + thread.getUid());
         }
         // 更新排队状态，待优化
-        queueMemberEntity.setAgentAcceptedAt(ZonedDateTime.now());
+        queueMemberEntity.setAgentAcceptedAt(BdDateUtils.now());
         queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
         queueMemberRestService.save(queueMemberEntity);
         // 
@@ -235,7 +236,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
         // if (messageOptional.isPresent()) {
         //     MessageEntity message = messageOptional.get();
-        //     if (message.getCreatedAt().isAfter(ZonedDateTime.now().minusMinutes(30))) {
+        //     if (message.getCreatedAt().isAfter(BdDateUtils.now().minusMinutes(30))) {
         //         // 距离当前时间不超过30分钟，则直接使用之前的消息
         //         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
         //         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);

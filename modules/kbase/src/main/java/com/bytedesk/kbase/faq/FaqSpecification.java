@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 13:04:00
+ * @LastEditTime: 2025-07-04 10:25:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 @Slf4j
 public class FaqSpecification extends BaseSpecification {
@@ -54,7 +55,7 @@ public class FaqSpecification extends BaseSpecification {
             if (request.getOnlyLoadValid() != null && request.getOnlyLoadValid()) {
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), true));
                 // 当前时间 > startDate && 当前时间 < endDate
-                ZonedDateTime now = ZonedDateTime.now();
+                ZonedDateTime now = BdDateUtils.now();
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), now));
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), now));
             }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-11 15:58:44
+ * @LastEditTime: 2025-07-04 10:30:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,7 @@ import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import org.flowable.dmn.api.DmnDecisionService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +58,7 @@ public class TicketSLAService {
     public Boolean isSLABreached(TicketEntity ticket) {
         Map<String, Object> sla = determineSLA(ticket.getCategoryUid(), ticket.getPriority());
         
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = BdDateUtils.now();
         ZonedDateTime createdAt = ticket.getCreatedAt();
         
         // 检查响应时间
@@ -86,7 +87,7 @@ public class TicketSLAService {
      */
     public void recordFirstResponse(TicketEntity ticket) {
         // if (ticket.getFirstResponseTime() == null) {
-        //     ticket.setFirstResponseTime(ZonedDateTime.now());
+        //     ticket.setFirstResponseTime(BdDateUtils.now());
         //     ticketRepository.save(ticket);
         // }
     }

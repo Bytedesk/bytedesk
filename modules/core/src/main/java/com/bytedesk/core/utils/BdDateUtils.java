@@ -225,4 +225,12 @@ public class BdDateUtils {
         return zonedDateTime.toInstant().atZone(getDisplayZoneId()).toInstant().toEpochMilli();
     }
 
+    /**
+     * 获取当前时间，使用Asia/Shanghai时区
+     * @return 当前时间的ZonedDateTime对象
+     */
+    public static ZonedDateTime now() {
+        return ZonedDateTime.now(getDisplayZoneId());
+    }
+
 }

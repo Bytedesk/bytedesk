@@ -1,6 +1,5 @@
 package com.bytedesk.freeswitch.queue;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.freeswitch.call.FreeSwitchCallEntity;
 import com.bytedesk.freeswitch.call.FreeSwitchCallEntity.CallStatus;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +33,8 @@ public class FreeSwitchQueueService {
         }
         
         queue.setStatus(FreeSwitchQueueEntity.QueueStatus.ACTIVE);
-        queue.setCreatedAt(ZonedDateTime.now());
-        queue.setUpdatedAt(ZonedDateTime.now());
+        queue.setCreatedAt(BdDateUtils.now());
+        queue.setUpdatedAt(BdDateUtils.now());
         
         return queueRepository.save(queue);
     }
@@ -53,7 +53,7 @@ public class FreeSwitchQueueService {
         existingQueue.setMaxLength(queue.getMaxLength());
         existingQueue.setWeight(queue.getWeight());
         existingQueue.setNotes(queue.getNotes());
-        existingQueue.setUpdatedAt(ZonedDateTime.now());
+        existingQueue.setUpdatedAt(BdDateUtils.now());
         
         return queueRepository.save(existingQueue);
     }
@@ -96,7 +96,7 @@ public class FreeSwitchQueueService {
             .orElseThrow(() -> new RuntimeException("队列不存在: " + queueName));
             
         queue.setStatus(status);
-        queue.setUpdatedAt(ZonedDateTime.now());
+        queue.setUpdatedAt(BdDateUtils.now());
         
         return queueRepository.save(queue);
     }
@@ -120,7 +120,7 @@ public class FreeSwitchQueueService {
         
         // call.setCurrentQueue(queueName);
         call.setStatus(CallStatus.QUEUED);
-        // call.setQueueTime(ZonedDateTime.now());
+        // call.setQueueTime(BdDateUtils.now());
     }
     
     /**

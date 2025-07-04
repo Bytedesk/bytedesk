@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 14:59:40
+ * @LastEditTime: 2025-07-04 10:29:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,7 +61,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer queueNumber = 0;  // 排队号码
 
     @Builder.Default
-    private ZonedDateTime visitorEnqueueAt = ZonedDateTime.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
 
     private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 

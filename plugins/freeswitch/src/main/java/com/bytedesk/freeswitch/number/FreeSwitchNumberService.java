@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.utils.BdDateUtils;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -160,7 +162,7 @@ public class FreeSwitchNumberService {
         Optional<FreeSwitchNumberEntity> userOpt = userRepository.findByUsernameAndDomain(username, domain);
         if (userOpt.isPresent()) {
             FreeSwitchNumberEntity user = userOpt.get();
-            user.setLastRegister(ZonedDateTime.now());
+            user.setLastRegister(BdDateUtils.now());
             user.setRegisterIp(registerIp);
             user.setUserAgent(userAgent);
             userRepository.save(user);
@@ -186,7 +188,7 @@ public class FreeSwitchNumberService {
      * 获取在线用户列表
      */
     public List<FreeSwitchNumberEntity> findOnlineNumbers() {
-        ZonedDateTime cutoffTime = ZonedDateTime.now().minusMinutes(5);
+        ZonedDateTime cutoffTime = BdDateUtils.now().minusMinutes(5);
         return userRepository.findByEnabledTrueAndLastRegisterAfter(cutoffTime);
     }
 
@@ -222,7 +224,7 @@ public class FreeSwitchNumberService {
      * 获取在线的用户数量
      */
     public long countOnline() {
-        ZonedDateTime cutoffTime = ZonedDateTime.now().minusMinutes(5);
+        ZonedDateTime cutoffTime = BdDateUtils.now().minusMinutes(5);
         return userRepository.countByEnabledTrueAndLastRegisterAfter(cutoffTime);
     }
 

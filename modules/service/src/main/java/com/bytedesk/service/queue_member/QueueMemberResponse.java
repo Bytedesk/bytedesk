@@ -58,7 +58,7 @@ public class QueueMemberResponse extends BaseResponse {
      * 统计访客消息总数
      */
     @Builder.Default
-    private ZonedDateTime visitorEnqueueAt = ZonedDateTime.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
 
     private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 

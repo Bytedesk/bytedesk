@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * 灰度发布指标服务
@@ -40,7 +41,7 @@ public class GrayReleaseMetricsService {
                 .userUid(userUid)
                 .feature(feature.getCode())
                 .success(success)
-                .timestamp(ZonedDateTime.now())
+                .timestamp(BdDateUtils.now())
                 .build();
             
             grayReleaseRepository.save(metrics);
