@@ -88,7 +88,7 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
     }
 
     @Override
-    public CustomerResponse initVisitor(CustomerRequest request) {
+    public CustomerResponse create(CustomerRequest request) {
         if (customerRepository.existsByVisitorUid(request.getVisitorUid())) {
             return convertToResponse(customerRepository.findByVisitorUid(request.getVisitorUid()).get());
         }

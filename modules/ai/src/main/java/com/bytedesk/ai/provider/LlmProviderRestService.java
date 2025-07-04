@@ -112,7 +112,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     }
 
     @Override
-    public LlmProviderResponse initVisitor(LlmProviderRequest request) {
+    public LlmProviderResponse create(LlmProviderRequest request) {
         // 
         if (existsByNameAndLevelAndOrgUid(request.getName(), request.getLevel(), request.getOrgUid())) {
             Optional<LlmProviderEntity> optional = repository.findByNameAndLevelAndOrgUidAndDeletedFalse(request.getName(), request.getLevel(), request.getOrgUid());
@@ -144,7 +144,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
                 .level(level)
                 .build();
 
-        return initVisitor(request);
+        return create(request);
     }
 
     @Override

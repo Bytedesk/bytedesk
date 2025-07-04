@@ -76,7 +76,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
     @Override
     public ResponseEntity<?> create(@RequestBody AutoReplyKeywordRequest request) {
         
-        AutoReplyKeywordResponse response = keywordRestService.initVisitor(request);
+        AutoReplyKeywordResponse response = keywordRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

@@ -53,7 +53,7 @@ public class ReportRestController extends BaseRestController<ReportRequest> {
     @Override
     public ResponseEntity<?> create(ReportRequest request) {
         
-        ReportResponse report = reportService.initVisitor(request);
+        ReportResponse report = reportService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(report));
     }

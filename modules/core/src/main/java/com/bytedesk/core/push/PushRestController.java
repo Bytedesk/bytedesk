@@ -53,7 +53,7 @@ public class PushRestController extends BaseRestController<PushRequest> {
     @Override
     public ResponseEntity<?> create(PushRequest request) {
         
-        return ResponseEntity.ok(JsonResult.success(pushService.initVisitor(request)));
+        return ResponseEntity.ok(JsonResult.success(pushService.create(request)));
     }
 
     @Override

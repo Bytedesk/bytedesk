@@ -75,7 +75,7 @@ public class WorkgroupEventListener {
                 .build();
         workgroupRequest.getMessageLeaveSettings().setWorktimeUids(worktimeUids);
 
-        workgroupService.initVisitor(workgroupRequest);
+        workgroupService.create(workgroupRequest);
     }
 
 

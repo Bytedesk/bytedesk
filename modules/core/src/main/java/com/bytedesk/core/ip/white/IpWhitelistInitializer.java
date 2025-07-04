@@ -34,6 +34,6 @@ public class IpWhitelistInitializer {
             .ip("127.0.0.1")
             .description("127.0.0.1")
             .build();
-        ipWhitelistRestService.initVisitor(ipWhitelistRequest);
+        ipWhitelistRestService.create(ipWhitelistRequest);
     }
 }

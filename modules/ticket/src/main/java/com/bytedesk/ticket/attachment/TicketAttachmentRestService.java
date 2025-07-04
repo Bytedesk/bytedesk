@@ -45,7 +45,7 @@ public class TicketAttachmentRestService extends BaseRestService<TicketAttachmen
     }
 
     @Override
-    public TicketAttachmentResponse initVisitor(TicketAttachmentRequest request) {
+    public TicketAttachmentResponse create(TicketAttachmentRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

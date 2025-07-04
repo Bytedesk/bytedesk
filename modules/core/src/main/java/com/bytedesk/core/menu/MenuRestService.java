@@ -62,7 +62,7 @@ public class MenuRestService extends BaseRestService<MenuEntity, MenuRequest, Me
     }
 
     @Override
-    public MenuResponse initVisitor(MenuRequest request) {
+    public MenuResponse create(MenuRequest request) {
         
         MenuEntity entity = modelMapper.map(request, MenuEntity.class);
         entity.setUid(uidUtils.getUid());

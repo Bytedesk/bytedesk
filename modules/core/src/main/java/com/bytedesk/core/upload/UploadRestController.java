@@ -94,7 +94,7 @@ public class UploadRestController extends BaseRestController<UploadRequest> {
 	@Override
 	public ResponseEntity<?> create(UploadRequest request) {
 		
-		UploadResponse response = uploadRestService.initVisitor(request);
+		UploadResponse response = uploadRestService.create(request);
 
 		return ResponseEntity.ok(JsonResult.success(response));
 	}

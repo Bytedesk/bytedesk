@@ -95,7 +95,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     }
 
     @Override
-    public QueueResponse initVisitor(QueueRequest request) {
+    public QueueResponse create(QueueRequest request) {
         QueueEntity entity = modelMapper.map(request, QueueEntity.class);
         entity.setUid(uidUtils.getUid());
         //
@@ -116,7 +116,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
             //
             return convertToResponse(save(entity));
         }
-        return initVisitor(request);
+        return create(request);
     }
 
     @CachePut(value = "queue", key = "#entity.uid")

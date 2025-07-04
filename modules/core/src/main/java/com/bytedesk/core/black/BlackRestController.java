@@ -123,7 +123,7 @@ public class BlackRestController extends BaseRestController<BlackRequest> {
     @Override
     public ResponseEntity<?> create(BlackRequest request) {
 
-        BlackResponse response = blackRestService.initVisitor(request);
+        BlackResponse response = blackRestService.create(request);
         
         return ResponseEntity.ok(JsonResult.success(response));
     }

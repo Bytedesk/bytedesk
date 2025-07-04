@@ -68,7 +68,7 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
         return actionRepository.findByUid(uid);
     }
 
-    public ActionResponse initVisitor(ActionRequest actionRequest) {
+    public ActionResponse create(ActionRequest actionRequest) {
         ActionEntity action = modelMapper.map(actionRequest, ActionEntity.class);
         action.setUid(uidUtils.getUid());
         //

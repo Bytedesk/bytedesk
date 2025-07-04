@@ -50,7 +50,7 @@ public class WorktimeController extends BaseRestController<WorktimeRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody WorktimeRequest request) {
         
-        WorktimeResponse response = worktimeService.initVisitor(request);
+        WorktimeResponse response = worktimeService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

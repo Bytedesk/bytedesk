@@ -51,7 +51,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
     @Override
     public ResponseEntity<?> create(IntentionSettingsRequest request) {
         
-        IntentionSettingsResponse intentionSettings = intentionSettingsService.initVisitor(request);
+        IntentionSettingsResponse intentionSettings = intentionSettingsService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }

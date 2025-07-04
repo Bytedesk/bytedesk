@@ -124,7 +124,7 @@ public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzReque
         deleteByUid(object.getUid());
     }
 
-    public QuartzResponse initVisitor(QuartzRequest quartzRequest) {
+    public QuartzResponse create(QuartzRequest quartzRequest) {
 
         if (existsByJobName(quartzRequest.getJobName())) {
             return null;

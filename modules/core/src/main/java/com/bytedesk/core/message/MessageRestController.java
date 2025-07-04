@@ -132,7 +132,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @Override
     public ResponseEntity<?> create(MessageRequest request) {
         
-        MessageResponse response = messageRestService.initVisitor(request);
+        MessageResponse response = messageRestService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }

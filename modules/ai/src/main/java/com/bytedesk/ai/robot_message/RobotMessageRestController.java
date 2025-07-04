@@ -58,7 +58,7 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
     @Override
     public ResponseEntity<?> create(RobotMessageRequest request) {
         
-        RobotMessageResponse response = robotMessageRestService.initVisitor(request);
+        RobotMessageResponse response = robotMessageRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

@@ -51,7 +51,7 @@ public class ServiceSettingsRestController extends BaseRestController<ServiceSet
     @Override
     public ResponseEntity<?> create(ServiceSettingsRequest request) {
         
-        ServiceSettingsResponse serviceSetting = serviceSettingService.initVisitor(request);
+        ServiceSettingsResponse serviceSetting = serviceSettingService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(serviceSetting));
     }

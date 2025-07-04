@@ -53,7 +53,7 @@ public class MenuRestController extends BaseRestController<MenuRequest> {
     @Override
     public ResponseEntity<?> create(MenuRequest request) {
         
-        MenuResponse menu = menuService.initVisitor(request);
+        MenuResponse menu = menuService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(menu));
     }

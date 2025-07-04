@@ -150,7 +150,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = threadRestService.initVisitor(request);
+        ThreadResponse thread = threadRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(thread));
     }

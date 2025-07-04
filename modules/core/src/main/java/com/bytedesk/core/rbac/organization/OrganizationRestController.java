@@ -72,7 +72,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
         //
-        OrganizationResponse response = organizationService.initVisitor(request);
+        OrganizationResponse response = organizationService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }

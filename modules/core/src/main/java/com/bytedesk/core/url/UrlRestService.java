@@ -72,7 +72,7 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     }
 
     @Override
-    public UrlResponse initVisitor(UrlRequest request) {
+    public UrlResponse create(UrlRequest request) {
         
         UrlEntity entity = modelMapper.map(request, UrlEntity.class);
         entity.setUid(uidUtils.getUid());

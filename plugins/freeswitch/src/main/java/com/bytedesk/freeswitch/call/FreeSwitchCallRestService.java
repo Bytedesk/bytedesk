@@ -53,7 +53,7 @@ public class FreeSwitchCallRestService extends BaseRestService<FreeSwitchCallEnt
     }
 
     @Override
-    public FreeSwitchCallResponse initVisitor(FreeSwitchCallRequest request) {
+    public FreeSwitchCallResponse create(FreeSwitchCallRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

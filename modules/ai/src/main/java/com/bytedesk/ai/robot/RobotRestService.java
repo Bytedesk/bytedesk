@@ -135,7 +135,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
 
     @Transactional
     @Override
-    public RobotResponse initVisitor(RobotRequest request) {
+    public RobotResponse create(RobotRequest request) {
         // 如果uid不为空，判断是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             throw new RuntimeException("robot " + request.getUid() + " already exists");
@@ -531,7 +531,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             }
         }
         //
-        return initVisitor(robotRequest);
+        return create(robotRequest);
     }
 
     // 创建一个空白智能体
@@ -582,7 +582,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
                             .type(CategoryTypeEnum.ROBOT.name())
                             .orgUid(orgUid)
                             .build();
-                    CategoryResponse categoryResponse = categoryService.initVisitor(categoryRequest);
+                    CategoryResponse categoryResponse = categoryService.create(categoryRequest);
                     if (categoryResponse != null) {
                         categoryUid = categoryResponse.getUid();
                     } else {

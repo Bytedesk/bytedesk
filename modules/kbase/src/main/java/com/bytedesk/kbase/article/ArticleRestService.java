@@ -99,7 +99,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
     }
 
     @Override
-    public ArticleResponse initVisitor(ArticleRequest request) {
+    public ArticleResponse create(ArticleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

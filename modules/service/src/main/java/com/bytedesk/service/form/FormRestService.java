@@ -77,7 +77,7 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     }
 
     @Override
-    public FormResponse initVisitor(FormRequest request) {
+    public FormResponse create(FormRequest request) {
         FormEntity entity = modelMapper.map(request, FormEntity.class);
         entity.setUid(uidUtils.getUid());
 

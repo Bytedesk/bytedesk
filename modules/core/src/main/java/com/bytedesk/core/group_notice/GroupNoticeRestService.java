@@ -70,7 +70,7 @@ public class GroupNoticeRestService extends BaseRestService<GroupNoticeEntity, G
     }
 
     @Override
-    public GroupNoticeResponse initVisitor(GroupNoticeRequest request) {
+    public GroupNoticeResponse create(GroupNoticeRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

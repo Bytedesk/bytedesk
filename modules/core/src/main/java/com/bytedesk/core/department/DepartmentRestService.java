@@ -81,7 +81,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return departmentRepository.existsByUid(uid);
     }
 
-    public DepartmentResponse initVisitor(DepartmentRequest request) {
+    public DepartmentResponse create(DepartmentRequest request) {
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

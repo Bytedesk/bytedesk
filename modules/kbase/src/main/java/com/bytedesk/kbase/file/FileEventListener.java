@@ -72,7 +72,7 @@ public class FileEventListener {
                 .orgUid(upload.getOrgUid())
                 .build();
             // 读取文件内容，写入到content字段，迁移到 ai 模块 SpringAIEventListener中读取
-            FileResponse fileResponse = fileRestService.initVisitor(fileRequest);
+            FileResponse fileResponse = fileRestService.create(fileRequest);
             // 
             bytedeskEventPublisher.publishEvent(new FileChunkEvent(documents, fileResponse));
         }

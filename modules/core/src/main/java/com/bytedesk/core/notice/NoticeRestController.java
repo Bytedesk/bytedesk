@@ -50,7 +50,7 @@ public class NoticeRestController extends BaseRestController<NoticeRequest> {
     @Override
     public ResponseEntity<?> create(NoticeRequest request) {
 
-        NoticeResponse notice = noticeRestService.initVisitor(request);
+        NoticeResponse notice = noticeRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(notice));
     }

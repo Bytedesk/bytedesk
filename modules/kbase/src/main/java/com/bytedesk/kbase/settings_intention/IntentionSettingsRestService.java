@@ -84,7 +84,7 @@ public class IntentionSettingsRestService extends BaseRestServiceWithExcel<Inten
     }
 
     @Override
-    public IntentionSettingsResponse initVisitor(IntentionSettingsRequest request) {
+    public IntentionSettingsResponse create(IntentionSettingsRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

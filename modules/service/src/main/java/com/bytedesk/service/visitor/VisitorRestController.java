@@ -85,7 +85,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest> {
     @Override
     public ResponseEntity<?> create(VisitorRequest request) {
         
-        VisitorResponse visitorResponse = visitorRestService.initVisitor(request);
+        VisitorResponse visitorResponse = visitorRestService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }

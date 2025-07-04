@@ -100,7 +100,7 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
 
     @Transactional
     @Override
-    public TagResponse initVisitor(TagRequest request) {
+    public TagResponse create(TagRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -214,7 +214,7 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            initVisitor(tagRequest);
+            create(tagRequest);
         }
     }
     

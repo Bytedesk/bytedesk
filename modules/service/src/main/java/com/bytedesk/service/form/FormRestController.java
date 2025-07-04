@@ -82,7 +82,7 @@ public class FormRestController extends BaseRestController<FormRequest> {
     @Override
     public ResponseEntity<?> create(FormRequest request) {
         
-        FormResponse form = formRestService.initVisitor(request);
+        FormResponse form = formRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(form));
     }

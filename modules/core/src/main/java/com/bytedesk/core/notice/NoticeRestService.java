@@ -70,7 +70,7 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
     }
 
     @Override
-    public NoticeResponse initVisitor(NoticeRequest request) {
+    public NoticeResponse create(NoticeRequest request) {
         NoticeEntity entity = modelMapper.map(request, NoticeEntity.class);
         entity.setUid(uidUtils.getUid());
         // 

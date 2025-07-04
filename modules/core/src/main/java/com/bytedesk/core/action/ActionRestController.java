@@ -60,7 +60,7 @@ public class ActionRestController extends BaseRestController<ActionRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody ActionRequest request) {
         
-        ActionResponse action = actionRestService.initVisitor(request);
+        ActionResponse action = actionRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(action));
     }

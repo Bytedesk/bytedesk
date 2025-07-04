@@ -86,7 +86,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @Override
     public ResponseEntity<?> create(WorkflowRequest request) {
         
-        WorkflowResponse workflow = workflowRestService.initVisitor(request);
+        WorkflowResponse workflow = workflowRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }

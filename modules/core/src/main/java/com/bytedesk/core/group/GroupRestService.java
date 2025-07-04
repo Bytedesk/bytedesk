@@ -159,7 +159,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
     }
 
     @Override
-    public GroupResponse initVisitor(GroupRequest request) {
+    public GroupResponse create(GroupRequest request) {
         UserEntity creator = authService.getUser();
         if (creator == null) {
             throw new RuntimeException("group creator is null");

@@ -92,7 +92,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
 
-        RobotResponse robot = robotRestService.initVisitor(request);
+        RobotResponse robot = robotRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(robot));
     }

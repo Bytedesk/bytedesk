@@ -119,7 +119,7 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
     }
 
     @Override
-    public MessageResponse initVisitor(MessageRequest request) {
+    public MessageResponse create(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

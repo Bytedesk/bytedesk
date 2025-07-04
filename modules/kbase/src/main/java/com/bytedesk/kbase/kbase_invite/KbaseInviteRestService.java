@@ -70,7 +70,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     }
 
     @Override
-    public KbaseInviteResponse initVisitor(KbaseInviteRequest request) {
+    public KbaseInviteResponse create(KbaseInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

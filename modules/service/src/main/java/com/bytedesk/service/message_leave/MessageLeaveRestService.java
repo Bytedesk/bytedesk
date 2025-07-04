@@ -98,7 +98,7 @@ public class MessageLeaveRestService extends
     }
 
     @Override
-    public MessageLeaveResponse initVisitor(MessageLeaveRequest request) {
+    public MessageLeaveResponse create(MessageLeaveRequest request) {
         log.info("request {}", request);
 
         MessageLeaveEntity messageLeave = modelMapper.map(request, MessageLeaveEntity.class);

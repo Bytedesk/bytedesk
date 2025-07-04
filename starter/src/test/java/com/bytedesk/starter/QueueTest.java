@@ -67,7 +67,7 @@ public class QueueTest {
         }
 
         // Mock visitorService的响应
-        when(visitorRestService.initVisitor(any())).thenAnswer(invocation -> {
+        when(visitorRestService.create(any())).thenAnswer(invocation -> {
             int index = (int)(Math.random() * VISITOR_COUNT);
             return visitors.get(index);
         });
@@ -130,7 +130,7 @@ public class QueueTest {
         executor.shutdown();
 
         // 验证调用次数
-        verify(visitorRestService, times(VISITOR_COUNT)).initVisitor(any());
+        verify(visitorRestService, times(VISITOR_COUNT)).create(any());
         verify(visitorRestService, times(VISITOR_COUNT * REQUEST_PER_VISITOR)).requestThread(any());
     }
 
@@ -192,7 +192,7 @@ public class QueueTest {
         executor.shutdown();
 
         // 验证调用次数
-        verify(visitorRestService, times(concurrentVisitors)).initVisitor(any());
+        verify(visitorRestService, times(concurrentVisitors)).create(any());
         verify(visitorRestService, times(concurrentVisitors * concurrentRequests)).requestThread(any());
     }
 } 

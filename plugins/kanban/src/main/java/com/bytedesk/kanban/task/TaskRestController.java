@@ -53,7 +53,7 @@ public class TaskRestController extends BaseRestController<TaskRequest> {
     @Override
     public ResponseEntity<?> create(TaskRequest request) {
         
-        TaskResponse task = taskService.initVisitor(request);
+        TaskResponse task = taskService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(task));
     }

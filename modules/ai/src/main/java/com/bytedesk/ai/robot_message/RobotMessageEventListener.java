@@ -40,7 +40,7 @@ public class RobotMessageEventListener {
         }
         messageJsonList.forEach(item -> {
             RobotMessageRequest request = JSON.parseObject(item, RobotMessageRequest.class);
-            robotMessageRestService.initVisitor(request);
+            robotMessageRestService.create(request);
         });
     }
     

@@ -63,7 +63,7 @@ public class RoleInitializer {
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();
-        roleService.initVisitor(roleRequest);
+        roleService.create(roleRequest);
     }
     private void createAdmin() {
         RoleRequest roleRequest = RoleRequest.builder()
@@ -73,7 +73,7 @@ public class RoleInitializer {
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();
-        roleService.initVisitor(roleRequest);
+        roleService.create(roleRequest);
     }
 
     private void createMember() {
@@ -84,7 +84,7 @@ public class RoleInitializer {
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();
-        roleService.initVisitor(roleRequest);
+        roleService.create(roleRequest);
     }
 
     private void createAgent() {
@@ -95,7 +95,7 @@ public class RoleInitializer {
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();
-        roleService.initVisitor(roleRequest);
+        roleService.create(roleRequest);
     }
 
     // createUser
@@ -107,7 +107,7 @@ public class RoleInitializer {
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();
-        roleService.initVisitor(roleRequest);
+        roleService.create(roleRequest);
     }
 
     // create visitor

@@ -74,7 +74,7 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
     }
 
     @Override
-    public TodoListResponse initVisitor(TodoListRequest request) {
+    public TodoListResponse create(TodoListRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

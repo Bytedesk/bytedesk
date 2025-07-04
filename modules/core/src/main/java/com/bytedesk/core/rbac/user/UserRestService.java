@@ -78,7 +78,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
     }
 
     @Override
-    public UserResponse initVisitor(UserRequest request) {
+    public UserResponse create(UserRequest request) {
         return userService.register(request);
     }
 

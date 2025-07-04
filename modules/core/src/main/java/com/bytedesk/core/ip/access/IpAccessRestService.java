@@ -104,7 +104,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     @Transactional
     @Override
-    public IpAccessResponse initVisitor(IpAccessRequest request) {
+    public IpAccessResponse create(IpAccessRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

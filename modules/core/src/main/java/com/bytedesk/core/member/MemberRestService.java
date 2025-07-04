@@ -130,7 +130,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
     }
 
     @Transactional
-    public MemberResponse initVisitor(MemberRequest request) {
+    public MemberResponse create(MemberRequest request) {
         // 判断uid是否已存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -380,7 +380,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
                     .description("Description for " + excel.getDepartmentName())
                     .orgUid(orgUid)
                     .build();
-            departmentRestService.initVisitor(departmentRequest);
+            departmentRestService.create(departmentRequest);
             member.setDeptUid(departmentRequest.getUid());
         }
         // 生成user

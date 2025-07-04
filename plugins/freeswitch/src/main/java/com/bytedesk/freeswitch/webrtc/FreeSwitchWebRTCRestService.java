@@ -84,7 +84,7 @@ public class FreeSwitchWebRTCRestService extends BaseRestServiceWithExcel<FreeSw
     }
 
     @Override
-    public FreeSwitchWebRTCResponse initVisitor(FreeSwitchWebRTCRequest request) {
+    public FreeSwitchWebRTCResponse create(FreeSwitchWebRTCRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

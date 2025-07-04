@@ -65,7 +65,7 @@ public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRe
         return channelRepository.existsByUid(uid);
     }
 
-    public ChannelResponse initVisitor(ChannelRequest request) {
+    public ChannelResponse create(ChannelRequest request) {
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

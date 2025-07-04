@@ -146,7 +146,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     }
 
     @Override
-    public QueueMemberResponse initVisitor(QueueMemberRequest request) {
+    public QueueMemberResponse create(QueueMemberRequest request) {
         QueueMemberEntity counter = modelMapper.map(request, QueueMemberEntity.class);
         counter.setUid(uidUtils.getUid());
         

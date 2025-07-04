@@ -53,7 +53,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
     @Override
     public ResponseEntity<?> create(RatedownSettingsRequest request) {
         
-        RatedownSettingsResponse ratedownSetting = ratedownSettingService.initVisitor(request);
+        RatedownSettingsResponse ratedownSetting = ratedownSettingService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(ratedownSetting));
     }

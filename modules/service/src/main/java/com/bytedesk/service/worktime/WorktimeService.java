@@ -52,7 +52,7 @@ public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeReq
     }
 
     @Override
-    public WorktimeResponse initVisitor(WorktimeRequest request) {
+    public WorktimeResponse create(WorktimeRequest request) {
 
         // Worktime worktime = modelMapper.map(request, Worktime.class);
         WorktimeEntity worktime = WorktimeEntity.builder()
@@ -146,7 +146,7 @@ public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeReq
                 .endTime("23:59:59")
                 .build();
 
-        WorktimeResponse worktimeResponse = initVisitor(worktimeRequest);
+        WorktimeResponse worktimeResponse = create(worktimeRequest);
 
         return worktimeResponse.getUid();
     }

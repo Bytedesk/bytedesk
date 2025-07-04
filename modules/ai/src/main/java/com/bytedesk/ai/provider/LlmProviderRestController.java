@@ -85,7 +85,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
     @Override
     public ResponseEntity<?> create(LlmProviderRequest request) {
         
-        LlmProviderResponse response = llmProviderRestService.initVisitor(request);
+        LlmProviderResponse response = llmProviderRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

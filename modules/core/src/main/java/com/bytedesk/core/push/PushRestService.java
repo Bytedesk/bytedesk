@@ -150,7 +150,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         //     pushRequest.setUserUid(authRequest.getUserUid());
         // }
         // pushRequest.setOrgUid(orgUid);
-        initVisitor(pushRequest);
+        create(pushRequest);
 
         // 更新IP最后发送验证码的时间
         pushFilterService.updateIpLastSentTime(ip);
@@ -237,7 +237,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         return convertToResponse(savedPush);
     }
 
-    public PushResponse initVisitor(PushRequest pushRequest) {
+    public PushResponse create(PushRequest pushRequest) {
         log.info("pushRequest {}", pushRequest.toString());
 
         PushEntity push = modelMapper.map(pushRequest, PushEntity.class);

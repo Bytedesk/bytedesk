@@ -52,7 +52,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
     @Override
     public ResponseEntity<?> create(TabooMessageRequest request) {
         
-        TabooMessageResponse tabooMessage = tabooMessageService.initVisitor(request);
+        TabooMessageResponse tabooMessage = tabooMessageService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tabooMessage));
     }

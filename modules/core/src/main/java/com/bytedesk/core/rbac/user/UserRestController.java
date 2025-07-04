@@ -68,7 +68,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
     @Override
     public ResponseEntity<?> create(UserRequest request) {
         
-        UserResponse userResponse = userRestService.initVisitor(request);
+        UserResponse userResponse = userRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }

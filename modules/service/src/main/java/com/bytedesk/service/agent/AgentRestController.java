@@ -142,7 +142,7 @@ public class AgentRestController extends BaseRestController<AgentRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentRestService.initVisitor(request);
+        AgentResponse agent = agentRestService.create(request);
         if (agent == null) {
             return ResponseEntity.ok(JsonResult.error("create agent failed"));
         }

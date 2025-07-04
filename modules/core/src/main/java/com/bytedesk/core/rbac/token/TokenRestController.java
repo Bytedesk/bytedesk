@@ -60,7 +60,7 @@ public class TokenRestController extends BaseRestController<TokenRequest> {
     @Override
     public ResponseEntity<?> create(TokenRequest request) {
         
-        TokenResponse response = tokenRestService.initVisitor(request);
+        TokenResponse response = tokenRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

@@ -56,7 +56,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
     @Override
     public ResponseEntity<?> create(IpBlacklistRequest request) {
 
-        IpBlacklistResponse response = ipBlacklistRestService.initVisitor(request);
+        IpBlacklistResponse response = ipBlacklistRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

@@ -72,7 +72,7 @@ public class FreeSwitchCallRestController extends BaseRestController<FreeSwitchC
     @Override
     public ResponseEntity<?> create(FreeSwitchCallRequest request) {
         
-        FreeSwitchCallResponse entity = callRestService.initVisitor(request);
+        FreeSwitchCallResponse entity = callRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(entity));
     }

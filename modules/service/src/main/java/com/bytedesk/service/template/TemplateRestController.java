@@ -67,7 +67,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(TemplateRequest request) {
         
-        TemplateResponse template = templateRestService.initVisitor(request);
+        TemplateResponse template = templateRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(template));
     }

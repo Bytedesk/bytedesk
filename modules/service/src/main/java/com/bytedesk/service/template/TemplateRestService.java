@@ -88,7 +88,7 @@ public class TemplateRestService extends BaseRestServiceWithExcel<TemplateEntity
     }
 
     @Override
-    public TemplateResponse initVisitor(TemplateRequest request) {
+    public TemplateResponse create(TemplateRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -193,7 +193,7 @@ public class TemplateRestService extends BaseRestServiceWithExcel<TemplateEntity
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            initVisitor(templateRequest);
+            create(templateRequest);
         }
     }
     

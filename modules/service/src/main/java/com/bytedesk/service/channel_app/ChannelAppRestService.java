@@ -84,7 +84,7 @@ public class ChannelAppRestService extends BaseRestServiceWithExcel<ChannelAppEn
     }
 
     @Override
-    public ChannelAppResponse initVisitor(ChannelAppRequest request) {
+    public ChannelAppResponse create(ChannelAppRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

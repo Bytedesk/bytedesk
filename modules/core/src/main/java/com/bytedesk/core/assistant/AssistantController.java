@@ -59,7 +59,7 @@ public class AssistantController extends BaseRestController<AssistantRequest> {
     @Override
     public ResponseEntity<?> create(AssistantRequest request) {
         
-        AssistantResponse assistantResponse = assistantService.initVisitor(request);
+        AssistantResponse assistantResponse = assistantService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }

@@ -53,7 +53,7 @@ public class ProjectInviteRestController extends BaseRestController<ProjectInvit
     @Override
     public ResponseEntity<?> create(ProjectInviteRequest request) {
         
-        ProjectInviteResponse project_invite = project_inviteService.initVisitor(request);
+        ProjectInviteResponse project_invite = project_inviteService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(project_invite));
     }

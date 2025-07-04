@@ -69,7 +69,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     @Override
     public ResponseEntity<?> create(ChunkRequest request) {
         
-        ChunkResponse chunk = chunkRestService.initVisitor(request);
+        ChunkResponse chunk = chunkRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(chunk));
     }

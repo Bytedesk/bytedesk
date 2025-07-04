@@ -109,7 +109,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
     }
 
     @Override
-    public QuickReplyResponse initVisitor(QuickReplyRequest request) {
+    public QuickReplyResponse create(QuickReplyRequest request) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(request.getUid()) && findByUid(request.getUid()).isPresent()) {
             return null;
@@ -279,7 +279,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         categoryContact.setUid(quickReplyCategoryContactUid);
         // 此处设置orgUid方便超级管理员加载
         categoryContact.setOrgUid(orgUid);
-        categoryRestService.initVisitor(categoryContact);
+        categoryRestService.create(categoryContact);
 
         // 快捷回复-感谢
         String quickReplyCategoryThanksUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS);
@@ -294,7 +294,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         categoryThanks.setUid(quickReplyCategoryThanksUid);
         // 此处设置orgUid方便超级管理员加载
         categoryThanks.setOrgUid(orgUid);
-        categoryRestService.initVisitor(categoryThanks);
+        categoryRestService.create(categoryThanks);
 
         // 快捷回复-问候
         String quickReplyCategoryWelcomeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME);
@@ -309,7 +309,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         categoryWelcome.setUid(quickReplyCategoryWelcomeUid);
         // 此处设置orgUid方便超级管理员加载
         categoryWelcome.setOrgUid(orgUid);
-        categoryRestService.initVisitor(categoryWelcome);
+        categoryRestService.create(categoryWelcome);
 
         // 快捷回复-告别
         String quickReplyCategoryByeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE);
@@ -324,7 +324,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
         categoryBye.setUid(quickReplyCategoryByeUid);
         // 此处设置orgUid方便超级管理员加载
         categoryBye.setOrgUid(orgUid);
-        categoryRestService.initVisitor(categoryBye);
+        categoryRestService.create(categoryBye);
     }
 
     public void initQuickReply(String orgUid) {
@@ -345,7 +345,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
-            initVisitor(quickReplyRequest);
+            create(quickReplyRequest);
         }
         //
         String quickReplyCategoryThanksUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_THANKS);
@@ -363,7 +363,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
-            initVisitor(quickReplyRequest);
+            create(quickReplyRequest);
         }
         //
         String quickReplyCategoryWelcomeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_WELCOME);
@@ -381,7 +381,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
-            initVisitor(quickReplyRequest);
+            create(quickReplyRequest);
         }
 
         String quickReplyCategoryByeUid = Utils.formatUid(orgUid, I18Consts.I18N_QUICK_REPLY_CATEGORY_BYE);
@@ -399,7 +399,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
             quickReplyRequest.setType(MessageTypeEnum.TEXT.name());
             // 此处设置orgUid方便超级管理员加载
             quickReplyRequest.setOrgUid(orgUid);
-            initVisitor(quickReplyRequest);
+            create(quickReplyRequest);
         }
     }
 
@@ -426,7 +426,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
             categoryRequest.setType(CategoryTypeEnum.QUICKREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             //
-            CategoryResponse categoryResponse = categoryRestService.initVisitor(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
             quickReply.setCategoryUid(categoryResponse.getUid());
         }
 

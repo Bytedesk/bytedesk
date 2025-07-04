@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:13:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-16 13:57:18
+ * @LastEditTime: 2025-07-04 13:25:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ public abstract class BaseRestService<T, TRequest, TResponse> {
 
     abstract public Optional<T> findByUid(String uid);
 
-    abstract public TResponse initVisitor(TRequest request);
+    abstract public TResponse create(TRequest request);
 
     abstract public TResponse update(TRequest request);
 

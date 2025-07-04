@@ -61,7 +61,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @Override
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
-        MessageLeaveResponse response = messageLeaveRestService.initVisitor(request);
+        MessageLeaveResponse response = messageLeaveRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

@@ -75,7 +75,7 @@ public class FileRestController extends BaseRestController<FileRequest> {
     @Override
     public ResponseEntity<?> create(FileRequest request) {
         
-        FileResponse file = fileRestService.initVisitor(request);
+        FileResponse file = fileRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(file));
     }

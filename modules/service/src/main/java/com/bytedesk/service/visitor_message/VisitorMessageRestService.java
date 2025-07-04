@@ -58,7 +58,7 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
     }
 
     @Override
-    public MessageResponse initVisitor(MessageRequest request) {
+    public MessageResponse create(MessageRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

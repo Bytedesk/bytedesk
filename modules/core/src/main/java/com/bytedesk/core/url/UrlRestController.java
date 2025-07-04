@@ -50,7 +50,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
     @Override
     public ResponseEntity<?> create(UrlRequest request) {
         
-        UrlResponse url = urlService.initVisitor(request);
+        UrlResponse url = urlService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(url));
     }

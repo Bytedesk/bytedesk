@@ -73,7 +73,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     }
 
     @Override
-    public TokenResponse initVisitor(TokenRequest request) {
+    public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
         entity.setUid(uidUtils.getUid());
         //

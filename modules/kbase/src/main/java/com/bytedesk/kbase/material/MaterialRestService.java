@@ -88,7 +88,7 @@ public class MaterialRestService extends BaseRestServiceWithExcel<MaterialEntity
     }
 
     @Override
-    public MaterialResponse initVisitor(MaterialRequest request) {
+    public MaterialResponse create(MaterialRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -193,7 +193,7 @@ public class MaterialRestService extends BaseRestServiceWithExcel<MaterialEntity
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            initVisitor(materialRequest);
+            create(materialRequest);
         }
     }
     

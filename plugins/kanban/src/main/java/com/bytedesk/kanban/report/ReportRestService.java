@@ -69,7 +69,7 @@ public class ReportRestService extends BaseRestService<ReportEntity, ReportReque
     }
 
     @Override
-    public ReportResponse initVisitor(ReportRequest request) {
+    public ReportResponse create(ReportRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

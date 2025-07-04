@@ -67,7 +67,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(WorktimeSettingRequest request) {
         
-        WorktimeSettingResponse tag = tagService.initVisitor(request);
+        WorktimeSettingResponse tag = tagService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }

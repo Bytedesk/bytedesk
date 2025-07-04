@@ -133,7 +133,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
 
     @Transactional
     @Override
-    public TicketResponse initVisitor(TicketRequest request) {
+    public TicketResponse create(TicketRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
             throw new RuntimeException("user not found");
@@ -438,7 +438,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            categoryService.initVisitor(categoryRequest);
+            categoryService.create(categoryRequest);
         }
     }
 

@@ -114,7 +114,7 @@ public class ThreadRestService
         return Optional.empty();
     }
 
-    public ThreadResponse initVisitor(ThreadRequest request) {
+    public ThreadResponse create(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         //
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);

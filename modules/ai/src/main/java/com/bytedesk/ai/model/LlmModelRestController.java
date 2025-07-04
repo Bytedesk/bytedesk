@@ -81,7 +81,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest> 
     @Override
     public ResponseEntity<?> create(LlmModelRequest request) {
         
-        LlmModelResponse result = llmModelRestService.initVisitor(request);
+        LlmModelResponse result = llmModelRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(result));
     }

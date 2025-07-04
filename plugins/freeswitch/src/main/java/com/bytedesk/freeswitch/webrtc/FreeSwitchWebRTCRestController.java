@@ -67,7 +67,7 @@ public class FreeSwitchWebRTCRestController extends BaseRestController<FreeSwitc
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(FreeSwitchWebRTCRequest request) {
         
-        FreeSwitchWebRTCResponse webrtc = freeswitchWebRTCRestService.initVisitor(request);
+        FreeSwitchWebRTCResponse webrtc = freeswitchWebRTCRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(webrtc));
     }

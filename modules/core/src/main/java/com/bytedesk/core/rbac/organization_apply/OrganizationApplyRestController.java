@@ -66,7 +66,7 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
     // @PreAuthorize("hasAuthority('organizationApply_CREATE')")
     public ResponseEntity<?> create(OrganizationApplyRequest request) {
         
-        OrganizationApplyResponse organizationApply = organizationRestService.initVisitor(request);
+        OrganizationApplyResponse organizationApply = organizationRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(organizationApply));
     }

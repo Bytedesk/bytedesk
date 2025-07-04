@@ -68,7 +68,7 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     }
 
     @Override
-    public CommentResponse initVisitor(CommentRequest request) {
+    public CommentResponse create(CommentRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

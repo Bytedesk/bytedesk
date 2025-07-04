@@ -53,7 +53,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest> {
     @Override
     public ResponseEntity<?> create(WebpageRequest request) {
         
-        WebpageResponse webpage = webpageRestService.initVisitor(request);
+        WebpageResponse webpage = webpageRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(webpage));
     }

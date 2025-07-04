@@ -74,7 +74,7 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
     }
 
     @Override
-    public IpWhitelistResponse initVisitor(IpWhitelistRequest request) {
+    public IpWhitelistResponse create(IpWhitelistRequest request) {
         Optional<IpWhitelistEntity> ipWhitelist = findByIp(request.getIp());
         if (ipWhitelist.isPresent()) {
             throw new RuntimeException("ipWhitelist is present");

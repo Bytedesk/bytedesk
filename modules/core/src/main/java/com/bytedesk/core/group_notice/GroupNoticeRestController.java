@@ -51,7 +51,7 @@ public class GroupNoticeRestController extends BaseRestController<GroupNoticeReq
     @Override
     public ResponseEntity<?> create(GroupNoticeRequest request) {
         
-        GroupNoticeResponse group_notice = groupNoticeService.initVisitor(request);
+        GroupNoticeResponse group_notice = groupNoticeService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(group_notice));
     }

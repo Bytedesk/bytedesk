@@ -92,7 +92,7 @@ public class FreeSwitchCdrRestService extends BaseRestServiceWithExcel<FreeSwitc
     }
 
     @Override
-    public FreeSwitchCdrResponse initVisitor(FreeSwitchCdrRequest request) {
+    public FreeSwitchCdrResponse create(FreeSwitchCdrRequest request) {
 
         UserEntity user = authService.getUser();
         if (!StringUtils.hasText(request.getOrgUid())) {

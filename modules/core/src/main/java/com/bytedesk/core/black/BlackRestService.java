@@ -117,7 +117,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     }
 
     @Override
-    public BlackResponse initVisitor(BlackRequest request) {
+    public BlackResponse create(BlackRequest request) {
         // 判断是否已经存在黑名单用户uid
         Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
         if (black.isPresent()) {

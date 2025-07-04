@@ -51,7 +51,7 @@ public class QuartzInitializer {
                 .triggerState("started")
                 .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
                 .build();
-                quartzRestService.initVisitor(quartzRequest);
+                quartzRestService.create(quartzRequest);
         
     }
     

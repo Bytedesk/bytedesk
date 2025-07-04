@@ -114,7 +114,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
 	@Override
-	public UploadResponse initVisitor(UploadRequest request) {
+	public UploadResponse create(UploadRequest request) {
 		UploadEntity upload = modelMapper.map(request, UploadEntity.class);
 		upload.setUid(uidUtils.getUid());
 		//
@@ -526,7 +526,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		request.setType(request.getKbType());
 		request.setUser(userProtobuf.toJson());
 		// 
-		return initVisitor(request);
+		return create(request);
 	}
 
 	

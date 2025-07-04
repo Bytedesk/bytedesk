@@ -90,7 +90,7 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @Override
     public ResponseEntity<?> create(QueueMemberRequest request) {
         
-        QueueMemberResponse response = queueMemberRestService.initVisitor(request);
+        QueueMemberResponse response = queueMemberRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

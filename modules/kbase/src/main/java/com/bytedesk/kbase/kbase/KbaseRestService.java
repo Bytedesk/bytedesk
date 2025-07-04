@@ -103,7 +103,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     }
 
     @Override
-    public KbaseResponse initVisitor(KbaseRequest request) {
+    public KbaseResponse create(KbaseRequest request) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -281,7 +281,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestHelpdoc);
+        create(kownledgebaseRequestHelpdoc);
 
         // 初始化内部知识库 NOTEBASE
         KbaseRequest kownledgebaseRequestNotebase = KbaseRequest.builder()
@@ -292,7 +292,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestNotebase);
+        create(kownledgebaseRequestNotebase);
 
         // 初始化LLM知识库
         KbaseRequest kownledgebaseRequestLlm = KbaseRequest.builder()
@@ -303,7 +303,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestLlm);
+        create(kownledgebaseRequestLlm);
 
         // 初始化关键词知识库
         KbaseRequest kownledgebaseRequestKeyword = KbaseRequest.builder()
@@ -314,7 +314,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestKeyword);
+        create(kownledgebaseRequestKeyword);
 
         // 初始化自动回复知识库
         KbaseRequest kownledgebaseRequestAutoReply = KbaseRequest.builder()
@@ -325,7 +325,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestAutoReply);
+        create(kownledgebaseRequestAutoReply);
 
         // 初始化快捷回复知识库
         KbaseRequest kownledgebaseRequestQuickReply = KbaseRequest.builder()
@@ -336,7 +336,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestQuickReply);
+        create(kownledgebaseRequestQuickReply);
 
         // 初始化敏感词/屏蔽词知识库
         KbaseRequest kownledgebaseRequestTaboo = KbaseRequest.builder()
@@ -347,7 +347,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        initVisitor(kownledgebaseRequestTaboo);
+        create(kownledgebaseRequestTaboo);
     }
 
     public LlmProviderConfigDefault getLlmProviderConfigDefault() {

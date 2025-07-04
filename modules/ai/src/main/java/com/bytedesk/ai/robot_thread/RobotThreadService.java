@@ -67,7 +67,7 @@ public class RobotThreadService extends BaseRestService<RobotThreadEntity, Robot
     }
 
     @Override
-    public RobotThreadResponse initVisitor(RobotThreadRequest request) {
+    public RobotThreadResponse create(RobotThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
