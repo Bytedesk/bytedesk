@@ -29,7 +29,6 @@ declare interface ButtonConfig {
 
 declare interface BytedeskConfig {
     isDebug?: boolean;
-    isPreload?: boolean;
     forceRefresh?: boolean;
     baseUrl?: string;
     apiUrl?: string;

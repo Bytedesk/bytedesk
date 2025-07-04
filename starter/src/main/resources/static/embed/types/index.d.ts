@@ -29,7 +29,6 @@ declare interface ButtonConfig {
 
 export declare interface BytedeskConfig {
     isDebug?: boolean;
-    isPreload?: boolean;
     forceRefresh?: boolean;
     baseUrl?: string;
     apiUrl?: string;
@@ -78,9 +77,14 @@ declare class BytedeskWeb {
     private getDefaultConfig;
     init(): Promise<void>;
     _initVisitor(): Promise<any>;
+    private _browseVisitor;
+    private getBrowserInfo;
+    private getOSInfo;
+    private getDeviceInfo;
     _getUnreadMessageCount(): Promise<any>;
     getUnreadMessageCount(): Promise<any>;
     initVisitor(): Promise<any>;
+    browseVisitor(): Promise<void>;
     clearVisitorInfo(): void;
     forceInitVisitor(): Promise<any>;
     private showUnreadBadge;
@@ -93,7 +97,6 @@ declare class BytedeskWeb {
     private setupMessageListener;
     private handleLocalStorageData;
     sendMessageToIframe(message: any): void;
-    preload(): void;
     showChat(config?: Partial<BytedeskConfig>): void;
     hideChat(): void;
     private minimizeWindow;
