@@ -61,6 +61,11 @@ public class BdDateUtils {
         if (zonedDateTime == null) {
             return null;
         }
+        // 如果已经是 Asia/Shanghai 时区，直接格式化
+        if (zonedDateTime.getZone().equals(getDisplayZoneId())) {
+            return DateTimeFormatter.ofPattern(datetimeFormat).format(zonedDateTime);
+        }
+        // 否则转换为 Asia/Shanghai 时区
         ZonedDateTime chinaTime = zonedDateTime.toInstant().atZone(getDisplayZoneId());
         return DateTimeFormatter.ofPattern(datetimeFormat).format(chinaTime);
     }
