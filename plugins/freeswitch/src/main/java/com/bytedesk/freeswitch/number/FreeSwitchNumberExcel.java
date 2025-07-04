@@ -57,17 +57,17 @@ public class FreeSwitchNumberExcel {
     private Integer sipPort;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "最后注册时间")
+    @ExcelProperty(value = "最后注册时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime lastRegister;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "创建时间")
+    @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime createdAt;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "修改时间")
+    @ExcelProperty(value = "修改时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime updatedAt;
 

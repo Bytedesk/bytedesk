@@ -70,7 +70,7 @@ public class ChunkExcel {
     private String kbaseName;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "创建时间")
+    @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime createdAt;
 }
