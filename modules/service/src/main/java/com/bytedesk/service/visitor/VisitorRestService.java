@@ -72,10 +72,10 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     // @Override
     public VisitorResponse queryByUid(VisitorRequest request) {
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
-        if (!visitorOptional.isPresent()) {
+        if (visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }
-        return convertToResponsinitVisitor(visitorOptional.get());
+        return convertToResponse(visitorOptional.get());
     }
 
     @Transactional
