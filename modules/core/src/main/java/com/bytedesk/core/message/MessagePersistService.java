@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 13:14:51
+ * @LastEditTime: 2025-07-04 11:14:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,6 +75,7 @@ public class MessagePersistService {
         if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
         }
+        log.info("message content: {}, createdAt: {}, messageProtobuf createdAt: {}", message.getContent(), message.getCreatedAt(), messageProtobuf.getCreatedAt());
         Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
         if (threadOpt.isPresent()) {
             ThreadEntity thread = threadOpt.get();

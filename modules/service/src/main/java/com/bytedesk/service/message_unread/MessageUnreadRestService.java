@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-27 16:21:35
+ * @LastEditTime: 2025-07-04 11:12:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,6 +83,7 @@ public class MessageUnreadRestService
         return messageUnreadRepository.existsByUid(uid);
     }
 
+    @Transactional
     @Override
     public MessageUnreadResponse create(MessageUnreadRequest request) {
         // 检查uid是否存在
@@ -92,9 +93,13 @@ public class MessageUnreadRestService
         // 
         MessageUnreadEntity messageUnread = modelMapper.map(request, MessageUnreadEntity.class);
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
+        if (savedMessageUnread == null) {
+            throw new RuntimeException("Failed to save MessageUnreadEntity");
+        }
         return convertToResponse(savedMessageUnread);
     }
 
+    @Transactional
     @Override
     public MessageUnreadResponse update(MessageUnreadRequest request) {
         Optional<MessageUnreadEntity> messageUnreadEntityOptional = findByUid(request.getUid());
@@ -102,7 +107,12 @@ public class MessageUnreadRestService
             MessageUnreadEntity messageUnread = messageUnreadEntityOptional.get();
             // messageUnread.setStatus(request.getStatus());
             // messageUnread.setExtra(request.getExtra());
-            return convertToResponse(save(messageUnread));
+
+            MessageUnreadEntity savedMessageUnread = save(messageUnread);
+            if (savedMessageUnread == null) {
+                throw new RuntimeException("Failed to save MessageUnreadEntity");
+            }
+            return convertToResponse(savedMessageUnread);
         } 
         return null;
     }
@@ -145,6 +155,9 @@ public class MessageUnreadRestService
             messageUnread.setOrgUid(orgUid);
         }
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
+        if (savedMessageUnread == null) {
+            throw new RuntimeException("Failed to save MessageUnreadEntity");
+        }
         log.info("create message unread: uid {}, content {}", savedMessageUnread.getContent());
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 09:49:45
+ * @LastEditTime: 2025-07-04 11:09:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,28 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageUnreadEventListener {
 
     private final MessageUnreadRestService messageUnreadRestService;
-
-    // @EventListener
-    // public void onMessageCreateEvent(MessageCreateEvent event) {
-    //     try {
-    //         MessageEntity message = event.getMessage();
-    //         if (MessageTypeEnum.STREAM.name().equalsIgnoreCase(message.getType()) ||
-    //                 MessageTypeEnum.NOTICE.name().equalsIgnoreCase(message.getType()) ||
-    //                 MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
-    //             return;
-    //         }
-    //         if (ClientEnum.SYSTEM.name().equalsIgnoreCase(message.getClient())) {
-    //             return;
-    //         }
-    //         log.info("message unread create event: {} {} {}", message.getUid(), message.getType(),
-    //                 message.getContent());
-    //         // 缓存未读消息
-    //         messageUnreadRestService.create(message);
-    //     } catch (Exception e) {
-    //         log.error("Error processing message create event for message {}: {}",
-    //                 event.getMessage() != null ? event.getMessage().getUid() : "unknown", e.getMessage(), e);
-    //     }
-    // }
 
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
