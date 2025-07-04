@@ -14,6 +14,7 @@
 package com.bytedesk.core.config;
 
 import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
@@ -31,11 +32,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class JpaAuditingConfig {
 
     /**
-     * 配置日期时间提供者，使用ZonedDateTime
+     * 配置日期时间提供者，使用ZonedDateTime，指定Asia/Shanghai时区
      */
     @Bean
     public DateTimeProvider dateTimeProvider() {
-        return () -> Optional.of(ZonedDateTime.now());
+        return () -> Optional.of(ZonedDateTime.now(ZoneId.of("Asia/Shanghai")));
     }
 
     /**
