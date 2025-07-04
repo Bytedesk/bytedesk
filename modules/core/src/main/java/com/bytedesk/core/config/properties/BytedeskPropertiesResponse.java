@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 11:05:24
+ * @LastEditTime: 2025-07-04 18:11:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ public class BytedeskPropertiesResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Boolean debug;
-    // private String edition;
     private String version; 
     private String appkey; // 注意：这是加密后的appkey，前端需要先解密再解码
 
