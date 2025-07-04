@@ -69,7 +69,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return queryByOrg(request);
     }
 
-    // @Override
+    @Override
     public VisitorResponse queryByUid(VisitorRequest request) {
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
         if (visitorOptional.isPresent()) {
@@ -146,6 +146,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return convertToResponse(savedVisitor);
     }
 
+    @Transactional
     @Override
     public VisitorResponse update(VisitorRequest request) {
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
@@ -169,6 +170,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return convertToResponse(savedVisitor);
     }
 
+    @Transactional
     public VisitorResponse updateTagList(VisitorRequest request) {
         // 
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
@@ -199,6 +201,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return visitorRepository.findByUidAndDeleted(uid, false);
     }
 
+    @Transactional
     @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
     public Optional<VisitorEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
         // 如果参数为空，则返回空
