@@ -15,6 +15,7 @@ package com.bytedesk.core.ip.access;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,16 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @Entity
-@Table(name = "bytedesk_core_ip_access")
+@Table(
+    name = "bytedesk_core_ip_access",
+    indexes = {
+        @Index(name = "idx_ip_access_uid", columnList = "uuid"),
+        @Index(name = "idx_ip_access_ip", columnList = "ip"),
+        @Index(name = "idx_ip_access_endpoint", columnList = "endpoint"),
+        @Index(name = "idx_ip_access_time", columnList = "access_time"),
+        @Index(name = "idx_ip_access_ip_endpoint_time", columnList = "ip, endpoint, access_time")
+    }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 public class IpAccessEntity extends BaseEntity {

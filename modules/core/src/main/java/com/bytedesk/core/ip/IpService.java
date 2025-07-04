@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:18:47
+ * @LastEditTime: 2025-07-04 12:49:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,10 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class IpService {
-
-    // private final IpRepository ipRepository;
-
-    // private final ModelMapper modelMapper;
 
     private final Searcher searcher;
 

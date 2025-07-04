@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:18:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:19:03
+ * @LastEditTime: 2025-07-04 12:48:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
 
     @Override
     public Page<IpWhitelistResponse> queryByOrg(IpWhitelistRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC, "id");
+        Pageable pageable = request.getPageable();
         Specification<IpWhitelistEntity> spec = IpWhitelistSpecification.search(request);
         Page<IpWhitelistEntity> ipWhitelistPage = ipWhitelistRepository.findAll(spec, pageable);
         return ipWhitelistPage.map(this::convertToResponse);
@@ -65,17 +65,14 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
         if (currentUser == null) {
             throw new RuntimeException("user is null");
         }
-
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC, "id");
-        Specification<IpWhitelistEntity> spec = IpWhitelistSpecification.search(request);
-        Page<IpWhitelistEntity> ipWhitelistPage = ipWhitelistRepository.findAll(spec, pageable);
-        return ipWhitelistPage.map(this::convertToResponse);
+        request.setUserUid(currentUser.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Override
     public Optional<IpWhitelistEntity> findByUid(String uid) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return ipWhitelistRepository.findByUid(uid);
     }
 
     @Override
@@ -106,16 +103,6 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
 
     public long count() { 
         return ipWhitelistRepository.count();
-    }
-
-    @Override
-    public IpWhitelistEntity save(IpWhitelistEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
     }
 
     @Override

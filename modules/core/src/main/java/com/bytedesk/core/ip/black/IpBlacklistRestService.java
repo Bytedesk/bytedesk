@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:19:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:26:53
+ * @LastEditTime: 2025-07-04 12:57:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,6 +73,16 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
         request.setUserUid(user.getUid());
         //
         return queryByOrg(request);
+    }
+
+    @Override
+    public IpBlacklistResponse queryByUid(IpBlacklistRequest request) {
+        Optional<IpBlacklistEntity> ipBlacklist = findByUid(request.getUid());
+        if (ipBlacklist.isPresent()) {
+            return convertToResponse(ipBlacklist.get());
+        } else {
+            throw new RuntimeException("Ip blacklist not found");
+        }
     }
 
     @Cacheable(value = "ipBlacklist", key = "#uid", unless = "#result == null")
@@ -198,12 +208,6 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     @Override
     public IpBlacklistResponse convertToResponse(IpBlacklistEntity entity) {
         return modelMapper.map(entity, IpBlacklistResponse.class);
-    }
-
-    @Override
-    public IpBlacklistResponse queryByUid(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Override
