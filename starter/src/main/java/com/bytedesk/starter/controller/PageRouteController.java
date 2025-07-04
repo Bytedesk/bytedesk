@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 18:14:36
+ * @LastEditTime: 2025-07-04 18:38:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 
 /**
@@ -29,6 +30,9 @@ import org.springframework.ui.Model;
 @Controller
 public class PageRouteController {
 
+    @Value("${bytedesk.custom.show-demo:true}")
+    private Boolean showDemo;
+
 	/**
 	 * 微语首页
 	 * http://127.0.0.1:9003
@@ -36,10 +40,12 @@ public class PageRouteController {
 	 */
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
+		if (!showDemo) {
+			return "default";
+		}
 		model.addAttribute("title", "微语");
 		model.addAttribute("chatUrl", "/chat/home");
 		return "home";
-		// return "quanjing";
 	}
 
 	/**
@@ -48,6 +54,9 @@ public class PageRouteController {
 	 */
 	@GetMapping("/web")
 	public String web() {
+		if (!showDemo) {
+			return "default";
+		}
 		return "index";
 	}
 
@@ -93,11 +102,7 @@ public class PageRouteController {
 			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
 			"/admin/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
-	public String admin(
-		// @PathVariable(required = false) String path, 
-		// @PathVariable(required = false) String path2, 
-		// @PathVariable(required = false) String path3
-		) {
+	public String admin() {
 		return "forward:/admin/index.html"; // 默认路径
 	}
 
@@ -114,18 +119,24 @@ public class PageRouteController {
 			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
 			"/agent/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
-	public String agent(
-		@PathVariable(required = false) String path, 
-		@PathVariable(required = false) String path2
-		) {
+	public String agent(@PathVariable(required = false) String path) {
 		return "forward:/agent/index.html"; // 默认路径
 	}
 
 	/**
 	 * visitor
 	 * 访客对话窗口
-	 * http://127.0.0.1:9003/chat/
+	 * http://127.0.0.1:9003/chat/demo
 	 */
+	// 特定的chat/demo路径，放在通用chat路径之前
+	@GetMapping("/chat/demo")
+	public String chatDemo() {
+		if (!showDemo) {
+			return "default";
+		}
+		return "forward:/chat/index.html"; // 默认路径
+	}
+
 	@GetMapping({
 			"/chat",
 			"/chat/",
@@ -197,7 +208,6 @@ public class PageRouteController {
 		return "forward:/kanban/index.html";
 	}
 
-
 	@GetMapping({
 			"/reactdemo",
 			"/reactdemo/",
@@ -218,6 +228,9 @@ public class PageRouteController {
 	 */
 	@GetMapping({ "/{page:download|contact|about|privacy|terms|office}", "/{page:download|contact|about|privacy|terms|office}.html" })
 	public String handlePageRoutes(@PathVariable String page) {
+		if (!showDemo) {
+			return "default";
+		}
 		return page;
 	}
 

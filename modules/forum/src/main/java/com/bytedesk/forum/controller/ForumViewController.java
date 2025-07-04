@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 11:51:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 15:42:29
+ * @LastEditTime: 2025-07-04 18:41:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import com.bytedesk.core.category.CategoryRepository;
 import com.bytedesk.forum.post.PostService;
 import com.bytedesk.forum.user.ForumUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -29,6 +30,9 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/forum")
 public class ForumViewController {
+
+    @Value("${bytedesk.custom.show-demo:true}")
+    private Boolean showDemo;
 
     @Autowired
     private PostService postService;
@@ -52,6 +56,10 @@ public class ForumViewController {
     // 论坛首页
     @GetMapping({"", "/"})
     public String index() {
+        if (!showDemo) {
+			return "default";
+		}
+        // 
         return "forum/index";
     }
 
