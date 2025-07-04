@@ -1,7 +1,5 @@
 package com.bytedesk.freeswitch.config;
 
-import java.time.ZonedDateTime;
-
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

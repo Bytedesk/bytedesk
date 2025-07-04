@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 14:14:30
+ * @LastEditTime: 2025-07-04 10:49:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,8 +29,6 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceTrigger;
 import com.bytedesk.service.agent.AgentEntity;
-
-import java.time.ZonedDateTime;
 
 // 可以根据需要选择是否使用 @Component 注解
 // 如果该方法不需要被Spring容器管理，则不需要此注解

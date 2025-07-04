@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ticket.thread.delegate;
 
-import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Date;
 
