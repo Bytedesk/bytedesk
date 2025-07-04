@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 11:54:56
+ * @LastEditTime: 2025-07-04 12:26:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,7 +81,7 @@ public class MessagePersistService {
         if (messageProtobuf.getCreatedAtDateTime() != null) {
             message.setCreatedAt(messageProtobuf.getCreatedAtDateTime());
         }
-        // message content: 8, createdAt: 2025-07-04T11:21:05+08:00[Asia/Shanghai], messageProtobuf createdAt: 2025-07-04 11:21:05
+        // message content: 4, createdAt: 2025-07-04T12:21:50+08:00[Asia/Shanghai], messageProtobuf createdAt: 2025-07-04 12:21:50
         log.info("message content: {}, createdAt: {}, messageProtobuf createdAt: {}", message.getContent(), message.getCreatedAt(), messageProtobuf.getCreatedAt());
         Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
         if (threadOpt.isPresent()) {
