@@ -79,7 +79,7 @@ public class FreeSwitchNumberRestService extends BaseRestServiceWithExcel<FreeSw
     }
 
     @Override
-    public FreeSwitchNumberResponse create(FreeSwitchNumberRequest request) {
+    public FreeSwitchNumberResponse initVisitor(FreeSwitchNumberRequest request) {
         UserEntity user = authService.getUser();
         if (!StringUtils.hasText(request.getOrgUid())) {
             request.setOrgUid(user.getOrgUid());

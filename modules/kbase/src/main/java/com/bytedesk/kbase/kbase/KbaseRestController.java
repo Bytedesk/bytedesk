@@ -92,7 +92,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
-        KbaseResponse Faq = knowledgeService.create(request);
+        KbaseResponse Faq = knowledgeService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(Faq));
     }

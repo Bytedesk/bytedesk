@@ -59,7 +59,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     @Override
     public ResponseEntity<?> create(TicketProcessRequest request) {
         
-        TicketProcessResponse process = processRestService.create(request);
+        TicketProcessResponse process = processRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(process));
     }

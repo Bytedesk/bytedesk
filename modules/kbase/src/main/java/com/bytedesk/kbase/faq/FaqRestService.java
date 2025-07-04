@@ -197,7 +197,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     @Override
     @Transactional
-    public FaqResponse create(FaqRequest request) {
+    public FaqResponse initVisitor(FaqRequest request) {
         try {
             // 如果提供了uid，先尝试查找现有记录
             if (StringUtils.hasText(request.getUid())) {
@@ -470,7 +470,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
-            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.initVisitor(categoryRequest);
             faq.setCategoryUid(categoryResponse.getUid());
         }
         faq.setFileUid(fileUid);
@@ -586,7 +586,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                             .orgUid(orgUid)
                             .build();
                     // 保存FAQ到数据库
-                    create(request);
+                    initVisitor(request);
                 } else {
                     // log.info("FAQ already exists: {}", faq.getUid());
                 }

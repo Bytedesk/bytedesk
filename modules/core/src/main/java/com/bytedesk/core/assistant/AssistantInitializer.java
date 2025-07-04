@@ -51,7 +51,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 .description(I18Consts.I18N_FILE_ASSISTANT_DESCRIPTION)
                 .level(LevelEnum.PLATFORM.name())
                 .build();
-        assistantService.create(fileAssistantRequest);
+        assistantService.initVisitor(fileAssistantRequest);
 
         // 剪贴助手
         // AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()

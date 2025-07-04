@@ -67,7 +67,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(FormResultRequest request) {
         
-        FormResultResponse tag = tagRestService.create(request);
+        FormResultResponse tag = tagRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }

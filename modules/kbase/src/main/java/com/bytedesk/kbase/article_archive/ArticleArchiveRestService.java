@@ -83,7 +83,7 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
     }
 
     @Override
-    public ArticleArchiveResponse create(ArticleArchiveRequest request) {
+    public ArticleArchiveResponse initVisitor(ArticleArchiveRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

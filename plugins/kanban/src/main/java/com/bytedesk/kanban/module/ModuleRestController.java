@@ -53,7 +53,7 @@ public class ModuleRestController extends BaseRestController<ModuleRequest> {
     @Override
     public ResponseEntity<?> create(ModuleRequest request) {
         
-        ModuleResponse module = moduleService.create(request);
+        ModuleResponse module = moduleService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(module));
     }

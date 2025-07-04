@@ -113,7 +113,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
                 .reason("Exceeded maximum request rate")
                 .userUid("system")
                 .build();
-        create(request);
+        initVisitor(request);
     }
 
     // 用户拉黑，同时拉黑ip
@@ -129,7 +129,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
                 .userNickname(blackEntity.getUserNickname())
                 .orgUid(blackEntity.getOrgUid())
                 .build();
-        create(request);
+        initVisitor(request);
     }
 
     public void deleteByIp(String ip) {
@@ -143,7 +143,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     }
     
     @Override
-    public IpBlacklistResponse create(IpBlacklistRequest request) {
+    public IpBlacklistResponse initVisitor(IpBlacklistRequest request) {
         // 判断ip是否在黑名单中
         Optional<IpBlacklistEntity> ipBlacklist = findByIp(request.getIp());
         if (ipBlacklist.isPresent()) {

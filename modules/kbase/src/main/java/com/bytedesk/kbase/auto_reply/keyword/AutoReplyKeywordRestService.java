@@ -110,7 +110,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     }
 
     @Override
-    public AutoReplyKeywordResponse create(AutoReplyKeywordRequest request) {
+    public AutoReplyKeywordResponse initVisitor(AutoReplyKeywordRequest request) {
         // 获取当前用户
         UserEntity user = authService.getUser();
         if (user == null) {
@@ -263,7 +263,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
             categoryRequest.setType(CategoryTypeEnum.AUTOREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             //
-            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryService.initVisitor(categoryRequest);
             keyword.setCategoryUid(categoryResponse.getUid());
         }
         // 

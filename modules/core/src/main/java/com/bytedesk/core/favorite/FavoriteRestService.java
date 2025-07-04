@@ -66,7 +66,7 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
     }
 
     @Override
-    public FavoriteResponse create(FavoriteRequest request) {
+    public FavoriteResponse initVisitor(FavoriteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

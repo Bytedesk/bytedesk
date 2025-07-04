@@ -82,7 +82,7 @@ public class QueueRestController extends BaseRestController<QueueRequest> {
     @Override
     public ResponseEntity<?> create(QueueRequest request) {
         
-        QueueResponse queue = queueRestService.create(request);
+        QueueResponse queue = queueRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(queue));
     }

@@ -89,7 +89,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     }
 
     @Override
-    public RobotMessageResponse create(RobotMessageRequest request) {
+    public RobotMessageResponse initVisitor(RobotMessageRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             // 已经存在，则更新

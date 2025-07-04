@@ -62,7 +62,7 @@ public class TextRestController extends BaseRestController<TextRequest> {
     @Override
     public ResponseEntity<?> create(TextRequest request) {
         
-        TextResponse text = textRestService.create(request);
+        TextResponse text = textRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(text));
     }

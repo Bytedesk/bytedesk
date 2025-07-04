@@ -79,7 +79,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     }
 
     @Override
-    public WorkflowResponse create(WorkflowRequest request) {
+    public WorkflowResponse initVisitor(WorkflowRequest request) {
         WorkflowEntity entity = modelMapper.map(request, WorkflowEntity.class);
         entity.setUid(uidUtils.getUid());
         // 

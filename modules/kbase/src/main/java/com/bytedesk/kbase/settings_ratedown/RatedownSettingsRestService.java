@@ -84,7 +84,7 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExcel<Ratedo
     }
 
     @Override
-    public RatedownSettingsResponse create(RatedownSettingsRequest request) {
+    public RatedownSettingsResponse initVisitor(RatedownSettingsRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

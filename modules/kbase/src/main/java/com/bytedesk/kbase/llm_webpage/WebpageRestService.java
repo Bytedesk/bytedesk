@@ -75,7 +75,7 @@ public class WebpageRestService
     }
 
     @Override
-    public WebpageResponse create(WebpageRequest request) {
+    public WebpageResponse initVisitor(WebpageRequest request) {
 
         WebpageEntity entity = modelMapper.map(request, WebpageEntity.class);
         entity.setUid(uidUtils.getUid());

@@ -84,7 +84,7 @@ public class ServiceSettingsRestService extends BaseRestServiceWithExcel<Service
     }
 
     @Override
-    public ServiceSettingsResponse create(ServiceSettingsRequest request) {
+    public ServiceSettingsResponse initVisitor(ServiceSettingsRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

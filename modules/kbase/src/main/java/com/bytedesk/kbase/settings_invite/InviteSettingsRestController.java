@@ -51,7 +51,7 @@ public class InviteSettingsRestController extends BaseRestController<InviteSetti
     @Override
     public ResponseEntity<?> create(InviteSettingsRequest request) {
         
-        InviteSettingsResponse inviteSetting = inviteSettingService.create(request);
+        InviteSettingsResponse inviteSetting = inviteSettingService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(inviteSetting));
     }

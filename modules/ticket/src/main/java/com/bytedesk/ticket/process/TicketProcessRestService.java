@@ -89,7 +89,7 @@ public class TicketProcessRestService
     }
 
     @Override
-    public TicketProcessResponse create(TicketProcessRequest request) {
+    public TicketProcessResponse initVisitor(TicketProcessRequest request) {
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid())) {
             Optional<TicketProcessEntity> optional = processRepository.findByUid(request.getUid());
@@ -221,7 +221,7 @@ public class TicketProcessRestService
                     .description(TicketConsts.TICKET_PROCESS_NAME)
                     .orgUid(orgUid)
                     .build();
-            create(processRequest);
+            initVisitor(processRequest);
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
@@ -279,7 +279,7 @@ public class TicketProcessRestService
                     .description(ThreadConsts.THREAD_PROCESS_NAME)
                     .orgUid(orgUid)
                     .build();
-            create(processRequest);
+            initVisitor(processRequest);
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()

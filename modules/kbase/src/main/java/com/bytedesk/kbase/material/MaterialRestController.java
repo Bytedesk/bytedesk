@@ -67,7 +67,7 @@ public class MaterialRestController extends BaseRestController<MaterialRequest> 
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(MaterialRequest request) {
         
-        MaterialResponse material = materialRestService.create(request);
+        MaterialResponse material = materialRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(material));
     }

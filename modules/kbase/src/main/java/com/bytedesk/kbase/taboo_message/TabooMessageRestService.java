@@ -77,7 +77,7 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
     }
 
     @Override
-    public TabooMessageResponse create(TabooMessageRequest request) {
+    public TabooMessageResponse initVisitor(TabooMessageRequest request) {
         // 
         TabooMessageEntity taboo_message = modelMapper.map(request, TabooMessageEntity.class);
         taboo_message.setUid(uidUtils.getUid());

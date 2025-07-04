@@ -76,7 +76,7 @@ public class OptimisticLockingHandler {
                 .extra(entityJSON)
                 .build();
         actionRequest.setType(ActionTypeEnum.FAILED.name());
-        actionService.create(actionRequest);
+        actionService.initVisitor(actionRequest);
         log.error("All retry attempts failed for optimistic locking of {}", entityJSON);
     }
 } 

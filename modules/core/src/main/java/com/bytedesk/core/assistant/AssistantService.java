@@ -58,7 +58,7 @@ public class AssistantService extends BaseRestService<AssistantEntity, Assistant
     }
 
     @Override
-    public AssistantResponse create(AssistantRequest request) {
+    public AssistantResponse initVisitor(AssistantRequest request) {
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

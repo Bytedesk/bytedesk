@@ -67,7 +67,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @ActionAnnotation(title = "部门", action = "新建", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest request) {
 
-        DepartmentResponse department = departmentRestService.create(request);
+        DepartmentResponse department = departmentRestService.initVisitor(request);
 
         return ResponseEntity.ok().body(JsonResult.success(department));
     }

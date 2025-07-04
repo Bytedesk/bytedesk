@@ -53,7 +53,7 @@ public class LlmProviderEventListener {
             LlmProviderRequest providerRequest = modelMapper.map(provider, LlmProviderRequest.class);
             providerRequest.setLevel(LevelEnum.ORGANIZATION.name());
             providerRequest.setOrgUid(orgUid);
-            llmProviderRestService.create(providerRequest);
+            llmProviderRestService.initVisitor(providerRequest);
         }
     }
     

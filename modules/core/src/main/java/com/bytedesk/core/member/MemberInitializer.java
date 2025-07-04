@@ -73,7 +73,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
                 .deptUid(DepartmentConsts.DEFAULT_DEPT_ADMIN_UID)
                 .orgUid(orgUid)
                 .build();
-        memberService.create(memberRequest);
+        memberService.initVisitor(memberRequest);
 
     }
 

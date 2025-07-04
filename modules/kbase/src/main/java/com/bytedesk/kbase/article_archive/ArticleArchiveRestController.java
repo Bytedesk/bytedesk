@@ -64,7 +64,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleArchiveRequest request) {
 
-        ArticleArchiveResponse article_archive = article_archiveService.create(request);
+        ArticleArchiveResponse article_archive = article_archiveService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(article_archive));
     }

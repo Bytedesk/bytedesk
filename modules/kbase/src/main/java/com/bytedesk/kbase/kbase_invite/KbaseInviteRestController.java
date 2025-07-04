@@ -53,7 +53,7 @@ public class KbaseInviteRestController extends BaseRestController<KbaseInviteReq
     @Override
     public ResponseEntity<?> create(KbaseInviteRequest request) {
         
-        KbaseInviteResponse tag = tagService.create(request);
+        KbaseInviteResponse tag = tagService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }

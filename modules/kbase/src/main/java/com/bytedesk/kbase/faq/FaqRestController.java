@@ -99,7 +99,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
 
-        FaqResponse Faq = faqRestService.create(request);
+        FaqResponse Faq = faqRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(Faq));
     }

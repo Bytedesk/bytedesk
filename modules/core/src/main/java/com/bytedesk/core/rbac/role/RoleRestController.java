@@ -68,7 +68,7 @@ public class RoleRestController extends BaseRestController<RoleRequest> {
     @Override
     public ResponseEntity<?> create(RoleRequest request) {
 
-        RoleResponse role = roleService.create(request);
+        RoleResponse role = roleService.initVisitor(request);
         
         return ResponseEntity.ok(JsonResult.success(role));
     }

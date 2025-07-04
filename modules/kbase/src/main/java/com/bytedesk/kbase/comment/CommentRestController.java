@@ -72,7 +72,7 @@ public class CommentRestController extends BaseRestController<CommentRequest> {
     @Override
     public ResponseEntity<?> create(CommentRequest request) {
         
-        CommentResponse comment = commentService.create(request);
+        CommentResponse comment = commentService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(comment));
     }

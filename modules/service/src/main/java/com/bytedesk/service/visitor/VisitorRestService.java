@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 13:03:14
+ * @LastEditTime: 2025-07-04 13:12:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
@@ -50,7 +51,6 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
 
     private final ThreadRoutingContext csThreadCreationContext;
 
-
     @Override
     public Page<VisitorEntity> queryByOrgEntity(VisitorRequest request) {
         Pageable pageable = request.getPageable();
@@ -75,9 +75,11 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         if (!visitorOptional.isPresent()) {
             throw new RuntimeException("visitor not found");
         }
-        return convertToResponse(visitorOptional.get());
+        return convertToResponsinitVisitor(visitorOptional.get());
     }
 
+    @Transactional
+    @Override
     public VisitorResponse create(VisitorRequest request) {
         //
         String visitorUid = request.getVisitorUid();

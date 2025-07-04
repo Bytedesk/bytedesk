@@ -84,12 +84,12 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
                     .description("Permission for " + permissionValue)
                     .level(LevelEnum.PLATFORM.name())
                     .build();
-        return create(authRequest);
+        return initVisitor(authRequest);
     }
 
     @Override
     @Transactional
-    public AuthorityResponse create(AuthorityRequest request) {
+    public AuthorityResponse initVisitor(AuthorityRequest request) {
         if (existsByValue(request.getValue())) {
             return findByValue(request.getValue()).map(this::convertToResponse).orElse(null);
         }

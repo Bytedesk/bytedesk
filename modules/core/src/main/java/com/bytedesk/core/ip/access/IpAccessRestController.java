@@ -42,7 +42,7 @@ public class IpAccessRestController extends BaseRestController<IpAccessRequest> 
 
     @Override
     public ResponseEntity<?> create(IpAccessRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipAccessRestService.create(request)));
+        return ResponseEntity.ok(JsonResult.success(ipAccessRestService.initVisitor(request)));
     }
 
     @Override

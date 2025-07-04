@@ -34,7 +34,7 @@ public class MessageLeaveRestControllerVisitor {
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
-        MessageLeaveResponse response = messageLeaveService.create(request);
+        MessageLeaveResponse response = messageLeaveService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

@@ -55,7 +55,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
     @Override
     public ResponseEntity<?> create(WebsiteRequest request) {
         
-        WebsiteResponse website = websiteRestService.create(request);
+        WebsiteResponse website = websiteRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(website));
     }

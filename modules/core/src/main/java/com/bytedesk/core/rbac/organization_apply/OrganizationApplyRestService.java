@@ -84,7 +84,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExcel<Organ
     }
 
     @Override
-    public OrganizationApplyResponse create(OrganizationApplyRequest request) {
+    public OrganizationApplyResponse initVisitor(OrganizationApplyRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

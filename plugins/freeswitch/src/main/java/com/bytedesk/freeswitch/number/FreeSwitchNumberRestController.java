@@ -64,7 +64,7 @@ public class FreeSwitchNumberRestController extends BaseRestController<FreeSwitc
     @Override
     public ResponseEntity<?> create(FreeSwitchNumberRequest request) {
 
-        FreeSwitchNumberResponse number = freeSwitchNumberRestService.create(request);
+        FreeSwitchNumberResponse number = freeSwitchNumberRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(number));
     }

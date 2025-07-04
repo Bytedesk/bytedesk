@@ -53,7 +53,7 @@ public class FavoriteRestController extends BaseRestController<FavoriteRequest> 
     @Override
     public ResponseEntity<?> create(FavoriteRequest request) {
         
-        FavoriteResponse favorite = favoriteService.create(request);
+        FavoriteResponse favorite = favoriteService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(favorite));
     }

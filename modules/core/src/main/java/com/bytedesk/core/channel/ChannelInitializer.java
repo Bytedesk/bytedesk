@@ -50,7 +50,7 @@ public class ChannelInitializer implements SmartInitializingSingleton {
                 .description(I18Consts.I18N_SYSTEM_NOTIFICATION_DESCRIPTION)
                 .level(LevelEnum.PLATFORM.name())
                 .build();
-        channelService.create(channelRequest);
+        channelService.initVisitor(channelRequest);
     }
     
 }

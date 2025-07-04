@@ -103,7 +103,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleRequest request) {
 
-        ArticleResponse article = articleRestService.create(request);
+        ArticleResponse article = articleRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(article));
     }

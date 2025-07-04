@@ -121,7 +121,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     }
 
     @Override
-    public CategoryResponse create(CategoryRequest request) {
+    public CategoryResponse initVisitor(CategoryRequest request) {
 
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -255,7 +255,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            create(categoryRequest);
+            initVisitor(categoryRequest);
         }
     }
 

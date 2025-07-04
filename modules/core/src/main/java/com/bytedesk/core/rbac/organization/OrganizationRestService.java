@@ -74,7 +74,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     }
 
     @Transactional
-    public OrganizationResponse create(OrganizationRequest organizationRequest) {
+    public OrganizationResponse initVisitor(OrganizationRequest organizationRequest) {
         //
         if (existsByName(organizationRequest.getName())) {
             throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");

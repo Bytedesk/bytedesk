@@ -37,7 +37,7 @@ public class TopicService {
     // 创建topic
     @Transactional
     public void create(TopicRequest request) {
-        topicRestService.create(request);
+        topicRestService.initVisitor(request);
     }
 
     // 删除topic

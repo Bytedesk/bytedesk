@@ -56,7 +56,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody QuartzRequest request) {
 
-        QuartzResponse response = quartzRestService.create(request);
+        QuartzResponse response = quartzRestService.initVisitor(request);
         if (response == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("jobName already exists"));
         }

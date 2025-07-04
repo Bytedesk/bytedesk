@@ -91,7 +91,7 @@ public class FormResultRestService extends BaseRestServiceWithExcel<FormResultEn
 
     @Transactional
     @Override
-    public FormResultResponse create(FormResultRequest request) {
+    public FormResultResponse initVisitor(FormResultRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

@@ -40,7 +40,7 @@ public class DepartmentInitializer implements SmartInitializingSingleton {
             .description("Description for " + DepartmentConsts.DEPT_ADMIN)
             .orgUid(orgUid)
             .build();
-        departmentService.create(adminDept);
+        departmentService.initVisitor(adminDept);
         //
         DepartmentRequest csDept = DepartmentRequest.builder()
             .uid(DepartmentConsts.DEFAULT_DEPT_CUSTOMER_SERVICE_UID)
@@ -48,7 +48,7 @@ public class DepartmentInitializer implements SmartInitializingSingleton {
             .description("Description for " + DepartmentConsts.DEPT_CUSTOMER_SERVICE)
             .orgUid(orgUid)
             .build();
-        departmentService.create(csDept);
+        departmentService.initVisitor(csDept);
     }
     
 }

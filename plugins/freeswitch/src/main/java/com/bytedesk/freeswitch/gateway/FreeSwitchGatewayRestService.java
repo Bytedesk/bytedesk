@@ -69,7 +69,7 @@ public class FreeSwitchGatewayRestService extends BaseRestServiceWithExcel<FreeS
 
     @Override
     @CacheEvict(value = "gateway", allEntries = true)
-    public FreeSwitchGatewayResponse create(FreeSwitchGatewayRequest request) {
+    public FreeSwitchGatewayResponse initVisitor(FreeSwitchGatewayRequest request) {
         
         // 设置组织UID
         // if (!StringUtils.hasText(request.getOrgUid())) {

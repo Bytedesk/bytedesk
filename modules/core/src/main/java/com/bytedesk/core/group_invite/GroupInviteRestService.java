@@ -70,7 +70,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     }
 
     @Override
-    public GroupInviteResponse create(GroupInviteRequest request) {
+    public GroupInviteResponse initVisitor(GroupInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

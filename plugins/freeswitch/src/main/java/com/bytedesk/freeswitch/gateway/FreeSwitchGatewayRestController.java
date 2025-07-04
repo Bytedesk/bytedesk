@@ -97,7 +97,7 @@ public class FreeSwitchGatewayRestController extends BaseRestController<FreeSwit
     @Override
     public ResponseEntity<?> create(@RequestBody FreeSwitchGatewayRequest request) {
         
-        FreeSwitchGatewayResponse gateway = gatewayRestService.create(request);
+        FreeSwitchGatewayResponse gateway = gatewayRestService.initVisitor(request);
         
         return ResponseEntity.ok(JsonResult.success(gateway));
     }

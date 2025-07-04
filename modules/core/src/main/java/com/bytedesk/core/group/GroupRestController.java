@@ -104,7 +104,7 @@ public class GroupRestController extends BaseRestController<GroupRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody GroupRequest request) {
         
-        GroupResponse group = groupRestService.create(request);
+        GroupResponse group = groupRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(group));
     }

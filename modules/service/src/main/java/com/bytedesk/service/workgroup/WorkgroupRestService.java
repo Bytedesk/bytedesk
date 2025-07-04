@@ -86,7 +86,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     }
 
     @Transactional
-    public WorkgroupResponse create(WorkgroupRequest request) {
+    public WorkgroupResponse initVisitor(WorkgroupRequest request) {
         // 判断uid是否已经存储，如果已经存在，则不创建新的workgroup
         if (StringUtils.hasText(request.getUid()) && findByUid(request.getUid()).isPresent()) {
             return convertToResponse(findByUid(request.getUid()).get());

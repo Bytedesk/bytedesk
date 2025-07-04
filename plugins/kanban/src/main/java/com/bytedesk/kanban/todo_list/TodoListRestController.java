@@ -53,7 +53,7 @@ public class TodoListRestController extends BaseRestController<TodoListRequest> 
     @Override
     public ResponseEntity<?> create(TodoListRequest request) {
         
-        TodoListResponse todo = todoService.create(request);
+        TodoListResponse todo = todoService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(todo));
     }

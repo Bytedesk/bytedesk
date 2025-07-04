@@ -79,7 +79,7 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     }
 
     @Override
-    public ClipboardResponse create(ClipboardRequest request) {
+    public ClipboardResponse initVisitor(ClipboardRequest request) {
        
         ClipboardEntity Clipboard = modelMapper.map(request, ClipboardEntity.class);
         Clipboard.setUid(uidUtils.getCacheSerialUid());

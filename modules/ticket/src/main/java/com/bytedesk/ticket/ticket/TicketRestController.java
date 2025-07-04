@@ -95,7 +95,7 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
 
-        TicketResponse response = ticketRestService.create(request);
+        TicketResponse response = ticketRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

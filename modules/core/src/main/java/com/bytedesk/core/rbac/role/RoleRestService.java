@@ -103,7 +103,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return roleRepository.existsByUid(uid);
         }
 
-        public RoleResponse create(RoleRequest request) {
+        public RoleResponse initVisitor(RoleRequest request) {
                 // 判断uid是否已存在
                 if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
                         return convertToResponse(findByUid(request.getUid()).get());

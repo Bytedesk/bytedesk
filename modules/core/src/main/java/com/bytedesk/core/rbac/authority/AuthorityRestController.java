@@ -62,7 +62,7 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
     @Override
     public ResponseEntity<?> create(AuthorityRequest request) {
 
-        AuthorityResponse authority = authorityService.create(request);
+        AuthorityResponse authority = authorityService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(authority));
     }

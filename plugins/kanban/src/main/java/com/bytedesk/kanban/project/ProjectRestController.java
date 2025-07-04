@@ -63,7 +63,7 @@ public class ProjectRestController extends BaseRestController<ProjectRequest> {
     @Override
     public ResponseEntity<?> create(ProjectRequest request) {
         
-        ProjectResponse project = projectService.create(request);
+        ProjectResponse project = projectService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(project));
     }

@@ -51,7 +51,7 @@ public class GroupInviteRestController extends BaseRestController<GroupInviteReq
     @Override
     public ResponseEntity<?> create(GroupInviteRequest request) {
         
-        GroupInviteResponse groupInvite = groupInviteService.create(request);
+        GroupInviteResponse groupInvite = groupInviteService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(groupInvite));
     }

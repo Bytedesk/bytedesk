@@ -86,7 +86,7 @@ public class AgentEventListener {
                 .agentUid(agent.getUid())
                 .orgUid(agent.getOrgUid())
                 .build();
-        kbaseRestService.create(kbaseQuickReply);
+        kbaseRestService.initVisitor(kbaseQuickReply);
     }
 
     @EventListener

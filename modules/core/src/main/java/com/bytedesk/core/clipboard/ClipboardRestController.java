@@ -48,7 +48,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
     @Override
     public ResponseEntity<?> create(ClipboardRequest request) {
         
-        ClipboardResponse response = clipboardService.create(request);
+        ClipboardResponse response = clipboardService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

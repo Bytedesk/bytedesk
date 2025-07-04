@@ -67,7 +67,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(TagRequest request) {
         
-        TagResponse tag = tagRestService.create(request);
+        TagResponse tag = tagRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }

@@ -81,7 +81,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     }
 
     @Override
-    public AutoReplyFixedResponse create(AutoReplyFixedRequest request) {
+    public AutoReplyFixedResponse initVisitor(AutoReplyFixedRequest request) {
         // 获取当前用户
         UserEntity user = authService.getUser();
         if (user == null) {
@@ -226,7 +226,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
             categoryRequest.setType(CategoryTypeEnum.AUTOREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             // 
-            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryService.initVisitor(categoryRequest);
             autoReply.setCategoryUid(categoryResponse.getUid());
         }
         // 

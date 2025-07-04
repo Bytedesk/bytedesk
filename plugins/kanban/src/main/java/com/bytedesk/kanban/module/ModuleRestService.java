@@ -74,7 +74,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
     }
 
     @Override
-    public ModuleResponse create(ModuleRequest request) {
+    public ModuleResponse initVisitor(ModuleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

@@ -94,7 +94,7 @@ public class FreeSwitchConferenceRestService extends BaseRestServiceWithExcel<Fr
     }
 
     @Override
-    public FreeSwitchConferenceResponse create(FreeSwitchConferenceRequest request) {
+    public FreeSwitchConferenceResponse initVisitor(FreeSwitchConferenceRequest request) {
 
         UserEntity user = authService.getUser();
         if (StringUtils.hasText(request.getOrgUid())) {

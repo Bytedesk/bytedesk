@@ -146,7 +146,7 @@ public class AuthService {
             tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(365)); // 其他客户端默认365天过期
         }
         
-        tokenRestService.create(tokenRequest);
+        tokenRestService.initVisitor(tokenRequest);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)

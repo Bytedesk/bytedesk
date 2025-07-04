@@ -61,7 +61,7 @@ public class LlmModelEventListener {
                     .level(LevelEnum.ORGANIZATION.name())
                     .orgUid(lpmEntity.getOrgUid())
                     .build();
-                llmModelRestService.create(request);
+                llmModelRestService.initVisitor(request);
             }
         } else {
             log.error("LlmModelEventListener onLlmProviderCreateEvent not found {}", lpmEntity.getName());

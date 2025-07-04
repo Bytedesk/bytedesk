@@ -61,7 +61,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Override
     public ResponseEntity<?> create(MessageUnreadRequest request) {
         
-        MessageUnreadResponse messageUnread = messageUnreadService.create(request);
+        MessageUnreadResponse messageUnread = messageUnreadService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success("create unread message success", messageUnread));
     }

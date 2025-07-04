@@ -88,7 +88,7 @@ public class MemberEventListener {
                 .description("Description for" + DepartmentConsts.DEPT_ADMIN)
                 .orgUid(orgUid)
                 .build();
-        DepartmentResponse departmentResponse = departmentService.create(departmentRequest);
+        DepartmentResponse departmentResponse = departmentService.initVisitor(departmentRequest);
         //
         if (departmentResponse != null) {
             Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
@@ -103,7 +103,7 @@ public class MemberEventListener {
             memberRequest.setRoleUids(roleUids);
             memberRequest.setDeptUid(departmentResponse.getUid());
             memberRequest.setOrgUid(orgUid);
-            memberService.create(memberRequest);
+            memberService.initVisitor(memberRequest);
         }
     }
 

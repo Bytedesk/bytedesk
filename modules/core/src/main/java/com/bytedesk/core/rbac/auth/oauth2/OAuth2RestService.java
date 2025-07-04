@@ -43,7 +43,7 @@ public class OAuth2RestService extends BaseRestService<OAuth2Entity, OAuth2Reque
     }
 
     @Override
-    public OAuth2Response create(OAuth2Request request) {
+    public OAuth2Response initVisitor(OAuth2Request request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

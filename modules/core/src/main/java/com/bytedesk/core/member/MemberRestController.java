@@ -111,7 +111,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest request) {
 
-        MemberResponse member = memberRestService.create(request);
+        MemberResponse member = memberRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(member));
     }

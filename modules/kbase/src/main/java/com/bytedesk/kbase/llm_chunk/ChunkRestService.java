@@ -95,7 +95,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     }
 
     @Override
-    public ChunkResponse create(ChunkRequest request) {
+    public ChunkResponse initVisitor(ChunkRequest request) {
         // log.info("ChunkRestService create: {}", request);
         ChunkEntity entity = ChunkEntity.builder()
                 .uid(uidUtils.getUid())

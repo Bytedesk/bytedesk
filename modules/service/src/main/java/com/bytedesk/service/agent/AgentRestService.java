@@ -119,7 +119,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     }
 
     @Transactional
-    public AgentResponse create(AgentRequest request) {
+    public AgentResponse initVisitor(AgentRequest request) {
         //
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -181,7 +181,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
                 .memberUid(member.getUid())
                 .orgUid(orgUid)
                 .build();
-        create(agentRequest);
+        initVisitor(agentRequest);
     }
 
     @Transactional

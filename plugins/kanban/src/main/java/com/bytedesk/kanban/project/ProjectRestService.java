@@ -79,7 +79,7 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
     }
 
     @Override
-    public ProjectResponse create(ProjectRequest request) {
+    public ProjectResponse initVisitor(ProjectRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

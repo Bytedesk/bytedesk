@@ -64,7 +64,7 @@ public class FreeSwitchConferenceRestController extends BaseRestController<FreeS
     @Override
     public ResponseEntity<?> create(FreeSwitchConferenceRequest request) {
 
-        FreeSwitchConferenceResponse conference = freeSwitchConferenceRestService.create(request);
+        FreeSwitchConferenceResponse conference = freeSwitchConferenceRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(conference));
     }

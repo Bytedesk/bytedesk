@@ -276,7 +276,7 @@ public class VisitorThreadService
     }
 
     @Override
-    public VisitorThreadResponse create(VisitorThreadRequest request) {
+    public VisitorThreadResponse initVisitor(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

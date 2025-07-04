@@ -90,7 +90,7 @@ public class VisitorRestControllerVisitor {
             visitorRequest.setNickname(ipService.createVisitorNickname(httpRequest));
         }
         // 
-        VisitorResponse visitor = visitorRestService.create(visitorRequest);
+        VisitorResponse visitor = visitorRestService.initVisitor(visitorRequest);
         //
         return ResponseEntity.ok(JsonResult.success(visitor));
     }

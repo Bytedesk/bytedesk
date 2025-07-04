@@ -60,7 +60,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     @Override
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
         
-        QuickReplyResponse quickReply = quickReplyRestService.create(request);
+        QuickReplyResponse quickReply = quickReplyRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }

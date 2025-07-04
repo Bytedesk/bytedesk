@@ -98,7 +98,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     }
 
     @Override
-    public TextResponse create(TextRequest request) {
+    public TextResponse initVisitor(TextRequest request) {
         // 获取当前登录用户
         UserEntity user = authService.getUser();
         if (user == null) {
@@ -280,7 +280,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
                     .kbUid(kbUid)
                     .orgUid(orgUid)
                     .build();
-            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.initVisitor(categoryRequest);
             text.setCategoryUid(categoryResponse.getUid());
         }
         text.setOrgUid(orgUid);

@@ -84,7 +84,7 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExcel<Worktim
     }
 
     @Override
-    public WorktimeSettingResponse create(WorktimeSettingRequest request) {
+    public WorktimeSettingResponse initVisitor(WorktimeSettingRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

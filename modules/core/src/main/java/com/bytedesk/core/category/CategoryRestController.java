@@ -51,7 +51,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
     @Override
     public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
         
-        CategoryResponse response = categoryRestService.create(request);
+        CategoryResponse response = categoryRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

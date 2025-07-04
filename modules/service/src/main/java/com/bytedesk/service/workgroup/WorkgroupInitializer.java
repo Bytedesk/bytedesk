@@ -88,13 +88,13 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         workgroupRequest.getRobotSettings().setDefaultRobot(true);
         workgroupRequest.getRobotSettings().setOfflineRobot(true);
         workgroupRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
-        workgroupService.create(workgroupRequest);
+        workgroupService.initVisitor(workgroupRequest);
         // 
         workgroupBeforeRequest.getServiceSettings().setFaqKbUid(kbUid);
         workgroupBeforeRequest.getRobotSettings().setDefaultRobot(true);
         workgroupBeforeRequest.getRobotSettings().setOfflineRobot(true);
         workgroupBeforeRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
-        workgroupService.create(workgroupBeforeRequest);
+        workgroupService.initVisitor(workgroupBeforeRequest);
         // add workgroup after
         WorkgroupRequest workgroupAfterRequest = WorkgroupRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_AFTERSALES)
@@ -103,7 +103,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        workgroupService.create(workgroupAfterRequest);
+        workgroupService.initVisitor(workgroupAfterRequest);
     }
     
 

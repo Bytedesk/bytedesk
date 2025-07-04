@@ -85,7 +85,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     @ActionAnnotation(title = "工作组", action = "新建", description = "create workgroup")
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
-        WorkgroupResponse workgroup = workgroupRestService.create(request);
+        WorkgroupResponse workgroup = workgroupRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }

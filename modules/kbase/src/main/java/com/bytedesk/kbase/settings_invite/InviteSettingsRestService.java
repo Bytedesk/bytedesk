@@ -84,7 +84,7 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
     }
 
     @Override
-    public InviteSettingsResponse create(InviteSettingsRequest request) {
+    public InviteSettingsResponse initVisitor(InviteSettingsRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

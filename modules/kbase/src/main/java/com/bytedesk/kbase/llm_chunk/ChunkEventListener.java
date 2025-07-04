@@ -82,7 +82,7 @@ public class ChunkEventListener {
 					.startDate(BdDateUtils.now()) // 使用文件的开始日期，默认为当前时间
 					.endDate(BdDateUtils.now().plusYears(100)) // 使用文件的结束日期，默认为100年后
 					.build();
-			chunkRestService.create(splitRequest);
+			chunkRestService.initVisitor(splitRequest);
 		}
         Optional<FileEntity> fileEntity = fileRestService.findByUid(fileResponse.getUid());
         if (fileEntity.isPresent()) {

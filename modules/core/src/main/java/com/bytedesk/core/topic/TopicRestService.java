@@ -104,7 +104,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     @Transactional
     @Override
-    public TopicResponse create(TopicRequest request) {
+    public TopicResponse initVisitor(TopicRequest request) {
         // 设置用户信息
         UserEntity user = authService.getUser();
         if (user != null) {
@@ -275,7 +275,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
                      .userUid(uid)
                      .build();
              topicRequest.getClientIds().add(clientId);
-             create(topicRequest);
+             initVisitor(topicRequest);
          }
      }
  

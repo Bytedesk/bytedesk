@@ -49,7 +49,7 @@ public class DepartmentEventListener {
             .build();
         csDept.setUid(uidUtils.getUid());
         csDept.setOrgUid(orgUid);
-        departmentService.create(csDept);
+        departmentService.initVisitor(csDept);
     }
 
 }

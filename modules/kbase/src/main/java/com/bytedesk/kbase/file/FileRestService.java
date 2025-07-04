@@ -87,7 +87,7 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     }
 
     @Override
-    public FileResponse create(FileRequest request) {
+    public FileResponse initVisitor(FileRequest request) {
 
         FileEntity entity = modelMapper.map(request, FileEntity.class);
         entity.setUid(uidUtils.getUid());

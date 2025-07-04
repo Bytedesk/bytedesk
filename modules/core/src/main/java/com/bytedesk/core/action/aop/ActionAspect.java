@@ -106,7 +106,7 @@ public class ActionAspect {
             // 处理非Web请求情况，比如记录日志或者直接返回
         }
         // 
-        actionService.create(actionRequest);
+        actionService.initVisitor(actionRequest);
     }
 
     /**

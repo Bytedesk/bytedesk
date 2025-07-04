@@ -42,7 +42,7 @@ public abstract class BaseRestService<T, TRequest, TResponse> {
 
     abstract public Optional<T> findByUid(String uid);
 
-    abstract public TResponse create(TRequest request);
+    abstract public TResponse initVisitor(TRequest request);
 
     abstract public TResponse update(TRequest request);
 

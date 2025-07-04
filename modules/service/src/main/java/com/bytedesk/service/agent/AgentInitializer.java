@@ -62,7 +62,7 @@ public class AgentInitializer implements SmartInitializingSingleton {
                 .memberUid(memberUid)
                 .orgUid(orgUid)
                 .build();
-        agentService.create(agentRequest);
+        agentService.initVisitor(agentRequest);
     }
 
     private void initPermissions() {

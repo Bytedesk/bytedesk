@@ -89,7 +89,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     }
 
     @Override
-    public LlmModelResponse create(LlmModelRequest request) {
+    public LlmModelResponse initVisitor(LlmModelRequest request) {
 
         if (existsByNameAndProviderUid(request.getName(), request.getProviderUid())) {
             Optional<LlmModelEntity> optional = repository.findByNameAndProviderUid(request.getName(), request.getProviderUid());
@@ -129,7 +129,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
                 .orgUid(orgUid)
                 .build();
 
-        return create(request);
+        return initVisitor(request);
     }
 
     @Override

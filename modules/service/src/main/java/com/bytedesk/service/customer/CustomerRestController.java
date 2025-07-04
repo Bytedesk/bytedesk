@@ -99,7 +99,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest> 
     @Override
     public ResponseEntity<?> create(CustomerRequest request) {
         
-        CustomerResponse response = customerService.create(request);
+        CustomerResponse response = customerService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

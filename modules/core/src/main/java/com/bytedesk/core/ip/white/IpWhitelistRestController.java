@@ -42,7 +42,7 @@ public class IpWhitelistRestController extends BaseRestController<IpWhitelistReq
 
     @Override
     public ResponseEntity<?> create(IpWhitelistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipWhitelistRestService.create(request)));
+        return ResponseEntity.ok(JsonResult.success(ipWhitelistRestService.initVisitor(request)));
     }
 
     @Override

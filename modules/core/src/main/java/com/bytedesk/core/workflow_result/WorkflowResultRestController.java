@@ -67,7 +67,7 @@ public class WorkflowResultRestController extends BaseRestController<WorkflowRes
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(WorkflowResultRequest request) {
         
-        WorkflowResultResponse tag = workflowResultRestService.create(request);
+        WorkflowResultResponse tag = workflowResultRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }

@@ -74,7 +74,7 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
     }
 
     @Override
-    public TaskResponse create(TaskRequest request) {
+    public TaskResponse initVisitor(TaskRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("user not found");

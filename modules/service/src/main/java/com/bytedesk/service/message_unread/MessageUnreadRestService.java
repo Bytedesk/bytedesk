@@ -85,7 +85,7 @@ public class MessageUnreadRestService
 
     @Transactional
     @Override
-    public MessageUnreadResponse create(MessageUnreadRequest request) {
+    public MessageUnreadResponse initVisitor(MessageUnreadRequest request) {
         // 检查uid是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());

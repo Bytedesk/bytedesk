@@ -82,7 +82,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> create(ChannelAppRequest request) {
         
-        ChannelAppResponse app = appRestService.create(request);
+        ChannelAppResponse app = appRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(app));
     }

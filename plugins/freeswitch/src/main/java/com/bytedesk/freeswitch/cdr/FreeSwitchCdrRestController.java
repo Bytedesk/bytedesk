@@ -64,7 +64,7 @@ public class FreeSwitchCdrRestController extends BaseRestController<FreeSwitchCd
     @Override
     public ResponseEntity<?> create(FreeSwitchCdrRequest request) {
 
-        FreeSwitchCdrResponse cdr = freeSwitchCdrRestService.create(request);
+        FreeSwitchCdrResponse cdr = freeSwitchCdrRestService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(cdr));
     }

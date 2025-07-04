@@ -75,7 +75,7 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @Override
     public ResponseEntity<?> create(AutoReplyFixedRequest request) {
         
-        AutoReplyFixedResponse response = autoReplyService.create(request);
+        AutoReplyFixedResponse response = autoReplyService.initVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
