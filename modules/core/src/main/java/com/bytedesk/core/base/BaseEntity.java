@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:07:57
+ * @LastEditTime: 2025-07-04 11:34:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,9 +69,6 @@ import java.time.ZonedDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
 
-    // @Value("${bytedesk.timezone}")
-    // private static final String timezone = "GMT+8";
-
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -87,37 +84,27 @@ public abstract class BaseEntity implements Serializable {
     @Version
     private int version;
     
-    // 在配置文件中存储时区信息
-    // 数据库DDL中： created_at timestamp(6) without time zone,
-    // @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
     @CreatedDate
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime createdAt;
 
-    // @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     @LastModifiedDate
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime updatedAt;
 
-    // soft delete
 	@Builder.Default
 	@Column(name = "is_deleted")
 	private boolean deleted = false;
 
-    // organization uid
     private String orgUid;
 
-    // user uid
     private String userUid;
 
-    // platform: 只有超级管理员才有权限
-    // organization: 管理员才有权限
     @Builder.Default
     private String level = LevelEnum.ORGANIZATION.name();
 
-    // 默认bytedesk平台
     @Builder.Default
     private String platform = PlatformEnum.BYTEDESK.name();
 
