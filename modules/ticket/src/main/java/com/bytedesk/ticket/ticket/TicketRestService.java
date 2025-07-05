@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 16:02:35
+ * @LastEditTime: 2025-07-05 11:03:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,6 +43,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -202,8 +203,8 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     @Override
     public TicketResponse update(TicketRequest request) {
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
-        if (!ticketOptional.isPresent()) {
-            throw new RuntimeException("ticket not found");
+        if (ticketOptional.isEmpty()) {
+            throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
 

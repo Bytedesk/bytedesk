@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:27:07
+ * @LastEditTime: 2025-07-05 11:04:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -65,8 +66,8 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     @Override
     public LlmModelResponse queryByUid(LlmModelRequest request) {
         Optional<LlmModelEntity> optional = repository.findByUid(request.getUid());
-        if (!optional.isPresent()) {
-            throw new RuntimeException("model not found");
+        if (optional.isEmpty()) {
+            throw new NotFoundException("model not found");
         }
         return convertToResponse(optional.get());
     }

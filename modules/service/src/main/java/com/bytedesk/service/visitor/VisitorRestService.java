@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 16:44:36
+ * @LastEditTime: 2025-07-05 11:02:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.routing_strategy.ThreadRoutingContext;
@@ -72,8 +73,8 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     @Override
     public VisitorResponse queryByUid(VisitorRequest request) {
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
-        if (visitorOptional.isPresent()) {
-            throw new RuntimeException("visitor not found");
+        if (visitorOptional.isEmpty()) {
+            throw new NotFoundException("visitor not found");
         }
         return convertToResponse(visitorOptional.get());
     }
@@ -150,8 +151,8 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     @Override
     public VisitorResponse update(VisitorRequest request) {
         Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
-        if (!visitorOptional.isPresent()) {
-            throw new RuntimeException("visitor not found");
+        if (visitorOptional.isEmpty()) {
+            throw new NotFoundException("visitor not found");
         }
         // 
         VisitorEntity visitor = visitorOptional.get();
