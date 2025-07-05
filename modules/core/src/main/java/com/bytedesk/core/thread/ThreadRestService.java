@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 12:03:49
+ * @LastEditTime: 2025-07-05 13:30:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,9 +13,13 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,6 +27,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
@@ -47,7 +52,7 @@ import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
-import io.jsonwebtoken.lang.Arrays;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -142,7 +147,22 @@ public class ThreadRestService
 
         Pageable pageable = request.getPageable();
         Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(customerServiceTopics, pageable);
-        return threadPage.map(this::convertToResponse);
+        
+        // 对结果按topic进行过滤，每个topic只保留一条记录
+        Map<String, ThreadEntity> uniqueThreadsByTopic = new HashMap<>();
+        threadPage.getContent().forEach(thread -> {
+            uniqueThreadsByTopic.putIfAbsent(thread.getTopic(), thread);
+        });
+        
+        // 将过滤后的结果转换为Page对象
+        List<ThreadEntity> uniqueThreads = new ArrayList<>(uniqueThreadsByTopic.values());
+        Page<ThreadEntity> filteredPage = new PageImpl<>(
+                uniqueThreads, 
+                pageable, 
+                Math.min(uniqueThreads.size(), threadPage.getTotalElements()) // 调整总数
+        );
+        
+        return filteredPage.map(this::convertToResponse);
     }
 
     @Transactional
