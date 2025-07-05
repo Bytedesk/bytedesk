@@ -60,7 +60,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExcel<Organ
     public Page<OrganizationApplyResponse> queryByUser(OrganizationApplyRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

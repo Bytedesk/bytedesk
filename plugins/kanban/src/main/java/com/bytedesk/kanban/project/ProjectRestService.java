@@ -56,7 +56,7 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
     public Page<ProjectResponse> queryByUser(ProjectRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -82,7 +82,7 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
     public ProjectResponse create(ProjectRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         

@@ -60,7 +60,7 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
     public Page<InviteSettingsResponse> queryByUser(InviteSettingsRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

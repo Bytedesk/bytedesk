@@ -65,7 +65,7 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
     public Page<TagResponse> queryByUser(TagRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

@@ -60,7 +60,7 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
     public Page<TaskResponse> queryByUser(TaskRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -77,7 +77,7 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
     public TaskResponse create(TaskRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

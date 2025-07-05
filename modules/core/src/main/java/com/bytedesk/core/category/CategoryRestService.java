@@ -81,7 +81,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     public Page<CategoryResponse> queryByUser(CategoryRequest request) {
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(authUser.getUid());
         // 

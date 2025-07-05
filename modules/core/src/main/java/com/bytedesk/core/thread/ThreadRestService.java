@@ -89,7 +89,7 @@ public class ThreadRestService
     public Page<ThreadResponse> query(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         request.setOwnerUid(user.getUid());

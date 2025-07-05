@@ -103,7 +103,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     public Page<FaqResponse> queryByUser(FaqRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         //

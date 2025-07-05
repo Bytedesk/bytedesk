@@ -60,7 +60,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
     public Page<ModuleResponse> queryByUser(ModuleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         //
@@ -77,7 +77,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
     public ModuleResponse create(ModuleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
 

@@ -60,7 +60,7 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExcel<Worktim
     public Page<WorktimeSettingResponse> queryByUser(WorktimeSettingRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

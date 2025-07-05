@@ -71,7 +71,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
     public Page<ArticleResponse> queryByUser(ArticleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         String userUid = user.getUid();
         request.setUserUid(userUid);
@@ -102,7 +102,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
     public ArticleResponse create(ArticleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
 
         ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);

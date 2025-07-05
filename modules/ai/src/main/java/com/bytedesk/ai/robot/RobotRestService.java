@@ -99,7 +99,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     public Page<RobotResponse> queryByUser(RobotRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         //

@@ -60,7 +60,7 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
     public Page<TodoListResponse> queryByUser(TodoListRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -77,7 +77,7 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
     public TodoListResponse create(TodoListRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         

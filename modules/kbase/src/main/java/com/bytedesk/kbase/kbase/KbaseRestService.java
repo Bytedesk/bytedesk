@@ -76,7 +76,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     public Page<KbaseResponse> queryByUser(KbaseRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         //

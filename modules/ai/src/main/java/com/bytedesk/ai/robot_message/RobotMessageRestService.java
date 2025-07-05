@@ -65,7 +65,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
     public Page<RobotMessageResponse> queryByUser(RobotMessageRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

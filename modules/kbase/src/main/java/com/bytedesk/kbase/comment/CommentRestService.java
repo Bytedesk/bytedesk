@@ -71,7 +71,7 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     public CommentResponse create(CommentRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         
         CommentEntity entity = modelMapper.map(request, CommentEntity.class);

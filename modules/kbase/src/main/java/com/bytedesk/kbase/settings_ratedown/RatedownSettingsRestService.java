@@ -60,7 +60,7 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExcel<Ratedo
     public Page<RatedownSettingsResponse> queryByUser(RatedownSettingsRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

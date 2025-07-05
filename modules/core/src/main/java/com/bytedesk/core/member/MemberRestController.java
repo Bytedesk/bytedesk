@@ -83,7 +83,7 @@ public class MemberRestController extends BaseRestController<MemberRequest> {
         //
         MemberResponse memberResponse = memberRestService.queryByUserUid(request);
         if (memberResponse == null) {
-            return ResponseEntity.ok(JsonResult.error("user not found"));
+            return ResponseEntity.ok(JsonResult.error("login first"));
         }
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));

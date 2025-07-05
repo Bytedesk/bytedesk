@@ -119,7 +119,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     public Page<TicketResponse> queryByUser(TicketRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-        throw new RuntimeException("user not found");
+        throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         //
@@ -137,7 +137,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     public TicketResponse create(TicketRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         String userUid = owner.getUid();
         // 创建工单...
@@ -291,7 +291,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
         //
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         // 
         if (ticket.getDepartmentUid() == null || ticket.getDepartmentUid().isEmpty()) {

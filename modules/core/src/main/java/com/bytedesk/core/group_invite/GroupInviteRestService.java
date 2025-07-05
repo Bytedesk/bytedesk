@@ -56,7 +56,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     public Page<GroupInviteResponse> queryByUser(GroupInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -73,7 +73,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     public GroupInviteResponse create(GroupInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         

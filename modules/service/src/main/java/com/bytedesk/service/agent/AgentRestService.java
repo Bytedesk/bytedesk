@@ -94,7 +94,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public Page<AgentResponse> queryByUser(AgentRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         //

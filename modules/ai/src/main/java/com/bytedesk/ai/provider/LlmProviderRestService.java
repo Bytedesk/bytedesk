@@ -63,7 +63,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     public Page<LlmProviderResponse> queryByUser(LlmProviderRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

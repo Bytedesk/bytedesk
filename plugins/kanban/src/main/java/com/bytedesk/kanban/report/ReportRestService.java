@@ -55,7 +55,7 @@ public class ReportRestService extends BaseRestService<ReportEntity, ReportReque
     public Page<ReportResponse> queryByUser(ReportRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -72,7 +72,7 @@ public class ReportRestService extends BaseRestService<ReportEntity, ReportReque
     public ReportResponse create(ReportRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         

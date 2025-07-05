@@ -58,7 +58,7 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
     public Page<ArticleArchiveResponse> queryByUser(ArticleArchiveRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         String userUid = user.getUid();
         //
@@ -86,7 +86,7 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
     public ArticleArchiveResponse create(ArticleArchiveRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
 
         ArticleArchiveEntity entity = modelMapper.map(request, ArticleArchiveEntity.class);

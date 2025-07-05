@@ -61,7 +61,7 @@ public class WorkflowResultRestService extends BaseRestServiceWithExcel<Workflow
     public Page<WorkflowResultResponse> queryByUser(WorkflowResultRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

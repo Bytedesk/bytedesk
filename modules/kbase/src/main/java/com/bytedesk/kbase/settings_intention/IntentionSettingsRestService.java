@@ -60,7 +60,7 @@ public class IntentionSettingsRestService extends BaseRestServiceWithExcel<Inten
     public Page<IntentionSettingsResponse> queryByUser(IntentionSettingsRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

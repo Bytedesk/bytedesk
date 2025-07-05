@@ -60,7 +60,7 @@ public class ChannelAppRestService extends BaseRestServiceWithExcel<ChannelAppEn
     public Page<ChannelAppResponse> queryByUser(ChannelAppRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

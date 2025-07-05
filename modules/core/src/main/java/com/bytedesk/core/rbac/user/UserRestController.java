@@ -111,7 +111,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         if (userResponse != null) {
             return ResponseEntity.ok(JsonResult.success(userResponse));
         } else {
-            return ResponseEntity.ok().body(JsonResult.error("user not found", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error("login first", -1, false));
         }
     }
     

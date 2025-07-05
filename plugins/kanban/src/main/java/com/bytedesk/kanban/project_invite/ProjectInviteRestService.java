@@ -56,7 +56,7 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
     public Page<ProjectInviteResponse> queryByUser(ProjectInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -73,7 +73,7 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
     public ProjectInviteResponse create(ProjectInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         

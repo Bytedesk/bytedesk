@@ -56,7 +56,7 @@ public class GroupNoticeRestService extends BaseRestService<GroupNoticeEntity, G
     public Page<GroupNoticeResponse> queryByUser(GroupNoticeRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -73,7 +73,7 @@ public class GroupNoticeRestService extends BaseRestService<GroupNoticeEntity, G
     public GroupNoticeResponse create(GroupNoticeRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         

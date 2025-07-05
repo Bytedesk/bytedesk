@@ -64,7 +64,7 @@ public class TemplateRestService extends BaseRestServiceWithExcel<TemplateEntity
     public Page<TemplateResponse> queryByUser(TemplateRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 

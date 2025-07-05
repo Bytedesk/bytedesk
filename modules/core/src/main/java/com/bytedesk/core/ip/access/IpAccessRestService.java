@@ -75,7 +75,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
     public Page<IpAccessResponse> queryByUser(IpAccessRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new RuntimeException("login first");
         }
         request.setUserUid(user.getUid());
         // 
