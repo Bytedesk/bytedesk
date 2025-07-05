@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 12:45:38
+ * @LastEditTime: 2025-07-05 14:39:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -130,9 +130,9 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@RequestBody TopicRequest request) {
 
-        topicRestService.subscribe(request.getTopic(), request.getClientIds().iterator().next());
+        TopicResponse topic = topicRestService.subscribe(request);
 
-        return ResponseEntity.ok(JsonResult.success("订阅主题成功"));
+        return ResponseEntity.ok(JsonResult.success("订阅主题成功", topic));
     }
 
     /**
@@ -145,9 +145,9 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
     @PostMapping("/unsubscribe")
     public ResponseEntity<?> unsubscribe(@RequestBody TopicRequest request) {
 
-        topicRestService.unsubscribe(request.getTopic(), request.getClientIds().iterator().next());
+        TopicResponse topic = topicRestService.unsubscribe(request);
 
-        return ResponseEntity.ok(JsonResult.success("取消订阅主题成功"));
+        return ResponseEntity.ok(JsonResult.success("取消订阅主题成功", topic));
     }
 
     /**
@@ -162,7 +162,7 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
     public ResponseEntity<?> delete(@RequestBody TopicRequest request) {
 
         topicRestService.delete(request);
-        
+
         return ResponseEntity.ok(JsonResult.success("删除主题成功"));
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 14:36:41
+ * @LastEditTime: 2025-07-05 14:44:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -331,8 +331,20 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         }
         String topic = request.getTopic();
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
-
-        
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            if (!topicElement.getTopics().contains(topic)) {
+                return convertToResponse(topicElement);
+            }
+            topicElement.getTopics().remove(topic);
+           TopicEntity savedEntity = save(topicElement);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update topic failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Topic not found");
+        }
     }
 
 
@@ -365,75 +377,4 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         }
     }
 
-    // // 添加clientId
-    // @CacheEvict(value = "topic", key = "#userUid")
-    // public void addClientId(String clientId) {
-    // // 用户clientId格式: userUid/client/deviceUid
-    // final String userUid = clientId.split("/")[0];
-    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    // if (topicOptional.isPresent()) {
-    // TopicEntity topic = topicOptional.get();
-    // if (!topic.getClientIds().contains(clientId)) {
-    // log.info("addClientId: {}", clientId);
-    // topic.getClientIds().add(clientId);
-    // save(topic);
-    // }
-    // }
-    // }
-
-    // // 移除clientId
-    // @CacheEvict(value = "topic", key = "#userUid")
-    // public void removeClientId(String clientId) {
-    // // 用户clientId格式: userUid/client/deviceUid
-    // final String userUid = clientId.split("/")[0];
-    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    // if (topicOptional.isPresent()) {
-    // TopicEntity topic = topicOptional.get();
-    // if (topic.getClientIds().contains(clientId)) {
-    // log.info("removeClientId: {}", clientId);
-    // topic.getClientIds().remove(clientId);
-    // save(topic);
-    // }
-    // }
-    // }
-
-    // // 订阅topic
-    // @CacheEvict(value = "topic", key = "#userUid")
-    // public void subscribe(String topic, String clientId) {
-    // // 用户clientId格式: uid/client/deviceUid
-    // final String userUid = clientId.split("/")[0];
-    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    // if (topicOptional.isPresent()) {
-    // TopicEntity topicElement = topicOptional.get();
-    // if (topicElement.getTopics().contains(topic)) {
-    // log.info("topic already exists: {}", topic);
-    // return;
-    // }
-    // topicElement.getTopics().add(topic);
-    // save(topicElement);
-    // } else {
-    // // create new topic
-    // TopicRequest topicRequest = TopicRequest.builder()
-    // .topic(topic)
-    // .userUid(userUid)
-    // .build();
-    // topicRequest.getClientIds().add(clientId);
-    // create(topicRequest);
-    // }
-    // }
-
-    // // 取消订阅topic
-    // @CacheEvict(value = "topic", key = "#userUid")
-    // public void unsubscribe(String topic, String clientId) {
-    // // 用户clientId格式: userUid/client/deviceUid
-    // final String userUid = clientId.split("/")[0];
-    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    // if (topicOptional.isPresent()) {
-    // TopicEntity topicElement = topicOptional.get();
-    // if (topicElement.getTopics().contains(topic)) {
-    // topicElement.getTopics().remove(topic);
-    // save(topicElement);
-    // }
-    // }
-    // }
 }
