@@ -15,6 +15,7 @@ package com.bytedesk.core.topic;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -118,6 +119,15 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
         TopicResponse topicResponse = topicRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(topicResponse));
+    }
+
+    // 判断是否已经订阅 is/subscribed
+    @GetMapping("/is/subscribed")
+    public ResponseEntity<?> isSubscribed(@RequestBody TopicRequest request) {
+
+        Boolean isSubscribed = topicRestService.isSubscribed(request);
+
+        return ResponseEntity.ok(JsonResult.success(isSubscribed));
     }
 
     /**

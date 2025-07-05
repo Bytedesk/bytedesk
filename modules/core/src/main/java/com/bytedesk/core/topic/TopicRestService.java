@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 14:44:48
+ * @LastEditTime: 2025-07-05 14:56:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -227,6 +227,20 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     @Override
     public TopicResponse convertToResponse(TopicEntity entity) {
         return modelMapper.map(entity, TopicResponse.class);
+    }
+
+    public Boolean isSubscribed(TopicRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("login first");
+        }
+        Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            return topicElement.getTopics().contains(request.getTopic());
+        } else {
+            return false;
+        }
     }
 
     // 删除topic
