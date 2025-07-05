@@ -146,4 +146,7 @@ public class ThreadRequest extends BaseRequest {
     
     // 流程定义实体UID
     private String processEntityUid;
+
+    // 是否取消订阅topic
+    private Boolean unsubscribe;
 }
