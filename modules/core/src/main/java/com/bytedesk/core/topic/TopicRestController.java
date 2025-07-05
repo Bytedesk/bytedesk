@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 14:39:44
+ * @LastEditTime: 2025-07-05 15:20:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -123,7 +123,7 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
 
     // 判断是否已经订阅 is/subscribed
     @GetMapping("/is/subscribed")
-    public ResponseEntity<?> isSubscribed(@RequestBody TopicRequest request) {
+    public ResponseEntity<?> isSubscribed(TopicRequest request) {
 
         Boolean isSubscribed = topicRestService.isSubscribed(request);
 
