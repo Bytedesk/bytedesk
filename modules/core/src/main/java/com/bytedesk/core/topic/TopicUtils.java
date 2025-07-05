@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 09:40:23
+ * @LastEditTime: 2025-07-05 11:59:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,17 +92,30 @@ public class TopicUtils {
     // 用户默认订阅技能组uid：org/workgroup/{workgroup_uid}
     // 技能组客服会话：org/workgroup/{workgroup_uid}/{visitor_uid}
     // 统一客服入口：org/unified/{unified_uid}/{visitor_uid}
-    // 一对一工单会话：org/ticket/agent/{agent_uid}/{user_uid}
-    // 技能组工单会话：org/ticket/workgroup/{workgroup_uid}/{user_uid}
+    // 部门ticket会话：org/ticket/department/{department_uid}/{visitor_uid}
     private static final String TOPIC_ORG_AGENT_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s"; // "org/agent/%s";
     private static final String TOPIC_ORG_AGENT_THREAD_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s/%s"; // "org/agent/%s/%s";
     private static final String TOPIC_ORG_WORKGROUP_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s"; // "org/workgroup/%s";
     private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
     private static final String TOPIC_ORG_UNIFIED_THREAD_PATTERN = TOPIC_ORG_UNIFIED_PREFIX + "%s/%s"; // "org/unified/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
-    // department ticket thread
     private static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN = TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/department/%s/%s";
 
+
+    /**
+     * 判断一个主题是否为客服相关主题
+     * 包括：客服、技能组、统一入口和部门工单等
+     * 
+     * @param topic 需要判断的主题
+     * @return 如果是客服相关主题返回true，否则返回false
+     */
+    public static Boolean isCustomerServiceTopic(String topic) {
+        return isOrgAgentTopic(topic) || 
+               isOrgWorkgroupTopic(topic) || 
+               isOrgUnifiedTopic(topic) || 
+               isOrgDepartmentTicketThreadTopic(topic) ||
+               isOrgQueueTopic(topic);
+    }
 
     public static String getUserTopic(String userUid) {
         return String.format(TOPIC_USER_PATTERN, userUid);

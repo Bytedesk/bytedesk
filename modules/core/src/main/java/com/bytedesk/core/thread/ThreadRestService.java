@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 10:45:59
+ * @LastEditTime: 2025-07-05 12:03:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -130,8 +131,17 @@ public class ThreadRestService
             return Page.empty();
         }
 
+        // 过滤出客服相关主题
+        Set<String> customerServiceTopics = topicOptional.get().getTopics().stream()
+                .filter(TopicUtils::isCustomerServiceTopic)
+                .collect(java.util.stream.Collectors.toSet());
+        
+        if (customerServiceTopics.isEmpty()) {
+            return Page.empty();
+        }
+
         Pageable pageable = request.getPageable();
-        Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(topicOptional.get().getTopics(), pageable);
+        Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(customerServiceTopics, pageable);
         return threadPage.map(this::convertToResponse);
     }
 
