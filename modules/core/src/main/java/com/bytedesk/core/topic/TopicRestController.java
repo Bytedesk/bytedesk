@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:14:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:37:38
+ * @LastEditTime: 2025-07-05 12:45:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,61 +13,174 @@
  */
 package com.bytedesk.core.topic;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+/**
+ * 主题管理接口
+ * 
+ * @author Jackning
+ * @since 2024-04-13
+ */
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/topic")
+@Tag(name = "主题管理", description = "主题管理相关接口，包括查询、创建、更新、删除等操作")
 public class TopicRestController extends BaseRestController<TopicRequest> {
 
+    private final TopicRestService topicRestService;
 
+    /**
+     * 根据组织查询主题
+     * 
+     * @param request 查询请求
+     * @return 分页主题列表
+     */
+    @Operation(summary = "根据组织查询主题", description = "返回当前组织的主题列表")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TopicRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Page<TopicResponse> topicPage = topicRestService.queryByOrg(request);
+        return ResponseEntity.ok(JsonResult.success(topicPage));
     }
 
+    /**
+     * 根据用户查询主题
+     * 
+     * @param request 查询请求
+     * @return 分页主题列表
+     */
+    @Operation(summary = "根据用户查询主题", description = "返回当前用户的主题列表")
+    @GetMapping("/query/user")
     @Override
     public ResponseEntity<?> queryByUser(TopicRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        Page<TopicResponse> topicPage = topicRestService.queryByUser(request);
+        return ResponseEntity.ok(JsonResult.success(topicPage));
     }
 
-    @Override
-    public ResponseEntity<?> create(TopicRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-    @Override
-    public ResponseEntity<?> update(TopicRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public ResponseEntity<?> delete(TopicRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public Object export(TopicRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
-    }
-
+    /**
+     * 根据UID查询主题
+     * 
+     * @param request 查询请求
+     * @return 主题信息
+     */
+    @Operation(summary = "根据UID查询主题", description = "通过唯一标识符查询主题")
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(TopicRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        TopicResponse topicResponse = topicRestService.queryByUid(request);
+        if (topicResponse != null) {
+            return ResponseEntity.ok(JsonResult.success(topicResponse));
+        }
+        return ResponseEntity.ok(JsonResult.error("未找到主题"));
+    }
+
+    /**
+     * 创建主题
+     * 
+     * @param request 创建主题请求
+     * @return 创建的主题
+     */
+    @Operation(summary = "创建主题", description = "创建新的主题")
+    @ActionAnnotation(title = "主题", action = "新建", description = "create topic")
+    @PostMapping("/create")
+    @Override
+    public ResponseEntity<?> create(@RequestBody TopicRequest request) {
+        TopicResponse topic = topicRestService.create(request);
+        return ResponseEntity.ok(JsonResult.success(topic));
+    }
+
+    /**
+     * 更新主题
+     * 
+     * @param request 更新主题请求
+     * @return 更新后的主题
+     */
+    @Operation(summary = "更新主题", description = "更新已存在的主题信息")
+    @ActionAnnotation(title = "主题", action = "更新", description = "update topic")
+    @PostMapping("/update")
+    @Override
+    public ResponseEntity<?> update(@RequestBody TopicRequest request) {
+        TopicResponse topicResponse = topicRestService.update(request);
+        return ResponseEntity.ok(JsonResult.success(topicResponse));
+    }
+
+    /**
+     * 订阅主题
+     * 
+     * @param request 订阅请求
+     * @return 订阅结果
+     */
+    @Operation(summary = "订阅主题", description = "订阅指定主题")
+    @PostMapping("/subscribe")
+    public ResponseEntity<?> subscribe(@RequestBody TopicRequest request) {
+        topicRestService.subscribe(request.getTopic(), request.getClientIds().iterator().next());
+        return ResponseEntity.ok(JsonResult.success("订阅主题成功"));
+    }
+
+    /**
+     * 取消订阅主题
+     * 
+     * @param request 取消订阅请求
+     * @return 取消订阅结果
+     */
+    @Operation(summary = "取消订阅主题", description = "取消订阅指定主题")
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(@RequestBody TopicRequest request) {
+        topicRestService.unsubscribe(request.getTopic(), request.getClientIds().iterator().next());
+        return ResponseEntity.ok(JsonResult.success("取消订阅主题成功"));
+    }
+
+    /**
+     * 删除主题
+     * 
+     * @param request 删除请求
+     * @return 删除结果
+     */
+    @Operation(summary = "删除主题", description = "删除指定主题")
+    @ActionAnnotation(title = "主题", action = "删除", description = "delete topic")
+    @PostMapping("/delete")
+    @Override
+    public ResponseEntity<?> delete(@RequestBody TopicRequest request) {
+        topicRestService.delete(request);
+        return ResponseEntity.ok(JsonResult.success("删除主题成功"));
+    }
+
+    /**
+     * 导出主题列表
+     * 
+     * @param request 导出请求
+     * @param response HTTP响应
+     * @return 导出结果
+     */
+    @Operation(summary = "导出主题列表", description = "将主题数据导出为Excel格式")
+    @ActionAnnotation(title = "主题", action = "导出", description = "export topic")
+    @GetMapping("/export")
+    @Override
+    public Object export(TopicRequest request, HttpServletResponse response) {
+        // 如果没有TopicExcel类，需要创建一个
+        return exportTemplate(
+            request,
+            response,
+            topicRestService,
+            TopicEntity.class, // 如果存在TopicExcel类，应替换为TopicExcel.class
+            "主题列表",
+            "topic"
+        );
     }
     
 }
