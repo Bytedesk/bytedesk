@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 09:57:14
+ * @LastEditTime: 2025-07-05 14:34:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,8 +71,9 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         Optional<TopicEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             return convertToResponse(optional.get());
+        } else {
+            throw new RuntimeException("Failed to query topic by uid: " + request.getUid());
         }
-        return null;
     }
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
@@ -82,18 +83,18 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         return findByUserUid(userUid);
     }
 
-    @Cacheable(value = "topic", key = "#uid", unless="#result==null")
+    @Cacheable(value = "topic", key = "#uid", unless = "#result==null")
     @Override
     public Optional<TopicEntity> findByUid(String uid) {
         return topicRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "topic", key = "#userUid", unless="#result==null")
+    @Cacheable(value = "topic", key = "#userUid", unless = "#result==null")
     public Optional<TopicEntity> findByUserUid(String userUid) {
         return topicRepository.findFirstByUserUid(userUid);
     }
 
-    @Cacheable(value = "topic", key = "#topic", unless="#result==null")
+    @Cacheable(value = "topic", key = "#topic", unless = "#result==null")
     public Set<TopicEntity> findByTopic(String topic) {
         return topicRepository.findByTopicsContains(topic);
     }
@@ -127,7 +128,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             if (request.getClientIds() != null) {
                 entity.getClientIds().addAll(request.getClientIds());
             }
-            
+
             TopicEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
@@ -171,7 +172,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             if (request.getClientIds() != null) {
                 entity.getClientIds().addAll(request.getClientIds());
             }
-            
+
             TopicEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
@@ -188,7 +189,8 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     }
 
     @Override
-    public TopicEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TopicEntity entity) {
+    public TopicEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TopicEntity entity) {
         try {
             Optional<TopicEntity> latest = findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -227,172 +229,199 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         return modelMapper.map(entity, TopicResponse.class);
     }
 
+    // 删除topic
+    @Transactional
+    public void remove(TopicRequest topicRequest) {
+        Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            topicElement.getTopics().remove(topicRequest.getTopic());
+            save(topicElement);
+        }
+    }
 
-     // 删除topic
-     @Transactional
-     public void remove(TopicRequest topicRequest) {
-         Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
-         if (topicOptional.isPresent()) {
-             TopicEntity topicElement = topicOptional.get();
-             topicElement.getTopics().remove(topicRequest.getTopic());
-             save(topicElement);
-         }
-     }
- 
-     // 删除topic
-     @Transactional
-     public void remove(String topic, String userUid) {
-         Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-         if (topicOptional.isPresent()) {
-             TopicEntity topicElement = topicOptional.get();
-             if (!topicElement.getTopics().contains(topic)) {
-                 return;
-             }
-             log.info("remove topic: {}, userUid {}", topic, userUid);
-             topicElement.getTopics().remove(topic);
-             save(topicElement);
-         }
-     }
- 
-     // 订阅topic
-     @Transactional
-     public void subscribe(String topic, String clientId) {
-         // 用户clientId格式: uid/client/deviceUid
-         Optional<TopicEntity> topicOptional = findByClientId(clientId);
-         if (topicOptional.isPresent()) {
-             TopicEntity topicElement = topicOptional.get();
-             if (topicElement.getTopics().contains(topic)) {
-                 log.info("create: {}", topic);
-                 return;
-             }
-             topicElement.getTopics().add(topic);
-             save(topicElement);
-         } else {
-             // create
-             final String uid = clientId.split("/")[0];
-             TopicRequest topicRequest = TopicRequest.builder()
-                     .topic(topic)
-                     .userUid(uid)
-                     .build();
-             topicRequest.getClientIds().add(clientId);
-             create(topicRequest);
-         }
-     }
- 
-     // 取消订阅topic
-     @Transactional
-     public void unsubscribe(String topic, String clientId) {
-         // 用户clientId格式: userUid/client/deviceUid
-         Optional<TopicEntity> topicOptional = findByClientId(clientId);
-         if (topicOptional.isPresent()) {
-             TopicEntity topicElement = topicOptional.get();
-             if (topicElement.getTopics().contains(topic)) {
-                 log.info("create: {}", topic);
-                 return;
-             }
-             topicElement.getTopics().add(topic);
-             save(topicElement);
-         }
-     }
- 
-     @Transactional
-     public void addClientId(String clientId) {
-         // 用户clientId格式: userUid/client/deviceUid
-         final String userUid = clientId.split("/")[0];
-         Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-         if (topicOptional.isPresent()) {
-             TopicEntity topic = topicOptional.get();
-             if (!topic.getClientIds().contains(clientId)) {
-                 log.info("addClientId: {}", clientId);
-                 topic.getClientIds().add(clientId);
-                 save(topic);
-             }
-         }
-     }
- 
-     @Transactional
-     public void removeClientId(String clientId) {
-         // 用户clientId格式: userUid/client/deviceUid
-         Optional<TopicEntity> topicOptional = findByClientId(clientId);
-         if (topicOptional.isPresent()) {
-             TopicEntity topic = topicOptional.get();
-             if (topic.getClientIds().contains(clientId)) {
-                 log.info("removeClientId: {}", clientId);
-                 topic.getClientIds().remove(clientId);
-                 save(topic);
-             }
-         }
-     }
+    // 删除topic
+    @Transactional
+    public void remove(String topic, String userUid) {
+        Optional<TopicEntity> topicOptional = findByUserUid(userUid);
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            if (!topicElement.getTopics().contains(topic)) {
+                return;
+            }
+            log.info("remove topic: {}, userUid {}", topic, userUid);
+            topicElement.getTopics().remove(topic);
+            save(topicElement);
+        }
+    }
+
+    // 订阅topic
+    @Transactional
+    public void subscribe(String topic, String clientId) {
+        // 用户clientId格式: uid/client/deviceUid
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            if (topicElement.getTopics().contains(topic)) {
+                log.info("create: {}", topic);
+                return;
+            }
+            topicElement.getTopics().add(topic);
+            save(topicElement);
+        } else {
+            // create
+            final String uid = clientId.split("/")[0];
+            TopicRequest topicRequest = TopicRequest.builder()
+                    .topic(topic)
+                    .userUid(uid)
+                    .build();
+            topicRequest.getClientIds().add(clientId);
+            create(topicRequest);
+        }
+    }
+
+    @Transactional
+    public TopicResponse subscribe(TopicRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("login first");
+        }
+        String topic = request.getTopic();
+        Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            if (topicElement.getTopics().contains(topic)) {
+                return convertToResponse(topicElement);
+            } else {
+                topicElement.getTopics().add(topic);
+            }
+            TopicEntity savedEntity = save(topicElement);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update topic failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            // create new topic
+            request.setUserUid(user.getUid());
+            // request.getClientIds().add(request.getClientId());
+            return create(request);
+        }
+    }
+
+    // 取消订阅topic
+    @Transactional
+    public void unsubscribe(String topic, String clientId) {
+        // 用户clientId格式: userUid/client/deviceUid
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
+        if (topicOptional.isPresent()) {
+            TopicEntity topicElement = topicOptional.get();
+            if (topicElement.getTopics().contains(topic)) {
+                log.info("create: {}", topic);
+                return;
+            }
+            topicElement.getTopics().add(topic);
+            save(topicElement);
+        }
+    }
+
+    @Transactional
+    public void addClientId(String clientId) {
+        // 用户clientId格式: userUid/client/deviceUid
+        final String userUid = clientId.split("/")[0];
+        Optional<TopicEntity> topicOptional = findByUserUid(userUid);
+        if (topicOptional.isPresent()) {
+            TopicEntity topic = topicOptional.get();
+            if (!topic.getClientIds().contains(clientId)) {
+                log.info("addClientId: {}", clientId);
+                topic.getClientIds().add(clientId);
+                save(topic);
+            }
+        }
+    }
+
+    @Transactional
+    public void removeClientId(String clientId) {
+        // 用户clientId格式: userUid/client/deviceUid
+        Optional<TopicEntity> topicOptional = findByClientId(clientId);
+        if (topicOptional.isPresent()) {
+            TopicEntity topic = topicOptional.get();
+            if (topic.getClientIds().contains(clientId)) {
+                log.info("removeClientId: {}", clientId);
+                topic.getClientIds().remove(clientId);
+                save(topic);
+            }
+        }
+    }
 
     // // 添加clientId
     // @CacheEvict(value = "topic", key = "#userUid")
     // public void addClientId(String clientId) {
-    //     // 用户clientId格式: userUid/client/deviceUid
-    //     final String userUid = clientId.split("/")[0];
-    //     Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    //     if (topicOptional.isPresent()) {
-    //         TopicEntity topic = topicOptional.get();
-    //         if (!topic.getClientIds().contains(clientId)) {
-    //             log.info("addClientId: {}", clientId);
-    //             topic.getClientIds().add(clientId);
-    //             save(topic);
-    //         }
-    //     }
+    // // 用户clientId格式: userUid/client/deviceUid
+    // final String userUid = clientId.split("/")[0];
+    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
+    // if (topicOptional.isPresent()) {
+    // TopicEntity topic = topicOptional.get();
+    // if (!topic.getClientIds().contains(clientId)) {
+    // log.info("addClientId: {}", clientId);
+    // topic.getClientIds().add(clientId);
+    // save(topic);
+    // }
+    // }
     // }
 
     // // 移除clientId
     // @CacheEvict(value = "topic", key = "#userUid")
     // public void removeClientId(String clientId) {
-    //     // 用户clientId格式: userUid/client/deviceUid
-    //     final String userUid = clientId.split("/")[0];
-    //     Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    //     if (topicOptional.isPresent()) {
-    //         TopicEntity topic = topicOptional.get();
-    //         if (topic.getClientIds().contains(clientId)) {
-    //             log.info("removeClientId: {}", clientId);
-    //             topic.getClientIds().remove(clientId);
-    //             save(topic);
-    //         }
-    //     }
+    // // 用户clientId格式: userUid/client/deviceUid
+    // final String userUid = clientId.split("/")[0];
+    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
+    // if (topicOptional.isPresent()) {
+    // TopicEntity topic = topicOptional.get();
+    // if (topic.getClientIds().contains(clientId)) {
+    // log.info("removeClientId: {}", clientId);
+    // topic.getClientIds().remove(clientId);
+    // save(topic);
+    // }
+    // }
     // }
 
     // // 订阅topic
     // @CacheEvict(value = "topic", key = "#userUid")
     // public void subscribe(String topic, String clientId) {
-    //     // 用户clientId格式: uid/client/deviceUid
-    //     final String userUid = clientId.split("/")[0];
-    //     Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    //     if (topicOptional.isPresent()) {
-    //         TopicEntity topicElement = topicOptional.get();
-    //         if (topicElement.getTopics().contains(topic)) {
-    //             log.info("topic already exists: {}", topic);
-    //             return;
-    //         }
-    //         topicElement.getTopics().add(topic);
-    //         save(topicElement);
-    //     } else {
-    //         // create new topic
-    //         TopicRequest topicRequest = TopicRequest.builder()
-    //                 .topic(topic)
-    //                 .userUid(userUid)
-    //                 .build();
-    //         topicRequest.getClientIds().add(clientId);
-    //         create(topicRequest);
-    //     }
+    // // 用户clientId格式: uid/client/deviceUid
+    // final String userUid = clientId.split("/")[0];
+    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
+    // if (topicOptional.isPresent()) {
+    // TopicEntity topicElement = topicOptional.get();
+    // if (topicElement.getTopics().contains(topic)) {
+    // log.info("topic already exists: {}", topic);
+    // return;
+    // }
+    // topicElement.getTopics().add(topic);
+    // save(topicElement);
+    // } else {
+    // // create new topic
+    // TopicRequest topicRequest = TopicRequest.builder()
+    // .topic(topic)
+    // .userUid(userUid)
+    // .build();
+    // topicRequest.getClientIds().add(clientId);
+    // create(topicRequest);
+    // }
     // }
 
     // // 取消订阅topic
     // @CacheEvict(value = "topic", key = "#userUid")
     // public void unsubscribe(String topic, String clientId) {
-    //     // 用户clientId格式: userUid/client/deviceUid
-    //     final String userUid = clientId.split("/")[0];
-    //     Optional<TopicEntity> topicOptional = findByUserUid(userUid);
-    //     if (topicOptional.isPresent()) {
-    //         TopicEntity topicElement = topicOptional.get();
-    //         if (topicElement.getTopics().contains(topic)) {
-    //             topicElement.getTopics().remove(topic);
-    //             save(topicElement);
-    //         }
-    //     }
+    // // 用户clientId格式: userUid/client/deviceUid
+    // final String userUid = clientId.split("/")[0];
+    // Optional<TopicEntity> topicOptional = findByUserUid(userUid);
+    // if (topicOptional.isPresent()) {
+    // TopicEntity topicElement = topicOptional.get();
+    // if (topicElement.getTopics().contains(topic)) {
+    // topicElement.getTopics().remove(topic);
+    // save(topicElement);
+    // }
+    // }
     // }
 }
