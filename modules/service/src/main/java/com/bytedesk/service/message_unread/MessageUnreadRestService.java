@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 16:47:38
+ * @LastEditTime: 2025-07-05 17:34:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.message.MessageExtra;
-import com.bytedesk.core.message.MessagePersistService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -42,8 +41,6 @@ public class MessageUnreadRestService
         extends BaseRestService<MessageUnreadEntity, MessageUnreadRequest, MessageUnreadResponse> {
 
     private final MessageUnreadRepository messageUnreadRepository;
-
-    private final MessagePersistService messagePersistService;
 
     private final ModelMapper modelMapper;
 
@@ -124,8 +121,10 @@ public class MessageUnreadRestService
         String threadUid = messageProtobuf.getThread().getUid();
         String threadTopic = messageProtobuf.getThread().getTopic();
 
-        // 返回true表示该消息是系统通知，不应该保存到数据库
-        if (messagePersistService.dealWithMessageNotification(type, messageProtobuf)) {
+        // 目前只记录文本、图片和文件类型的未读消息
+        if (!MessageTypeEnum.TEXT.equals(type) &&
+            !MessageTypeEnum.IMAGE.equals(type) &&
+            !MessageTypeEnum.FILE.equals(type)) {
             return;
         }
         //

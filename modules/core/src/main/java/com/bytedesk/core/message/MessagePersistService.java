@@ -174,67 +174,9 @@ public class MessagePersistService {
 
     // 消息撤回，从数据库中删除消息
     private void dealWithMessageRecall(MessageProtobuf message) {
-        // log.info("dealWithMessageRecall");
         // content为撤回消息的uid
         messageRestService.deleteByUid(message.getContent());
     }
-
-    // private void dealWithRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-    //     // log.info("dealWithMessageRateSubmit");
-    //     // 如果是客服邀请评价，则content为邀请评价消息的uid，否则为空
-    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-    //     if (messageOpt.isPresent()) {
-    //         MessageEntity messageEntity = messageOpt.get();
-    //         if (MessageTypeEnum.RATE_SUBMIT.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.RATE_SUBMIT.name());
-    //             messageEntity.setContent(message.getExtra());
-    //         } else if (MessageTypeEnum.RATE_CANCEL.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.RATE_CANCEL.name());
-    //         }
-    //         messageRestService.save(messageEntity);
-    //     }
-    // }
-
-    // private void dealWithMessageLeave(MessageTypeEnum type, MessageProtobuf message) {
-    //     log.info("dealWithMessageLeave");
-    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-    //     if (messageOpt.isPresent()) {
-    //         MessageEntity messageEntity = messageOpt.get();
-    //         if (MessageTypeEnum.LEAVE_MSG_SUBMIT.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.LEAVE_MSG_SUBMIT.name());
-    //             messageEntity.setContent(message.getExtra());
-    //             messageRestService.save(messageEntity);
-    //         }
-    //     }
-    // }
-
-    // private void dealWithFaqRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-    //     // log.info("dealWithFaqRateMessage");
-    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-    //     if (messageOpt.isPresent()) {
-    //         MessageEntity messageEntity = messageOpt.get();
-    //         if (MessageTypeEnum.FAQ_UP.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
-    //         } else if (MessageTypeEnum.FAQ_DOWN.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
-    //         }
-    //         messageRestService.save(messageEntity);
-    //     }
-    // }
-
-    // private void dealWithRobotRateMessage(MessageTypeEnum type, MessageProtobuf message) {
-    //     // log.info("dealWithRobotRateMessage");
-    //     Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-    //     if (messageOpt.isPresent()) {
-    //         MessageEntity messageEntity = messageOpt.get();
-    //         if (MessageTypeEnum.ROBOT_UP.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.RATE_UP.name());
-    //         } else if (MessageTypeEnum.ROBOT_DOWN.equals(type)) {
-    //             messageEntity.setStatus(MessageStatusEnum.RATE_DOWN.name());
-    //         }
-    //         messageRestService.save(messageEntity);
-    //     }
-    // }
 
     // 处理转接消息
     private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
