@@ -15,7 +15,6 @@ package com.bytedesk.core.topic;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,10 +50,11 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      * @return 分页主题列表
      */
     @Operation(summary = "根据组织查询主题", description = "返回当前组织的主题列表")
-    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TopicRequest request) {
+
         Page<TopicResponse> topicPage = topicRestService.queryByOrg(request);
+
         return ResponseEntity.ok(JsonResult.success(topicPage));
     }
 
@@ -65,10 +65,11 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      * @return 分页主题列表
      */
     @Operation(summary = "根据用户查询主题", description = "返回当前用户的主题列表")
-    @GetMapping("/query/user")
     @Override
     public ResponseEntity<?> queryByUser(TopicRequest request) {
+
         Page<TopicResponse> topicPage = topicRestService.queryByUser(request);
+
         return ResponseEntity.ok(JsonResult.success(topicPage));
     }
 
@@ -79,14 +80,12 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      * @return 主题信息
      */
     @Operation(summary = "根据UID查询主题", description = "通过唯一标识符查询主题")
-    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(TopicRequest request) {
+
         TopicResponse topicResponse = topicRestService.queryByUid(request);
-        if (topicResponse != null) {
-            return ResponseEntity.ok(JsonResult.success(topicResponse));
-        }
-        return ResponseEntity.ok(JsonResult.error("未找到主题"));
+
+        return ResponseEntity.ok(JsonResult.success(topicResponse));
     }
 
     /**
@@ -97,10 +96,11 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      */
     @Operation(summary = "创建主题", description = "创建新的主题")
     @ActionAnnotation(title = "主题", action = "新建", description = "create topic")
-    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody TopicRequest request) {
+
         TopicResponse topic = topicRestService.create(request);
+
         return ResponseEntity.ok(JsonResult.success(topic));
     }
 
@@ -112,10 +112,11 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      */
     @Operation(summary = "更新主题", description = "更新已存在的主题信息")
     @ActionAnnotation(title = "主题", action = "更新", description = "update topic")
-    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody TopicRequest request) {
+
         TopicResponse topicResponse = topicRestService.update(request);
+
         return ResponseEntity.ok(JsonResult.success(topicResponse));
     }
 
@@ -128,7 +129,9 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
     @Operation(summary = "订阅主题", description = "订阅指定主题")
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@RequestBody TopicRequest request) {
+
         topicRestService.subscribe(request.getTopic(), request.getClientIds().iterator().next());
+
         return ResponseEntity.ok(JsonResult.success("订阅主题成功"));
     }
 
@@ -141,7 +144,9 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
     @Operation(summary = "取消订阅主题", description = "取消订阅指定主题")
     @PostMapping("/unsubscribe")
     public ResponseEntity<?> unsubscribe(@RequestBody TopicRequest request) {
+
         topicRestService.unsubscribe(request.getTopic(), request.getClientIds().iterator().next());
+
         return ResponseEntity.ok(JsonResult.success("取消订阅主题成功"));
     }
 
@@ -153,10 +158,11 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      */
     @Operation(summary = "删除主题", description = "删除指定主题")
     @ActionAnnotation(title = "主题", action = "删除", description = "delete topic")
-    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody TopicRequest request) {
+
         topicRestService.delete(request);
+        
         return ResponseEntity.ok(JsonResult.success("删除主题成功"));
     }
 
@@ -169,7 +175,6 @@ public class TopicRestController extends BaseRestController<TopicRequest> {
      */
     @Operation(summary = "导出主题列表", description = "将主题数据导出为Excel格式")
     @ActionAnnotation(title = "主题", action = "导出", description = "export topic")
-    @GetMapping("/export")
     @Override
     public Object export(TopicRequest request, HttpServletResponse response) {
         // 如果没有TopicExcel类，需要创建一个
