@@ -44,6 +44,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
+import com.bytedesk.core.topic.TopicRepository;
+import com.bytedesk.core.topic.TopicEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
