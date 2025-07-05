@@ -31,4 +31,8 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteByThreadTopicContainsAndUserNotContains(String uid1, String uid2);
+
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    void deleteByUid(String uid);
 }

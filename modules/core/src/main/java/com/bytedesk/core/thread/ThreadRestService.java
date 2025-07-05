@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 15:59:23
+ * @LastEditTime: 2025-07-05 16:50:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -604,7 +604,7 @@ public class ThreadRestService
         if (Boolean.TRUE.equals(request.getUnsubscribe())) {
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(request.getTopic())
-                    .userUid(updateThread.getUserUid())
+                    .userUid(request.getUserUid())
                     .build();
             topicRestService.remove(topicRequest);
         }
@@ -616,6 +616,12 @@ public class ThreadRestService
 
     // 找到第一个未关闭的，执行关闭并返回，用于处理前端传递thread.uid不准确的情况
     public ThreadResponse closeByTopic(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("login first");
+        }
+        request.setUserUid(user.getUid());
+
         List<ThreadEntity> threads = findListByTopic(request.getTopic());
         for (ThreadEntity thread : threads) {
             // 找到第一个未关闭的，执行关闭并返回
@@ -635,7 +641,7 @@ public class ThreadRestService
                 if (Boolean.TRUE.equals(request.getUnsubscribe())) {
                     TopicRequest topicRequest = TopicRequest.builder()
                             .topic(request.getTopic())
-                            .userUid(updateThread.getUserUid())
+                            .userUid(request.getUserUid())
                             .build();
                     topicRestService.remove(topicRequest);
                 }
