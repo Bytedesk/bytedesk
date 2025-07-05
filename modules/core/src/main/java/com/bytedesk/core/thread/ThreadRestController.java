@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 10:01:13
+ * @LastEditTime: 2025-07-05 10:44:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -293,6 +293,21 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         ThreadResponse threadResponse = threadRestService.updateUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    /**
+     * 根据用户UID查询所有会话
+     * 
+     * @param request 包含userUid的请求
+     * @return 用户所有会话列表
+     */
+    @Operation(summary = "根据用户UID查询所有会话", description = "通过userUid查询用户相关的所有会话")
+    @GetMapping("/query/by/user/topics")
+    public ResponseEntity<?> queryByUserTopics(ThreadRequest request) {
+        
+        Page<ThreadResponse> responses = threadRestService.queryThreadsByUserTopics(request);
+
+        return ResponseEntity.ok(JsonResult.success(responses));
     }
 
     // update/note

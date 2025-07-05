@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 13:35:37
+ * @LastEditTime: 2025-07-05 10:45:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,8 @@
  */
 package com.bytedesk.core.thread;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -44,8 +41,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
-import com.bytedesk.core.topic.TopicRepository;
 import com.bytedesk.core.topic.TopicEntity;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -69,7 +66,7 @@ public class ThreadRestService
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final TopicRepository topicRepository;
+    private final TopicRestService topicRestService;
 
     @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
@@ -120,6 +117,22 @@ public class ThreadRestService
             return Optional.of(convertToResponse(threadOptional.get()));
         }
         return Optional.empty();
+    }
+
+    public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("login first");
+        }
+
+        Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
+        if (!topicOptional.isPresent()) {
+            return Page.empty();
+        }
+
+        Pageable pageable = request.getPageable();
+        Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(topicOptional.get().getTopics(), pageable);
+        return threadPage.map(this::convertToResponse);
     }
 
     @Transactional

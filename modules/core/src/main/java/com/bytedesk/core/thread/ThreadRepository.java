@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 19:28:35
+ * @LastEditTime: 2025-07-05 10:41:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,9 +82,9 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         List<ThreadEntity> findByTopicAndStatusNotAndDeletedFalse(@Param("topic") String topic, @Param("status") String status);
 
         @Query("SELECT t FROM ThreadEntity t WHERE t.topic IN :topics AND t.deleted = false")
-        List<ThreadEntity> findByTopicsInAndDeletedFalse(@Param("topics") List<String> topics);
+        List<ThreadEntity> findByTopicsInAndDeletedFalse(@Param("topics") Set<String> topics);
 
         @Query("SELECT t FROM ThreadEntity t WHERE t.topic IN :topics AND t.deleted = false")
-        Page<ThreadEntity> findByTopicsInAndDeletedFalse(@Param("topics") List<String> topics, Pageable pageable);
+        Page<ThreadEntity> findByTopicsInAndDeletedFalse(@Param("topics") Set<String> topics, Pageable pageable);
 
 }
