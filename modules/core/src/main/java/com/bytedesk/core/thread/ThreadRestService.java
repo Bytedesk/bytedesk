@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 13:30:31
+ * @LastEditTime: 2025-07-05 15:59:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,6 +48,7 @@ import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.topic.TopicEntity;
+import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -140,28 +141,28 @@ public class ThreadRestService
         Set<String> customerServiceTopics = topicOptional.get().getTopics().stream()
                 .filter(TopicUtils::isCustomerServiceTopic)
                 .collect(java.util.stream.Collectors.toSet());
-        
+
         if (customerServiceTopics.isEmpty()) {
             return Page.empty();
         }
 
         Pageable pageable = request.getPageable();
         Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(customerServiceTopics, pageable);
-        
+
         // 对结果按topic进行过滤，每个topic只保留一条记录
         Map<String, ThreadEntity> uniqueThreadsByTopic = new HashMap<>();
         threadPage.getContent().forEach(thread -> {
             uniqueThreadsByTopic.putIfAbsent(thread.getTopic(), thread);
         });
-        
+
         // 将过滤后的结果转换为Page对象
         List<ThreadEntity> uniqueThreads = new ArrayList<>(uniqueThreadsByTopic.values());
         Page<ThreadEntity> filteredPage = new PageImpl<>(
-                uniqueThreads, 
-                pageable, 
+                uniqueThreads,
+                pageable,
                 Math.min(uniqueThreads.size(), threadPage.getTotalElements()) // 调整总数
         );
-        
+
         return filteredPage.map(this::convertToResponse);
     }
 
@@ -227,8 +228,8 @@ public class ThreadRestService
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, owner);
         if (threadOptional.isPresent()) {
             deleteByUid(threadOptional.get().getUid());
-            // 
-            bytedeskEventPublisher.publishEvent(new ThreadRemoveTopicEvent(this,threadOptional.get()));
+            //
+            bytedeskEventPublisher.publishEvent(new ThreadRemoveTopicEvent(this, threadOptional.get()));
         }
     }
 
@@ -327,7 +328,8 @@ public class ThreadRestService
         thread.setStar(threadRequest.getStar());
         thread.setFold(threadRequest.getFold());
         thread.setContent(threadRequest.getContent());
-        // thread.setTagList(threadRequest.getTagList());  // 标签列表不在这里更新，使用 updateTagList 方法更新
+        // thread.setTagList(threadRequest.getTagList()); // 标签列表不在这里更新，使用 updateTagList
+        // 方法更新
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -337,7 +339,7 @@ public class ThreadRestService
     }
 
     // update top
-    public ThreadResponse updateTop(ThreadRequest threadRequest) {  
+    public ThreadResponse updateTop(ThreadRequest threadRequest) {
         if (!StringUtils.hasText(threadRequest.getUid())) {
             throw new RuntimeException("thread uid is required");
         }
@@ -577,20 +579,20 @@ public class ThreadRestService
         return close(threadRequest);
     }
 
-    public ThreadResponse close(ThreadRequest threadRequest) {
-        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+    public ThreadResponse close(ThreadRequest request) {
+        Optional<ThreadEntity> threadOptional = findByUid(request.getUid());
         if (!threadOptional.isPresent()) {
-            throw new RuntimeException("close thread " + threadRequest.getUid() + " not found");
+            throw new RuntimeException("close thread " + request.getUid() + " not found");
         }
         //
         ThreadEntity thread = threadOptional.get();
         if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
             throw new RuntimeException("thread " + thread.getUid() + " is already closed");
         }
-        thread.setAutoClose(threadRequest.getAutoClose());
-        thread.setStatus(threadRequest.getStatus());
+        thread.setAutoClose(request.getAutoClose());
+        thread.setStatus(request.getStatus());
         // 发布关闭消息, 通知用户
-        String content = threadRequest.getAutoClose()
+        String content = request.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED
                 : I18Consts.I18N_AGENT_CLOSED;
         thread.setContent(content);
@@ -599,6 +601,13 @@ public class ThreadRestService
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
+        if (request.getUnsubscribe()) {
+            TopicRequest topicRequest = TopicRequest.builder()
+                    .topic(request.getTopic())
+                    .userUid(updateThread.getUserUid())
+                    .build();
+            topicRestService.remove(topicRequest);
+        }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
         //
@@ -606,15 +615,15 @@ public class ThreadRestService
     }
 
     // 找到第一个未关闭的，执行关闭并返回，用于处理前端传递thread.uid不准确的情况
-    public ThreadResponse closeByTopic(ThreadRequest threadRequest) {
-        List<ThreadEntity> threads = findListByTopic(threadRequest.getTopic());
+    public ThreadResponse closeByTopic(ThreadRequest request) {
+        List<ThreadEntity> threads = findListByTopic(request.getTopic());
         for (ThreadEntity thread : threads) {
             // 找到第一个未关闭的，执行关闭并返回
             if (!thread.isClosed()) {
-                thread.setAutoClose(threadRequest.getAutoClose());
+                thread.setAutoClose(request.getAutoClose());
                 thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
                 // 发布关闭消息, 通知用户
-                String content = threadRequest.getAutoClose()
+                String content = request.getAutoClose()
                         ? I18Consts.I18N_AUTO_CLOSED
                         : I18Consts.I18N_AGENT_CLOSED;
                 thread.setContent(content);
@@ -622,6 +631,13 @@ public class ThreadRestService
                 ThreadEntity updateThread = save(thread);
                 if (updateThread == null) {
                     throw new RuntimeException("thread save failed");
+                }
+                if (request.getUnsubscribe()) {
+                    TopicRequest topicRequest = TopicRequest.builder()
+                            .topic(request.getTopic())
+                            .userUid(updateThread.getUserUid())
+                            .build();
+                    topicRestService.remove(topicRequest);
                 }
                 // 发布关闭事件
                 bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
@@ -671,7 +687,7 @@ public class ThreadRestService
         return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
-    //找到某个访客当前对应某技能组未关闭会话
+    // 找到某个访客当前对应某技能组未关闭会话
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
         List<String> states = Arrays.asList(new String[] { ThreadProcessStatusEnum.CLOSED.name() });
@@ -691,8 +707,8 @@ public class ThreadRestService
 
     @Override
     @Caching(put = {
-        @CachePut(value = "thread", key = "#thread.uid", unless = "#result == null"),
-        @CachePut(value = "thread", key = "#thread.topic", unless = "#result == null")
+            @CachePut(value = "thread", key = "#thread.uid", unless = "#result == null"),
+            @CachePut(value = "thread", key = "#thread.topic", unless = "#result == null")
     })
     protected ThreadEntity doSave(ThreadEntity entity) {
         log.info("doSave thread agent: {}, owner: {}", entity.getAgent(), entity.getOwner());
@@ -701,8 +717,8 @@ public class ThreadRestService
 
     @Override
     @Caching(put = {
-        @CachePut(value = "thread", key = "#entity.uid", unless = "#result == null"),
-        @CachePut(value = "thread", key = "#entity.topic", unless = "#result == null")
+            @CachePut(value = "thread", key = "#entity.uid", unless = "#result == null"),
+            @CachePut(value = "thread", key = "#entity.topic", unless = "#result == null")
     })
     public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             ThreadEntity entity) {
@@ -710,8 +726,9 @@ public class ThreadRestService
             Optional<ThreadEntity> latestOptional = threadRepository.findByUid(entity.getUid());
             if (latestOptional.isPresent()) {
                 ThreadEntity latestEntity = latestOptional.get();
-                log.warn("Optimistic locking conflict detected for thread topic {}, attempting to merge data", entity.getTopic());
-                
+                log.warn("Optimistic locking conflict detected for thread topic {}, attempting to merge data",
+                        entity.getTopic());
+
                 // Preserve basic thread information
                 if (entity.getTopic() != null) {
                     latestEntity.setTopic(entity.getTopic());
@@ -726,7 +743,7 @@ public class ThreadRestService
                     latestEntity.setStatus(entity.getStatus());
                 }
                 log.info("latestEntity status: {}", latestEntity.getStatus());
-                
+
                 // Preserve thread state flags
                 latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
                 latestEntity.setStar(entity.getStar() != null ? entity.getStar() : latestEntity.getStar());
@@ -735,8 +752,9 @@ public class ThreadRestService
                 latestEntity.setMute(entity.getMute() != null ? entity.getMute() : latestEntity.getMute());
                 latestEntity.setHide(entity.getHide() != null ? entity.getHide() : latestEntity.getHide());
                 latestEntity.setFold(entity.getFold() != null ? entity.getFold() : latestEntity.getFold());
-                latestEntity.setAutoClose(entity.getAutoClose() != null ? entity.getAutoClose() : latestEntity.getAutoClose());
-                
+                latestEntity.setAutoClose(
+                        entity.getAutoClose() != null ? entity.getAutoClose() : latestEntity.getAutoClose());
+
                 // Preserve metadata
                 if (entity.getNote() != null) {
                     latestEntity.setNote(entity.getNote());
@@ -745,12 +763,12 @@ public class ThreadRestService
                     latestEntity.setTagList(entity.getTagList());
                 }
                 // if (entity.getClient() != null) {
-                //     latestEntity.setClient(entity.getClient());
+                // latestEntity.setClient(entity.getClient());
                 // }
                 if (entity.getExtra() != null) {
                     latestEntity.setExtra(entity.getExtra());
                 }
-                
+
                 // Preserve user and agent information
                 if (entity.getUser() != null) {
                     latestEntity.setUser(entity.getUser());
@@ -764,7 +782,7 @@ public class ThreadRestService
                 if (entity.getWorkgroup() != null) {
                     latestEntity.setWorkgroup(entity.getWorkgroup());
                 }
-                
+
                 // Preserve lists
                 if (entity.getInvites() != null && !entity.getInvites().isEmpty()) {
                     latestEntity.setInvites(entity.getInvites());
@@ -778,7 +796,7 @@ public class ThreadRestService
                 if (entity.getTicketors() != null && !entity.getTicketors().isEmpty()) {
                     latestEntity.setTicketors(entity.getTicketors());
                 }
-                
+
                 // Preserve process information
                 if (entity.getProcessInstanceId() != null) {
                     latestEntity.setProcessInstanceId(entity.getProcessInstanceId());
@@ -786,23 +804,23 @@ public class ThreadRestService
                 if (entity.getProcessEntityUid() != null) {
                     latestEntity.setProcessEntityUid(entity.getProcessEntityUid());
                 }
-                
+
                 // Preserve owner if changed
                 if (entity.getOwner() != null) {
                     latestEntity.setOwner(entity.getOwner());
                 }
-                
+
                 log.info("Successfully merged thread data for {}", entity.getUid());
                 return threadRepository.save(latestEntity);
             }
         } catch (Exception ex) {
-            log.error("Failed to handle optimistic locking conflict for thread {}: {}", entity.getUid(), ex.getMessage(), ex);
+            log.error("Failed to handle optimistic locking conflict for thread {}: {}", entity.getUid(),
+                    ex.getMessage(), ex);
             throw new RuntimeException("Failed to handle optimistic locking conflict: " + ex.getMessage(), ex);
         }
         return null;
     }
 
-    
     @CacheEvict(value = "thread", key = "#uid")
     public void deleteByTopic(String topic) {
         List<ThreadEntity> threads = findListByTopic(topic);
@@ -847,39 +865,39 @@ public class ThreadRestService
     }
 
     // public void initThreadCategory(String orgUid) {
-    //     // log.info("initThreadCategory");
-    //     // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    //     for (String category : ThreadCategories.getAllCategories()) {
-    //         // log.info("initThreadCategory: {}", category);
-    //         CategoryRequest categoryRequest = CategoryRequest.builder()
-    //                 .uid(Utils.formatUid(orgUid, category))
-    //                 .name(category)
-    //                 .order(0)
-    //                 .type(CategoryTypeEnum.THREAD.name())
-    //                 .level(LevelEnum.ORGANIZATION.name())
-    //                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-    //                 .orgUid(orgUid)
-    //                 .build();
-    //         categoryService.create(categoryRequest);
-    //     }
+    // // log.info("initThreadCategory");
+    // // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    // for (String category : ThreadCategories.getAllCategories()) {
+    // // log.info("initThreadCategory: {}", category);
+    // CategoryRequest categoryRequest = CategoryRequest.builder()
+    // .uid(Utils.formatUid(orgUid, category))
+    // .name(category)
+    // .order(0)
+    // .type(CategoryTypeEnum.THREAD.name())
+    // .level(LevelEnum.ORGANIZATION.name())
+    // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    // .orgUid(orgUid)
+    // .build();
+    // categoryService.create(categoryRequest);
+    // }
     // }
 
     // public void initThreadTag(String orgUid) {
-    //     // log.info("initThreadTag");
-    //     // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    //     for (String tag : ThreadTags.getAllTags()) {
-    //         // log.info("initThreadCategory: {}", category);
-    //         TagRequest tagRequest = TagRequest.builder()
-    //                 .uid(Utils.formatUid(orgUid, tag))
-    //                 .name(tag)
-    //                 .order(0)
-    //                 .type(TagTypeEnum.THREAD.name())
-    //                 .level(LevelEnum.ORGANIZATION.name())
-    //                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-    //                 .orgUid(orgUid)
-    //                 .build();
-    //         tagRestService.create(tagRequest);
-    //     }
+    // // log.info("initThreadTag");
+    // // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    // for (String tag : ThreadTags.getAllTags()) {
+    // // log.info("initThreadCategory: {}", category);
+    // TagRequest tagRequest = TagRequest.builder()
+    // .uid(Utils.formatUid(orgUid, tag))
+    // .name(tag)
+    // .order(0)
+    // .type(TagTypeEnum.THREAD.name())
+    // .level(LevelEnum.ORGANIZATION.name())
+    // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    // .orgUid(orgUid)
+    // .build();
+    // tagRestService.create(tagRequest);
+    // }
     // }
 
     @Override
@@ -919,7 +937,7 @@ public class ThreadRestService
         return excel;
     }
 
-        // 剪贴板会话：clipboard/{user_uid}
+    // 剪贴板会话：clipboard/{user_uid}
     // public ThreadResponse createClipboardAssistantThread(UserEntity user) {
     // //
     // String topic = TopicUtils.getClipboardTopic(user.getUid());
@@ -953,6 +971,5 @@ public class ThreadRestService
     // }
     // return convertToResponse(updateThread);
     // }
-
 
 }
