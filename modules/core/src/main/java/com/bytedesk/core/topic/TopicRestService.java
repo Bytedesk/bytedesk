@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 14:34:25
+ * @LastEditTime: 2025-07-05 14:36:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -302,8 +302,8 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             return convertToResponse(savedEntity);
         } else {
             // create new topic
+            request.setTopic(topic);
             request.setUserUid(user.getUid());
-            // request.getClientIds().add(request.getClientId());
             return create(request);
         }
     }
@@ -323,6 +323,18 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             save(topicElement);
         }
     }
+
+    public TopicResponse unsubscribe(TopicRequest request) { 
+         UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("login first");
+        }
+        String topic = request.getTopic();
+        Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
+
+        
+    }
+
 
     @Transactional
     public void addClientId(String clientId) {
