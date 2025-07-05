@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 10:17:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-05 11:00:20
+ * @LastEditTime: 2025-07-05 09:57:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,9 +71,6 @@ public class AgentResponse extends BaseResponse {
 
     private String timeoutRemindTip;
 
-    // private Integer currentThreadCount;
-
-    // private UserResponse user;
     private MemberProtobuf member;
 
     private String userUid;

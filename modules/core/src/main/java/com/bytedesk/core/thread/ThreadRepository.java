@@ -80,5 +80,10 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         @Query("SELECT t FROM ThreadEntity t WHERE t.topic = :topic AND t.status != :status AND t.deleted = false")
         List<ThreadEntity> findByTopicAndStatusNotAndDeletedFalse(@Param("topic") String topic, @Param("status") String status);
 
+        @Query("SELECT t FROM ThreadEntity t WHERE t.topic IN :topics AND t.deleted = false")
+        List<ThreadEntity> findByTopicsInAndDeletedFalse(@Param("topics") List<String> topics);
+
+        @Query("SELECT t FROM ThreadEntity t WHERE t.topic IN :topics AND t.deleted = false")
+        Page<ThreadEntity> findByTopicsInAndDeletedFalse(@Param("topics") List<String> topics, Pageable pageable);
 
 }

@@ -13,8 +13,11 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,6 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
@@ -62,6 +66,8 @@ public class ThreadRestService
     private final UidUtils uidUtils;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final TopicRepository topicRepository;
 
     @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
@@ -114,6 +120,8 @@ public class ThreadRestService
         return Optional.empty();
     }
 
+    @Transactional
+    @Override
     public ThreadResponse create(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         //
@@ -142,32 +150,7 @@ public class ThreadRestService
         return convertToResponse(savedThread);
     }
 
-    // 在group会话创建之后，自动为group成员members创建会话
-    // 同事群组会话：org/group/{group_uid}
-    // public ThreadResponse createGroupMemberThread(ThreadEntity thread, UserEntity owner) {
-    //     //
-    //     Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(thread.getTopic(), owner);
-    //     if (threadOptional.isPresent()) {
-    //         return convertToResponse(threadOptional.get());
-    //     }
-    //     ThreadEntity groupThread = ThreadEntity.builder()
-    //             .uid(uidUtils.getUid())
-    //             .type(thread.getType())
-    //             .topic(thread.getTopic())
-    //             .unreadCount(0)
-    //             .status(thread.getStatus())
-    //             .client(ClientEnum.SYSTEM.name())
-    //             .user(thread.getUser())
-    //             .owner(owner)
-    //             .orgUid(thread.getOrgUid())
-    //             .build();
-    //     ThreadEntity updateThread = save(groupThread);
-    //     if (updateThread == null) {
-    //         throw new RuntimeException("thread save failed");
-    //     }
-    //     return convertToResponse(updateThread);
-    // }
-
+    @Transactional
     public ThreadResponse createGroupMemberThread(String user, String topic, String orgUid, UserEntity owner) {
         //
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic, owner);

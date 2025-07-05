@@ -40,21 +40,11 @@ public class ProjectResponse extends BaseResponse {
 
     private String type;
 
-    // private String color;
-
     private Integer order;
 
     private List<MemberProtobuf> members;
 
     private List<ModuleResponse> modules;
 
-    // private String parentUid;
-
-    private String userUid;
-
     private Boolean isPublic;
-
-    // private ZonedDateTime createdAt;
-
-    // private ZonedDateTime updatedAt;
 }

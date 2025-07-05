@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 12:38:10
+ * @LastEditTime: 2025-07-05 09:49:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -169,18 +169,20 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> invites = new ArrayList<>();
 
-    // 多个管理员监听会话
+    // 多个管理员监听会话, 存放多个 UserProtobuf 实体转换成的 JSON
     @Builder.Default
     @Convert(converter = JsonListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> monitors = new ArrayList<>();
 
+    // 存放多个 UserProtobuf 实体转换成的 JSON
     // assistants: monitoring agent、quality check agent、robot agent
     @Builder.Default
     @Convert(converter = JsonListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> assistants = new ArrayList<>();
 
+    // 存放多个 UserProtobuf 实体转换成的 JSON
     // ticketors: ticket observers
     @Builder.Default
     @Convert(converter = JsonListConverter.class)

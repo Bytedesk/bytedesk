@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-13 16:03:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 09:40:37
+ * @LastEditTime: 2025-07-05 10:05:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,9 +50,11 @@ public class TopicEntity extends BaseEntityNoOrg {
     @Convert(converter = StringSetConverter.class)
     private Set<String> topics = new HashSet<>();
 
+    // 每种topic的qos都可能不一样，因为用数组存储索引topic，不方便分开，暂时不用此字段
     /** AT_MOST_ONCE(0),AT_LEAST_ONCE(1), EXACTLY_ONCE(2), */
-    @Builder.Default
-    private Integer qos = 1;
+    // @Builder.Default
+    // @Column(name = "topic_qos")
+    // private Integer qos = 1;
 
     /**
      * current online clientIds

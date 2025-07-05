@@ -40,8 +40,6 @@ public class ModuleResponse extends BaseResponse {
 
     private String type;
 
-    // private String color;
-
     private Integer order;
 
     private List<MemberProtobuf> members;
@@ -53,8 +51,4 @@ public class ModuleResponse extends BaseResponse {
     private String userUid;
 
     private Boolean isPublic;
-
-    // private ZonedDateTime createdAt;
-
-    // private ZonedDateTime updatedAt;
 }
