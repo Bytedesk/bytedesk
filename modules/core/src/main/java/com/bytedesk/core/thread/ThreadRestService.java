@@ -601,7 +601,7 @@ public class ThreadRestService
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        if (request.getUnsubscribe()) {
+        if (Boolean.TRUE.equals(request.getUnsubscribe())) {
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(request.getTopic())
                     .userUid(updateThread.getUserUid())
@@ -632,7 +632,7 @@ public class ThreadRestService
                 if (updateThread == null) {
                     throw new RuntimeException("thread save failed");
                 }
-                if (request.getUnsubscribe()) {
+                if (Boolean.TRUE.equals(request.getUnsubscribe())) {
                     TopicRequest topicRequest = TopicRequest.builder()
                             .topic(request.getTopic())
                             .userUid(updateThread.getUserUid())
