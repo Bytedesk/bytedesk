@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-07 12:32:28
+ * @LastEditTime: 2025-07-05 09:40:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,12 +29,9 @@ public class TopicUtils {
     public static final String TOPIC_EMOTION_ASSISTANT = "emotion";
     public static final String TOPIC_SYSTEM_NOTIFICATION = "system";
     //
-    // public static final String TOPIC_PRIVATE_PREFIX = "private/";
-    // public static final String TOPIC_GROUP_PREFIX = "group/";
     public static final String TOPIC_FILE_PREFIX = "file/";
     public static final String TOPIC_CLIPBOARD_PREFIX = "clipboard/";
     public static final String TOPIC_SYSTEM_PREFIX = "system/";
-    // public static final String TOPIC_ROBOT_PREFIX = "robot/";
     //
     public static final String TOPIC_ORG_PREFIX = "org/";
     public static final String TOPIC_ORG_MEMBER_PREFIX = "org/member/";
@@ -71,9 +68,6 @@ public class TopicUtils {
     private static final String TOPIC_GROUP_PATTERN = "group/%s";
     private static final String TOPIC_PRIVATE_PATTERN = "private/%s/%s";
     private static final String TOPIC_ROBOT_PATTERN = "robot/%s/%s";
-    // private static final String TOPIC_AGENT_PATTERN = "agent/%s";
-    // private static final String TOPIC_WORKGROUP_PATTERN = "workgroup/%s";
-    // private static final String TOPIC_QUEUE_PATTERN = "queue/%s";
 
     // 企业消息: 所有uid全平台唯一，包括不同表之间uid也唯一，所以未在企业topic中添加org_uid前缀为前缀
     // 用户默认订阅组织uid：org/{org_uid}
@@ -106,8 +100,6 @@ public class TopicUtils {
     private static final String TOPIC_ORG_WORKGROUP_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_PREFIX + "%s/%s"; // "org/workgroup/%s/%s";
     private static final String TOPIC_ORG_UNIFIED_THREAD_PATTERN = TOPIC_ORG_UNIFIED_PREFIX + "%s/%s"; // "org/unified/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
-    // private static final String TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN = TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/agent/%s/%s";
-    // private static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/workgroup/%s/%s";
     // department ticket thread
     private static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN = TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/department/%s/%s";
 

@@ -24,8 +24,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -107,7 +109,7 @@ public class KbaseResponse extends BaseResponse {
 
     private String agentUid;
 
-    private String userUid;
+    // private String userUid; // 父类中已定义
     
     private List<UserProtobuf> members;
 
