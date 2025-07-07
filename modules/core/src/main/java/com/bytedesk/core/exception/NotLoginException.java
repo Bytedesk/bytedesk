@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 12:35:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:24:25
+ * @LastEditTime: 2025-07-07 11:25:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,17 +14,17 @@
 package com.bytedesk.core.exception;
 
 /**
- * Resource not found
+ * Not Login Exception.
  */
-public class NotFoundException extends BaseException {
+public class NotLoginException extends BaseException {
 
     private static final long serialVersionUID = 1L;
 
-    public NotFoundException(String message) {
+    public NotLoginException(String message) {
         super(message);
     }
 
-    public NotFoundException(String message, Throwable cause) {
+    public NotLoginException(String message, Throwable cause) {
         super(message, cause);
     }
 

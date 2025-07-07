@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 18:29:48
+ * @LastEditTime: 2025-07-07 11:26:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,6 +77,11 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(NotFoundException e) {
         return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_RESOURCE_NOT_FOUND));
+    }
+
+    @ExceptionHandler(NotLoginException.class)
+    public ResponseEntity<?> handleNotLoginException(NotLoginException e) {
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_NOT_LOGIN));
     }
 
     @ExceptionHandler(UserDisabledException.class)

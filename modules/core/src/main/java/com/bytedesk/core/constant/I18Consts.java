@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 12:17:33
+ * @LastEditTime: 2025-07-07 11:26:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -321,6 +321,7 @@ public class I18Consts {
     public static final String I18N_EMAIL_SIGNUP_FIRST = "请先使用邮箱注册"; // 请先使用邮箱注册
     public static final String I18N_MOBILE_SIGNUP_FIRST = "请先使用手机号注册"; // 请先使用手机号注册
     public static final String I18N_RESOURCE_NOT_FOUND = "资源未找到"; // 资源未找到
+    public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
     public static final String I18N_USER_DISABLED = "用户已被禁用"; // 用户已被禁用
     public static final String I18N_FORBIDDEN_ACCESS = "禁止访问"; // 禁止访问
     public static final String I18N_USER_BLOCKED = "用户已被封禁"; // 用户已被封禁
