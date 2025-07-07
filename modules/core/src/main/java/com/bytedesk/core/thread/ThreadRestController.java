@@ -133,8 +133,6 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    
-
     /**
      * 创建会话
      * 
