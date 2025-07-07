@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:48:41
+ * @LastEditTime: 2025-07-07 17:08:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,9 +56,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
 
-    private final AgentRestService agentService;
+    private final AgentRestService agentRestService;
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     private final VisitorThreadService visitorThreadService;
 
@@ -85,7 +85,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 是否已经存在会话
         ThreadEntity thread = null;
         AgentEntity agentEntity = null;
-        Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
+        Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
         if (agentOptional.isPresent()) {
             agentEntity = agentOptional.get();
         } else {
@@ -93,7 +93,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Agent uid " + agentUid + " not found");
         }
         // 是否已经存在会话
-        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             //
             if (threadOptional.get().isNew()) {
@@ -129,7 +129,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
             // 判断是否达到最大接待人数，如果达到则进入排队
-            if (queueMemberEntity.getAgentQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
+            if (queueMemberEntity.getAgentQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableAgent(thread, agentEntity, queueMemberEntity);
             } else {
@@ -148,7 +148,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.notNull(agent, "AgentEntity must not be null");
         Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
         // 客服在线 且 接待状态
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         String content = agent.getServiceSettings().getWelcomeTip();
@@ -157,7 +157,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         ThreadEntity thread = threadOptional.get();
         thread.setChatting().setContent(content).setUnreadCount(1);
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
             throw new RuntimeException("Failed to save thread " + thread.getUid());
@@ -180,7 +180,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             QueueMemberEntity queueMemberEntity) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
 
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
         // 已满则排队
@@ -196,7 +196,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 进入排队队列
         thread.setQueuing().setUnreadCount(0).setContent(content);
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
             throw new RuntimeException("Failed to save thread " + thread.getUid());
@@ -214,7 +214,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
     private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
         // 
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         String content = agent.getMessageLeaveSettings().getMessageLeaveTip();
@@ -224,7 +224,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         ThreadEntity thread = threadOptional.get();
         // 客服离线或小休不接待状态，则进入留言
         thread.setOffline().setUnreadCount(0).setContent(content);
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
             throw new RuntimeException("Failed to save thread " + thread.getUid());
