@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 09:56:59
+ * @LastEditTime: 2025-07-07 15:09:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,8 +35,7 @@ public class ThreadSpecification extends BaseSpecification {
     public static Specification<ThreadEntity> search(ThreadRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder,
-            // request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder,request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
 
             if (StringUtils.hasText(request.getOrgUid())) {
@@ -137,7 +136,7 @@ public class ThreadSpecification extends BaseSpecification {
                     if (StringUtils.hasText(inviteUid)) {
                         // 使用LIKE查询匹配invites字段中包含特定uid的记录
                         // 匹配JSON格式：\"uid\":\"1688358346555520\"
-                        invitePredicates.add(criteriaBuilder.like(root.get("invites"), "%\"uid\":\"" + inviteUid + "\"%"));
+                        invitePredicates.add(criteriaBuilder.like(root.get("invites"), "%" + inviteUid + "%"));
                     }
                 }
                 if (!invitePredicates.isEmpty()) {
@@ -153,7 +152,7 @@ public class ThreadSpecification extends BaseSpecification {
                     if (StringUtils.hasText(monitorUid)) {
                         // 使用LIKE查询匹配monitors字段中包含特定uid的记录
                         // 匹配JSON格式：\"uid\":\"1688358346555520\"
-                        monitorPredicates.add(criteriaBuilder.like(root.get("monitors"), "%\"uid\":\"" + monitorUid + "\"%"));
+                        monitorPredicates.add(criteriaBuilder.like(root.get("monitors"), "%" + monitorUid + "%"));
                     }
                 }
                 if (!monitorPredicates.isEmpty()) {
@@ -169,7 +168,7 @@ public class ThreadSpecification extends BaseSpecification {
                     if (StringUtils.hasText(ticketorUid)) {
                         // 使用LIKE查询匹配ticketors字段中包含特定uid的记录
                         // 匹配JSON格式：\"uid\":\"1688342408200341\"
-                        ticketorPredicates.add(criteriaBuilder.like(root.get("ticketors"), "%\"uid\":\"" + ticketorUid + "\"%"));
+                        ticketorPredicates.add(criteriaBuilder.like(root.get("ticketors"), "%" + ticketorUid + "%"));
                     }
                 }
                 if (!ticketorPredicates.isEmpty()) {
