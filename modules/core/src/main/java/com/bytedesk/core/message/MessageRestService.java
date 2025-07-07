@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 14:14:41
+ * @LastEditTime: 2025-07-07 12:19:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -74,8 +76,11 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
 
     @Override
     public MessageResponse queryByUid(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        Optional<MessageEntity> optional = findByUid(request.getUid());
+        if (!optional.isPresent()) {
+            throw new NotFoundException("Message not found");
+        }
+        return convertToResponse(optional.get());
     }
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")

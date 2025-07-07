@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 13:34:35
+ * @LastEditTime: 2025-07-07 12:20:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -134,24 +133,6 @@ public class MessagePersistService {
             return true;
         }
 
-        //
-        if (MessageTypeEnum.TRANSFER_ACCEPT.equals(type)
-                || MessageTypeEnum.TRANSFER_REJECT.equals(type)) {
-            // content为转接消息的uid
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithTransferMessage(type, messageProtobuf);
-                return true;
-            }
-        }
-
-        if (MessageTypeEnum.INVITE_ACCEPT.equals(type)
-                || MessageTypeEnum.INVITE_REJECT.equals(type)) {
-            if (StringUtils.hasText(messageProtobuf.getContent())) {
-                dealWithInviteMessage(type, messageProtobuf);
-                return true;
-            }
-        }
-
         return false;
     }
 
@@ -176,14 +157,6 @@ public class MessagePersistService {
     private void dealWithMessageRecall(MessageProtobuf message) {
         // content为撤回消息的uid
         messageRestService.deleteByUid(message.getContent());
-    }
-
-    // 处理转接消息
-    private void dealWithTransferMessage(MessageTypeEnum type, MessageProtobuf message) {
-    }
-
-    // 处理邀请消息
-    private void dealWithInviteMessage(MessageTypeEnum type, MessageProtobuf message) {
     }
 
 
