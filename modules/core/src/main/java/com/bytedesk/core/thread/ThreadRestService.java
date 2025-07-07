@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 14:32:39
+ * @LastEditTime: 2025-07-07 15:27:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -623,6 +623,8 @@ public class ThreadRestService
                     .userUid(request.getUserUid())
                     .build();
             topicRestService.remove(topicRequest);
+            // 
+            List<String> invites = 
         }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
