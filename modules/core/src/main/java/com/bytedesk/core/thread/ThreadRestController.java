@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 10:44:47
+ * @LastEditTime: 2025-07-07 13:10:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,8 +12,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.thread;
-
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -100,11 +98,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Operation(summary = "根据主题查询会话", description = "通过主题查找相关会话")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByThreadTopic(ThreadRequest request) {
-        Optional<ThreadResponse> threadOptional = threadRestService.queryByTopic(request);
-        if (threadOptional.isPresent()) {
-            return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
-        }
-        return ResponseEntity.ok(JsonResult.error("not found"));
+  
+        ThreadResponse threadResponse = threadRestService.queryByTopic(request);
+  
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
     /**
@@ -115,11 +112,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Operation(summary = "根据主题和用户查询会话", description = "通过主题和用户查找相关会话")
     @GetMapping("/query/topic/owner")
     public ResponseEntity<?> queryByTopicAndOwner(ThreadRequest request) {
-        Optional<ThreadResponse> threadOptional = threadRestService.queryByTopicAndOwner(request);
-        if (threadOptional.isPresent()) {
-            return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
-        }
-        return ResponseEntity.ok(JsonResult.error("not found"));
+        
+        ThreadResponse threadResponse = threadRestService.queryByTopicAndOwner(request);
+ 
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
     /**
@@ -131,11 +127,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Operation(summary = "根据UID查询会话", description = "通过唯一标识符查询会话")
     @Override
     public ResponseEntity<?> queryByUid(ThreadRequest request) {
-        Optional<ThreadResponse> threadOptional = threadRestService.queryByThreadUid(request);
-        if (threadOptional.isPresent()) {
-            return ResponseEntity.ok(JsonResult.success(threadOptional.get()));
-        }
-        return ResponseEntity.ok(JsonResult.error("not found"));
+
+        ThreadResponse threadResponse = threadRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
     /**
@@ -149,9 +144,9 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
-        ThreadResponse thread = threadRestService.create(request);
+        ThreadResponse threadResponse = threadRestService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(thread));
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
     /**

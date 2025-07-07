@@ -50,6 +50,9 @@ public class UserProtobuf implements Serializable {
     private String extra;
 
     public static UserProtobuf fromJson(String user) {
+        if (user == null || user.trim().isEmpty()) {
+            return null;
+        }
         return JSON.parseObject(user, UserProtobuf.class);
     }
 

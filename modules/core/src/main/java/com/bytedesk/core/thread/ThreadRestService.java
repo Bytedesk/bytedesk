@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 16:50:18
+ * @LastEditTime: 2025-07-07 13:10:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -98,32 +99,36 @@ public class ThreadRestService
         return queryByOrg(request);
     }
 
-    public Optional<ThreadResponse> queryByTopic(ThreadRequest request) {
+    public ThreadResponse queryByTopic(ThreadRequest request) {
         Optional<ThreadEntity> threadOptional = findFirstByTopic(request.getTopic());
         if (threadOptional.isPresent()) {
-            return Optional.of(convertToResponse(threadOptional.get()));
+            return convertToResponse(threadOptional.get());
+        } else {
+            throw new NotFoundException("thread not found");
         }
-        return Optional.empty();
     }
 
-    public Optional<ThreadResponse> queryByTopicAndOwner(ThreadRequest request) {
+    public ThreadResponse queryByTopicAndOwner(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
             throw new RuntimeException("owner not found");
         }
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
-            return Optional.of(convertToResponse(threadOptional.get()));
+            return convertToResponse(threadOptional.get());
+        } else {
+            throw new NotFoundException("thread not found");
         }
-        return Optional.empty();
     }
 
-    public Optional<ThreadResponse> queryByThreadUid(ThreadRequest request) {
+    @Override
+    public ThreadResponse queryByUid(ThreadRequest request) {
         Optional<ThreadEntity> threadOptional = findByUid(request.getUid());
         if (threadOptional.isPresent()) {
-            return Optional.of(convertToResponse(threadOptional.get()));
+            return convertToResponse(threadOptional.get());
+        } else {
+            throw new NotFoundException("thread " + request.getUid() + " not found");
         }
-        return Optional.empty();
     }
 
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
@@ -862,12 +867,6 @@ public class ThreadRestService
     public Page<ThreadResponse> queryByUser(ThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
-
-    @Override
-    public ThreadResponse queryByUid(ThreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     // public void initThreadCategory(String orgUid) {

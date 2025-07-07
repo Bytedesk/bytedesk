@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
@@ -82,23 +83,28 @@ public class ThreadResponse extends BaseResponse {
     private Boolean offline;
 
     // 标签
-    private List<String> tagList;
+    @Builder.Default
+    private List<String> tagList = new ArrayList<>();
 
     private String client;
 
     private String extra;
 
     // 邀请多个客服参与会话
-    private List<UserProtobuf> invites;
+    @Builder.Default
+    private List<UserProtobuf> invites = new ArrayList<>();
 
     // 多个管理员监听会话
-    private List<UserProtobuf> monitors;
+    @Builder.Default
+    private List<UserProtobuf> monitors = new ArrayList<>();
 
     // assistants: monitoring agent、quality check agent、robot agent
-    private List<UserProtobuf> assistants;
+    @Builder.Default
+    private List<UserProtobuf> assistants = new ArrayList<>();
 
     // ticket observers
-    private List<UserProtobuf> ticketors;
+    @Builder.Default
+    private List<UserProtobuf> ticketors = new ArrayList<>();
 
     private UserProtobuf user;
     //

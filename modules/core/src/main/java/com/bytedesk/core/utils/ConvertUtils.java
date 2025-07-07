@@ -94,11 +94,15 @@ public class ConvertUtils {
     public static ThreadProtobuf convertToThreadProtobuf(ThreadEntity thread) {
         ThreadProtobuf threadProtobuf = modelMapper.map(thread, ThreadProtobuf.class);
         //
-        UserProtobuf user = JSON.parseObject(thread.getUser(), UserProtobuf.class);
-        if (user.getExtra() == null) {
-            user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+        if (thread.getUser() != null) {
+            UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
+            if (user != null) {
+                if (user.getExtra() == null) {
+                    user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+                }
+                threadProtobuf.setUser(user);
+            }
         }
-        threadProtobuf.setUser(user);
         //
         return threadProtobuf;
     }
@@ -118,7 +122,9 @@ public class ConvertUtils {
         // }
         if (thread.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
-            threadResponse.setUser(user);
+            if (user != null) {
+                threadResponse.setUser(user);
+            }
         }
         // robot
         // if (thread.getRobot() != null) {
@@ -130,22 +136,34 @@ public class ConvertUtils {
         //     threadResponse.setWorkgroup(workgroup);
         // }
         if (thread.getInvites() != null) {
+            // 清空列表，防止modelMapper自动映射产生的空对象
+            threadResponse.getInvites().clear();
             // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
             for (String invite : thread.getInvites()) {
                 UserProtobuf inviteUser = UserProtobuf.fromJson(invite);
-                threadResponse.getInvites().add(inviteUser);
+                if (inviteUser != null) {
+                    threadResponse.getInvites().add(inviteUser);
+                }
             }
         }
         if (thread.getMonitors() != null) {
+            // 清空列表，防止modelMapper自动映射产生的空对象
+            threadResponse.getMonitors().clear();
             for (String monitor : thread.getMonitors()) {
                 UserProtobuf monitorUser = UserProtobuf.fromJson(monitor);
-                threadResponse.getMonitors().add(monitorUser);
+                if (monitorUser != null) {
+                    threadResponse.getMonitors().add(monitorUser);
+                }
             }
         }
         if (thread.getAssistants() != null) {
+            // 清空列表，防止modelMapper自动映射产生的空对象
+            threadResponse.getAssistants().clear();
             for (String assistant : thread.getAssistants()) {
                 UserProtobuf assistantUser = UserProtobuf.fromJson(assistant);
-                threadResponse.getAssistants().add(assistantUser);
+                if (assistantUser != null) {
+                    threadResponse.getAssistants().add(assistantUser);
+                }
             }
         }
         //
@@ -170,10 +188,12 @@ public class ConvertUtils {
         //
         if (message.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(message.getUser());
-            if (user.getExtra() == null) {
-                user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+            if (user != null) {
+                if (user.getExtra() == null) {
+                    user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+                }
+                messageResponse.setUser(user);
             }
-            messageResponse.setUser(user);
         }
 
         // extra格式不固定，前端需要根据type字段来解析，所以此处不能使用MessageExtra
