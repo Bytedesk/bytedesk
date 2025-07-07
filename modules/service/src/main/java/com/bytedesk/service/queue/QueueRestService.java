@@ -110,7 +110,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
                 request.getTopicList().add(workgroup.getUid());
             }
         }
-        log.debug("查询排队中会话，当前用户: {}, 主题列表: {}", request.getTopicList());
+        log.debug("查询排队中会话，主题列表: {}", request.getTopicList());
         
         // 使用 threadRestService 查询排队中的会话
         return threadRestService.queryByOrg(request);
