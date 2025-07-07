@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 17:24:34
+ * @LastEditTime: 2025-07-07 18:04:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -196,14 +196,14 @@ demo password: admin
 
 ```bash
 # Community
-bytedesk.appkey=ZjoyMDI1LTA3LTE5OkNPTU1VTklUWTo6
-BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OkNPTU1VTklUWTo6
-# Enterprise Trial: 2025-07-19
-bytedesk.appkey=ZjoyMDI1LTA3LTE5OkVOVEVSUFJJU0U6Og==
-BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OkVOVEVSUFJJU0U6Og==
-# Platform Trial: 2025-07-19
-bytedesk.appkey=ZjoyMDI1LTA3LTE5OlBMQVRGT1JNOjo=
-BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OlBMQVRGT1JNOjo=
+bytedesk.appkey=ZjoyMDI1LTA4LTA2OkNPTU1VTklUWTo6Ojo=
+BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OkNPTU1VTklUWTo6Ojo=
+# Enterprise Trial: 2025-08-06
+bytedesk.appkey=ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
+BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
+# Platform Trial: 2025-08-06
+bytedesk.appkey=ZjoyMDI1LTA4LTA2OlBMQVRGT1JNOjo6Og==
+BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OlBMQVRGT1JNOjo6Og==
 ```
 
 ## architecture

@@ -136,7 +136,7 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: "true"
       BYTEDESK_VERSION: 0.8.6
-      BYTEDESK_APPKEY: ZjoyMDI1LTA3LTE5OkVOVEVSUFJJU0U6Og==
+      BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: "false"
       BYTEDESK_CUSTOM_NAME: 
