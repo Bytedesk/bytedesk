@@ -209,7 +209,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线 且 接待状态
-            if (queueMemberEntity.getWorkgroupQueue().getQueuingCount() < agentEntity.getMaxThreadCount()) {
+            if (queueMemberEntity.getWorkgroupQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
                 // 未满则接待
                 return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);
             } else {
