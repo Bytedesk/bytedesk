@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 15:10:57
+ * @LastEditTime: 2025-07-07 15:55:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -128,12 +128,7 @@ public class ThreadEventListener {
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         // UserEntity user = thread.getOwner();
-        log.info("thread onThreadCloseEvent: {}", thread.getUid());
-        // TopicRequest request = TopicRequest.builder()
-        //             .topic(thread.getTopic())
-        //             .userUid(user.getUid())
-        //             .build();
-        // topicService.remove(request);
+        log.info("ThreadEventListener onThreadCloseEvent: {}", thread.getUid());
     }
 
     @EventListener
