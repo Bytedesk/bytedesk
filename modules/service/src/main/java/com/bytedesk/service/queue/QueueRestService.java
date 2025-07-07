@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 17:38:24
+ * @LastEditTime: 2025-07-07 17:49:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,9 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, QueueRequest, QueueResponse, QueueExcel> {
@@ -108,6 +110,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
                 request.getTopicList().add(workgroup.getUid());
             }
         }
+        log.debug("查询排队中会话，当前用户: {}, 主题列表: {}", request.getTopicList());
         
         // 使用 threadRestService 查询排队中的会话
         return threadRestService.queryByOrg(request);
