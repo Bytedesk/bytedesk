@@ -33,7 +33,6 @@ import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseRequest;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
@@ -50,7 +49,6 @@ public class AgentEventListener {
 
     private final AgentRestService agentRestService;
     private final KbaseRestService kbaseRestService;
-    private final UidUtils uidUtils;
     private final IMessageSendService messageSendService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
@@ -64,8 +62,8 @@ public class AgentEventListener {
         log.info("agent - organization created: {}", organization.getName());
         //
         String mobile = user.getMobile();
-        String agentUid = uidUtils.getUid();
-        agentRestService.createFromMember(mobile, orgUid, agentUid);
+        // String agentUid = uidUtils.getUid();
+        agentRestService.createFromMember(mobile, orgUid);
     }
     
     // 新创建客服，创建默认知识库

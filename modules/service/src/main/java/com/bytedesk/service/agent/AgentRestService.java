@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 08:57:38
+ * @LastEditTime: 2025-07-07 15:47:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -165,7 +165,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(savedAgent);
     }
 
-    public void createFromMember(String mobile, String orgUid, String agentUid) {
+    public void createFromMember(String mobile, String orgUid) {
         //
         Optional<MemberEntity> memberOptional = memberService.findByMobileAndOrgUid(mobile, orgUid);
         if (!memberOptional.isPresent()) {
@@ -174,7 +174,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         MemberEntity member = memberOptional.get();
         // 创建默认客服
         AgentRequest agentRequest = AgentRequest.builder()
-                .uid(agentUid)
+                .uid(uidUtils.getUid())
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .mobile(member.getMobile())

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 17:25:44
+ * @LastEditTime: 2025-07-07 15:46:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,9 +42,6 @@ public class AgentInitializer implements SmartInitializingSingleton {
     }
 
     public void init() {
-        // if (agentRepository.count() > 0) {
-        //     return;
-        // }
         // 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         String mobile = bytedeskProperties.getMobile();
@@ -52,7 +49,6 @@ public class AgentInitializer implements SmartInitializingSingleton {
         String email = bytedeskProperties.getEmail();
         String memberUid = BytedeskConsts.DEFAULT_MEMBER_UID;
         String agentUid = BytedeskConsts.DEFAULT_AGENT_UID;
-        // agentService.createFromMember(mobile, orgUid, agentUid);
          // 创建默认客服
          AgentRequest agentRequest = AgentRequest.builder()
                 .uid(agentUid)
