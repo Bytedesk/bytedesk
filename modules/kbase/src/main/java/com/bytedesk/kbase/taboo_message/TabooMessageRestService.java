@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 23:31:32
+ * @LastEditTime: 2025-07-07 11:29:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 // import com.bytedesk.core.category.CategoryRestService;
@@ -41,8 +42,6 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
-
-    // private final CategoryRestService categoryRestService;
 
     private final AuthService authService;
 

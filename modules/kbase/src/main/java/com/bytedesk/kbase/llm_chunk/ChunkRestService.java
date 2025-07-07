@@ -34,6 +34,7 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
