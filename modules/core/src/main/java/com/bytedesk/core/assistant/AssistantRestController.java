@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 13:07:04
+ * @LastEditTime: 2025-07-07 11:16:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,14 +28,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/assistant")
 // @Tag(name = "assistant - 助手", description = "assistant apis")
-public class AssistantController extends BaseRestController<AssistantRequest> {
+public class AssistantRestController extends BaseRestController<AssistantRequest> {
 
-    private final AssistantService assistantService;
+    private final AssistantRestService assistantRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(AssistantRequest request) {
         
-        Page<AssistantResponse> assistantPage = assistantService.queryByOrg(request);
+        Page<AssistantResponse> assistantPage = assistantRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(assistantPage));
     }
@@ -43,7 +43,7 @@ public class AssistantController extends BaseRestController<AssistantRequest> {
     @Override
     public ResponseEntity<?> queryByUser(AssistantRequest request) {
         
-        Page<AssistantResponse> assistantPage = assistantService.queryByUser(request);
+        Page<AssistantResponse> assistantPage = assistantRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(assistantPage));
     }
@@ -51,7 +51,7 @@ public class AssistantController extends BaseRestController<AssistantRequest> {
     @Override
     public ResponseEntity<?> queryByUid(AssistantRequest request) {
         
-        AssistantResponse assistantResponse = assistantService.queryByUid(request);
+        AssistantResponse assistantResponse = assistantRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }
@@ -59,7 +59,7 @@ public class AssistantController extends BaseRestController<AssistantRequest> {
     @Override
     public ResponseEntity<?> create(AssistantRequest request) {
         
-        AssistantResponse assistantResponse = assistantService.create(request);
+        AssistantResponse assistantResponse = assistantRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }
@@ -67,7 +67,7 @@ public class AssistantController extends BaseRestController<AssistantRequest> {
     @Override
     public ResponseEntity<?> update(AssistantRequest request) {
         
-        AssistantResponse assistantResponse = assistantService.update(request);
+        AssistantResponse assistantResponse = assistantRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }
@@ -75,7 +75,7 @@ public class AssistantController extends BaseRestController<AssistantRequest> {
     @Override
     public ResponseEntity<?> delete(AssistantRequest request) {
        
-        assistantService.delete(request);
+        assistantRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

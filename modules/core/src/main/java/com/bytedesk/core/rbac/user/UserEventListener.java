@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 10:21:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 22:35:26
+ * @LastEditTime: 2025-07-07 11:03:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,16 +42,13 @@ public class UserEventListener {
                 .topic(TopicUtils.getUserTopic(user.getUid()))
                 .userUid(user.getUid())
                 .build();
-        // topicRequest.setUserUid(user.getUid());
         topicCacheService.pushRequest(topicRequest);
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {
-            // topicService.create(TopicUtils.getOrgTopic(user.getOrgUid()), user.getUid());
             TopicRequest topicRequestOrg = TopicRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
                     .userUid(user.getUid())
                     .build();
-            // topicRequestOrg.setUserUid(user.getUid());
             topicCacheService.pushRequest(topicRequestOrg);
         }
     }
@@ -62,12 +59,10 @@ public class UserEventListener {
         log.info("topic onUserUpdateEvent: {}", user.getUid());
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {
-            // topicService.create(TopicUtils.getOrgTopic(user.getOrgUid()), user.getUid());
             TopicRequest topicRequestOrg = TopicRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
                     .userUid(user.getUid())
                     .build();
-            // topicRequestOrg.setUserUid(user.getUid());
             topicCacheService.pushRequest(topicRequestOrg);
         }
     }

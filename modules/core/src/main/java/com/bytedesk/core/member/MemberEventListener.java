@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 12:40:39
+ * @LastEditTime: 2025-07-07 11:12:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -119,7 +119,6 @@ public class MemberEventListener {
 
     @EventListener
     public void onMemberCreateEvent(MemberCreateEvent event) {
-        // MemberCreateEvent memberCreateEvent = (MemberCreateEvent) event.getObject();
         MemberEntity member = event.getMember();
         UserEntity user = member.getUser();
         log.info("member created: {}", event);
@@ -129,7 +128,6 @@ public class MemberEventListener {
                 .topic(topic)
                 .userUid(user.getUid())
                 .build();
-        // request.setUserUid(user.getUid());
         topicCacheService.pushRequest(request);
     }
 

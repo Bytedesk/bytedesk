@@ -32,7 +32,7 @@ public class AssistantInitializer implements SmartInitializingSingleton {
 
     // private AssistantRepository assistantRepository;
 
-    private AssistantService assistantService;
+    private AssistantRestService assistantService;
 
     @Override
     public void afterSingletonsInstantiated() {
