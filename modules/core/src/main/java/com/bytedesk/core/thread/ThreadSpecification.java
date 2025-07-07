@@ -126,6 +126,27 @@ public class ThreadSpecification extends BaseSpecification {
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
+            
+            // 主题列表查询 - 支持批量查询指定的主题
+            if (request.getTopicList() != null && !request.getTopicList().isEmpty()) {
+                List<Predicate> topicPredicates = new ArrayList<>();
+                for (String topicItem : request.getTopicList()) {
+                    if (StringUtils.hasText(topicItem)) {
+                        // 支持模糊匹配，检查topic是否包含指定的字符串
+                        topicPredicates.add(criteriaBuilder.like(root.get("topic"), "%" + topicItem + "%"));
+                    }
+                }
+                if (!topicPredicates.isEmpty()) {
+                    // 任一主题匹配即可
+                    predicates.add(criteriaBuilder.or(topicPredicates.toArray(new Predicate[0])));
+                }
+            }
+            
+            // 状态查询
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+            
             // 创建一个包含inviteUids、monitorUids和ownerUid的OR条件组
             List<Predicate> filterPredicates = new ArrayList<>();
 

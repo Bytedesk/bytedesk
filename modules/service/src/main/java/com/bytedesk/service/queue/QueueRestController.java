@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-25 11:09:27
+ * @LastEditTime: 2025-07-07 17:30:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,10 +15,13 @@ package com.bytedesk.service.queue;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.thread.ThreadRequest;
+import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -73,6 +76,16 @@ public class QueueRestController extends BaseRestController<QueueRequest> {
         QueueResponse queue = queueRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(queue));
+    }
+
+    // 查询排队中会话 query/queuing
+    @GetMapping("/query/queuing")
+    @Operation(summary = "查询排队中会话", description = "查询当前排队中的会话")
+    public ResponseEntity<?> queryQueuing(ThreadRequest request) {
+
+        Page<ThreadResponse> threadPage = queueRestService.queryQueuing(request);
+        
+        return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
     @Operation(summary = "创建队列", description = "创建新的队列")

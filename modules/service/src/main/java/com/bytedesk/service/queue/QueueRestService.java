@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:03:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:30:16
+ * @LastEditTime: 2025-07-07 17:38:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.queue;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -29,9 +30,17 @@ import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadRequest;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.ThreadProcessStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -46,6 +55,12 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final ThreadRestService threadRestService;
+
+    private final AgentRestService agentRestService;
+
+    private final WorkgroupRepository workgroupRepository;
 
     @Override
     public Page<QueueEntity> queryByOrgEntity(QueueRequest request) {
@@ -69,6 +84,33 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
         // set user uid
         request.setUserUid(user.getUid());
         return queryByOrg(request);
+    }
+
+    public Page<ThreadResponse> queryQueuing(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("please login first");
+        }        
+        // 设置查询条件：状态为排队中
+        request.setStatus(ThreadProcessStatusEnum.QUEUING.name());
+        
+        // 通过user.uid查询相应的agent
+        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(user.getUid());
+        if (agentOptional.isPresent()) {
+            AgentEntity agent = agentOptional.get();
+            // 将agent.uid添加到topicList中
+            request.getTopicList().add(agent.getUid());
+            
+            // 通过agent.uid查询相应的workgroups
+            List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agent.getUid());
+            for (WorkgroupEntity workgroup : workgroups) {
+                // 将workgroup.uid添加到topicList中
+                request.getTopicList().add(workgroup.getUid());
+            }
+        }
+        
+        // 使用 threadRestService 查询排队中的会话
+        return threadRestService.queryByOrg(request);
     }
 
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")

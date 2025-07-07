@@ -34,6 +34,10 @@ import lombok.experimental.SuperBuilder;
 public class ThreadRequest extends BaseRequest {
     // 
     private String topic;
+    
+    // 主题列表，用于批量查询
+    @Builder.Default
+    private List<String> topicList = new ArrayList<>();
 
     private String status;
 
