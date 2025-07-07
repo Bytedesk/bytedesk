@@ -9,6 +9,7 @@
 
 ![weiyu](./images/nin1.png)
 ![chat](./images/admin/chat_zh.png)
+![agent](./images/agent/agent_chat.png)
 
 ## 介绍
 
