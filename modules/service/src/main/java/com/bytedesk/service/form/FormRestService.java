@@ -53,7 +53,7 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     public Page<FormResponse> queryByUser(FormRequest request) {
         UserEntity user = authService.getCurrentUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 

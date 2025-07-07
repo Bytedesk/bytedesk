@@ -56,7 +56,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     public Page<WorkflowResponse> queryByUser(WorkflowRequest request) {
         UserEntity user = authService.getCurrentUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 

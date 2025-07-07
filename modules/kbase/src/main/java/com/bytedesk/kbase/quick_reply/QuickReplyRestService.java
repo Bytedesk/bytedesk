@@ -74,7 +74,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
     public Page<QuickReplyResponse> queryByUser(QuickReplyRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 

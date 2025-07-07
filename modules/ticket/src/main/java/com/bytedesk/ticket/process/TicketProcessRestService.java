@@ -74,7 +74,7 @@ public class TicketProcessRestService
         // 获取当前登录用户
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         String userUid = user.getUid();
         request.setUserUid(userUid);

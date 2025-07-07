@@ -67,7 +67,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     public Page<AutoReplyFixedResponse> queryByUser(AutoReplyFixedRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 
@@ -85,7 +85,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
         // 获取当前用户
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 

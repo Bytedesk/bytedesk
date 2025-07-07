@@ -63,7 +63,7 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
     public Page<TabooMessageResponse> queryByUser(TabooMessageRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 

@@ -76,7 +76,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     public Page<TextResponse> queryByUser(TextRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         return queryByOrg(request);
@@ -102,7 +102,7 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
         // 获取当前登录用户
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         //

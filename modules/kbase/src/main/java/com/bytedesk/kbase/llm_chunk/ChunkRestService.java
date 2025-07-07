@@ -75,7 +75,7 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     public Page<ChunkResponse> queryByUser(ChunkRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         //

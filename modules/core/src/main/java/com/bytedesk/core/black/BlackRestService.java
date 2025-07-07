@@ -62,7 +62,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     public Page<BlackResponse> queryByUser(BlackRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
         // 

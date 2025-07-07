@@ -63,7 +63,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     public Page<QueueResponse> queryByUser(QueueRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotLoginException("please login first");
         }
         // set user uid
         request.setUserUid(user.getUid());
