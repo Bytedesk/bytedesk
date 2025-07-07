@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 15:30:39
+ * @LastEditTime: 2025-07-07 15:32:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -623,26 +623,6 @@ public class ThreadRestService
                     .userUid(request.getUserUid())
                     .build();
             topicRestService.remove(topicRequest);
-            // 
-            List<String> invites = thread.getInvites();
-            if (invites != null && !invites.isEmpty()) {
-                for (String invite : invites) {
-                    UserProtobuf user = UserProtobuf.fromJson(invite);
-                    String agentUid = user.getUid();
-                    // 获取Agent的UserUid用于取消订阅
-                    Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-                    if (agentOptional.isPresent()) {
-                        String userUid = agentOptional.get().getUserUid();
-                        // 移除被邀请人的话题订阅
-                        String topic = savedEntity.getTopic();
-                        TopicRequest topicRequest = TopicRequest.builder()
-                                            .topic(topic)
-                                            .userUid(userUid)
-                                            .build();
-                        topicRestService.remove(topicRequest);
-                    }
-                }
-            }
         }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
