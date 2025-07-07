@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 13:10:26
+ * @LastEditTime: 2025-07-07 14:32:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,7 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ClientEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -99,6 +100,17 @@ public class ThreadRestService
         return queryByOrg(request);
     }
 
+    @Override
+    public Page<ThreadResponse> queryByUser(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("login first");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
+    }
+
     public ThreadResponse queryByTopic(ThreadRequest request) {
         Optional<ThreadEntity> threadOptional = findFirstByTopic(request.getTopic());
         if (threadOptional.isPresent()) {
@@ -111,7 +123,7 @@ public class ThreadRestService
     public ThreadResponse queryByTopicAndOwner(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("owner not found");
+            throw new NotLoginException("owner not found");
         }
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
@@ -134,9 +146,8 @@ public class ThreadRestService
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException("please login first");
         }
-
         Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
         if (!topicOptional.isPresent()) {
             return Page.empty();
@@ -623,7 +634,7 @@ public class ThreadRestService
     public ThreadResponse closeByTopic(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException("please login first");
         }
         request.setUserUid(user.getUid());
 
@@ -863,47 +874,8 @@ public class ThreadRestService
         return ConvertUtils.convertToThreadResponse(thread);
     }
 
-    @Override
-    public Page<ThreadResponse> queryByUser(ThreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
+    
 
-    // public void initThreadCategory(String orgUid) {
-    // // log.info("initThreadCategory");
-    // // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    // for (String category : ThreadCategories.getAllCategories()) {
-    // // log.info("initThreadCategory: {}", category);
-    // CategoryRequest categoryRequest = CategoryRequest.builder()
-    // .uid(Utils.formatUid(orgUid, category))
-    // .name(category)
-    // .order(0)
-    // .type(CategoryTypeEnum.THREAD.name())
-    // .level(LevelEnum.ORGANIZATION.name())
-    // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-    // .orgUid(orgUid)
-    // .build();
-    // categoryService.create(categoryRequest);
-    // }
-    // }
-
-    // public void initThreadTag(String orgUid) {
-    // // log.info("initThreadTag");
-    // // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    // for (String tag : ThreadTags.getAllTags()) {
-    // // log.info("initThreadCategory: {}", category);
-    // TagRequest tagRequest = TagRequest.builder()
-    // .uid(Utils.formatUid(orgUid, tag))
-    // .name(tag)
-    // .order(0)
-    // .type(TagTypeEnum.THREAD.name())
-    // .level(LevelEnum.ORGANIZATION.name())
-    // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-    // .orgUid(orgUid)
-    // .build();
-    // tagRestService.create(tagRequest);
-    // }
-    // }
 
     @Override
     public ThreadExcel convertToExcel(ThreadEntity entity) {

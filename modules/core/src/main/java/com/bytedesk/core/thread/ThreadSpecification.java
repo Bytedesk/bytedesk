@@ -136,7 +136,8 @@ public class ThreadSpecification extends BaseSpecification {
                 for (String inviteUid : request.getInviteUids()) {
                     if (StringUtils.hasText(inviteUid)) {
                         // 使用LIKE查询匹配invites字段中包含特定uid的记录
-                        invitePredicates.add(criteriaBuilder.like(root.get("invites"), "%" + inviteUid + "%"));
+                        // 匹配JSON格式：\"uid\":\"1688358346555520\"
+                        invitePredicates.add(criteriaBuilder.like(root.get("invites"), "%\"uid\":\"" + inviteUid + "\"%"));
                     }
                 }
                 if (!invitePredicates.isEmpty()) {
@@ -151,7 +152,8 @@ public class ThreadSpecification extends BaseSpecification {
                 for (String monitorUid : request.getMonitorUids()) {
                     if (StringUtils.hasText(monitorUid)) {
                         // 使用LIKE查询匹配monitors字段中包含特定uid的记录
-                        monitorPredicates.add(criteriaBuilder.like(root.get("monitors"), "%" + monitorUid + "%"));
+                        // 匹配JSON格式：\"uid\":\"1688358346555520\"
+                        monitorPredicates.add(criteriaBuilder.like(root.get("monitors"), "%\"uid\":\"" + monitorUid + "\"%"));
                     }
                 }
                 if (!monitorPredicates.isEmpty()) {
@@ -166,7 +168,8 @@ public class ThreadSpecification extends BaseSpecification {
                 for (String ticketorUid : request.getTicketorUids()) {
                     if (StringUtils.hasText(ticketorUid)) {
                         // 使用LIKE查询匹配ticketors字段中包含特定uid的记录
-                        ticketorPredicates.add(criteriaBuilder.like(root.get("ticketors"), "%" + ticketorUid + "%"));
+                        // 匹配JSON格式：\"uid\":\"1688342408200341\"
+                        ticketorPredicates.add(criteriaBuilder.like(root.get("ticketors"), "%\"uid\":\"" + ticketorUid + "\"%"));
                     }
                 }
                 if (!ticketorPredicates.isEmpty()) {
