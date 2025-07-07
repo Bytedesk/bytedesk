@@ -46,6 +46,7 @@ public enum MessageStatusEnum {
     INVITE_TIMEOUT, // 邀请超时
     INVITE_CANCELED, // 取消邀请
     INVITE_EXITED, // 邀请退出
+    INVITE_REMOVED, // 邀请移除
     INVITE_VISITOR_PENDING, // 邀请访客处理
     INVITE_VISITOR_ACCEPTED, // 接受访客邀请
     INVITE_VISITOR_REJECTED, // 拒绝访客邀请

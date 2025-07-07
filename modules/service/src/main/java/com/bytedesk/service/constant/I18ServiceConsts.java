@@ -120,6 +120,8 @@ public class I18ServiceConsts {
     public static final String I18N_INVITE_CANCEL_NOTICE_CONTENT = "取消邀请通知内容"; // 取消邀请通知内容
     public static final String I18N_INVITE_EXIT_NOTICE_TITLE = "退出邀请通知标题"; // 退出邀请通知标题
     public static final String I18N_INVITE_EXIT_NOTICE_CONTENT = "退出邀请通知内容"; // 退出邀请通知内容
+    public static final String I18N_INVITE_REMOVE_NOTICE_TITLE = "移除邀请通知标题"; // 移除邀请通知标题
+    public static final String I18N_INVITE_REMOVE_NOTICE_CONTENT = "移除邀请通知内容"; // 移除邀请通知内容
     
     // 邀请状态异常
     public static final String I18N_ALREADY_IN_INVITE_PENDING_STATE = "已处于邀请待处理状态"; // 已处于邀请待处理状态
