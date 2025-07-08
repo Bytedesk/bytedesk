@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:48:30
+ * @LastEditTime: 2025-07-08 13:04:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,10 +14,13 @@
 package com.bytedesk.service.message_leave;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -29,6 +32,8 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -56,6 +61,8 @@ public class MessageLeaveRestService extends
     private final MessageRestService messageRestService;
 
     private final QueueMemberRestService queueMemberRestService;
+
+    private final ThreadRestService threadRestService;
 
     @Override
     public Page<MessageLeaveEntity> queryByOrgEntity(MessageLeaveRequest request) {
@@ -91,6 +98,29 @@ public class MessageLeaveRestService extends
         throw new RuntimeException("MessageLeave not found");
     }
 
+    // Query threads by leave message
+    public Page<ThreadResponse> queryThreadsByLeaveMessage(MessageLeaveRequest request) {
+        Page<MessageLeaveEntity> messageLeaveEntities = queryByOrgEntity(request);
+        
+        // Extract thread UIDs from message leave entities
+        List<String> threadUids = messageLeaveEntities.getContent().stream()
+                .map(MessageLeaveEntity::getThreadUid)
+                .filter(threadUid -> threadUid != null && !threadUid.isEmpty())
+                .collect(Collectors.toList());
+        
+        // Query threads by UIDs
+        List<ThreadResponse> threadResponses = threadUids.stream()
+                .map(threadUid -> threadRestService.findByUid(threadUid))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(threadRestService::convertToResponse)
+                .collect(Collectors.toList());
+        
+        // Create a Page object
+        Pageable pageable = messageLeaveEntities.getPageable();
+        return new PageImpl<>(threadResponses, pageable, messageLeaveEntities.getTotalElements());
+    }
+
     @Cacheable(value = "messageLeave", key = "#uid", unless = "#result == null")
     @Override
     public Optional<MessageLeaveEntity> findByUid(String uid) {
@@ -99,7 +129,7 @@ public class MessageLeaveRestService extends
 
     @Override
     public MessageLeaveResponse create(MessageLeaveRequest request) {
-        log.info("request {}", request);
+        // log.info("request {}", request);
 
         MessageLeaveEntity messageLeave = modelMapper.map(request, MessageLeaveEntity.class);
         messageLeave.setUid(uidUtils.getUid());
