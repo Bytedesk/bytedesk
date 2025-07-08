@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 15:56:11
+ * @LastEditTime: 2025-07-08 17:42:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -224,7 +224,7 @@ public class MessageLeaveEntity extends BaseEntity {
      * Agent who closed the message
      */
     @Builder.Default
-    @Column(name = "close_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "close_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String closeUser = BytedeskConsts.EMPTY_JSON_STRING;
     
     /**
@@ -236,7 +236,7 @@ public class MessageLeaveEntity extends BaseEntity {
      * Agent who marked the message as spam
      */
     @Builder.Default
-    @Column(name = "spam_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "spam_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String spamUser = BytedeskConsts.EMPTY_JSON_STRING;
     
     /**
@@ -248,4 +248,21 @@ public class MessageLeaveEntity extends BaseEntity {
     public String getRepliedAtString() {
         return BdDateUtils.formatDatetimeToString(repliedAt);
     }
+
+    public String getReadAtString() {
+        return BdDateUtils.formatDatetimeToString(readAt);
+    }
+
+    public String getTransferredAtString() {
+        return BdDateUtils.formatDatetimeToString(transferredAt);
+    }
+
+    public String getClosedAtString() {
+        return BdDateUtils.formatDatetimeToString(closedAt);
+    }
+
+    public String getSpamAtString() {
+        return BdDateUtils.formatDatetimeToString(spamAt);
+    }
+    
 }
