@@ -29,8 +29,11 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * FreeSwitch通话详单记录实体
- * 对应数据库表：freeswitch_cdr
+ * FreeSwitch call detail record entity
+ * Stores detailed information about voice calls processed by FreeSwitch
+ * 
+ * Database Table: bytedesk_freeswitch_cdr
+ * Purpose: Records call metadata, timing information, and call quality metrics
  */
 @Entity
 @Data
@@ -44,93 +47,93 @@ import lombok.experimental.SuperBuilder;
 public class FreeSwitchCdrEntity extends BaseEntity {
     
     /**
-     * 主叫名称
+     * Caller's display name
      */
     private String callerIdName;
 
     /**
-     * 主叫号码
+     * Caller's phone number
      */
     private String callerIdNumber;
 
     /**
-     * 被叫号码
+     * Destination phone number
      */
     private String destinationNumber;
 
     /**
-     * 上下文
+     * FreeSwitch dialplan context
      */
     private String context;
 
     /**
-     * 通话开始时间
+     * Call start timestamp
      */
     private ZonedDateTime startStamp;
 
     /**
-     * 通话接通时间
+     * Call answer timestamp when connection is established
      */
     private ZonedDateTime answerStamp;
 
     /**
-     * 通话结束时间
+     * Call end timestamp
      */
     private ZonedDateTime endStamp;
 
     /**
-     * 通话总时长（秒）
+     * Total call duration in seconds
      */
     private Integer duration;
 
     /**
-     * 计费时长（秒）
+     * Billable duration in seconds
      */
     private Integer billsec;
 
     /**
-     * 挂断原因
+     * Reason for call termination
      */
     private String hangupCause;
 
     /**
-     * 账户代码
+     * Account code for billing purposes
      */
     private String accountcode;
 
     /**
-     * 读取编解码器
+     * Audio codec used for receiving audio
      */
     private String readCodec;
 
     /**
-     * 写入编解码器
+     * Audio codec used for sending audio
      */
     private String writeCodec;
 
     /**
-     * SIP挂断处理
+     * SIP hangup disposition information
      */
     private String sipHangupDisposition;
 
     /**
-     * 录音文件路径
+     * Path to call recording file
      */
     private String recordFile;
 
     /**
-     * 通话方向（inbound/outbound）
+     * Call direction (inbound/outbound)
      */
     private String direction;
 
     /**
-     * JSON格式的扩展信息
+     * Additional call information stored as JSON
      */
     @Column(columnDefinition = "TEXT")
     private String json;
 
     /**
-     * 获取通话状态描述
+     * Get call status description
      */
     public String getCallStatusDescription() {
         if (answerStamp != null) {
@@ -143,14 +146,14 @@ public class FreeSwitchCdrEntity extends BaseEntity {
     }
 
     /**
-     * 检查是否为成功通话
+     * Check if the call was successful
      */
     public boolean isSuccessfulCall() {
         return answerStamp != null && billsec != null && billsec > 0;
     }
 
     /**
-     * 获取格式化的通话时长
+     * Get formatted call duration
      */
     public String getFormattedDuration() {
         if (duration == null) return "00:00:00";

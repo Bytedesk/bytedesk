@@ -102,7 +102,41 @@ public class MessageLeaveResponse extends BaseResponse {
 
     private UserProtobuf replyUser;
 
+    // 已读相关字段
+    private UserProtobuf readUser;
+    private ZonedDateTime readAt;
+    
+    // 转接相关字段
+    private UserProtobuf transferUser;
+    private ZonedDateTime transferredAt;
+    private String targetAgentUid; // 转接目标客服UID
+    private UserProtobuf targetAgent; // 转接目标客服信息
+    
+    // 关闭相关字段
+    private UserProtobuf closeUser;
+    private ZonedDateTime closedAt;
+    
+    // 垃圾留言相关字段
+    private UserProtobuf spamUser;
+    private ZonedDateTime spamAt;
+
     public String getRepliedAt() {
         return BdDateUtils.formatDatetimeToString(repliedAt);
+    }
+
+    public String getReadAt() {
+        return BdDateUtils.formatDatetimeToString(readAt);
+    }
+
+    public String getTransferredAt() {
+        return BdDateUtils.formatDatetimeToString(transferredAt);
+    }
+
+    public String getClosedAt() {
+        return BdDateUtils.formatDatetimeToString(closedAt);
+    }
+
+    public String getSpamAt() {
+        return BdDateUtils.formatDatetimeToString(spamAt);
     }
 }

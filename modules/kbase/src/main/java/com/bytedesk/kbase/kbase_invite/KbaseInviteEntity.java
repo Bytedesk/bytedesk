@@ -27,6 +27,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Knowledge base invite entity for member invitation management
+ * Manages invitations to join knowledge bases and collaboration spaces
+ * 
+ * Database Table: bytedesk_kbase_invite
+ * Purpose: Stores invitation configurations and member access management
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -38,19 +45,34 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_kbase_invite")
 public class KbaseInviteEntity extends BaseEntity {
 
+    /**
+     * Name of the invitation
+     */
     private String name;
 
+    /**
+     * Description of the invitation
+     */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    /**
+     * Type of invitation (CUSTOMER, MEMBER, etc.)
+     */
     @Builder.Default
     @Column(name = "tag_type")
     private String type = KbaseInviteTypeEnum.CUSTOMER.name();
 
+    /**
+     * Color theme for the invitation display
+     */
     @Builder.Default
     @Column(name = "tag_color")
     private String color = "red";
 
+    /**
+     * Display order of the invitation
+     */
     @Builder.Default
     @Column(name = "tag_order")
     private Integer order = 0;

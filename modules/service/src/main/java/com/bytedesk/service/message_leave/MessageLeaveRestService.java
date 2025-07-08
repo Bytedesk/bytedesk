@@ -298,9 +298,9 @@ public class MessageLeaveRestService extends
             throw new RuntimeException("User should login first.");
         }
         
-        if (request.getTargetAgentUid() == null || request.getTargetAgentUid().isEmpty()) {
-            throw new RuntimeException("Target agent UID is required");
-        }
+        // if (request.getTargetAgentUid() == null || request.getTargetAgentUid().isEmpty()) {
+        //     throw new RuntimeException("Target agent UID is required");
+        // }
 
         Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
         if (messageLeaveOptional.isPresent()) {
@@ -308,7 +308,7 @@ public class MessageLeaveRestService extends
             messageLeave.setStatus(MessageLeaveStatusEnum.TRANSFERRED.name());
             messageLeave.setTransferredAt(BdDateUtils.now());
             messageLeave.setTransferUser(user.toProtobuf().toJson());
-            messageLeave.setTargetAgentUid(request.getTargetAgentUid());
+            // messageLeave.setTargetAgentUid(request.getTargetAgentUid());
             
             MessageLeaveEntity updateMessageLeave = save(messageLeave);
             if (updateMessageLeave == null) {

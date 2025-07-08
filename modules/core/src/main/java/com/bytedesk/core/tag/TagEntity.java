@@ -27,6 +27,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Tag entity for content categorization and organization
+ * Provides tagging functionality for various system entities
+ * 
+ * Database Table: bytedesk_core_tag
+ * Purpose: Stores tag definitions, colors, and organization settings
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -38,19 +45,34 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_core_tag")
 public class TagEntity extends BaseEntity {
 
+    /**
+     * Name of the tag
+     */
     private String name;
 
+    /**
+     * Description of the tag
+     */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    /**
+     * Type of tag (CUSTOMER, TICKET, ARTICLE, etc.)
+     */
     @Builder.Default
     @Column(name = "tag_type")
     private String type = TagTypeEnum.CUSTOMER.name();
 
+    /**
+     * Color theme for the tag display
+     */
     @Builder.Default
     @Column(name = "tag_color")
     private String color = "red";
 
+    /**
+     * Display order of the tag
+     */
     @Builder.Default
     @Column(name = "tag_order")
     private Integer order = 0;

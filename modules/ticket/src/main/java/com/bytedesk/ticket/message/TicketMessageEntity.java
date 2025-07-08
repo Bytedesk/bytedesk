@@ -21,6 +21,13 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+/**
+ * Ticket message entity for workflow communication
+ * Manages messages and notifications within ticket workflows
+ * 
+ * Database Table: bytedesk_ticket_message
+ * Purpose: Stores ticket-related messages and workflow notifications
+ */
 @Entity
 // @Data
 @Builder

@@ -28,6 +28,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * LLM model entity for AI model management
+ * Manages large language model configurations and provider relationships
+ * 
+ * Database Table: bytedesk_ai_model
+ * Purpose: Stores LLM model definitions, types, and provider associations
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -41,22 +48,37 @@ public class LlmModelEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // 模型名称，用于调用
+    /**
+     * Model name used for API calls
+     */
     private String name;
     
-    // 便于记忆
+    /**
+     * User-friendly nickname for the model
+     */
     private String nickname;
 
+    /**
+     * Description of the model capabilities
+     */
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
 
-    // 模型类型
+    /**
+     * Type of LLM model (CHAT, EMBEDDING, etc.)
+     */
     @Builder.Default
     @Column(name = "model_type")
     private String type = LlmModelTypeEnum.CHAT.name();
 
+    /**
+     * Associated provider UID
+     */
     private String providerUid;
 
+    /**
+     * Name of the model provider
+     */
     private String providerName;
 
     // @Builder.Default
