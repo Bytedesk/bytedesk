@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:49:00
+ * @LastEditTime: 2025-07-08 14:37:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,6 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceTrigger;
-import com.bytedesk.service.agent.AgentEntity;
 
 // 可以根据需要选择是否使用 @Component 注解
 // 如果该方法不需要被Spring容器管理，则不需要此注解
@@ -97,8 +96,7 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    public static MessageProtobuf getAgentThreadQueueMessage(AgentEntity agent, ThreadEntity thread) {
-        // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
+    public static MessageProtobuf getThreadQueueMessage(ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         

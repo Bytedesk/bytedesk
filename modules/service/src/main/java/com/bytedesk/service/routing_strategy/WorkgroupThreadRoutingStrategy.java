@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 12:24:17
+ * @LastEditTime: 2025-07-08 14:47:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
-import com.bytedesk.core.thread.event.ThreadAgentQueueEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
 import com.bytedesk.core.topic.TopicUtils;
@@ -276,13 +275,13 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
         // 排队，已满则排队
         String content = "";
-        if (queueMemberEntity.getWorkgroupQueue().getQueuingCount() == 0) {
+        int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
+        if (queuingCount == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
         } else {
             // 前面有排队人数
-            content = " 当前排队人数：" + queueMemberEntity.getWorkgroupQueue().getQueuingCount() + " 大约等待时间："
-                    + queueMemberEntity.getWorkgroupQueue().getQueuingCount() * 2 + "  分钟";
+            content = " 当前排队人数：" + queuingCount + " 大约等待时间：" + queuingCount * 2 + "  分钟";
         }
         // 进入排队队列
         thread.setUserUid(agentEntity.getUid());
@@ -291,10 +290,9 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
-        //
-        bytedeskEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
-        //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agentEntity, savedThread);
+        // 
+        // bytedeskEventPublisher.publishEvent(new ThreadAgentQueueEvent(this, savedThread));
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         //
         return messageProtobuf;

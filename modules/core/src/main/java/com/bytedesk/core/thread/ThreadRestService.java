@@ -736,6 +736,11 @@ public class ThreadRestService
         return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
     }
 
+    // 根据topic前缀和状态查询会话列表
+    public List<ThreadEntity> findByTopicStartsWithAndStatus(String topicPrefix, String status) {
+        return threadRepository.findByTopicStartsWithAndStatusAndDeletedFalse(topicPrefix, status);
+    }
+
     @Cacheable(value = "thread", key = "#user.uid + '-' + #pageable.getPageNumber()", unless = "#result == null")
     public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);

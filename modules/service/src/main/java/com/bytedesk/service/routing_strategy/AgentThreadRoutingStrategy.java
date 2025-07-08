@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 17:08:43
+ * @LastEditTime: 2025-07-08 14:46:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -186,13 +186,13 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 已满则排队
         // String queueTip = agent.getQueueSettings().getQueueTip();
         String content = "";
-        if (queueMemberEntity.getAgentQueue().getQueuingCount() == 0) {
+        int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
+        if (queuingCount == 0) {
             // 客服接待刚满员，下一个就是他，
             content = "请稍后，下一个就是您";
         } else {
             // 前面有排队人数
-            content = " 当前排队人数：" + queueMemberEntity.getAgentQueue().getQueuingCount() + " 大约等待时间："
-                    + queueMemberEntity.getAgentQueue().getQueuingCount() * 2 + "  分钟";
+            content = " 当前排队人数：" + queuingCount + " 大约等待时间：" + queuingCount * 2 + "  分钟";
         }
         // 进入排队队列
         thread.setQueuing().setUnreadCount(0).setContent(content);
@@ -205,7 +205,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
         //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getAgentThreadQueueMessage(agent, thread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         // 
         return messageProtobuf;
