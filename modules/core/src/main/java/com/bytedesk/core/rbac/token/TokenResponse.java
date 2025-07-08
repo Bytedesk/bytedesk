@@ -40,9 +40,13 @@ public class TokenResponse extends BaseResponse {
 
     private String type;
 
+    private String scope;
+
     private ZonedDateTime expiresAt;
 
     private Boolean revoked;
+
+    private String revokeReason;
 
     private String client;
 

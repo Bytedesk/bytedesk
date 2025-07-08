@@ -16,10 +16,8 @@ package com.bytedesk.core.rbac.token;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.enums.ClientEnum;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -40,16 +38,17 @@ public class TokenRequest extends BaseRequest {
 
     private String refreshToken;
 
-    @Builder.Default
-    private String type = TokenTypeEnum.LOGIN.name();
+    // private String type;
+
+    private String scope;
 
     private ZonedDateTime expiresAt;
 
-    @Builder.Default
-    private Boolean revoked = false;
+    private Boolean revoked;
 
-    @Builder.Default
-    private String client = ClientEnum.WEB.name();
+    private String revokeReason;
+
+    private String client;
 
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;
