@@ -34,7 +34,11 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 客户留资，自动提取，手动添加
+ * Customer entity for lead management and customer relationship management
+ * Represents customer information collected automatically or manually added
+ * 
+ * Database Table: bytedesk_service_customer
+ * Purpose: Stores customer contact information, preferences, and interaction history
  * 
  * @author jackning 270580156@qq.com
  */
@@ -48,13 +52,24 @@ import lombok.experimental.Accessors;
 @Table(name = "bytedesk_service_customer")
 public class CustomerEntity extends BaseEntity {
 
+    /**
+     * Customer's display name or nickname
+     */
     private String nickname;
 
+    /**
+     * Customer's email address for communication
+     */
     private String email;
 
+    /**
+     * Customer's mobile phone number
+     */
     private String mobile;
 
-    // 备注信息note
+    /**
+     * Customer description or notes
+     */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
     
@@ -103,13 +118,17 @@ public class CustomerEntity extends BaseEntity {
     // private Integer dealCount; // 成交次数
     // private ZonedDateTime lastDealTime; // 最后成交时间
 
-    // 标签
+    /**
+     * Tags for customer categorization and search
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
-	// extra info，customFields，开发者自定义URL参数，使用json格式存储，便于扩展
+    /**
+     * Additional customer information stored as JSON format for extensibility
+     */
 	@Builder.Default
 	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
@@ -118,9 +137,14 @@ public class CustomerEntity extends BaseEntity {
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     // private String customFields; // JSON格式存储自定义字段
     
-    // 备注信息
+    /**
+     * Additional notes or comments about the customer
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String notes; // 备注信息
 
+    /**
+     * Associated visitor UID for tracking customer journey
+     */
     private String visitorUid;
 }

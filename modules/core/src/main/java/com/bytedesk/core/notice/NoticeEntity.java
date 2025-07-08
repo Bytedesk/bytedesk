@@ -32,7 +32,11 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 注意与message类型notice区分
+ * System notice entity for announcements and notifications
+ * Different from message type notices - used for system-wide announcements
+ * 
+ * Database Table: bytedesk_core_notice
+ * Purpose: Stores system announcements, alerts, and important notifications
  */
 @Getter
 @Setter
@@ -46,18 +50,33 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_core_notice")
 public class NoticeEntity extends BaseEntity {
     
+    /**
+     * Title of the notice or announcement
+     */
     private String title;
 
+    /**
+     * Main content of the notice
+     */
     private String content;
 
+    /**
+     * Type of notice (LOGIN, SYSTEM, MAINTENANCE, etc.)
+     */
     @Builder.Default
     @Column(name = "notice_type")
     private String type = NoticeTypeEnum.LOGIN.name();
 
+    /**
+     * Current status of the notice (PENDING, PUBLISHED, ARCHIVED, etc.)
+     */
     @Builder.Default
     @Column(name = "notice_status")
     private String status = MessageStatusEnum.TRANSFER_PENDING.name();
 
+    /**
+     * Additional notice information stored as JSON format
+     */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
