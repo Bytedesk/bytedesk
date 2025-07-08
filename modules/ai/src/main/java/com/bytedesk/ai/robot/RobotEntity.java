@@ -45,9 +45,11 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * - agent：一对一人工客服，不支持机器人接待
- * - robot：机器人客服，不支持转人工
- * - workgroup：工作组，支持机器人接待，支持转人工
+ * AI robot entity for automated customer service
+ * Supports different service types: agent (human-only), robot (AI-only), workgroup (hybrid)
+ * 
+ * Database Table: bytedesk_ai_robot
+ * Purpose: Stores AI robot configurations, LLM settings, and service parameters
  */
 @Entity
 @Data
@@ -69,23 +71,40 @@ public class RobotEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Internal name of the robot
+     */
     @Builder.Default
     private String name = I18Consts.I18N_ROBOT_NAME;
 
-    // 对外名称
+    /**
+     * Display name shown to customers
+     */
     @Builder.Default
     private String nickname = I18Consts.I18N_ROBOT_NICKNAME;
 
+    /**
+     * Avatar image URL for the robot
+     */
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultRobotAvatar();
 
+    /**
+     * Description of the robot's capabilities
+     */
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
     
+    /**
+     * LLM configuration settings for the robot
+     */
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
 
+    /**
+     * Service settings and parameters for the robot
+     */
     @Embedded
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
@@ -94,12 +113,16 @@ public class RobotEntity extends BaseEntity {
     // @Builder.Default
     // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
-    // service、ask、chat
+    /**
+     * Type of robot service (SERVICE, ASK, CHAT)
+     */
     @Builder.Default
     @Column(name = "robot_type")
     private String type = RobotTypeEnum.SERVICE.name();
 
-    // stream, 使用流式返回
+    /**
+     * Whether to use streaming responses for real-time interaction
+     */
     @Builder.Default
     @Column(name = "is_stream")
     private Boolean stream = true;
@@ -107,36 +130,57 @@ public class RobotEntity extends BaseEntity {
     // @Builder.Default
     // private Boolean published = false;
 
+    /**
+     * Whether knowledge base integration is enabled
+     */
     @Builder.Default
     @Column(name = "is_kb_enabled")
     private Boolean kbEnabled = false;
 
+    /**
+     * Associated knowledge base UID for AI responses
+     */
     private String kbUid; // 对应知识库
 
-    // flow enabled
+    /**
+     * Whether workflow/flow integration is enabled
+     */
     @Builder.Default
     @Column(name = "is_flow_enabled")
     private Boolean flowEnabled = false;
 
-    // flow uid
+    /**
+     * Associated workflow/flow UID for automated processes
+     */
     private String flowUid;
 
+    /**
+     * Associated category UID for robot classification
+     */
     private String categoryUid; // 机器人分类
 
-    // 是否是系统自带
+    /**
+     * Whether this is a system-provided robot
+     */
     @Builder.Default
     @Column(name = "is_system")
     private Boolean system = false;
 
-    // 邀请设置
+    /**
+     * Invitation settings for the robot
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private InviteSettingsEntity inviteSettings;
 
-    // 点踩设置
+    /**
+     * Rating down settings for feedback collection
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private RatedownSettingsEntity rateDownSettings;
 
-    // 意图识别
+    /**
+     * Intention recognition settings for the robot
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private IntentionSettingsEntity intentionSetting;
 

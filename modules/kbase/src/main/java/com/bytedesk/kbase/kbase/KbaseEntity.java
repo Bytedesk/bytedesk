@@ -42,7 +42,11 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * kbase + space
+ * Knowledge base entity for organizing and managing knowledge articles
+ * Combines knowledge base functionality with workspace features
+ * 
+ * Database Table: bytedesk_kbase
+ * Purpose: Stores knowledge base configurations, themes, and member management
  */
 @Entity
 @Data
@@ -62,120 +66,188 @@ public class KbaseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Name of the knowledge base
+     */
     private String name;
 
+    /**
+     * Description of the knowledge base
+     */
     private String description;
 
+    /**
+     * Type of knowledge base (HELPCENTER, DOCUMENTATION, FAQ, etc.)
+     */
     @Builder.Default
     @Column(name = "kb_type")
     private String type = KbaseTypeEnum.HELPCENTER.name();
 
-    // headline标头
+    /**
+     * Main headline or title displayed on the knowledge base
+     */
     @Builder.Default
     private String headline = KbaseConsts.HEADLINE;
 
-    // 自定义副标题
+    /**
+     * Subtitle or secondary headline for the knowledge base
+     */
     @Builder.Default
     @Column(name = "sub_headline")
     private String subHeadline = KbaseConsts.SUB_HEADLINE;
 
-    // 自定义网址
+    /**
+     * Custom URL for the knowledge base
+     */
     @Builder.Default
     private String url = KbaseConsts.KBASE_URL;
 
+    /**
+     * URL of the knowledge base logo image
+     */
     @Builder.Default
     private String logoUrl = KbaseConsts.KBASE_LOGO_URL;
 
+    /**
+     * URL of the knowledge base favicon
+     */
     @Builder.Default
     private String faviconUrl = KbaseConsts.KBASE_FAVICON_URL;
 
-    // 自定义封面图片
+    /**
+     * URL of the custom cover image for the knowledge base
+     */
     private String coverImageUrl;
 
-    // 自定义背景图片
+    /**
+     * URL of the custom background image for the knowledge base
+     */
     private String backgroundImageUrl;
 
-    // 主题色
+    /**
+     * Primary color theme for the knowledge base
+     */
     @Builder.Default
     private String primaryColor = BytedeskConsts.EMPTY_STRING;
 
+    /**
+     * Theme name for the knowledge base appearance
+     */
     @Builder.Default
     private String theme = KbaseThemeEnum.DEFAULT.name();
 
-    // 成员数量
+    /**
+     * Number of members in the knowledge base
+     */
     @Builder.Default
     private Integer memberCount = 0;
 
-    // 文章数量
+    /**
+     * Number of articles in the knowledge base
+     */
     @Builder.Default
     private Integer articleCount = 0;
 
-    // 是否收藏
+    /**
+     * Whether the knowledge base is marked as favorite
+     */
     @Builder.Default
     @Column(name = "is_favorite")
     private Boolean favorite = false;
 
-    // 是否公开: 内部知识库可设置为公开，外部知识库可设置为不公开
+    /**
+     * Whether the knowledge base is publicly accessible
+     */
     @Builder.Default
     @Column(name = "is_public")
     private Boolean isPublic = false;
 
     /**
-     * 知识库描述
-     * 输入一两句话简单介绍您的论坛。这将会显示为 <meta name="description"> 描述标签，一般为 160
-     * 字的文本，用于介绍网页的内容。平常多被搜索引擎截取网页简介用。
+     * HTML description for SEO purposes (meta description tag)
      */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String descriptionHtml = KbaseConsts.KB_DESCRIPTION;
 
-    // 自定义页眉, 添加显示于页面顶部、位于默认页眉上方的 HTML 代码。
+    /**
+     * Custom HTML header code displayed at the top of the knowledge base
+     */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String headerHtml = BytedeskConsts.EMPTY_STRING;
 
-    // 自定义页脚, 添加显示于页面底部的 HTML 代码。
+    /**
+     * Custom HTML footer code displayed at the bottom of the knowledge base
+     */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String footerHtml = BytedeskConsts.EMPTY_STRING;
 
-    // 自定义 CSS, 添加 Less/CSS 代码以自定义论坛外观，此设置将覆盖默认样式
+    /**
+     * Custom CSS/Less code for styling the knowledge base
+     */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String css = BytedeskConsts.EMPTY_STRING;
 
+    /**
+     * Language setting for the knowledge base
+     */
     @Builder.Default
     private String language = LanguageEnum.ZH_CN.name();
 
-    // 有效开始日期
+    /**
+     * Start date when the knowledge base becomes active
+     */
     private ZonedDateTime startDate;
 
-    // 有效结束日期
+    /**
+     * End date when the knowledge base expires
+     */
     private ZonedDateTime endDate;
 
+    /**
+     * Tags for knowledge base categorization and search
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
-    // 大模型知识库-嵌入向量提供者
+    /**
+     * LLM embedding provider for vector search functionality
+     */
     @Builder.Default
     @Column(name = "llm_embedding_provider")
     private String embeddingProvider = LlmConsts.DEFAULT_EMBEDDING_PROVIDER;
     
+    /**
+     * LLM embedding model for vector search functionality
+     */
     @Builder.Default
     @Column(name = "llm_embedding_model")
     private String embeddingModel = LlmConsts.DEFAULT_EMBEDDING_MODEL;
 
+    /**
+     * Whether to show chat functionality in the knowledge base
+     */
     @Builder.Default
     private Boolean showChat = false;
 
+    /**
+     * Whether the knowledge base is published and accessible
+     */
     @Builder.Default
     private Boolean published = true;
 
-    // 某人工客服快捷回复知识库
+    /**
+     * Associated agent UID for agent-specific knowledge base
+     */
     private String agentUid;
 
+    /**
+     * Members who have access to this knowledge base
+     */
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     private List<MemberEntity> members = new ArrayList<>();

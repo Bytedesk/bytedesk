@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 17:13:08
+ * @LastEditTime: 2025-07-08 16:20:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -723,7 +723,6 @@ public class ThreadRestService
         return threadRepository.findByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
-    // 状态不能及时更新，暂时注释掉，TODO: 待完善
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
         return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);

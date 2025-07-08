@@ -23,40 +23,5 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageLeaveEventListener {
 
-    // private final MessageLeaveRestService MessageLeaveService;
-
-    // private final QueueMemberRestService queueMemberRestService;
-
-    // 更换为Rest接口，迁移到messageLeaveService中, 此处暂时注释掉
-    // @EventListener
-    // public void onMessageUpdateEvent(MessageUpdateEvent event) {
-    //     MessageEntity message = event.getMessage();
-    //     // log.info("message leave_msg update event: {}", message);
-    //     //
-    //     if (message.getStatus().equals(MessageStatusEnum.LEAVE_MSG_SUBMIT.name())) {
-    //         MessageLeaveExtra extra = JSON.parseObject(message.getContent(), MessageLeaveExtra.class);
-    //         //
-    //         MessageLeaveRequest request = MessageLeaveRequest.builder()
-    //                 .contact(extra.getContact())
-    //                 .content(extra.getContent())
-    //                 .images(extra.getImages())
-    //                 .threadUid(message.getThread().getUid())
-    //                 // .thread(message.getThread())
-    //                 .user(message.getUser())
-    //                 .client(message.getClient())
-    //                 .orgUid(extra.getOrgUid())
-    //                 .build();
-    //         MessageLeaveService.create(request);
-
-    //         // 更新queue_member表
-    //         Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(message.getThread().getUid());
-    //         if (queueMemberOptional.isPresent()) {
-    //             QueueMemberEntity queueMember = queueMemberOptional.get();
-    //             queueMember.setLeaveMsg(true);
-    //             queueMember.setLeaveMsgAt(message.getCreatedAt());
-    //             queueMemberRestService.save(queueMember);
-    //         }
-    //     }
-    // }
 
 }

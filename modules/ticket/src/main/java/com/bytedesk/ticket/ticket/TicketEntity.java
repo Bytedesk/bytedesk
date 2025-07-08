@@ -38,6 +38,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * Support ticket entity for customer service and issue tracking
+ * Manages customer support requests, assignments, and resolution tracking
+ * 
+ * Database Table: bytedesk_ticket
+ * Purpose: Stores support tickets, their status, assignments, and resolution history
+ */
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true, exclude = { "attachments" })
@@ -47,87 +54,135 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TicketEntity extends BaseEntity {
     
+    /**
+     * Title of the support ticket (required field)
+     */
     @Column(nullable = false)
     private String title;           // 工单标题(必填)
     
-    // 非结构化内容
+    /**
+     * Detailed description of the ticket issue (optional)
+     */
     private String description;     // 工单描述(选填)
 
+    /**
+     * Current status of the ticket (NEW, IN_PROGRESS, RESOLVED, CLOSED)
+     */
     @Builder.Default
     private String status = TicketStatusEnum.NEW.name();          // 状态(新建/处理中/已解决/已关闭)
     
+    /**
+     * Priority level of the ticket (LOW, MEDIUM, HIGH, URGENT)
+     */
     @Builder.Default
     private String priority = TicketPriorityEnum.LOW.name();        // 优先级(低/中/高/紧急)
 
+    /**
+     * Type of ticket (AGENT, GROUP)
+     */
     @Builder.Default
     private String type = TicketTypeEnum.AGENT.name();        // 类型(agent/group)
 
-    // 对应在线客服会话: 跟threadUid合并
+    /**
+     * Thread topic for online customer service session
+     */
     @Column(name = "thread_topic")
     private String topic;
 
-    // 对应工单会话，工单会话uid。每一个在线客服会话，可以创建多个工单，每个工单对应一个工单会话
+    /**
+     * Associated thread UID for ticket conversation
+     */
     private String threadUid;
 
-    // 关联category，工单分类
+    /**
+     * Associated category UID for ticket classification
+     */
     private String categoryUid;
 
+    /**
+     * Associated workgroup UID for ticket assignment
+     */
     private String workgroupUid; // 工作组
 
+    /**
+     * Associated department UID for ticket routing
+     */
     private String departmentUid; // 部门
 
-    // 统一使用member entity
-    // 使用UserProtobuf json格式化
-    // 一个工单一个处理人，一个处理人可以处理多个工单
+    /**
+     * Ticket assignee information stored as JSON string
+     */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String assignee = BytedeskConsts.EMPTY_JSON_STRING;
     
-    // 统一使用member entity
-    // 使用UserProtobuf json格式化
-    // 一个工单一个报告人，一个报告人可以报告多个工单
+    /**
+     * Ticket reporter information stored as JSON string
+     */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String reporter = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 工单评论
+    /**
+     * Comments associated with the ticket
+     */
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TicketCommentEntity> comments;
 
-    // 工单附件
+    /**
+     * Attachments associated with the ticket
+     */
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TicketAttachmentEntity> attachments;
 
-    // 流程实例ID
+    /**
+     * Process instance ID for workflow integration
+     */
     private String processInstanceId;
 
-    // 流程定义实体UID
+    /**
+     * Process definition entity UID
+     */
     private String processEntityUid;
 
-    // 是否评价
+    /**
+     * Whether the ticket has been rated by the customer
+     */
     @Builder.Default
     @Column(name = "is_rated")
     private Boolean rated = false;
 
-    // 满意度评价
+    /**
+     * Customer satisfaction rating for the ticket
+     */
     @Builder.Default
     private Integer rating = TicketRatingEnum.GOOD.getValue();
 
-    // 客户验证
+    /**
+     * Whether the customer has been verified
+     */
     @Builder.Default
     @Column(name = "is_verified")
     private Boolean verified = false;
 
-    // 解决时间
+    /**
+     * Timestamp when the ticket was resolved
+     */
     private ZonedDateTime resolvedTime;
 
-    // 关闭时间
+    /**
+     * Timestamp when the ticket was closed
+     */
     private ZonedDateTime closedTime;
 
-    // 工单会话client
+    /**
+     * Client platform from which the ticket was created
+     */
     private String client;
 
-    // 工单创建者
+    /**
+     * User who created the ticket
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity owner;
 

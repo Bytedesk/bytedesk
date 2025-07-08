@@ -35,9 +35,12 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 支持客服发送自定义表单，
- * 例如留言表单、询前表单、工单表单、问卷调查等。
- * 收集用户信息
+ * Custom form entity for customer service interactions
+ * Supports various form types like feedback forms, pre-inquiry forms, ticket forms, surveys, etc.
+ * Used to collect user information and feedback
+ * 
+ * Database Table: bytedesk_service_form
+ * Purpose: Stores form definitions, configurations, and submission tracking
  */
 @Entity
 @Data
@@ -49,67 +52,101 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_service_form")
 public class FormEntity extends BaseEntity {
 
+    /**
+     * Name or title of the form
+     */
     private String name;
 
+    /**
+     * Description of the form's purpose
+     */
     private String description;
 
     // @Builder.Default    
     // @Column(name = "form_type")    
     // private String type = FormTypeEnum.TICKET.name();        
 
-    // 表单状态：草稿、已发布、已归档、已禁用
+    /**
+     * Current status of the form (DRAFT, PUBLISHED, ARCHIVED, DISABLED)
+     */
     @Builder.Default
     @Column(name = "form_status")
     private String status = FormStatusEnum.DRAFT.name();
     
-    // 是否为模板
+    /**
+     * Whether this form is a template for creating other forms
+     */
     @Builder.Default
     @Column(name = "is_template")
     private Boolean template = false;
     
-    // 表单结构定义，存储为JSON格式
+    /**
+     * Form structure definition stored as JSON format
+     */
     @Lob
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String formSchema;
     
-    // 表单发布时间
+    /**
+     * Timestamp when the form was published
+     */
     private ZonedDateTime publishTime;
     
-    // 表单过期时间
+    /**
+     * Expiration date/time for the form
+     */
     private ZonedDateTime expireLength;
     
-    // 表单布局类型：单列、双列、响应式等
+    /**
+     * Form layout type (SINGLE_COLUMN, TWO_COLUMN, RESPONSIVE, etc.)
+     */
     @Builder.Default
     private String layoutType = "SINGLE_COLUMN";
     
-    // 表单样式配置，JSON格式
+    /**
+     * Form styling configuration stored as JSON format
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String styleConfig;
     
-    // 提交后跳转URL
+    /**
+     * URL to redirect to after form submission
+     */
     private String redirectUrl;
     
-    // 提交后显示的消息
+    /**
+     * Message to display after successful form submission
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String submitMessage;
     
-    // 是否允许匿名提交
+    /**
+     * Whether anonymous submissions are allowed
+     */
     @Builder.Default
     private Boolean allowAnonymous = true;
     
-    // 表单访问权限设置，JSON格式
+    /**
+     * Form access control settings stored as JSON format
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String accessControl;
     
-    // 提交次数限制，0表示不限制
+    /**
+     * Maximum number of submissions allowed (0 means unlimited)
+     */
     @Builder.Default
     private Integer submissionLimit = 0;
     
-    // 提交总数统计
+    /**
+     * Total number of form submissions received
+     */
     @Builder.Default
     private Integer submissionCount = 0;
     
-    // 标签
+    /**
+     * Tags for form categorization and search
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

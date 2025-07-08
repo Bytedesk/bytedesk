@@ -117,9 +117,20 @@ public class MessageLeaveRestService extends
                 .map(threadRestService::convertToResponse)
                 .collect(Collectors.toList());
         
+        // Group by topic and keep only the latest one by createdAt
+        List<ThreadResponse> mergedThreadResponses = threadResponses.stream()
+                .collect(Collectors.groupingBy(ThreadResponse::getTopic))
+                .values()
+                .stream()
+                .map(threadList -> threadList.stream()
+                        .max((t1, t2) -> t1.getCreatedAt().compareTo(t2.getCreatedAt()))
+                        .orElse(null))
+                .filter(thread -> thread != null)
+                .collect(Collectors.toList());
+        
         // Create a Page object
         Pageable pageable = messageLeaveEntities.getPageable();
-        return new PageImpl<>(threadResponses, pageable, messageLeaveEntities.getTotalElements());
+        return new PageImpl<>(mergedThreadResponses, pageable, messageLeaveEntities.getTotalElements());
     }
 
     @Cacheable(value = "messageLeave", key = "#uid", unless = "#result == null")
@@ -182,12 +193,14 @@ public class MessageLeaveRestService extends
             if (updateMessageLeave == null) {
                 throw new RuntimeException("MessageLeave not updated");
             }
+            // 
             return convertToResponse(updateMessageLeave);
         }
 
         throw new RuntimeException("MessageLeave not found");
     }
 
+    
     // reply
     public MessageLeaveResponse reply(MessageLeaveRequest request) {
         UserEntity user = authService.getUser();
