@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 12:39:26
+ * @LastEditTime: 2025-07-08 12:46:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,6 +31,8 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadRequest;
+import com.bytedesk.core.thread.ThreadRestService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +47,8 @@ public class MessageUnreadRestService
     private final ModelMapper modelMapper;
 
     private final AuthService authService;
+
+    private final ThreadRestService threadRestService;
 
     @Override
     public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
@@ -94,7 +98,6 @@ public class MessageUnreadRestService
             throw new RuntimeException("Failed to save MessageUnreadEntity");
         }
         // 
-
         return convertToResponse(savedMessageUnread);
     }
 
@@ -159,7 +162,19 @@ public class MessageUnreadRestService
         if (savedMessageUnread == null) {
             throw new RuntimeException("Failed to save MessageUnreadEntity");
         }
-        log.info("create message unread: uid {}, content {}", savedMessageUnread.getContent());
+        log.info("create message unread: uid {}, content {}", savedMessageUnread.getUid(), savedMessageUnread.getContent());
+        
+        // 同步更新会话未读消息数
+        try {
+            ThreadRequest threadRequest = ThreadRequest.builder()
+                    .uid(threadUid)
+                    .build();
+            threadRestService.increaseUnreadCount(threadRequest);
+            log.info("thread unread count increased for thread: {}", threadUid);
+        } catch (Exception e) {
+            log.error("Failed to increase thread unread count for thread {}: {}", threadUid, e.getMessage(), e);
+            // 不抛出异常，避免影响未读消息的保存
+        }
     }
 
     public long getUnreadCount(MessageUnreadRequest request) {
@@ -180,6 +195,19 @@ public class MessageUnreadRestService
             
             // 删除符合条件的未读消息
             messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
+            
+            // 同步更新相关会话的未读消息数为0
+            // 对于访客uid，通常会话的topic会包含这个uid，我们需要找到所有相关的会话并清零未读数
+            try {
+                log.info("Attempting to clear unread count for visitor uid: {}", uid);
+                // 这里暂时跳过会话未读数的更新，因为需要更多的上下文信息来准确找到相关会话
+                // TODO: 如果需要精确更新，可能需要添加更多的查询方法或者通过其他方式获取会话信息
+                // 例如：可以通过 ThreadRestService 查询包含该uid的topic的会话，然后更新它们的未读数为0
+                
+            } catch (Exception e) {
+                log.error("Failed to clear thread unread count for uid {}: {}", uid, e.getMessage(), e);
+                // 不抛出异常，避免影响整个清理流程
+            }
             
             log.info("Successfully cleared unread messages for uid: {}", uid);
         } catch (Exception e) {

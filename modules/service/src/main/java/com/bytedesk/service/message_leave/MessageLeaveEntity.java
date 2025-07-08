@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 16:08:18
+ * @LastEditTime: 2025-07-08 12:44:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,8 +103,10 @@ public class MessageLeaveEntity extends BaseEntity {
     
     // 关联消息uID（用于更新提示留言消息状态）
     private String messageUid;
+    
     // 关联会话uID（本身对应的会话）
     private String threadUid;
+    
     // 关联的会话
     // private String threadTopic;
     // private ThreadEntity thread;

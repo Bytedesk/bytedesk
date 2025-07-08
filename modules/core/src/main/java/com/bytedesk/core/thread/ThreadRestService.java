@@ -532,13 +532,13 @@ public class ThreadRestService
         }
         //
         ThreadEntity thread = threadOptional.get();
-        thread.setUnreadCount(threadRequest.getUnreadCount());
+        thread.setUnreadCount(threadRequest.getUnreadCount() + 1);
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-
+        return convertToResponse(updateThread);
     }
 
     // update unread
