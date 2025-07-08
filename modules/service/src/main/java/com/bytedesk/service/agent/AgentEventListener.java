@@ -123,8 +123,6 @@ public class AgentEventListener {
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentProtobuf.getUid());
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
-            // agent.increaseThreadCount();
-            // agentService.save(agent);
             // 发送欢迎语
             String content = agent.getServiceSettings().getWelcomeTip();
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
