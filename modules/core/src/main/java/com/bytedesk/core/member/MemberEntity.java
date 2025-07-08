@@ -32,6 +32,13 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
+/**
+ * Team member entity for organizational structure management
+ * Manages member profiles, roles, and department assignments
+ * 
+ * Database Table: bytedesk_team_member
+ * Purpose: Stores member information, contact details, and organizational relationships
+ */
 @Entity
 @SuperBuilder
 @Accessors(chain = true)
@@ -46,39 +53,76 @@ public class MemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Display name of the team member
+     */
     private String nickname;
 
+    /**
+     * Profile picture URL for the member
+     */
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultUserAvatarUrl();
 
+    /**
+     * Brief description or bio of the member
+     */
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
+    /**
+     * Employee job number or ID
+     */
     private String jobNo;
 
+    /**
+     * Job title or position of the member
+     */
     private String jobTitle; // 职位
 
+    /**
+     * Seat or desk number of the member
+     */
     private String seatNo;
 
+    /**
+     * Office telephone number
+     */
     private String telephone;
 
+    /**
+     * Email address of the member
+     */
     @Email(message = "email format error")
     private String email;
 
-    // only support chinese mobile number
+    /**
+     * Mobile phone number (Chinese format supported)
+     */
     private String mobile;
 
+    /**
+     * Current status of the member (INVITING, ACTIVE, INACTIVE, etc.)
+     */
     @Builder.Default
     private String status = MemberStatusEnum.INVITING.name();
 
+    /**
+     * Role UIDs assigned to this member
+     */
     @Builder.Default
     @Convert(converter = StringSetConverter.class)
     @Column(length = 512)
 	private Set<String> roleUids = new HashSet<>(); 
 
-    // 一个人只能属于一个部门，一个部门可以有多个成员
+    /**
+     * Department UID that this member belongs to
+     */
     private String deptUid;
 
+    /**
+     * Associated user account for this member
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 

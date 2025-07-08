@@ -21,6 +21,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Forum post entity for community discussions
+ * Manages forum posts, content, and user interactions
+ * 
+ * Database Table: bytedesk_forum_post
+ * Purpose: Stores forum posts, categories, and engagement metrics
+ */
 @Data
 @Entity
 @Table(name = "bytedesk_forum_post",
@@ -32,26 +39,50 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class PostEntity extends BaseEntity {
 
+    /**
+     * Title of the forum post
+     */
     @Column(nullable = false)
     private String title;
 
+    /**
+     * Main content of the forum post
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
+    /**
+     * ID of the user who created the post
+     */
     @Column(name = "user_id")
     private Long userId;
 
+    /**
+     * Number of times the post has been viewed
+     */
     @Column(name = "view_count")
     private Integer viewCount = 0;
 
+    /**
+     * Number of likes received on the post
+     */
     @Column(name = "like_count")
     private Integer likeCount = 0;
 
+    /**
+     * Number of comments on the post
+     */
     @Column(name = "comment_count")
     private Integer commentCount = 0;
 
+    /**
+     * Current status of the post (draft, published, deleted)
+     */
     private String status = "published"; // draft, published, deleted
 
+    /**
+     * Category that the post belongs to
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private CategoryEntity category;

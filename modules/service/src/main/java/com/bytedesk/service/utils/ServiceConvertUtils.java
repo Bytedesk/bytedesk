@@ -158,12 +158,37 @@ public class ServiceConvertUtils {
     
     public static MessageLeaveResponse convertToMessageLeaveResponse(MessageLeaveEntity entity) {
         MessageLeaveResponse messageLeaveResponse = modelMapper.map(entity, MessageLeaveResponse.class);
+        
+        // 设置用户信息
         if (entity.getUser() != null) {
             messageLeaveResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
         }
+        
+        // 设置回复用户信息
         if (entity.getReplyUser() != null) {
             messageLeaveResponse.setReplyUser(UserProtobuf.fromJson(entity.getReplyUser()));
         }
+        
+        // 设置已读用户信息
+        if (entity.getReadUser() != null) {
+            messageLeaveResponse.setReadUser(UserProtobuf.fromJson(entity.getReadUser()));
+        }
+        
+        // 设置转接用户信息
+        if (entity.getTransferUser() != null) {
+            messageLeaveResponse.setTransferUser(UserProtobuf.fromJson(entity.getTransferUser()));
+        }
+        
+        // 设置关闭用户信息
+        if (entity.getCloseUser() != null) {
+            messageLeaveResponse.setCloseUser(UserProtobuf.fromJson(entity.getCloseUser()));
+        }
+        
+        // 设置标记垃圾留言用户信息
+        if (entity.getSpamUser() != null) {
+            messageLeaveResponse.setSpamUser(UserProtobuf.fromJson(entity.getSpamUser()));
+        }
+        
         return messageLeaveResponse;
     }
     

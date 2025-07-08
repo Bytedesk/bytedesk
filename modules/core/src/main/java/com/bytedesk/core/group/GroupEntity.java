@@ -33,6 +33,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Team group entity for group chat and collaboration management
+ * Manages group settings, members, and communication features
+ * 
+ * Database Table: bytedesk_team_groups
+ * Purpose: Stores group information, member relationships, and group settings
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -46,41 +53,66 @@ public class GroupEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Name of the group
+     */
     @Builder.Default
     private String name = I18Consts.I18N_GROUP_NAME;
 
+    /**
+     * Group avatar or profile picture URL
+     */
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultGroupAvatarUrl();
 
+    /**
+     * Description of the group's purpose
+     */
     @Builder.Default
     private String description = I18Consts.I18N_GROUP_DESCRIPTION;
 
-    // 是否显示顶部通知提示
+    /**
+     * Whether to show top notification banner
+     */
     @Builder.Default
     private Boolean showTopTip = false;
 
-    // 通知栏提示
+    /**
+     * Top notification banner content
+     */
     @Builder.Default
     private String topTip = BytedeskConsts.EMPTY_STRING;
 
-    // 是否外部群
+    /**
+     * Whether this is an external group (open to external users)
+     */
     @Builder.Default
     @Column(name = "is_external")
     private Boolean external = false;
 
+    /**
+     * Type of group (NORMAL, PROJECT, DEPARTMENT, etc.)
+     */
     @Builder.Default
     @Column(name = "group_type")
     private String type = GroupTypeEnum.NORMAL.name();
 
+    /**
+     * Current status of the group (NORMAL, ARCHIVED, etc.)
+     */
     @Builder.Default
     private String status = GroupStatusEnum.NORMAL.name();
 
-    // 群成员关系
-    
+    /**
+     * Members of the group
+     */
     @Builder.Default
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<MemberEntity> members = new ArrayList<>();
 
+    /**
+     * Administrators of the group
+     */
     @Builder.Default
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<UserEntity> admins = new ArrayList<>();
@@ -89,16 +121,30 @@ public class GroupEntity extends BaseEntity {
     // @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     // private List<RobotEntity> robots = new ArrayList<>();
 
+    /**
+     * User who created the group
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity creator;
 
-    // 群组设置
+    /**
+     * Maximum number of members allowed in the group
+     */
     @Builder.Default
     private Integer maxMembers = 500;  // 最大成员数
+    /**
+     * Whether approval is required to join the group
+     */
     @Builder.Default
     private Boolean needApproval = true; // 是否需要审批
+    /**
+     * Whether members can invite others to the group
+     */
     @Builder.Default
     private Boolean allowInvite = true;  // 是否允许邀请
+    /**
+     * Whether all members are muted (only admins can speak)
+     */
     @Builder.Default
     private Boolean muteAll = false;     // 是否全员禁言
 

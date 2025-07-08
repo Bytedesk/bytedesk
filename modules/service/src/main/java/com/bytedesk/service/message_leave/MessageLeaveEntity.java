@@ -181,21 +181,21 @@ public class MessageLeaveEntity extends BaseEntity {
      * Customer user information stored as JSON string
      */
     @Builder.Default
-    @Column(name = "leavemsg_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "leavemsg_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * Agent information who replied to the message stored as JSON string
      */
     @Builder.Default
-    @Column(name = "reply_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "reply_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String replyUser = BytedeskConsts.EMPTY_JSON_STRING;
     
     /**
      * Agent who read the message
      */
     @Builder.Default
-    @Column(name = "read_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "read_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String readUser = BytedeskConsts.EMPTY_JSON_STRING;
     
     /**
@@ -207,7 +207,7 @@ public class MessageLeaveEntity extends BaseEntity {
      * Agent who transferred the message
      */
     @Builder.Default
-    @Column(name = "transfer_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "transfer_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String transferUser = BytedeskConsts.EMPTY_JSON_STRING;
     
     /**
