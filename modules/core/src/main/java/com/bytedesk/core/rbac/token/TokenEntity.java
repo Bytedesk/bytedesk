@@ -14,11 +14,15 @@
 package com.bytedesk.core.rbac.token;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.ClientEnum;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -63,8 +67,9 @@ public class TokenEntity extends BaseEntity {
     private String type = TokenTypeEnum.BEARER.name();
 
     @Builder.Default
+    @Convert(converter = StringListConverter.class)
     @Column(name = "token_scope")
-    private String scope = TokenScopeEnum.LOGIN.name();
+    private List<String> scope = new ArrayList<>();
 
     private ZonedDateTime expiresAt;
 

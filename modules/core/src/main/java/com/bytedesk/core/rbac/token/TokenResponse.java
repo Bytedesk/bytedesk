@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.token;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -40,7 +41,7 @@ public class TokenResponse extends BaseResponse {
 
     private String type;
 
-    private String scope;
+    private List<String> scope;
 
     private ZonedDateTime expiresAt;
 

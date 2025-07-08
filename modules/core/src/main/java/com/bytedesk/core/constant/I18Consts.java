@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:26:25
+ * @LastEditTime: 2025-07-08 11:26:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -339,6 +339,8 @@ public class I18Consts {
     public static final String I18N_NO_ANSWER = "您的这个问题暂时无法回答，请提问其他问题。";
     public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
 
+    public static final String I18N_LOGIN_REQUIRED = "请先登录"; // 请先登录
+    public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
 
 
 

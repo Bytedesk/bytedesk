@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 09:58:15
+ * @LastEditTime: 2025-07-08 11:16:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,13 +24,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.rbac.token.TokenEntity;
+import com.bytedesk.core.rbac.token.TokenRepository;
 import com.bytedesk.core.rbac.token.TokenRequest;
-import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.token.TokenTypeEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -50,8 +52,10 @@ public class AuthService {
     private final UserDetailsServiceImpl userDetailsService;
 
     private final ModelMapper modelMapper;
+
+    private final UidUtils uidUtils;
     
-    private final TokenRestService tokenRestService;
+    private final TokenRepository tokenRepository;
 
     public UserEntity getUser() {
         // not logged in
@@ -105,10 +109,6 @@ public class AuthService {
         return new AuthToken(userDetails);
     }
 
-    public String generateAccessToken(String username, String platform) {
-        return JwtUtils.generateJwtToken(username, platform);
-    }
-
     public AuthResponse formatResponse(Authentication authentication) {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -150,8 +150,14 @@ public class AuthService {
             tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(365)); // 其他客户端默认365天过期
         }
         
-        tokenRestService.create(tokenRequest);
-
+        TokenEntity entity = modelMapper.map(tokenRequest, TokenEntity.class);
+        entity.setUid(uidUtils.getUid());
+        //
+        TokenEntity savedEntity = tokenRepository.save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create token failed");
+        }
+        // 手动将实体放入缓存
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .user(userResponse)

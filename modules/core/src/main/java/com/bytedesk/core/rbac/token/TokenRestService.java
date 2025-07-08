@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 10:21:36
+ * @LastEditTime: 2025-07-08 11:26:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,9 +23,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.JwtUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +48,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     private final UidUtils uidUtils;
 
-    // 循环依赖
-    // private final AuthService authService;
+    private final AuthService authService;
 
     @Override
     public Page<TokenResponse> queryByOrg(TokenRequest request) {
@@ -54,12 +60,11 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public Page<TokenResponse> queryByUser(TokenRequest request) {
-        // UserEntity user = authService.getCurrentUser();
-        // if (user == null) {
-        //     throw new NotLoginException("login required");
-        // }
-        // request.setUserUid(user.getUid());
-        // 
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+        request.setUserUid(user.getUid());
         return queryByOrg(request);
     }
 
@@ -151,4 +156,21 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     public TokenResponse convertToResponse(TokenEntity entity) {
         return modelMapper.map(entity, TokenResponse.class);
     }
+
+    public String generateAccessToken(TokenRequest request) {
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        String username = user.getUsername();
+        String platform = request.getPlatform();
+        if (!StringUtils.hasText(platform)) {
+            platform = PlatformEnum.BYTEDESK.name(); // 默认平台
+        }
+        // 生成访问令牌
+        return JwtUtils.generateJwtToken(username, platform);
+    }
+
+
+
 }
