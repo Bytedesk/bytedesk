@@ -15,6 +15,7 @@ package com.bytedesk.service.message_leave;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,15 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    // query threads by leave message
+    @GetMapping("/query/threads")
+    public ResponseEntity<?> queryThreadsByLeaveMessage(MessageLeaveRequest request) {
+        
+        Page<ThreadResponse> page = messageLeaveRestService.queryThreadsByLeaveMessage(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
     @Override
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
@@ -82,15 +92,6 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         MessageLeaveResponse response = messageLeaveRestService.reply(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
-    }
-
-    // query threads by leave message
-    @PostMapping("/threads")
-    public ResponseEntity<?> queryThreadsByLeaveMessage(@RequestBody MessageLeaveRequest request) {
-
-        Page<ThreadResponse> page = messageLeaveRestService.queryThreadsByLeaveMessage(request);
-
-        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Override
