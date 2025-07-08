@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 13:04:36
+ * @LastEditTime: 2025-07-08 13:16:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -81,7 +82,7 @@ public class MessageLeaveRestService extends
     public Page<MessageLeaveResponse> queryByUser(MessageLeaveRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("User should login first.");
+            throw new NotLoginException("please login first.");
         }
         request.setUserUid(user.getUid());
         //
@@ -130,7 +131,6 @@ public class MessageLeaveRestService extends
     @Override
     public MessageLeaveResponse create(MessageLeaveRequest request) {
         // log.info("request {}", request);
-
         MessageLeaveEntity messageLeave = modelMapper.map(request, MessageLeaveEntity.class);
         messageLeave.setUid(uidUtils.getUid());
         messageLeave.setStatus(MessageLeaveStatusEnum.PENDING.name());
