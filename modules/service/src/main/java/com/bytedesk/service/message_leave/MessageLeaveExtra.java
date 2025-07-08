@@ -21,15 +21,15 @@ import com.bytedesk.core.message.MessageExtra;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
 public class MessageLeaveExtra extends MessageExtra {
-
-    private static final long serialVersionUID = 1L;
 
     private String uid;
     private String contact;
@@ -46,10 +46,14 @@ public class MessageLeaveExtra extends MessageExtra {
     private String status;
 
     public static MessageLeaveExtra fromJson(String json) {
-        return JSON.parseObject(json, MessageLeaveExtra.class);
-    }
-
-    public String toJson() {
-        return JSON.toJSONString(this);
+        try {
+            if (json == null || json.isEmpty()) {
+                return MessageLeaveExtra.builder().build();
+            }
+            return JSON.parseObject(json, MessageLeaveExtra.class);
+        } catch (Exception e) {
+            // 如果解析失败，返回一个默认的对象
+            return MessageLeaveExtra.builder().build();
+        }
     }
 }

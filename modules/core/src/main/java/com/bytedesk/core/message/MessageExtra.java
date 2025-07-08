@@ -17,7 +17,6 @@ package com.bytedesk.core.message;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseExtra;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,12 +28,9 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
-@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
-@SuperBuilder
 public class MessageExtra extends BaseExtra {
-
-    private static final long serialVersionUID = 1L;
 
     // 是否内部消息
     // 例如：企业内部员工之间的消息，true: 内部消息，false: 外部消息
@@ -45,10 +41,14 @@ public class MessageExtra extends BaseExtra {
     private String orgUid;
 
     public static MessageExtra fromJson(String json) {
-        return JSON.parseObject(json, MessageExtra.class);
-    }
-
-    public String toJson() {
-        return JSON.toJSONString(this);
+        try {
+            if (json == null || json.isEmpty()) {
+                return MessageExtra.builder().build();
+            }
+            return JSON.parseObject(json, MessageExtra.class);
+        } catch (Exception e) {
+            // 如果解析失败，返回一个默认的对象
+            return MessageExtra.builder().build();
+        }
     }
 }
