@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 11:03:09
+ * @LastEditTime: 2025-06-02 10:29:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,11 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 部门
+ * Department entity for organizational hierarchy management
+ * Manages department structure with parent-child relationships
+ * 
+ * Database Table: bytedesk_team_department
+ * Purpose: Stores department information and hierarchical organization structure
  */
 @Entity
 @Data
@@ -42,25 +46,41 @@ public class DepartmentEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Name of the department
+     */
     private String name;
 
+    /**
+     * Description of the department's function
+     */
     private String description;
 
-    // 关联上级部门
+    /**
+     * Parent department in the hierarchy
+     */
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private DepartmentEntity parent;
 
-    // 关联下级部门（集合形式）
+    /**
+     * Child departments under this department
+     */
     @Builder.Default
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<DepartmentEntity> children = new HashSet<>();
 
+    /**
+     * Add a child department to this department
+     */
     public void addChild(DepartmentEntity child) {
         children.add(child);
         child.setParent(this);
     }
 
+    /**
+     * Remove a child department from this department
+     */
     public void removeChild(DepartmentEntity child) {
         children.remove(child);
         child.setParent(null);

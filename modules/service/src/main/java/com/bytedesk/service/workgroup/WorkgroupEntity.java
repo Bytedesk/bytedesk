@@ -50,15 +50,16 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * WorkgroupEntity和skills的区别主要在于:
- * - 组织结构 vs 能力标签
- * - WorkgroupEntity是组织结构层面的分组,比如"售前组"、"售后组"、"技术支持组"等
- * - Skills是能力标签层面的标识,比如"Java"、"Python"、"数据库"等技术能力
+ * Workgroup entity for customer service team management
+ * Manages workgroups that support both robot and human agent services
  * 
- * WorkgroupEntity和agent的区别主要在于:
- * - agent：一对一人工客服，不支持机器人接待
- * - robot：机器人客服，不支持转人工
- * - workgroup：工作组，支持机器人接待，支持转人工
+ * Database Table: bytedesk_service_workgroup
+ * Purpose: Stores workgroup configurations, agent assignments, and service settings
+ * 
+ * Key differences:
+ * - WorkgroupEntity vs Skills: Organizational structure vs capability labels
+ * - WorkgroupEntity vs Agent: Group support (robot + human) vs individual agent only
+ * - WorkgroupEntity vs Robot: Group with routing vs standalone robot
  */
 @Entity
 @Data
@@ -83,44 +84,75 @@ public class WorkgroupEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Display name of the workgroup
+     */
     @NotBlank
     private String nickname;
 
+    /**
+     * Workgroup avatar or profile picture URL
+     */
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultWorkGroupAvatarUrl();
 
+    /**
+     * Description of the workgroup's function
+     */
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
+    /**
+     * Customer routing mode (ROUND_ROBIN, LEAST_BUSY, etc.)
+     */
     @Builder.Default
     private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
+    /**
+     * Current status of the workgroup (AVAILABLE, BUSY, OFFLINE, etc.)
+     */
     @Builder.Default
     private String status = WorkgroupStateEnum.AVAILABLE.name();
 
-    // 留言设置
+    /**
+     * Settings for handling offline messages
+     */
     @Embedded
     @Builder.Default
     private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
 
+    /**
+     * Robot service configuration settings
+     */
     @Embedded
     @Builder.Default
     private RobotSettings robotSettings = new RobotSettings();
 
+    /**
+     * General service configuration settings
+     */
     @Embedded
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
 
+    /**
+     * Queue management settings
+     */
     @Embedded
     @Builder.Default
     private QueueSettings queueSettings = new QueueSettings();
 
+    /**
+     * Agents assigned to this workgroup
+     */
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
     private List<AgentEntity> agents = new ArrayList<>();
 
-    // 留言处理agent - 多个工作组可以共用同一个留言处理客服（多对一关系）
+    /**
+     * Agent responsible for handling offline messages
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private AgentEntity messageLeaveAgent;
 
@@ -129,20 +161,28 @@ public class WorkgroupEntity extends BaseEntity {
     // @ManyToMany(fetch = FetchType.LAZY)
     // private List<AgentEntity> monitorAgents = new ArrayList<>();
 
-    /** 存储下一个待分配的客服等信息 */
+    /**
+     * Additional configuration data stored as JSON
+     */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 邀请设置
+    /**
+     * Invitation settings for the workgroup
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private InviteSettingsEntity inviteSettings;
 
-    // 意图识别
+    /**
+     * Intent recognition settings
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     private IntentionSettingsEntity intentionSetting;
 
-    // 是否启用，状态：启用/禁用
+    /**
+     * Whether the workgroup is enabled and active
+     */
     @Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;

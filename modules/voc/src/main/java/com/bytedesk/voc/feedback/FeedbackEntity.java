@@ -20,28 +20,56 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Voice of Customer feedback entity for user feedback management
+ * Manages user feedback, suggestions, and complaint tracking
+ * 
+ * Database Table: bytedesk_voc_feedback
+ * Purpose: Stores user feedback content, status tracking, and assignment management
+ */
 @Data
 @Entity
 @Table(name = "bytedesk_voc_feedback")
 @EqualsAndHashCode(callSuper = true)
 public class FeedbackEntity extends BaseEntity {
 
+    /**
+     * Main content of the feedback
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
+    /**
+     * ID of the user who submitted the feedback
+     */
     @Column(name = "user_id")
     private Long userId;
 
+    /**
+     * Type of feedback (suggestion, bug, complaint, other)
+     */
     private String type = "suggestion"; // suggestion, bug, complaint, other
 
+    /**
+     * Current status of the feedback (pending, processing, resolved, closed)
+     */
     private String status = "pending"; // pending, processing, resolved, closed
 
+    /**
+     * Number of replies to this feedback
+     */
     @Column(name = "reply_count")
     private Integer replyCount = 0;
 
+    /**
+     * Number of likes received on this feedback
+     */
     @Column(name = "like_count")
     private Integer likeCount = 0;
 
+    /**
+     * ID of the administrator assigned to handle this feedback
+     */
     @Column(name = "assigned_to")
     private Long assignedTo; // 分配给哪个管理员处理
 } 
