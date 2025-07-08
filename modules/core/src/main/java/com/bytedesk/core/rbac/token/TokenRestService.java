@@ -16,7 +16,6 @@ package com.bytedesk.core.rbac.token;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -107,22 +106,36 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
 
         // 手动将实体放入缓存
-        cacheToken(savedEntity);
+        // cacheToken(savedEntity);
 
         return convertToResponse(savedEntity);
     }
 
     // 添加一个新方法来处理缓存
-    @CachePut(cacheNames = "token", key = "#entity.accessToken")
-    private TokenEntity cacheToken(TokenEntity entity) {
-        log.debug("Manually caching token with key: {}", entity.getAccessToken());
-        return entity;
-    }
+    // @CachePut(cacheNames = "token", key = "#entity.accessToken")
+    // private TokenEntity cacheToken(TokenEntity entity) {
+    //     log.debug("Manually caching token with key: {}", entity.getAccessToken());
+    //     return entity;
+    // }
 
     @Override
     public TokenResponse update(TokenRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Optional<TokenEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            // 更新实体属性
+            modelMapper.map(request, entity);
+            // 保存更新后的实体
+            TokenEntity updatedEntity = save(entity);
+            if (updatedEntity == null) {
+                throw new RuntimeException("Update token failed");
+            }
+            // 手动将更新后的实体放入缓存
+            // cacheToken(updatedEntity);
+            return convertToResponse(updatedEntity);
+        } else {
+            throw new RuntimeException("Token not found for uid: " + request.getUid());
+        }
     }
 
     @Override
@@ -140,6 +153,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
     }
 
+
     @Override
     public void delete(TokenRequest request) {
         deleteByUid(request.getUid());
@@ -148,8 +162,21 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     @Override
     public TokenEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             TokenEntity entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
+        try {
+            // 尝试重新加载实体
+            Optional<TokenEntity> optional = findByUid(entity.getUid());
+            if (optional.isPresent()) {
+                TokenEntity existingEntity = optional.get();
+                // 更新实体属性
+                modelMapper.map(entity, existingEntity);
+                return doSave(existingEntity);
+            } else {
+                throw new RuntimeException("Token not found for uid: " + entity.getUid());
+            }
+        } catch (Exception ex) {
+            log.error("Error handling optimistic locking failure: {}", ex.getMessage());
+            throw ex;
+        }
     }
 
     @Override
