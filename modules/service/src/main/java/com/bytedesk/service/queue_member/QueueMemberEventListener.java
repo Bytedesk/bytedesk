@@ -157,11 +157,9 @@ public class QueueMemberEventListener {
                 // 处理系统消息
                 updateSystemMessageStats(message, thread);
             }
-            
         } catch (Exception e) {
             log.error("处理消息事件时出错: {}", e.getMessage(), e);
         }
-        
     }
 
     /**
