@@ -45,5 +45,7 @@ public enum TokenTypeEnum {
     // 隐式授权token
     IMPLICIT,
     // 资源拥有者密码凭证token
-    RESOURCE_OWNER_PASSWORD
+    RESOURCE_OWNER_PASSWORD,
+    // 自定义
+    CUSTOM
 }

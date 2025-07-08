@@ -105,6 +105,10 @@ public class AuthService {
         return new AuthToken(userDetails);
     }
 
+    public String generateAccessToken(String username, String platform) {
+        return JwtUtils.generateJwtToken(username, platform);
+    }
+
     public AuthResponse formatResponse(Authentication authentication) {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

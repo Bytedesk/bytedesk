@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 16:05:52
+ * @LastEditTime: 2025-07-08 11:06:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -192,6 +192,23 @@ public class AuthController {
         AuthResponse authResponse = authService.formatResponse(authentication);
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
+    }
+
+    @PostMapping("/generate/token")
+    @ActionAnnotation(title = "用户", action = "generate_token", description = "Generate Access Token")
+    public ResponseEntity<?> generateAccessToken(@RequestBody AuthRequest generateTokenRequest) {
+        log.debug("generate access token for user: {}, platform: {}", 
+                generateTokenRequest.getUsername(), generateTokenRequest.getPlatform());
+
+        String accessToken = authService.generateAccessToken(
+                generateTokenRequest.getUsername(), 
+                generateTokenRequest.getPlatform());
+
+        AuthResponse response = AuthResponse.builder()
+                .accessToken(accessToken)
+                .build();
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     // TODO: 刷新token
