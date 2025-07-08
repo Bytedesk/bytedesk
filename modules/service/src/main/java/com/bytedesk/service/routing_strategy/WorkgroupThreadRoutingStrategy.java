@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 13:59:50
+ * @LastEditTime: 2025-07-08 12:24:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -237,7 +237,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 未满则接待
         thread.setUserUid(agentEntity.getUid());
         thread.setChatting().setContent(content).setUnreadCount(1);
-        
+        // 
         // Only set owner if member exists
         if (agentEntity.getMember() != null) {
             log.info("Setting owner for thread: {}", agentEntity.getMember().getUser().getNickname());
