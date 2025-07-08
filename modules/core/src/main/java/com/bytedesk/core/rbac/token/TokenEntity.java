@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 21:25:06
+ * @LastEditTime: 2025-07-08 09:17:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,11 +62,17 @@ public class TokenEntity extends BaseEntityNoOrg {
     @Column(name = "token_type")
     private String type = TokenTypeEnum.LOGIN.name();
 
+    @Builder.Default
+    @Column(name = "token_scope")
+    private String scope = TokenScopeEnum.LOGIN.name();
+
     private ZonedDateTime expiresAt;
 
     @Builder.Default
     @Column(name = "is_revoked")
     private Boolean revoked = false;
+
+    private String revokeReason;
 
     @Builder.Default
     private String client = ClientEnum.WEB.name();
