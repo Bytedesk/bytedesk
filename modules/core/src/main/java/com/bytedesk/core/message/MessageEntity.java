@@ -25,6 +25,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Message entity for storing individual chat messages
+ * Represents a single message within a conversation thread
+ * 
+ * Database Table: bytedesk_core_message
+ * Purpose: Stores message content, sender information, and message metadata
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -37,7 +44,10 @@ public class MessageEntity extends AbstractMessageEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // 多对一thread, 多条消息对应一个thread
+    /**
+     * Associated conversation thread containing this message
+     * Many-to-one relationship: multiple messages can belong to one thread
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
     @JsonBackReference

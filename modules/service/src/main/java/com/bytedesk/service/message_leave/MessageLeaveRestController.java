@@ -94,6 +94,51 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    // 更新留言状态
+    @PostMapping("/status/update")
+    public ResponseEntity<?> updateStatus(@RequestBody MessageLeaveRequest request) {
+        
+        MessageLeaveResponse response = messageLeaveRestService.updateStatus(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // 标记为已读
+    @PostMapping("/read")
+    public ResponseEntity<?> markAsRead(@RequestBody MessageLeaveRequest request) {
+        
+        MessageLeaveResponse response = messageLeaveRestService.markAsRead(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // 转接留言
+    @PostMapping("/transfer")
+    public ResponseEntity<?> transfer(@RequestBody MessageLeaveRequest request) {
+        
+        MessageLeaveResponse response = messageLeaveRestService.transfer(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // 关闭留言
+    @PostMapping("/close")
+    public ResponseEntity<?> close(@RequestBody MessageLeaveRequest request) {
+        
+        MessageLeaveResponse response = messageLeaveRestService.close(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // 标记为垃圾留言
+    @PostMapping("/spam")
+    public ResponseEntity<?> markAsSpam(@RequestBody MessageLeaveRequest request) {
+        
+        MessageLeaveResponse response = messageLeaveRestService.markAsSpam(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     @Override
     public ResponseEntity<?> delete(MessageLeaveRequest request) {
         

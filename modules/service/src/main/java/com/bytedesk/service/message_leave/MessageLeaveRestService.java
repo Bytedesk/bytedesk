@@ -238,6 +238,162 @@ public class MessageLeaveRestService extends
         }
         throw new RuntimeException("MessageLeave not found");
     }
+    
+    // 更新留言状态
+    public MessageLeaveResponse updateStatus(MessageLeaveRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(request.getStatus());
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave status not updated");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.valueOf(request.getStatus()));
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
+    // 标记为已读
+    public MessageLeaveResponse markAsRead(MessageLeaveRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(MessageLeaveStatusEnum.READ.name());
+            messageLeave.setReadAt(BdDateUtils.now());
+            messageLeave.setReadUser(user.toProtobuf().toJson());
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not marked as read");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.LEAVE_MSG_READ);
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
+    // 转接留言
+    public MessageLeaveResponse transfer(MessageLeaveRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+        
+        if (request.getTargetAgentUid() == null || request.getTargetAgentUid().isEmpty()) {
+            throw new RuntimeException("Target agent UID is required");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(MessageLeaveStatusEnum.TRANSFERRED.name());
+            messageLeave.setTransferredAt(BdDateUtils.now());
+            messageLeave.setTransferUser(user.toProtobuf().toJson());
+            messageLeave.setTargetAgentUid(request.getTargetAgentUid());
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not transferred");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.LEAVE_MSG_TRANSFERRED);
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
+    // 关闭留言
+    public MessageLeaveResponse close(MessageLeaveRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(MessageLeaveStatusEnum.CLOSED.name());
+            messageLeave.setClosedAt(BdDateUtils.now());
+            messageLeave.setCloseUser(user.toProtobuf().toJson());
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not closed");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.LEAVE_MSG_CLOSED);
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
+    // 标记为垃圾留言
+    public MessageLeaveResponse markAsSpam(MessageLeaveRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("User should login first.");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(MessageLeaveStatusEnum.SPAM.name());
+            messageLeave.setSpamAt(BdDateUtils.now());
+            messageLeave.setSpamUser(user.toProtobuf().toJson());
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not marked as spam");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.LEAVE_MSG_SPAM);
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
+    // 更新消息状态的辅助方法
+    private void updateMessageStatus(MessageLeaveEntity messageLeave, MessageStatusEnum status) {
+        Optional<MessageEntity> messageOptional = messageRestService.findByUid(messageLeave.getMessageUid());
+        if (messageOptional.isPresent()) {
+            MessageEntity message = messageOptional.get();
+            message.setStatus(status.name());
+            
+            // 更新消息扩展信息
+            MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.fromJson(message.getExtra());
+            if (messageLeaveExtra != null) {
+                messageLeaveExtra.setStatus(messageLeave.getStatus());
+                message.setExtra(messageLeaveExtra.toJson());
+            }
+            
+            messageRestService.save(message);
+        }
+    }
 
     @Override
     protected MessageLeaveEntity doSave(MessageLeaveEntity entity) {

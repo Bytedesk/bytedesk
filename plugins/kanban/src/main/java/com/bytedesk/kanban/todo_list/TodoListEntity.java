@@ -35,6 +35,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Todo list entity for Kanban board management
+ * Represents a column or list in a Kanban board for organizing tasks
+ * 
+ * Database Table: bytedesk_plugin_kanban_todo_list
+ * Purpose: Stores todo list configurations, task organization, and board structure
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -46,30 +53,53 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_plugin_kanban_todo_list")
 public class TodoListEntity extends BaseEntity {
 
+    /**
+     * Name of the todo list
+     */
     private String name;
 
+    /**
+     * Description of the todo list
+     */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    /**
+     * Type of todo list (CUSTOMER, PROJECT, etc.)
+     */
     @Builder.Default
     @Column(name = "todo_type")
     private String type = TodoListTypeEnum.CUSTOMER.name();
 
+    /**
+     * Color theme for the todo list display
+     */
     @Builder.Default
     @Column(name = "todo_color")
     private String color = "red";
 
+    /**
+     * Display order of the todo list in the Kanban board
+     */
     @Builder.Default
     @Column(name = "todo_order")
     private int order = 0;
 
-    // task list
+    /**
+     * Tasks associated with this todo list
+     */
     @Builder.Default
     @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<TaskEntity> tasks = new ArrayList<>();
 
+    /**
+     * Associated project UID for project-specific todo lists
+     */
     private String projectUid;
 
+    /**
+     * Associated module UID for module-specific todo lists
+     */
     private String moduleUid;
 
     // @Builder.Default

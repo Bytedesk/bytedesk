@@ -37,6 +37,13 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import com.bytedesk.core.utils.BdDateUtils;
 
+/**
+ * User entity for system authentication and authorization
+ * Manages user accounts, roles, and organizational relationships
+ * 
+ * Database Table: bytedesk_core_user
+ * Purpose: Stores user information, authentication details, and role assignments
+ */
 @Entity
 @Data
 @Accessors(chain = true)
@@ -55,63 +62,106 @@ public class UserEntity extends BaseEntityNoOrg {
 
 	private static final long serialVersionUID = 1L;
 
-	// 用于搜索用户，添加好友
+	/**
+	 * User number for searching and adding friends
+	 */
 	// @Column(unique = true) // num + platform unique
 	private String num;
 
-	// used in auth jwt token, should not be null
+	/**
+	 * Username used in JWT authentication (required field)
+	 */
 	@NotBlank(message = "username is required")
 	@Column(nullable = false)
 	private String username;
 
+	/**
+	 * Display name of the user
+	 */
 	private String nickname;
 
+	/**
+	 * Encrypted password for user authentication
+	 */
 	private String password;
 
+	/**
+	 * User's email address for communication and verification
+	 */
 	@Email(message = "email format error")
 	// @Column(unique = true) // email + platform unique
 	private String email;
 
-	// 国家
+	/**
+	 * Country code for the user (default: 86 for China)
+	 */
 	@Builder.Default
 	private String country = "86";
 
+    /**
+     * User's mobile phone number
+     */
     private String mobile;
 
+	/**
+	 * URL of the user's avatar image
+	 */
 	@Builder.Default
 	private String avatar = AvatarConsts.getDefaultAvatarUrl();
 
+	/**
+	 * User description or bio
+	 */
 	@Builder.Default
 	private String description = I18Consts.I18N_USER_DESCRIPTION;
 
+	/**
+	 * User's gender (MALE, FEMALE, UNKNOWN)
+	 */
 	@Builder.Default
 	private String sex = Sex.UNKNOWN.name();
 
+	/**
+	 * Whether the user account is enabled
+	 */
 	@Builder.Default
 	@Column(name = "is_enabled")
 	private boolean enabled = true;
 
+	/**
+	 * Whether the user has super administrator privileges
+	 */
 	@Builder.Default
 	@Column(name = "is_super")
 	private boolean superUser = false;
 
+	/**
+	 * Whether the user's email has been verified
+	 */
 	@Builder.Default
 	@Column(name = "is_email_verified")
 	private boolean emailVerified = false;
 
+	/**
+	 * Whether the user's mobile number has been verified
+	 */
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
 
 	// TODO: 一个用户可以属于多个组织
 
-	
-	// 同一时刻，用户只能在一个组织下，用户可以切换组织
+	/**
+	 * User's current active organization
+	 * Users can belong to multiple organizations but can only be active in one at a time
+	 */
 	@ManyToOne(fetch = FetchType.EAGER)
 	@com.fasterxml.jackson.annotation.JsonManagedReference
 	private OrganizationEntity currentOrganization;
 
-	// 用户当前拥有的角色
+	/**
+	 * Current roles assigned to the user in the active organization
+	 */
     @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -121,7 +171,10 @@ public class UserEntity extends BaseEntityNoOrg {
     )
     private Set<RoleEntity> currentRoles = new HashSet<>();
 
-	// 一个用户可以属于多个组织，每个组织中可以多个角色
+	/**
+	 * User's roles across all organizations
+	 * One user can belong to multiple organizations with different roles in each
+	 */
 	@Builder.Default
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	@com.fasterxml.jackson.annotation.JsonManagedReference("user-orgRoles")

@@ -101,4 +101,21 @@ public class MessageLeaveRequest extends BaseRequest {
     private String user;
 
     private String replyUser;
+
+    // 已读相关字段
+    private String readUser;
+    private ZonedDateTime readAt;
+    
+    // 转接相关字段
+    private String transferUser;
+    private ZonedDateTime transferredAt;
+    private String targetAgentUid; // 转接目标客服UID
+    
+    // 关闭相关字段
+    private String closeUser;
+    private ZonedDateTime closedAt;
+    
+    // 垃圾留言相关字段
+    private String spamUser;
+    private ZonedDateTime spamAt;
 }

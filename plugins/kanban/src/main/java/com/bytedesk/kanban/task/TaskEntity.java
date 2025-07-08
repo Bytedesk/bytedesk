@@ -33,6 +33,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Task entity for Kanban board task management
+ * Represents individual tasks within a Kanban board system
+ * 
+ * Database Table: bytedesk_plugin_kanban_task
+ * Purpose: Stores task information, status, and organization within Kanban boards
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -44,37 +51,66 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_plugin_kanban_task")
 public class TaskEntity extends BaseEntity {
 
+    /**
+     * Name or title of the task
+     */
     private String name;
 
+    /**
+     * Description of the task
+     */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    /**
+     * Type of task (CUSTOMER, PROJECT, etc.)
+     */
     @Builder.Default
     @Column(name = "task_type")
     private String type = TaskTypeEnum.CUSTOMER.name();
 
+    /**
+     * Color theme for the task display
+     */
     @Builder.Default
     @Column(name = "task_color")
     private String color = "red";
 
+    /**
+     * Display order of the task within its todo list
+     */
     @Builder.Default
     @Column(name = "task_order")
     private int order = 0;
 
+    /**
+     * Tags for task categorization and search
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
-    // 是否完成
+    /**
+     * Whether the task has been completed
+     */
     @Builder.Default
     @Column(name = "task_complete")
     private boolean complete = false;
 
+    /**
+     * Associated project UID for project-specific tasks
+     */
     private String projectUid;
 
+    /**
+     * Associated module UID for module-specific tasks
+     */
     private String moduleUid;
 
+    /**
+     * Associated todo list UID where this task belongs
+     */
     private String todoListUid;
 
     // @Builder.Default

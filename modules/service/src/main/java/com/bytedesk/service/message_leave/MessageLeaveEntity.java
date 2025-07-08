@@ -190,6 +190,59 @@ public class MessageLeaveEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "reply_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String replyUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Agent who read the message
+     */
+    @Builder.Default
+    @Column(name = "read_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String readUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Timestamp when the message was read
+     */
+    private ZonedDateTime readAt;
+    
+    /**
+     * Agent who transferred the message
+     */
+    @Builder.Default
+    @Column(name = "transfer_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String transferUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Timestamp when the message was transferred
+     */
+    private ZonedDateTime transferredAt;
+    
+    /**
+     * Target agent UID for transfer
+     */
+    private String targetAgentUid;
+    
+    /**
+     * Agent who closed the message
+     */
+    @Builder.Default
+    @Column(name = "close_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String closeUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Timestamp when the message was closed
+     */
+    private ZonedDateTime closedAt;
+    
+    /**
+     * Agent who marked the message as spam
+     */
+    @Builder.Default
+    @Column(name = "spam_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String spamUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Timestamp when the message was marked as spam
+     */
+    private ZonedDateTime spamAt;
 
 
     public String getRepliedAtString() {

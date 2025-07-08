@@ -28,6 +28,10 @@ public enum MessageStatusEnum {
     PROCESSED, // leave message processed
     LEAVE_MSG_SUBMIT, // 提交留言
     LEAVE_MSG_REPLIED, // 留言已回复
+    LEAVE_MSG_READ, // 留言已读
+    LEAVE_MSG_TRANSFERRED, // 留言已转接
+    LEAVE_MSG_CLOSED, // 留言已关闭
+    LEAVE_MSG_SPAM, // 垃圾留言
     RATE_SUBMIT, // 提交会话评价
     RATE_CANCEL, // 取消会话评价
     RATE_PENDING, // 未评价
