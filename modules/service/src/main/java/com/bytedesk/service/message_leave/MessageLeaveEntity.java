@@ -35,8 +35,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 留言
- * TODO：留言转工单
+ * Customer leave message entity
+ * Represents customer messages left when agents are offline or unavailable
+ * 
+ * Database Table: bytedesk_service_message_leave
+ * Purpose: Stores offline messages from customers when agents are unavailable
+ * 
+ * TODO: Convert leave messages to tickets
  */
 @Entity
 @Data
@@ -50,94 +55,138 @@ public class MessageLeaveEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // 联系方式
+    /**
+     * Customer contact information such as email or phone number
+     */
     private String contact;
 
-    // 留言内容
+    /**
+     * The main content of the leave message
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
-    // 支持图片
+    /**
+     * URLs of images attached to the leave message
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
 
-    // 附件
+    /**
+     * URLs of file attachments for the leave message
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> attachments = new ArrayList<>();
 
-    // 回复内容
+    /**
+     * Agent's reply content to the leave message
+     */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String reply;
 
-    // 回复支持图片
+    /**
+     * URLs of images attached to the agent's reply
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> replyImages = new ArrayList<>();
 
-    // 回复附件
+    /**
+     * URLs of file attachments for the agent's reply
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> replyAttachments = new ArrayList<>();
 
-    // 回复时间
+    /**
+     * Timestamp when the agent replied to the leave message
+     */
     private ZonedDateTime repliedAt;
 
+    /**
+     * Current status of the leave message (PENDING, REPLIED, CLOSED, etc.)
+     */
     @Builder.Default
     private String status = MessageLeaveStatusEnum.PENDING.name();
     
-    // 留言分类（如：咨询、投诉、建议、其他）
+    /**
+     * Category UID for message classification (consultation, complaint, suggestion, etc.)
+     */
     private String categoryUid;
     
-    // 留言优先级（如：低、中、高、紧急）
+    /**
+     * Priority level of the leave message (LOW, MEDIUM, HIGH, URGENT)
+     */
     @Builder.Default
     private String priority = MessageLeavePriorityEnum.LOW.name();
 
-    // 关联工单ID（如果生成了工单）
+    /**
+     * Associated ticket UID if leave message is converted to ticket
+     */
     private String ticketUid;
     
-    // 关联消息uID（用于更新提示留言消息状态）
+    /**
+     * Associated message UID for updating leave message status
+     */
     private String messageUid;
     
-    // 关联会话uID（本身对应的会话）
+    /**
+     * Associated thread UID for the conversation
+     */
     private String threadUid;
     
-    // 关联的会话
+    // Associated conversation (commented out for now)
     // private String threadTopic;
     // private ThreadEntity thread;
 
-    // 客户来源渠道（如：网站、APP、小程序等）
+    /**
+     * Customer source channel such as website, mobile app, mini-program, etc.
+     */
     private String client;
     
-    // 设备信息（浏览器、APP版本等）
+    /**
+     * Customer device information including browser and app version
+     */
     private String deviceInfo;
     
-    // 客户IP地址
+    /**
+     * Customer's IP address when leaving the message
+     */
     private String ipAddress;
     
-    // 地理位置信息
+    /**
+     * Geographic location information of the customer
+     */
     private String location;
     
-    // 留言暂时不需要评价
-    // 满意度评价（处理后可以让用户评价）
+    // Leave messages don't need satisfaction rating for now
+    // Satisfaction rating (users can rate after processing)
     // private Integer satisfaction;
     
-    // 标签，用于分类和检索
+    /**
+     * Tags for message categorization and search
+     */
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
 
+    /**
+     * Customer user information stored as JSON string
+     */
     @Builder.Default
     @Column(name = "leavemsg_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 回复人信息
+    /**
+     * Agent information who replied to the message stored as JSON string
+     */
     @Builder.Default
     @Column(name = "reply_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String replyUser = BytedeskConsts.EMPTY_JSON_STRING;
