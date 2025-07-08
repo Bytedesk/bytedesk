@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 17:34:09
+ * @LastEditTime: 2025-07-08 12:39:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,6 +93,8 @@ public class MessageUnreadRestService
         if (savedMessageUnread == null) {
             throw new RuntimeException("Failed to save MessageUnreadEntity");
         }
+        // 
+
         return convertToResponse(savedMessageUnread);
     }
 
