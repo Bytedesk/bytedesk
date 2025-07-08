@@ -58,7 +58,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     public Page<LlmModelResponse> queryByUser(LlmModelRequest request) {
         UserEntity user = authService.getCurrentUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         request.setUserUid(user.getUid());
         return queryByOrg(request);

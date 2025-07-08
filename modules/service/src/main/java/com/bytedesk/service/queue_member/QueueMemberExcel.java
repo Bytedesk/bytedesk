@@ -2,7 +2,7 @@
  * @Author: jackning 270580206@qq.com
  * @Date: 2024-08-01 06:18:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 15:23:59
+ * @LastEditTime: 2025-07-08 10:14:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,7 +50,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ColumnWidth(20)
     private Integer waitLength;
 
-    @ExcelProperty(value = "入队时间")
+    @ExcelProperty(value = "入队时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
     private ZonedDateTime visitorEnqueueAt;
@@ -63,7 +63,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ColumnWidth(20)
     private String robotAcceptType;
 
-    @ExcelProperty(value = "机器人接入时间")
+    @ExcelProperty(value = "机器人接入时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
     private ZonedDateTime robotAcceptedAt;
@@ -72,7 +72,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ColumnWidth(20)
     private String robotToAgent;
 
-    @ExcelProperty(value = "转人工时间")
+    @ExcelProperty(value = "转人工时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
     private ZonedDateTime robotToAgentAt;
@@ -89,7 +89,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ColumnWidth(20)
     private String agentAcceptType;
 
-    @ExcelProperty(value = "接入时间")
+    @ExcelProperty(value = "接入时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
     private ZonedDateTime agentAcceptedAt;
@@ -102,7 +102,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ColumnWidth(20)
     private String rated;
 
-    @ExcelProperty(value = "评分时间")
+    @ExcelProperty(value = "评分时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
     private ZonedDateTime rateAt;
@@ -126,11 +126,6 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "是否留言")
     @ColumnWidth(20)
     private String messageLeave;
-
-    // @ExcelProperty(value = "留言时间")
-    // @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    // @ColumnWidth(25)
-    // private ZonedDateTime messageLeaveAt;
 
     @ExcelProperty(value = "客户端")
     @ColumnWidth(20)

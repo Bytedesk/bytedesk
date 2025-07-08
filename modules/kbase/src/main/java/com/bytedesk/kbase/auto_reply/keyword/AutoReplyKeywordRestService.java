@@ -72,7 +72,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     public Page<AutoReplyKeywordResponse> queryByUser(AutoReplyKeywordRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         request.setUserUid(user.getUid());
         // 
@@ -115,7 +115,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
         // 获取当前用户
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         request.setUserUid(user.getUid());
         // 

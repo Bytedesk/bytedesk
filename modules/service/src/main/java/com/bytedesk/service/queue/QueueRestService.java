@@ -81,7 +81,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     public Page<QueueResponse> queryByUser(QueueRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         // set user uid
         request.setUserUid(user.getUid());
@@ -91,7 +91,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     public Page<ThreadResponse> queryQueuing(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }        
         // 设置查询条件：状态为排队中
         request.setStatus(ThreadProcessStatusEnum.QUEUING.name());

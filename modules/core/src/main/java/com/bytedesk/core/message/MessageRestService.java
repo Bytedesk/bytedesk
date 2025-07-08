@@ -67,7 +67,7 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
     public Page<MessageResponse> queryByUser(MessageRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         request.setUserUid(user.getUid());
         //

@@ -53,8 +53,10 @@ public class TokenRestController extends BaseRestController<TokenRequest> {
 
     @Override
     public ResponseEntity<?> queryByUid(TokenRequest request) {
+
+        TokenResponse response = tokenRestService.queryByUid(request);
         // 
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Override

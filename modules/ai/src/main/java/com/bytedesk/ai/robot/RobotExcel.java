@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-24 21:40:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 11:49:42
+ * @LastEditTime: 2025-07-08 10:09:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,12 +38,12 @@ public class RobotExcel {
     private String prompt;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(index = 3, value = "创建时间")
+    @ExcelProperty(index = 3, value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(20)
     private ZonedDateTime createdAt;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(index = 4, value = "修改时间")
+    @ExcelProperty(index = 4, value = "修改时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(20)
     private ZonedDateTime updatedAt;
 }

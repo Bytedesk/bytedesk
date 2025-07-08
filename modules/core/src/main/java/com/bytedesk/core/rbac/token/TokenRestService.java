@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 09:08:19
+ * @LastEditTime: 2025-07-08 10:21:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,9 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     private final UidUtils uidUtils;
 
+    // 循环依赖
+    // private final AuthService authService;
+
     @Override
     public Page<TokenResponse> queryByOrg(TokenRequest request) {
         Pageable pageable = request.getPageable();
@@ -51,8 +54,24 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public Page<TokenResponse> queryByUser(TokenRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        // UserEntity user = authService.getCurrentUser();
+        // if (user == null) {
+        //     throw new NotLoginException("login required");
+        // }
+        // request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
+    }
+
+    @Override
+    public TokenResponse queryByUid(TokenRequest request) {
+        Optional<TokenEntity> optional = tokenRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            return convertToResponse(entity);
+        } else {
+            throw new RuntimeException("Token not found for uid: " + request.getUid());
+        }
     }
 
     @Cacheable(cacheNames = "token", key = "#uid", unless = "#result == null")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:00:00
+ * @LastEditTime: 2025-07-08 10:12:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,12 +81,12 @@ public class FreeSwitchGatewayExcel {
     @ColumnWidth(40)
     private String remarks;
 
-    @ExcelProperty("创建时间")
+    @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(20)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createdAt;
 
-    @ExcelProperty("更新时间")
+    @ExcelProperty(value = "更新时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(20)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime updatedAt;

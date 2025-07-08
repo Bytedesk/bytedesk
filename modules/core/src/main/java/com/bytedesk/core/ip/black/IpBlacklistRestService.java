@@ -69,7 +69,7 @@ public class IpBlacklistRestService extends BaseRestServiceWithExcel<IpBlacklist
     public Page<IpBlacklistResponse> queryByUser(IpBlacklistRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         request.setUserUid(user.getUid());
         //

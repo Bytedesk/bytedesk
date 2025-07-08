@@ -146,7 +146,7 @@ public class ThreadRestService
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
         if (!topicOptional.isPresent()) {
@@ -634,7 +634,7 @@ public class ThreadRestService
     public ThreadResponse closeByTopic(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("please login first");
+            throw new NotLoginException("login required");
         }
         request.setUserUid(user.getUid());
 
