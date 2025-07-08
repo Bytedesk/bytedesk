@@ -47,7 +47,7 @@ public class MessageLeaveRequest extends BaseRequest {
     @Builder.Default
     private List<String> attachments = new ArrayList<>();
 
-    private String reply;
+    private String replyContent;
 
     @Builder.Default
     private List<String> replyImages = new ArrayList<>();

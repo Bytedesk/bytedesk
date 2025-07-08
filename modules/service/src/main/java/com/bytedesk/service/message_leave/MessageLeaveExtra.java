@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 11:49:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 18:23:03
+ * @LastEditTime: 2025-07-08 18:55:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,7 @@ package com.bytedesk.service.message_leave;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.base.BaseExtra;
 import com.bytedesk.core.message.MessageExtra;
 
 import lombok.Builder;
@@ -38,7 +38,7 @@ public class MessageLeaveExtra extends MessageExtra {
     @Builder.Default
     private List<String> images = new ArrayList<>();
     
-    private String reply;
+    private String replyContent;
 
     @Builder.Default
     private List<String> replyImages = new ArrayList<>();
@@ -46,14 +46,7 @@ public class MessageLeaveExtra extends MessageExtra {
     private String status;
 
     public static MessageLeaveExtra fromJson(String json) {
-        try {
-            if (json == null || json.isEmpty()) {
-                return MessageLeaveExtra.builder().build();
-            }
-            return JSON.parseObject(json, MessageLeaveExtra.class);
-        } catch (Exception e) {
-            // 如果解析失败，返回一个默认的对象
-            return MessageLeaveExtra.builder().build();
-        }
+        MessageLeaveExtra result = BaseExtra.fromJson(json, MessageLeaveExtra.class);
+        return result != null ? result : MessageLeaveExtra.builder().build();
     }
 }

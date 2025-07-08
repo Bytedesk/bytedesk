@@ -211,7 +211,7 @@ public class MessageLeaveRestService extends
         Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
         if (messageLeaveOptional.isPresent()) {
             MessageLeaveEntity messageLeave = messageLeaveOptional.get();
-            messageLeave.setReply(request.getReply());
+            messageLeave.setReplyContent(request.getReplyContent());
             messageLeave.setReplyImages(request.getReplyImages());
             messageLeave.setRepliedAt(BdDateUtils.now());
             messageLeave.setReplyUser(user.toProtobuf().toJson());
@@ -228,7 +228,7 @@ public class MessageLeaveRestService extends
                 message.setStatus(MessageStatusEnum.LEAVE_MSG_REPLIED.name());
                 // 
                 MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.fromJson(message.getExtra());
-                messageLeaveExtra.setReply(request.getReply());
+                messageLeaveExtra.setReplyContent(request.getReplyContent());
                 messageLeaveExtra.setReplyImages(request.getReplyImages());
                 messageLeaveExtra.setStatus(messageLeave.getStatus());
                 message.setExtra(messageLeaveExtra.toJson());

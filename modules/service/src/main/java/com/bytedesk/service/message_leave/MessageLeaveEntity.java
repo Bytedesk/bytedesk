@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 17:42:36
+ * @LastEditTime: 2025-07-08 18:55:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,7 +86,7 @@ public class MessageLeaveEntity extends BaseEntity {
      * Agent's reply content to the leave message
      */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String reply;
+    private String replyContent;
 
     /**
      * URLs of images attached to the agent's reply

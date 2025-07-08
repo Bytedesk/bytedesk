@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 15:47:02
+ * @LastEditTime: 2025-07-08 18:56:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,7 +48,7 @@ public class MessageLeaveResponse extends BaseResponse {
     private List<String> attachments;
 
     // 回复内容
-    private String reply;
+    private String replyContent;
 
     // 回复图片
     private List<String> replyImages;

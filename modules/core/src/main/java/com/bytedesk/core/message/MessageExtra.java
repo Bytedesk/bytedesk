@@ -14,7 +14,6 @@
  */
 package com.bytedesk.core.message;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseExtra;
 
 import lombok.Builder;
@@ -41,14 +40,7 @@ public class MessageExtra extends BaseExtra {
     private String orgUid;
 
     public static MessageExtra fromJson(String json) {
-        try {
-            if (json == null || json.isEmpty()) {
-                return MessageExtra.builder().build();
-            }
-            return JSON.parseObject(json, MessageExtra.class);
-        } catch (Exception e) {
-            // 如果解析失败，返回一个默认的对象
-            return MessageExtra.builder().build();
-        }
+        MessageExtra result = BaseExtra.fromJson(json, MessageExtra.class);
+        return result != null ? result : MessageExtra.builder().build();
     }
 }
