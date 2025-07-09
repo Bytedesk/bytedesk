@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 12:46:40
+ * @LastEditTime: 2025-07-09 12:23:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,7 @@ public class MessageUnreadRestService
     }
 
     public Boolean existsByUid(String uid) {
-        if (StringUtils.hasText(uid)) {
+        if (!StringUtils.hasText(uid)) {
             return false;
         }
         return messageUnreadRepository.existsByUid(uid);
@@ -135,12 +135,7 @@ public class MessageUnreadRestService
         //
         String uid = messageProtobuf.getUid();
         if (existsByUid(uid)) {
-            // 流式消息单独处理下
-            if (MessageTypeEnum.STREAM.equals(type)) {
-                return;
-            }
             log.info("message already exists, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
-            //
             return;
         }
         //

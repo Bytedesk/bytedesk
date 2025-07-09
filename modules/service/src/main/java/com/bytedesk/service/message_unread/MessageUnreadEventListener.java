@@ -62,7 +62,7 @@ public class MessageUnreadEventListener {
                 // message.getContent() 代表 已读消息的uid
                 messageUnreadRestService.deleteByUid(message.getContent());
             } else {
-                // 缓存未读消息
+                // 缓存未读消息，create方法内部已包含重复检查逻辑
                 messageUnreadRestService.create(message);
             }
         } catch (Exception e) {
