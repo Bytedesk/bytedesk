@@ -24,18 +24,22 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/template")
 @AllArgsConstructor
+@Tag(name = "模板管理", description = "模板管理相关接口")
 public class TemplateRestController extends BaseRestController<TemplateRequest> {
 
     private final TemplateRestService templateRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "模板", action = "组织查询", description = "query template by org")
+    @Operation(summary = "根据组织查询模板", description = "查询组织的模板列表")
     @Override
     public ResponseEntity<?> queryByOrg(TemplateRequest request) {
         
@@ -45,6 +49,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     }
 
     @ActionAnnotation(title = "模板", action = "用户查询", description = "query template by user")
+    @Operation(summary = "根据用户查询模板", description = "查询用户的模板列表")
     @Override
     public ResponseEntity<?> queryByUser(TemplateRequest request) {
         
@@ -54,6 +59,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     }
 
     @ActionAnnotation(title = "模板", action = "查询详情", description = "query template by uid")
+    @Operation(summary = "根据UID查询模板", description = "通过UID查询具体的模板")
     @Override
     public ResponseEntity<?> queryByUid(TemplateRequest request) {
         
@@ -63,6 +69,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     }
 
     @ActionAnnotation(title = "模板", action = "新建", description = "create template")
+    @Operation(summary = "创建模板", description = "创建新的模板")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(TemplateRequest request) {
@@ -73,6 +80,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     }
 
     @ActionAnnotation(title = "模板", action = "更新", description = "update template")
+    @Operation(summary = "更新模板", description = "更新现有的模板")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(TemplateRequest request) {
@@ -83,6 +91,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     }
 
     @ActionAnnotation(title = "模板", action = "删除", description = "delete template")
+    @Operation(summary = "删除模板", description = "删除指定的模板")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(TemplateRequest request) {
@@ -93,6 +102,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     }
 
     @ActionAnnotation(title = "模板", action = "导出", description = "export template")
+    @Operation(summary = "导出模板", description = "导出模板数据")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")

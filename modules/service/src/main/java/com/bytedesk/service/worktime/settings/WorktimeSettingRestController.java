@@ -24,18 +24,22 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/worktime/setting")
 @AllArgsConstructor
+@Tag(name = "工作时间设置管理", description = "工作时间设置管理相关接口")
 public class WorktimeSettingRestController extends BaseRestController<WorktimeSettingRequest> {
 
     private final WorktimeSettingRestService tagService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "查询组织", description = "query tag by org")
+    @Operation(summary = "根据组织查询工作时间设置", description = "查询组织的工作时间设置")
     @Override
     public ResponseEntity<?> queryByOrg(WorktimeSettingRequest request) {
         
@@ -45,6 +49,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     }
 
     @ActionAnnotation(title = "标签", action = "查询用户", description = "query tag by user")
+    @Operation(summary = "根据用户查询工作时间设置", description = "查询用户的工作时间设置")
     @Override
     public ResponseEntity<?> queryByUser(WorktimeSettingRequest request) {
         
@@ -54,6 +59,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     }
 
     @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @Operation(summary = "根据UID查询工作时间设置", description = "通过UID查询具体的工作时间设置")
     @Override
     public ResponseEntity<?> queryByUid(WorktimeSettingRequest request) {
         
@@ -63,6 +69,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     }
 
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @Operation(summary = "创建工作时间设置", description = "创建新的工作时间设置")
     @Override
     @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(WorktimeSettingRequest request) {
@@ -73,6 +80,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     }
 
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @Operation(summary = "更新工作时间设置", description = "更新现有的工作时间设置")
     @Override
     @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(WorktimeSettingRequest request) {
@@ -83,6 +91,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     }
 
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @Operation(summary = "删除工作时间设置", description = "删除指定的工作时间设置")
     @Override
     @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(WorktimeSettingRequest request) {
@@ -93,6 +102,7 @@ public class WorktimeSettingRestController extends BaseRestController<WorktimeSe
     }
 
     @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @Operation(summary = "导出工作时间设置", description = "导出工作时间设置数据")
     @Override
     @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")

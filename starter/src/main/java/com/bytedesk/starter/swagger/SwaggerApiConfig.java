@@ -1018,4 +1018,64 @@ public class SwaggerApiConfig {
                 .pathsToMatch("/visitor/api/v1/upload/**")
                 .build();
     }
+
+    /**
+     * 工作时间管理接口
+     */
+    @Bean
+    public GroupedOpenApi worktimeApis() {
+        return GroupedOpenApi.builder()
+                .group("worktime-apis")
+                .displayName("Worktime Management APIs")
+                .pathsToMatch("/api/v1/worktime/**")
+                .build();
+    }
+
+    /**
+     * 工作时间设置管理接口
+     */
+    @Bean
+    public GroupedOpenApi worktimeSettingApis() {
+        return GroupedOpenApi.builder()
+                .group("worktime-setting-apis")
+                .displayName("Worktime Setting Management APIs")
+                .pathsToMatch("/api/v1/worktime/setting/**")
+                .build();
+    }
+
+    /**
+     * 模板管理接口
+     */
+    @Bean
+    public GroupedOpenApi templateApis() {
+        return GroupedOpenApi.builder()
+                .group("template-apis")
+                .displayName("Template Management APIs")
+                .pathsToMatch("/api/v1/template/**")
+                .build();
+    }
+
+    /**
+     * 访客会话管理接口
+     */
+    @Bean
+    public GroupedOpenApi visitorThreadApis() {
+        return GroupedOpenApi.builder()
+                .group("visitor-thread-apis")
+                .displayName("Visitor Thread Management APIs")
+                .pathsToMatch("/visitor/api/v1/visitor_thread/**")
+                .build();
+    }
+
+    /**
+     * 访客评价匿名接口
+     */
+    @Bean
+    public GroupedOpenApi visitorRatingAnonymousApis() {
+        return GroupedOpenApi.builder()
+                .group("visitor-rating-anonymous-apis")
+                .displayName("Visitor Rating Anonymous APIs")
+                .pathsToMatch("/visitor/api/v1/visitor/rating/**")
+                .build();
+    }
 }

@@ -23,23 +23,28 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/worktime")
+@Tag(name = "工作时间管理", description = "工作时间管理相关接口")
 public class WorktimeController extends BaseRestController<WorktimeRequest> {
 
     private final WorktimeService worktimeService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询工作时间", description = "管理员查询组织的工作时间设置")
     @Override
     public ResponseEntity<?> queryByOrg(WorktimeRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
+    @Operation(summary = "根据用户查询工作时间", description = "查询用户的工作时间设置")
     @Override
     public ResponseEntity<?> queryByUser(WorktimeRequest request) {
         // TODO Auto-generated method stub
@@ -47,6 +52,7 @@ public class WorktimeController extends BaseRestController<WorktimeRequest> {
     }
 
     @RequestMapping("create")
+    @Operation(summary = "创建工作时间", description = "创建新的工作时间设置")
     @Override
     public ResponseEntity<?> create(@RequestBody WorktimeRequest request) {
         
@@ -56,6 +62,7 @@ public class WorktimeController extends BaseRestController<WorktimeRequest> {
     }
 
     @RequestMapping("update")
+    @Operation(summary = "更新工作时间", description = "更新现有的工作时间设置")
     @Override
     public ResponseEntity<?> update(@RequestBody WorktimeRequest request) {
         
@@ -65,6 +72,7 @@ public class WorktimeController extends BaseRestController<WorktimeRequest> {
     }
 
     @RequestMapping("delete")
+    @Operation(summary = "删除工作时间", description = "删除指定的工作时间设置")
     @Override
     public ResponseEntity<?> delete(@RequestBody WorktimeRequest request) {
         
@@ -73,12 +81,14 @@ public class WorktimeController extends BaseRestController<WorktimeRequest> {
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
 
+    @Operation(summary = "导出工作时间", description = "导出工作时间数据")
     @Override
     public Object export(WorktimeRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "根据UID查询工作时间", description = "通过UID查询具体的工作时间设置")
     @Override
     public ResponseEntity<?> queryByUid(WorktimeRequest request) {
         // TODO Auto-generated method stub

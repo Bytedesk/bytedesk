@@ -23,17 +23,21 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/visitor/api/v1/visitor_thread")
 @AllArgsConstructor
+@Tag(name = "访客会话管理", description = "访客会话管理相关接口")
 public class VisitorThreadController extends BaseRestController<VisitorThreadRequest> {
 
     private VisitorThreadService visitorThreadService;
  
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询访客会话", description = "管理员查询组织的访客会话")
     @Override
     public ResponseEntity<?> queryByOrg(VisitorThreadRequest request) {
         
@@ -42,36 +46,42 @@ public class VisitorThreadController extends BaseRestController<VisitorThreadReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "根据用户查询访客会话", description = "查询用户的访客会话")
     @Override
     public ResponseEntity<?> queryByUser(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
+    @Operation(summary = "创建访客会话", description = "创建新的访客会话")
     @Override
     public ResponseEntity<?> create(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
+    @Operation(summary = "更新访客会话", description = "更新现有的访客会话")
     @Override
     public ResponseEntity<?> update(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
+    @Operation(summary = "删除访客会话", description = "删除指定的访客会话")
     @Override
     public ResponseEntity<?> delete(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
+    @Operation(summary = "导出访客会话", description = "导出访客会话数据")
     @Override
     public Object export(VisitorThreadRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "根据UID查询访客会话", description = "通过UID查询具体的访客会话")
     @Override
     public ResponseEntity<?> queryByUid(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
