@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 13:47:19
+ * @LastEditTime: 2025-07-09 14:05:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,13 +36,13 @@ public class PageRouteController {
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
     
-    @Value("${bytedesk.custom.name:智慧客服}")
+    @Value("${bytedesk.custom.name:微语}")
     private String customName;
     
-    @Value("${bytedesk.custom.logo:https://dpic.tech/logo/logo.png}")
+    @Value("${bytedesk.custom.logo:https://www.weiyuai.cn/logo.png}")
     private String customLogo;
     
-    @Value("${bytedesk.custom.description:智慧客服}")
+    @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
 	/**

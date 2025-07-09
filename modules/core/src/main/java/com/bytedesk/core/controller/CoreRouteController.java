@@ -13,7 +13,9 @@
  */
 package com.bytedesk.core.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -21,9 +23,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/core")
 public class CoreRouteController {
 
+    @Value("${bytedesk.custom.show-demo:true}")
+    private Boolean showDemo;
+    
+    @Value("${bytedesk.custom.enabled:false}")
+    private Boolean customEnabled;
+    
+    @Value("${bytedesk.custom.name:微语}")
+    private String customName;
+    
+    @Value("${bytedesk.custom.logo:https://www.weiyuai.cn/logo.png}")
+    private String customLogo;
+    
+    @Value("${bytedesk.custom.description:重复工作自动化}")
+    private String customDescription;
+
     // http://127.0.0.1:9003/core/
     @GetMapping({"", "/"})
-    public String index() {
+    public String index(Model model) {
+        if (!showDemo) {
+            // 添加自定义配置到模型
+            if (customEnabled) {
+                model.addAttribute("customName", customName);
+                model.addAttribute("customLogo", customLogo);
+                model.addAttribute("customDescription", customDescription);
+            }
+			return "default";
+		}
         return "core/index";
     }
 

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${(customName?exists && customName != '')?then(customName, '系统入口')}</title>
+    <title>系统入口</title>
+    <#--  <title>${(customName?exists && customName != '')?then(customName?html, '系统入口')}</title>  -->
     <#if customLogo?exists && customLogo != ''>
     <link rel="icon" href="${customLogo}" type="image/x-icon">
     <link rel="shortcut icon" href="${customLogo}" type="image/x-icon">
@@ -120,11 +122,13 @@
 </head>
 <body>
     <div class="container">
-        <#if customLogo?exists && customLogo != ''>
-        <img src="${customLogo}" alt="${(customName?exists && customName != '')?then(customName, '系统入口')}" class="logo">
-        </#if>
-        <h1>${(customName?exists && customName != '')?then(customName, '系统入口')}</h1>
-        <p class="description">${(customDescription?exists && customDescription != '')?then(customDescription, '请选择您要进入的系统入口')}</p>
+        <#--  <#if customLogo?exists && customLogo != ''>
+        <img src="${customLogo}" alt="${(customName?exists && customName != '')?then(customName?html, '系统入口')}" class="logo">
+        </#if>  -->
+        <#--  <h1>${(customName?exists && customName != '')?then(customName?html, '系统入口')}</h1>  -->
+        <h1>系统入口</h1>
+        <#--  <p class="description">${(customDescription?exists && customDescription != '')?then(customDescription?html, '请选择您要进入的系统入口')}</p>  -->
+        <p class="description">请选择您要进入的系统入口</p>
         
         <div class="button-container">
             <a href="/admin" target="_blank" class="button">
