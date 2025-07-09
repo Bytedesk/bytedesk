@@ -20,16 +20,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/visitor/api/v1/article")
 @AllArgsConstructor
+@Tag(name = "文章匿名管理", description = "文章匿名相关接口")
 public class ArticleRestControllerVisitor {
 
     private final ArticleRestService articleService;
 
     @RequestMapping("/search")
+    @Operation(summary = "搜索文章", description = "访客搜索文章")
     public ResponseEntity<?> searchKb(ArticleRequest request) {
         
         Page<ArticleResponse> page = articleService.queryByOrg(request);

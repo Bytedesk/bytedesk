@@ -24,17 +24,21 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.annotation.ActionAnnotation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/llm/website")
 @AllArgsConstructor
+@Tag(name = "网站管理", description = "网站管理相关接口")
 public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
 
     private final WebsiteRestService websiteRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询网站", description = "查询组织的网站列表")
     @Override
     public ResponseEntity<?> queryByOrg(WebsiteRequest request) {
         
@@ -43,6 +47,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         return ResponseEntity.ok(JsonResult.success(websites));
     }
 
+    @Operation(summary = "根据用户查询网站", description = "查询用户的网站列表")
     @Override
     public ResponseEntity<?> queryByUser(WebsiteRequest request) {
         
@@ -52,6 +57,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
     }
 
     @ActionAnnotation(title = "知识库网站", action = "新建", description = "create website")
+    @Operation(summary = "创建网站", description = "创建新的网站")
     @Override
     public ResponseEntity<?> create(WebsiteRequest request) {
         
@@ -61,6 +67,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
     }
 
     @ActionAnnotation(title = "知识库网站", action = "更新", description = "update website")
+    @Operation(summary = "更新网站", description = "更新现有的网站")
     @Override
     public ResponseEntity<?> update(WebsiteRequest request) {
         
@@ -70,6 +77,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
     }
 
     @ActionAnnotation(title = "知识库网站", action = "删除", description = "delete website")
+    @Operation(summary = "删除网站", description = "删除指定的网站")
     @Override
     public ResponseEntity<?> delete(WebsiteRequest request) {
         
@@ -80,6 +88,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
 
     // deleteAll
     @PostMapping("/deleteAll")
+    @Operation(summary = "删除所有网站", description = "删除所有网站")
     public ResponseEntity<?> deleteAll(@RequestBody WebsiteRequest request) {
 
         websiteRestService.deleteAll(request);
@@ -89,6 +98,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
 
     // enable/disable website
     @PostMapping("/enable")
+    @Operation(summary = "启用/禁用网站", description = "启用或禁用网站")
     public ResponseEntity<?> enable(@RequestBody WebsiteRequest request) {
 
         WebsiteResponse website = websiteRestService.enable(request);
@@ -97,6 +107,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
     }
 
     @ActionAnnotation(title = "知识库网站", action = "导出", description = "export website")
+    @Operation(summary = "导出网站", description = "导出网站数据")
     @Override
     public Object export(WebsiteRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -109,6 +120,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
         );
     }
 
+    @Operation(summary = "根据UID查询网站", description = "通过UID查询具体的网站")
     @Override
     public ResponseEntity<?> queryByUid(WebsiteRequest request) {
         // TODO Auto-generated method stub

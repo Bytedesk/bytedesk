@@ -1078,4 +1078,88 @@ public class SwaggerApiConfig {
                 .pathsToMatch("/visitor/api/v1/visitor/rating/**")
                 .build();
     }
+
+    /**
+     * 素材管理接口
+     */
+    @Bean
+    public GroupedOpenApi materialApis() {
+        return GroupedOpenApi.builder()
+                .group("material-apis")
+                .displayName("Material Management APIs")
+                .pathsToMatch("/api/v1/material/**")
+                .build();
+    }
+
+    /**
+     * 文章归档管理接口
+     */
+    @Bean
+    public GroupedOpenApi articleArchiveApis() {
+        return GroupedOpenApi.builder()
+                .group("article-archive-apis")
+                .displayName("Article Archive Management APIs")
+                .pathsToMatch("/api/v1/article_archive/**")
+                .build();
+    }
+
+    /**
+     * 文章匿名接口
+     */
+    @Bean
+    public GroupedOpenApi articleAnonymousApis() {
+        return GroupedOpenApi.builder()
+                .group("article-anonymous-apis")
+                .displayName("Article Anonymous APIs")
+                .pathsToMatch("/visitor/api/v1/article/**")
+                .build();
+    }
+
+    /**
+     * 意图设置管理接口
+     */
+    @Bean
+    public GroupedOpenApi intentionSettingsApis() {
+        return GroupedOpenApi.builder()
+                .group("intention-settings-apis")
+                .displayName("Intention Settings Management APIs")
+                .pathsToMatch("/api/v1/intention/settings/**")
+                .build();
+    }
+
+    /**
+     * 服务设置管理接口
+     */
+    @Bean
+    public GroupedOpenApi serviceSettingsApis() {
+        return GroupedOpenApi.builder()
+                .group("service-settings-apis")
+                .displayName("Service Settings Management APIs")
+                .pathsToMatch("/api/v1/service/setting/**")
+                .build();
+    }
+
+    /**
+     * 降级设置管理接口
+     */
+    @Bean
+    public GroupedOpenApi ratedownSettingsApis() {
+        return GroupedOpenApi.builder()
+                .group("ratedown-settings-apis")
+                .displayName("Ratedown Settings Management APIs")
+                .pathsToMatch("/api/v1/ratedown/setting/**")
+                .build();
+    }
+
+    /**
+     * 敏感词消息管理接口
+     */
+    @Bean
+    public GroupedOpenApi tabooMessageApis() {
+        return GroupedOpenApi.builder()
+                .group("taboo-message-apis")
+                .displayName("Taboo Message Management APIs")
+                .pathsToMatch("/api/v1/taboo/message/**")
+                .build();
+    }
 }

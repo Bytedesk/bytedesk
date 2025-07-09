@@ -23,17 +23,21 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/ratedown/setting")
 @AllArgsConstructor
+@Tag(name = "降级设置管理", description = "降级设置管理相关接口")
 public class RatedownSettingsRestController extends BaseRestController<RatedownSettingsRequest> {
 
     private final RatedownSettingsRestService ratedownSettingService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询降级设置", description = "管理员查询组织的降级设置列表")
     @Override
     public ResponseEntity<?> queryByOrg(RatedownSettingsRequest request) {
         
@@ -42,6 +46,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSettings));
     }
 
+    @Operation(summary = "根据用户查询降级设置", description = "查询用户的降级设置列表")
     @Override
     public ResponseEntity<?> queryByUser(RatedownSettingsRequest request) {
         
@@ -50,6 +55,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSettings));
     }
 
+    @Operation(summary = "创建降级设置", description = "创建新的降级设置")
     @Override
     public ResponseEntity<?> create(RatedownSettingsRequest request) {
         
@@ -58,6 +64,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSetting));
     }
 
+    @Operation(summary = "更新降级设置", description = "更新现有的降级设置")
     @Override
     public ResponseEntity<?> update(RatedownSettingsRequest request) {
         
@@ -66,6 +73,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSetting));
     }
 
+    @Operation(summary = "删除降级设置", description = "删除指定的降级设置")
     @Override
     public ResponseEntity<?> delete(RatedownSettingsRequest request) {
         
@@ -74,12 +82,14 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "导出降级设置", description = "导出降级设置数据")
     @Override
     public Object export(RatedownSettingsRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "根据UID查询降级设置", description = "通过UID查询具体的降级设置")
     @Override
     public ResponseEntity<?> queryByUid(RatedownSettingsRequest request) {
         // TODO Auto-generated method stub

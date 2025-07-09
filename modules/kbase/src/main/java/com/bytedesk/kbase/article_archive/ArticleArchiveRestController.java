@@ -22,17 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/article_archive")
 @AllArgsConstructor
+@Tag(name = "文章归档管理", description = "文章归档管理相关接口")
 public class ArticleArchiveRestController extends BaseRestController<ArticleArchiveRequest> {
 
     private final ArticleArchiveRestService article_archiveService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询文章归档", description = "查询组织的文章归档列表")
     @Override
     public ResponseEntity<?> queryByOrg(ArticleArchiveRequest request) {
 
@@ -41,6 +45,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "根据用户查询文章归档", description = "查询用户的文章归档列表")
     @Override
     public ResponseEntity<?> queryByUser(ArticleArchiveRequest request) {
         
@@ -49,6 +54,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "根据UID查询文章归档", description = "通过UID查询具体的文章归档")
     @Override
     public ResponseEntity<?> queryByUid(ArticleArchiveRequest request) {
 
@@ -61,6 +67,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success(article_archive));
     }
 
+    @Operation(summary = "创建文章归档", description = "创建新的文章归档")
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleArchiveRequest request) {
 
@@ -69,6 +76,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success(article_archive));
     }
 
+    @Operation(summary = "更新文章归档", description = "更新现有的文章归档")
     @Override
     public ResponseEntity<?> update(@RequestBody ArticleArchiveRequest request) {
 
@@ -77,6 +85,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success(article_archive));
     }
 
+    @Operation(summary = "删除文章归档", description = "删除指定的文章归档")
     @Override
     public ResponseEntity<?> delete(@RequestBody ArticleArchiveRequest request) {
 
@@ -85,6 +94,7 @@ public class ArticleArchiveRestController extends BaseRestController<ArticleArch
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @Operation(summary = "导出文章归档", description = "导出文章归档数据")
     @Override
     public Object export(ArticleArchiveRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

@@ -21,17 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/intention/settings")
 @AllArgsConstructor
+@Tag(name = "意图设置管理", description = "意图设置管理相关接口")
 public class IntentionSettingsRestController extends BaseRestController<IntentionSettingsRequest> {
 
     private final IntentionSettingsRestService intentionSettingsService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询意图设置", description = "查询组织的意图设置列表")
     @Override
     public ResponseEntity<?> queryByOrg(IntentionSettingsRequest request) {
         
@@ -40,6 +44,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @Operation(summary = "根据用户查询意图设置", description = "查询用户的意图设置列表")
     @Override
     public ResponseEntity<?> queryByUser(IntentionSettingsRequest request) {
         
@@ -48,6 +53,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @Operation(summary = "创建意图设置", description = "创建新的意图设置")
     @Override
     public ResponseEntity<?> create(IntentionSettingsRequest request) {
         
@@ -56,6 +62,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @Operation(summary = "更新意图设置", description = "更新现有的意图设置")
     @Override
     public ResponseEntity<?> update(IntentionSettingsRequest request) {
         
@@ -64,6 +71,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @Operation(summary = "删除意图设置", description = "删除指定的意图设置")
     @Override
     public ResponseEntity<?> delete(IntentionSettingsRequest request) {
         
@@ -72,12 +80,14 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "导出意图设置", description = "导出意图设置数据")
     @Override
     public Object export(IntentionSettingsRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "根据UID查询意图设置", description = "通过UID查询具体的意图设置")
     @Override
     public ResponseEntity<?> queryByUid(IntentionSettingsRequest request) {
         // TODO Auto-generated method stub

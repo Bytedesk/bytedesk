@@ -21,17 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/service/setting")
 @AllArgsConstructor
+@Tag(name = "服务设置管理", description = "服务设置管理相关接口")
 public class ServiceSettingsRestController extends BaseRestController<ServiceSettingsRequest> {
 
     private final ServiceSettingsRestService serviceSettingService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "根据组织查询服务设置", description = "查询组织的服务设置列表")
     @Override
     public ResponseEntity<?> queryByOrg(ServiceSettingsRequest request) {
         
@@ -40,6 +44,7 @@ public class ServiceSettingsRestController extends BaseRestController<ServiceSet
         return ResponseEntity.ok(JsonResult.success(serviceSettings));
     }
 
+    @Operation(summary = "根据用户查询服务设置", description = "查询用户的服务设置列表")
     @Override
     public ResponseEntity<?> queryByUser(ServiceSettingsRequest request) {
         
@@ -48,6 +53,7 @@ public class ServiceSettingsRestController extends BaseRestController<ServiceSet
         return ResponseEntity.ok(JsonResult.success(serviceSettings));
     }
 
+    @Operation(summary = "创建服务设置", description = "创建新的服务设置")
     @Override
     public ResponseEntity<?> create(ServiceSettingsRequest request) {
         
@@ -56,6 +62,7 @@ public class ServiceSettingsRestController extends BaseRestController<ServiceSet
         return ResponseEntity.ok(JsonResult.success(serviceSetting));
     }
 
+    @Operation(summary = "更新服务设置", description = "更新现有的服务设置")
     @Override
     public ResponseEntity<?> update(ServiceSettingsRequest request) {
         
@@ -64,6 +71,7 @@ public class ServiceSettingsRestController extends BaseRestController<ServiceSet
         return ResponseEntity.ok(JsonResult.success(serviceSetting));
     }
 
+    @Operation(summary = "删除服务设置", description = "删除指定的服务设置")
     @Override
     public ResponseEntity<?> delete(ServiceSettingsRequest request) {
         
@@ -72,12 +80,14 @@ public class ServiceSettingsRestController extends BaseRestController<ServiceSet
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "导出服务设置", description = "导出服务设置数据")
     @Override
     public Object export(ServiceSettingsRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "根据UID查询服务设置", description = "通过UID查询具体的服务设置")
     @Override
     public ResponseEntity<?> queryByUid(ServiceSettingsRequest request) {
         // TODO Auto-generated method stub
