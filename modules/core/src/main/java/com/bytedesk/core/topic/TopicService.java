@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -73,7 +75,16 @@ public class TopicService {
     public void removeClientId(String clientId) {
         topicRestService.removeClientId(clientId);
     }
-
+    
+    /**
+     * 查询所有的 TopicEntity
+     * 
+     * @return 所有的 TopicEntity 列表
+     */
+    public List<TopicEntity> findAll() {
+        return topicRestService.findAll();
+    }
+    
     // @Cacheable(value = "topic", key = "#uid")
     // public Optional<TopicEntity> findByUid(String uid) {
     //     return topicRestService.findByUid(uid);

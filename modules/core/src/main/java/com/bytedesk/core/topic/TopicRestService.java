@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.topic;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -389,6 +390,15 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
                 save(topic);
             }
         }
+    }
+    
+    /**
+     * 查询所有的 TopicEntity
+     * 
+     * @return 所有的 TopicEntity 列表
+     */
+    public List<TopicEntity> findAll() {
+        return topicRepository.findAll();
     }
 
 }

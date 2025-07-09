@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 11:59:49
+ * @LastEditTime: 2025-07-09 17:37:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -265,9 +265,6 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_WORKGROUP_PATTERN, workgroupUid);
     }
 
-    // public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String agentUid, String visitorUid) {
-    //     return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, agentUid, visitorUid);
-    // }
     public static String formatOrgWorkgroupThreadTopic(String workgroupUid, String visitorUid) {
         return String.format(TOPIC_ORG_WORKGROUP_THREAD_PATTERN, workgroupUid, visitorUid);
     }
@@ -312,14 +309,6 @@ public class TopicUtils {
         return String.format(TOPIC_ORG_QUEUE_PATTERN, uid);
     }
 
-    // public static String getQueueTopicFromWorkgroupUid(String workgroupUid) {
-    //     return String.format(TOPIC_ORG_QUEUE_PATTERN, workgroupUid);
-    // }
-    
-    // public static String getQueueTopicFromRobotUid(String robotUid) {
-    //     return String.format(TOPIC_ORG_QUEUE_PATTERN, robotUid);
-    // }
-
     //////////////////////////////////////////////////////////////////////////
     // 工单会话 department ticket thread
 
@@ -328,35 +317,8 @@ public class TopicUtils {
     }
 
     public static String formatOrgDepartmentTicketThreadTopic(String departmentUid, String ticketUid) {
-        
-
         return String.format(TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN, departmentUid, ticketUid);
     }
-
-    // public static Boolean isOrgAgentTicketTopic(String topic) {
-    //     return topic.startsWith(TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX);
-    // }
-
-    // public static Boolean isOrgWorkgroupTicketTopic(String topic) {
-    //     return topic.startsWith(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX);
-    // }
-
-    // public static String formatOrgAgentTicketThreadTopic(String agentUid, String ticketUid) {
-    //     return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid);
-    // }
-
-    // public static String formatOrgAgentTicketThreadTopicInternal(String agentUid, String ticketUid) {
-    //     return String.format(TOPIC_ORG_AGENT_TICKET_THREAD_PATTERN, agentUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
-    // }
-
-    // public static String formatOrgWorkgroupTicketThreadTopic(String workgroupUid, String ticketUid) {
-    //     return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid);
-    // }
-
-    // public static String formatOrgWorkgroupTicketThreadTopicInternal(String workgroupUid, String ticketUid) {
-    //     return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid) + TOPIC_INTERNAL_SUFFIX;
-    // }
-
     //////////////////////////////////////////////////////////////////////////
     // 统一客服入口
 
@@ -377,16 +339,5 @@ public class TopicUtils {
     public static final String formatTopicInternal(String topic) {
         return topic + TOPIC_INTERNAL_SUFFIX;
     }
-
-    // 添加获取客服队列主题的方法
-    // public static String getAgentQueueTopicFromThreadTopic(String threadTopic) {
-    //     // 实现从会话主题生成客服队列主题的逻辑
-    //     // 例如: thread/org1/visitor1/agent1 -> queue/agent/org1/agent1
-    //     String[] parts = threadTopic.split("/");
-    //     if (parts.length >= 4) {
-    //         return "queue/agent/" + parts[1] + "/" + parts[3];
-    //     }
-    //     return "queue/agent/unknown/unknown";
-    // }
 
 }
