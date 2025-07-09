@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 18:42:38
+ * @LastEditTime: 2025-07-09 16:33:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,10 +39,6 @@ public class TopicEventListener {
     private final TopicCacheService topicCacheService;
 
     private final MqttConnectionService mqttConnectionService;
-
-    // 此处使用static，否则在定时器中无法读取初始化时期的数据
-    // private final static TopicCacheService topicCacheService = new TopicCacheService();
-    // private final static String cacheKey = "topicList";
 
     @EventListener
     public void onTopicCreateEvent(TopicCreateEvent event) {
