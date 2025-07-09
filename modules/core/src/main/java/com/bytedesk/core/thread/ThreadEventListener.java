@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 17:00:28
+ * @LastEditTime: 2025-07-09 17:49:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.core.thread;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
@@ -142,11 +141,6 @@ public class ThreadEventListener {
                     .userUid(user.getUid())
                     .build();
         topicRestService.remove(request);
-    }
-
-    @EventListener
-    public void onQuartzDay0Event(QuartzDay0Event event) {
-        log.info("onQuartzDay0Event: {}", event);
     }
 
 }

@@ -1,24 +1,8 @@
 /*
  * @Author: import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.quartz.event.QuartzDay0Event;
-import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
-import com.bytedesk.core.socket.mqtt.MqttConnectionService;
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.topic.event.TopicCreateEvent;156@qq.com
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 17:35:11
+ * @LastEditTime: 2025-07-09 17:49:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
