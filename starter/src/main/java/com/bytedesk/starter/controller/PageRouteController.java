@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 18:38:18
+ * @LastEditTime: 2025-07-09 13:47:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,18 @@ public class PageRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")
     private Boolean showDemo;
+    
+    @Value("${bytedesk.custom.enabled:false}")
+    private Boolean customEnabled;
+    
+    @Value("${bytedesk.custom.name:智慧客服}")
+    private String customName;
+    
+    @Value("${bytedesk.custom.logo:https://dpic.tech/logo/logo.png}")
+    private String customLogo;
+    
+    @Value("${bytedesk.custom.description:智慧客服}")
+    private String customDescription;
 
 	/**
 	 * 微语首页
@@ -41,6 +53,12 @@ public class PageRouteController {
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
 		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
 			return "default";
 		}
 		model.addAttribute("title", "微语");
@@ -53,8 +71,14 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/web
 	 */
 	@GetMapping("/web")
-	public String web() {
+	public String web(Model model) {
 		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
 			return "default";
 		}
 		return "index";
@@ -130,8 +154,14 @@ public class PageRouteController {
 	 */
 	// 特定的chat/demo路径，放在通用chat路径之前
 	@GetMapping("/chat/demo")
-	public String chatDemo() {
+	public String chatDemo(Model model) {
 		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
 			return "default";
 		}
 		return "forward:/chat/index.html"; // 默认路径
@@ -227,8 +257,14 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/terms
 	 */
 	@GetMapping({ "/{page:download|contact|about|privacy|terms|office}", "/{page:download|contact|about|privacy|terms|office}.html" })
-	public String handlePageRoutes(@PathVariable String page) {
+	public String handlePageRoutes(@PathVariable String page, Model model) {
 		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
 			return "default";
 		}
 		return page;
