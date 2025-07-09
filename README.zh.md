@@ -8,7 +8,17 @@
 - [中文](./README.zh.md)
 
 ![weiyu](./images/nin1.png)
+
+## 管理端
+
 ![chat](./images/admin/chat_zh.png)
+
+## 多渠道
+
+![channel](./images/admin/channel.png)
+
+## 客服端
+
 ![agent](./images/agent/agent_chat.png)
 
 ## 介绍

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 21:08:55
+ * @LastEditTime: 2025-07-10 07:25:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ AI powered Omnichannel customer service With Team Cooperation
 
 ![statistics](./images/admin/statistics.png)
 ![chat](./images/admin/chat.png)
+![channel](./images/admin/channel.png)
 ![agent](./images/agent/agent_chat.png)
 
 ## Introduction
