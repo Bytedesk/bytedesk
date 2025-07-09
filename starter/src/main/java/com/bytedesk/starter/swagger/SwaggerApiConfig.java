@@ -610,4 +610,412 @@ public class SwaggerApiConfig {
                 .pathsToMatch("/api/v1/upload/**")
                 .build();
     }
+
+    /**
+     * 会话管理接口
+     */
+    @Bean
+    public GroupedOpenApi sessionApis() {
+        return GroupedOpenApi.builder()
+                .group("session-apis")
+                .displayName("Session Management APIs")
+                .pathsToMatch("/session/**", "/cookie/**")
+                .build();
+    }
+
+    /**
+     * 分类管理接口
+     */
+    @Bean
+    public GroupedOpenApi categoryApis() {
+        return GroupedOpenApi.builder()
+                .group("category-apis")
+                .displayName("Category Management APIs")
+                .pathsToMatch("/api/v1/category/**")
+                .build();
+    }
+
+    /**
+     * 剪贴板管理接口
+     */
+    @Bean
+    public GroupedOpenApi clipboardApis() {
+        return GroupedOpenApi.builder()
+                .group("clipboard-apis")
+                .displayName("Clipboard Management APIs")
+                .pathsToMatch("/api/v1/clipboard/**")
+                .build();
+    }
+
+    /**
+     * 标签管理接口
+     */
+    @Bean
+    public GroupedOpenApi tagApis() {
+        return GroupedOpenApi.builder()
+                .group("tag-apis")
+                .displayName("Tag Management APIs")
+                .pathsToMatch("/api/v1/tag/**")
+                .build();
+    }
+
+    /**
+     * 群组邀请管理接口
+     */
+    @Bean
+    public GroupedOpenApi groupInviteApis() {
+        return GroupedOpenApi.builder()
+                .group("group-invite-apis")
+                .displayName("Group Invitation Management APIs")
+                .pathsToMatch("/api/v1/group/invite/**")
+                .build();
+    }
+
+    /**
+     * 群组通知管理接口
+     */
+    @Bean
+    public GroupedOpenApi groupNoticeApis() {
+        return GroupedOpenApi.builder()
+                .group("group-notice-apis")
+                .displayName("Group Notice Management APIs")
+                .pathsToMatch("/api/v1/group/notice/**")
+                .build();
+    }
+
+    /**
+     * 通知管理接口
+     */
+    @Bean
+    public GroupedOpenApi noticeApis() {
+        return GroupedOpenApi.builder()
+                .group("notice-apis")
+                .displayName("Notice Management APIs")
+                .pathsToMatch("/api/v1/notice/**")
+                .build();
+    }
+
+    /**
+     * 推送管理接口
+     */
+    @Bean
+    public GroupedOpenApi pushApis() {
+        return GroupedOpenApi.builder()
+                .group("push-apis")
+                .displayName("Push Notification APIs")
+                .pathsToMatch("/api/v1/push/**")
+                .build();
+    }
+
+    /**
+     * 操作日志管理接口
+     */
+    @Bean
+    public GroupedOpenApi actionApis() {
+        return GroupedOpenApi.builder()
+                .group("action-apis")
+                .displayName("Action Log Management APIs")
+                .pathsToMatch("/api/v1/action/**")
+                .build();
+    }
+
+    /**
+     * 菜单管理接口
+     */
+    @Bean
+    public GroupedOpenApi menuApis() {
+        return GroupedOpenApi.builder()
+                .group("menu-apis")
+                .displayName("Menu Management APIs")
+                .pathsToMatch("/api/v1/menu/**")
+                .build();
+    }
+
+    /**
+     * 功能特性管理接口
+     */
+    @Bean
+    public GroupedOpenApi featureApis() {
+        return GroupedOpenApi.builder()
+                .group("feature-apis")
+                .displayName("Feature Management APIs")
+                .pathsToMatch("/api/v1/features/**", "/features/**")
+                .build();
+    }
+
+    /**
+     * 验证码管理接口
+     */
+    @Bean
+    public GroupedOpenApi kaptchaApis() {
+        return GroupedOpenApi.builder()
+                .group("kaptcha-apis")
+                .displayName("Captcha Management APIs")
+                .pathsToMatch("/kaptcha/api/v1/**")
+                .build();
+    }
+
+    /**
+     * 工作流变量管理接口
+     */
+    @Bean
+    public GroupedOpenApi workflowVariableApis() {
+        return GroupedOpenApi.builder()
+                .group("workflow-variable-apis")
+                .displayName("Workflow Variable Management APIs")
+                .pathsToMatch("/api/v1/workflow/variable/**")
+                .build();
+    }
+
+    /**
+     * 工作流结果管理接口
+     */
+    @Bean
+    public GroupedOpenApi workflowResultApis() {
+        return GroupedOpenApi.builder()
+                .group("workflow-result-apis")
+                .displayName("Workflow Result Management APIs")
+                .pathsToMatch("/api/v1/workflow/result/**")
+                .build();
+    }
+
+    /**
+     * 收藏管理接口
+     */
+    @Bean
+    public GroupedOpenApi favoriteApis() {
+        return GroupedOpenApi.builder()
+                .group("favorite-apis")
+                .displayName("Favorite Management APIs")
+                .pathsToMatch("/api/v1/favorite/**")
+                .build();
+    }
+
+    /**
+     * 灰度发布管理接口
+     */
+    @Bean
+    public GroupedOpenApi grayReleaseApis() {
+        return GroupedOpenApi.builder()
+                .group("gray-release-apis")
+                .displayName("Gray Release Management APIs")
+                .pathsToMatch("/api/v1/gray-release/**")
+                .build();
+    }
+
+    /**
+     * 定时任务管理接口
+     */
+    @Bean
+    public GroupedOpenApi quartzApis() {
+        return GroupedOpenApi.builder()
+                .group("quartz-apis")
+                .displayName("Quartz Job Management APIs")
+                .pathsToMatch("/api/v1/quartz/**")
+                .build();
+    }
+
+    /**
+     * IP管理接口
+     */
+    @Bean
+    public GroupedOpenApi ipApis() {
+        return GroupedOpenApi.builder()
+                .group("ip-apis")
+                .displayName("IP Management APIs")
+                .pathsToMatch("/ip/api/v1/**", "/api/v1/ip/**")
+                .build();
+    }
+
+    /**
+     * IP黑名单管理接口
+     */
+    @Bean
+    public GroupedOpenApi ipBlacklistApis() {
+        return GroupedOpenApi.builder()
+                .group("ip-blacklist-apis")
+                .displayName("IP Blacklist Management APIs")
+                .pathsToMatch("/api/v1/ip/black/**")
+                .build();
+    }
+
+    /**
+     * IP白名单管理接口
+     */
+    @Bean
+    public GroupedOpenApi ipWhitelistApis() {
+        return GroupedOpenApi.builder()
+                .group("ip-whitelist-apis")
+                .displayName("IP Whitelist Management APIs")
+                .pathsToMatch("/api/v1/ip/white/**")
+                .build();
+    }
+
+    /**
+     * IP访问管理接口
+     */
+    @Bean
+    public GroupedOpenApi ipAccessApis() {
+        return GroupedOpenApi.builder()
+                .group("ip-access-apis")
+                .displayName("IP Access Management APIs")
+                .pathsToMatch("/api/v1/ip/access/**")
+                .build();
+    }
+
+    /**
+     * 配置管理接口（补充bytedesk路径）
+     */
+    @Bean
+    public GroupedOpenApi configBytedeskApis() {
+        return GroupedOpenApi.builder()
+                .group("config-bytedesk-apis")
+                .displayName("Bytedesk Configuration APIs")
+                .pathsToMatch("/config/bytedesk/**")
+                .build();
+    }
+
+    /**
+     * 频道管理接口
+     */
+    @Bean
+    public GroupedOpenApi channelApis() {
+        return GroupedOpenApi.builder()
+                .group("channel-apis")
+                .displayName("Channel Management APIs")
+                .pathsToMatch("/api/v1/channel/**")
+                .build();
+    }
+
+    /**
+     * MQTT管理接口
+     */
+    @Bean
+    public GroupedOpenApi mqttApis() {
+        return GroupedOpenApi.builder()
+                .group("mqtt-apis")
+                .displayName("MQTT Management APIs")
+                .pathsToMatch("/mqtt/api/v1/**")
+                .build();
+    }
+
+    /**
+     * JMS管理接口
+     */
+    @Bean
+    public GroupedOpenApi jmsApis() {
+        return GroupedOpenApi.builder()
+                .group("jms-apis")
+                .displayName("JMS Management APIs")
+                .pathsToMatch("/jms/**")
+                .build();
+    }
+
+    /**
+     * Redis流管理接口
+     */
+    @Bean
+    public GroupedOpenApi redisStreamApis() {
+        return GroupedOpenApi.builder()
+                .group("redis-stream-apis")
+                .displayName("Redis Stream Management APIs")
+                .pathsToMatch("/redis/stream/**")
+                .build();
+    }
+
+    /**
+     * Redis发布订阅管理接口
+     */
+    @Bean
+    public GroupedOpenApi redisPubsubApis() {
+        return GroupedOpenApi.builder()
+                .group("redis-pubsub-apis")
+                .displayName("Redis PubSub Management APIs")
+                .pathsToMatch("/redis/pubsub/**")
+                .build();
+    }
+
+    /**
+     * 配置管理接口
+     */
+    @Bean
+    public GroupedOpenApi configApis() {
+        return GroupedOpenApi.builder()
+                .group("config-apis")
+                .displayName("Configuration Management APIs")
+                .pathsToMatch("/config/**")
+                .build();
+    }
+
+    /**
+     * OAuth2管理接口
+     */
+    @Bean
+    public GroupedOpenApi oauth2Apis() {
+        return GroupedOpenApi.builder()
+                .group("oauth2-apis")
+                .displayName("OAuth2 Management APIs")
+                .pathsToMatch("/api/v1/oauth2/**", "/sso/oauth2/**")
+                .build();
+    }
+
+    /**
+     * 组织申请管理接口
+     */
+    @Bean
+    public GroupedOpenApi organizationApplyApis() {
+        return GroupedOpenApi.builder()
+                .group("organization-apply-apis")
+                .displayName("Organization Application Management APIs")
+                .pathsToMatch("/api/v1/org/apply/**")
+                .build();
+    }
+
+    /**
+     * 助手管理接口
+     */
+    @Bean
+    public GroupedOpenApi assistantApis() {
+        return GroupedOpenApi.builder()
+                .group("assistant-apis")
+                .displayName("Assistant Management APIs")
+                .pathsToMatch("/api/v1/assistant/**")
+                .build();
+    }
+
+    /**
+     * URL管理接口
+     */
+    @Bean
+    public GroupedOpenApi urlApis() {
+        return GroupedOpenApi.builder()
+                .group("url-apis")
+                .displayName("URL Management APIs")
+                .pathsToMatch("/api/v1/url/**", "/url/**")
+                .build();
+    }
+
+    /**
+     * 文件预览接口
+     */
+    @Bean
+    public GroupedOpenApi filePreviewApis() {
+        return GroupedOpenApi.builder()
+                .group("file-preview-apis")
+                .displayName("File Preview APIs")
+                .pathsToMatch("/file/**")
+                .build();
+    }
+
+    /**
+     * 访客上传接口
+     */
+    @Bean
+    public GroupedOpenApi visitorUploadApis() {
+        return GroupedOpenApi.builder()
+                .group("visitor-upload-apis")
+                .displayName("Visitor Upload APIs")
+                .pathsToMatch("/visitor/api/v1/upload/**")
+                .build();
+    }
 }

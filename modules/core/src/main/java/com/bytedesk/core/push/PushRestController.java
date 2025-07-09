@@ -23,17 +23,21 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/push")
 @RequiredArgsConstructor
+@Tag(name = "Push Notification Management", description = "Push notification management APIs for sending and managing push notifications")
 public class PushRestController extends BaseRestController<PushRequest> {
 
     private final PushRestService pushService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Push Notifications by Organization", description = "Retrieve push notifications for the current organization (Admin only)")
     @Override
     public ResponseEntity<?> queryByOrg(PushRequest request) {
 
@@ -42,6 +46,7 @@ public class PushRestController extends BaseRestController<PushRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Push Notifications by User", description = "Retrieve push notifications for the current user")
     @Override
     public ResponseEntity<?> queryByUser(PushRequest request) {
         
@@ -50,18 +55,21 @@ public class PushRestController extends BaseRestController<PushRequest> {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Create Push Notification", description = "Create and send a new push notification")
     @Override
     public ResponseEntity<?> create(PushRequest request) {
         
         return ResponseEntity.ok(JsonResult.success(pushService.create(request)));
     }
 
+    @Operation(summary = "Update Push Notification", description = "Update an existing push notification")
     @Override
     public ResponseEntity<?> update(PushRequest request) {
         
         return ResponseEntity.ok(JsonResult.success(pushService.update(request)));
     }
 
+    @Operation(summary = "Delete Push Notification", description = "Delete a push notification")
     @Override
     public ResponseEntity<?> delete(PushRequest request) {
 

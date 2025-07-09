@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:36:15
+ * @LastEditTime: 2025-07-09 22:53:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,17 +23,21 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/menu")
 @AllArgsConstructor
+@Tag(name = "Menu Management", description = "Menu management APIs for organizing application navigation and permissions")
 public class MenuRestController extends BaseRestController<MenuRequest> {
 
     private final MenuRestService menuService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Menus by Organization", description = "Retrieve menus for the current organization (Admin only)")
     @Override
     public ResponseEntity<?> queryByOrg(MenuRequest request) {
         
@@ -42,6 +46,7 @@ public class MenuRestController extends BaseRestController<MenuRequest> {
         return ResponseEntity.ok(JsonResult.success(menus));
     }
 
+    @Operation(summary = "Query Menus by User", description = "Retrieve menus for the current user")
     @Override
     public ResponseEntity<?> queryByUser(MenuRequest request) {
         
@@ -50,6 +55,7 @@ public class MenuRestController extends BaseRestController<MenuRequest> {
         return ResponseEntity.ok(JsonResult.success(menus));
     }
 
+    @Operation(summary = "Create Menu", description = "Create a new menu item")
     @Override
     public ResponseEntity<?> create(MenuRequest request) {
         
@@ -58,6 +64,7 @@ public class MenuRestController extends BaseRestController<MenuRequest> {
         return ResponseEntity.ok(JsonResult.success(menu));
     }
 
+    @Operation(summary = "Update Menu", description = "Update an existing menu item")
     @Override
     public ResponseEntity<?> update(MenuRequest request) {
         
@@ -66,6 +73,7 @@ public class MenuRestController extends BaseRestController<MenuRequest> {
         return ResponseEntity.ok(JsonResult.success(menu));
     }
 
+    @Operation(summary = "Delete Menu", description = "Delete a menu item")
     @Override
     public ResponseEntity<?> delete(MenuRequest request) {
         

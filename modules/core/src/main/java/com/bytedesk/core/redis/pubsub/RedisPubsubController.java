@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/redis/pubsub")
+@Tag(name = "Redis PubSub Management", description = "Redis publish/subscribe messaging APIs")
 public class RedisPubsubController {
 
     @Autowired
@@ -47,6 +50,7 @@ public class RedisPubsubController {
      * @param message
      * @return
      */
+    @Operation(summary = "Publish Text Message", description = "Publish a text message to Redis pub/sub channel")
     @GetMapping("/send")
     public JsonResult<String> publishText(@RequestParam String message) {
         log.info("redisPubsub redisMessageSend: {}", message);

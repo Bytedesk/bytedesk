@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -32,10 +34,12 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/quartz")
+@Tag(name = "Quartz Job Management", description = "Quartz job scheduling and management APIs")
 public class QuartzRestController extends BaseRestController<QuartzRequest> {
 
     private QuartzRestService quartzRestService;
 
+    @Operation(summary = "Query Jobs by Organization", description = "Retrieve Quartz jobs for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(QuartzRequest request) {
 
@@ -44,7 +48,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
 
-
+    @Operation(summary = "Query Jobs by User", description = "Retrieve Quartz jobs for the current user")
     @Override
     public ResponseEntity<?> queryByUser(QuartzRequest request) {
 
@@ -53,6 +57,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(pageResult));
     }
 
+    @Operation(summary = "Create Job", description = "Create a new Quartz job")
     @Override
     public ResponseEntity<?> create(@RequestBody QuartzRequest request) {
 
@@ -64,6 +69,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update Job", description = "Update an existing Quartz job")
     @Override
     public ResponseEntity<?> update(@RequestBody QuartzRequest request) {
 
@@ -75,6 +81,7 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete Job", description = "Delete a Quartz job")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuartzRequest request) {
 
@@ -84,24 +91,28 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
     }
 
     //
+    @Operation(summary = "Start Job", description = "Start a Quartz job")
     @PostMapping("/startJob")
     public ResponseEntity<?> startJob(@RequestBody QuartzRequest request) {
         quartzRestService.startJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @Operation(summary = "Pause Job", description = "Pause a running Quartz job")
     @PostMapping("/pauseJob")
     public ResponseEntity<?> pauseJob(@RequestBody QuartzRequest request) {
         quartzRestService.pauseJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @Operation(summary = "Resume Job", description = "Resume a paused Quartz job")
     @PostMapping("/resumeJob")
     public ResponseEntity<?> resumeJob(@RequestBody QuartzRequest request) {
         quartzRestService.resumeJob(request);
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @Operation(summary = "Delete Job from Scheduler", description = "Remove a job from the Quartz scheduler")
     @PostMapping("/deleteJob")
     public ResponseEntity<?> deleteJob(@RequestBody QuartzRequest request) {
         quartzRestService.deleteJob(request);
@@ -113,7 +124,6 @@ public class QuartzRestController extends BaseRestController<QuartzRequest> {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
-
 
     @Override
     public ResponseEntity<?> queryByUid(QuartzRequest request) {

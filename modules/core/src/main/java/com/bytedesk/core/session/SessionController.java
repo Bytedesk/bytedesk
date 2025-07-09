@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/session")
+@Tag(name = "Session Management", description = "Session management APIs for user session handling")
 public class SessionController {
 
     /**
@@ -45,6 +48,7 @@ public class SessionController {
      * @param session
      * @return
      */
+    @Operation(summary = "Get Session", description = "Retrieve current session information")
     @GetMapping({"", "/"})
     public ResponseEntity<?> getSession(HttpSession session) {
         log.info("sessionId:[{}]", session.getId());
@@ -68,6 +72,7 @@ public class SessionController {
      * @param session
      * @return
      */
+    @Operation(summary = "Set Session", description = "Set username in session")
     @GetMapping("/set")
     public ResponseEntity<?> setSession(@RequestParam String username, HttpSession session) {
         log.info("sessionId:[{}]", session.getId());

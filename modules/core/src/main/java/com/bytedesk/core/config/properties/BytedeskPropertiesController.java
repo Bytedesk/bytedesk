@@ -21,11 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping(value = "/config/bytedesk", produces = "application/json;charset=UTF-8")
+@Tag(name = "Configuration Properties", description = "Configuration properties management APIs for system settings")
 public class BytedeskPropertiesController {
 
     // http://127.0.0.1:9003/config/bytedesk/properties
+    @Operation(summary = "Get Bytedesk Properties", description = "Retrieve Bytedesk system configuration properties")
     @GetMapping(value = "/properties", produces = "application/json;charset=UTF-8")
     public ResponseEntity<JsonResult<?>> getBytedeskProperties() {
 

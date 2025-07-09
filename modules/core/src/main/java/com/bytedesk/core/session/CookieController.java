@@ -25,6 +25,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +38,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/cookie")
+@Tag(name = "Cookie Management", description = "Cookie management APIs for visitor tracking and session management")
 public class CookieController {
 
     /**
@@ -45,6 +48,7 @@ public class CookieController {
      * @param username
      * @return
      */
+    @Operation(summary = "Get Cookie", description = "Retrieve visitor ID from cookie")
     @GetMapping({"", "/"})
     public ResponseEntity<?> getCookie(@CookieValue(value = "v_vid", defaultValue = "no vid") String vid) {
 
@@ -57,6 +61,7 @@ public class CookieController {
      * @param response
      * @return
      */
+    @Operation(summary = "Set Cookie", description = "Set visitor ID cookie")
     @GetMapping("/set")
     public ResponseEntity<?> setCookie(HttpServletResponse response) {
         // create a cookie
@@ -78,6 +83,7 @@ public class CookieController {
      * @param httpRequest The HTTP request object
      * @return
      */
+    @Operation(summary = "Get All Cookies", description = "Retrieve all cookies from the request")
     @GetMapping("/all")
     public ResponseEntity<?> getAllCookies(HttpServletRequest httpRequest) {
 
@@ -102,6 +108,7 @@ public class CookieController {
      * @param response
      * @return
      */
+    @Operation(summary = "Delete Cookie", description = "Delete visitor ID cookie")
     @GetMapping("/delete")
     public ResponseEntity<?> deleteCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie("v_vid", null);

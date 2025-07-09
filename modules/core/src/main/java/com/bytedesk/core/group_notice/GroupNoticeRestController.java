@@ -21,17 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/group/notice")
 @AllArgsConstructor
+@Tag(name = "Group Notice Management", description = "Group notice management APIs for managing announcements within groups")
 public class GroupNoticeRestController extends BaseRestController<GroupNoticeRequest> {
 
     private final GroupNoticeRestService groupNoticeService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Group Notices by Organization", description = "Retrieve group notices for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(GroupNoticeRequest request) {
         
@@ -40,6 +44,7 @@ public class GroupNoticeRestController extends BaseRestController<GroupNoticeReq
         return ResponseEntity.ok(JsonResult.success(groupNotices));
     }
 
+    @Operation(summary = "Query Group Notices by User", description = "Retrieve group notices for the current user")
     @Override
     public ResponseEntity<?> queryByUser(GroupNoticeRequest request) {
         
@@ -48,6 +53,7 @@ public class GroupNoticeRestController extends BaseRestController<GroupNoticeReq
         return ResponseEntity.ok(JsonResult.success(groupNotices));
     }
 
+    @Operation(summary = "Create Group Notice", description = "Create a new group notice")
     @Override
     public ResponseEntity<?> create(GroupNoticeRequest request) {
         
@@ -56,6 +62,7 @@ public class GroupNoticeRestController extends BaseRestController<GroupNoticeReq
         return ResponseEntity.ok(JsonResult.success(group_notice));
     }
 
+    @Operation(summary = "Update Group Notice", description = "Update an existing group notice")
     @Override
     public ResponseEntity<?> update(GroupNoticeRequest request) {
         
@@ -64,6 +71,7 @@ public class GroupNoticeRestController extends BaseRestController<GroupNoticeReq
         return ResponseEntity.ok(JsonResult.success(group_notice));
     }
 
+    @Operation(summary = "Delete Group Notice", description = "Delete a group notice")
     @Override
     public ResponseEntity<?> delete(GroupNoticeRequest request) {
         

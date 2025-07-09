@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-19 17:02:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-28 17:11:53
+ * @LastEditTime: 2025-07-09 23:01:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/file")
+@Tag(name = "File Preview and Download", description = "File preview and download APIs for displaying and downloading uploaded files")
 public class UploadFilePreview {
 
 	private final UploadRestService uploadService;
@@ -52,6 +55,7 @@ public class UploadFilePreview {
 	 * @return
 	 * @throws IOException
 	 */
+	@Operation(summary = "Preview File", description = "Preview file in browser or display in img tag")
 	@GetMapping("/{yyyy}/{MM}/{dd}/{filename:.+}")
 	@ResponseBody
 	public void preview(
@@ -90,6 +94,7 @@ public class UploadFilePreview {
 	 * @return
 	 */
 	@Deprecated
+	@Operation(summary = "Download File", description = "Download file from server (deprecated)")
 	@GetMapping("/download/{yyyy}/{MM}/{dd}/{filename:.+}")
 	@ResponseBody
 	public ResponseEntity<Resource> download(

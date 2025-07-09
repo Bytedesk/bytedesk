@@ -21,12 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/clipboard")
 @AllArgsConstructor
+@Tag(name = "Clipboard Management", description = "Clipboard management APIs for sharing and managing clipboard content")
 public class ClipboardRestController extends BaseRestController<ClipboardRequest> {
 
     private final ClipboardRestService clipboardService;
@@ -37,6 +40,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
+    @Operation(summary = "Query Clipboard by User", description = "Retrieve clipboard items for the current user")
     @Override
     public ResponseEntity<?> queryByUser(ClipboardRequest request) {
         
@@ -45,6 +49,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Create Clipboard Item", description = "Create a new clipboard item")
     @Override
     public ResponseEntity<?> create(ClipboardRequest request) {
         
@@ -53,6 +58,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update Clipboard Item", description = "Update an existing clipboard item")
     @Override
     public ResponseEntity<?> update(ClipboardRequest request) {
         
@@ -61,6 +67,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete Clipboard Item", description = "Delete a clipboard item")
     @Override
     public ResponseEntity<?> delete(ClipboardRequest request) {
         

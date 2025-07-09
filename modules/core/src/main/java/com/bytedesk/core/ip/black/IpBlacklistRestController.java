@@ -21,16 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/ip/black")
 @AllArgsConstructor
+@Tag(name = "IP Blacklist Management", description = "IP blacklist management APIs for blocking specific IP addresses")
 public class IpBlacklistRestController extends BaseRestController<IpBlacklistRequest> {
 
     private final IpBlacklistRestService ipBlacklistRestService;
 
+    @Operation(summary = "Query IP Blacklist by Organization", description = "Retrieve IP blacklist for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(IpBlacklistRequest request) {
 
@@ -39,6 +43,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query IP Blacklist by User", description = "Retrieve IP blacklist for the current user")
     @Override
     public ResponseEntity<?> queryByUser(IpBlacklistRequest request) {
 
@@ -53,6 +58,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
+    @Operation(summary = "Create IP Blacklist Entry", description = "Add an IP address to the blacklist")
     @Override
     public ResponseEntity<?> create(IpBlacklistRequest request) {
 
@@ -61,6 +67,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update IP Blacklist Entry", description = "Update an existing IP blacklist entry")
     @Override
     public ResponseEntity<?> update(IpBlacklistRequest request) {
 
@@ -69,6 +76,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete IP Blacklist Entry", description = "Remove an IP address from the blacklist")
     @Override
     public ResponseEntity<?> delete(IpBlacklistRequest request) {
 
@@ -77,6 +85,7 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export IP Blacklist", description = "Export IP blacklist to Excel format")
     @Override
     public Object export(IpBlacklistRequest request, HttpServletResponse response) {
         return exportTemplate(

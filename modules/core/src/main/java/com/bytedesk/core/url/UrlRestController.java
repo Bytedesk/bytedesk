@@ -21,16 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/url")
 @AllArgsConstructor
+@Tag(name = "URL Management", description = "URL management APIs for managing system URLs")
 public class UrlRestController extends BaseRestController<UrlRequest> {
 
     private final UrlRestService urlService;
 
+    @Operation(summary = "Query URLs by Organization", description = "Retrieve URLs for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(UrlRequest request) {
         
@@ -39,6 +43,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
         return ResponseEntity.ok(JsonResult.success(urls));
     }
 
+    @Operation(summary = "Query URLs by User", description = "Retrieve URLs for the current user")
     @Override
     public ResponseEntity<?> queryByUser(UrlRequest request) {
         
@@ -47,6 +52,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
         return ResponseEntity.ok(JsonResult.success(urls));
     }
 
+    @Operation(summary = "Create URL", description = "Create a new URL entry")
     @Override
     public ResponseEntity<?> create(UrlRequest request) {
         
@@ -55,6 +61,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
         return ResponseEntity.ok(JsonResult.success(url));
     }
 
+    @Operation(summary = "Update URL", description = "Update an existing URL entry")
     @Override
     public ResponseEntity<?> update(UrlRequest request) {
         
@@ -63,6 +70,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
         return ResponseEntity.ok(JsonResult.success(url));
     }
 
+    @Operation(summary = "Delete URL", description = "Delete a URL entry")
     @Override
     public ResponseEntity<?> delete(UrlRequest request) {
         

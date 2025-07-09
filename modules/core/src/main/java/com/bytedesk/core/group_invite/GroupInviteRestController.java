@@ -21,17 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/group/invite")
 @AllArgsConstructor
+@Tag(name = "Group Invitation Management", description = "Group invitation management APIs for creating and managing group invitations")
 public class GroupInviteRestController extends BaseRestController<GroupInviteRequest> {
 
     private final GroupInviteRestService groupInviteService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Group Invitations by Organization", description = "Retrieve group invitations for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(GroupInviteRequest request) {
         
@@ -40,6 +44,7 @@ public class GroupInviteRestController extends BaseRestController<GroupInviteReq
         return ResponseEntity.ok(JsonResult.success(groupInvites));
     }
 
+    @Operation(summary = "Query Group Invitations by User", description = "Retrieve group invitations for the current user")
     @Override
     public ResponseEntity<?> queryByUser(GroupInviteRequest request) {
         
@@ -48,6 +53,7 @@ public class GroupInviteRestController extends BaseRestController<GroupInviteReq
         return ResponseEntity.ok(JsonResult.success(groupInvites));
     }
 
+    @Operation(summary = "Create Group Invitation", description = "Create a new group invitation")
     @Override
     public ResponseEntity<?> create(GroupInviteRequest request) {
         
@@ -56,6 +62,7 @@ public class GroupInviteRestController extends BaseRestController<GroupInviteReq
         return ResponseEntity.ok(JsonResult.success(groupInvite));
     }
 
+    @Operation(summary = "Update Group Invitation", description = "Update an existing group invitation")
     @Override
     public ResponseEntity<?> update(GroupInviteRequest request) {
         
@@ -64,6 +71,7 @@ public class GroupInviteRestController extends BaseRestController<GroupInviteReq
         return ResponseEntity.ok(JsonResult.success(groupInvite));
     }
 
+    @Operation(summary = "Delete Group Invitation", description = "Delete a group invitation")
     @Override
     public ResponseEntity<?> delete(GroupInviteRequest request) {
         

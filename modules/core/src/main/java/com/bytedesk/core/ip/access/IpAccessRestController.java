@@ -20,36 +20,44 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/ip/access")
 @RequiredArgsConstructor
+@Tag(name = "IP Access Management", description = "IP access control management APIs for managing IP access permissions")
 public class IpAccessRestController extends BaseRestController<IpAccessRequest> {
 
     private final IpAccessRestService ipAccessRestService;
 
+    @Operation(summary = "Query IP Access by Organization", description = "Retrieve IP access records for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(IpAccessRequest request) {
         return ResponseEntity.ok(JsonResult.success(ipAccessRestService.queryByOrg(request)));
     }
 
+    @Operation(summary = "Query IP Access by User", description = "Retrieve IP access records for the current user")
     @Override
     public ResponseEntity<?> queryByUser(IpAccessRequest request) {
         return ResponseEntity.ok(JsonResult.success(ipAccessRestService.queryByUser(request)));
     }
 
+    @Operation(summary = "Create IP Access Record", description = "Create a new IP access record")
     @Override
     public ResponseEntity<?> create(IpAccessRequest request) {
         return ResponseEntity.ok(JsonResult.success(ipAccessRestService.create(request)));
     }
 
+    @Operation(summary = "Update IP Access Record", description = "Update an existing IP access record")
     @Override
     public ResponseEntity<?> update(IpAccessRequest request) {
         return ResponseEntity.ok(JsonResult.success(ipAccessRestService.update(request)));
     }
 
+    @Operation(summary = "Delete IP Access Record", description = "Delete an IP access record")
     @Override
     public ResponseEntity<?> delete(IpAccessRequest request) {
         ipAccessRestService.delete(request);

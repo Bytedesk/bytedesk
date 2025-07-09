@@ -22,16 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/category")
+@Tag(name = "Category Management", description = "Category management APIs for organizing and classifying content")
 public class CategoryRestController extends BaseRestController<CategoryRequest> {
     
     private final CategoryRestService categoryRestService;
     
+    @Operation(summary = "Query Categories by Organization", description = "Retrieve categories for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(CategoryRequest request) {
         
@@ -40,6 +44,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Categories by User", description = "Retrieve categories for the current user")
     @Override
     public ResponseEntity<?> queryByUser(CategoryRequest request) {
         
@@ -48,6 +53,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Create Category", description = "Create a new category")
     @Override
     public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
         
@@ -56,6 +62,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update Category", description = "Update an existing category")
     @Override
     public ResponseEntity<?> update(@RequestBody CategoryRequest request) {
         
@@ -64,6 +71,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest> 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete Category", description = "Delete a category")
     @Override
     public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
         

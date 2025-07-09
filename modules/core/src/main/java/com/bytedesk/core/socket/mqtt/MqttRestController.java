@@ -25,11 +25,14 @@ import com.bytedesk.core.uid.utils.NetUtils;
 import com.bytedesk.core.utils.JsonResult;
 import com.alibaba.fastjson2.JSONObject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/mqtt/api/v1")
+@Tag(name = "MQTT Management", description = "MQTT connection and session management APIs")
 public class MqttRestController {
 
     private final MqttSessionService mqttSessionService;
@@ -41,6 +44,7 @@ public class MqttRestController {
      * http://127.0.0.1:9003/mqtt/api/v1/session/clients
      * @return
      */
+    @Operation(summary = "Get Session Clients", description = "Retrieve all client IDs that have sessions in the local MQTT server")
     @GetMapping("/session/clients")
     public ResponseEntity<?> getSessionClients() {
         //
@@ -55,6 +59,7 @@ public class MqttRestController {
     }
 
     // http://127.0.0.1:9003/mqtt/api/v1/connected/clients
+    @Operation(summary = "Get Connected Clients", description = "Retrieve all currently connected MQTT client IDs")
     @GetMapping("/connected/clients")
     public ResponseEntity<?> isConnectedClients() {
 

@@ -22,16 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.redis.RedisEvent;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/redis/stream/")
 @AllArgsConstructor
+@Tag(name = "Redis Stream Management", description = "Redis stream management APIs for event streaming")
 public class RedisStreamController {
 
     private final RedisStreamService redisStreamProducer;
 
     // http://127.0.0.1:9003/redis/stream/test?content=123&type=text
+    @Operation(summary = "Test Redis Stream", description = "Test Redis stream functionality with custom content and type")
     @GetMapping("/test")
     public ResponseEntity<?> test(
             @RequestParam(required = false, defaultValue = "text") String type,

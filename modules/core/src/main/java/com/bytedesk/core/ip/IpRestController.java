@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/ip/api/v1")
+@Tag(name = "IP Management", description = "IP address management and location services APIs")
 public class IpRestController {
 
     private final IpService ipService;
@@ -40,6 +43,7 @@ public class IpRestController {
      *
      * @return json
      */
+    @Operation(summary = "Get Client IP", description = "Get the client's IP address")
     @GetMapping({"", "/"})
     public JsonResult<?> ip(HttpServletRequest request) {
         return new JsonResult<>("your ip", 200, IpUtils.getClientIp(request));
@@ -54,6 +58,7 @@ public class IpRestController {
      * @param request
      * @return
      */
+    @Operation(summary = "Get IP Location", description = "Get location information for the client's IP address")
     @GetMapping("/location")
     public JsonResult<?> location(HttpServletRequest request) {
 
@@ -74,6 +79,7 @@ public class IpRestController {
      * @param request
      * @return
      */
+    @Operation(summary = "Get Specific IP Location", description = "Get location information for a specific IP address")
     @GetMapping("/ip/location")
     public JsonResult<?> ipLocation(@RequestParam String ip) {
 
@@ -89,6 +95,7 @@ public class IpRestController {
     }
 
     // http://127.0.0.1:9003/ip/api/v1/ip/inrange?ip=192.168.1.100
+    @Operation(summary = "Check IP in Range", description = "Check if an IP address is within a specific range")
     @GetMapping("/ip/inrange")
     public JsonResult<?> ipInRange(@RequestParam String ip) {
 
@@ -103,6 +110,7 @@ public class IpRestController {
 
     // for testing
     // http://127.0.0.1:9003/ip/api/v1/ip/province?ip=202.106.212.226
+    @Operation(summary = "Get IP Province", description = "Get province information for a specific IP address")
     @GetMapping("/ip/province")
     public JsonResult<?> ipProvince(@RequestParam String ip) {
 

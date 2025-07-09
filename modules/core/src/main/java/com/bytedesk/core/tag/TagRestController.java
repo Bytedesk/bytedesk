@@ -24,18 +24,22 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/tag")
 @AllArgsConstructor
+@Tag(name = "Tag Management", description = "Tag management APIs for organizing and categorizing content with tags")
 public class TagRestController extends BaseRestController<TagRequest> {
 
     private final TagRestService tagRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
+    @Operation(summary = "Query Tags by Organization", description = "Retrieve tags for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(TagRequest request) {
         
@@ -45,6 +49,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     }
 
     @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
+    @Operation(summary = "Query Tags by User", description = "Retrieve tags for the current user")
     @Override
     public ResponseEntity<?> queryByUser(TagRequest request) {
         
@@ -54,6 +59,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     }
 
     @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @Operation(summary = "Query Tag by UID", description = "Retrieve a specific tag by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(TagRequest request) {
         
@@ -63,6 +69,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     }
 
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @Operation(summary = "Create Tag", description = "Create a new tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(TagRequest request) {
@@ -73,6 +80,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     }
 
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @Operation(summary = "Update Tag", description = "Update an existing tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(TagRequest request) {
@@ -83,6 +91,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     }
 
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @Operation(summary = "Delete Tag", description = "Delete a tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(TagRequest request) {
@@ -93,6 +102,7 @@ public class TagRestController extends BaseRestController<TagRequest> {
     }
 
     @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @Operation(summary = "Export Tags", description = "Export tags to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")

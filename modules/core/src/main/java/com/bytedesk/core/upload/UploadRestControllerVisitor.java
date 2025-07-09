@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,11 +34,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1/upload")
+@Tag(name = "Visitor Upload Management", description = "Visitor upload APIs for anonymous file uploads")
 public class UploadRestControllerVisitor {
 
     private final UploadRestService uploadService;
 
     // 文件上传
+    @Operation(summary = "Upload File", description = "Upload file anonymously")
     @PostMapping("/file")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file, UploadRequest request) {
         
@@ -46,6 +50,7 @@ public class UploadRestControllerVisitor {
     }
 
     // 文件上传（支持水印控制）
+    @Operation(summary = "Upload File with Watermark", description = "Upload file with watermark control")
     @PostMapping("/file/watermark")
     public ResponseEntity<?> uploadWithWatermark(
             @RequestParam("file") MultipartFile file, 

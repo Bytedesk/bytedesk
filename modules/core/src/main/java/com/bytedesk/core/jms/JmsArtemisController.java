@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -30,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/jms")
+@Tag(name = "JMS Management", description = "JMS Artemis queue and topic management APIs for testing")
 public class JmsArtemisController {
     
     @Autowired
@@ -39,6 +42,7 @@ public class JmsArtemisController {
 	private BytedeskProperties bytedeskProperties;
 
     // http://127.0.0.1:9003/jms/artemis/queue
+	@Operation(summary = "Test JMS Queue", description = "Test sending a message to JMS Artemis queue (debug mode only)")
 	@GetMapping("/artemis/queue")
 	public ResponseEntity<?> getJmsQueueArtemis() {
 		if (!bytedeskProperties.getDebug()) {
@@ -50,6 +54,7 @@ public class JmsArtemisController {
  	}
 
 	// http://127.0.0.1:9003/jms/artemis/topic
+	@Operation(summary = "Test JMS Topic", description = "Test sending a message to JMS Artemis topic (debug mode only)")
 	@GetMapping("/artemis/topic")
 	public ResponseEntity<?> getJmsTopicArtemis() {
 		if (!bytedeskProperties.getDebug()) {
