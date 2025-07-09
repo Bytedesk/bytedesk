@@ -27,16 +27,20 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/message/leave")
 @AllArgsConstructor
+@Tag(name = "留言消息管理", description = "留言消息管理相关接口")
 public class MessageLeaveRestController extends BaseRestController<MessageLeaveRequest> {
 
     private final MessageLeaveRestService messageLeaveRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
+    @Operation(summary = "查询留言消息")
     public ResponseEntity<?> queryByOrg(MessageLeaveRequest request) {
 
         Page<MessageLeaveResponse> page = messageLeaveRestService.queryByOrg(request);
@@ -45,6 +49,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @Override
+    @Operation(summary = "查询用户留言消息")
     public ResponseEntity<?> queryByUser(MessageLeaveRequest request) {
         
         Page<MessageLeaveResponse> page = messageLeaveRestService.queryByUser(request);
@@ -53,6 +58,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @Override
+    @Operation(summary = "查询留言消息详情")
     public ResponseEntity<?> queryByUid(MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.queryByUid(request);
@@ -62,6 +68,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // query threads by leave message
     @GetMapping("/query/threads")
+    @Operation(summary = "查询留言消息关联的会话")
     public ResponseEntity<?> queryThreadsByLeaveMessage(MessageLeaveRequest request) {
         
         Page<ThreadResponse> page = messageLeaveRestService.queryThreadsByLeaveMessage(request);
@@ -70,6 +77,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @Override
+    @Operation(summary = "创建留言消息")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.create(request);
@@ -78,6 +86,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @Override
+    @Operation(summary = "更新留言消息")
     public ResponseEntity<?> update(MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.update(request);
@@ -87,6 +96,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // reply
     @PostMapping("/reply")
+    @Operation(summary = "回复留言消息")
     public ResponseEntity<?> reply(@RequestBody MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.reply(request);
@@ -96,6 +106,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // 更新留言状态
     @PostMapping("/status/update")
+    @Operation(summary = "更新留言消息状态")
     public ResponseEntity<?> updateStatus(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.updateStatus(request);
@@ -105,6 +116,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // 标记为已读
     @PostMapping("/read")
+    @Operation(summary = "标记留言消息为已读")
     public ResponseEntity<?> markAsRead(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.markAsRead(request);
@@ -114,6 +126,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // 转接留言
     @PostMapping("/transfer")
+    @Operation(summary = "转接留言消息")
     public ResponseEntity<?> transfer(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.transfer(request);
@@ -123,6 +136,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // 关闭留言
     @PostMapping("/close")
+    @Operation(summary = "关闭留言消息")
     public ResponseEntity<?> close(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.close(request);
@@ -132,6 +146,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     // 标记为垃圾留言
     @PostMapping("/spam")
+    @Operation(summary = "标记留言消息为垃圾")
     public ResponseEntity<?> markAsSpam(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.markAsSpam(request);
@@ -140,6 +155,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @Override
+    @Operation(summary = "删除留言消息")
     public ResponseEntity<?> delete(MessageLeaveRequest request) {
         
         messageLeaveRestService.delete(request);
@@ -148,6 +164,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @Override
+    @Operation(summary = "导出留言消息")
     public Object export(MessageLeaveRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,

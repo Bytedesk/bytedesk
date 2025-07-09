@@ -46,6 +46,8 @@ import com.bytedesk.service.message_unread.MessageUnreadRequest;
 import com.bytedesk.service.message_unread.MessageUnreadResponse;
 import com.bytedesk.service.message_unread.MessageUnreadRestService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +58,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/visitor/api/v1")
+@RequestMapping("/visitor/api/v1/visitor")
+@Tag(name = "访客匿名管理", description = "访客匿名相关接口")
 public class VisitorRestControllerVisitor {
 
     private final VisitorRestService visitorRestService;

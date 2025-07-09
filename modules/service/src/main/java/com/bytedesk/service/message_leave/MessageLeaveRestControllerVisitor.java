@@ -23,15 +23,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/visitor/api/v1/message/leave")
 @AllArgsConstructor
+@Tag(name = "留言消息匿名管理", description = "留言消息匿名相关接口")
 public class MessageLeaveRestControllerVisitor {
 
     private final MessageLeaveRestService messageLeaveService;
 
     @PostMapping("/create")
+    @Operation(summary = "创建留言消息")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveService.create(request);
@@ -41,6 +45,7 @@ public class MessageLeaveRestControllerVisitor {
 
     // TODO: 访客端拉取留言列表
     @PostMapping("/query")
+    @Operation(summary = "查询留言消息")
     public ResponseEntity<?> query(@RequestBody MessageLeaveRequest request) {
        
         Page<MessageLeaveResponse> response = messageLeaveService.queryByUser(request);
@@ -50,6 +55,7 @@ public class MessageLeaveRestControllerVisitor {
 
     // TODO: confirm
     @PostMapping("/confirm")
+    @Operation(summary = "确认留言消息")
     public ResponseEntity<?> confirm(@RequestBody MessageLeaveRequest request) {
        
         // MessageLeaveResponse response = messageLeaveService.confirm(request);
@@ -59,6 +65,7 @@ public class MessageLeaveRestControllerVisitor {
 
     // TODO: reject
     @PostMapping("/reject")
+    @Operation(summary = "拒绝留言消息")
     public ResponseEntity<?> reject(@RequestBody MessageLeaveRequest request) {
        
         // MessageLeaveResponse response = messageLeaveService.reject(request);

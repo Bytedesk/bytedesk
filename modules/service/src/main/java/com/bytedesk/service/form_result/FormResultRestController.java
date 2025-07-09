@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:01:16
+ * @LastEditTime: 2025-07-09 23:17:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,18 +24,22 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/form/result")
 @AllArgsConstructor
+@Tag(name = "Form Result Management", description = "Form result management APIs for handling form submissions")
 public class FormResultRestController extends BaseRestController<FormResultRequest> {
 
     private final FormResultRestService tagRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
+    @Operation(summary = "Query Form Results by Organization", description = "Retrieve form results for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(FormResultRequest request) {
         
@@ -45,6 +49,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     }
 
     @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
+    @Operation(summary = "Query Form Results by User", description = "Retrieve form results for the current user")
     @Override
     public ResponseEntity<?> queryByUser(FormResultRequest request) {
         
@@ -54,6 +59,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     }
 
     @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @Operation(summary = "Query Form Result by UID", description = "Retrieve a specific form result by UID")
     @Override
     public ResponseEntity<?> queryByUid(FormResultRequest request) {
         
@@ -63,6 +69,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     }
 
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @Operation(summary = "Create Form Result", description = "Create a new form result entry")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(FormResultRequest request) {
@@ -73,6 +80,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     }
 
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @Operation(summary = "Update Form Result", description = "Update an existing form result entry")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(FormResultRequest request) {
@@ -83,6 +91,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     }
 
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @Operation(summary = "Delete Form Result", description = "Delete a form result entry")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(FormResultRequest request) {
@@ -93,6 +102,7 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     }
 
     @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @Operation(summary = "Export Form Results", description = "Export form results to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
