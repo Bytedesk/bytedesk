@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 15:09:47
+ * @LastEditTime: 2025-07-10 14:03:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,11 +37,10 @@ public class ThreadSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder,request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
-
+            
             // 仅当mergeByTopic为true时才应用topic合并逻辑
             if (Boolean.TRUE.equals(request.getMergeByTopic())) {
                 // 创建子查询获取每个topic的最新记录的updatedAt时间
@@ -113,6 +112,8 @@ public class ThreadSpecification extends BaseSpecification {
                             criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.toString())));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
                     predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.toString()));
+                } else if (TypeConsts.COMPONENT_TYPE_CHANNEL.equals(request.getComponentType())) {
+                    
                 }
             } else if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
