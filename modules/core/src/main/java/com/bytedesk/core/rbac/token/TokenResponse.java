@@ -49,7 +49,7 @@ public class TokenResponse extends BaseResponse {
 
     private String revokeReason;
 
-    private String client;
+    private String channel;
 
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;

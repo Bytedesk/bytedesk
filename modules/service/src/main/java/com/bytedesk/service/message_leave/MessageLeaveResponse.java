@@ -80,7 +80,7 @@ public class MessageLeaveResponse extends BaseResponse {
     // private ThreadResponse thread;
 
     // 客户来源渠道（如：网站、APP、小程序等）
-    private String client;
+    private String channel;
     
     // 设备信息（浏览器、APP版本等）
     private String deviceInfo;

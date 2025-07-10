@@ -229,7 +229,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
             excel.setRobotNickname(response.getThread().getRobotProtobuf().getNickname());
             // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
             excel.setStatus(ThreadProcessStatusEnum.fromValue(response.getThread().getStatus()).toChineseDisplay());
-            excel.setClient(ChannelEnum.fromValue(response.getThread().getClient()).toChineseDisplay());
+            excel.setChannel(ChannelEnum.fromValue(response.getThread().getChannel()).toChineseDisplay());
         }
         
         // 人工客服相关

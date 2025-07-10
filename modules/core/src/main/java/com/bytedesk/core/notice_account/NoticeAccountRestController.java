@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -31,52 +31,52 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/channel")
 // @Tag(name = "channel - 频道", description = "channel apis")
-public class ChannelRestController extends BaseRestController<ChannelRequest> {
+public class NoticeAccountRestController extends BaseRestController<NoticeAccountRequest> {
 
-    private final ChannelRestService channelService;
+    private final NoticeAccountRestService channelService;
 
     @Override
-    public ResponseEntity<?> queryByOrg(ChannelRequest request) {
+    public ResponseEntity<?> queryByOrg(NoticeAccountRequest request) {
         
-        Page<ChannelResponse> channelPage = channelService.queryByOrg(request);
+        Page<NoticeAccountResponse> channelPage = channelService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(channelPage));
     }
 
     @Override
-    public ResponseEntity<?> queryByUser(ChannelRequest request) {
+    public ResponseEntity<?> queryByUser(NoticeAccountRequest request) {
         
-        Page<ChannelResponse> channelPage = channelService.queryByUser(request);
+        Page<NoticeAccountResponse> channelPage = channelService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(channelPage));
     }
 
     @Override
-    public ResponseEntity<?> queryByUid(ChannelRequest request) {
+    public ResponseEntity<?> queryByUid(NoticeAccountRequest request) {
         
-        ChannelResponse channelResponse = channelService.queryByUid(request);
+        NoticeAccountResponse channelResponse = channelService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(channelResponse));
     }
 
     @Override
-    public ResponseEntity<?> create(ChannelRequest request) {
+    public ResponseEntity<?> create(NoticeAccountRequest request) {
         
-        ChannelResponse channelResponse = channelService.create(request);
+        NoticeAccountResponse channelResponse = channelService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(channelResponse));
     }
 
     @Override
-    public ResponseEntity<?> update(ChannelRequest request) {
+    public ResponseEntity<?> update(NoticeAccountRequest request) {
         
-        ChannelResponse channelResponse = channelService.update(request);
+        NoticeAccountResponse channelResponse = channelService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(channelResponse));
     }
 
     @Override
-    public ResponseEntity<?> delete(ChannelRequest request) {
+    public ResponseEntity<?> delete(NoticeAccountRequest request) {
         
         channelService.delete(request);
 
@@ -84,7 +84,7 @@ public class ChannelRestController extends BaseRestController<ChannelRequest> {
     }
 
     @Override
-    public Object export(ChannelRequest request, HttpServletResponse response) {
+    public Object export(NoticeAccountRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }

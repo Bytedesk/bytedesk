@@ -57,7 +57,7 @@ public class VisitorExcel extends BaseExcel {
     
     @ExcelProperty(value = "客户端")
     @ColumnWidth(20)
-    private String client;
+    private String channel;
     
     // @ExcelProperty(value = "状态")
     // @ColumnWidth(20)

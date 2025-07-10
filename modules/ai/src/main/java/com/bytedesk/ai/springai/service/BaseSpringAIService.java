@@ -129,7 +129,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 String answer = robot.getLlm().getDefaultReply();
                 messageProtobufReply.setType(MessageTypeEnum.TEXT);
                 messageProtobufReply.setContent(answer);
-                messageProtobufReply.setClient(ChannelEnum.SYSTEM);
+                messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
                 
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, true);
@@ -150,7 +150,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 String answer = firstFaq.toJson();
                 messageProtobufReply.setType(MessageTypeEnum.FAQ_ANSWER);
                 messageProtobufReply.setContent(answer);
-                messageProtobufReply.setClient(ChannelEnum.SYSTEM);
+                messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
                 
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, false);
@@ -518,7 +518,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             String answer = robot.getLlm().getDefaultReply();
             messageProtobufReply.setType(MessageTypeEnum.TEXT);
             messageProtobufReply.setContent(answer);
-            messageProtobufReply.setClient(ChannelEnum.SYSTEM);
+            messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
             
             // 保存消息到数据库
             persistMessage(messageProtobufQuery, messageProtobufReply, true);
@@ -705,7 +705,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufReply, Boolean isUnanswered, SseEmitter emitter) {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(answer);
-        messageProtobufReply.setClient(ChannelEnum.SYSTEM);
+        messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
         log.info("BaseSpringAIService processAnswerMessage messageProtobufReply {}", messageProtobufReply);
         // 保存消息到数据库
         persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);

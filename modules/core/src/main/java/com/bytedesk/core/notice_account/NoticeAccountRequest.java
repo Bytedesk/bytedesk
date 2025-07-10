@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
 import com.bytedesk.core.base.BaseRequestNoOrg;
 
@@ -28,7 +28,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChannelRequest extends BaseRequestNoOrg {
+public class NoticeAccountRequest extends BaseRequestNoOrg {
     
     private String topic;
     

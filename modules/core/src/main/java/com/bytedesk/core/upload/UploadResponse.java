@@ -37,7 +37,7 @@ public class UploadResponse extends BaseResponse {
 
     private String fileType;
 
-    private ChannelEnum client;
+    private ChannelEnum channel;
 
     private UploadTypeEnum type;
 

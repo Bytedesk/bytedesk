@@ -129,5 +129,5 @@ public class QueueMemberExcel extends BaseExcel {
 
     @ExcelProperty(value = "客户端")
     @ColumnWidth(20)
-    private String client;
+    private String channel;
 }

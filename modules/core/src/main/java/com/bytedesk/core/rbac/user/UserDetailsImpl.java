@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:05:34
+ * @LastEditTime: 2025-07-10 10:33:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class UserDetailsImpl implements UserDetails {
     private Boolean emailVerified;
     private Boolean mobileVerified;
     private String platform;
-    private String client;
+    private String channel;
     private String device;
     // 
     private String orgUid;
@@ -81,7 +81,7 @@ public class UserDetailsImpl implements UserDetails {
             Boolean emailVerified,
             Boolean mobileVerified,
             String platform,
-            String client,
+            String channel,
             String device,
             String orgUid,
             ZonedDateTime createdAt,
@@ -109,7 +109,7 @@ public class UserDetailsImpl implements UserDetails {
         this.emailVerified = emailVerified;
         this.mobileVerified = mobileVerified;
         this.platform = platform;
-        this.client = client;
+        this.channel = channel;
         this.device = device;
         this.orgUid = orgUid;
         this.createdAt = createdAt;

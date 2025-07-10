@@ -32,9 +32,9 @@ public class WorkgroupSpecification extends BaseSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
             //
-            // if (StringUtils.hasText(request.getClient())) {
+            // if (StringUtils.hasText(request.getChannel())) {
             // predicates.add(criteriaBuilder.like(root.get("client"), "%" +
-            // request.getClient() + "%"));
+            // request.getChannel() + "%"));
             // }
             // status == null, 报错
             // if (StringUtils.hasText(request.getStatus().name())) {

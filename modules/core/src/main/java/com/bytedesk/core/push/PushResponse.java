@@ -47,7 +47,7 @@ public class PushResponse extends BaseResponse {
 
     private PushStatusEnum status;
 
-    private String client;
+    private String channel;
 
     // private PlatformEnum platform;
 

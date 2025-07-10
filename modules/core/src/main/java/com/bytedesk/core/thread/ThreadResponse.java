@@ -86,7 +86,7 @@ public class ThreadResponse extends BaseResponse {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
-    private String client;
+    private String channel;
 
     private String extra;
 

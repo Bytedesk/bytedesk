@@ -75,8 +75,8 @@ public class QueueMemberSpecification extends BaseSpecification {
             }
             
             // 根据client查询
-            if (StringUtils.hasText(request.getClient())) {
-                predicates.add(criteriaBuilder.like(root.get("thread").get("client"), "%" + request.getClient() + "%"));
+            if (StringUtils.hasText(request.getChannel())) {
+                predicates.add(criteriaBuilder.like(root.get("thread").get("client"), "%" + request.getChannel() + "%"));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

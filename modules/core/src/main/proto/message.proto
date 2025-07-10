@@ -49,7 +49,7 @@ message Message {
     // 时间戳
     string createdAt = 5;
     // 消息来源客户端
-    string client = 6;
+    string channel = 6;
     // 会话
     Thread thread = 7;
     // 发送者

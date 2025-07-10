@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 09:49:35
+ * @LastEditTime: 2025-07-10 10:16:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ import jakarta.persistence.Convert;
 
 @MappedSuperclass
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -124,7 +124,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default
-    private String client = ClientEnum.WEB.name();
+    private String channel = ChannelEnum.WEB.name();
 
     @Builder.Default
     @Column(name = "thread_extra", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)   

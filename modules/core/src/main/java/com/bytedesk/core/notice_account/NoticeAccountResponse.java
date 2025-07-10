@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -28,7 +28,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChannelResponse extends BaseResponse {
+public class NoticeAccountResponse extends BaseResponse {
     
     // private String cid;
 

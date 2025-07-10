@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 17:16:21
+ * @LastEditTime: 2025-07-10 10:38:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,7 +44,7 @@ public class ThreadProtobuf implements Serializable {
 
     private UserProtobuf user;
 
-    private ChannelEnum client;
+    private ChannelEnum channel;
 
     private String extra;
 
@@ -117,11 +117,11 @@ public class ThreadProtobuf implements Serializable {
     }
 
     public Boolean isWeChatMp() {
-        return ChannelEnum.WECHAT_MP.equals(getClient());
+        return ChannelEnum.WECHAT_MP.equals(getChannel());
     }
 
     public Boolean isWeChatMini() {
-        return ChannelEnum.WECHAT_MINI.equals(getClient());
+        return ChannelEnum.WECHAT_MINI.equals(getChannel());
     }
 
     // public static ThreadProtobuf fromEntity(ThreadEntity thread) {

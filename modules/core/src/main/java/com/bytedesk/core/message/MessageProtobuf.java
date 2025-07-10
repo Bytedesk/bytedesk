@@ -57,7 +57,7 @@ public class MessageProtobuf implements Serializable {
 
 	private ZonedDateTime createdAt;
 
-	private ChannelEnum client;
+	private ChannelEnum channel;
 
 	private ThreadProtobuf thread;
 

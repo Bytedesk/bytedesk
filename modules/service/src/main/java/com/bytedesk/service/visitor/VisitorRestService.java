@@ -124,7 +124,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         }
         // 如果用户不存在，则创建新用户
         if (!StringUtils.hasText(request.getAvatar())) {
-            request.setAvatar(getAvatar(request.getClient()));
+            request.setAvatar(getAvatar(request.getChannel()));
         }
         // uid使用自动生成的uid，防止前端uid冲突
         request.setUid(uidUtils.getUid());
@@ -295,7 +295,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     public VisitorExcel convertToExcel(VisitorEntity entity) {
         // return VisitorExcelConverter.convert(entity);
         VisitorExcel excel = modelMapper.map(entity, VisitorExcel.class);
-        excel.setClient(ChannelEnum.toChineseDisplay(entity.getClient()));
+        excel.setChannel(ChannelEnum.toChineseDisplay(entity.getChannel()));
         return excel;
     }
 

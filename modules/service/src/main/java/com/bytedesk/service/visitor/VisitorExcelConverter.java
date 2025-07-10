@@ -48,8 +48,8 @@ package com.bytedesk.service.visitor;
 //         excel.setEmail(response.getEmail());
 //         excel.setNote(response.getNote());
 //         // 客户端信息处理
-//         if (response.getClient() != null) {
-//             excel.setClient(response.getClient().name());
+//         if (response.getChannel() != null) {
+//             excel.setChannel(response.getChannel().name());
 //         }
 //         // excel.setStatus(response.getStatus());
 //         // 标签列表转换为字符串

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 15:46:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:33:33
+ * @LastEditTime: 2025-07-10 10:40:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ public class RobotMessageUtils {
                         .status(MessageStatusEnum.SUCCESS)
                         .thread(thread)
                         .user(robot.toUserProtobuf())
-                        .client(ChannelEnum.SYSTEM)
+                        .channel(ChannelEnum.SYSTEM)
                         .extra(messageProtobuf.getExtra())
                         .createdAt(BdDateUtils.now())
                         .build();
@@ -55,7 +55,7 @@ public class RobotMessageUtils {
         // .status(MessageStatusEnum.SUCCESS)
         // .thread(threadProtobuf)
         // .user(user)
-        // .client(ClientEnum.ROBOT)
+        // .channel(ChannelEnum.ROBOT)
         // .extra(JSONObject.toJSONString(extraObject))
         // .createdAt(BdDateUtils.now())
         // .build();

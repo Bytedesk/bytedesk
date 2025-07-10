@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 11:41:28
+ * @LastEditTime: 2025-07-10 10:30:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -75,9 +75,9 @@ public abstract class BaseRequest implements Serializable {
     protected String content;
 
     /**
-     * 客户端标识
+     * 来源
      */
-    protected String client;
+    protected String channel;
 
     /**
      * 用户唯一标识

@@ -55,7 +55,7 @@ public class ThreadExcel extends BaseExcel {
     // client
     @ExcelProperty(value = "客户端")
     @ColumnWidth(20)
-    private String client;
+    private String channel;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)

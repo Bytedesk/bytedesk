@@ -47,7 +47,7 @@ public class QueueIntegrationTest {
         initRequest.setNickname("Visitor Test");
         initRequest.setOrgUid(ORG_UID);
         initRequest.setType(TYPE);
-        initRequest.setClient(ChannelEnum.TEST.name());
+        initRequest.setChannel(ChannelEnum.TEST.name());
         initRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
         initRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
         initRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
@@ -94,7 +94,7 @@ public class QueueIntegrationTest {
         threadRequest.setUid(visitor.getUid());
         threadRequest.setOrgUid(ORG_UID);
         threadRequest.setType(TYPE);
-        threadRequest.setClient(ChannelEnum.TEST.name());
+        threadRequest.setChannel(ChannelEnum.TEST.name());
         threadRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
         threadRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
         threadRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
@@ -132,7 +132,7 @@ public class QueueIntegrationTest {
                     initRequest.setNickname("Visitor Test " + index);
                     initRequest.setOrgUid(ORG_UID);
                     initRequest.setType(TYPE);
-                    initRequest.setClient(ChannelEnum.TEST.name());
+                    initRequest.setChannel(ChannelEnum.TEST.name());
                     initRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
                     initRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
                     initRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");
@@ -168,7 +168,7 @@ public class QueueIntegrationTest {
                         threadRequest.setUid(visitor.getUid());
                         threadRequest.setOrgUid(ORG_UID);
                         threadRequest.setType(TYPE);
-                        threadRequest.setClient(ChannelEnum.TEST.name());
+                        threadRequest.setChannel(ChannelEnum.TEST.name());
                         threadRequest.setBrowser("{\"name\":\"Chrome\",\"version\":\"131.0.0.0\",\"major\":\"131\"}");
                         threadRequest.setDevice("{\"name\":\"iPhone\",\"version\":\"13.5\"}");
                         threadRequest.setOs("{\"name\":\"Mac OS\",\"version\":\"10.15.7\"}");

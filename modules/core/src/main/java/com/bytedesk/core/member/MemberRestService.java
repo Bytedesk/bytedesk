@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:24:11
+ * @LastEditTime: 2025-07-10 10:30:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -490,7 +490,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         reverseThread.setType(thread.getType());
         // TODO: 同事私聊被动方默认不显示会话，直到收到一条消息
         // reverseThread.setHide(true);
-        reverseThread.setClient(ChannelEnum.SYSTEM.name());
+        reverseThread.setChannel(ChannelEnum.SYSTEM.name());
         reverseThread.setOrgUid(thread.getOrgUid());
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
 

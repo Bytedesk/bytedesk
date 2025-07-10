@@ -33,7 +33,7 @@ message Thread {
     // 头像昵称等信息
     User user = 5;
     // 会话来源客户端
-    string client = 6;
+    string channel = 6;
     // 自定义扩展/附加信息
     string extra = 7;
 }

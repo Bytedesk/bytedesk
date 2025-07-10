@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-08 14:09:16
+ * @LastEditTime: 2025-07-10 10:29:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -178,7 +178,7 @@ public class TicketEntity extends BaseEntity {
     /**
      * Client platform from which the ticket was created
      */
-    private String client;
+    private String channel;
 
     /**
      * User who created the ticket

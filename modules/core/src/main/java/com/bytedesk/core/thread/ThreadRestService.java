@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 16:20:07
+ * @LastEditTime: 2025-07-10 10:27:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -200,7 +200,7 @@ public class ThreadRestService
         log.info("request {}, user {}", request.toString(), user);
         thread.setUser(user);
         //
-        thread.setClient(request.getClient());
+        thread.setChannel(request.getChannel());
         thread.setOwner(owner);
         thread.setOrgUid(owner.getOrgUid());
         //
@@ -226,7 +226,7 @@ public class ThreadRestService
                 .topic(topic)
                 .unreadCount(0)
                 .status(ThreadProcessStatusEnum.CHATTING.name())
-                .client(ChannelEnum.SYSTEM.name())
+                .channel(ChannelEnum.SYSTEM.name())
                 .user(user)
                 .owner(owner)
                 .orgUid(orgUid)
@@ -277,7 +277,7 @@ public class ThreadRestService
                 .topic(topic)
                 .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
-                .client(ChannelEnum.SYSTEM.name())
+                .channel(ChannelEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(userSimple.toJson())
                 .userUid(user.getUid())
@@ -293,7 +293,7 @@ public class ThreadRestService
     }
 
     // 系统通知会话：system/{user_uid}
-    public ThreadResponse createSystemChannelThread(UserEntity user) {
+    public ThreadResponse createSystemNoticeAccountThread(UserEntity user) {
         //
         String topic = TopicUtils.getSystemTopic(user.getUid());
         //
@@ -310,7 +310,7 @@ public class ThreadRestService
                 .topic(topic)
                 .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
-                .client(ChannelEnum.SYSTEM.name())
+                .channel(ChannelEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(userSimple.toJson())
                 .userUid(user.getUid())
@@ -808,8 +808,8 @@ public class ThreadRestService
                 if (entity.getTagList() != null && !entity.getTagList().isEmpty()) {
                     latestEntity.setTagList(entity.getTagList());
                 }
-                // if (entity.getClient() != null) {
-                // latestEntity.setClient(entity.getClient());
+                // if (entity.getChannel() != null) {
+                // latestEntity.setChannel(entity.getChannel());
                 // }
                 if (entity.getExtra() != null) {
                     latestEntity.setExtra(entity.getExtra());
@@ -926,8 +926,8 @@ public class ThreadRestService
         }
 
         // 将client转换为中文
-        if (StringUtils.hasText(entity.getClient())) {
-            excel.setClient(ChannelEnum.toChineseDisplay(entity.getClient()));
+        if (StringUtils.hasText(entity.getChannel())) {
+            excel.setChannel(ChannelEnum.toChineseDisplay(entity.getChannel()));
         }
 
         // 将status转换为中文
@@ -955,7 +955,7 @@ public class ThreadRestService
     // .topic(topic)
     // .unreadCount(0)
     // .state(ThreadStateEnum.STARTED.name())
-    // .client(ClientEnum.SYSTEM.name())
+    // .channel(ChannelEnum.SYSTEM.name())
     // .user(JSON.toJSONString(userSimple))
     // .owner(user)
     // .build();

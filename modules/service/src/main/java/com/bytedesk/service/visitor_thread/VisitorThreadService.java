@@ -128,7 +128,7 @@ public class VisitorThreadService
                 .user(user)
                 .workgroup(workgroupString)
                 .extra(extra)
-                .client(visitorRequest.getClient())
+                .channel(visitorRequest.getChannel())
                 .orgUid(workgroup.getOrgUid())
                 .build();
         // 保存
@@ -193,7 +193,7 @@ public class VisitorThreadService
                 .owner(owner) // 使用安全获取的owner值
                 .user(visitor)
                 .extra(extra)
-                .client(visitorRequest.getClient())
+                .channel(visitorRequest.getChannel())
                 .orgUid(orgUid)
                 .build();
         //
@@ -235,7 +235,7 @@ public class VisitorThreadService
                 .robot(robotString) // 机器人
                 .userUid(robot.getUid()) // 机器人uid
                 .user(visitor)
-                .client(visitorRequest.getClient())
+                .channel(visitorRequest.getChannel())
                 .orgUid(robot.getOrgUid())
                 .extra(extra)
                 .build();

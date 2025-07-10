@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:30:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:49:28
+ * @LastEditTime: 2025-07-10 10:20:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ import com.bytedesk.core.enums.ChannelEnum;
  */
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -62,5 +62,5 @@ public class PushEntity extends BaseEntity {
     private String status = PushStatusEnum.PENDING.name();
 
     @Builder.Default
-    private String client = ClientEnum.WEB.name();
+    private String channel = ChannelEnum.WEB.name();
 }

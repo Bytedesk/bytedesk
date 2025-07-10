@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 17:05:13
+ * @LastEditTime: 2025-07-10 10:38:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -131,11 +131,11 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     public Boolean isWeChatMp() {
-        return ChannelEnum.WECHAT_MP.name().equals(getClient());
+        return ChannelEnum.WECHAT_MP.name().equals(getChannel());
     }
 
     public Boolean isWeChatMini() {
-        return ChannelEnum.WECHAT_MINI.name().equals(getClient());
+        return ChannelEnum.WECHAT_MINI.name().equals(getChannel());
     }
 
     // ---------------------------

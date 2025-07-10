@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 14:25:10
+ * @LastEditTime: 2025-07-10 10:21:32
  * @Description: 消息实体抽象基类，用于统一所有消息类型的字段结构
  */
 package com.bytedesk.core.message;
@@ -25,7 +25,7 @@ import lombok.ToString;
 
 @MappedSuperclass
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -54,7 +54,7 @@ public abstract class AbstractMessageEntity extends BaseEntity {
 
     // 消息来源，用于区分消息是来自web、android还是ios等
     @Builder.Default
-    private String client = ClientEnum.WEB.name();
+    private String channel = ChannelEnum.WEB.name();
 
     /**
      * sender信息的JSON表示

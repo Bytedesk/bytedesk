@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-04-28 11:19:41
+ * @Date: 2024-04-26 21:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-25 10:27:36
+ * @LastEditTime: 2025-03-24 12:49:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,20 +11,15 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
-import org.springframework.stereotype.Component;
+import java.util.Optional;
 
-import jakarta.persistence.PostPersist;
-// import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-// @Slf4j
-@Component
-public class ChannelEntityListener {
-
-    @PostPersist
-    public void onPostPersist(ChannelEntity channel) {
-        // log.info("onPostPersist: {}", channel.getNickname());
-    }
-
+public interface NoticeAccountRepository extends JpaRepository<NoticeAccountEntity, Long> {
+    
+    Optional<NoticeAccountEntity> findByUid(String uid);
+    
+    Boolean existsByUid(String uid);
 }

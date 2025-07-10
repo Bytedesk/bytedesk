@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:34:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:45:08
+ * @LastEditTime: 2025-07-10 10:26:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,10 +11,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
-import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.persistence.Entity;
@@ -38,9 +37,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({ ChannelEntityListener.class })
-@Table(name = "bytedesk_core_channel")
-public class ChannelEntity extends BaseEntityNoOrg {
+@EntityListeners({ NoticeAccountEntityListener.class })
+@Table(name = "bytedesk_core_notice_account")
+public class NoticeAccountEntity extends BaseEntityNoOrg {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,8 +50,7 @@ public class ChannelEntity extends BaseEntityNoOrg {
 
     private String nickname;
 
-    @Builder.Default
-    private String avatar = AvatarConsts.getDefaultAvatarUrl();
+    private String avatar;
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;

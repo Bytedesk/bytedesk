@@ -159,7 +159,7 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
-    private String client;  // 客户来源渠道
+    private String channel;  // 客户来源渠道
 
     // 排队用户信息
     @Builder.Default

@@ -42,7 +42,7 @@ public class UploadExcel extends BaseExcel {
 
     @ExcelProperty(value = "客户端")
     @ColumnWidth(15)
-    private String client;
+    private String channel;
 
     @ExcelProperty(value = "上传类型")
     @ColumnWidth(15)

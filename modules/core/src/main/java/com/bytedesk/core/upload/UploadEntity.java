@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 10:46:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 16:20:56
+ * @LastEditTime: 2025-07-10 10:21:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -73,7 +73,7 @@ public class UploadEntity extends BaseEntity {
      * Client platform from which the file was uploaded (WEB, MOBILE, etc.)
      */
     @Builder.Default
-    private String client = ClientEnum.WEB.name();
+    private String channel = ChannelEnum.WEB.name();
 
     /**
      * Type of upload (LLM, IMAGE, DOCUMENT, etc.)

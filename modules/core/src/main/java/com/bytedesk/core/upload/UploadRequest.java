@@ -38,7 +38,7 @@ public class UploadRequest extends BaseRequest {
 
     private String fileType;
 
-    private String client;
+    private String channel;
 
     private String user;
 

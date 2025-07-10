@@ -316,7 +316,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
                 // .agent(user) // 客服会话的创建者是客服
                 .userUid(owner.getUid())
                 .owner(owner)
-                .client(ticket.getClient())
+                .channel(ticket.getChannel())
                 .orgUid(ticket.getOrgUid())
                 .build();
         //

@@ -79,7 +79,7 @@ public class VisitorEntity extends BaseEntity {
 	private String note = BytedeskConsts.EMPTY_STRING;
 
 	@Builder.Default
-	private String client = ClientEnum.WEB.name();
+	private String channel = ChannelEnum.WEB.name();
 
 	@Builder.Default
 	private String status = VisitorStatusEnum.ONLINE.name();

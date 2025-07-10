@@ -61,8 +61,8 @@ public class VisitorResponse extends BaseResponse {
 	private String note;
 
 	// from source
-	// private String client;
-	private ChannelEnum client;
+	// private String channel;
+	private ChannelEnum channel;
 
 	// private ZonedDateTime updatedAt;
 

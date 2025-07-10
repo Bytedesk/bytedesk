@@ -51,7 +51,7 @@ public class AuthRequest extends BaseRequest {
     private String deviceUid;
     
     // 客户端类型 WEB, ANDROID, IOS 等
-    private String client;
+    private String channel;
     
     // 设备信息
     private String device;

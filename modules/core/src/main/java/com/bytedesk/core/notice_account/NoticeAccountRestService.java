@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:06:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:19:35
+ * @LastEditTime: 2025-07-10 10:18:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
 import java.util.Optional;
 
@@ -29,25 +29,23 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRequest, ChannelResponse> {
+public class NoticeAccountRestService extends BaseRestService<NoticeAccountEntity, NoticeAccountRequest, NoticeAccountResponse> {
 
-    private final ChannelRepository channelRepository;
+    private final NoticeAccountRepository channelRepository;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
-    // private final AuthService authService;
-
     @Override
-    public Page<ChannelResponse> queryByOrg(ChannelRequest request) {
+    public Page<NoticeAccountResponse> queryByOrg(NoticeAccountRequest request) {
         Pageable pageable = request.getPageable();
-        Page<ChannelEntity> channelPage = channelRepository.findAll(pageable);
+        Page<NoticeAccountEntity> channelPage = channelRepository.findAll(pageable);
         return channelPage.map(channel -> convertToResponse(channel));
     }
 
     @Override
-    public Page<ChannelResponse> queryByUser(ChannelRequest request) {
+    public Page<NoticeAccountResponse> queryByUser(NoticeAccountRequest request) {
         // UserEntity user = authService.getUser();
         // if (user == null) {
         //     throw new RuntimeException("user is null");
@@ -57,7 +55,7 @@ public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRe
         return queryByOrg(request);
     }
 
-    public Optional<ChannelEntity> findByUid(String uid) {
+    public Optional<NoticeAccountEntity> findByUid(String uid) {
         return channelRepository.findByUid(uid);
     }
 
@@ -65,37 +63,34 @@ public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRe
         return channelRepository.existsByUid(uid);
     }
 
-    public ChannelResponse create(ChannelRequest request) {
+    public NoticeAccountResponse create(NoticeAccountRequest request) {
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
 
-        ChannelEntity channel = modelMapper.map(request, ChannelEntity.class);
+        NoticeAccountEntity channel = modelMapper.map(request, NoticeAccountEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             channel.setUid(uidUtils.getUid());
         }
 
         // 保存
-        ChannelEntity savedChannel = save(channel);
-        if (savedChannel == null) {
+        NoticeAccountEntity savedNoticeAccount = save(channel);
+        if (savedNoticeAccount == null) {
             throw new RuntimeException("channel is null");
         }
 
-        return convertToResponse(savedChannel);
+        return convertToResponse(savedNoticeAccount);
     }
 
-
-
-
     @Override
-    public ChannelResponse update(ChannelRequest request) {
+    public NoticeAccountResponse update(NoticeAccountRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     @Override
-    public ChannelEntity save(ChannelEntity entity) {
+    public NoticeAccountEntity save(NoticeAccountEntity entity) {
         try {
             return doSave(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -107,15 +102,15 @@ public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRe
     }
 
     @Override
-    protected ChannelEntity doSave(ChannelEntity entity) {
+    protected NoticeAccountEntity doSave(NoticeAccountEntity entity) {
         return channelRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<ChannelEntity> optional = findByUid(uid);
+        Optional<NoticeAccountEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
-            ChannelEntity channel = optional.get();
+            NoticeAccountEntity channel = optional.get();
             channel.setDeleted(true);
             save(channel);
             // channelRepository.delete(optional.get());
@@ -123,19 +118,19 @@ public class ChannelRestService extends BaseRestService<ChannelEntity, ChannelRe
     }
 
     @Override
-    public void delete(ChannelRequest request) {
+    public void delete(NoticeAccountRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public ChannelEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
-            ChannelEntity entity) {
+    public NoticeAccountEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            NoticeAccountEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'handleOptimisticLockingFailureException'");
     }
 
     @Override
-    public ChannelResponse convertToResponse(ChannelEntity channel) {
-        return modelMapper.map(channel, ChannelResponse.class);
+    public NoticeAccountResponse convertToResponse(NoticeAccountEntity channel) {
+        return modelMapper.map(channel, NoticeAccountResponse.class);
     }
 }

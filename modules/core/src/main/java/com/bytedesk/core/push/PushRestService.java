@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:57:40
+ * @LastEditTime: 2025-07-10 10:30:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -141,7 +141,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         pushRequest.setSender(TypeConsts.TYPE_SYSTEM);
         pushRequest.setContent(code);
         // pushRequest.setReceiver(receiver);
-        // pushRequest.setClient(client);
+        // pushRequest.setChannel(client);
         // pushRequest.setPlatform(platform);
         pushRequest.setIp(ip);
         pushRequest.setIpLocation(ipLocation);
@@ -242,7 +242,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
 
         PushEntity push = modelMapper.map(pushRequest, PushEntity.class);
         push.setUid(uidUtils.getUid());
-        push.setClient(pushRequest.getClient());
+        push.setChannel(pushRequest.getChannel());
 
         PushEntity savedPush = save(push);
         if (savedPush == null) {

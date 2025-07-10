@@ -52,7 +52,7 @@ public class MessageUnreadEventListener {
                     MessageTypeEnum.SYSTEM.equals(message.getType())) {
                 return;
             }
-            if (ChannelEnum.SYSTEM.equals(message.getClient())) {
+            if (ChannelEnum.SYSTEM.equals(message.getChannel())) {
                 return;
             }
             // 删除已读消息

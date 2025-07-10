@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.channel;
+package com.bytedesk.core.notice_account;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.core.annotation.Order;
@@ -29,11 +29,11 @@ import lombok.AllArgsConstructor;
 @Component
 @Order(2)
 @AllArgsConstructor
-public class ChannelInitializer implements SmartInitializingSingleton {
+public class NoticeAccountInitializer implements SmartInitializingSingleton {
 
-    // private final ChannelRepository channelRepository;
+    // private final NoticeAccountRepository channelRepository;
 
-    private final ChannelRestService channelService;
+    private final NoticeAccountRestService channelService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -42,7 +42,7 @@ public class ChannelInitializer implements SmartInitializingSingleton {
 
     public void init() {
         // 初始化默认频道
-        ChannelRequest channelRequest = ChannelRequest.builder()
+        NoticeAccountRequest channelRequest = NoticeAccountRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_CHANNEL_UID)
                 .topic(TopicUtils.TOPIC_SYSTEM_NOTIFICATION)
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)

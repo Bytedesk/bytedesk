@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 10:33:21
+ * @LastEditTime: 2025-07-10 10:23:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,7 +44,7 @@ import com.bytedesk.core.utils.BdDateUtils;
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -80,7 +80,7 @@ public class TokenEntity extends BaseEntity {
     private String revokeReason;
 
     @Builder.Default
-    private String client = ClientEnum.WEB.name();
+    private String channel = ChannelEnum.WEB.name();
 
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;

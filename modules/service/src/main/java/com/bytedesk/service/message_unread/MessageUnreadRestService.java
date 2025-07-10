@@ -237,7 +237,7 @@ public class MessageUnreadRestService
                     .status(entity.getStatus())
                     .content(entity.getContent())
                     .extra(entity.getExtra())
-                    .client(entity.getClient())
+                    .channel(entity.getChannel())
                     .user(entity.getUser())
                     .userUid(entity.getUserUid())
                     .orgUid(entity.getOrgUid())

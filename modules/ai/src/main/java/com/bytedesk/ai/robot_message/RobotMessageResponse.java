@@ -51,8 +51,8 @@ public class RobotMessageResponse extends BaseResponse {
 	// private String status;
 	private MessageStatusEnum status;
 
-	// private String client;
-	private ChannelEnum client;
+	// private String channel;
+	private ChannelEnum channel;
 
 	private UserProtobuf user;
 

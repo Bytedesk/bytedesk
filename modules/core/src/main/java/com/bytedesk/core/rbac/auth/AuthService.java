@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 11:16:40
+ * @LastEditTime: 2025-07-10 10:33:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,14 +97,14 @@ public class AuthService {
 
     public AuthToken authenticationWithMobileAndPlatform(String mobile, String platform, String client, String device) {
         UserDetailsImpl userDetails = userDetailsService.loadUserByMobileAndPlatform(mobile, platform);
-        userDetails.setClient(client);
+        userDetails.setChannel(client);
         userDetails.setDevice(device);
         return new AuthToken(userDetails);
     }
 
     public AuthToken authenticationWithEmailAndPlatform(String email, String platform, String client, String device) {
         UserDetailsImpl userDetails = userDetailsService.loadUserByEmailAndPlatform(email, platform);
-        userDetails.setClient(client);
+        userDetails.setChannel(client);
         userDetails.setDevice(device);
         return new AuthToken(userDetails);
     }
@@ -120,10 +120,10 @@ public class AuthService {
         String accessToken = JwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
         
         // 登录成功后，将生成的accessToken同时保存到数据库中
-        String client = userDetails.getClient();
-        if (client == null || client.isEmpty()) {
+        String channel = userDetails.getChannel();
+        if (channel == null || channel.isEmpty()) {
             // 如果UserDetailsImpl中没有client信息，使用默认值
-            client = ChannelEnum.WEB.name();
+            channel = ChannelEnum.WEB.name();
         }
         
         String device = userDetails.getDevice();
@@ -139,12 +139,12 @@ public class AuthService {
             .accessToken(accessToken)
             .type(TokenTypeEnum.BEARER.name())
             .revoked(false)
-            .client(client)
+            .channel(channel)
             .device(device)
             .userUid(userDetails.getUid())
             .build();
         // 只有当client中含有web字样时，expiresAt有效期24小时，否则为365天
-        if (client.toLowerCase().contains("web")) {
+        if (channel.toLowerCase().contains("web")) {
             tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(30)); // 默认30天过期
         } else {
             tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(365)); // 其他客户端默认365天过期

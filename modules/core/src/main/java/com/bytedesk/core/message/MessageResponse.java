@@ -47,7 +47,7 @@ public class MessageResponse extends BaseResponse {
 
 	private String status;
 
-	private String client;
+	private String channel;
 
     private ThreadResponse thread;
 

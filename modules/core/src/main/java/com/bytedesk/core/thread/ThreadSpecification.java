@@ -230,8 +230,8 @@ public class ThreadSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("workgroup"), "%" + request.getWorkgroupNickname() + "%"));
             }
             //
-            if (StringUtils.hasText(request.getClient())) {
-                predicates.add(criteriaBuilder.equal(root.get("client"), request.getClient()));
+            if (StringUtils.hasText(request.getChannel())) {
+                predicates.add(criteriaBuilder.equal(root.get("client"), request.getChannel()));
             }
             // content
             if (StringUtils.hasText(request.getContent())) {

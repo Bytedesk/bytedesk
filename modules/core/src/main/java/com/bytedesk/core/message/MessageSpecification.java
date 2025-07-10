@@ -118,8 +118,8 @@ public class MessageSpecification extends BaseSpecification {
                 ));
             }
             //
-            if (StringUtils.hasText(request.getClient())) {
-                predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getClient() + "%"));
+            if (StringUtils.hasText(request.getChannel())) {
+                predicates.add(criteriaBuilder.like(root.get("client"), "%" + request.getChannel() + "%"));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

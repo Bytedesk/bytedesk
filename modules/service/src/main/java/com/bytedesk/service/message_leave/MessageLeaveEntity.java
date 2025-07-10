@@ -148,7 +148,7 @@ public class MessageLeaveEntity extends BaseEntity {
     /**
      * Customer source channel such as website, mobile app, mini-program, etc.
      */
-    private String client;
+    private String channel;
     
     /**
      * Customer device information including browser and app version

@@ -49,7 +49,7 @@ public abstract class BaseRequestNoOrg implements Serializable {
 
     protected String content;
 
-    protected String client;
+    protected String channel;
 
     // platform: 只有超级管理员才有权限
     // organization: 管理员才有权限
