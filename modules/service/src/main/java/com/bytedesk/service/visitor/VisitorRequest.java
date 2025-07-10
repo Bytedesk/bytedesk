@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 15:07:46
+ * @LastEditTime: 2025-07-10 16:23:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,16 +108,13 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Integer vipLevel = 0;
 
-	// wechat extra
-	private String weChatThreadExtra;
-
-	private String metaThreadExtra;
-	
-	// telegram extra
-	private String telegramThreadExtra;
-	
-	// whatsapp extra
-	private String whatsappThreadExtra;
+	/**
+	 * 判断是否为社交渠道（微信、Meta、Telegram、WhatsApp）
+	 * @return true 如果为社交渠道，否则为 false
+	 */
+	public Boolean isSocial() {
+		return isWeChat() || isMeta() || isTelegram() || isWhatsApp();
+	}
 	
 	public Boolean isWeChat() {
 		// 忽略大小写

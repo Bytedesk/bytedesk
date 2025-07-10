@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 15:48:16
+ * @LastEditTime: 2025-07-10 16:20:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,20 +108,13 @@ public class VisitorThreadService
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         //
         String extra = "";
-        // 处理微信相关额外信息
-        if (visitorRequest.isWeChat()) {
-            extra = visitorRequest.getWeChatThreadExtra();
-        } else if (visitorRequest.isMeta()) {
-            extra = visitorRequest.getMetaThreadExtra();
-        } else if (visitorRequest.isTelegram()) {
-            extra = visitorRequest.getTelegramThreadExtra();
-        } else if (visitorRequest.isWhatsApp()) {
-            extra = visitorRequest.getWhatsappThreadExtra();
+        // 处理渠道相关额外信息
+        if (visitorRequest.isSocial()) {
+            extra = visitorRequest.getExtra();
         } else {
             extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
         }
-
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -144,18 +137,9 @@ public class VisitorThreadService
     public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         //
-        if (visitorRequest.isWeChat()) {
-            String weChatExtra = visitorRequest.getWeChatThreadExtra();
-            thread.setExtra(weChatExtra);
-        } else if (visitorRequest.isMeta()) {
-            String metaExtra = visitorRequest.getMetaThreadExtra();
-            thread.setExtra(metaExtra);
-        } else if (visitorRequest.isTelegram()) {
-            String telegramExtra = visitorRequest.getTelegramThreadExtra();
-            thread.setExtra(telegramExtra);
-        } else if (visitorRequest.isWhatsApp()) {
-            String whatsappExtra = visitorRequest.getWhatsappThreadExtra();
-            thread.setExtra(whatsappExtra);
+        if (visitorRequest.isSocial()) {
+            String threadExtra = visitorRequest.getExtra();
+            thread.setExtra(threadExtra);
         } else {
             String extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
