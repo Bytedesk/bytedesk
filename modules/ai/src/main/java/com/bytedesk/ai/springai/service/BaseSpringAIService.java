@@ -21,7 +21,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
@@ -129,7 +129,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 String answer = robot.getLlm().getDefaultReply();
                 messageProtobufReply.setType(MessageTypeEnum.TEXT);
                 messageProtobufReply.setContent(answer);
-                messageProtobufReply.setClient(ClientEnum.SYSTEM);
+                messageProtobufReply.setClient(ChannelEnum.SYSTEM);
                 
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, true);
@@ -150,7 +150,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 String answer = firstFaq.toJson();
                 messageProtobufReply.setType(MessageTypeEnum.FAQ_ANSWER);
                 messageProtobufReply.setContent(answer);
-                messageProtobufReply.setClient(ClientEnum.SYSTEM);
+                messageProtobufReply.setClient(ChannelEnum.SYSTEM);
                 
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, false);
@@ -518,7 +518,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             String answer = robot.getLlm().getDefaultReply();
             messageProtobufReply.setType(MessageTypeEnum.TEXT);
             messageProtobufReply.setContent(answer);
-            messageProtobufReply.setClient(ClientEnum.SYSTEM);
+            messageProtobufReply.setClient(ChannelEnum.SYSTEM);
             
             // 保存消息到数据库
             persistMessage(messageProtobufQuery, messageProtobufReply, true);
@@ -705,7 +705,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageProtobuf messageProtobufReply, Boolean isUnanswered, SseEmitter emitter) {
         messageProtobufReply.setType(type);
         messageProtobufReply.setContent(answer);
-        messageProtobufReply.setClient(ClientEnum.SYSTEM);
+        messageProtobufReply.setClient(ChannelEnum.SYSTEM);
         log.info("BaseSpringAIService processAnswerMessage messageProtobufReply {}", messageProtobufReply);
         // 保存消息到数据库
         persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);

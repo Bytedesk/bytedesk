@@ -44,7 +44,7 @@
         <springdoc.version>2.8.8</springdoc.version>
         <spring-ai.version>1.0.0</spring-ai.version>
 		<spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
-        <revision>0.8.6</revision>
+        <revision>0.8.7</revision>
     </properties>
 
     <dependencies>

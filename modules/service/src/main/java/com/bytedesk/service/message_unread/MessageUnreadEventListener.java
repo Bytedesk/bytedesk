@@ -16,7 +16,7 @@ package com.bytedesk.service.message_unread;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
@@ -52,7 +52,7 @@ public class MessageUnreadEventListener {
                     MessageTypeEnum.SYSTEM.equals(message.getType())) {
                 return;
             }
-            if (ClientEnum.SYSTEM.equals(message.getClient())) {
+            if (ChannelEnum.SYSTEM.equals(message.getClient())) {
                 return;
             }
             // 删除已读消息

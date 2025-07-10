@@ -16,7 +16,7 @@ package com.bytedesk.core.upload;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +37,7 @@ public class UploadResponse extends BaseResponse {
 
     private String fileType;
 
-    private ClientEnum client;
+    private ChannelEnum client;
 
     private UploadTypeEnum type;
 

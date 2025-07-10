@@ -35,7 +35,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
@@ -490,7 +490,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         reverseThread.setType(thread.getType());
         // TODO: 同事私聊被动方默认不显示会话，直到收到一条消息
         // reverseThread.setHide(true);
-        reverseThread.setClient(ClientEnum.SYSTEM.name());
+        reverseThread.setClient(ChannelEnum.SYSTEM.name());
         reverseThread.setOrgUid(thread.getOrgUid());
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
 

@@ -20,7 +20,7 @@ import java.time.ZonedDateTime;
 
 import com.alibaba.fastjson2.JSON;
 // import com.alibaba.fastjson2.annotation.JSONField;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -57,7 +57,7 @@ public class MessageProtobuf implements Serializable {
 
 	private ZonedDateTime createdAt;
 
-	private ClientEnum client;
+	private ChannelEnum client;
 
 	private ThreadProtobuf thread;
 

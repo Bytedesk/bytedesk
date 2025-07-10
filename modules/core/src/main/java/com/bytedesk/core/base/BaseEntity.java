@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 12:02:01
+ * @LastEditTime: 2025-07-10 10:11:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesa
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,7 @@ import java.time.ZonedDateTime;
  * //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = timezone)
  * config in properties
  * @see https://docs.spring.io/spring-data/jpa/reference/auditing.html
- * @author im.bytedesk.com
+ * @author 270580156@qq.com
  * 
  * 注意: 所有继承此类的实体类应该在@Table注解中添加uuid字段的索引，例如:
  * @Table(

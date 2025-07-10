@@ -10,7 +10,7 @@ package com.bytedesk.core.message;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -25,7 +25,7 @@ import lombok.ToString;
 
 @MappedSuperclass
 @Data
-@SuperBuilder
+@Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.ArrayList;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 
@@ -118,11 +118,11 @@ public class VisitorRequest extends BaseRequest {
 	
 	public Boolean isWeChat() {
 		// 忽略大小写
-		return this.client.toLowerCase().contains(ClientEnum.WECHAT.name().toLowerCase());
+		return this.client.toLowerCase().contains(ChannelEnum.WECHAT.name().toLowerCase());
 	}
 
 	public Boolean isMeta() {
-		return this.client.toLowerCase().contains(ClientEnum.MESSENGER.name().toLowerCase());
+		return this.client.toLowerCase().contains(ChannelEnum.MESSENGER.name().toLowerCase());
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class VisitorRequest extends BaseRequest {
 	 */
 	public Boolean isWeChatWork() {
 		// 忽略大小写
-		return this.client.toLowerCase().contains(ClientEnum.WECHAT_WORK.name().toLowerCase());
+		return this.client.toLowerCase().contains(ChannelEnum.WECHAT_WORK.name().toLowerCase());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class VisitorRequest extends BaseRequest {
 	 */
 	public Boolean isTelegram() {
 		// 忽略大小写
-		return this.client.toLowerCase().contains(ClientEnum.TELEGRAM.name().toLowerCase());
+		return this.client.toLowerCase().contains(ChannelEnum.TELEGRAM.name().toLowerCase());
 	}
 
 	public void setWorkgroupType() {

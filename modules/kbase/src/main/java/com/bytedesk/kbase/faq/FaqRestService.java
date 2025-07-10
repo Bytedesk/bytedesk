@@ -37,7 +37,7 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -702,7 +702,7 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
                 .content(content)
                 .type(MessageTypeEnum.FAQ_ANSWER.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(answerUser)
                 .orgUid(threadEntity.getOrgUid())
                 .createdAt(BdDateUtils.now())

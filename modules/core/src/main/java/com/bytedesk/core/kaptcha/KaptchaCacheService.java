@@ -19,7 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.redis.RedisConsts;
 
 import lombok.AllArgsConstructor;
@@ -55,7 +55,7 @@ public class KaptchaCacheService {
 
     public Boolean checkKaptcha(String key, String value, @NonNull String client) {
         // flutter手机端验证码暂时不做校验, TODO: 后续需要优化
-        if (client != null && client.toLowerCase().contains(ClientEnum.FLUTTER.name().toLowerCase())) {
+        if (client != null && client.toLowerCase().contains(ChannelEnum.FLUTTER.name().toLowerCase())) {
             return true;
         }
         log.info("checkKaptcha key: " + key + ", value: " + value);

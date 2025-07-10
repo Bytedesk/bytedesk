@@ -14,7 +14,7 @@
 package com.bytedesk.ai.robot_message;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -31,7 +31,7 @@ public class RobotMessageUtils {
                         .status(MessageStatusEnum.SUCCESS)
                         .thread(thread)
                         .user(robot.toUserProtobuf())
-                        .client(ClientEnum.SYSTEM)
+                        .client(ChannelEnum.SYSTEM)
                         .extra(messageProtobuf.getExtra())
                         .createdAt(BdDateUtils.now())
                         .build();

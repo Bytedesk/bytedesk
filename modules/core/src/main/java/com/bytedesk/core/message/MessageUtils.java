@@ -14,7 +14,7 @@
 package com.bytedesk.core.message;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -40,7 +40,7 @@ public class MessageUtils {
                 .content(content)
                 .status(MessageStatusEnum.SUCCESS)
                 .createdAt(BdDateUtils.now())
-                .client(ClientEnum.SYSTEM)
+                .client(ChannelEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(system)
                 .extra(messageExtra.toJson())
@@ -60,7 +60,7 @@ public class MessageUtils {
                 .content(content)
                 .status(MessageStatusEnum.SUCCESS)
                 .createdAt(BdDateUtils.now())
-                .client(ClientEnum.SYSTEM)
+                .client(ChannelEnum.SYSTEM)
                 .thread(threadProtobuf)
                 .user(sender)
                 .extra(extra.toJson())
@@ -125,7 +125,7 @@ public class MessageUtils {
                 .content(content)
                 .type(type)
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(user)
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())

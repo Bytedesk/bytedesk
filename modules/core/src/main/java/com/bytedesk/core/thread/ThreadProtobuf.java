@@ -16,7 +16,7 @@ package com.bytedesk.core.thread;
 import java.io.Serializable;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ public class ThreadProtobuf implements Serializable {
 
     private UserProtobuf user;
 
-    private ClientEnum client;
+    private ChannelEnum client;
 
     private String extra;
 
@@ -117,11 +117,11 @@ public class ThreadProtobuf implements Serializable {
     }
 
     public Boolean isWeChatMp() {
-        return ClientEnum.WECHAT_MP.equals(getClient());
+        return ChannelEnum.WECHAT_MP.equals(getClient());
     }
 
     public Boolean isWeChatMini() {
-        return ClientEnum.WECHAT_MINI.equals(getClient());
+        return ChannelEnum.WECHAT_MINI.equals(getClient());
     }
 
     // public static ThreadProtobuf fromEntity(ThreadEntity thread) {

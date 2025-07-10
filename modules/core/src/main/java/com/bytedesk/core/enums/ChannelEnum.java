@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 13:07:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-30 12:06:50
+ * @LastEditTime: 2025-07-10 10:02:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.enums;
 
-public enum ClientEnum {
+public enum ChannelEnum {
     SYSTEM,
     // 
     WEB,
@@ -116,8 +116,8 @@ public enum ClientEnum {
     ;
 
     // 根据字符串查找对应的枚举常量
-    public static ClientEnum fromValue(String value) {
-        for (ClientEnum type : ClientEnum.values()) {
+    public static ChannelEnum fromValue(String value) {
+        for (ChannelEnum type : ChannelEnum.values()) {
             if (type.name().equalsIgnoreCase(value)) {
                 return type;
             }
@@ -132,7 +132,7 @@ public enum ClientEnum {
      */
     public static String toChineseDisplay(String client) {
         try {
-            ClientEnum clientEnum = fromValue(client);
+            ChannelEnum clientEnum = fromValue(client);
             return clientEnum.toChineseDisplay();
         } catch (Exception e) {
             return client;

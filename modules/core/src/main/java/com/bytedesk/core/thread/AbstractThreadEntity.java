@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bytedesk.core.converter.JsonListConverter;
@@ -42,7 +42,7 @@ import jakarta.persistence.Convert;
 
 @MappedSuperclass
 @Data
-@SuperBuilder
+@Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

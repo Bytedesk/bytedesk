@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
@@ -226,7 +226,7 @@ public class ThreadRestService
                 .topic(topic)
                 .unreadCount(0)
                 .status(ThreadProcessStatusEnum.CHATTING.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(user)
                 .owner(owner)
                 .orgUid(orgUid)
@@ -277,7 +277,7 @@ public class ThreadRestService
                 .topic(topic)
                 .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(userSimple.toJson())
                 .userUid(user.getUid())
@@ -310,7 +310,7 @@ public class ThreadRestService
                 .topic(topic)
                 .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
                 .user(userSimple.toJson())
                 .userUid(user.getUid())
@@ -927,7 +927,7 @@ public class ThreadRestService
 
         // 将client转换为中文
         if (StringUtils.hasText(entity.getClient())) {
-            excel.setClient(ClientEnum.toChineseDisplay(entity.getClient()));
+            excel.setClient(ChannelEnum.toChineseDisplay(entity.getClient()));
         }
 
         // 将status转换为中文

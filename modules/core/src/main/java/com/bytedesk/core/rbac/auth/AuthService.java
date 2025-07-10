@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.token.TokenEntity;
 import com.bytedesk.core.rbac.token.TokenRepository;
 import com.bytedesk.core.rbac.token.TokenRequest;
@@ -123,7 +123,7 @@ public class AuthService {
         String client = userDetails.getClient();
         if (client == null || client.isEmpty()) {
             // 如果UserDetailsImpl中没有client信息，使用默认值
-            client = ClientEnum.WEB.name();
+            client = ChannelEnum.WEB.name();
         }
         
         String device = userDetails.getDevice();

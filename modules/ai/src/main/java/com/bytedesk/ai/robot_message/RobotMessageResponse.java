@@ -16,7 +16,7 @@ package com.bytedesk.ai.robot_message;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -52,7 +52,7 @@ public class RobotMessageResponse extends BaseResponse {
 	private MessageStatusEnum status;
 
 	// private String client;
-	private ClientEnum client;
+	private ChannelEnum client;
 
 	private UserProtobuf user;
 

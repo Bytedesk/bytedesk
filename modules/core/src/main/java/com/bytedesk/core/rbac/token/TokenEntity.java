@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -44,7 +44,7 @@ import com.bytedesk.core.utils.BdDateUtils;
  */
 @Entity
 @Data
-@SuperBuilder
+@Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

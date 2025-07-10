@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -131,11 +131,11 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     public Boolean isWeChatMp() {
-        return ClientEnum.WECHAT_MP.name().equals(getClient());
+        return ChannelEnum.WECHAT_MP.name().equals(getClient());
     }
 
     public Boolean isWeChatMini() {
-        return ClientEnum.WECHAT_MINI.name().equals(getClient());
+        return ChannelEnum.WECHAT_MINI.name().equals(getClient());
     }
 
     // ---------------------------

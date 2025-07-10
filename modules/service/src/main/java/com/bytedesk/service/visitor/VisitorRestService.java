@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
@@ -279,13 +279,13 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         if (client == null) {
             return AvatarConsts.getDefaultVisitorAvatarUrl();
         }
-        if (client.toUpperCase().contains(ClientEnum.WEB.name())) {
+        if (client.toUpperCase().contains(ChannelEnum.WEB.name())) {
             return AvatarConsts.getDefaultWebAvatarUrl();
-        } else if (client.toUpperCase().contains(ClientEnum.ANDROID.name())) {
+        } else if (client.toUpperCase().contains(ChannelEnum.ANDROID.name())) {
             return AvatarConsts.getDefaultAndroidAvatarUrl();
-        } else if (client.toUpperCase().contains(ClientEnum.IOS.name())) {
+        } else if (client.toUpperCase().contains(ChannelEnum.IOS.name())) {
             return AvatarConsts.getDefaultIosAvatarUrl();
-        } else if (client.toUpperCase().contains(ClientEnum.UNIAPP.name())) {
+        } else if (client.toUpperCase().contains(ChannelEnum.UNIAPP.name())) {
             return AvatarConsts.getDefaultUniappAvatarUrl();
         }
         return AvatarConsts.getDefaultVisitorAvatarUrl();
@@ -295,7 +295,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     public VisitorExcel convertToExcel(VisitorEntity entity) {
         // return VisitorExcelConverter.convert(entity);
         VisitorExcel excel = modelMapper.map(entity, VisitorExcel.class);
-        excel.setClient(ClientEnum.toChineseDisplay(entity.getClient()));
+        excel.setClient(ChannelEnum.toChineseDisplay(entity.getClient()));
         return excel;
     }
 

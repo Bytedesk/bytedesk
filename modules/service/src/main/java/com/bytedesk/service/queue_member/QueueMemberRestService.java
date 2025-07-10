@@ -26,7 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
@@ -229,7 +229,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
             excel.setRobotNickname(response.getThread().getRobotProtobuf().getNickname());
             // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
             excel.setStatus(ThreadProcessStatusEnum.fromValue(response.getThread().getStatus()).toChineseDisplay());
-            excel.setClient(ClientEnum.fromValue(response.getThread().getClient()).toChineseDisplay());
+            excel.setClient(ChannelEnum.fromValue(response.getThread().getClient()).toChineseDisplay());
         }
         
         // 人工客服相关

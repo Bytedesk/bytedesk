@@ -16,7 +16,7 @@ package com.bytedesk.service.visitor;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,7 +62,7 @@ public class VisitorResponse extends BaseResponse {
 
 	// from source
 	// private String client;
-	private ClientEnum client;
+	private ChannelEnum client;
 
 	// private ZonedDateTime updatedAt;
 

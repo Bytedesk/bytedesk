@@ -15,7 +15,7 @@ package com.bytedesk.service.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.ClientEnum;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -41,7 +41,7 @@ public class ThreadMessageUtil {
                 .content(thread.getContent())
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
@@ -63,7 +63,7 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(thread.getRobot())
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
@@ -84,7 +84,7 @@ public class ThreadMessageUtil {
                 .content(content)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(thread.getAgent())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
@@ -105,7 +105,7 @@ public class ThreadMessageUtil {
                 .content(thread.getContent())
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
@@ -125,7 +125,7 @@ public class ThreadMessageUtil {
                 .content(thread.getContent())
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
@@ -145,7 +145,7 @@ public class ThreadMessageUtil {
                 .content(I18Consts.I18N_REENTER_TIP)
                 .type(MessageTypeEnum.CONTINUE.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(user.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
@@ -167,7 +167,7 @@ public class ThreadMessageUtil {
                 .content(content)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
@@ -189,7 +189,7 @@ public class ThreadMessageUtil {
                 .content(content)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
-                .client(ClientEnum.SYSTEM.name())
+                .client(ChannelEnum.SYSTEM.name())
                 .user(system.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
