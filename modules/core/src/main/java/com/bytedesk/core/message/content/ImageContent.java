@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-17 15:40:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-19 16:19:38
+ * @LastEditTime: 2025-07-10 18:10:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 图片消息内容类
+ */
 @Getter
 @Setter
 @SuperBuilder
@@ -28,11 +31,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class ImageContent extends BaseContent {
 
-    private String url;
-
-    private String width;
-
-    private String height;
-    
-    private String label;
+    private String url;           // 图片URL
+    private String width;         // 图片宽度
+    private String height;        // 图片高度
+    private String label;         // 图片标签/说明
+    private String mimeType;      // MIME类型 (如: image/jpeg, image/png)
+    private String size;          // 文件大小 (字节)
+    private String hash;          // 文件哈希值 (SHA256)
+    private String thumbnail;     // 缩略图URL
+    private String filename;      // 文件名
 }

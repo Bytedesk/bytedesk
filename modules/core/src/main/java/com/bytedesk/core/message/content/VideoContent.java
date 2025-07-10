@@ -21,17 +21,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 视频消息内容类
+ */
 @Getter
 @Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class VideoContent extends BaseContent {
-    private String url;
-    private String coverUrl;
-    private String duration;
-    private String width;
-    private String height;
-    private String format;
-    private String label;
+    private String url;           // 视频URL
+    private String coverUrl;      // 视频封面URL
+    private String duration;      // 视频时长 (秒)
+    private String width;         // 视频宽度
+    private String height;        // 视频高度
+    private String format;        // 视频格式 (兼容性字段)
+    private String mimeType;      // MIME类型 (如: video/mp4, video/avi)
+    private String label;         // 视频标签/说明
+    private String size;          // 文件大小 (字节)
+    private String hash;          // 文件哈希值 (SHA256)
+    private String filename;      // 文件名
+    private String caption;       // 视频说明文字
 } 

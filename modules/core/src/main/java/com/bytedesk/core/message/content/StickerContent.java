@@ -21,6 +21,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 贴纸消息内容类
+ */
 @Getter
 @Setter
 @SuperBuilder
@@ -28,7 +31,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class StickerContent extends BaseContent {
 
-    private String url;
-
-    private String label;
+    private String url;           // 贴纸URL
+    private String label;         // 贴纸标签/说明
+    private String mimeType;      // MIME类型 (如: image/webp, image/png)
+    private String size;          // 文件大小 (字节)
+    private String hash;          // 文件哈希值 (SHA256)
+    private String filename;      // 文件名
+    private String caption;       // 贴纸说明文字
 }

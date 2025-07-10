@@ -31,11 +31,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DocumentContent extends BaseContent {
-    private String url;       // 文档文件URL
-    private String name;      // 文件名称
-    private String size;      // 文件大小
-    private String type;      // 文件MIME类型
-    private String caption;   // 文档说明文字
-    private String thumbnail; // 缩略图URL
-    private String label;     // 文档标签
+    private String url;           // 文档文件URL
+    private String name;          // 文件名称
+    private String size;          // 文件大小 (字节)
+    private String type;          // 文件MIME类型
+    private String caption;       // 文档说明文字
+    private String thumbnail;     // 缩略图URL
+    private String label;         // 文档标签
+    private String hash;          // 文件哈希值 (SHA256)
+    private String filename;      // 文件名 (兼容性字段)
 }
