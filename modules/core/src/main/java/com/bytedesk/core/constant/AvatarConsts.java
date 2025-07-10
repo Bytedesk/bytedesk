@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 15:56:01
+ * @LastEditTime: 2025-07-10 15:57:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -393,9 +393,9 @@ public class AvatarConsts {
                 
             // 海外即时通讯
             case TELEGRAM:
-                return getDefaultHost() + "/avatars/telegram.png";
+                return getDefaultTelegramAvatarUrl();
             case LINE:
-                return getDefaultHost() + "/avatars/line.png";
+                return getDefaultLineAvatarUrl();
             case KAKAO:
             case VIBER:
             case SIGNAL:
@@ -408,9 +408,9 @@ public class AvatarConsts {
             case EBAY:
                 return getDefaultHost() + "/avatars/web.png"; // 暂时使用web图标
             case SHOPIFY:
-                return getDefaultHost() + "/avatars/shopify.png";
+                return getDefaultShopifyAvatarUrl();
             case LAZADA:
-                return getDefaultHost() + "/avatars/lazada.png";
+                return getDefaultLazadaAvatarUrl();
             case SHOPEE:
                 return getDefaultHost() + "/avatars/web.png"; // 暂时使用web图标
                 
@@ -444,49 +444,49 @@ public class AvatarConsts {
         } else if (upperChannel.contains("EMAIL")) {
             return getDefaultHost() + "/avatars/email.png";
         } else if (upperChannel.contains("TELEGRAM")) {
-            return getDefaultHost() + "/avatars/telegram.png";
+            return getDefaultTelegramAvatarUrl();
         } else if (upperChannel.contains("LINE")) {
-            return getDefaultHost() + "/avatars/line.png";
+            return getDefaultLineAvatarUrl();
         } else if (upperChannel.contains("WHATSAPP")) {
-            return getDefaultHost() + "/avatars/whatsapp.png";
+            return getDefaultWhatsappAvatarUrl();
         } else if (upperChannel.contains("MESSENGER")) {
-            return getDefaultHost() + "/avatars/messenger.png";
+            return getDefaultMessengerAvatarUrl();
         } else if (upperChannel.contains("INSTAGRAM")) {
-            return getDefaultHost() + "/avatars/instagram.png";
+            return getDefaultInstagramAvatarUrl();
         } else if (upperChannel.contains("DOUYIN")) {
-            return getDefaultHost() + "/avatars/douyin.png";
+            return getDefaultDouyinAvatarUrl();
         } else if (upperChannel.contains("XIAOHONGSHU")) {
-            return getDefaultHost() + "/avatars/xiaohongshu.png";
+            return getDefaultXiaohongshuAvatarUrl();
         } else if (upperChannel.contains("KUAISHOU")) {
-            return getDefaultHost() + "/avatars/kuaishou.png";
+            return getDefaultKuaishouAvatarUrl();
         } else if (upperChannel.contains("BILIBILI")) {
-            return getDefaultHost() + "/avatars/bilibili.png";
+            return getDefaultBilibiliAvatarUrl();
         } else if (upperChannel.contains("WEIBO")) {
-            return getDefaultHost() + "/avatars/weibo.png";
+            return getDefaultWeiboAvatarUrl();
         } else if (upperChannel.contains("JD") || upperChannel.contains("JINGDONG")) {
-            return getDefaultHost() + "/avatars/jingdong.png";
+            return getDefaultJingdongAvatarUrl();
         } else if (upperChannel.contains("PINDUODUO")) {
-            return getDefaultHost() + "/avatars/pinduoduo.png";
+            return getDefaultPinduoduoAvatarUrl();
         } else if (upperChannel.contains("SHOPIFY")) {
-            return getDefaultHost() + "/avatars/shopify.png";
+            return getDefaultShopifyAvatarUrl();
         } else if (upperChannel.contains("LAZADA")) {
-            return getDefaultHost() + "/avatars/lazada.png";
+            return getDefaultLazadaAvatarUrl();
         } else if (upperChannel.contains("WORDPRESS")) {
-            return getDefaultHost() + "/avatars/wordpress.png";
+            return getDefaultWordpressAvatarUrl();
         } else if (upperChannel.contains("MAGENTO")) {
-            return getDefaultHost() + "/avatars/magento.png";
+            return getDefaultMagentoAvatarUrl();
         } else if (upperChannel.contains("WOOCOMMERCE")) {
-            return getDefaultHost() + "/avatars/woocommerce.png";
+            return getDefaultWooCommerceAvatarUrl();
         } else if (upperChannel.contains("OPENCART")) {
-            return getDefaultHost() + "/avatars/opencart.png";
+            return getDefaultOpenCartAvatarUrl();
         } else if (upperChannel.contains("PRESTASHOP")) {
-            return getDefaultHost() + "/avatars/prestashop.png";
+            return getDefaultPrestaShopAvatarUrl();
         } else if (upperChannel.contains("DIFY")) {
-            return getDefaultHost() + "/avatars/dify.png";
+            return getDefaultDifyAvatarUrl();
         } else if (upperChannel.contains("COZE")) {
-            return getDefaultHost() + "/avatars/coze.png";
+            return getDefaultCozeAvatarUrl();
         } else if (upperChannel.contains("NPM")) {
-            return getDefaultHost() + "/avatars/npm.png";
+            return getDefaultNpmAvatarUrl();
         }
         
         return getDefaultVisitorAvatarUrl();
