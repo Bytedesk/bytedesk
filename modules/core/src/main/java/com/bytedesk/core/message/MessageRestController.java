@@ -103,8 +103,10 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @Operation(summary = "根据UID查询消息", description = "通过唯一标识符查询消息")
     @Override
     public ResponseEntity<?> queryByUid(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        MessageResponse response = messageRestService.queryByUid(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**

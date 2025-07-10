@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:30:55
+ * @LastEditTime: 2025-07-10 13:20:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 
@@ -109,10 +110,10 @@ public abstract class BaseRequest implements Serializable {
     // updatedAt/createdAt: 'ascend', 'descend'
     // 其他字段可以根据需要添加
     @Builder.Default
-    private String sortBy = "updatedAt";
+    private String sortBy = BytedeskConsts.DEFAULT_SORT_BY; // 默认按更新时间倒序
 
     @Builder.Default
-    private String sortDirection = "descend";
+    private String sortDirection = BytedeskConsts.DEFAULT_SORT_DIRECTION; // 默认降序
 
     // 
     private String searchText;
@@ -135,7 +136,7 @@ public abstract class BaseRequest implements Serializable {
             pageSize = 10;
         }
         
-        Sort.Direction direction = "ascend".equals(sortDirection) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction direction = BytedeskConsts.SORT_DIRECTION_ASC.equals(sortDirection) ? Sort.Direction.ASC : Sort.Direction.DESC;
         return PageRequest.of(pageNumber, pageSize, direction, sortBy);
     }
 

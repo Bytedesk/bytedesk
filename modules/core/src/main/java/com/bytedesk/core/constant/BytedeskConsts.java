@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-02 21:48:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 09:10:42
+ * @LastEditTime: 2025-07-10 13:20:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,6 +72,11 @@ public class BytedeskConsts {
     public static final int COLUMN_EXTRA_LENGTH = 2048;
     // 
     public static final String HAS_ANY_ROLE = "hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT', 'USER')";
+    // 
+    public static final String DEFAULT_SORT_BY = "updatedAt";
+    public static final String DEFAULT_SORT_DIRECTION = "descend"; // 默认降序
+    public static final String SORT_DIRECTION_ASC = "ascend";
+    public static final String SORT_DIRECTION_DESC = "descend";
 
 
 }
