@@ -115,6 +115,8 @@ public class VisitorThreadService
             extra = visitorRequest.getMetaThreadExtra();
         } else if (visitorRequest.isTelegram()) {
             extra = visitorRequest.getTelegramThreadExtra();
+        } else if (visitorRequest.isWhatsApp()) {
+            extra = visitorRequest.getWhatsappThreadExtra();
         } else {
             extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
@@ -151,6 +153,9 @@ public class VisitorThreadService
         } else if (visitorRequest.isTelegram()) {
             String telegramExtra = visitorRequest.getTelegramThreadExtra();
             thread.setExtra(telegramExtra);
+        } else if (visitorRequest.isWhatsApp()) {
+            String whatsappExtra = visitorRequest.getWhatsappThreadExtra();
+            thread.setExtra(whatsappExtra);
         } else {
             String extra = ServiceConvertUtils
                     .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
