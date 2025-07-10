@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 08:32:47
+ * @LastEditTime: 2025-07-10 09:48:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,5 +37,6 @@ public class TypeConsts {
     public static final String COMPONENT_TYPE_SERVICE = "service";
     public static final String COMPONENT_TYPE_ROBOT = "robot";
     public static final String COMPONENT_TYPE_VISITOR = "visitor";
+    public static final String COMPONENT_TYPE_CHANNEL = "channel"; // 通道类型，比如：whatsapp, wechat, facebook, twitter, etc.
 
 }
