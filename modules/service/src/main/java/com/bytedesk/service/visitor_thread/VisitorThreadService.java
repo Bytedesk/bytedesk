@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:49:14
+ * @LastEditTime: 2025-07-10 15:48:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -316,10 +316,18 @@ public class VisitorThreadService
             // log.info("before autoCloseThread threadUid {} threadType {} threadId {}
             // diffInMinutes {}", thread.getUid(), thread.getType(),
             // thread.getUid(),diffInMinutes);
-            ServiceSettingsResponseVisitor settings = JSON.parseObject(thread.getExtra(),
-                    ServiceSettingsResponseVisitor.class);
-            Double autoCloseMinutes = settings.getAutoCloseMin();
-            //
+            
+            // 添加空值检查，防止 NullPointerException
+            ServiceSettingsResponseVisitor settings = null;
+            if (StringUtils.hasText(thread.getExtra())) {
+                try {
+                    settings = JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
+                } catch (Exception e) {
+                    log.warn("Failed to parse thread extra JSON for thread {}: {}", thread.getUid(), e.getMessage());
+                }
+            }
+            
+            Double autoCloseMinutes = (settings != null) ? settings.getAutoCloseMin() : null;
             // 添加空值检查，如果为null则使用默认值30分钟
             double autoCloseValue = (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
             if (diffInMinutes > autoCloseValue) {

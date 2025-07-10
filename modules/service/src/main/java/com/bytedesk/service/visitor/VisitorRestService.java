@@ -124,7 +124,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         }
         // 如果用户不存在，则创建新用户
         if (!StringUtils.hasText(request.getAvatar())) {
-            request.setAvatar(getAvatar(request.getChannel()));
+            request.setAvatar(AvatarConsts.getAvatar(request.getChannel()));
         }
         // uid使用自动生成的uid，防止前端uid冲突
         request.setUid(uidUtils.getUid());
@@ -275,21 +275,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return ServiceConvertUtils.convertToVisitorResponse(entity);
     }
 
-    public String getAvatar(String client) {
-        if (client == null) {
-            return AvatarConsts.getDefaultVisitorAvatarUrl();
-        }
-        if (client.toUpperCase().contains(ChannelEnum.WEB.name())) {
-            return AvatarConsts.getDefaultWebAvatarUrl();
-        } else if (client.toUpperCase().contains(ChannelEnum.ANDROID.name())) {
-            return AvatarConsts.getDefaultAndroidAvatarUrl();
-        } else if (client.toUpperCase().contains(ChannelEnum.IOS.name())) {
-            return AvatarConsts.getDefaultIosAvatarUrl();
-        } else if (client.toUpperCase().contains(ChannelEnum.UNIAPP.name())) {
-            return AvatarConsts.getDefaultUniappAvatarUrl();
-        }
-        return AvatarConsts.getDefaultVisitorAvatarUrl();
-    }
+    
 
     @Override
     public VisitorExcel convertToExcel(VisitorEntity entity) {
