@@ -57,13 +57,27 @@ public class MessageUnreadEventListener {
                         message.getContent());
                 // message.getContent() 代表 已读消息的uid
                 String readMessageUid = message.getContent();
-                // 先清理 Redis 缓存
-                redisService.removeMessageExists(readMessageUid);
-                // 再删除数据库记录
-                messageUnreadRestService.deleteByUid(readMessageUid);
+                if (readMessageUid != null && !readMessageUid.trim().isEmpty()) {
+                    try {
+                        // 先清理 Redis 缓存
+                        redisService.removeMessageExists(readMessageUid);
+                        // 再删除数据库记录
+                        messageUnreadRestService.deleteByUid(readMessageUid);
+                    } catch (Exception e) {
+                        log.error("Error processing READ message for uid {}: {}", readMessageUid, e.getMessage());
+                        // 不重新抛出异常，避免影响其他事件处理
+                    }
+                } else {
+                    log.warn("READ message content is null or empty: {}", message.getUid());
+                }
             } else {
                 // 缓存未读消息，create方法内部已包含重复检查逻辑
-                messageUnreadRestService.create(message);
+                try {
+                    messageUnreadRestService.create(message);
+                } catch (Exception e) {
+                    log.error("Error creating unread message for uid {}: {}", message.getUid(), e.getMessage());
+                    // 不重新抛出异常，避免影响其他事件处理
+                }
             }
         } catch (Exception e) {
             log.error("Error processing message json event for message {}: {}", 

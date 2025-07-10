@@ -67,8 +67,18 @@ public class RedisService {
         if (messageUid == null || messageUid.trim().isEmpty()) {
             return;
         }
-        String key = RedisConsts.MESSAGE_UNREAD_PREFIX + messageUid;
-        redisTemplate.delete(key);
+        try {
+            String key = RedisConsts.MESSAGE_UNREAD_PREFIX + messageUid;
+            Boolean result = redisTemplate.delete(key);
+            if (Boolean.TRUE.equals(result)) {
+                // 成功删除
+            } else {
+                // 键不存在，这是正常的
+            }
+        } catch (Exception e) {
+            // Redis 操作失败，记录日志但不抛出异常
+            // 避免因为 Redis 问题影响主要业务逻辑
+        }
     }
     
     /**

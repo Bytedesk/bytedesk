@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 16:35:13
+ * @LastEditTime: 2025-07-10 16:44:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -282,10 +282,42 @@ public class MessageUnreadRestService
 
     @Override
     public void deleteByUid(String uid) {
-        // 先删除 Redis 缓存
-        redisService.removeMessageExists(uid);
-        // 再删除数据库记录
-        messageUnreadRepository.deleteByUid(uid);
+        if (!StringUtils.hasText(uid)) {
+            return;
+        }
+        
+        try {
+            // 先删除 Redis 缓存
+            redisService.removeMessageExists(uid);
+            
+            // 检查记录是否存在，如果不存在则直接返回
+            if (!existsByUid(uid)) {
+                log.debug("MessageUnreadEntity with uid {} does not exist, skipping deletion", uid);
+                return;
+            }
+            
+            // 使用软删除而不是硬删除，避免乐观锁冲突
+            Optional<MessageUnreadEntity> entityOptional = findByUid(uid);
+            if (entityOptional.isPresent()) {
+                MessageUnreadEntity entity = entityOptional.get();
+                entity.setDeleted(true);
+                try {
+                    save(entity);
+                    log.debug("Successfully soft deleted MessageUnreadEntity with uid: {}", uid);
+                } catch (ObjectOptimisticLockingFailureException e) {
+                    // 乐观锁冲突，说明记录已经被其他线程修改
+                    log.warn("Optimistic locking failure when soft deleting MessageUnreadEntity with uid {}: {}", uid, e.getMessage());
+                    // 不需要重新抛出异常，因为删除操作已经完成（被其他线程删除）
+                } catch (Exception e) {
+                    log.error("Failed to soft delete MessageUnreadEntity with uid {}: {}", uid, e.getMessage(), e);
+                    // 对于其他异常，可以选择重新抛出或者记录日志
+                    throw new RuntimeException("Failed to soft delete MessageUnreadEntity", e);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error in deleteByUid for uid {}: {}", uid, e.getMessage(), e);
+            // 不重新抛出异常，避免影响其他操作
+        }
     }
 
     @Override
