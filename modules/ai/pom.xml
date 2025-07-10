@@ -19,8 +19,6 @@
 
 	<properties>
 		<ollama4j.version>1.0.100</ollama4j.version>
-		<!-- <spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version> -->
-		<!-- <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version> -->
 		<jsonp.version>1.18.3</jsonp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<ai.djl.version>0.32.0</ai.djl.version>
@@ -208,7 +206,7 @@
 		</dependency> -->
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
-		<!-- https://central.sonatype.com/artifact/io.github.ollama4j/ollama4j/overview -->
+		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
 		<dependency>
 			<groupId>io.github.ollama4j</groupId>
 			<artifactId>ollama4j</artifactId>
