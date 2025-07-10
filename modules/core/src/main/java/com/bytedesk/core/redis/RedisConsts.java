@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-23 15:20:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 16:28:22
+ * @LastEditTime: 2025-07-10 16:33:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,8 @@ public class RedisConsts {
     // 
     public static final String CONNECTED_MQTT_CLIENT_IDS = BYTEDESK_REDIS_PREFIX + "connected-mqtt-client-ids";
 
-    
+    // 消息未读相关常量
+    public static final String MESSAGE_UNREAD_PREFIX = BYTEDESK_REDIS_PREFIX + "message_unread:";
+    public static final String MESSAGE_UNREAD_EXISTS_VALUE = "1";
 
 }

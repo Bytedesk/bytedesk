@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 12:23:38
+ * @LastEditTime: 2025-07-10 16:35:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,6 +29,7 @@ import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.redis.RedisService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRequest;
@@ -49,6 +50,11 @@ public class MessageUnreadRestService
     private final AuthService authService;
 
     private final ThreadRestService threadRestService;
+
+    private final RedisService redisService;
+
+    // Redis 缓存过期时间：24小时
+    private static final long MESSAGE_CACHE_TTL = 24 * 60 * 60;
 
     @Override
     public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
@@ -134,10 +140,24 @@ public class MessageUnreadRestService
         }
         //
         String uid = messageProtobuf.getUid();
-        if (existsByUid(uid)) {
-            log.info("message already exists, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
+        
+        // 使用 Redis 进行去重判断，避免数据库查询和并发问题
+        if (redisService.isMessageExists(uid)) {
+            log.info("message already exists in redis cache, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
             return;
         }
+        
+        // 双重检查：Redis 不存在，再检查数据库
+        if (existsByUid(uid)) {
+            log.info("message already exists in database, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
+            // 同步到 Redis 缓存
+            redisService.setMessageExists(uid, MESSAGE_CACHE_TTL);
+            return;
+        }
+        
+        // 在 Redis 中设置标记，防止并发创建
+        redisService.setMessageExists(uid, MESSAGE_CACHE_TTL);
+        
         //
         MessageUnreadEntity messageUnread = modelMapper.map(messageProtobuf, MessageUnreadEntity.class);
         if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
@@ -155,6 +175,8 @@ public class MessageUnreadRestService
         }
         MessageUnreadEntity savedMessageUnread = save(messageUnread);
         if (savedMessageUnread == null) {
+            // 如果保存失败，删除 Redis 标记
+            redisService.removeMessageExists(uid);
             throw new RuntimeException("Failed to save MessageUnreadEntity");
         }
         log.info("create message unread: uid {}, content {}", savedMessageUnread.getUid(), savedMessageUnread.getContent());
@@ -187,6 +209,8 @@ public class MessageUnreadRestService
         try {
             String uid = request.getUid();
             log.info("Clearing unread messages for uid: {}", uid);
+            
+            redisService.removeMessageExists(uid);
             
             // 删除符合条件的未读消息
             messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
@@ -258,6 +282,9 @@ public class MessageUnreadRestService
 
     @Override
     public void deleteByUid(String uid) {
+        // 先删除 Redis 缓存
+        redisService.removeMessageExists(uid);
+        // 再删除数据库记录
         messageUnreadRepository.deleteByUid(uid);
     }
 
