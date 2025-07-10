@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 11:05:25
+ * @LastEditTime: 2025-07-10 10:46:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -118,11 +118,11 @@ public class VisitorRequest extends BaseRequest {
 	
 	public Boolean isWeChat() {
 		// 忽略大小写
-		return this.client.toLowerCase().contains(ChannelEnum.WECHAT.name().toLowerCase());
+		return this.channel.toLowerCase().contains(ChannelEnum.WECHAT.name().toLowerCase());
 	}
 
 	public Boolean isMeta() {
-		return this.client.toLowerCase().contains(ChannelEnum.MESSENGER.name().toLowerCase());
+		return this.channel.toLowerCase().contains(ChannelEnum.MESSENGER.name().toLowerCase());
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class VisitorRequest extends BaseRequest {
 	 */
 	public Boolean isWeChatWork() {
 		// 忽略大小写
-		return this.client.toLowerCase().contains(ChannelEnum.WECHAT_WORK.name().toLowerCase());
+		return this.channel.toLowerCase().contains(ChannelEnum.WECHAT_WORK.name().toLowerCase());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class VisitorRequest extends BaseRequest {
 	 */
 	public Boolean isTelegram() {
 		// 忽略大小写
-		return this.client.toLowerCase().contains(ChannelEnum.TELEGRAM.name().toLowerCase());
+		return this.channel.toLowerCase().contains(ChannelEnum.TELEGRAM.name().toLowerCase());
 	}
 
 	public void setWorkgroupType() {
