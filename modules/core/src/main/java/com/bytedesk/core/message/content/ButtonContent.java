@@ -582,4 +582,13 @@ public class ButtonContent extends BaseContent {
             return String.join("; ", errors);
         }
     }
+    
+    /**
+     * 从JSON字符串反序列化为ButtonContent对象
+     * @param json JSON字符串
+     * @return ButtonContent对象，如果解析失败返回null
+     */
+    public static ButtonContent fromJson(String json) {
+        return BaseContent.fromJson(json, ButtonContent.class);
+    }
 }

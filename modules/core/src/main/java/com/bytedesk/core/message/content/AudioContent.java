@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-17 15:43:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-19 16:17:53
+ * @LastEditTime: 2025-07-10 18:46:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,4 +40,13 @@ public class AudioContent extends BaseContent {
     private String hash;          // 文件哈希值 (SHA256)
     private String filename;      // 文件名
     private String caption;       // 音频说明文字
+
+    /**
+     * 从JSON字符串反序列化为AudioContent对象
+     * @param json JSON字符串
+     * @return AudioContent对象，如果解析失败返回null
+     */
+    public static AudioContent fromJson(String json) {
+        return BaseContent.fromJson(json, AudioContent.class);
+    }
 } 

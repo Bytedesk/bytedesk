@@ -40,4 +40,13 @@ public class DocumentContent extends BaseContent {
     private String label;         // 文档标签
     private String hash;          // 文件哈希值 (SHA256)
     private String filename;      // 文件名 (兼容性字段)
+
+    /**
+     * 从JSON字符串反序列化为DocumentContent对象
+     * @param json JSON字符串
+     * @return DocumentContent对象，如果解析失败返回null
+     */
+    public static DocumentContent fromJson(String json) {
+        return BaseContent.fromJson(json, DocumentContent.class);
+    }
 }

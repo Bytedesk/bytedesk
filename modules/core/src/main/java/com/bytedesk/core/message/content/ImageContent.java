@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-17 15:40:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 18:10:18
+ * @LastEditTime: 2025-07-10 18:45:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,4 +40,13 @@ public class ImageContent extends BaseContent {
     private String hash;          // 文件哈希值 (SHA256)
     private String thumbnail;     // 缩略图URL
     private String filename;      // 文件名
+
+    /**
+     * 从JSON字符串反序列化为ImageContent对象
+     * @param json JSON字符串
+     * @return ImageContent对象，如果解析失败返回null
+     */
+    public static ImageContent fromJson(String json) {
+        return BaseContent.fromJson(json, ImageContent.class);
+    }
 }

@@ -42,4 +42,13 @@ public class VideoContent extends BaseContent {
     private String hash;          // 文件哈希值 (SHA256)
     private String filename;      // 文件名
     private String caption;       // 视频说明文字
+
+    /**
+     * 从JSON字符串反序列化为VideoContent对象
+     * @param json JSON字符串
+     * @return VideoContent对象，如果解析失败返回null
+     */
+    public static VideoContent fromJson(String json) {
+        return BaseContent.fromJson(json, VideoContent.class);
+    }
 } 
