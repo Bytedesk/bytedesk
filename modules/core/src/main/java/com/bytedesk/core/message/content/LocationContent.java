@@ -34,4 +34,13 @@ public class LocationContent extends BaseContent {
     private String longitude;     // 经度
     private String address;       // 地址
     private String label;         // 位置标签/名称
+
+    /**
+     * 从JSON字符串反序列化为LocationContent对象
+     * @param json JSON字符串
+     * @return LocationContent对象，如果解析失败返回null
+     */
+    public static LocationContent fromJson(String json) {
+        return BaseContent.fromJson(json, LocationContent.class);
+    }
 } 

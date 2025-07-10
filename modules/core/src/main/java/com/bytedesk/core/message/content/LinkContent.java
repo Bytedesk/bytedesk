@@ -35,4 +35,13 @@ public class LinkContent extends BaseContent {
     private String description;   // 链接描述
     private String imageUrl;      // 链接预览图片URL
     private String label;         // 链接标签/说明
+
+    /**
+     * 从JSON字符串反序列化为LinkContent对象
+     * @param json JSON字符串
+     * @return LinkContent对象，如果解析失败返回null
+     */
+    public static LinkContent fromJson(String json) {
+        return BaseContent.fromJson(json, LinkContent.class);
+    }
 } 
