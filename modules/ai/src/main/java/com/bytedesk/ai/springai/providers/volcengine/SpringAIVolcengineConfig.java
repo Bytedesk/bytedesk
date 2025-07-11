@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.volcengine.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.volcengine.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIVolcengineConfig {
 
     @Value("${spring.ai.volcengine.base-url:https://ark.cn-beijing.volces.com/api/v3}")
