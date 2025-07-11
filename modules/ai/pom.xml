@@ -125,11 +125,11 @@
 
 		<!-- https://github.com/alibaba/spring-ai-alibaba -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 

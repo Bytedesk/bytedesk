@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 14:44:29
+ * @LastEditTime: 2025-07-11 09:46:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import lombok.Data;
 /**
@@ -37,7 +38,6 @@ import lombok.Data;
  */
 @Data
 @Configuration
-@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiConfig {
 
     @Value("${spring.ai.zhipuai.api-key:}")
@@ -58,6 +58,7 @@ public class SpringAIZhipuaiConfig {
     }
 
     @Bean("bytedeskZhipuaiChatOptions")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ZhiPuAiChatOptions bytedeskZhipuaiChatOptions() {
         return ZhiPuAiChatOptions.builder()
                 .model(zhipuaiApiModel)
@@ -68,6 +69,7 @@ public class SpringAIZhipuaiConfig {
     // https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
     // https://open.bigmodel.cn/overview
     @Bean("bytedeskZhipuaiEmbeddingOptions")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
     ZhiPuAiEmbeddingOptions bytedeskZhipuaiEmbeddingOptions() {
         return ZhiPuAiEmbeddingOptions.builder()
                 .model(zhipuaiEmbeddingModel)
@@ -76,28 +78,26 @@ public class SpringAIZhipuaiConfig {
 
     // https://open.bigmodel.cn/dev/api/normal-model/glm-4
     @Bean("bytedeskZhipuaiChatModel")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ZhiPuAiChatModel bytedeskZhipuaiChatModel() {
         return new ZhiPuAiChatModel(bytedeskZhipuaiApi(), bytedeskZhipuaiChatOptions());
     }
 
     @Bean("bytedeskZhipuaiEmbeddingModel")
+    @Primary
     @ConditionalOnProperty(prefix = "spring.ai.zhipuai.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
-    ZhiPuAiEmbeddingModel bytedeskZhipuaiEmbeddingModel(org.springframework.core.env.Environment env) {
-        // Only mark as @Primary if this is the selected embedding provider
-        boolean isPrimary = "zhipuai".equals(env.getProperty("spring.ai.model.embedding"));
-        ZhiPuAiEmbeddingModel model = new ZhiPuAiEmbeddingModel(bytedeskZhipuaiApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
-        if (isPrimary) {
-            // Use a proxy or custom annotation processor if needed, or document that only one embedding should be enabled
-        }
-        return model;
+    ZhiPuAiEmbeddingModel bytedeskZhipuaiEmbeddingModel() {
+        return new ZhiPuAiEmbeddingModel(bytedeskZhipuaiApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
     }
 
     @Bean("bytedeskZhipuaiChatClientBuilder")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ChatClient.Builder bytedeskZhipuaiChatClientBuilder() {
         return ChatClient.builder(bytedeskZhipuaiChatModel());
     }
 
     @Bean("bytedeskZhipuaiChatClient")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ChatClient bytedeskZhipuaiChatClient() {
         return bytedeskZhipuaiChatClientBuilder()
                 .defaultOptions(bytedeskZhipuaiChatOptions())
@@ -105,11 +105,13 @@ public class SpringAIZhipuaiConfig {
     }
 
     @Bean("bytedeskZhipuaiImageApi")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ZhiPuAiImageApi bytedeskZhipuaiImageApi() {
         return new ZhiPuAiImageApi(zhipuaiApiKey);
     }
 
     @Bean("bytedeskZhipuaiImageModel")
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ZhiPuAiImageModel bytedeskZhipuaiImageModel() {
         return new ZhiPuAiImageModel(bytedeskZhipuaiImageApi());
     }

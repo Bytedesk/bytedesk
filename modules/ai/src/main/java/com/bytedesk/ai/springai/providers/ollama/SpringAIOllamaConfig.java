@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 @Configuration
-@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
@@ -61,6 +60,7 @@ public class SpringAIOllamaConfig {
     }
 
     @Bean("bytedeskOllamaChatOptions")
+    @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaChatOptions() {
         return OllamaOptions.builder()
                 .model(ollamaChatOptionsModel)
@@ -72,6 +72,7 @@ public class SpringAIOllamaConfig {
     }
 
     @Bean("bytedeskOllamaEmbeddingOptions")
+    @ConditionalOnProperty(prefix = "spring.ai.ollama.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaEmbeddingOptions() {
         return OllamaOptions.builder()
                 .model(ollamaEmbeddingOptionsModel)
@@ -80,6 +81,7 @@ public class SpringAIOllamaConfig {
 
     @Primary
     @Bean("bytedeskOllamaChatModel")
+    @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     OllamaChatModel bytedeskOllamaChatModel() {
         return OllamaChatModel.builder()
                 .ollamaApi(bytedeskOllamaApi())
@@ -99,6 +101,7 @@ public class SpringAIOllamaConfig {
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
     @Primary
     @Bean("bytedeskOllamaChatClient")
+    @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ChatClient bytedeskOllamaChatClient() {
         return ChatClient.builder(bytedeskOllamaChatModel())
                 // .defaultSystem("You are a friendly chat bot that answers question in the voice of a {voice}")
