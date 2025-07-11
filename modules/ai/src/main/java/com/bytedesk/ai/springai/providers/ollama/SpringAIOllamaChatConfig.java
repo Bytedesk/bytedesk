@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 10:11:43
+ * @LastEditTime: 2025-07-11 09:36:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,7 @@
 package com.bytedesk.ai.springai.providers.ollama;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,12 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * https://ollama.com/
  * https://www.promptingguide.ai/
- * https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
+ * Ollama Chat Configuration
  */
 @Slf4j
 @Data
 @Configuration
-public class SpringAIOllamaConfig {
+public class SpringAIOllamaChatConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;
@@ -45,9 +43,6 @@ public class SpringAIOllamaConfig {
 
     @Value("${spring.ai.ollama.chat.options.numa:false}")
     private Boolean ollamaChatOptionsNuma;
-
-    @Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")
-    private String ollamaEmbeddingOptionsModel;
 
     @Value("${spring.ai.ollama.service.auto-check:true}")
     private Boolean autoCheckService;
@@ -71,14 +66,6 @@ public class SpringAIOllamaConfig {
                 .build();
     }
 
-    @Bean("bytedeskOllamaEmbeddingOptions")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
-    OllamaOptions bytedeskOllamaEmbeddingOptions() {
-        return OllamaOptions.builder()
-                .model(ollamaEmbeddingOptionsModel)
-                .build();
-    }
-
     @Primary
     @Bean("bytedeskOllamaChatModel")
     @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
@@ -86,15 +73,6 @@ public class SpringAIOllamaConfig {
         return OllamaChatModel.builder()
                 .ollamaApi(bytedeskOllamaApi())
                 .defaultOptions(bytedeskOllamaChatOptions())
-                .build();
-    }
-
-    @Bean("bytedeskOllamaEmbeddingModel")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
-    EmbeddingModel bytedeskOllamaEmbeddingModel() {
-        return OllamaEmbeddingModel.builder()
-                .ollamaApi(bytedeskOllamaApi())
-                .defaultOptions(bytedeskOllamaEmbeddingOptions())
                 .build();
     }
 
@@ -110,4 +88,4 @@ public class SpringAIOllamaConfig {
                 .build();
     }
 
-}
+} 
