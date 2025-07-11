@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 15:36:16
+ * @LastEditTime: 2025-07-11 10:39:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,9 +63,9 @@ public class WebsiteEntity extends BaseEntity {
     private String content;
 
     // 网站类型
-    // @Builder.Default
-    // @Column(name = "website_type")
-    // private String type = MessageTypeEnum.TEXT.name();
+    @Builder.Default
+    @Column(name = "website_type")
+    private String type = WebsiteTypeEnum.Docusaurus.name();
 
     @Builder.Default
     private String elasticStatus = ChunkStatusEnum.NEW.name();

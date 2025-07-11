@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 15:34:34
+ * @LastEditTime: 2025-07-11 10:38:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,12 +14,13 @@
 package com.bytedesk.kbase.llm_website;
 
 public enum WebsiteTypeEnum {
-    TEXT,
-    IMAGE,
-    VIDEO,
-    AUDIO,
-    PDF,
-    DOC,
-    EXCEL,
-    PPT
+    Docusaurus,
+    Hexo,
+    Jekyll,
+    Hugo,
+    VuePress,
+    Docsify,
+    GitBook,
+    MkDocs,
+    Docz,
 }
