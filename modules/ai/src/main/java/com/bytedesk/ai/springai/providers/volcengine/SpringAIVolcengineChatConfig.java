@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 10:16:10
+ * @LastEditTime: 2025-04-11 15:40:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.tencent;
+package com.bytedesk.ai.springai.providers.volcengine;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -23,54 +23,50 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 腾讯混元大模型聊天配置
- * https://console.cloud.tencent.com/hunyuan/start#
- * https://cloud.tencent.com/document/product/1729/111007
+ * 火山引擎聊天配置
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.tencent.chat.enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAITencentChatConfig {
+@ConditionalOnProperty(prefix = "spring.ai.volcengine.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIVolcengineChatConfig {
 
-    @Value("${spring.ai.tencent.base-url:https://api.hunyuan.cloud.tencent.com}")
+    @Value("${spring.ai.volcengine.base-url:https://ark.cn-beijing.volces.com/api/v3}")
     private String baseUrl;
 
-    @Value("${spring.ai.tencent.api-key:sk-xxx}")
+    @Value("${spring.ai.volcengine.api-key:sk-xxx}")
     private String apiKey;
 
-    @Value("${spring.ai.tencent.chat.options.model:hunyuan-t1-latest}")
+    @Value("${spring.ai.volcengine.chat.options.model:volcengine-chat}")
     private String model;
 
-    @Value("${spring.ai.tencent.chat.options.temperature:0.7}")
+    @Value("${spring.ai.volcengine.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("tencentApi")
-    OpenAiApi tencentApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
+    @Bean("volcengineApi")
+    OpenAiApi volcengineApi() {
+        // 使用VolcengineApi工厂方法创建API实例，自动配置正确的路径
+        return VolcengineApi.create(baseUrl, apiKey);
     }
 
-    @Bean("tencentChatOptions")
-    OpenAiChatOptions tencentChatOptions() {
+    @Bean("volcengineChatOptions")
+    OpenAiChatOptions volcengineChatOptions() {
         return OpenAiChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
-    @Bean("tencentChatModel")
-    OpenAiChatModel tencentChatModel() {
+    @Bean("volcengineChatModel")
+    OpenAiChatModel volcengineChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(tencentApi())
-                .defaultOptions(tencentChatOptions())
+                .openAiApi(volcengineApi())
+                .defaultOptions(volcengineChatOptions())
                 .build();
     }
 
-    @Bean("tencentChatClient")
-    ChatClient tencentChatClient() {
-        return  ChatClient.builder(tencentChatModel())
-                .defaultOptions(tencentChatOptions())
+    @Bean("volcengineChatClient")
+    ChatClient volcengineChatClient() {
+        return  ChatClient.builder(volcengineChatModel())
+                .defaultOptions(volcengineChatOptions())
                 .build();
     }
 
