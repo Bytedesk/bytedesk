@@ -148,7 +148,7 @@
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency> -->
-		<!-- 引入 Graph 核心依赖 -->
+		<!-- 工作流或多智能体 -->
 		<!-- <dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-graph-core</artifactId>
