@@ -123,7 +123,6 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<dependency>
@@ -149,21 +148,12 @@
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency> -->
-
-		<!-- https://java2ai.com/docs/1.0.0-M5.1/overview/?spm=5176.29160081.0.0.2856aa5cNBNg4X -->
-		<!-- https://github.com/alibaba/spring-ai-alibaba/blob/main/README-zh.md -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter -->
+		<!-- 引入 Graph 核心依赖 -->
 		<!-- <dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter</artifactId>
+			<artifactId>spring-ai-alibaba-graph-core</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>io.swagger.core.v3</groupId>
-					<artifactId>swagger-annotations</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency> -->
+	   </dependency> -->
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
