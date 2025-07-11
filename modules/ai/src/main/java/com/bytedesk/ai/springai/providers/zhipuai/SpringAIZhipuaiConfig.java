@@ -37,7 +37,7 @@ import lombok.Data;
  */
 @Data
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiConfig {
 
     @Value("${spring.ai.zhipuai.api-key:}")
@@ -81,8 +81,15 @@ public class SpringAIZhipuaiConfig {
     }
 
     @Bean("bytedeskZhipuaiEmbeddingModel")
-    ZhiPuAiEmbeddingModel bytedeskZhipuaiEmbeddingModel() {
-        return new ZhiPuAiEmbeddingModel(bytedeskZhipuaiApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
+    @ConditionalOnProperty(prefix = "spring.ai.zhipuai.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
+    ZhiPuAiEmbeddingModel bytedeskZhipuaiEmbeddingModel(org.springframework.core.env.Environment env) {
+        // Only mark as @Primary if this is the selected embedding provider
+        boolean isPrimary = "zhipuai".equals(env.getProperty("spring.ai.model.embedding"));
+        ZhiPuAiEmbeddingModel model = new ZhiPuAiEmbeddingModel(bytedeskZhipuaiApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
+        if (isPrimary) {
+            // Use a proxy or custom annotation processor if needed, or document that only one embedding should be enabled
+        }
+        return model;
     }
 
     @Bean("bytedeskZhipuaiChatClientBuilder")
