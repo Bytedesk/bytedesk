@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 10:29:21
+ * @LastEditTime: 2025-07-11 12:06:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,16 @@
 -->
 # docker
 
-## 微语启动
+## 文件说明
+
+```bash
+.
+├── docker-compose-middleware.yaml # 仅启动mysql,redis,elasticsearch依赖，不启动微语
+├── docker-compose-ollama.yaml # 启动微语，同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama，默认使用ollama对话
+├── docker-compose.yaml # 启动微语，同时启动mysql,redis,elasticsearch依赖和微语，不内含ollama，默认使用zhipuai
+```
+
+## 微语启动步骤
 
 ```bash
 # https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker

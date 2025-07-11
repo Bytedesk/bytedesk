@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 11:04:46
+ * @LastEditTime: 2025-07-11 12:13:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/visitor/api/v1/visitor")
+@RequestMapping("/visitor/api/v1")
 @Tag(name = "访客匿名管理", description = "访客匿名相关接口")
 public class VisitorRestControllerVisitor {
 
