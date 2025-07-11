@@ -123,13 +123,6 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-		<!-- https://github.com/alibaba/spring-ai-alibaba -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
-		<!-- <dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
-		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
@@ -149,36 +142,13 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
-
-		<!--  开始：运行 Embedding 模型依赖   -->
-		<!-- https://github.com/deepjavalibrary/djl-demo -->
-		<!-- https://docs.djl.ai/master/docs/quick_start.html -->
+		<!-- https://github.com/alibaba/spring-ai-alibaba -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
 		<!-- <dependency>
-			<groupId>ai.djl</groupId>
-			<artifactId>api</artifactId>
-			<version>${ai.djl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ai.djl.huggingface</groupId>
-			<artifactId>tokenizers</artifactId>
-			<version>${ai.djl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ai.djl</groupId>
-			<artifactId>model-zoo</artifactId>
-			<version>${ai.djl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ai.djl.pytorch</groupId>
-			<artifactId>pytorch-engine</artifactId>
-			<version>${ai.djl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ai.djl.onnxruntime</groupId>
-			<artifactId>onnxruntime-engine</artifactId>
-			<version>${ai.djl.version}</version>
+			<groupId>com.alibaba.cloud.ai</groupId>
+			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+			<version>${spring-ai-alibaba.version}</version>
 		</dependency> -->
-		<!--  结束：运行 Embedding 模型依赖   -->
 
 		<!-- https://java2ai.com/docs/1.0.0-M5.1/overview/?spm=5176.29160081.0.0.2856aa5cNBNg4X -->
 		<!-- https://github.com/alibaba/spring-ai-alibaba/blob/main/README-zh.md -->
@@ -193,16 +163,6 @@
 					<artifactId>swagger-annotations</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency> -->
-
-		<!-- https://open.bigmodel.cn/dev/api#sdk_install -->
-		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
-		<!--
-		https://central.sonatype.com/artifact/cn.bigmodel.openapi/oapi-java-sdk/release-V4-2.3.1 -->
-		<!-- <dependency>
-			<groupId>cn.bigmodel.openapi</groupId>
-			<artifactId>oapi-java-sdk</artifactId>
-			<version>${zhipuai.version}</version>
 		</dependency> -->
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
@@ -220,49 +180,6 @@
 			<artifactId>jsoup</artifactId>
 			<version>${jsonp.version}</version>
 		</dependency>
-
-		<!-- Open Manus -->
-		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
-		<!--
-		https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk/examples/java/src/test/java/dev/selenium/actions_api/ActionsTest.java -->
-		<!-- <dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>${selenium.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-chrome-driver</artifactId>
-			<version>${selenium.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-api</artifactId>
-			<version>${selenium.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-remote-driver</artifactId>
-			<version>${selenium.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-manager</artifactId>
-			<version>${selenium.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-http</artifactId>
-			<version>${selenium.version}</version>
-		</dependency> -->
-
-		<!-- 添加Chrome 134版本对应的DevTools支持 -->
-		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-devtools-v134 -->
-		<!-- <dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-devtools-v134</artifactId>
-			<version>${selenium.version}</version>
-		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 		<dependency>
