@@ -25,18 +25,10 @@ public class VectorStoreConfig {
     @Value("${spring.ai.vectorstore.elasticsearch.dimensions}")
     private Integer elasticsearchDimensions;
 
-    // @Autowired
-    // private JedisProperties jedisProperties;
-
-    // @Autowired
-    // private ApplicationContext applicationContext;
-
     /**
      * Elasticsearch向量存储配置
-     * @Qualifier("bytedeskOllamaEmbeddingModel") 
      */
     @Bean("elasticsearchVectorStore")
-//     @Primary
     @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true", matchIfMissing = false)
     public ElasticsearchVectorStore elasticsearchVectorStore(RestClient restClient, EmbeddingModel embeddingModel) {
         
@@ -68,42 +60,6 @@ public class VectorStoreConfig {
         return vectorStore;
     }
 
-    /**
-     * Zhipuai专用的RedisVectorStore配置
-     */
-    // @Bean("bytedeskZhipuaiRedisVectorStore")
-    // @ConditionalOnProperty(name = "spring.ai.vectorstore.redis.initialize-schema",  havingValue = "true", matchIfMissing = false)
-    // public RedisVectorStore bytedeskZhipuaiRedisVectorStore(RedisVectorStoreProperties properties) {
-    //     try {
-    //         var kbUid = MetadataField.text(KbaseConst.KBASE_KB_UID);
-    //         var fileUid = MetadataField.text(KbaseConst.KBASE_FILE_UID);
-            
-    //         var jedisPooled = new JedisPooled(jedisProperties.getHost(),
-    //                 jedisProperties.getPort(),
-    //                 null,
-    //                 jedisProperties.getPassword());
-            
-    //         var embeddingModel = applicationContext.getBean("bytedeskZhipuaiEmbeddingModel", EmbeddingModel.class);
-    //         // 初始化向量库, 创建索引
-    //         RedisVectorStore vectorStore = RedisVectorStore.builder(jedisPooled, embeddingModel)
-    //                 .indexName(properties.getIndex())
-    //                 .prefix(properties.getPrefix())
-    //                 .metadataFields(kbUid, fileUid)
-    //                 .initializeSchema(true)
-    //                 .build();
-                    
-    //         try {
-    //             vectorStore.afterPropertiesSet();
-    //             log.info("Successfully initialized RedisVectorStore with Zhipuai embedding model");
-    //             return vectorStore;
-    //         } catch (Exception e) {
-    //             log.error("Error initializing RedisVectorStore with Zhipuai: {}", e.getMessage());
-    //         }
-    //     } catch (Exception e) {
-    //         log.error("Failed to create RedisVectorStore with Zhipuai: {}", e.getMessage());
-    //     }
 
-    //     return null;
-    // }
 
 }
