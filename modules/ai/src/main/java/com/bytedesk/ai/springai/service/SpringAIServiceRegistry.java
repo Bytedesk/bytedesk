@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-19 13:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 12:53:26
+ * @LastEditTime: 2025-07-11 09:09:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
-import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
+// import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
@@ -45,7 +45,7 @@ public class SpringAIServiceRegistry {
 
     private final Optional<SpringAIDeepseekService> springAIDeepseekService;
     private final Optional<SpringAIZhipuaiService> springAIZhipuaiService;
-    private final Optional<SpringAIDashscopeService> springAIDashscopeService;
+    // private final Optional<SpringAIDashscopeService> springAIDashscopeService;
     private final Optional<SpringAIOllamaService> springAIOllamaService;
     private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
     private final Optional<SpringAIGiteeService> springAIGiteeService;
@@ -61,7 +61,7 @@ public class SpringAIServiceRegistry {
         // 在初始化时注册所有可用的服务
         registerService(LlmConsts.DEEPSEEK, springAIDeepseekService.orElse(null));
         registerService(LlmConsts.ZHIPUAI, springAIZhipuaiService.orElse(null));
-        registerService(LlmConsts.DASHSCOPE, springAIDashscopeService.orElse(null));
+        // registerService(LlmConsts.DASHSCOPE, springAIDashscopeService.orElse(null));
         registerService(LlmConsts.OLLAMA, springAIOllamaService.orElse(null));
         registerService(LlmConsts.SILICONFLOW, springAISiliconFlowService.orElse(null));
         registerService(LlmConsts.GITEE, springAIGiteeService.orElse(null));
