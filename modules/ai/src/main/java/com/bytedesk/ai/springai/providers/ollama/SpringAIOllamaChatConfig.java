@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 09:36:15
+ * @LastEditTime: 2025-07-11 10:17:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 @Configuration
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaChatConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
@@ -55,7 +56,6 @@ public class SpringAIOllamaChatConfig {
     }
 
     @Bean("bytedeskOllamaChatOptions")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaChatOptions() {
         return OllamaOptions.builder()
                 .model(ollamaChatOptionsModel)
@@ -68,7 +68,6 @@ public class SpringAIOllamaChatConfig {
 
     @Primary
     @Bean("bytedeskOllamaChatModel")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     OllamaChatModel bytedeskOllamaChatModel() {
         return OllamaChatModel.builder()
                 .ollamaApi(bytedeskOllamaApi())
@@ -79,7 +78,6 @@ public class SpringAIOllamaChatConfig {
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
     @Primary
     @Bean("bytedeskOllamaChatClient")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ChatClient bytedeskOllamaChatClient() {
         return ChatClient.builder(bytedeskOllamaChatModel())
                 // .defaultSystem("You are a friendly chat bot that answers question in the voice of a {voice}")

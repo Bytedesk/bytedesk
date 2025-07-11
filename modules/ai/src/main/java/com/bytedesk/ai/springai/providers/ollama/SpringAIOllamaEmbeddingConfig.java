@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 @Configuration
+@ConditionalOnProperty(prefix = "spring.ai.ollama.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaEmbeddingConfig {
 
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
@@ -44,15 +45,14 @@ public class SpringAIOllamaEmbeddingConfig {
     @Value("${spring.ai.ollama.service.auto-check:true}")
     private Boolean autoCheckService;
 
-    @Bean("bytedeskOllamaApi")
-    OllamaApi bytedeskOllamaApi() {
+    @Bean("bytedeskOllamaEmbeddingApi")
+    OllamaApi bytedeskOllamaEmbeddingApi() {
         return OllamaApi.builder()
                 .baseUrl(ollamaBaseUrl)
                 .build();
     }
 
     @Bean("bytedeskOllamaEmbeddingOptions")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
     OllamaOptions bytedeskOllamaEmbeddingOptions() {
         return OllamaOptions.builder()
                 .model(ollamaEmbeddingOptionsModel)
@@ -61,10 +61,9 @@ public class SpringAIOllamaEmbeddingConfig {
 
     @Primary
     @Bean("bytedeskOllamaEmbeddingModel")
-    @ConditionalOnProperty(prefix = "spring.ai.ollama.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
     EmbeddingModel bytedeskOllamaEmbeddingModel() {
         return OllamaEmbeddingModel.builder()
-                .ollamaApi(bytedeskOllamaApi())
+                .ollamaApi(bytedeskOllamaEmbeddingApi())
                 .defaultOptions(bytedeskOllamaEmbeddingOptions())
                 .build();
     }

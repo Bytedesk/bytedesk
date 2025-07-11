@@ -6,7 +6,8 @@
  * <p>主要组件：</p>
  * <ul>
  *   <li>{@link com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuAIService} - 智谱 AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuAIConfig} - 智谱 AI 服务配置类，包含API密钥和模型设置</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuaiChatConfig} - 智谱 AI 聊天服务配置类，包含聊天API密钥和模型设置</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuaiEmbeddingConfig} - 智谱 AI 嵌入服务配置类，包含嵌入API密钥和模型设置</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.zhipuai.SpringAIZhipuAIController} - 智谱 AI 服务的REST API控制器</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.zhipuai.ZhipuAIApi} - 与智谱 AI API交互的底层接口</li>
  * </ul>
