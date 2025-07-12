@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 07:25:33
+ * @LastEditTime: 2025-07-12 18:36:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,30 +86,7 @@ AI powered Omnichannel customer service With Team Cooperation
 - Supports one-click video conversations and screen sharing
 - Suitable for service scenarios requiring intuitive demonstrations
 
-### [Video Conference](./plugins/jitsi/readme.zh.md)
-
-- Professional meeting platform integrated with Jitsi
-- Supports multi-person online meetings and screen sharing
-- Meeting recording and other features to meet remote collaboration needs
-
-### [project kanban](./plugins/kanban/readme.md)
-
-- todo list
-- daily/weekly report
-- statistics
-- ...
-
-### [Social Group](./modules/social/readme.md)
-
-- like Discord
-- ...
-
-### Multi-tenant
-
-- Multi-tenant management
-- Tenant isolation
-- Tenant statistics
-- ...
+### Open Platform
 
 ## Docker Quick Start
 
@@ -150,15 +127,6 @@ docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # or download model from huggingface
 # docker exec ollama-bytedesk ollama pull hf.co/<username>/<model-repository>
 ```
-
-<!-- #### if don't need ollama, you can change `docker-compose.yaml` or `docker-compose-ollama.yaml`
-
-```bash
-# disable Ollama chat
-SPRING_AI_OLLAMA_CHAT_ENABLED: false
-# disable Ollama embedding
-SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
-``` -->
 
 #### stop container
 
