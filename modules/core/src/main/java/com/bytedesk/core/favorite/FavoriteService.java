@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-12 11:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:00:00
+ * @LastEditTime: 2025-07-12 11:09:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,17 +13,11 @@
  */
 package com.bytedesk.core.favorite;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.enums.ChannelEnum;
-import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,27 +62,27 @@ public class FavoriteService {
         }
 
         // 构建收藏实体
-        FavoriteEntity favoriteEntity = FavoriteEntity.builder()
-                .name(favoriteName)
-                .type(request.getFavoriteType())
-                .content(request.getFavoriteContent())
-                .messageType(request.getMessageType() != null ? request.getMessageType() : MessageTypeEnum.TEXT.name())
-                .messageStatus(request.getMessageStatus() != null ? request.getMessageStatus() : MessageStatusEnum.SUCCESS.name())
-                .messageSender(request.getMessageSender() != null ? request.getMessageSender() : BytedeskConsts.EMPTY_JSON_STRING)
-                .messageReceiver(request.getMessageReceiver() != null ? request.getMessageReceiver() : BytedeskConsts.EMPTY_JSON_STRING)
-                .threadInfo(request.getThreadInfo() != null ? request.getThreadInfo() : BytedeskConsts.EMPTY_JSON_STRING)
-                .messageChannel(request.getMessageChannel() != null ? request.getMessageChannel() : ChannelEnum.WEB.name())
-                .messageExtra(request.getMessageExtra() != null ? request.getMessageExtra() : BytedeskConsts.EMPTY_JSON_STRING)
-                .tagList(request.getTagList() != null ? request.getTagList() : List.of())
-                .description(request.getDescription())
-                .category(request.getCategory())
-                .isPinned(request.getIsPinned() != null ? request.getIsPinned() : false)
-                .favoriteSource(request.getFavoriteSource() != null ? request.getFavoriteSource() : FavoriteSourceEnum.MANUAL.name())
-                .originalMessageUid(request.getOriginalMessageUid())
-                .originalThreadUid(request.getOriginalThreadUid())
-                .userUid(request.getUserUid())
-                .orgUid(request.getOrgUid())
-                .build();
+        // FavoriteEntity favoriteEntity = FavoriteEntity.builder()
+        //         .name(favoriteName)
+        //         .type(request.getFavoriteType())
+        //         .content(request.getFavoriteContent())
+        //         .messageType(request.getMessageType() != null ? request.getMessageType() : MessageTypeEnum.TEXT.name())
+        //         .messageStatus(request.getMessageStatus() != null ? request.getMessageStatus() : MessageStatusEnum.SUCCESS.name())
+        //         .messageSender(request.getMessageSender() != null ? request.getMessageSender() : BytedeskConsts.EMPTY_JSON_STRING)
+        //         .messageReceiver(request.getMessageReceiver() != null ? request.getMessageReceiver() : BytedeskConsts.EMPTY_JSON_STRING)
+        //         .threadInfo(request.getThreadInfo() != null ? request.getThreadInfo() : BytedeskConsts.EMPTY_JSON_STRING)
+        //         .messageChannel(request.getMessageChannel() != null ? request.getMessageChannel() : ChannelEnum.WEB.name())
+        //         .messageExtra(request.getMessageExtra() != null ? request.getMessageExtra() : BytedeskConsts.EMPTY_JSON_STRING)
+        //         .tagList(request.getTagList() != null ? request.getTagList() : List.of())
+        //         .description(request.getDescription())
+        //         .category(request.getCategory())
+        //         .isPinned(request.getIsPinned() != null ? request.getIsPinned() : false)
+        //         .favoriteSource(request.getFavoriteSource() != null ? request.getFavoriteSource() : FavoriteSourceEnum.MANUAL.name())
+        //         .originalMessageUid(request.getOriginalMessageUid())
+        //         .originalThreadUid(request.getOriginalThreadUid())
+        //         .userUid(request.getUserUid())
+        //         .orgUid(request.getOrgUid())
+        //         .build();
 
         // 保存收藏
         // FavoriteEntity savedEntity = favoriteRepository.save(favoriteEntity);
