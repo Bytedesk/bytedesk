@@ -53,19 +53,17 @@ public class QuotationContent extends BaseContent {
      * 对于其他类型消息，存储JSON格式的内容
      */
     private String quotedContent;
+    
+    // 被引用消息唯一标识
+    private String quotedMessageUid;
 
     // 被引用消息发送人
     private String quotedSenderName;
     
-    // 被引用消息发送时间
-    private ZonedDateTime quotedCreatedAt;
-    
-    // 被引用消息唯一标识
-    private String quotedMessageUid;
-    
     // 被引用消息发送人唯一标识
     private String quotedSenderUid;
     
-    
+    // 被引用消息发送时间
+    private ZonedDateTime quotedCreatedAt;
     
 }
