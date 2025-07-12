@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import com.bytedesk.core.base.BaseContent;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,6 +54,7 @@ public class EmailContent extends BaseContent {
     /**
      * 邮件附件列表
      */
+    @Builder.Default
     private List<EmailAttachment> attachments = new ArrayList<>();
     
     /**
@@ -113,6 +115,7 @@ public class EmailContent extends BaseContent {
         /**
          * 是否内联附件
          */
+        @Builder.Default
         private Boolean isInline = false;
     }
     
