@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-12 11:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:00:00
+ * @LastEditTime: 2025-07-12 11:40:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,9 +14,6 @@
 package com.bytedesk.core.favorite;
 
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.enums.ChannelEnum;
-import com.bytedesk.core.constant.BytedeskConsts;
 
 /**
  * 收藏工具类
