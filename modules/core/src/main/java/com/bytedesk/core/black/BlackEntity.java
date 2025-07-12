@@ -69,7 +69,7 @@ public class BlackEntity extends BaseEntity {
 
     // // 执行拉黑的用户uid
     // @Column(nullable = false)
-    // private String userUid;
+    private String name;
 
     // 执行拉黑的用户昵称
     private String userNickname;

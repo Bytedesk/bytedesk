@@ -51,5 +51,5 @@ public class PushRequest extends BaseRequest {
     // private String platform = PlatformEnum.BYTEDESK.name();
 
     // 修改邮箱、手机号需要记录用户uid和组织uid
-    // private String userUid;
+    private String name;
 }

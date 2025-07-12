@@ -52,7 +52,7 @@ public class BlackExcel  extends BaseExcel {
 
     // @ExcelProperty(value = "客服UID")
     // @ColumnWidth(20)
-    // private String userUid;
+    private String name;
 
     @ExcelProperty(value = "客服昵称")
     @ColumnWidth(25)

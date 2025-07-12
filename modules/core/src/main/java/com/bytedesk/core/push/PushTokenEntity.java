@@ -48,5 +48,5 @@ public class PushTokenEntity extends BaseEntity {
     // ios or android
     private String device;
 
-    // private String userUid;
+    private String name;
 }

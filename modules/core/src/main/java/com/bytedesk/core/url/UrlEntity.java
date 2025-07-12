@@ -41,5 +41,5 @@ public class UrlEntity extends BaseEntity {
     // 生成的二维码地址
     // private String qrcodeUrl;
 
-    // private String userUid;
+    private String name;
 }

@@ -47,7 +47,7 @@ public class BlackResponse extends BaseResponse {
     private Boolean blockIp;
 
     // 执行拉黑的用户uid
-    // private String userUid;
+    private String name;
 
     // 执行拉黑的用户昵称
     private String userNickname;

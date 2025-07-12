@@ -52,6 +52,6 @@ public class ClipboardEntity extends BaseEntity {
     private String type = MessageTypeEnum.TEXT.name();
     
     // 用户uid
-    // private String userUid;
+    private String name;
     
 }

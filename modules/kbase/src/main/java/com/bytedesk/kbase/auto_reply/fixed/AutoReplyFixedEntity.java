@@ -82,5 +82,5 @@ public class AutoReplyFixedEntity extends BaseEntity {
     private String kbUid; // 对应知识库
     
     // user uid
-    // private String userUid;
+    private String name;
 }

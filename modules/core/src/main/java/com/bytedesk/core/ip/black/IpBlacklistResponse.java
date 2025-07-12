@@ -39,6 +39,6 @@ public class IpBlacklistResponse extends BaseResponse {
     private String blackUid;
     private String blackNickname;
 
-    // private String userUid;
+    private String name;
     private String userNickname;
 }

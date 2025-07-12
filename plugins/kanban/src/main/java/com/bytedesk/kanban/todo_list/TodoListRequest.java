@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:05:47
+ * @LastEditTime: 2025-07-12 10:18:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,6 +60,4 @@ public class TodoListRequest extends BaseRequest {
 
     @Builder.Default
     private List<String> taskUids = new ArrayList<>();
-
-    // private String userUid;
 }

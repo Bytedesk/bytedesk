@@ -27,5 +27,5 @@ public class UrlRequest extends BaseRequest {
 
     private String url;
 
-    // private String userUid;
+    private String name;
 }

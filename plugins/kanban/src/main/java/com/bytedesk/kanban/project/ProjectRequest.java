@@ -60,10 +60,6 @@ public class ProjectRequest extends BaseRequest {
     @Builder.Default
     private List<String> modulesUids = new ArrayList<>();
 
-    // private String parentUid;
-
-    // private String userUid;
-
     // 是否公开，公开后，对外匿名可见
     @Builder.Default
     private Boolean isPublic = false;
