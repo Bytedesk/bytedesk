@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-19 16:24:02
+ * @LastEditTime: 2025-07-12 16:20:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,6 +61,7 @@ public enum MessageTypeEnum {
     PROCESSING, // 正在处理，等待大模型回复中
     // 
     STICKER, // 贴纸
+    EMAIL, // 邮件
     // 
     BUTTON, // 按钮消息
     BUTTON_SUBMIT, // 按钮提交
