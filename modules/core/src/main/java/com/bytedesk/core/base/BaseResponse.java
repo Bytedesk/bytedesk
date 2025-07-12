@@ -34,9 +34,9 @@ public abstract class BaseResponse implements Serializable {
 
     protected String uid;
 
-    private String userUid;
+    protected String userUid;
 
-    private String orgUid;
+    protected String orgUid;
 
     private String level;
 

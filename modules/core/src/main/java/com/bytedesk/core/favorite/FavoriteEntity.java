@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:11:21
+ * @LastEditTime: 2025-07-12 11:15:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
@@ -44,7 +45,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_core_favorite")
-public class FavoriteEntity extends BaseEntity {
+public class FavoriteEntity extends BaseEntityNoOrg {
 
     /**
      * 收藏名称/标题

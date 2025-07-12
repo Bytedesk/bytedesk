@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 10:53:51
+ * @LastEditTime: 2025-07-12 11:15:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,7 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
         FavoriteEntity entity = modelMapper.map(request, FavoriteEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
-        entity.setOrgUid(user.getOrgUid());
+        // entity.setOrgUid(user.getOrgUid());
 
         FavoriteEntity savedEntity = save(entity);
         if (savedEntity == null) {

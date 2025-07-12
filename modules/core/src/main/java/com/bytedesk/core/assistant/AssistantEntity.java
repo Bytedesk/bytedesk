@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:40:31
+ * @LastEditTime: 2025-07-12 11:32:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,8 +55,5 @@ public class AssistantEntity extends BaseEntityNoOrg {
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
-
-    // @Builder.Default
-    // private String level = LevelEnum.PLATFORM.name();
 
 }
