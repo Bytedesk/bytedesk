@@ -126,6 +126,9 @@ declare interface ChatConfig {
     visitorUid?: string;
     nickname?: string;
     avatar?: string;
+    mobile?: string;
+    email?: string;
+    note?: string;
     extra?: string;
     goodsInfo?: string;
     orderInfo?: string;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 11:02:07
+ * @LastEditTime: 2025-07-12 09:31:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,6 +101,15 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
             if (StringUtils.hasText(request.getAvatar())) {
                 visitor.setAvatar(request.getAvatar());
             }
+            if (StringUtils.hasText(request.getMobile())) {
+                visitor.setMobile(request.getMobile());
+            }
+            if (StringUtils.hasText(request.getEmail())) {
+                visitor.setEmail(request.getEmail());
+            }
+            if (StringUtils.hasText(request.getNote())) {
+                visitor.setNote(request.getNote());
+            }
             // 对比ip是否有变化
             if (visitor.getIp() == null || !visitor.getIp().equals(request.getIp())) {
                 // 更新浏览信息
@@ -135,7 +144,6 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         // 
         log.info("request {}", request);
         VisitorEntity visitor = modelMapper.map(request, VisitorEntity.class);
-        //
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
         visitor.setDeviceInfo(device);
         //
