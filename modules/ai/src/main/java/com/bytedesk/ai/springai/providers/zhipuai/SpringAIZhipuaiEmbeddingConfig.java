@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import lombok.Data;
 /**
@@ -59,7 +58,6 @@ public class SpringAIZhipuaiEmbeddingConfig {
     }
 
     @Bean("bytedeskZhipuaiEmbeddingModel")
-    @Primary
     EmbeddingModel bytedeskZhipuaiEmbeddingModel() {
         return new ZhiPuAiEmbeddingModel(bytedeskZhipuaiEmbeddingApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
     }
