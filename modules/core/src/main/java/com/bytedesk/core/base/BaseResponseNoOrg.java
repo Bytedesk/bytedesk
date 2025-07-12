@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:34:35
+ * @LastEditTime: 2025-07-12 11:48:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,31 +13,48 @@
  */
 package com.bytedesk.core.base;
 
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.utils.BdDateUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
-@ToString
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public abstract class BaseResponseNoOrg extends BaseResponse {
+@NoArgsConstructor
+public abstract class BaseResponseNoOrg implements Serializable {
 
-    // 继承父类的所有字段和方法，但不需要userUid和orgUid字段
-    // 子类可以通过重写getter方法来隐藏这些字段
+    protected String uid;
+
+    protected String userUid;
+
+    private String level;
+
+    private String platform;
+
+    protected ZonedDateTime createdAt;
     
-    @Override
-    public String getUserUid() {
-        return null; // 不包含用户ID
+    protected ZonedDateTime updatedAt;
+
+    public String getCreatedAt() {
+        return BdDateUtils.formatDatetimeToString(createdAt);
     }
-    
-    @Override
-    public String getOrgUid() {
-        return null; // 不包含组织ID
+
+    public String getUpdatedAt() {
+        return BdDateUtils.formatDatetimeToString(updatedAt);
+    }
+
+    public String toJson() {
+        return JSON.toJSONString(this);
     }
 }
