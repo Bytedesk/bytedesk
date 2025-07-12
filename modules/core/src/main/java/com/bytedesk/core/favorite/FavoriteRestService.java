@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:20:18
+ * @LastEditTime: 2025-07-12 10:53:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,8 +45,7 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
 
     @Override
     public Page<FavoriteResponse> queryByOrg(FavoriteRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
+        Pageable pageable = request.getPageable();
         Specification<FavoriteEntity> spec = FavoriteSpecification.search(request);
         Page<FavoriteEntity> page = favoriteRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
@@ -55,8 +53,12 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
 
     @Override
     public Page<FavoriteResponse> queryByUser(FavoriteRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("login first");
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "favorite", key = "#uid", unless="#result==null")
@@ -101,16 +103,6 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
         else {
             throw new RuntimeException("Favorite not found");
         }
-    }
-
-    @Override
-    public FavoriteEntity save(FavoriteEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        }
-        return null;
     }
 
     @Override

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-23 17:02:46
+ * @Date: 2025-07-12 11:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-23 17:02:48
+ * @LastEditTime: 2025-07-12 11:02:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,13 @@
  */
 package com.bytedesk.core.favorite;
 
-public enum FavoriteTypeEnum {
-    THREAD,    // 会话收藏
-    CUSTOMER,  // 客户收藏
-    MESSAGE    // 消息收藏
-}
+/**
+ * 收藏来源枚举
+ */
+public enum FavoriteSourceEnum {
+    MANUAL,     // 手动收藏
+    AUTO,       // 自动收藏
+    IMPORT,     // 导入收藏
+    SHARE,      // 分享收藏
+    FORWARD     // 转发收藏
+} 

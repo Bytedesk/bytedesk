@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.favorite;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -30,11 +32,89 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class FavoriteResponse extends BaseResponse {
 
+    /**
+     * 收藏名称/标题
+     */
     private String name;
 
+    /**
+     * 收藏类型：THREAD(会话收藏)、CUSTOMER(客户收藏)、MESSAGE(消息收藏)
+     */
     private String type;
 
-    // private String color;
+    /**
+     * 收藏的消息内容
+     */
+    private String content;
 
-    // private ZonedDateTime createdAt;
+    /**
+     * 消息类型：TEXT、IMAGE、FILE、AUDIO、VIDEO等
+     */
+    private String messageType;
+
+    /**
+     * 消息状态
+     */
+    private String messageStatus;
+
+    /**
+     * 消息发送人信息（JSON格式）
+     */
+    private String messageSender;
+
+    /**
+     * 消息接收人信息（JSON格式）
+     */
+    private String messageReceiver;
+
+    /**
+     * 会话信息（JSON格式）
+     */
+    private String threadInfo;
+
+    /**
+     * 消息来源渠道：WEB、ANDROID、IOS等
+     */
+    private String messageChannel;
+
+    /**
+     * 消息额外信息（JSON格式）
+     */
+    private String messageExtra;
+
+    /**
+     * 收藏的标签列表
+     */
+    private List<String> tagList;
+
+    /**
+     * 收藏描述/备注
+     */
+    private String description;
+
+    /**
+     * 收藏分类
+     */
+    private String category;
+
+    /**
+     * 是否置顶
+     */
+    private Boolean isPinned;
+
+    /**
+     * 收藏来源：手动收藏、自动收藏等
+     */
+    private String favoriteSource;
+
+    /**
+     * 原始消息ID（如果是从消息收藏的）
+     */
+    private String originalMessageUid;
+
+    /**
+     * 原始会话ID（如果是从会话收藏的）
+     */
+    private String originalThreadUid;
+
 }
