@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:40:31
+ * @LastEditTime: 2025-07-12 11:56:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,13 +84,6 @@ public class FavoriteEntity extends BaseEntityNoOrg {
     @Builder.Default
     @Column(name = "message_sender", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String messageSender = BytedeskConsts.EMPTY_JSON_STRING;
-
-    /**
-     * 消息接收人信息（JSON格式）
-     */
-    @Builder.Default
-    @Column(name = "message_receiver", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String messageReceiver = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 会话信息（JSON格式）

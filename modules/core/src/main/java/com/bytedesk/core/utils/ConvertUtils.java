@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 13:01:35
+ * @LastEditTime: 2025-07-12 11:55:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,8 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserOrganizationRoleResponse;
+import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -47,6 +49,13 @@ public class ConvertUtils {
 
     private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
 
+    // 静态初始化块，配置 ModelMapper
+    static {
+        // 配置 ModelMapper 忽略模糊映射
+        modelMapper.getConfiguration()
+            .setAmbiguityIgnored(true);
+    }
+
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
         // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities
         return modelMapper.map(userDetails, UserResponse.class);
@@ -54,6 +63,43 @@ public class ConvertUtils {
 
     public static UserResponse convertToUserResponse(UserEntity user) {
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        
+        // 手动处理 userOrganizationRoles 映射
+        if (user.getUserOrganizationRoles() != null) {
+            Set<UserOrganizationRoleResponse> userOrgRoleResponses = user.getUserOrganizationRoles().stream()
+                .map(uor -> {
+                    UserOrganizationRoleResponse response = new UserOrganizationRoleResponse();
+                    // 映射组织信息
+                    if (uor.getOrganization() != null) {
+                        OrganizationResponseSimple orgResponse = new OrganizationResponseSimple();
+                        orgResponse.setUid(uor.getOrganization().getUid());
+                        orgResponse.setName(uor.getOrganization().getName());
+                        orgResponse.setLogo(uor.getOrganization().getLogo());
+                        orgResponse.setCode(uor.getOrganization().getCode());
+                        orgResponse.setDescription(uor.getOrganization().getDescription());
+                        orgResponse.setVerifyStatus(uor.getOrganization().getVerifyStatus());
+                        response.setOrganization(orgResponse);
+                    }
+                    // 映射角色信息
+                    if (uor.getRoles() != null) {
+                        Set<RoleResponse> roleResponses = uor.getRoles().stream()
+                            .map(role -> {
+                                RoleResponse roleResponse = new RoleResponse();
+                                roleResponse.setUid(role.getUid());
+                                roleResponse.setName(role.getName());
+                                roleResponse.setDescription(role.getDescription());
+                                roleResponse.setLevel(role.getLevel());
+                                return roleResponse;
+                            })
+                            .collect(Collectors.toSet());
+                        response.setRoles(roleResponses);
+                    }
+                    return response;
+                })
+                .collect(Collectors.toSet());
+            userResponse.setUserOrganizationRoles(userOrgRoleResponses);
+        }
+        
         Set<GrantedAuthority> authorities = filterUserGrantedAuthorities(user);
         userResponse.setAuthorities(authorities);
         return userResponse;

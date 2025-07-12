@@ -18,13 +18,15 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequestNoOrg;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
@@ -40,12 +42,12 @@ public class FavoriteRequest extends BaseRequestNoOrg {
     /**
      * 收藏类型：THREAD(会话收藏)、CUSTOMER(客户收藏)、MESSAGE(消息收藏)
      */
-    private String favoriteType;
+    // private String type;
 
     /**
      * 收藏的消息内容
      */
-    private String favoriteContent;
+    // private String content;
 
     /**
      * 消息类型：TEXT、IMAGE、FILE、AUDIO、VIDEO等
@@ -61,11 +63,6 @@ public class FavoriteRequest extends BaseRequestNoOrg {
      * 消息发送人信息（JSON格式）
      */
     private String messageSender;
-
-    /**
-     * 消息接收人信息（JSON格式）
-     */
-    private String messageReceiver;
 
     /**
      * 会话信息（JSON格式）
