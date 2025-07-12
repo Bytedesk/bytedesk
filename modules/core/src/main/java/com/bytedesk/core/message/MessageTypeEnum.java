@@ -166,7 +166,8 @@ public enum MessageTypeEnum {
                 || MessageTypeEnum.VIDEO == type
                 || MessageTypeEnum.MUSIC == type
                 || MessageTypeEnum.LOCATION == type
-                || MessageTypeEnum.CARD == type;
+                || MessageTypeEnum.CARD == type
+                || MessageTypeEnum.QUOTATION == type;
     }
 
 }
