@@ -59,7 +59,7 @@
 - 工作流
 - ...
 
-### 工作流
+### [工作流](./modules/core/readme.workflow.md)
 
 - 自定义表单
 - 自定义流程

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 18:36:55
+ * @LastEditTime: 2025-07-13 17:00:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,7 +61,7 @@ AI powered Omnichannel customer service With Team Cooperation
 - Function calling
 - Mcp
 
-### workflow
+### [workflow](./modules/core/readme.workflow.md)
 
 - form
 - process
