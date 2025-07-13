@@ -121,7 +121,7 @@ Listed course START -->
 			</div>
 
 			<!-- Item -->
-			<div class="col-sm-6 col-md-4 col-xl-3">
+			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/home.svg" alt="项目管理图标">
@@ -129,10 +129,10 @@ Listed course START -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="stretched-link" target="_blank">项目管理</a></h5>
 					<span class="mb-0">看板、日报、任务管理</span>
 				</div>
-			</div>
+			</div>  -->
 
 			<!-- Item -->
-			<div class="col-sm-6 col-md-4 col-xl-3">
+			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/coding.svg" alt="插件模块图标">
@@ -140,7 +140,7 @@ Listed course START -->
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="stretched_link" target="_blank">插件模块</a></h5>
 					<span class="mb-0">扩展能力，支持第三方插件开发和集成，自定义业务流程、API对接，插件商店，一键安装</span>
 				</div>
-			</div>
+			</div>  -->
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
@@ -168,10 +168,10 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/engineering.svg" alt="视频会议图标">
+						<img src="assets/images/element/engineering.svg" alt="开放平台图标">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="stretched_link" target="_blank">视频会议</a></h5>
-					<span class="mb-0">多人视频会议，会议室管理，会议录制，白板协作，聊天互动，支持Jitsi Meet集成</span>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="stretched_link" target="_blank">开放平台</a></h5>
+					<span class="mb-0">API接口开放，第三方集成，开发者工具，SDK支持，插件生态，开放API文档</span>
 				</div>
 			</div>
 			

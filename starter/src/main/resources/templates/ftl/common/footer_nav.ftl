@@ -92,14 +92,14 @@
 					<div class="col-6 col-lg-3">
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="text-reset d-inline-block mb-1" target="_blank">工作流</a>
 					</div>
-					<div class="col-6 col-lg-3">
+					<#--  <div class="col-6 col-lg-3">
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
-					</div>
+					</div>  -->
 
 					<!-- 第三行 -->
-					<div class="col-6 col-lg-3">
+					<#--  <div class="col-6 col-lg-3">
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="text-reset d-inline-block mb-1" target="_blank">插件模块</a>
-					</div>
+					</div>  -->
 					<div class="col-6 col-lg-3">
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="text-reset d-inline-block mb-1" target="_blank">呼叫中心</a>
 					</div>
@@ -107,7 +107,7 @@
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank">视频客服</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/jitsi" class="text-reset d-inline-block mb-1" target="_blank">视频会议</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="text-reset d-inline-block mb-1" target="_blank">开放平台</a>
 					</div>
 
 					<#--  第四行  -->
