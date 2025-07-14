@@ -1,0 +1,4 @@
+header-includes:
+  - |
+    \usepackage{xeCJK}
+    \setCJKmainfont{PingFang SC}
