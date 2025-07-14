@@ -123,7 +123,7 @@ services:
       BYTEDESK_CUSTOM_LOGO: 
       BYTEDESK_CUSTOM_DESCRIPTION: 
       BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: "false"
-      BYTEDESK_CUSTOM_SHOW_DEMO: "false"
+      BYTEDESK_CUSTOM_SHOW_DEMO: "true"
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
       BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: "true"
