@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
@@ -32,7 +33,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "工作流管理", description = "工作流管理相关接口")
+@Tag(name = "Workflow Management", description = "Workflow management APIs for process automation and task management")
+@Description("Workflow Management Controller - Business process automation and workflow management APIs")
 @RestController
 @RequestMapping("/api/v1/workflow")
 @AllArgsConstructor

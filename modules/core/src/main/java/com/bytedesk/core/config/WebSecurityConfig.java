@@ -16,6 +16,7 @@ package com.bytedesk.core.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -42,6 +43,7 @@ import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Description("Web Security Configuration - Web安全配置类，配置JWT认证、CORS、CSRF等安全策略")
 public class WebSecurityConfig {
 
     @Autowired

@@ -15,6 +15,7 @@ package com.bytedesk.core.socket.stomp;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -33,6 +34,7 @@ import com.bytedesk.core.socket.stomp.handler.CustomWebSocketHandlerDecoratorFac
  */
 @Configuration
 @EnableWebSocketMessageBroker
+@Description("STOMP WebSocket Configuration - STOMP over WebSocket configuration for real-time messaging")
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
     /**

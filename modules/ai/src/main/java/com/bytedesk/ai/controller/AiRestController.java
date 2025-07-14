@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.annotation.PostConstruct;
@@ -37,6 +38,7 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ai")
+@Description("AI REST Controller - AI service APIs for chat completions, embeddings, and streaming responses")
 public class AiRestController {
     
     @Autowired

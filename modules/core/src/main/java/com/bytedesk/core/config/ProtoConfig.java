@@ -15,6 +15,8 @@ package com.bytedesk.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,6 +26,8 @@ import java.util.Collections;
  * @author bytedesk.com on 2019-08-01
  */
 @Configuration
+@Import({ProtobufHttpMessageConverter.class})
+@Description("Protocol Buffers Configuration - Protocol Buffers message converter configuration")
 public class ProtoConfig {
 
     /**

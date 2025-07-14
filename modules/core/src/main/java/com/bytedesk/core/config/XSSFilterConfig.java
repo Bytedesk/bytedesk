@@ -13,9 +13,13 @@
  */
 package com.bytedesk.core.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 @Configuration
+@Description("XSS Filter Configuration - Cross-site scripting protection filter configuration")
 public class XSSFilterConfig {
 
 	// @Bean

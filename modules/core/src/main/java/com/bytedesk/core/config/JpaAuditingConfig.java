@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -29,6 +30,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 @Configuration
 @EnableJpaAuditing(dateTimeProviderRef = "dateTimeProvider")
+@Description("JPA Auditing Configuration - JPA entity auditing configuration for automatic timestamp management")
 public class JpaAuditingConfig {
 
     /**

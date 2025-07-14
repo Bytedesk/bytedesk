@@ -14,13 +14,15 @@
 package com.bytedesk.core.socket.mqtt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = MqttProperties.CONFIG_PREFIX)
+@ConfigurationProperties(prefix = "bytedesk.mqtt")
+@Description("MQTT Properties Configuration - MQTT broker connection and configuration properties")
 public class MqttProperties {
 
     public static final String CONFIG_PREFIX = "bytedesk.socket";

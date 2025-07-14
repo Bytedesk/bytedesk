@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
@@ -43,7 +44,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/upload")
-@Tag(name = "文件上传管理", description = "文件上传管理相关接口")
+@Tag(name = "Upload Management", description = "File upload management APIs")
+@Description("File Upload Controller - File upload and management APIs for handling file operations")
 public class UploadRestController extends BaseRestController<UploadRequest> {
 
 	private final UploadRestService uploadRestService;

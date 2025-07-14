@@ -15,12 +15,14 @@ package com.bytedesk.kbase.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.annotation.Description;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/kbase")
+@Description("Knowledge Base Route Controller - Knowledge base module route controller for handling knowledge base page requests")
 public class KbaseRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")

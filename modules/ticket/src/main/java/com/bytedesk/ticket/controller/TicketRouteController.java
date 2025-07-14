@@ -15,12 +15,14 @@ package com.bytedesk.ticket.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.annotation.Description;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/ticket")
+@Description("Ticket Route Controller - Ticket module route controller for handling ticket-related page requests")
 public class TicketRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")

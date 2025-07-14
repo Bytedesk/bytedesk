@@ -14,8 +14,10 @@
 package com.bytedesk.kbase.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 
 @Configuration
+@Description("Knowledge Base Configuration - Knowledge base module configuration and settings")
 public class KbaseConfig {
 
        

@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
@@ -32,6 +33,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/menu")
 @AllArgsConstructor
 @Tag(name = "Menu Management", description = "Menu management APIs for organizing application navigation and permissions")
+@Description("Menu Management Controller - Application menu and navigation management APIs")
 public class MenuRestController extends BaseRestController<MenuRequest> {
 
     private final MenuRestService menuService;

@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
@@ -33,6 +34,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/tag")
 @AllArgsConstructor
 @Tag(name = "Tag Management", description = "Tag management APIs for organizing and categorizing content with tags")
+@Description("Tag Management Controller - Content tagging and categorization APIs")
 public class TagRestController extends BaseRestController<TagRequest> {
 
     private final TagRestService tagRestService;

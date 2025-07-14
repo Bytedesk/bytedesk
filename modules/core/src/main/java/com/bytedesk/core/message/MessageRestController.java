@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
@@ -44,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @RequestMapping("/api/v1/message")
 @Tag(name = "消息管理", description = "消息管理相关接口，包括查询、创建、更新、删除等操作")
+@Description("Message Management Controller - Message management APIs for CRUD operations")
 public class MessageRestController extends BaseRestController<MessageRequest> {
 
     private final MessageRestService messageRestService;

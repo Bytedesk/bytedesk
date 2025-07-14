@@ -15,6 +15,7 @@ package com.bytedesk.kbase.config;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 
 /**
  * Spring Batch配置类
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableBatchProcessing
+@Description("Batch Processing Configuration - Spring Batch configuration for knowledge base data processing")
 public class BatchConfig {
 
     // @Autowired

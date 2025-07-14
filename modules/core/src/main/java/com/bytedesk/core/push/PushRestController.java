@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/push")
 @RequiredArgsConstructor
 @Tag(name = "Push Notification Management", description = "Push notification management APIs for sending and managing push notifications")
+@Description("Push Notification Controller - Push notification and messaging APIs")
 public class PushRestController extends BaseRestController<PushRequest> {
 
     private final PushRestService pushService;

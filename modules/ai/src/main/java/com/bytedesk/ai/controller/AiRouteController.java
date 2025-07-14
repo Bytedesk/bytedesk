@@ -15,12 +15,14 @@ package com.bytedesk.ai.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.annotation.Description;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/ai")
+@Description("AI Route Controller - AI module route controller for handling AI-related page requests")
 public class AiRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")

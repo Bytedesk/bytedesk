@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.utils.JsonResult;
 
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1/upload")
 @Tag(name = "Visitor Upload Management", description = "Visitor upload APIs for anonymous file uploads")
+@Description("Visitor Upload Controller - Anonymous file upload APIs for visitors without authentication")
 public class UploadRestControllerVisitor {
 
     private final UploadRestService uploadService;

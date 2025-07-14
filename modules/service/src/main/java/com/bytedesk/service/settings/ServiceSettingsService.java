@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Description;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotEntity;
@@ -39,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Description("Service Settings Service - Customer service settings management for agents and workgroups")
 public class ServiceSettingsService {
 
     private final ModelMapper modelMapper;

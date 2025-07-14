@@ -14,8 +14,10 @@
 package com.bytedesk.kbase;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Description;
 
 @SpringBootApplication
+@Description("Bytedesk Knowledge Base Module - Knowledge base and FAQ management module for content organization")
 public class KbaseApplication {
 
 	// public static void main(String[] args) {

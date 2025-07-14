@@ -16,11 +16,12 @@ package com.bytedesk.ticket.config;
 import org.flowable.ldap.LDAPConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.context.annotation.Description;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
+@Description("LDAP Configuration - LDAP directory service configuration for user authentication and group management")
 public class LdapConfig {
 
     @Bean

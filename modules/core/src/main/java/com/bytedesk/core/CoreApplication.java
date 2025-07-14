@@ -15,8 +15,10 @@ package com.bytedesk.core;
 
 // import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Description;
 
 @SpringBootApplication
+@Description("Bytedesk Core Module - 核心模块主应用类，提供基础功能和配置")
 public class CoreApplication {
 
 	// public static void main(String[] args) {

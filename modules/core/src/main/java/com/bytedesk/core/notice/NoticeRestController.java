@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/notice")
 @RequiredArgsConstructor
 @Tag(name = "Notice Management", description = "Notice management APIs for system announcements and notifications")
+@Description("Notice Management Controller - System notice and announcement management APIs")
 public class NoticeRestController extends BaseRestController<NoticeRequest> {
 
     private final NoticeRestService noticeRestService;

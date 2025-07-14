@@ -17,6 +17,7 @@ package com.bytedesk.core.config;
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 // import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -31,6 +32,7 @@ import com.bytedesk.core.ip.access.IpAccessInterceptor;
 
 // @Slf4j
 @Configuration
+@Description("Web MVC Configuration - Web MVC配置类，配置跨域、拦截器、消息转换器等")
 public class WebMvcConfig implements WebMvcConfigurer {
 
     // https://www.baeldung.com/spring-mvc-static-resources

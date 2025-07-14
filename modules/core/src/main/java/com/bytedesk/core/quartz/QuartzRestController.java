@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -35,6 +36,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/api/v1/quartz")
 @Tag(name = "Quartz Job Management", description = "Quartz job scheduling and management APIs")
+@Description("Quartz Job Management Controller - Task scheduling and job management APIs using Quartz")
 public class QuartzRestController extends BaseRestController<QuartzRequest> {
 
     private QuartzRestService quartzRestService;

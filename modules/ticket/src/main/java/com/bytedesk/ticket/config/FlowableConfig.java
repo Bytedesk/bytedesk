@@ -17,8 +17,10 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 
 @Configuration
+@Description("Flowable Workflow Configuration - Flowable BPMN workflow engine configuration for ticket processing")
 public class FlowableConfig {
 
     // @Autowired

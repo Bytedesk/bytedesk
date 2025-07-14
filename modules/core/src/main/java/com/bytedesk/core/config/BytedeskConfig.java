@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +42,7 @@ import lombok.Getter;
  */
 @Getter
 @Configuration
+@Description("Bytedesk Core Configuration - 核心配置类，提供 ModelMapper、密码编码器、认证管理器等基础Bean")
 public class BytedeskConfig {
 
     @Value("${application.version}")

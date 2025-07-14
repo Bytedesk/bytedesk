@@ -14,7 +14,7 @@
 package com.bytedesk.core.feature;
 
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.context.annotation.Description;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RestController
 @RequestMapping("/features")
 @AllArgsConstructor
+@Description("Feature Controller - Feature flag and capability management APIs")
 public class FeatureController {
     
     // private final BytedeskProperties bytedeskProperties;

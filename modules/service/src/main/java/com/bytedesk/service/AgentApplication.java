@@ -15,8 +15,10 @@ package com.bytedesk.service;
 
 // import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Description;
 
 @SpringBootApplication
+@Description("Bytedesk Service Module - Customer service and agent management module for support operations")
 public class AgentApplication {
 
 	// public static void main(String[] args) {

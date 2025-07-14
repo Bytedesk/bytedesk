@@ -15,12 +15,14 @@ package com.bytedesk.service.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.annotation.Description;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/service")
+@Description("Service Route Controller - Customer service module route controller for handling service-related page requests")
 public class ServiceRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")

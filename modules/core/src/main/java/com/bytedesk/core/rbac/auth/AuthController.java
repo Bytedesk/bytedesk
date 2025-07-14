@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -42,6 +43,7 @@ import com.bytedesk.core.utils.JsonResult;
 @RequestMapping("/auth/v1")
 @AllArgsConstructor
 @Tag(name = "Authentication", description = "Authentication APIs")
+@Description("Authentication Controller - User authentication and authorization management")
 public class AuthController {
 
     private UserService userService;

@@ -14,12 +14,14 @@
 package com.bytedesk.core.config;
 
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Description;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Description("HTTP REST Service - Service for making HTTP GET and POST requests using RestTemplate")
 public class HttpRestService {
     
     private final RestTemplate restTemplate;

@@ -27,12 +27,14 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Description;
 // import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 // @Tag(name = "User Management", description = "User management APIs")
+@Description("User Management Controller - User management APIs for user CRUD operations")
 public class UserRestController extends BaseRestController<UserRequest> {
 
     private final UserRestService userRestService;

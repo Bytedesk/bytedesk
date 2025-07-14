@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 11:09:19
+ * @LastEditTime: 2025-07-14 18:25:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -31,6 +32,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/api/v1/category")
 @Tag(name = "Category Management", description = "Category management APIs for organizing and classifying content")
+@Description("Category Management Controller - Content categorization and organization APIs")
 public class CategoryRestController extends BaseRestController<CategoryRequest> {
     
     private final CategoryRestService categoryRestService;

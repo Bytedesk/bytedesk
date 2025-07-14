@@ -15,8 +15,10 @@ package com.bytedesk.ai;
 
 // import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Description;
 
 @SpringBootApplication
+@Description("Bytedesk AI Module - AI and machine learning module for chatbot and intelligent services")
 public class AiApplication {
 
 	// public static void main(String[] args) {

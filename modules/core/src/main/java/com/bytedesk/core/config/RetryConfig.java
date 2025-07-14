@@ -13,7 +13,9 @@
  */
 package com.bytedesk.core.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.retry.annotation.EnableRetry;
 
 /**
@@ -21,6 +23,7 @@ import org.springframework.retry.annotation.EnableRetry;
  */
 @Configuration
 @EnableRetry
+@Description("Retry Configuration - Retry mechanism configuration for handling transient failures")
 public class RetryConfig {
     // 仅用于启用Spring重试功能的配置类
     // 具体重试配置通过@Retryable注解在方法上实现

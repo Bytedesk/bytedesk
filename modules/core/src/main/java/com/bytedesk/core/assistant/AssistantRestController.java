@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/assistant")
 // @Tag(name = "assistant - 助手", description = "assistant apis")
+@Description("Assistant Management Controller - AI assistant and chatbot management APIs")
 public class AssistantRestController extends BaseRestController<AssistantRequest> {
 
     private final AssistantRestService assistantRestService;
