@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-14 09:47:23
+ * @LastEditTime: 2025-07-14 09:52:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -106,12 +106,12 @@ public class RelationRestService extends BaseRestServiceWithExcel<RelationEntity
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<RelationEntity> relation = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-            if (relation.isPresent()) {
-                return convertToResponse(relation.get());
-            }
-        }
+        // if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
+        //     Optional<RelationEntity> relation = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+        //     if (relation.isPresent()) {
+        //         return convertToResponse(relation.get());
+        //     }
+        // }
         // 
         UserEntity user = authService.getUser();
         if (user != null) {
@@ -201,21 +201,6 @@ public class RelationRestService extends BaseRestServiceWithExcel<RelationEntity
     public RelationExcel convertToExcel(RelationEntity entity) {
         return modelMapper.map(entity, RelationExcel.class);
     }
-    
-    public void initRelations(String orgUid) {
-        // log.info("initThreadRelation");
-        for (String relation : RelationInitData.getAllRelations()) {
-            RelationRequest relationRequest = RelationRequest.builder()
-                    .uid(Utils.formatUid(orgUid, relation))
-                    .name(relation)
-                    .order(0)
-                    .type(RelationTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(relationRequest);
-        }
-    }
+
     
 }

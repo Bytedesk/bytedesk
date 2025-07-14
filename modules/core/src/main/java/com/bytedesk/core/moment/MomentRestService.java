@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:05:26
+ * @LastEditTime: 2025-07-14 09:50:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -202,20 +202,20 @@ public class MomentRestService extends BaseRestServiceWithExcel<MomentEntity, Mo
         return modelMapper.map(entity, MomentExcel.class);
     }
     
-    public void initMoments(String orgUid) {
-        // log.info("initThreadMoment");
-        for (String moment : MomentInitData.getAllMoments()) {
-            MomentRequest momentRequest = MomentRequest.builder()
-                    .uid(Utils.formatUid(orgUid, moment))
-                    .name(moment)
-                    .order(0)
-                    .type(MomentTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(momentRequest);
-        }
-    }
+    // public void initMoments(String orgUid) {
+    //     // log.info("initThreadMoment");
+    //     for (String moment : MomentInitData.getAllMoments()) {
+    //         MomentRequest momentRequest = MomentRequest.builder()
+    //                 .uid(Utils.formatUid(orgUid, moment))
+    //                 .name(moment)
+    //                 .order(0)
+    //                 .type(MomentTypeEnum.THREAD.name())
+    //                 .level(LevelEnum.ORGANIZATION.name())
+    //                 .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+    //                 .orgUid(orgUid)
+    //                 .build();
+    //         create(momentRequest);
+    //     }
+    // }
     
 }

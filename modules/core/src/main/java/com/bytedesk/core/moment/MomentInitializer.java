@@ -16,7 +16,7 @@ package com.bytedesk.core.moment;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
+// import com.bytedesk.core.constant.BytedeskConsts;
 
 import lombok.AllArgsConstructor;
 
@@ -24,14 +24,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MomentInitializer implements SmartInitializingSingleton {
 
-    private final MomentRestService momentRestService;
+    // private final MomentRestService momentRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // 创建默认的工单分类
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        momentRestService.initMoments(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // momentRestService.initMoments(orgUid);
     }
 
     private void initPermissions() {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:50:06
+ * @LastEditTime: 2025-07-14 09:50:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,16 +28,16 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RelationEventListener {
 
-    private final RelationRestService relationRestService;
+    // private final RelationRestService relationRestService;
 
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        relationRestService.initRelations(orgUid);
-    }
+    // @Order(3)
+    // @EventListener
+    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
+    //     String orgUid = organization.getUid();
+    //     log.info("thread - organization created: {}", organization.getName());
+    //     relationRestService.initRelations(orgUid);
+    // }
 
  
 }

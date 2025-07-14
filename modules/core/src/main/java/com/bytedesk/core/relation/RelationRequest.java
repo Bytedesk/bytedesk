@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 14:24:05
+ * @LastEditTime: 2025-07-14 09:52:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,13 +31,6 @@ import java.util.List;
 @NoArgsConstructor
 public class RelationRequest extends BaseRequest {
 
-    private String name;
-
-    private String description;
-
-    private String color;
-
-    private Integer order;
 
     // ==================== 社交关系相关字段 ====================
     
