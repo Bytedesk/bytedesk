@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
@@ -38,6 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/workgroup")
+@Description("Workgroup Management Controller - Workgroup and team management APIs")
 public class WorkgroupRestController extends BaseRestController<WorkgroupRequest> {
 
     private final WorkgroupRestService workgroupRestService;

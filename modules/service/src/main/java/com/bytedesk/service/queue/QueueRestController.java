@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.thread.ThreadRequest;
@@ -37,6 +38,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/queue")
+@Description("Queue Management Controller - Customer service queue and routing management APIs")
 public class QueueRestController extends BaseRestController<QueueRequest> {
 
     private final QueueRestService queueRestService;

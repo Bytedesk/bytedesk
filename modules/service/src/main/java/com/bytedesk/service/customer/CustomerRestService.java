@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -31,6 +32,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Description("Customer Management Service - Customer information and relationship management service")
 public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity, CustomerRequest, CustomerResponse, CustomerExcel> {
     
     private final CustomerRepository customerRepository;
