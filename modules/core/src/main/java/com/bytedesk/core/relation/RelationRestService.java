@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:05:26
+ * @LastEditTime: 2025-07-14 09:47:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,7 +161,7 @@ public class RelationRestService extends BaseRestServiceWithExcel<RelationEntity
             if (latest.isPresent()) {
                 RelationEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-                latestEntity.setName(entity.getName());
+                // latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
                 return relationRepository.save(latestEntity);
