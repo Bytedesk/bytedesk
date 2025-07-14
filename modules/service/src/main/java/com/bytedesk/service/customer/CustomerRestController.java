@@ -32,11 +32,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @Tag(name = "客户管理", description = "客户管理相关接口")
 @RestController
 @RequestMapping("/api/v1/customer")
 @AllArgsConstructor
+@Description("Customer Management Controller - Customer information and relationship management APIs")
 public class CustomerRestController extends BaseRestController<CustomerRequest> {
 
     private final CustomerRestService customerService;

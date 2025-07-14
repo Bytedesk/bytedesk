@@ -28,10 +28,14 @@ import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @RestController
 @RequestMapping("/api/v1/llm/text")
 @AllArgsConstructor
+@Description("Text Management Controller - LLM text content management and vector processing APIs")
 public class TextRestController extends BaseRestController<TextRequest> {
 
     private final TextRestService textRestService;

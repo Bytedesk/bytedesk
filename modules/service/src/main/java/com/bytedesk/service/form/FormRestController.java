@@ -29,11 +29,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @Tag(name = "表单管理", description = "表单管理相关接口")
 @RestController
 @RequestMapping("/api/v1/form")
 @AllArgsConstructor
+@Description("Form Management Controller - Form creation and management APIs for customer service")
 public class FormRestController extends BaseRestController<FormRequest> {
 
     private final FormRestService formRestService;

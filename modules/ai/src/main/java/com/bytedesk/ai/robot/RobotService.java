@@ -30,10 +30,12 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Description;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Description("Robot Service - AI robot message processing and LLM integration service")
 public class RobotService {
 
     private final SpringAIServiceRegistry springAIServiceRegistry;

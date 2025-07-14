@@ -47,12 +47,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.context.annotation.Description;
 
 @Tag(name = "客服管理", description = "客服管理相关接口")
 @Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/agent")
+@Description("Agent Management Controller - Customer service agent management and chat APIs")
 public class AgentRestController extends BaseRestController<AgentRequest> {
 
     private final AgentRestService agentRestService;

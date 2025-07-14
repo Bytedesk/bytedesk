@@ -28,11 +28,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Description;
 
+@Tag(name = "模板管理", description = "模板管理相关接口")
 @RestController
 @RequestMapping("/api/v1/template")
 @AllArgsConstructor
-@Tag(name = "模板管理", description = "模板管理相关接口")
+@Description("Template Management Controller - Message template creation and management APIs")
 public class TemplateRestController extends BaseRestController<TemplateRequest> {
 
     private final TemplateRestService templateRestService;

@@ -32,11 +32,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @Tag(name = "知识库管理", description = "知识库管理相关接口")
 @RestController
 @RequestMapping("/api/v1/kbase")
 @AllArgsConstructor
+@Description("Knowledge Base Controller - Knowledge base content management and organization APIs")
 public class KbaseRestController extends BaseRestController<KbaseRequest> {
 
     private final KbaseRestService knowledgeService;

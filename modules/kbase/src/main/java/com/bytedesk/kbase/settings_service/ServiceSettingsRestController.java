@@ -25,11 +25,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @RestController
 @RequestMapping("/api/v1/service/setting")
 @AllArgsConstructor
 @Tag(name = "服务设置管理", description = "服务设置管理相关接口")
+@Description("Service Settings Controller - Knowledge base service configuration management APIs")
 public class ServiceSettingsRestController extends BaseRestController<ServiceSettingsRequest> {
 
     private final ServiceSettingsRestService serviceSettingService;
