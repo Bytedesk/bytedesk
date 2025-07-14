@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-14 09:52:31
+ * @LastEditTime: 2025-07-14 09:58:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,10 +89,10 @@ public class RelationRestService extends BaseRestServiceWithExcel<RelationEntity
         return relationRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "relation", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<RelationEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return relationRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
-    }
+    // @Cacheable(value = "relation", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
+    // public Optional<RelationEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
+    //     return relationRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+    // }
 
     public Boolean existsByUid(String uid) {
         return relationRepository.existsByUid(uid);
