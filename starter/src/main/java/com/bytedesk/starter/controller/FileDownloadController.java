@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class FileDownloadController {
 
     private final ResourceLoader resourceLoader;
-    private static final String FILES_PATH = "classpath:static/file/";
+    private static final String FILES_PATH = "classpath:static/downloads/file/";
 
     public FileDownloadController(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;

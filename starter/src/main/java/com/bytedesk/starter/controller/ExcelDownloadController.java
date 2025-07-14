@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-04 21:14:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-04 21:51:34
+ * @LastEditTime: 2025-07-14 10:33:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class ExcelDownloadController {
 
     private final ResourceLoader resourceLoader;
-    private static final String EXCEL_PATH = "classpath:static/excel/";
+    private static final String EXCEL_PATH = "classpath:static/downloads/excel/";
 
     public ExcelDownloadController(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
