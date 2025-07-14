@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 10:16:30
+ * @LastEditTime: 2025-07-14 17:22:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,34 +41,34 @@ public class SpringAIDashscopeChatConfig {
     @Value("${spring.ai.dashscope.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("dashscopeApi")
-    OpenAiApi dashscopeApi() {
+    @Bean("bytedeskDashscopeApi")
+    OpenAiApi bytedeskDashscopeApi() {
         return OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
     }
 
-    @Bean("dashscopeChatOptions")
-    OpenAiChatOptions dashscopeChatOptions() {
+    @Bean("bytedeskDashscopeChatOptions")
+    OpenAiChatOptions bytedeskDashscopeChatOptions() {
         return OpenAiChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
-    @Bean("dashscopeChatModel")
-    OpenAiChatModel dashscopeChatModel() {
+    @Bean("bytedeskDashscopeChatModel")
+    OpenAiChatModel bytedeskDashscopeChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(dashscopeApi())
-                .defaultOptions(dashscopeChatOptions())
+                .openAiApi(bytedeskDashscopeApi())
+                .defaultOptions(bytedeskDashscopeChatOptions())
                 .build();
     }
 
-    @Bean("dashscopeChatClient")
-    ChatClient dashscopeChatClient() {
-        return  ChatClient.builder(dashscopeChatModel())
-                .defaultOptions(dashscopeChatOptions())
+    @Bean("bytedeskDashscopeChatClient")
+    ChatClient bytedeskDashscopeChatClient() {
+        return  ChatClient.builder(bytedeskDashscopeChatModel())
+                .defaultOptions(bytedeskDashscopeChatOptions())
                 .build();
     }
 
