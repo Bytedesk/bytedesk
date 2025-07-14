@@ -31,12 +31,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @Tag(name = "访客管理", description = "访客管理相关接口")
 @Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/visitor")
+@Description("Visitor Management Controller - Visitor information and interaction management APIs")
 public class VisitorRestController extends BaseRestController<VisitorRequest> {
 
     private final VisitorRestService visitorRestService;

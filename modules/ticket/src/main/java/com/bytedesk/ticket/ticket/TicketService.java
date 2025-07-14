@@ -49,6 +49,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Description;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Description("Ticket Service - Workflow-based ticket management and processing service")
 public class TicketService {
 
     private final RuntimeService runtimeService;

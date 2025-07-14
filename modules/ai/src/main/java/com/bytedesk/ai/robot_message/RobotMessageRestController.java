@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -27,6 +28,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/robot/message")
 @AllArgsConstructor
+@Description("Robot Message Controller - AI robot message and conversation management APIs")
 public class RobotMessageRestController extends BaseRestController<RobotMessageRequest> {
 
     private final RobotMessageRestService robotMessageRestService;

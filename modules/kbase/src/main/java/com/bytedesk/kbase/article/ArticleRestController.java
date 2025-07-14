@@ -39,11 +39,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.context.annotation.Description;
 
 @Tag(name = "文章管理", description = "文章管理相关接口")
 @RestController
 @RequestMapping("/api/v1/article")
 @AllArgsConstructor
+@Description("Article Management Controller - Knowledge base article content management APIs")
 public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
     private final ArticleRestService articleRestService;

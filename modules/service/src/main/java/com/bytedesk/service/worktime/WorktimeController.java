@@ -27,11 +27,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Description;
 
-@AllArgsConstructor
+@Tag(name = "工作时间管理", description = "工作时间管理相关接口")
 @RestController
 @RequestMapping("/api/v1/worktime")
-@Tag(name = "工作时间管理", description = "工作时间管理相关接口")
+@AllArgsConstructor
+@Description("Worktime Management Controller - Agent working hours and schedule management APIs")
 public class WorktimeController extends BaseRestController<WorktimeRequest> {
 
     private final WorktimeService worktimeService;

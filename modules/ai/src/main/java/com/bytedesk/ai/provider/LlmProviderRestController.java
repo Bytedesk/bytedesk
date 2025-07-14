@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.base.LlmProviderConfigDefault;
@@ -36,6 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/provider")
 @AllArgsConstructor
+@Description("LLM Provider Controller - Large Language Model provider management and configuration APIs")
 public class LlmProviderRestController extends BaseRestController<LlmProviderRequest> {
 
     private final LlmProviderRestService llmProviderRestService;

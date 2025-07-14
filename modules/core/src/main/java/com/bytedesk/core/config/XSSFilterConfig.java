@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 13:36:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-22 16:37:50
+ * @LastEditTime: 2025-07-14 19:29:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,8 @@
  */
 package com.bytedesk.core.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 @Configuration
 @Description("XSS Filter Configuration - Cross-site scripting protection filter configuration")

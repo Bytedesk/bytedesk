@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Description("Robot Message Service - AI robot message and conversation management service")
 public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessageEntity, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
 
     private final RobotMessageRepository robotMessageRepository;

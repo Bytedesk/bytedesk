@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.context.annotation.Description;
 
 // import com.bytedesk.ai.demo.utils.FileContent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
@@ -62,6 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Description("Robot Management Service - AI robot and chatbot management service")
 public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
 
     private final RobotRepository robotRepository;

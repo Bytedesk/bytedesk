@@ -28,11 +28,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Description;
 
+@Tag(name = "表单结果管理", description = "表单结果管理相关接口")
 @RestController
 @RequestMapping("/api/v1/form/result")
 @AllArgsConstructor
-@Tag(name = "Form Result Management", description = "Form result management APIs for handling form submissions")
+@Description("Form Result Controller - Form submission result collection and management APIs")
 public class FormResultRestController extends BaseRestController<FormResultRequest> {
 
     private final FormResultRestService tagRestService;
