@@ -64,7 +64,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/prompt")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat.enabled", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIPromptController {
 
 	private final ChatClient bytedeskOllamaChatClient;

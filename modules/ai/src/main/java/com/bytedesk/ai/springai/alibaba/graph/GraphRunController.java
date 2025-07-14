@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-14 17:38:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-14 17:40:30
+ * @LastEditTime: 2025-07-14 17:51:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,13 +21,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;
 import java.util.HashMap;
 
-@RestController("/springai/alibaba/graph/run")
+@RestController
+@RequestMapping("/springai/alibaba/graph/run")
 public class GraphRunController {
 
     private CompiledGraph graph;
@@ -55,7 +57,7 @@ public class GraphRunController {
         Map<String, Object> startInputs = new HashMap<>();
         startInputs.put("review", inputs.get("review")); // null
         return graph.invoke(startInputs).get().data();
-
     }
+    
 
 }
