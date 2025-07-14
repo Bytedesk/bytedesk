@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.base.BaseRestService;
@@ -39,6 +40,7 @@ import org.springframework.core.env.Environment;
 
 @Service
 @AllArgsConstructor
+@Description("LLM Provider Service - Large Language Model provider management and configuration service")
 public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, LlmProviderRequest, LlmProviderResponse> {
 
     private final LlmProviderRepository repository;

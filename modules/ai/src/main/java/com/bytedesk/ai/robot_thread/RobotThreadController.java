@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.rbac.role.RolePermissions;
@@ -29,6 +30,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/visitor/api/v1/robot/thread")
 @AllArgsConstructor
+@Description("Robot Thread Controller - Visitor robot thread management APIs")
 public class RobotThreadController extends BaseRestController<RobotThreadRequest> {
 
     private RobotThreadService visitorThreadService;

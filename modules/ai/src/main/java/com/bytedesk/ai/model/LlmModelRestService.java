@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.core.base.BaseRestService;
@@ -36,6 +37,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Description("LLM Model Service - Large Language Model management and configuration service")
 public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmModelRequest, LlmModelResponse> {
 
     private final LlmModelRepository repository;
