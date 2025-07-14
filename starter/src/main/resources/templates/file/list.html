@@ -85,8 +85,8 @@
                         <span th:text="${#dates.format(new java.util.Date(file.lastModified), 'yyyy-MM-dd HH:mm:ss')}"></span>
                     </td>
                     <td>
-                        <a th:href="@{'/file/download/' + ${file.name}}" class="file-link">下载</a>
-                        <a th:href="@{'/file/' + ${file.name}}" class="file-link" target="_blank" style="margin-left: 10px;">查看</a>
+                        <a th:href="@{'/downloads/file/download/' + ${file.name}}" class="file-link">下载</a>
+                        <a th:href="@{'/downloads/file/' + ${file.name}}" class="file-link" target="_blank" style="margin-left: 10px;">查看</a>
                     </td>
                 </tr>
             </tbody>
