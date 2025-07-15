@@ -219,7 +219,9 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Gitee API SSE complete");
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
+                    // 发送流结束消息，包含token使用情况
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat";

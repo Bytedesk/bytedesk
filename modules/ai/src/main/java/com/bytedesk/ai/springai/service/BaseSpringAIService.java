@@ -326,6 +326,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Override
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered) {
+        // 调用重载方法，传入默认的token使用情况（0）
+        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, 0, 0, 0);
+    }
+
+    /**
+     * 持久化消息，包含token使用情况
+     * 
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param isUnanswered 是否未回答
+     * @param promptTokens prompt token数量
+     * @param completionTokens completion token数量
+     * @param totalTokens 总token数量
+     */
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
@@ -349,6 +365,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 // messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED)
                 .isUnAnswered(isUnanswered)
                 .orgUid(extraObject.getOrgUid())
+                //
+                // 添加token使用情况
+                .promptTokens((int) promptTokens)
+                .completionTokens((int) completionTokens)
+                .totalTokens((int) totalTokens)
                 //
                 .build();
         robotMessageCache.pushRequest(robotMessage);
@@ -808,13 +829,32 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
+        // 调用重载方法，传入默认的token使用情况（0）
+        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0);
+    }
+
+    /**
+     * 发送流结束消息，包含token使用情况
+     * 
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param emitter SSE发射器
+     * @param promptTokens prompt token数量
+     * @param completionTokens completion token数量
+     * @param totalTokens 总token数量
+     */
+    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens) {
+        log.info("BaseSpringAIService sendStreamEndMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}", 
+            messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
+            promptTokens, completionTokens, totalTokens);
         try {
             if (!isEmitterCompleted(emitter)) {
                 // 发送流结束标记
                 messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
                 messageProtobufReply.setContent("");
-                // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                // 保存消息到数据库，包含token使用情况
+                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens);
                 String messageJson = messageProtobufReply.toJson();
                 //
                 emitter.send(SseEmitter.event()
