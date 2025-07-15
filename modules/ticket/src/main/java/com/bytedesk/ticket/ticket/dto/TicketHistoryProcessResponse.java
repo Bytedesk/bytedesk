@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-18 09:13:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 07:34:00
+ * @LastEditTime: 2025-07-15 14:48:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ticket.ticket.dto;
 import java.util.Date;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.Builder;
 import lombok.Data;
@@ -45,4 +46,12 @@ public class TicketHistoryProcessResponse {
     private UserProtobuf assignee;              // 分配给谁
     private String priority;              // 优先级
     private String categoryUid;           // 分类UID
+    // 
+    public String getStartTime() {
+        return BdDateUtils.formatDatetimeToString(startTime);
+    }
+
+    public String getEndTime() {
+        return BdDateUtils.formatDatetimeToString(endTime);
+    }
 } 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 07:31:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-19 14:13:41
+ * @LastEditTime: 2025-07-15 14:48:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,8 @@
 package com.bytedesk.ticket.ticket.dto;
 import java.util.Date;
 import java.util.Map;
+
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,4 +45,13 @@ public class TicketHistoryActivityResponse {
     
     private Map<String, Object> taskLocalVariables;    // 任务局部变量
     private Map<String, Object> processVariables;      // 流程变量
+
+    // 
+    public String getStartTime() {
+        return BdDateUtils.formatDatetimeToString(startTime);
+    }
+
+    public String getEndTime() {
+        return BdDateUtils.formatDatetimeToString(endTime);
+    }
 } 

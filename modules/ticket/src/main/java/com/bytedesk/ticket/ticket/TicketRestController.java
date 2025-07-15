@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-24 15:26:03
+ * @LastEditTime: 2025-07-15 14:47:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -332,7 +332,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询工单流程实例历史
      */
-    
     @GetMapping("/history/process")
     public ResponseEntity<?> queryTicketProcessHistory(TicketRequest request) {
         List<TicketHistoryProcessResponse> histories = ticketService.queryTicketProcessHistory(request);
@@ -342,7 +341,6 @@ public class TicketRestController extends BaseRestController<TicketRequest> {
     /**
      * 查询工单活动历史
      */
-    
     @GetMapping("/history/activity")
     public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
 
