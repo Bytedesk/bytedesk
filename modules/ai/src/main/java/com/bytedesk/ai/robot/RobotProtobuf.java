@@ -44,6 +44,8 @@ public class RobotProtobuf implements Serializable {
     @Builder.Default
     private String type = UserTypeEnum.ROBOT.name();
 
+    private String orgUid;
+
     private String extra;
 
     private Boolean kbEnabled;

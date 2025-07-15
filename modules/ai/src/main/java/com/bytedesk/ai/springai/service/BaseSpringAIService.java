@@ -958,6 +958,46 @@ public abstract class BaseSpringAIService implements SpringAIService {
             } else if ("glm-3-turbo".equalsIgnoreCase(aiModelType)) {
                 return new java.math.BigDecimal("0.005"); // $0.005 per 1K tokens
             }
+        } else if ("dashscope".equalsIgnoreCase(aiProvider)) {
+            if ("qwen-turbo".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            } else if ("qwen-plus".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.01"); // $0.01 per 1K tokens
+            }
+        } else if ("deepseek".equalsIgnoreCase(aiProvider)) {
+            if ("deepseek-chat".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            } else if ("deepseek-coder".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.005"); // $0.005 per 1K tokens
+            }
+        } else if ("gitee".equalsIgnoreCase(aiProvider)) {
+            if ("gitee-chat".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.001"); // $0.001 per 1K tokens
+            }
+        } else if ("siliconflow".equalsIgnoreCase(aiProvider)) {
+            if ("siliconflow-chat".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            }
+        } else if ("volcengine".equalsIgnoreCase(aiProvider)) {
+            if ("volcengine-chat".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            }
+        } else if ("openrouter".equalsIgnoreCase(aiProvider)) {
+            if ("openrouter-chat".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            }
+        } else if ("tencent".equalsIgnoreCase(aiProvider)) {
+            if ("hunyuan-pro".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.01"); // $0.01 per 1K tokens
+            } else if ("hunyuan-standard".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            }
+        } else if ("ollama".equalsIgnoreCase(aiProvider)) {
+            if ("llama2".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.0001"); // $0.0001 per 1K tokens (local model)
+            } else if ("mistral".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.0001"); // $0.0001 per 1K tokens (local model)
+            }
         }
         
         // 默认价格
