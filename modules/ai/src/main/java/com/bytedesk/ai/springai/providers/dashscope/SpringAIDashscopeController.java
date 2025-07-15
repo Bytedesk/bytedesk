@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -37,15 +38,16 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * DeepSeek接口
+ * DashScope接口
  */
 @Slf4j
 @RestController
 @RequestMapping("/springai/dashscope")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAIDashscopeService springAIDashscopeService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -56,6 +58,11 @@ public class SpringAIDashscopeController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
+        }
+        
         String response = springAIDashscopeService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -67,6 +74,11 @@ public class SpringAIDashscopeController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
+        
         Prompt prompt = new Prompt(new UserMessage(message));
         OpenAiChatModel model = springAIDashscopeService.getChatModel();
         if (model != null) {
@@ -83,6 +95,10 @@ public class SpringAIDashscopeController {
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return null;
+        }
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
@@ -116,9 +132,13 @@ public class SpringAIDashscopeController {
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
+        }
+        
         OpenAiChatModel model = springAIDashscopeService.getChatModel();
         if (model == null) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
 
         try {

@@ -27,6 +27,7 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,8 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.ServletException;
@@ -55,9 +56,10 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/zhipuai")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAIZhipuaiService springAIZhipuaiService;
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
     private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
@@ -70,6 +72,11 @@ public class SpringAIZhipuaiController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+        }
+        
         String response = springAIZhipuaiService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -81,6 +88,11 @@ public class SpringAIZhipuaiController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
+        
         Prompt prompt = new Prompt(new UserMessage(message));
         return bytedeskZhipuaiChatModel.stream(prompt);
     }
@@ -92,6 +104,10 @@ public class SpringAIZhipuaiController {
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return null;
+        }
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
@@ -125,6 +141,10 @@ public class SpringAIZhipuaiController {
     public ResponseEntity<JsonResult<?>> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+        }
+        
         ChatResponse response = bytedeskZhipuaiChatModel.call(
             new Prompt(
                 message,
@@ -145,6 +165,11 @@ public class SpringAIZhipuaiController {
     @GetMapping("/image")
     public ResponseEntity<JsonResult<?>> generateImage(
             @RequestParam(defaultValue = "A cute cat") String prompt) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+        }
+        
         ImageResponse response = bytedeskZhipuaiImageModel.call(new ImagePrompt(prompt));
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -160,6 +185,11 @@ public class SpringAIZhipuaiController {
     @GetMapping("/stream-sse")
     public void streamSse(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return;
+        }
+        
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:21:30
+ * @LastEditTime: 2025-07-15 15:36:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-// import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -44,11 +44,11 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/baidu")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.baidu.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.baidu.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIBaiduController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAIBaiduService springAIBaiduService;
-    // private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
@@ -58,6 +58,11 @@ public class SpringAIBaiduController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Baidu service is not available"));
+        }
+        
         String response = springAIBaiduService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -69,6 +74,11 @@ public class SpringAIBaiduController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
+        
         Prompt prompt = new Prompt(new UserMessage(message));
         OpenAiChatModel model = springAIBaiduService.getChatModel();
         if (model != null) {
@@ -85,6 +95,10 @@ public class SpringAIBaiduController {
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return null;
+        }
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
@@ -117,6 +131,10 @@ public class SpringAIBaiduController {
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Baidu service is not available"));
+        }
         
         OpenAiChatModel model = springAIBaiduService.getChatModel();
         if (model == null) {
