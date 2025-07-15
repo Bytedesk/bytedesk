@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:21:49
+ * @LastEditTime: 2025-07-15 13:44:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -43,9 +44,10 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/springai/ollama")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAIOllamaService springAIOllamaService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -56,6 +58,11 @@ public class SpringAIOllamaController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
+
         String response = springAIOllamaService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -67,6 +74,11 @@ public class SpringAIOllamaController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
+
         Prompt prompt = new Prompt(new UserMessage(message));
         OllamaChatModel model = springAIOllamaService.getChatModel();
         if (model != null) {
@@ -82,9 +94,13 @@ public class SpringAIOllamaController {
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(@RequestParam(value = "message") String message) {
-        
+
+        if (!bytedeskProperties.getDebug()) {
+            return null;
+        }
+
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
-        
+
         executorService.execute(() -> {
             try {
                 // springAIOllamaService.processPromptSSE(message, emitter);
@@ -93,17 +109,17 @@ public class SpringAIOllamaController {
                 emitter.completeWithError(e);
             }
         });
-        
+
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
             log.warn("SSE connection timed out");
             emitter.complete();
         });
-        
+
         emitter.onCompletion(() -> {
             log.info("SSE connection completed");
         });
-        
+
         return emitter;
     }
 
@@ -114,28 +130,31 @@ public class SpringAIOllamaController {
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-                OllamaChatModel model = springAIOllamaService.getChatModel();
-                if (model == null) {
-                    return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
-                }
-        
-                try {
-                    ChatResponse response = model.call(
-                        new Prompt(
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
+
+        OllamaChatModel model = springAIOllamaService.getChatModel();
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
+
+        try {
+            ChatResponse response = model.call(
+                    new Prompt(
                             message,
                             OllamaOptions.builder()
-                                .model("llama2")
-                                .temperature(0.7)
-                                .topP(0.9)
-                                .build()
-                        ));
-                    
-                    String result = response.getResult().getOutput().getText();
-                    return ResponseEntity.ok(JsonResult.success(result));
-                } catch (Exception e) {
-                    return ResponseEntity.ok(JsonResult.error(e.getMessage()));
-                }
+                                    .model("llama2")
+                                    .temperature(0.7)
+                                    .topP(0.9)
+                                    .build()));
+
+            String result = response.getResult().getOutput().getText();
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
     }
 
     /**
@@ -144,6 +163,11 @@ public class SpringAIOllamaController {
      */
     @GetMapping("/health")
     public ResponseEntity<JsonResult<?>> checkHealth() {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
+
         try {
             boolean isHealthy = springAIOllamaService.isServiceHealthy();
             if (isHealthy) {
