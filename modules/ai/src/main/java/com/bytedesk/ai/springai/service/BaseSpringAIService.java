@@ -96,6 +96,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired
     protected MessageRestService messageRestService;
 
+    @Autowired
+    protected StatisticTokenRestService statisticTokenRestService;
+
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
@@ -882,6 +885,150 @@ public abstract class BaseSpringAIService implements SpringAIService {
             log.error("Error creating dynamic options for model {}", llm.getModel(), e);
             return null;
         }
+    }
+
+    // ==================== AI Token Statistics Methods ====================
+    
+    /**
+     * Record AI token usage statistics
+     * 
+     * @param robot Robot configuration
+     * @param aiProvider AI provider name
+     * @param aiModelType AI model type
+     * @param promptTokens Number of prompt tokens consumed
+     * @param completionTokens Number of completion tokens consumed
+     * @param success Whether the request was successful
+     * @param responseTime Response time in milliseconds
+     */
+    protected void recordAiTokenUsage(RobotProtobuf robot, String aiProvider, String aiModelType,
+            long promptTokens, long completionTokens, boolean success, long responseTime) {
+        try {
+            if (robot == null || !StringUtils.hasText(robot.getOrgUid())) {
+                log.warn("Cannot record AI token usage: robot or orgUid is null");
+                return;
+            }
+
+            // 获取token单价（这里可以根据不同的模型和提供商设置不同的价格）
+            java.math.BigDecimal tokenUnitPrice = getTokenUnitPrice(aiProvider, aiModelType);
+            
+            // 记录token使用情况
+            statisticTokenRestService.recordAiTokenUsage(
+                robot.getOrgUid(), 
+                aiProvider, 
+                aiModelType, 
+                promptTokens, 
+                completionTokens, 
+                success, 
+                responseTime, 
+                tokenUnitPrice
+            );
+            
+            log.info("Recorded AI token usage: provider={}, model={}, tokens={}+{}={}, success={}, responseTime={}ms", 
+                    aiProvider, aiModelType, promptTokens, completionTokens, promptTokens + completionTokens, success, responseTime);
+        } catch (Exception e) {
+            log.error("Error recording AI token usage", e);
+        }
+    }
+
+    /**
+     * Get token unit price based on AI provider and model type
+     * 
+     * @param aiProvider AI provider
+     * @param aiModelType AI model type
+     * @return Token unit price in USD
+     */
+    protected java.math.BigDecimal getTokenUnitPrice(String aiProvider, String aiModelType) {
+        // 这里可以根据不同的提供商和模型设置不同的价格
+        // 实际应用中可以从配置文件或数据库中读取
+        if ("openai".equalsIgnoreCase(aiProvider)) {
+            if ("gpt-4".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.03"); // $0.03 per 1K tokens
+            } else if ("gpt-3.5-turbo".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            }
+        } else if ("baidu".equalsIgnoreCase(aiProvider)) {
+            if ("ernie-bot-4".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.012"); // $0.012 per 1K tokens
+            } else if ("ernie-bot".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.002"); // $0.002 per 1K tokens
+            }
+        } else if ("zhipuai".equalsIgnoreCase(aiProvider)) {
+            if ("glm-4".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.01"); // $0.01 per 1K tokens
+            } else if ("glm-3-turbo".equalsIgnoreCase(aiModelType)) {
+                return new java.math.BigDecimal("0.005"); // $0.005 per 1K tokens
+            }
+        }
+        
+        // 默认价格
+        return new java.math.BigDecimal("0.01");
+    }
+
+    /**
+     * Extract token usage from ChatResponse metadata
+     * 
+     * @param response ChatResponse from AI service
+     * @return TokenUsage object containing prompt and completion tokens
+     */
+    protected TokenUsage extractTokenUsage(Object response) {
+        try {
+            if (response instanceof org.springframework.ai.chat.model.ChatResponse) {
+                org.springframework.ai.chat.model.ChatResponse chatResponse = (org.springframework.ai.chat.model.ChatResponse) response;
+                var metadata = chatResponse.getMetadata();
+                
+                if (metadata != null) {
+                    // 尝试从metadata中提取token信息
+                    Object promptTokens = metadata.get("prompt_tokens");
+                    Object completionTokens = metadata.get("completion_tokens");
+                    Object totalTokens = metadata.get("total_tokens");
+                    
+                    long prompt = 0, completion = 0, total = 0;
+                    
+                    if (promptTokens instanceof Number) {
+                        prompt = ((Number) promptTokens).longValue();
+                    }
+                    if (completionTokens instanceof Number) {
+                        completion = ((Number) completionTokens).longValue();
+                    }
+                    if (totalTokens instanceof Number) {
+                        total = ((Number) totalTokens).longValue();
+                    }
+                    
+                    // 如果没有单独的prompt和completion tokens，但有total tokens，则估算
+                    if (total > 0 && (prompt == 0 || completion == 0)) {
+                        // 简单估算：假设prompt占30%，completion占70%
+                        prompt = (long) (total * 0.3);
+                        completion = total - prompt;
+                    }
+                    
+                    return new TokenUsage(prompt, completion, total);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error extracting token usage from response", e);
+        }
+        
+        // 如果无法提取，返回默认值
+        return new TokenUsage(0, 0, 0);
+    }
+
+    /**
+     * Token usage data class
+     */
+    protected static class TokenUsage {
+        private final long promptTokens;
+        private final long completionTokens;
+        private final long totalTokens;
+
+        public TokenUsage(long promptTokens, long completionTokens, long totalTokens) {
+            this.promptTokens = promptTokens;
+            this.completionTokens = completionTokens;
+            this.totalTokens = totalTokens;
+        }
+
+        public long getPromptTokens() { return promptTokens; }
+        public long getCompletionTokens() { return completionTokens; }
+        public long getTotalTokens() { return totalTokens; }
     }
 
     // 抽象方法

@@ -23,6 +23,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -77,6 +78,10 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
         
+        long startTime = System.currentTimeMillis();
+        final boolean[] success = {false};
+        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        
         // 使用同一个ChatModel实例，但传入不同的选项
         openaiChatModel.stream(requestPrompt).subscribe(
                 response -> {
@@ -89,24 +94,32 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
 
                             sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
+                        // 提取token使用情况
+                        tokenUsage[0] = extractTokenUsage(response);
+                        success[0] = true;
                     }
                 },
                 error -> {
                     log.error("Openai API error: ", error);
                     sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    success[0] = false;
                 },
                 () -> {
                     log.info("Chat stream completed");
+                    // 记录token使用情况
+                    long responseTime = System.currentTimeMillis() - startTime;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gpt-3.5-turbo";
+                    recordAiTokenUsage(robot, "openai", modelType, 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
 
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return openaiChatModel != null ? openaiChatModel.call(prompt) : "";
-    // }
-
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
         try {
             if (openaiChatModel == null) {
                 return "Openai service is not available";
@@ -121,19 +134,32 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = openaiChatModel.call(prompt);
+                        tokenUsage = extractTokenUsage(response);
+                        success = true;
                         return extractTextFromResponse(response);
                     }
                 }
                 
                 var response = openaiChatModel.call(message);
+                tokenUsage = extractTokenUsage(response);
+                success = true;
                 return extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Openai API call error: ", e);
+                success = false;
                 return "服务暂时不可用，请稍后重试";
             }
         } catch (Exception e) {
             log.error("Openai API sync error: ", e);
+            success = false;
             return "服务暂时不可用，请稍后重试";
+        } finally {
+            // 记录token使用情况
+            long responseTime = System.currentTimeMillis() - startTime;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
+                    ? robot.getLlm().getModel() : "gpt-3.5-turbo";
+            recordAiTokenUsage(robot, "openai", modelType, 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
@@ -155,6 +181,10 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
 
+        long startTime = System.currentTimeMillis();
+        final boolean[] success = {false};
+        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+
         openaiChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
@@ -168,19 +198,29 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                                 
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
+                            // 提取token使用情况
+                            tokenUsage[0] = extractTokenUsage(response);
+                            success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
                         handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        success[0] = false;
                     }
                 },
                 error -> {
                     log.error("Openai API SSE error: ", error);
                     handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    success[0] = false;
                 },
                 () -> {
                     log.info("Openai API SSE complete");
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
+                    // 记录token使用情况
+                    long responseTime = System.currentTimeMillis() - startTime;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gpt-3.5-turbo";
+                    recordAiTokenUsage(robot, "openai", modelType, 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
 
