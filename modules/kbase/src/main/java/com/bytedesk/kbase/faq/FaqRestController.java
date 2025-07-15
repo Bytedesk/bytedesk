@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 15:54:56
+ * @LastEditTime: 2025-07-15 15:07:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,9 +84,7 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         
         FaqResponse faq = faqRestService.queryByUid(request);
-        if (faq == null) {
-            return ResponseEntity.ok(JsonResult.error("faq not found"));
-        }
+
         return ResponseEntity.ok(JsonResult.success(faq));
     }
 

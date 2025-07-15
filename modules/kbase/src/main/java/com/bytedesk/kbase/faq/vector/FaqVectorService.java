@@ -30,6 +30,7 @@ import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRequest;
 import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.faq.FaqStatusEnum;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -116,7 +117,7 @@ public class FaqVectorService {
             currentFaq.setDocIdList(docIdList);
 
             // 设置向量索引状态为成功
-            currentFaq.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+            currentFaq.setVectorStatus(FaqStatusEnum.SUCCESS.name());
 
             // 更新FAQ实体 - 使用明确的事务保证状态更新和保存原子性
             log.info("准备保存FAQ实体更新，设置向量索引状态为成功: {}", currentFaq.getUid());
