@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:50:05
+ * @LastEditTime: 2025-07-15 14:22:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
@@ -77,22 +79,39 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
     }
 
     public CustomerResponse queryByVisitorUid(CustomerRequest request) {
-        Optional<CustomerEntity> entity = customerRepository.findByVisitorUid(request.getVisitorUid());
+        Optional<CustomerEntity> entity = findByVisitorUid(request.getVisitorUid());
         if (entity.isPresent()) {
             return convertToResponse(entity.get());
         }
         return null;
     }
 
+    @Cacheable(value = "customer", key = "#uid", unless = "#result == null")
     @Override
     public Optional<CustomerEntity> findByUid(String uid) {
         return customerRepository.findByUid(uid);
     }
 
+    @Cacheable(value = "customer", key = "#visitorUid", unless = "#result == null")
+    public Optional<CustomerEntity> findByVisitorUid(String visitorUid) {
+        if (!StringUtils.hasText(visitorUid)) {
+            return Optional.empty();
+        }
+        return customerRepository.findByVisitorUid(visitorUid);
+    }
+
+    @Cacheable(value = "customer", key = "#visitorUid", unless = "#result == null")
+    public boolean existsByVisitorUid(String visitorUid) {
+        if (!StringUtils.hasText(visitorUid)) {
+            return false;
+        }
+        return customerRepository.existsByVisitorUid(visitorUid);
+    }
+
     @Override
     public CustomerResponse create(CustomerRequest request) {
-        if (customerRepository.existsByVisitorUid(request.getVisitorUid())) {
-            return convertToResponse(customerRepository.findByVisitorUid(request.getVisitorUid()).get());
+        if (existsByVisitorUid(request.getVisitorUid())) {
+            return convertToResponse(findByVisitorUid(request.getVisitorUid()).get());
         }
         // 
         CustomerEntity entity = modelMapper.map(request, CustomerEntity.class);
