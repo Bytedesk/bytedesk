@@ -89,6 +89,9 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
     @Cacheable(value = "customer", key = "#uid", unless = "#result == null")
     @Override
     public Optional<CustomerEntity> findByUid(String uid) {
+        if (!StringUtils.hasText(uid)) {
+            return Optional.empty();
+        }
         return customerRepository.findByUid(uid);
     }
 
