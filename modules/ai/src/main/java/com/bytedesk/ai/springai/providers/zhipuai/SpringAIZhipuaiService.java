@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 18:27:18
+ * @LastEditTime: 2025-07-15 18:58:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -126,6 +126,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         }
                         // 提取token使用情况
                         tokenUsage[0] = extractTokenUsage(response);
+                        log.info("Zhipuai API websocket tokenUsage after extraction: {}", tokenUsage[0]);
                         success[0] = true;
                     }
                 },
@@ -139,6 +140,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "glm-3-turbo";
+                    log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
                     recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -164,15 +167,53 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     // 创建动态的模型实例
                     ZhiPuAiChatModel chatModel = createDynamicChatModel(robot.getLlm());
                     if (chatModel != null) {
-                        var response = chatModel.call(message);
+                        // 创建Prompt对象以获取ChatResponse
+                        Prompt prompt = new Prompt(message);
+                        var response = chatModel.call(prompt);
+                        
+                        // 添加详细的调试信息
+                        log.info("Zhipuai API sync response class: {}", response.getClass().getName());
+                        log.info("Zhipuai API sync response metadata: {}", response.getMetadata());
+                        log.info("Zhipuai API sync response metadata class: {}", response.getMetadata() != null ? response.getMetadata().getClass().getName() : "null");
+                        
+                        // 检查metadata的所有字段
+                        if (response.getMetadata() != null) {
+                            log.info("Zhipuai API sync response metadata keys: {}", response.getMetadata().keySet());
+                            for (String key : response.getMetadata().keySet()) {
+                                Object value = response.getMetadata().get(key);
+                                log.info("Zhipuai API sync response metadata [{}]: {} (class: {})", 
+                                        key, value, value != null ? value.getClass().getName() : "null");
+                            }
+                        }
+                        
                         tokenUsage = extractTokenUsage(response);
+                        log.info("Zhipuai API sync tokenUsage after extraction: {}", tokenUsage);
                         success = true;
                         return extractTextFromResponse(response);
                     }
                 }
                 
-                var response = bytedeskZhipuaiChatModel.call(message);
+                // 创建Prompt对象以获取ChatResponse
+                Prompt prompt = new Prompt(message);
+                var response = bytedeskZhipuaiChatModel.call(prompt);
+                
+                // 添加详细的调试信息
+                log.info("Zhipuai API sync response class: {}", response.getClass().getName());
+                log.info("Zhipuai API sync response metadata: {}", response.getMetadata());
+                log.info("Zhipuai API sync response metadata class: {}", response.getMetadata() != null ? response.getMetadata().getClass().getName() : "null");
+                
+                // 检查metadata的所有字段
+                if (response.getMetadata() != null) {
+                    log.info("Zhipuai API sync response metadata keys: {}", response.getMetadata().keySet());
+                    for (String key : response.getMetadata().keySet()) {
+                        Object value = response.getMetadata().get(key);
+                        log.info("Zhipuai API sync response metadata [{}]: {} (class: {})", 
+                                key, value, value != null ? value.getClass().getName() : "null");
+                    }
+                }
+                
                 tokenUsage = extractTokenUsage(response);
+                log.info("Zhipuai API sync tokenUsage after extraction: {}", tokenUsage);
                 success = true;
                 return extractTextFromResponse(response);
             } catch (Exception e) {
@@ -189,6 +230,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
                     ? robot.getLlm().getModel() : "glm-3-turbo";
+            log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType);
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -219,15 +262,33 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 response -> {
                     try {
                         if (response != null) {
+                            // 添加详细的调试信息
+                            log.info("Zhipuai API SSE response class: {}", response.getClass().getName());
+                            log.info("Zhipuai API SSE response metadata: {}", response.getMetadata());
+                            log.info("Zhipuai API SSE response metadata class: {}", response.getMetadata() != null ? response.getMetadata().getClass().getName() : "null");
+                            
+                            // 检查metadata的所有字段
+                            if (response.getMetadata() != null) {
+                                log.info("Zhipuai API SSE response metadata keys: {}", response.getMetadata().keySet());
+                                for (String key : response.getMetadata().keySet()) {
+                                    Object value = response.getMetadata().get(key);
+                                    log.info("Zhipuai API SSE response metadata [{}]: {} (class: {})", 
+                                            key, value, value != null ? value.getClass().getName() : "null");
+                                }
+                            }
+                            
                             List<Generation> generations = response.getResults();
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                log.info("Zhipuai API SSE generation metadata {}, textContent {}", 
+                                    generation.getMetadata(), textContent);
                                 
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = extractTokenUsage(response);
+                            log.info("Zhipuai API SSE tokenUsage after extraction: {}", tokenUsage[0]);
                             success[0] = true;
                         }
                     } catch (Exception e) {
@@ -249,6 +310,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "glm-3-turbo";
+                    log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
                     recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });

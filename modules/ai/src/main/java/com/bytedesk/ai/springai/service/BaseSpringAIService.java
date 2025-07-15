@@ -344,6 +344,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
+        log.info("BaseSpringAIService persistMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}", 
+            messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
+            promptTokens, completionTokens, totalTokens);
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
         //
         MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
@@ -362,7 +365,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 //
                 .user(messageProtobufQuery.getUser().toJson())
                 .robot(messageProtobufReply.getUser().toJson())
-                // messageProtobufReply.getContent().equals(RobotConsts.ROBOT_UNMATCHED)
                 .isUnAnswered(isUnanswered)
                 .orgUid(extraObject.getOrgUid())
                 //
@@ -1056,6 +1058,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if (response instanceof org.springframework.ai.chat.model.ChatResponse) {
                 org.springframework.ai.chat.model.ChatResponse chatResponse = (org.springframework.ai.chat.model.ChatResponse) response;
                 var metadata = chatResponse.getMetadata();
+                log.info("BaseSpringAIService extractTokenUsage metadata {}", metadata);
                 
                 if (metadata != null) {
                     // 尝试从metadata中提取token信息
@@ -1082,6 +1085,85 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         completion = total - prompt;
                     }
                     
+                    // 如果仍然没有token信息，尝试从其他字段提取
+                    if (total == 0) {
+                        // 尝试从usage字段提取（智谱AI的特殊情况）
+                        Object usage = metadata.get("usage");
+                        if (usage != null) {
+                            log.info("BaseSpringAIService extractTokenUsage found usage field: {}", usage);
+                            // 如果usage是Map类型，尝试从中提取token信息
+                            if (usage instanceof java.util.Map) {
+                                java.util.Map<?, ?> usageMap = (java.util.Map<?, ?>) usage;
+                                Object usagePromptTokens = usageMap.get("prompt_tokens");
+                                Object usageCompletionTokens = usageMap.get("completion_tokens");
+                                Object usageTotalTokens = usageMap.get("total_tokens");
+                                
+                                if (usagePromptTokens instanceof Number) {
+                                    prompt = ((Number) usagePromptTokens).longValue();
+                                }
+                                if (usageCompletionTokens instanceof Number) {
+                                    completion = ((Number) usageCompletionTokens).longValue();
+                                }
+                                if (usageTotalTokens instanceof Number) {
+                                    total = ((Number) usageTotalTokens).longValue();
+                                }
+                            }
+                        }
+                        
+                        // 如果仍然没有token信息，尝试从其他可能的字段提取
+                        if (total == 0) {
+                            // 尝试从其他可能的字段名提取
+                            String[] possibleTotalTokenKeys = {"total_tokens", "tokens", "token_count", "usage_total"};
+                            String[] possiblePromptTokenKeys = {"prompt_tokens", "input_tokens", "request_tokens"};
+                            String[] possibleCompletionTokenKeys = {"completion_tokens", "output_tokens", "response_tokens"};
+                            
+                            for (String key : possibleTotalTokenKeys) {
+                                Object value = metadata.get(key);
+                                if (value instanceof Number) {
+                                    total = ((Number) value).longValue();
+                                    break;
+                                }
+                            }
+                            
+                            for (String key : possiblePromptTokenKeys) {
+                                Object value = metadata.get(key);
+                                if (value instanceof Number) {
+                                    prompt = ((Number) value).longValue();
+                                    break;
+                                }
+                            }
+                            
+                            for (String key : possibleCompletionTokenKeys) {
+                                Object value = metadata.get(key);
+                                if (value instanceof Number) {
+                                    completion = ((Number) value).longValue();
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // 如果仍然没有找到token信息，尝试从response的原始数据中提取
+                        if (total == 0) {
+                            log.info("BaseSpringAIService extractTokenUsage no token info found in metadata, checking response structure");
+                            // 记录所有metadata键值对以便调试
+                            for (String key : metadata.keySet()) {
+                                Object value = metadata.get(key);
+                                log.info("BaseSpringAIService extractTokenUsage metadata [{}]: {} (class: {})", 
+                                        key, value, value != null ? value.getClass().getName() : "null");
+                            }
+                            
+                            // 尝试从response的其他部分提取token信息
+                            total = extractTokenUsageFromResponse(chatResponse);
+                            if (total > 0) {
+                                // 简单估算：假设prompt占30%，completion占70%
+                                prompt = (long) (total * 0.3);
+                                completion = total - prompt;
+                            }
+                        }
+                    }
+                    
+                    log.info("BaseSpringAIService extractTokenUsage extracted tokens - prompt: {}, completion: {}, total: {}", 
+                            prompt, completion, total);
                     return new TokenUsage(prompt, completion, total);
                 }
             }
@@ -1090,7 +1172,37 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
         
         // 如果无法提取，返回默认值
+        log.warn("BaseSpringAIService extractTokenUsage could not extract token usage, returning zeros");
         return new TokenUsage(0, 0, 0);
+    }
+
+    /**
+     * Extract token usage from response object itself (for cases where metadata doesn't contain token info)
+     * 
+     * @param chatResponse ChatResponse object
+     * @return total token count if found, 0 otherwise
+     */
+    private long extractTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse chatResponse) {
+        try {
+            // 尝试从response的其他部分提取token信息
+            // 检查是否有任何包含token信息的字段
+            if (chatResponse.getResults() != null && !chatResponse.getResults().isEmpty()) {
+                for (org.springframework.ai.chat.model.Generation generation : chatResponse.getResults()) {
+                    var generationMetadata = generation.getMetadata();
+                    if (generationMetadata != null) {
+                        log.info("BaseSpringAIService extractTokenUsageFromResponse generation metadata: {}", generationMetadata);
+                        // 检查generation metadata中是否有token信息
+                        Object tokens = generationMetadata.get("tokens");
+                        if (tokens instanceof Number) {
+                            return ((Number) tokens).longValue();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error extracting token usage from response object", e);
+        }
+        return 0;
     }
 
     /**

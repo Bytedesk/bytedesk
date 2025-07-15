@@ -101,11 +101,11 @@
 		<!-- https://modelcontextprotocol.io/sdk/java/mcp-overview -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-client</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 		<!-- 生产环境，spring ai 官方推荐使用 webflux 版本 client：
 		 For production deployment, we recommend using the WebFlux-based SSE connection with the
 		spring-ai-starter-mcp-client-webflux-->
@@ -117,11 +117,11 @@
 			<version>${spring-ai.version}</version>
 		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-server</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
