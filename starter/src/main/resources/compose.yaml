@@ -109,6 +109,21 @@ services:
       timeout: 10s
       retries: 5
 
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  bytedesk-zipkin:
+    image: 'openzipkin/zipkin:latest'
+    ports:
+      - '9411:9411'
+    volumes:
+      - zipkin_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   # bytedesk-ldap:
   #   image: osixia/openldap:latest
   #   container_name: ldap-bytedesk
@@ -307,6 +322,8 @@ volumes:
   #   name: bytedesk_chroma_data
   elasticsearch_data:
     name: bytedesk_elasticsearch_data
+  zipkin_data:
+    name: bytedesk_zipkin_data
   artemis_data:
     name: bytedesk_artemis_data
   # weaviate_data:

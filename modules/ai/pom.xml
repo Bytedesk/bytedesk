@@ -186,9 +186,19 @@
 		</dependency> -->
 
 		<!-- 添加Micrometer依赖 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-observation</artifactId>
+		</dependency> -->
+
+		<!-- Observability -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.reporter2</groupId>
+			<artifactId>zipkin-reporter-brave</artifactId>
 		</dependency>
 
 
