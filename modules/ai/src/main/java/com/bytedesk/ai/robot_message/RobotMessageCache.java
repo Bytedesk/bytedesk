@@ -25,9 +25,11 @@ import com.bytedesk.core.redis.RedisConsts;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class RobotMessageCache {
 
     private static final String DEFAULT_PERSIST_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "robotMessageList";
@@ -44,7 +46,12 @@ public class RobotMessageCache {
 
     // 模拟 pop 操作：从列表中移除元素
     public List<String> getListForPersist() {
-        return getList(DEFAULT_PERSIST_KEY);
+        try {
+            return getList(DEFAULT_PERSIST_KEY);
+        } catch (Exception e) {
+            log.error("Failed to get robot message list from cache: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
     // 模拟 push 操作：向列表中添加元素

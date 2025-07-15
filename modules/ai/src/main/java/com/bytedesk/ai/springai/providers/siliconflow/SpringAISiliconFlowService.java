@@ -13,7 +13,10 @@
  */
 package com.bytedesk.ai.springai.providers.siliconflow;
 
+import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +32,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
 import java.util.Optional;
-import com.bytedesk.ai.robot.RobotLlm;
-import com.bytedesk.ai.robot.RobotProtobuf;
 
 /**
  * @author: https://github.com/fzj111
@@ -111,8 +112,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "siliconflow-chat";
-                    recordAiTokenUsage(robot, "siliconflow", modelType, 
+                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.SILICONFLOW;
+                    recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }    // @Override
@@ -163,8 +164,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : "siliconflow-chat";
-            recordAiTokenUsage(robot, "siliconflow", modelType, 
+                    ? robot.getLlm().getModel() : LlmConsts.SILICONFLOW;
+            recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -227,8 +228,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "siliconflow-chat";
-                    recordAiTokenUsage(robot, "siliconflow", modelType, 
+                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.SILICONFLOW;
+                    recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }

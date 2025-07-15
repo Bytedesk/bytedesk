@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
@@ -143,7 +144,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "llama2";
-                    recordAiTokenUsage(robot, "ollama", modelType, 
+                    recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
         } catch (Exception e) {
@@ -153,7 +154,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "llama2";
-            recordAiTokenUsage(robot, "ollama", modelType, 
+            recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
     }
@@ -201,7 +202,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
                     ? robot.getLlm().getModel() : "llama2";
-            recordAiTokenUsage(robot, "ollama", modelType, 
+            recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -266,7 +267,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                         // 记录token使用情况
                         long responseTime = System.currentTimeMillis() - startTime;
                         String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "llama2";
-                        recordAiTokenUsage(robot, "ollama", modelType, 
+                        recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                     });
         } catch (Exception e) {
@@ -276,7 +277,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "llama2";
-            recordAiTokenUsage(robot, "ollama", modelType, 
+            recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
     }

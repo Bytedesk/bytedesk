@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-14 18:39:33
+ * @LastEditTime: 2025-07-15 18:22:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -121,8 +121,14 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
         if (optional.isPresent()) {
             RobotMessageEntity entity = optional.get();
             // modelMapper.map(request, entity);
-            // / 对于Stream消息：拼接起来，而不是覆盖
-            entity.setAnswer(entity.getAnswer() + request.getAnswer());
+            // 对于Stream消息：拼接起来，而不是覆盖
+            String currentAnswer = entity.getAnswer() != null ? entity.getAnswer() : "";
+            String newAnswer = request.getAnswer() != null ? request.getAnswer() : "";
+            entity.setAnswer(currentAnswer + newAnswer);
+            
+            log.debug("Updating robot message {}: current answer length: {}, new answer length: {}", 
+                     request.getUid(), currentAnswer.length(), newAnswer.length());
+            
             //
             RobotMessageEntity savedEntity = save(entity);
             if (savedEntity == null) {
