@@ -50,6 +50,7 @@ import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.vector.TextVector;
 import com.bytedesk.kbase.llm_text.vector.TextVectorSearchResult;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
+import com.bytedesk.ai.statistic_token.StatisticTokenRestService;
 
 import lombok.extern.slf4j.Slf4j;
 
