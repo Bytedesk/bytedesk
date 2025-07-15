@@ -147,8 +147,28 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
             if (latest.isPresent()) {
                 RobotMessageEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-       
-                // latestEntity.setDeleted(entity.isDeleted());
+                // 对于Stream消息：拼接answer字段，而不是覆盖
+                if (entity.getAnswer() != null && !entity.getAnswer().isEmpty()) {
+                    String newAnswer = latestEntity.getAnswer() != null ? 
+                        latestEntity.getAnswer() + entity.getAnswer() : 
+                        entity.getAnswer();
+                    latestEntity.setAnswer(newAnswer);
+                }
+                
+                // 保留其他重要字段
+                if (entity.getPromptTokens() != null) {
+                    latestEntity.setPromptTokens(entity.getPromptTokens());
+                }
+                if (entity.getCompletionTokens() != null) {
+                    latestEntity.setCompletionTokens(entity.getCompletionTokens());
+                }
+                if (entity.getTotalTokens() != null) {
+                    latestEntity.setTotalTokens(entity.getTotalTokens());
+                }
+                if (entity.getStatus() != null) {
+                    latestEntity.setStatus(entity.getStatus());
+                }
+                
                 return robotMessageRepository.save(latestEntity);
             }
         } catch (Exception ex) {

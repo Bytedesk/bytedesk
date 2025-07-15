@@ -22,9 +22,11 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RobotMessageEventListener {
 
     private final RobotMessageCache robotMessageCache;
@@ -38,9 +40,17 @@ public class RobotMessageEventListener {
         if (messageJsonList == null || messageJsonList.isEmpty()) {
             return;
         }
+        
+        log.info("Processing {} robot messages for persistence", messageJsonList.size());
+        
         messageJsonList.forEach(item -> {
-            RobotMessageRequest request = JSON.parseObject(item, RobotMessageRequest.class);
-            robotMessageRestService.create(request);
+            try {
+                RobotMessageRequest request = JSON.parseObject(item, RobotMessageRequest.class);
+                robotMessageRestService.create(request);
+            } catch (Exception e) {
+                log.error("Failed to persist robot message: {}, error: {}", item, e.getMessage(), e);
+                // 继续处理其他消息，不因为单个消息失败而中断整个批次
+            }
         });
     }
     
