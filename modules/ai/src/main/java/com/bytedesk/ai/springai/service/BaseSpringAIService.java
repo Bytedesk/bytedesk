@@ -1152,12 +1152,62 @@ public abstract class BaseSpringAIService implements SpringAIService {
                                         key, value, value != null ? value.getClass().getName() : "null");
                             }
                             
+                            // 尝试从metadata的toString()中解析usage信息
+                            String metadataStr = metadata.toString();
+                            log.info("BaseSpringAIService extractTokenUsage parsing metadata string: {}", metadataStr);
+                            
+                            // 查找usage信息，格式通常是: DefaultUsage{promptTokens=16, completionTokens=14, totalTokens=30}
+                            if (metadataStr.contains("DefaultUsage{") || metadataStr.contains("usage:")) {
+                                // 提取promptTokens
+                                int promptStart = metadataStr.indexOf("promptTokens=");
+                                int promptEnd = metadataStr.indexOf(",", promptStart);
+                                if (promptEnd == -1) promptEnd = metadataStr.indexOf("}", promptStart);
+                                
+                                // 提取completionTokens
+                                int completionStart = metadataStr.indexOf("completionTokens=");
+                                int completionEnd = metadataStr.indexOf(",", completionStart);
+                                if (completionEnd == -1) completionEnd = metadataStr.indexOf("}", completionStart);
+                                
+                                // 提取totalTokens
+                                int totalStart = metadataStr.indexOf("totalTokens=");
+                                int totalEnd = metadataStr.indexOf("}", totalStart);
+                                
+                                if (promptStart > 0 && promptEnd > promptStart) {
+                                    try {
+                                        prompt = Long.parseLong(metadataStr.substring(promptStart + 13, promptEnd));
+                                    } catch (NumberFormatException e) {
+                                        log.warn("Could not parse promptTokens from: {}", metadataStr.substring(promptStart + 13, promptEnd));
+                                    }
+                                }
+                                
+                                if (completionStart > 0 && completionEnd > completionStart) {
+                                    try {
+                                        completion = Long.parseLong(metadataStr.substring(completionStart + 17, completionEnd));
+                                    } catch (NumberFormatException e) {
+                                        log.warn("Could not parse completionTokens from: {}", metadataStr.substring(completionStart + 17, completionEnd));
+                                    }
+                                }
+                                
+                                if (totalStart > 0 && totalEnd > totalStart) {
+                                    try {
+                                        total = Long.parseLong(metadataStr.substring(totalStart + 12, totalEnd));
+                                    } catch (NumberFormatException e) {
+                                        log.warn("Could not parse totalTokens from: {}", metadataStr.substring(totalStart + 12, totalEnd));
+                                    }
+                                }
+                                
+                                log.info("BaseSpringAIService extractTokenUsage parsed from string - prompt: {}, completion: {}, total: {}", 
+                                        prompt, completion, total);
+                            }
+                            
                             // 尝试从response的其他部分提取token信息
-                            total = extractTokenUsageFromResponse(chatResponse);
-                            if (total > 0) {
-                                // 简单估算：假设prompt占30%，completion占70%
-                                prompt = (long) (total * 0.3);
-                                completion = total - prompt;
+                            if (total == 0) {
+                                total = extractTokenUsageFromResponse(chatResponse);
+                                if (total > 0) {
+                                    // 简单估算：假设prompt占30%，completion占70%
+                                    prompt = (long) (total * 0.3);
+                                    completion = total - prompt;
+                                }
                             }
                         }
                     }

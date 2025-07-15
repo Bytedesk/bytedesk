@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 19:00:30
+ * @LastEditTime: 2025-07-15 19:33:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -343,7 +343,91 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             // 2. usage.completion_tokens  
             // 3. usage.total_tokens
             
-            Object usage = metadata.get("usage");
+            // 尝试从metadata中直接获取usage对象
+            Object usage = null;
+            
+            // 方法1: 尝试通过反射获取usage字段
+            try {
+                java.lang.reflect.Field usageField = metadata.getClass().getDeclaredField("usage");
+                usageField.setAccessible(true);
+                usage = usageField.get(metadata);
+                log.info("Zhipuai API found usage field via reflection: {}", usage);
+            } catch (Exception e) {
+                log.debug("Could not get usage field via reflection: {}", e.getMessage());
+            }
+            
+            // 方法2: 如果反射失败，尝试从metadata的toString()中解析
+            if (usage == null) {
+                String metadataStr = metadata.toString();
+                log.info("Zhipuai API parsing metadata string: {}", metadataStr);
+                
+                // 查找usage信息，格式通常是: DefaultUsage{promptTokens=16, completionTokens=14, totalTokens=30}
+                if (metadataStr.contains("DefaultUsage{") || metadataStr.contains("usage:")) {
+                    // 提取promptTokens
+                    int promptStart = metadataStr.indexOf("promptTokens=");
+                    int promptEnd = metadataStr.indexOf(",", promptStart);
+                    if (promptEnd == -1) promptEnd = metadataStr.indexOf("}", promptStart);
+                    
+                    // 提取completionTokens
+                    int completionStart = metadataStr.indexOf("completionTokens=");
+                    int completionEnd = metadataStr.indexOf(",", completionStart);
+                    if (completionEnd == -1) completionEnd = metadataStr.indexOf("}", completionStart);
+                    
+                    // 提取totalTokens
+                    int totalStart = metadataStr.indexOf("totalTokens=");
+                    int totalEnd = metadataStr.indexOf("}", totalStart);
+                    
+                    long promptTokens = 0;
+                    long completionTokens = 0;
+                    long totalTokens = 0;
+                    
+                    if (promptStart > 0 && promptEnd > promptStart) {
+                        try {
+                            promptTokens = Long.parseLong(metadataStr.substring(promptStart + 13, promptEnd));
+                        } catch (NumberFormatException e) {
+                            log.warn("Could not parse promptTokens from: {}", metadataStr.substring(promptStart + 13, promptEnd));
+                        }
+                    }
+                    
+                    if (completionStart > 0 && completionEnd > completionStart) {
+                        try {
+                            completionTokens = Long.parseLong(metadataStr.substring(completionStart + 17, completionEnd));
+                        } catch (NumberFormatException e) {
+                            log.warn("Could not parse completionTokens from: {}", metadataStr.substring(completionStart + 17, completionEnd));
+                        }
+                    }
+                    
+                    if (totalStart > 0 && totalEnd > totalStart) {
+                        try {
+                            totalTokens = Long.parseLong(metadataStr.substring(totalStart + 12, totalEnd));
+                        } catch (NumberFormatException e) {
+                            log.warn("Could not parse totalTokens from: {}", metadataStr.substring(totalStart + 12, totalEnd));
+                        }
+                    }
+                    
+                    // 如果没有total_tokens，计算它
+                    if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
+                        totalTokens = promptTokens + completionTokens;
+                    }
+                    
+                    // 如果只有total_tokens，估算prompt和completion
+                    if (totalTokens > 0 && (promptTokens == 0 || completionTokens == 0)) {
+                        if (promptTokens == 0) {
+                            promptTokens = (long) (totalTokens * 0.3);
+                        }
+                        if (completionTokens == 0) {
+                            completionTokens = totalTokens - promptTokens;
+                        }
+                    }
+                    
+                    log.info("Zhipuai API manual token extraction result from string parsing - prompt: {}, completion: {}, total: {}", 
+                            promptTokens, completionTokens, totalTokens);
+                    
+                    return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                }
+            }
+            
+            // 方法3: 尝试从usage对象中提取（如果通过反射获取到了）
             if (usage != null) {
                 log.info("Zhipuai API found usage field: {}", usage);
                 
@@ -355,19 +439,19 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     long totalTokens = 0;
                     
                     // 提取prompt_tokens
-                    Object promptObj = usageMap.get("prompt_tokens");
+                    Object promptObj = usageMap.get("promptTokens");
                     if (promptObj instanceof Number) {
                         promptTokens = ((Number) promptObj).longValue();
                     }
                     
                     // 提取completion_tokens
-                    Object completionObj = usageMap.get("completion_tokens");
+                    Object completionObj = usageMap.get("completionTokens");
                     if (completionObj instanceof Number) {
                         completionTokens = ((Number) completionObj).longValue();
                     }
                     
                     // 提取total_tokens
-                    Object totalObj = usageMap.get("total_tokens");
+                    Object totalObj = usageMap.get("totalTokens");
                     if (totalObj instanceof Number) {
                         totalTokens = ((Number) totalObj).longValue();
                     }
