@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 19:33:33
+ * @LastEditTime: 2025-07-15 19:49:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ import reactor.core.publisher.Flux;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "spring.ai.zhipuai.chat.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiService extends BaseSpringAIService {
 
     @Autowired
@@ -52,6 +52,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     @Qualifier("bytedeskZhipuaiApi")
     private ZhiPuAiApi zhipuaiApi;
 
+    
     public SpringAIZhipuaiService() {
         super(); // 调用基类的无参构造函数
     }
@@ -255,6 +256,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
         final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatResponse[] lastResponse = {null};
 
         Flux<ChatResponse> responseFlux = chatModel.stream(prompt);
 
@@ -262,6 +264,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 response -> {
                     try {
                         if (response != null) {
+                            // 保存最后一个响应，用于提取token信息
+                            lastResponse[0] = response;
+                            
                             // 添加详细的调试信息
                             log.info("Zhipuai API SSE response class: {}", response.getClass().getName());
                             log.info("Zhipuai API SSE response metadata: {}", response.getMetadata());
@@ -286,9 +291,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                                 
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
-                            // 提取token使用情况
-                            tokenUsage[0] = extractZhipuaiTokenUsage(response);
-                            log.info("Zhipuai API SSE tokenUsage after manual extraction: {}", tokenUsage[0]);
                             success[0] = true;
                         }
                     } catch (Exception e) {
@@ -304,6 +306,13 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Zhipuai API SSE complete");
+                    
+                    // 在流结束时，从最后一个响应中提取token使用情况
+                    if (lastResponse[0] != null) {
+                        tokenUsage[0] = extractZhipuaiTokenUsage(lastResponse[0]);
+                        log.info("Zhipuai API SSE final tokenUsage after manual extraction: {}", tokenUsage[0]);
+                    }
+                    
                     // 发送流结束消息，包含token使用情况
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
