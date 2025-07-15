@@ -174,6 +174,26 @@ public class SpringAIZhipuaiController {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 测试token提取功能
+     * http://127.0.0.1:9003/springai/zhipuai/test-tokens
+     */
+    @GetMapping("/test-tokens")
+    public ResponseEntity<JsonResult<?>> testTokenExtraction() {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+        }
+        
+        try {
+            springAIZhipuaiService.testTokenExtraction();
+            return ResponseEntity.ok(JsonResult.success("Token extraction test completed. Check logs for details."));
+        } catch (Exception e) {
+            log.error("Error testing token extraction", e);
+            return ResponseEntity.ok(JsonResult.error("Error testing token extraction: " + e.getMessage()));
+        }
+    }
+
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
         if (executorService != null && !executorService.isShutdown()) {

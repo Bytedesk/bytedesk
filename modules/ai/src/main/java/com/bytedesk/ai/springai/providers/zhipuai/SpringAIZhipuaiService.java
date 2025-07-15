@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 18:58:21
+ * @LastEditTime: 2025-07-15 19:00:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -125,8 +125,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
-                        log.info("Zhipuai API websocket tokenUsage after extraction: {}", tokenUsage[0]);
+                        tokenUsage[0] = extractZhipuaiTokenUsage(response);
+                        log.info("Zhipuai API websocket tokenUsage after manual extraction: {}", tokenUsage[0]);
                         success[0] = true;
                     }
                 },
@@ -186,8 +186,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                             }
                         }
                         
-                        tokenUsage = extractTokenUsage(response);
-                        log.info("Zhipuai API sync tokenUsage after extraction: {}", tokenUsage);
+                        tokenUsage = extractZhipuaiTokenUsage(response);
+                        log.info("Zhipuai API sync tokenUsage after manual extraction: {}", tokenUsage);
                         success = true;
                         return extractTextFromResponse(response);
                     }
@@ -212,8 +212,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     }
                 }
                 
-                tokenUsage = extractTokenUsage(response);
-                log.info("Zhipuai API sync tokenUsage after extraction: {}", tokenUsage);
+                tokenUsage = extractZhipuaiTokenUsage(response);
+                log.info("Zhipuai API sync tokenUsage after manual extraction: {}", tokenUsage);
                 success = true;
                 return extractTextFromResponse(response);
             } catch (Exception e) {
@@ -287,8 +287,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
-                            log.info("Zhipuai API SSE tokenUsage after extraction: {}", tokenUsage[0]);
+                            tokenUsage[0] = extractZhipuaiTokenUsage(response);
+                            log.info("Zhipuai API SSE tokenUsage after manual extraction: {}", tokenUsage[0]);
                             success[0] = true;
                         }
                     } catch (Exception e) {
@@ -315,6 +315,172 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
+    }
+
+    /**
+     * 手动提取智谱AI的token使用情况
+     * 由于Spring AI ZhiPuAI集成可能无法正确解析token使用情况，我们手动提取
+     * 
+     * @param response ChatResponse对象
+     * @return TokenUsage对象
+     */
+    private TokenUsage extractZhipuaiTokenUsage(org.springframework.ai.chat.model.ChatResponse response) {
+        try {
+            if (response == null) {
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            var metadata = response.getMetadata();
+            if (metadata == null) {
+                log.warn("Zhipuai API response metadata is null");
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            log.info("Zhipuai API manual token extraction - metadata: {}", metadata);
+            
+            // 智谱AI的token使用情况通常在以下字段中：
+            // 1. usage.prompt_tokens
+            // 2. usage.completion_tokens  
+            // 3. usage.total_tokens
+            
+            Object usage = metadata.get("usage");
+            if (usage != null) {
+                log.info("Zhipuai API found usage field: {}", usage);
+                
+                if (usage instanceof java.util.Map) {
+                    java.util.Map<?, ?> usageMap = (java.util.Map<?, ?>) usage;
+                    
+                    long promptTokens = 0;
+                    long completionTokens = 0;
+                    long totalTokens = 0;
+                    
+                    // 提取prompt_tokens
+                    Object promptObj = usageMap.get("prompt_tokens");
+                    if (promptObj instanceof Number) {
+                        promptTokens = ((Number) promptObj).longValue();
+                    }
+                    
+                    // 提取completion_tokens
+                    Object completionObj = usageMap.get("completion_tokens");
+                    if (completionObj instanceof Number) {
+                        completionTokens = ((Number) completionObj).longValue();
+                    }
+                    
+                    // 提取total_tokens
+                    Object totalObj = usageMap.get("total_tokens");
+                    if (totalObj instanceof Number) {
+                        totalTokens = ((Number) totalObj).longValue();
+                    }
+                    
+                    // 如果没有total_tokens，计算它
+                    if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
+                        totalTokens = promptTokens + completionTokens;
+                    }
+                    
+                    // 如果只有total_tokens，估算prompt和completion
+                    if (totalTokens > 0 && (promptTokens == 0 || completionTokens == 0)) {
+                        if (promptTokens == 0) {
+                            promptTokens = (long) (totalTokens * 0.3);
+                        }
+                        if (completionTokens == 0) {
+                            completionTokens = totalTokens - promptTokens;
+                        }
+                    }
+                    
+                    log.info("Zhipuai API manual token extraction result - prompt: {}, completion: {}, total: {}", 
+                            promptTokens, completionTokens, totalTokens);
+                    
+                    return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                }
+            }
+            
+            // 如果usage字段不存在，尝试其他可能的字段
+            log.info("Zhipuai API usage field not found, checking other fields");
+            for (String key : metadata.keySet()) {
+                Object value = metadata.get(key);
+                log.info("Zhipuai API metadata [{}]: {} (class: {})", 
+                        key, value, value != null ? value.getClass().getName() : "null");
+            }
+            
+            // 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
+            log.info("Zhipuai API manual extraction failed, trying original extractTokenUsage method");
+            TokenUsage fallbackUsage = extractTokenUsage(response);
+            if (fallbackUsage.getTotalTokens() > 0) {
+                log.info("Zhipuai API fallback extraction successful: {}", fallbackUsage);
+                return fallbackUsage;
+            }
+            
+        } catch (Exception e) {
+            log.error("Error in manual Zhipuai token extraction", e);
+            
+            // 如果手动提取出错，尝试使用原始的extractTokenUsage方法作为后备
+            try {
+                log.info("Zhipuai API manual extraction error, trying original extractTokenUsage method");
+                TokenUsage fallbackUsage = extractTokenUsage(response);
+                if (fallbackUsage.getTotalTokens() > 0) {
+                    log.info("Zhipuai API fallback extraction successful after error: {}", fallbackUsage);
+                    return fallbackUsage;
+                }
+            } catch (Exception fallbackError) {
+                log.error("Error in fallback token extraction", fallbackError);
+            }
+        }
+        
+        log.warn("Zhipuai API all token extraction methods failed, returning zeros");
+        return new TokenUsage(0, 0, 0);
+    }
+
+    /**
+     * 测试token提取功能
+     * 用于调试token计数问题
+     */
+    public void testTokenExtraction() {
+        try {
+            log.info("Zhipuai API testing token extraction...");
+            
+            if (bytedeskZhipuaiChatModel == null) {
+                log.error("Zhipuai API chat model is null");
+                return;
+            }
+            
+            // 创建一个简单的测试请求
+            String testMessage = "Hello, this is a test message for token counting.";
+            Prompt prompt = new Prompt(testMessage);
+            
+            log.info("Zhipuai API making test call with message: {}", testMessage);
+            
+            // 调用API
+            var response = bytedeskZhipuaiChatModel.call(prompt);
+            
+            log.info("Zhipuai API test response class: {}", response.getClass().getName());
+            log.info("Zhipuai API test response metadata: {}", response.getMetadata());
+            
+            if (response.getMetadata() != null) {
+                log.info("Zhipuai API test response metadata class: {}", response.getMetadata().getClass().getName());
+                log.info("Zhipuai API test response metadata keys: {}", response.getMetadata().keySet());
+                
+                for (String key : response.getMetadata().keySet()) {
+                    Object value = response.getMetadata().get(key);
+                    log.info("Zhipuai API test response metadata [{}]: {} (class: {})", 
+                            key, value, value != null ? value.getClass().getName() : "null");
+                }
+            }
+            
+            // 测试手动token提取
+            TokenUsage manualUsage = extractZhipuaiTokenUsage(response);
+            log.info("Zhipuai API test manual token extraction result: {}", manualUsage);
+            
+            // 测试原始token提取
+            TokenUsage originalUsage = extractTokenUsage(response);
+            log.info("Zhipuai API test original token extraction result: {}", originalUsage);
+            
+            // 提取文本内容
+            String textContent = extractTextFromResponse(response);
+            log.info("Zhipuai API test response text: {}", textContent);
+            
+        } catch (Exception e) {
+            log.error("Zhipuai API test token extraction error", e);
+        }
     }
 
     public Boolean isServiceHealthy() {
