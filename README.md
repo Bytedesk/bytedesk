@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-13 17:00:02
+ * @LastEditTime: 2025-07-15 08:37:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,23 +90,23 @@ AI powered Omnichannel customer service With Team Cooperation
 
 ## Docker Quick Start
 
-### method 1: clone project and start docker compose container，need ollama
+### method 1: clone project and start docker compose container，need zhipuai
 
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
 ```
 
-#### ollama pull model
+#### get zhipuai [API Key](https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys)
 
 ```bash
-# chat model
-ollama pull qwen3:0.6b
-# embedding model
-ollama pull bge-m3:latest
-# rerank model
-ollama pull linux6200/bge-reranker-v2-m3:latest
-# or download model from huggingface
-# ollama pull hf.co/<username>/<model-repository>
+# zhipuai
+# SPRING_AI_ZHIPUAI_BASE_URL: https://open.bigmodel.cn/api/paas
+SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx' // please replace sk-xxx with your zhipuai API key
+SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
+SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
+SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "true"
+SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
 ```
 
 ### method 2: run docker compose with ollama
@@ -140,6 +140,7 @@ docker compose -p bytedesk -f docker-compose.yaml stop
 
 ```bash
 # please replace 127.0.0.1 with your server ip
+BYTEDESK_FEATURES_AVATAR_BASE_URL: http://127.0.0.1:9003
 BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
 BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
 ```
