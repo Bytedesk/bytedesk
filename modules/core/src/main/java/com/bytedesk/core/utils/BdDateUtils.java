@@ -48,6 +48,9 @@ public class BdDateUtils {
     }
 
     public static String formatDatetimeToString(Date date) {
+        if (date == null) {
+            return null;
+        }
         return new SimpleDateFormat(datetimeFormat).format(date);
     }
 
