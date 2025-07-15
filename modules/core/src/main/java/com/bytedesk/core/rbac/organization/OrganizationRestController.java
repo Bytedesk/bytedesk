@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:32:46
+ * @LastEditTime: 2025-07-15 16:15:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,12 +40,12 @@ import lombok.AllArgsConstructor;
 @Tag(name = "Organization", description = "Organization management APIs")
 public class OrganizationRestController extends BaseRestController<OrganizationRequest> {
 
-    private final OrganizationRestService organizationService;
+    private final OrganizationRestService organizationRestService;
 
     @Override
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {
         
-        Page<OrganizationResponse> orgPage = organizationService.queryByOrg(request);
+        Page<OrganizationResponse> orgPage = organizationRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
@@ -53,7 +53,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     @Override
     public ResponseEntity<?> queryByUser(OrganizationRequest request) {
         
-        Page<OrganizationResponse> orgPage = organizationService.queryByUser(request);
+        Page<OrganizationResponse> orgPage = organizationRestService.queryByUser(request);
         //
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
@@ -61,18 +61,18 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     @GetMapping("/uid")
     public ResponseEntity<?> queryByUid(OrganizationRequest request) {
         //
-        Optional<OrganizationEntity> org = organizationService.findByUid(request.getUid());
+        Optional<OrganizationEntity> org = organizationRestService.findByUid(request.getUid());
         if (!org.isPresent()) {
             return ResponseEntity.ok(JsonResult.error("组织不存在"));
         }
-        return ResponseEntity.ok(JsonResult.success(organizationService.convertToResponse(org.get())));
+        return ResponseEntity.ok(JsonResult.success(organizationRestService.convertToResponse(org.get())));
     }
 
     @ActionAnnotation(title = "组织", action = "新建", description = "organization create")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
         //
-        OrganizationResponse response = organizationService.create(request);
+        OrganizationResponse response = organizationRestService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -81,7 +81,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
         //
-        OrganizationResponse response = organizationService.update(request);
+        OrganizationResponse response = organizationRestService.update(request);
         if (response == null) {
             return ResponseEntity.ok(JsonResult.error("更新组织失败"));
         }
@@ -93,7 +93,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     @Override
     public ResponseEntity<?> delete(OrganizationRequest request) {
         
-        organizationService.delete(request);
+        organizationRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
