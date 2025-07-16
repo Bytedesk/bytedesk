@@ -116,11 +116,7 @@ public class SpringAICustomService extends BaseSpringAIService {
     //     return customChatModel != null ? customChatModel.call(prompt) : "";
     // }
 
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        return processPromptSync(message, robot, "");
-    }
+
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
@@ -217,7 +213,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Custom service is not available");
         } catch (Exception e) {
             log.error("Error checking Custom service health", e);

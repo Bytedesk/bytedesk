@@ -117,11 +117,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                 });
     }
 
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        return processPromptSync(message, robot, "");
-    }
+
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
@@ -249,7 +245,7 @@ public class SpringAITencentService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Tencent service is not available");
         } catch (Exception e) {
             log.error("Error checking Tencent service health", e);

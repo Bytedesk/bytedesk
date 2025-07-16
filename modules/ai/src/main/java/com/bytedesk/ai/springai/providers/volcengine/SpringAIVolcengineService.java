@@ -255,7 +255,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Volcengine service is not available");
         } catch (Exception e) {
             log.error("Error checking Volcengine service health", e);

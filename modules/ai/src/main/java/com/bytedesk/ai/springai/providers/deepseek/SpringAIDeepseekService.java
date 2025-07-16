@@ -121,7 +121,51 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         log.info("SpringAIDeepseekService processPromptSync with full prompt content: {}", fullPromptContent);
-        return processPromptSync(message, robot);
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        try {
+            if (deepseekChatModel == null) {
+                return "Deepseek service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = deepseekChatModel.call(prompt);
+                        tokenUsage = extractTokenUsage(response);
+                        success = true;
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = deepseekChatModel.call(message);
+                tokenUsage = extractTokenUsage(response);
+                success = true;
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Deepseek API call error: ", e);
+                success = false;
+                return "服务暂时不可用，请稍后重试";
+            }
+        } catch (Exception e) {
+            log.error("Deepseek API sync error: ", e);
+            success = false;
+            return "服务暂时不可用，请稍后重试";
+        } finally {
+            // 记录token使用情况
+            long responseTime = System.currentTimeMillis() - startTime;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
+                    ? robot.getLlm().getModel() : LlmConsts.DEEPSEEK;
+            recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
+        }
     }
 
     @Override
