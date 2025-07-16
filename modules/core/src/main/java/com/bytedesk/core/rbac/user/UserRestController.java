@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 18:54:23
+ * @LastEditTime: 2025-07-16 19:01:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -87,7 +87,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @PreAuthorize("hasRole('SUPER')")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @ActionAnnotation(title = "user", action = "删除", description = "delete user info")
     @Override
     public ResponseEntity<?> delete(UserRequest request) {
@@ -97,7 +97,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @PreAuthorize("hasRole('SUPER')")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public Object export(UserRequest request, HttpServletResponse response) {
         return exportTemplate(

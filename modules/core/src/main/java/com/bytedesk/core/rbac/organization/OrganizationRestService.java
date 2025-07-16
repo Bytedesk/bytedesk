@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 18:24:15
+ * @LastEditTime: 2025-07-16 18:58:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.rbac.organization;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -83,13 +82,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     @Transactional
     @Override
-    public OrganizationResponse create(OrganizationRequest organizationRequest) {
+    public OrganizationResponse create(OrganizationRequest request) {
         //
-        if (existsByName(organizationRequest.getName())) {
-            throw new ExistsException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+        if (existsByName(request.getName())) {
+            throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
         }
-        if (existsByCode(organizationRequest.getCode())) {
-            throw new ExistsException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+        if (existsByCode(request.getCode())) {
+            throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
         }
         //
         UserEntity authUser = authService.getUser();
@@ -97,7 +96,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 .orElseThrow(() -> new NotFoundException("用户不存在."));
         String orgUid = uidUtils.getUid();
         //
-        OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
+        OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
@@ -114,7 +113,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     // 超级管理员创建组织
     @Transactional
-    public OrganizationResponse createByAdmin(OrganizationRequest organizationRequest) {
+    public OrganizationResponse createBySuper(OrganizationRequest request) {
         // 
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
@@ -124,18 +123,18 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             throw new ForbiddenException("super admin required");
         }
         //
-        if (existsByName(organizationRequest.getName())) {
-            throw new ExistsException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+        if (existsByName(request.getName())) {
+            throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
         }
-        if (existsByCode(organizationRequest.getCode())) {
-            throw new ExistsException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+        if (existsByCode(request.getCode())) {
+            throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
         }
         // 
-        OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
+        OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
         organization.setUid(uidUtils.getUid());
         // 使用 userUid 查询用户
-        if (StringUtils.hasText(organizationRequest.getUserUid())) {
-            UserEntity user = userService.findByUid(organizationRequest.getUserUid())
+        if (StringUtils.hasText(request.getUserUid())) {
+            UserEntity user = userService.findByUid(request.getUserUid())
                     .orElseThrow(() -> new NotFoundException("用户不存在."));
             organization.setUser(user);
             
@@ -154,53 +153,53 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     @Transactional
     @Override
-    public OrganizationResponse update(OrganizationRequest organizationRequest) {
+    public OrganizationResponse update(OrganizationRequest request) {
         // 查找要更新的组织
-        Optional<OrganizationEntity> organizationOptional = findByUid(organizationRequest.getUid());
+        Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
         if (!organizationOptional.isPresent()) {
             // 如果组织不存在，可以抛出一个自定义异常，例如OrganizationNotFoundException
-            throw new NotFoundException("Organization with UID: " + organizationRequest.getUid() + " not found.");
+            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
         }
 
         // 获取要更新的组织实体
         OrganizationEntity organization = organizationOptional.get();
         
         // 检查 name 唯一性（排除当前组织）
-        if (!organization.getName().equals(organizationRequest.getName())) {
-            if (organizationRepository.existsByNameAndDeletedAndUidNot(organizationRequest.getName(), false, organizationRequest.getUid())) {
-                throw new ExistsException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+        if (!organization.getName().equals(request.getName())) {
+            if (organizationRepository.existsByNameAndDeletedAndUidNot(request.getName(), false, request.getUid())) {
+                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
             }
         }
         
         // 检查 code 唯一性（排除当前组织）
-        if (!organization.getCode().equals(organizationRequest.getCode())) {
-            if (organizationRepository.existsByCodeAndDeletedAndUidNot(organizationRequest.getCode(), false, organizationRequest.getUid())) {
-                throw new ExistsException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+        if (!organization.getCode().equals(request.getCode())) {
+            if (organizationRepository.existsByCodeAndDeletedAndUidNot(request.getCode(), false, request.getUid())) {
+                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
             }
         }
         
         // 使用ModelMapper进行属性拷贝，避免逐一设置字段
         // modelMapper.map(organizationRequest, organization); // 一些默认值会被清空，待前端支持完善之后再启用
-        organization.setName(organizationRequest.getName());
-        organization.setLogo(organizationRequest.getLogo());
-        organization.setCode(organizationRequest.getCode());
-        organization.setDescription(organizationRequest.getDescription());
+        organization.setName(request.getName());
+        organization.setLogo(request.getLogo());
+        organization.setCode(request.getCode());
+        organization.setDescription(request.getDescription());
         // 认证
-        organization.setVerifiedType(organizationRequest.getVerifiedType());
-        organization.setIdentityType(organizationRequest.getIdentityType());
-        organization.setIdentityImage(organizationRequest.getIdentityImage());
-        organization.setIdentityNumber(organizationRequest.getIdentityNumber());
-        organization.setVerifyDate(organizationRequest.getVerifyDate());
-        organization.setVerifyStatus(organizationRequest.getVerifyStatus());
-        organization.setRejectReason(organizationRequest.getRejectReason());
+        organization.setVerifiedType(request.getVerifiedType());
+        organization.setIdentityType(request.getIdentityType());
+        organization.setIdentityImage(request.getIdentityImage());
+        organization.setIdentityNumber(request.getIdentityNumber());
+        organization.setVerifyDate(request.getVerifyDate());
+        organization.setVerifyStatus(request.getVerifyStatus());
+        organization.setRejectReason(request.getRejectReason());
         // 
-        organization.setVip(organizationRequest.getVip());
-        organization.setVipExpireDate(organizationRequest.getVipExpireDate());
+        organization.setVip(request.getVip());
+        organization.setVipExpireDate(request.getVipExpireDate());
         // 
-        organization.setEnabled(organizationRequest.getEnabled());
+        organization.setEnabled(request.getEnabled());
         // 使用 userUid 查询用户
-        if (StringUtils.hasText(organizationRequest.getUserUid())) {
-            UserEntity user = userService.findByUid(organizationRequest.getUserUid())
+        if (StringUtils.hasText(request.getUserUid())) {
+            UserEntity user = userService.findByUid(request.getUserUid())
                     .orElseThrow(() -> new NotFoundException("用户不存在."));
             organization.setUser(user);
         }
