@@ -56,7 +56,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             OpenAiChatOptions.builder()
-                .model(robotLlm.getModel())
+                .model(robotLlm.getChatModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .build()
@@ -112,7 +112,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "gitee-chat";
                     recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -161,8 +161,8 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : "gitee-chat";
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
+                    ? robot.getLlm().getChatModel() : "gitee-chat";
             recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -227,10 +227,10 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                     log.info("Gitee API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.GITEE, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.GITEE, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "gitee-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "gitee-chat";
                     recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });

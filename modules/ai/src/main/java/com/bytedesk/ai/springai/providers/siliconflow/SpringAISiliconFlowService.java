@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 11:38:53
+ * @LastEditTime: 2025-07-16 14:17:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,7 +58,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             OpenAiChatOptions.builder()
-                .model(robotLlm.getModel())
+                .model(robotLlm.getChatModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .build()
@@ -113,7 +113,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.SILICONFLOW;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : LlmConsts.SILICONFLOW;
                     recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -166,8 +166,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : LlmConsts.SILICONFLOW;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
+                    ? robot.getLlm().getChatModel() : LlmConsts.SILICONFLOW;
             recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -230,11 +230,12 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                 () -> {
                     log.info("SiliconFlow API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
+                    // String promptText = extractTextFromPrompt(prompt);
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), "", LlmConsts.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "siliconflow-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "siliconflow-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.SILICONFLOW;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : LlmConsts.SILICONFLOW;
                     recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });

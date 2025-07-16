@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 11:04:16
+ * @LastEditTime: 2025-07-16 14:21:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,13 +44,13 @@ public class RobotLlm {
 
     // 文字对话模型提供商
     @Builder.Default
-    @Column(name = "llm_text_provider")
-    private String provider = LlmConsts.DEFAULT_CHAT_PROVIDER;
+    @Column(name = "llm_chat_provider")
+    private String chatProvider = LlmConsts.DEFAULT_CHAT_PROVIDER;
     
     // chat model name
     @Builder.Default
-    @Column(name = "llm_text_model")
-    private String model = LlmConsts.DEFAULT_CHAT_MODEL; 
+    @Column(name = "llm_chat_model")
+    private String chatModel = LlmConsts.DEFAULT_CHAT_MODEL; 
 
     // 视觉模型
     // 启用vision

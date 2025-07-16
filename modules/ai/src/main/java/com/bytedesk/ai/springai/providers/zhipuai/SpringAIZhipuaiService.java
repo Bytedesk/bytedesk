@@ -70,7 +70,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     private ZhiPuAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             ZhiPuAiChatOptions.builder()
-                .model(robotLlm.getModel())
+                .model(robotLlm.getChatModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .build()
@@ -84,7 +84,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * @return 配置了特定模型的ZhiPuAiChatModel
      */
     private ZhiPuAiChatModel createDynamicChatModel(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getModel())) {
+        if (llm == null || !StringUtils.hasText(llm.getChatModel())) {
             // 如果没有指定模型或设置，使用默认配置
             return bytedeskZhipuaiChatModel;
         }
@@ -97,7 +97,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
             return new ZhiPuAiChatModel(bytedeskZhipuaiApi, options);
         } catch (Exception e) {
-            log.error("Error creating dynamic chat model for model {}", llm.getModel(), e);
+            log.error("Error creating dynamic chat model for model {}", llm.getChatModel(), e);
             return bytedeskZhipuaiChatModel;
         }
     }
@@ -145,7 +145,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "glm-3-turbo";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "glm-3-turbo";
                     log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
                     recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
@@ -236,8 +236,8 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : "glm-3-turbo";
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
+                    ? robot.getLlm().getChatModel() : "glm-3-turbo";
             log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType);
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
@@ -323,10 +323,10 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "glm-3-turbo");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "glm-3-turbo");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "glm-3-turbo";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "glm-3-turbo";
                     log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
                     recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 

@@ -53,7 +53,7 @@ public class RobotAgentService {
         Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
         if (robotOptional.isPresent()) {
             RobotLlm llm = robotOptional.get().getLlm();
-            String provider = llm.getProvider();
+            String provider = llm.getChatProvider();
             
             try {
                 // Get the appropriate service from registry

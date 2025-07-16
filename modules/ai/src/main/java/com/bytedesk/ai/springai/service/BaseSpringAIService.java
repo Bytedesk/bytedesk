@@ -218,7 +218,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 1 {}", messageProtobufReply);
                 
                 // 保存消息，包含prompt内容和AI模型信息
-                String modelType = robot.getLlm() != null && robot.getLlm().getModel() != null ? robot.getLlm().getModel() : "";
+                String modelType = robot.getLlm() != null && robot.getLlm().getChatModel() != null ? robot.getLlm().getChatModel() : "";
                 persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent(), "", modelType);
                 
                 // 发送消息
@@ -261,7 +261,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 3 {}", messageProtobufReply);
                     
                     // 保存消息，包含prompt内容和AI模型信息
-                    String modelType = robot.getLlm() != null && robot.getLlm().getModel() != null ? robot.getLlm().getModel() : "";
+                    String modelType = robot.getLlm() != null && robot.getLlm().getChatModel() != null ? robot.getLlm().getChatModel() : "";
                     persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent(), "", modelType);
                     
                     // 发送消息
@@ -986,7 +986,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     protected <T> T createDynamicOptions(RobotLlm llm, Function<RobotLlm, T> optionBuilder) {
-        if (llm == null || !StringUtils.hasText(llm.getModel())) {
+        if (llm == null || !StringUtils.hasText(llm.getChatModel())) {
             return null;
         }
 
@@ -994,7 +994,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 使用提供的构建器函数创建选项
             return optionBuilder.apply(llm);
         } catch (Exception e) {
-            log.error("Error creating dynamic options for model {}", llm.getModel(), e);
+            log.error("Error creating dynamic options for model {}", llm.getChatModel(), e);
             return null;
         }
     }
