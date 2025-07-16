@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 09:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 10:16:38
+ * @LastEditTime: 2025-07-16 15:38:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,9 +39,9 @@ public class LlmProviderConfigDefault implements Serializable {
     private String defaultVisionProvider;
     private String defaultVisionModel;
     
-    // Speech 配置
-    private String defaultSpeechProvider;
-    private String defaultSpeechModel;
+    // Voice 配置
+    private String defaultVoiceProvider;
+    private String defaultVoiceModel;
     
     // Rerank 配置
     private String defaultRerankProvider;

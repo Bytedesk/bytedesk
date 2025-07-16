@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 15:22:32
+ * @LastEditTime: 2025-07-16 15:33:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,11 +37,6 @@ public class RobotLlm {
     @Column(name = "is_llm_enabled")
     private Boolean enabled = true;
 
-    // stream流式输出
-    // @Builder.Default
-    // @Column(name = "is_stream_enabled")
-    // private Boolean streamEnabled = true;
-
     // 文本对话模型提供商
     @Builder.Default
     @Column(name = "llm_text_provider")
@@ -69,20 +64,19 @@ public class RobotLlm {
     private String visionModel = LlmConsts.DEFAULT_VISION_MODEL;
 
     // 语音模型
-    // 启用speech
     @Builder.Default
     @Column(name = "is_voice_enabled")
-    private Boolean speechEnabled = false;
+    private Boolean voiceEnabled = false;
 
     // 语音模型提供商
     @Builder.Default
-    @Column(name = "llm_speech_provider")
-    private String speechProvider = LlmConsts.DEFAULT_SPEECH_PROVIDER;
+    @Column(name = "llm_voice_provider")
+    private String voiceProvider = LlmConsts.DEFAULT_VOICE_PROVIDER;
 
     // 语音模型名称
     @Builder.Default
-    @Column(name = "llm_speech_model")
-    private String speechModel = LlmConsts.DEFAULT_SPEECH_MODEL;
+    @Column(name = "llm_voice_model")
+    private String voiceModel = LlmConsts.DEFAULT_VOICE_MODEL;
 
     // 启用rerank
     @Builder.Default

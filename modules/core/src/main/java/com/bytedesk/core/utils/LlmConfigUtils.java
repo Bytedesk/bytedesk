@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 09:44:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:42:28
+ * @LastEditTime: 2025-07-16 15:37:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,8 +37,8 @@ public class LlmConfigUtils {
         String defaultVisionModel = getVisionModel(environment, defaultVisionProvider);
 
         // Get the default speech provider and model
-        String defaultSpeechProvider = environment.getProperty("spring.ai.model.speech", LlmConsts.DEFAULT_SPEECH_PROVIDER);
-        String defaultSpeechModel = getSpeechModel(environment, defaultSpeechProvider);
+        String defaultSpeechProvider = environment.getProperty("spring.ai.model.voice", LlmConsts.DEFAULT_VOICE_PROVIDER);
+        String defaultSpeechModel = getVoiceModel(environment, defaultSpeechProvider);
 
         // Get the default rerank provider and model
         String defaultRerankProvider = environment.getProperty("spring.ai.model.rerank", LlmConsts.DEFAULT_RERANK_PROVIDER);
@@ -117,7 +117,7 @@ public class LlmConfigUtils {
         }
     }
 
-    private String getSpeechModel(Environment environment, String provider) {
+    private String getVoiceModel(Environment environment, String provider) {
         switch (provider) {
             case LlmConsts.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.speech.options.model", "mxbai-tts:latest");
@@ -126,7 +126,7 @@ public class LlmConfigUtils {
             case LlmConsts.OPENAI:
                 return environment.getProperty("spring.ai.openai.audio.speech.options.model", "tts-1");
             default:
-                return LlmConsts.DEFAULT_SPEECH_MODEL;
+                return LlmConsts.DEFAULT_VOICE_MODEL;
         }
     }
 

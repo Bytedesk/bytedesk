@@ -161,9 +161,11 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 }
                 
                 var response = bytedeskDashscopeChatModel.call(message);
-                tokenUsage = extractDashscopeTokenUsage(response);
+                // Since call() returns String, we can't extract token usage directly
+                // Use estimation based on response length
+                tokenUsage = estimateDashscopeTokenUsageFromText(response, fullPromptContent);
                 success = true;
-                return extractTextFromResponse(response);
+                return response;
             } catch (Exception e) {
                 log.error("Dashscope API call error: ", e);
                 success = false;

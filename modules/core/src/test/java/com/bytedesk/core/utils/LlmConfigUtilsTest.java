@@ -31,7 +31,7 @@ class LlmConfigUtilsTest {
         environment.setProperty("spring.ai.model.chat", "zhipuai");
         environment.setProperty("spring.ai.model.embedding", "zhipuai");
         environment.setProperty("spring.ai.model.vision", "zhipuai");
-        environment.setProperty("spring.ai.model.speech", "zhipuai");
+        environment.setProperty("spring.ai.model.voice", "zhipuai");
         environment.setProperty("spring.ai.model.rerank", "zhipuai");
         environment.setProperty("spring.ai.zhipuai.chat.options.model", "glm-4-flash");
         environment.setProperty("spring.ai.zhipuai.embedding.options.model", "embedding-2");
@@ -47,8 +47,8 @@ class LlmConfigUtilsTest {
         assertEquals("embedding-2", config.getDefaultEmbeddingModel());
         assertEquals("zhipuai", config.getDefaultVisionProvider());
         assertEquals("llava:latest", config.getDefaultVisionModel());
-        assertEquals("zhipuai", config.getDefaultSpeechProvider());
-        assertEquals("mxbai-tts:latest", config.getDefaultSpeechModel());
+        assertEquals("zhipuai", config.getDefaultVoiceProvider());
+        assertEquals("mxbai-tts:latest", config.getDefaultVoiceModel());
         assertEquals("zhipuai", config.getDefaultRerankProvider());
         assertEquals("linux6200/bge-reranker-v2-m3:latest", config.getDefaultRerankModel());
     }
@@ -60,7 +60,7 @@ class LlmConfigUtilsTest {
         environment.setProperty("spring.ai.model.chat", "ollama");
         environment.setProperty("spring.ai.model.embedding", "ollama");
         environment.setProperty("spring.ai.model.vision", "ollama");
-        environment.setProperty("spring.ai.model.speech", "ollama");
+        environment.setProperty("spring.ai.model.voice", "ollama");
         environment.setProperty("spring.ai.model.rerank", "ollama");
         environment.setProperty("spring.ai.ollama.chat.options.model", "qwen3:0.6b");
         environment.setProperty("spring.ai.ollama.embedding.options.model", "bge-m3:latest");
@@ -76,8 +76,8 @@ class LlmConfigUtilsTest {
         assertEquals("bge-m3:latest", config.getDefaultEmbeddingModel());
         assertEquals("ollama", config.getDefaultVisionProvider());
         assertEquals("llava:latest", config.getDefaultVisionModel());
-        assertEquals("ollama", config.getDefaultSpeechProvider());
-        assertEquals("mxbai-tts:latest", config.getDefaultSpeechModel());
+        assertEquals("ollama", config.getDefaultVoiceProvider());
+        assertEquals("mxbai-tts:latest", config.getDefaultVoiceModel());
         assertEquals("ollama", config.getDefaultRerankProvider());
         assertEquals("linux6200/bge-reranker-v2-m3:latest", config.getDefaultRerankModel());
     }
@@ -98,8 +98,8 @@ class LlmConfigUtilsTest {
         assertEquals(LlmConsts.DEFAULT_EMBEDDING_MODEL, config.getDefaultEmbeddingModel());
         assertEquals(LlmConsts.DEFAULT_VISION_PROVIDER, config.getDefaultVisionProvider());
         assertEquals(LlmConsts.DEFAULT_VISION_MODEL, config.getDefaultVisionModel());
-        assertEquals(LlmConsts.DEFAULT_SPEECH_PROVIDER, config.getDefaultSpeechProvider());
-        assertEquals(LlmConsts.DEFAULT_SPEECH_MODEL, config.getDefaultSpeechModel());
+        assertEquals(LlmConsts.DEFAULT_VOICE_PROVIDER, config.getDefaultVoiceProvider());
+        assertEquals(LlmConsts.DEFAULT_VOICE_MODEL, config.getDefaultVoiceModel());
         assertEquals(LlmConsts.DEFAULT_RERANK_PROVIDER, config.getDefaultRerankProvider());
         assertEquals(LlmConsts.DEFAULT_RERANK_MODEL, config.getDefaultRerankModel());
     }
