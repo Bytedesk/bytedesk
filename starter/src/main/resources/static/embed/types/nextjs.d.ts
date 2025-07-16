@@ -45,7 +45,6 @@ declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
-    showSupport?: boolean;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
     animation?: Animation_2;

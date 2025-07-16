@@ -43,7 +43,6 @@ export declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
-    showSupport?: boolean;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
@@ -91,7 +90,6 @@ declare class BytedeskWeb {
     private clearUnreadBadge;
     clearUnreadMessages(): Promise<any>;
     private createBubble;
-    private getSupportText;
     private createChatWindow;
     private generateChatUrl;
     private setupMessageListener;
