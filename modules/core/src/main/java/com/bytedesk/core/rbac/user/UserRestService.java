@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 14:02:08
+ * @LastEditTime: 2025-07-16 18:49:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -54,8 +55,22 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
 
     @Override
     public Page<UserResponse> queryByUser(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotFoundException("User not found.");
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
+    }
+
+    @Override
+    public UserResponse queryByUid(UserRequest request) {
+        Optional<UserEntity> userOptional = findByUid(request.getUid());
+        if (userOptional.isPresent()) {
+            return convertToResponse(userOptional.get());
+        } else {
+            throw new NotFoundException("User with UID: " + request.getUid() + " not found.");
+        }
     }
 
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
@@ -69,7 +84,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         if (user == null) {
             return null;
         }
-        Optional<UserEntity> userOptional = userRepository.findByUid(user.getUid());
+        Optional<UserEntity> userOptional = findByUid(user.getUid());
         if (userOptional.isPresent()) {
             return convertToResponse(userOptional.get());
         } else {
@@ -84,6 +99,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
 
     @Override
     public UserResponse update(UserRequest request) {
+        // 更新时候不使用缓存，直接查询
         Optional<UserEntity> userOptional = userRepository.findByUid(request.getUid());
         if (userOptional.isPresent()) {
             UserEntity userEntity = userOptional.get();
@@ -146,11 +162,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         return ConvertUtils.convertToUserResponse(entity);
     }
 
-    @Override
-    public UserResponse queryByUid(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
     public List<UserEntity> findAll(UserRequest request) {
         Specification<UserEntity> specification = UserSpecification.search(request);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:24:22
+ * @LastEditTime: 2025-07-16 18:54:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +43,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
 
     private final OrganizationRestService organizationRestService;
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {
         
@@ -66,6 +68,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @ActionAnnotation(title = "组织", action = "新建", description = "organization create")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
@@ -75,7 +78,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // create/by/admin
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @ActionAnnotation(title = "组织", action = "新建", description = "organization create by admin")
     @PostMapping("/create/by/admin")
     public ResponseEntity<?> createByAdmin(@RequestBody OrganizationRequest request) {
@@ -94,7 +97,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public ResponseEntity<?> delete(OrganizationRequest request) {
         
@@ -103,6 +106,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public Object export(OrganizationRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

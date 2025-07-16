@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 15:18:04
+ * @LastEditTime: 2025-07-16 18:54:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,7 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     private final PushRestService pushService;
 
-    @PreAuthorize("hasRole('SUPER')")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public ResponseEntity<?> queryByOrg(UserRequest request) {
         
@@ -62,8 +63,10 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     @Override
     public ResponseEntity<?> queryByUid(UserRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        UserResponse userResponse = userRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
     @ActionAnnotation(title = "user", action = "新建", description = "create user info")

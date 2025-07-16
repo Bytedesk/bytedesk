@@ -123,13 +123,19 @@ public class UserService {
         }
         // 只有经过验证的邮箱，才真正执行注册
         if (StringUtils.hasText(request.getEmail())) {
-            user.setUsername(request.getEmail());
+            // 如果username为空，则使用email作为username
+            if (!StringUtils.hasText(request.getUsername())) {
+                user.setUsername(request.getEmail());
+            } else {
+                user.setUsername(request.getUsername());
+            }
             user.setNum(request.getEmail());
             // 默认注册时，仅验证手机号，无需验证邮箱
             user.setEmailVerified(false);
         }
         // 只有经过验证的手机号，才真正执行注册
         if (StringUtils.hasText(request.getMobile())) {
+            // 如果有手机号，则使用手机号作为num
             user.setNum(request.getMobile());
             user.setMobileVerified(true);
         }
