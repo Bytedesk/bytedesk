@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 18:58:50
+ * @LastEditTime: 2025-07-17 07:42:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -197,18 +197,53 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setVipExpireDate(request.getVipExpireDate());
         // 
         organization.setEnabled(request.getEnabled());
+        // 保存原先的用户引用，用于后续比较
+        UserEntity originalUser = organization.getUser();
+        
         // 使用 userUid 查询用户
+        UserEntity newUser = null;
         if (StringUtils.hasText(request.getUserUid())) {
-            UserEntity user = userService.findByUid(request.getUserUid())
+            newUser = userService.findByUid(request.getUserUid())
                     .orElseThrow(() -> new NotFoundException("用户不存在."));
-            organization.setUser(user);
+            organization.setUser(newUser);
         }
+        
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
         if (updatedOrganization == null) {
             throw new RuntimeException("Failed to update organization.");
         }
-        // TODO: 超级管理员更新用户当前组织
+        
+        // 处理用户组织和角色的更新
+        if (newUser != null) {
+            // 判断是否与原先用户相同
+            if (originalUser == null || !originalUser.getUid().equals(newUser.getUid())) {
+                // 用户发生变化，需要处理组织和角色
+                
+                // 1. 清除原先用户的当前组织和角色（如果存在）
+                if (originalUser != null) {
+                    originalUser.setCurrentOrganization(null);
+                    originalUser.removeOrganizationRoles();
+                    userService.save(originalUser);
+                    log.info("Cleared original user's current organization and roles: {}", originalUser.getUid());
+                }
+                
+                // 2. 设置新用户的当前组织和角色
+                newUser.setCurrentOrganization(updatedOrganization);
+                userService.addRoleAdmin(newUser);
+                log.info("Set new user's current organization and admin role: {}", newUser.getUid());
+            } else {
+                // 用户相同，无需重复设置
+                log.info("User unchanged, no need to update organization and roles: {}", newUser.getUid());
+            }
+        } else if (originalUser != null) {
+            // 新用户为空，但原先有用户，需要清除原先用户的组织和角色
+            originalUser.setCurrentOrganization(null);
+            originalUser.removeOrganizationRoles();
+            userService.save(originalUser);
+            log.info("Cleared original user's current organization and roles (new user is null): {}", originalUser.getUid());
+        }
+        
         // 转换为响应对象
         return convertToResponse(updatedOrganization);
     }
