@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 10:43:53
+ * @LastEditTime: 2025-07-16 11:14:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -95,6 +95,52 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 添加请求日志
         log.info("Zhipuai API creating request - model: {}, stream: {}, requestId: {}, temperature: {}, message length: {}", 
                 chatCompletionRequest.getModel(), stream, requestId, chatCompletionRequest.getTemperature(), message.length());
+
+        return chatCompletionRequest;
+    }
+
+    /**
+     * 根据机器人配置创建动态的聊天选项（支持完整的Prompt对象）
+     */
+    private ChatCompletionRequest createDynamicRequestFromPrompt(RobotLlm llm, Prompt prompt, boolean stream) {
+        List<ChatMessage> messages = new ArrayList<>();
+        
+        // 将Spring AI的Message转换为智谱AI的ChatMessage
+        if (prompt != null && prompt.getInstructions() != null) {
+            for (org.springframework.ai.chat.messages.Message message : prompt.getInstructions()) {
+                String role;
+                String content = message.getText();
+                
+                if (message instanceof org.springframework.ai.chat.messages.SystemMessage) {
+                    role = ChatMessageRole.SYSTEM.value();
+                } else if (message instanceof org.springframework.ai.chat.messages.UserMessage) {
+                    role = ChatMessageRole.USER.value();
+                } else if (message instanceof org.springframework.ai.chat.messages.AssistantMessage) {
+                    role = ChatMessageRole.ASSISTANT.value();
+                } else {
+                    // 对于其他类型的消息，默认作为系统消息处理
+                    role = ChatMessageRole.SYSTEM.value();
+                }
+                
+                ChatMessage chatMessage = new ChatMessage(role, content);
+                messages.add(chatMessage);
+            }
+        }
+
+        String requestId = String.format("zhipuai-%d", System.currentTimeMillis());
+        
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(llm != null && llm.getModel() != null ? llm.getModel() : zhipuaiChatConfig.getModel())
+                .stream(stream)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .temperature(llm != null ? llm.getTemperature().floatValue() : (float) zhipuaiChatConfig.getTemperature())
+                .build();
+
+        // 添加请求日志
+        log.info("Zhipuai API creating request from prompt - model: {}, stream: {}, requestId: {}, temperature: {}, messages count: {}", 
+                chatCompletionRequest.getModel(), stream, requestId, chatCompletionRequest.getTemperature(), messages.size());
 
         return chatCompletionRequest;
     }
@@ -365,13 +411,13 @@ public class ZhipuaiService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        String message = extractTextFromPrompt(prompt);
-        log.info("Zhipuai API websocket message: {}", message);
+        log.info("Zhipuai API websocket prompt: {}", prompt);
 
         // 添加请求日志
-        log.info("Zhipuai API websocket request - model: {}, message length: {}, robot: {}", 
+        log.info("Zhipuai API websocket request - model: {}, prompt instructions count: {}, robot: {}", 
                 (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel(), 
-                message.length(), robot != null ? robot.getUid() : "null");
+                prompt != null && prompt.getInstructions() != null ? prompt.getInstructions().size() : 0, 
+                robot != null ? robot.getUid() : "null");
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
@@ -385,7 +431,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 return;
             }
 
-            ChatCompletionRequest chatCompletionRequest = createDynamicRequest(llm, message, true);
+            ChatCompletionRequest chatCompletionRequest = createDynamicRequestFromPrompt(llm, prompt, true);
             
             log.info("Zhipuai API invoking model with requestId: {}", chatCompletionRequest.getRequestId());
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
@@ -445,8 +491,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                                         if (extractedContent != null && !extractedContent.isEmpty()) {
                                             log.info("Zhipuai API websocket extracted content: {}", extractedContent);
                                             sendMessageWebsocket(MessageTypeEnum.STREAM, extractedContent, messageProtobufReply);
-                                        } else if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
-                                            // 如果无法提取content，则发送原始delta字符串
+                                        } else if (!deltaStr.isEmpty() && !deltaStr.equals("null") && !isEmptyAssistantMessage(deltaStr)) {
+                                            // 如果无法提取content，且不是空的助手消息，则发送原始delta字符串
                                             sendMessageWebsocket(MessageTypeEnum.STREAM, deltaStr, messageProtobufReply);
                                         }
                                     }
@@ -466,7 +512,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 log.info("Zhipuai API websocket tokenUsage from accumulator: {}", tokenUsage[0]);
                             } else {
                                 // 如果无法获取实际token信息，使用估算
-                                tokenUsage[0] = estimateTokenUsageFromMessage(message);
+                                String promptText = extractTextFromPrompt(prompt);
+                                tokenUsage[0] = estimateTokenUsageFromMessage(promptText);
                                 log.info("Zhipuai API websocket estimated tokenUsage: {}", tokenUsage[0]);
                             }
                             
@@ -558,13 +605,13 @@ public class ZhipuaiService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        String message = extractTextFromPrompt(prompt);
-        log.info("Zhipuai API SSE message: {}", message);
+        log.info("Zhipuai API SSE prompt: {}", prompt);
         
         // 添加请求日志
-        log.info("Zhipuai API SSE request - model: {}, message length: {}, robot: {}", 
+        log.info("Zhipuai API SSE request - model: {}, prompt instructions count: {}, robot: {}", 
                 (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel(), 
-                message.length(), robot != null ? robot.getUid() : "null");
+                prompt != null && prompt.getInstructions() != null ? prompt.getInstructions().size() : 0, 
+                robot != null ? robot.getUid() : "null");
         
         // 发送起始消息
         sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
@@ -581,7 +628,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 return;
             }
 
-            ChatCompletionRequest chatCompletionRequest = createDynamicRequest(llm, message, true);
+            ChatCompletionRequest chatCompletionRequest = createDynamicRequestFromPrompt(llm, prompt, true);
             
             log.info("Zhipuai API invoking SSE model with requestId: {}", chatCompletionRequest.getRequestId());
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
@@ -642,8 +689,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                                         if (extractedContent != null && !extractedContent.isEmpty()) {
                                             log.info("Zhipuai API SSE extracted content: {}", extractedContent);
                                             sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, extractedContent);
-                                        } else if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
-                                            // 如果无法提取content，则发送原始delta字符串
+                                        } else if (!deltaStr.isEmpty() && !deltaStr.equals("null") && !isEmptyAssistantMessage(deltaStr)) {
+                                            // 如果无法提取content，且不是空的助手消息，则发送原始delta字符串
                                             sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, deltaStr);
                                         }
                                     }
@@ -664,7 +711,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                                     log.info("Zhipuai API SSE tokenUsage from accumulator: {}", tokenUsage[0]);
                                 } else {
                                     // 如果无法获取实际token信息，使用估算
-                                    tokenUsage[0] = estimateTokenUsageFromMessage(message);
+                                    String promptText = extractTextFromPrompt(prompt);
+                                    tokenUsage[0] = estimateTokenUsageFromMessage(promptText);
                                     log.info("Zhipuai API SSE estimated tokenUsage: {}", tokenUsage[0]);
                                 }
                                 
@@ -708,14 +756,25 @@ public class ZhipuaiService extends BaseSpringAIService {
         if (prompt == null || prompt.getInstructions() == null) {
             return "";
         }
-        // Spring AI Prompt的getInstructions()返回的是List<Message>
-        // 我们需要找到UserMessage并提取其内容
+        
+        // 构建完整的提示词内容，包括所有消息
+        StringBuilder fullPrompt = new StringBuilder();
         for (org.springframework.ai.chat.messages.Message message : prompt.getInstructions()) {
-            if (message instanceof org.springframework.ai.chat.messages.UserMessage) {
-                return ((org.springframework.ai.chat.messages.UserMessage) message).getText();
+            String content = message.getText();
+            if (content != null && !content.trim().isEmpty()) {
+                if (message instanceof org.springframework.ai.chat.messages.SystemMessage) {
+                    fullPrompt.append("[系统] ").append(content).append("\n");
+                } else if (message instanceof org.springframework.ai.chat.messages.UserMessage) {
+                    fullPrompt.append("[用户] ").append(content).append("\n");
+                } else if (message instanceof org.springframework.ai.chat.messages.AssistantMessage) {
+                    fullPrompt.append("[助手] ").append(content).append("\n");
+                } else {
+                    fullPrompt.append(content).append("\n");
+                }
             }
         }
-        return "";
+        
+        return fullPrompt.toString().trim();
     }
 
     /**
@@ -925,8 +984,10 @@ public class ZhipuaiService extends BaseSpringAIService {
                         if (extractedContent != null && !extractedContent.isEmpty()) {
                             log.info("Zhipuai API function calling extracted content: {}", extractedContent);
                             return extractedContent;
-                        } else {
+                        } else if (!isEmptyAssistantMessage(deltaStr)) {
                             return deltaStr;
+                        } else {
+                            return "";
                         }
                     }
                     return "";
@@ -1213,12 +1274,39 @@ public class ZhipuaiService extends BaseSpringAIService {
     }
 
     /**
+     * 检查是否是空的助手消息
+     * 过滤掉 {"role":"assistant","content":"","tool_calls":[]} 这样的空消息
+     */
+    private boolean isEmptyAssistantMessage(String deltaStr) {
+        try {
+            if (deltaStr == null || deltaStr.isEmpty()) {
+                return true;
+            }
+            
+            // 检查是否是JSON格式的助手消息
+            if (deltaStr.trim().startsWith("{") && deltaStr.trim().endsWith("}")) {
+                // 检查是否包含 "role":"assistant" 和空的 "content":""
+                if (deltaStr.contains("\"role\":\"assistant\"") && 
+                    (deltaStr.contains("\"content\":\"\"") || deltaStr.contains("\"content\":null"))) {
+                    log.debug("Zhipuai API detected empty assistant message: {}", deltaStr);
+                    return true;
+                }
+            }
+            
+            return false;
+        } catch (Exception e) {
+            log.error("Error checking empty assistant message: {}", deltaStr, e);
+            return false;
+        }
+    }
+
+    /**
      * 从delta字符串中提取content字段
      * 处理JSON格式的ChatMessage字符串，如：{"role":"assistant","content":"的","tool_calls":[]}
      */
     private String extractContentFromDeltaString(String deltaStr) {
         try {
-            if (deltaStr == null || deltaStr.isEmpty() || deltaStr.equals("null")) {
+            if (deltaStr == null || deltaStr.isEmpty() || deltaStr.equals("null") || isEmptyAssistantMessage(deltaStr)) {
                 return null;
             }
             
