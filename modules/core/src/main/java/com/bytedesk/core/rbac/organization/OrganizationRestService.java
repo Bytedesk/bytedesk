@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 18:22:55
+ * @LastEditTime: 2025-07-16 18:24:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,10 +79,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
         }
         return convertToResponse(organizationOptional.get());
-    }
-
-    public List<OrganizationEntity> findAll() {
-        return organizationRepository.findAll();
     }
 
     @Transactional

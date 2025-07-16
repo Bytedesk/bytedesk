@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 15:16:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-22 17:15:12
+ * @LastEditTime: 2025-07-16 18:29:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,17 @@ public class OrganizationSpecification extends BaseSpecification {
             // code
             if (StringUtils.hasText(request.getCode())) {
                 predicates.add(criteriaBuilder.like(root.get("code"), "%" + request.getCode() + "%"));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("code"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
