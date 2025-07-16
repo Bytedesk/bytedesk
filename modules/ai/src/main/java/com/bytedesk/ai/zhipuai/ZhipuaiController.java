@@ -186,7 +186,7 @@ public class ZhipuaiController {
                 ChatFunction function = ChatFunction.builder()
                         .name((String) funcData.get("name"))
                         .description((String) funcData.get("description"))
-                        .parameters(createFunctionParameters((Map<String, Object>) funcData.get("parameters")))
+                        .parameters(createFunctionParameters(getMapSafely(funcData, "parameters")))
                         .build();
                 functions.add(function);
             }
@@ -219,7 +219,7 @@ public class ZhipuaiController {
                 ChatFunction function = ChatFunction.builder()
                         .name((String) funcData.get("name"))
                         .description((String) funcData.get("description"))
-                        .parameters(createFunctionParameters((Map<String, Object>) funcData.get("parameters")))
+                        .parameters(createFunctionParameters(getMapSafely(funcData, "parameters")))
                         .build();
                 functions.add(function);
             }
@@ -238,19 +238,35 @@ public class ZhipuaiController {
         ChatFunctionParameters parameters = new ChatFunctionParameters();
         parameters.setType((String) paramsData.get("type"));
         
-        @SuppressWarnings("unchecked")
-        Map<String, Object> properties = (Map<String, Object>) paramsData.get("properties");
+        Map<String, Object> properties = getMapSafely(paramsData, "properties");
         if (properties != null) {
             parameters.setProperties(properties);
         }
         
-        @SuppressWarnings("unchecked")
-        List<String> required = (List<String>) paramsData.get("required");
+        List<String> required = getListSafely(paramsData, "required");
         if (required != null) {
             parameters.setRequired(required);
         }
         
         return parameters;
+    }
+
+    /**
+     * 安全地获取Map类型的数据
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getMapSafely(Map<String, Object> data, String key) {
+        Object value = data.get(key);
+        return value instanceof Map ? (Map<String, Object>) value : null;
+    }
+
+    /**
+     * 安全地获取List类型的数据
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> getListSafely(Map<String, Object> data, String key) {
+        Object value = data.get(key);
+        return value instanceof List ? (List<String>) value : null;
     }
 
     /**

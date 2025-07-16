@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:55:48
+ * @LastEditTime: 2025-07-16 14:06:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -872,11 +872,13 @@ public class ZhipuaiService extends BaseSpringAIService {
             messages.add(chatMessage);
 
             List<ChatTool> chatToolList = new ArrayList<>();
-            for (ChatFunction function : functions) {
-                ChatTool chatTool = new ChatTool();
-                chatTool.setType(ChatToolType.FUNCTION.value());
-                chatTool.setFunction(function);
-                chatToolList.add(chatTool);
+            if (functions != null) {
+                for (ChatFunction function : functions) {
+                    ChatTool chatTool = new ChatTool();
+                    chatTool.setType(ChatToolType.FUNCTION.value());
+                    chatTool.setFunction(function);
+                    chatToolList.add(chatTool);
+                }
             }
 
             String requestId = String.format("function-%d", System.currentTimeMillis());
@@ -938,11 +940,13 @@ public class ZhipuaiService extends BaseSpringAIService {
             messages.add(chatMessage);
 
             List<ChatTool> chatToolList = new ArrayList<>();
-            for (ChatFunction function : functions) {
-                ChatTool chatTool = new ChatTool();
-                chatTool.setType(ChatToolType.FUNCTION.value());
-                chatTool.setFunction(function);
-                chatToolList.add(chatTool);
+            if (functions != null) {
+                for (ChatFunction function : functions) {
+                    ChatTool chatTool = new ChatTool();
+                    chatTool.setType(ChatToolType.FUNCTION.value());
+                    chatTool.setFunction(function);
+                    chatToolList.add(chatTool);
+                }
             }
 
             String requestId = String.format("function-stream-%d", System.currentTimeMillis());
