@@ -72,8 +72,15 @@ public class SpringAICustomService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
+    }
+
+    @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("Custom API websocket fullPromptContent: {}", fullPromptContent);
         
         if (customChatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Custom服务不可用", messageProtobufReply);
@@ -117,6 +124,14 @@ public class SpringAICustomService extends BaseSpringAIService {
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        return processPromptSync(message, robot, "");
+    }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        log.info("Custom API sync fullPromptContent: {}", fullPromptContent);
+        
         try {
             if (customChatModel == null) {
                 return "Custom service is not available";
@@ -149,8 +164,15 @@ public class SpringAICustomService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
+    }
+
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("Custom API SSE fullPromptContent: {}", fullPromptContent);
 
         if (customChatModel == null) {
             handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
@@ -192,7 +214,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Custom API SSE complete");
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter);
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent);
                 });
     }
 

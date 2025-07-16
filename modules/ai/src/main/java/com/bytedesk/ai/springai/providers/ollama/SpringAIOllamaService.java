@@ -101,8 +101,15 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
+    }
+
+    @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("Ollama API websocket fullPromptContent: {}", fullPromptContent);
 
         // 获取适当的模型实例
         OllamaChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskOllamaChatModel;
@@ -161,9 +168,17 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        return processPromptSync(message, robot, "");
+    }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        log.info("Ollama API sync fullPromptContent: {}", fullPromptContent);
         
         try {
             if (bytedeskOllamaChatModel != null) {

@@ -61,4 +61,7 @@ public class RobotMessageRequest extends BaseRequest {
     private Integer completionTokens;
 
     private Integer totalTokens;
+
+    // 存储传入到大模型的完整prompt内容
+    private String prompt;
 }

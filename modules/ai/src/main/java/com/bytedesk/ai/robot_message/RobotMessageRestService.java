@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 11:19:59
+ * @LastEditTime: 2025-07-16 12:28:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -129,7 +129,8 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
             entity.setPromptTokens(request.getPromptTokens());
             entity.setCompletionTokens(request.getCompletionTokens());
             entity.setTotalTokens(request.getTotalTokens());
-            
+            // 
+            entity.setPrompt(request.getPrompt());
             // log.debug("Updating robot message {}: current answer length: {}, new answer length: {}", 
             //          request.getUid(), currentAnswer.length(), newAnswer.length());
             

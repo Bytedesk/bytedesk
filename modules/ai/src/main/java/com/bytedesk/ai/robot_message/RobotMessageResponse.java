@@ -81,4 +81,7 @@ public class RobotMessageResponse extends BaseResponse {
 
     // 点踩的原因
     private String rateDownReason;
+
+    // 存储传入到大模型的完整prompt内容
+    private String prompt;
 }

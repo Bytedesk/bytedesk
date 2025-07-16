@@ -108,8 +108,19 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
+    }
+
+    /**
+     * 方式1：异步流式调用（带prompt参数）
+     */
+    @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
 
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
@@ -157,9 +168,20 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      */
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        return processPromptSync(message, robot, "");
+    }
+
+    /**
+     * 方式2：同步调用（带prompt参数）
+     */
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
         
         try {
             if (bytedeskZhipuaiChatModel == null) {
@@ -248,8 +270,19 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
+    }
+
+    /**
+     * 方式3：SSE方式调用（带prompt参数）
+     */
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("Zhipuai API SSE fullPromptContent: {}", fullPromptContent);
 
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
@@ -317,9 +350,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         log.info("Zhipuai API SSE final tokenUsage after manual extraction: {}", tokenUsage[0]);
                     }
                     
-                    // 发送流结束消息，包含token使用情况
+                    // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent);
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "glm-3-turbo";

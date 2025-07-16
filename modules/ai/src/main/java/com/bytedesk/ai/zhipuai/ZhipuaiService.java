@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 11:14:24
+ * @LastEditTime: 2025-07-16 12:29:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -409,9 +409,20 @@ public class ZhipuaiService extends BaseSpringAIService {
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
+    }
+
+    /**
+     * 方式1：异步流式调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）
+     */
+    @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API websocket prompt: {}", prompt);
+        log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
 
         // 添加请求日志
         log.info("Zhipuai API websocket request - model: {}, prompt instructions count: {}, robot: {}", 
@@ -548,11 +559,21 @@ public class ZhipuaiService extends BaseSpringAIService {
      */
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        return processPromptSync(message, robot, "");
+    }
+
+    /**
+     * 方式2：同步调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）
+     */
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         // 添加请求日志
         RobotLlm llm = robot != null ? robot.getLlm() : null;
         log.info("Zhipuai API sync request - model: {}, message length: {}, robot: {}", 
                 (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel(), 
                 message.length(), robot != null ? robot.getUid() : "null");
+        log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
 
         long startTime = System.currentTimeMillis();
         boolean success = false;
@@ -603,9 +624,20 @@ public class ZhipuaiService extends BaseSpringAIService {
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
+    }
+
+    /**
+     * 方式3：SSE方式调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）
+     */
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API SSE prompt: {}", prompt);
+        log.info("Zhipuai API SSE fullPromptContent: {}", fullPromptContent);
         
         // 添加请求日志
         log.info("Zhipuai API SSE request - model: {}, prompt instructions count: {}, robot: {}", 
@@ -717,7 +749,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 }
                                 
                                 sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
+                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent);
                             } catch (Exception e) {
                                 log.error("Zhipuai API SSE error completing stream: ", e);
                             }

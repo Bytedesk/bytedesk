@@ -210,20 +210,20 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if ((!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) && robot.getLlm().getEnabled()) {
                 log.info("知识库未启用或未指定知识库UID，但开启了LLM");
                 // 使用空上下文调用通用方法
-                String response = createAndProcessPromptSync(query, "", robot, messageProtobufQuery, messageProtobufReply);
+                PromptResult promptResult = createAndProcessPromptSyncWithPrompt(query, "", robot, messageProtobufQuery, messageProtobufReply);
                 
                 // 设置回复内容和类型
-                messageProtobufReply.setContent(response);
+                messageProtobufReply.setContent(promptResult.getResponse());
                 messageProtobufReply.setType(MessageTypeEnum.TEXT);
                 log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 1 {}", messageProtobufReply);
                 
-                // 保存消息
-                persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                // 保存消息，包含prompt内容
+                persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent());
                 
                 // 发送消息
                 messageSendService.sendProtobufMessage(messageProtobufReply);
                 
-                return response;
+                return promptResult.getResponse();
             }
             
             // 根据是否启用LLM决定如何处理结果
@@ -251,21 +251,21 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     log.info("BaseSpringAIService sendSyncMessage context {}", context);
                     
                     // 使用通用方法处理同步消息
-                    String response = createAndProcessPromptSync(query, context, robot, messageProtobufQuery, messageProtobufReply);
-                    log.info("BaseSpringAIService sendSyncMessage response {}", response);
+                    PromptResult promptResult = createAndProcessPromptSyncWithPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply);
+                    log.info("BaseSpringAIService sendSyncMessage response {}", promptResult.getResponse());
                     
                     // 设置回复内容和类型
-                    messageProtobufReply.setContent(response);
+                    messageProtobufReply.setContent(promptResult.getResponse());
                     messageProtobufReply.setType(MessageTypeEnum.TEXT);
                     log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 3 {}", messageProtobufReply);
                     
-                    // 保存消息
-                    persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                    // 保存消息，包含prompt内容
+                    persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent());
                     
                     // 发送消息
                     messageSendService.sendProtobufMessage(messageProtobufReply);
                     
-                    return response;
+                    return promptResult.getResponse();
                 }
             } else {
                 // 不启用大模型，直接返回搜索结果
@@ -326,8 +326,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Override
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered) {
-        // 调用重载方法，传入默认的token使用情况（0）
-        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, 0, 0, 0);
+        // 调用重载方法，传入默认的token使用情况（0）和空prompt
+        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, 0, 0, 0, "");
     }
 
     /**
@@ -342,11 +342,28 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens) {
+        // 调用重载方法，传入空prompt
+        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, promptTokens, completionTokens, totalTokens, "");
+    }
+
+    /**
+     * 持久化消息，包含token使用情况和prompt内容
+     * 
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param isUnanswered 是否未回答
+     * @param promptTokens prompt token数量
+     * @param completionTokens completion token数量
+     * @param totalTokens 总token数量
+     * @param prompt 传入到大模型的完整prompt内容
+     */
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens, String prompt) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
-        log.info("BaseSpringAIService persistMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}", 
+        log.info("BaseSpringAIService persistMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}", 
             messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
-            promptTokens, completionTokens, totalTokens);
+            promptTokens, completionTokens, totalTokens, prompt);
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
         //
         MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
@@ -372,6 +389,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 .promptTokens((int) promptTokens)
                 .completionTokens((int) completionTokens)
                 .totalTokens((int) totalTokens)
+                //
+                // 添加完整prompt内容
+                .prompt(prompt)
                 //
                 .build();
         robotMessageCache.pushRequest(robotMessage);
@@ -411,9 +431,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 添加用户查询
         aiPrompt.append("问题：\n").append(query);
         
+        // 获取完整的prompt内容用于存储
+        String fullPromptContent = aiPrompt.toString();
+        log.info("processDirectLlmRequest fullPromptContent: {}", fullPromptContent);
+        
         // 调用子类实现的处理方法
         try {
-            String response = processPromptSync(aiPrompt.toString(), robot);
+            String response = processPromptSync(aiPrompt.toString(), robot, fullPromptContent);
             log.info("processDirectLlmRequest response {}", response);
             if (response != null && response.contains("<think>")) {
                 log.debug("processDirectLlmRequest 替换前的内容: {}", response);
@@ -574,7 +598,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
-        processPromptWebsocket(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
+        
+        // 提取完整的prompt内容用于存储
+        String fullPromptContent = extractFullPromptContent(messages);
+        log.info("BaseSpringAIService processLlmResponseWebsocket fullPromptContent: {}", fullPromptContent);
+        
+        processPromptWebsocket(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, fullPromptContent);
     }
 
     private void createAndProcessPrompt(String query, String context, RobotProtobuf robot,
@@ -635,10 +664,20 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
-        processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        
+        // 提取完整的prompt内容用于存储
+        String fullPromptContent = extractFullPromptContent(messages);
+        log.info("BaseSpringAIService createAndProcessPrompt fullPromptContent: {}", fullPromptContent);
+        
+        processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter, fullPromptContent);
     }
 
-    private String createAndProcessPromptSync(String query, String context, RobotProtobuf robot,
+    // private String createAndProcessPromptSync(String query, String context, RobotProtobuf robot,
+    //         MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+    //     return createAndProcessPromptSyncWithPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply).getResponse();
+    // }
+
+    private PromptResult createAndProcessPromptSyncWithPrompt(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         
         // 创建系统提示信息，包含知识库上下文
@@ -694,7 +733,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 创建提示并处理
         Prompt aiPrompt = new Prompt(messages);
-        return processPromptSync(aiPrompt.toString(), robot);
+        
+        // 提取完整的prompt内容用于存储
+        String fullPromptContent = extractFullPromptContent(messages);
+        log.info("BaseSpringAIService createAndProcessPromptSync fullPromptContent: {}", fullPromptContent);
+        
+        String response = processPromptSync(aiPrompt.toString(), robot, fullPromptContent);
+        return new PromptResult(response, fullPromptContent);
     }
 
     private void processDirectResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
@@ -832,8 +877,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
-        // 调用重载方法，传入默认的token使用情况（0）
-        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0);
+        // 调用重载方法，传入默认的token使用情况（0）和空prompt
+        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, "");
     }
 
     /**
@@ -848,16 +893,33 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens) {
-        log.info("BaseSpringAIService sendStreamEndMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}", 
+        // 调用重载方法，传入空prompt
+        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, promptTokens, completionTokens, totalTokens, "");
+    }
+
+    /**
+     * 发送流结束消息，包含token使用情况和prompt内容
+     * 
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param emitter SSE发射器
+     * @param promptTokens prompt token数量
+     * @param completionTokens completion token数量
+     * @param totalTokens 总token数量
+     * @param prompt 传入到大模型的完整prompt内容
+     */
+    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens, String prompt) {
+        log.info("BaseSpringAIService sendStreamEndMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}", 
             messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
-            promptTokens, completionTokens, totalTokens);
+            promptTokens, completionTokens, totalTokens, prompt);
         try {
             if (!isEmitterCompleted(emitter)) {
                 // 发送流结束标记
                 messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
                 messageProtobufReply.setContent("");
-                // 保存消息到数据库，包含token使用情况
-                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens);
+                // 保存消息到数据库，包含token使用情况和prompt内容
+                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens, prompt);
                 String messageJson = messageProtobufReply.toJson();
                 //
                 emitter.send(SseEmitter.event()
@@ -1257,6 +1319,52 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     /**
+     * 提取完整的prompt内容
+     * 
+     * @param messages 消息列表
+     * @return 格式化的完整prompt内容
+     */
+    protected String extractFullPromptContent(List<Message> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return "";
+        }
+        
+        StringBuilder fullPrompt = new StringBuilder();
+        for (Message message : messages) {
+            String content = message.getText();
+            if (content != null && !content.trim().isEmpty()) {
+                if (message instanceof SystemMessage) {
+                    fullPrompt.append("[系统] ").append(content).append("\n");
+                } else if (message instanceof UserMessage) {
+                    fullPrompt.append("[用户] ").append(content).append("\n");
+                } else if (message instanceof AssistantMessage) {
+                    fullPrompt.append("[助手] ").append(content).append("\n");
+                } else {
+                    fullPrompt.append(content).append("\n");
+                }
+            }
+        }
+        
+        return fullPrompt.toString().trim();
+    }
+
+    /**
+     * Prompt处理结果类
+     */
+    protected static class PromptResult {
+        private final String response;
+        private final String fullPromptContent;
+
+        public PromptResult(String response, String fullPromptContent) {
+            this.response = response;
+            this.fullPromptContent = fullPromptContent;
+        }
+
+        public String getResponse() { return response; }
+        public String getFullPromptContent() { return fullPromptContent; }
+    }
+
+    /**
      * Token usage data class
      */
     protected static class TokenUsage {
@@ -1279,8 +1387,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply);
 
+    // 带prompt参数的抽象方法重载
+    protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, String fullPromptContent);
+
     protected abstract String processPromptSync(String message, RobotProtobuf robot);
 
     protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter);
+
+    // 带prompt参数的抽象方法重载
+    protected abstract String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent);
+
+    protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent);
 }
