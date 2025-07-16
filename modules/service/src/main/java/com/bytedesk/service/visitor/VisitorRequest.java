@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 16:23:49
+ * @LastEditTime: 2025-07-16 10:15:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -117,12 +117,13 @@ public class VisitorRequest extends BaseRequest {
 	}
 	
 	public Boolean isWeChat() {
-		// 忽略大小写
-		return this.channel.toLowerCase().contains(ChannelEnum.WECHAT.name().toLowerCase());
+		// 忽略大小写，常量放在前面避免空指针异常
+		return this.channel != null && ChannelEnum.WECHAT.name().toLowerCase().contains(this.channel.toLowerCase());
 	}
 
 	public Boolean isMeta() {
-		return this.channel.toLowerCase().contains(ChannelEnum.MESSENGER.name().toLowerCase());
+		// 忽略大小写，常量放在前面避免空指针异常
+		return this.channel != null && ChannelEnum.MESSENGER.name().toLowerCase().contains(this.channel.toLowerCase());
 	}
 	
 	/**
@@ -130,8 +131,8 @@ public class VisitorRequest extends BaseRequest {
 	 * @return true 如果为企业微信客户端，否则为 false
 	 */
 	public Boolean isWeChatWork() {
-		// 忽略大小写
-		return this.channel.toLowerCase().contains(ChannelEnum.WECHAT_WORK.name().toLowerCase());
+		// 忽略大小写，常量放在前面避免空指针异常
+		return this.channel != null && ChannelEnum.WECHAT_WORK.name().toLowerCase().contains(this.channel.toLowerCase());
 	}
 
 	/**
@@ -139,8 +140,8 @@ public class VisitorRequest extends BaseRequest {
 	 * @return true 如果为Telegram客户端，否则为 false
 	 */
 	public Boolean isTelegram() {
-		// 忽略大小写
-		return this.channel.toLowerCase().contains(ChannelEnum.TELEGRAM.name().toLowerCase());
+		// 忽略大小写，常量放在前面避免空指针异常
+		return this.channel != null && ChannelEnum.TELEGRAM.name().toLowerCase().contains(this.channel.toLowerCase());
 	}
 
 	/**
@@ -148,8 +149,8 @@ public class VisitorRequest extends BaseRequest {
 	 * @return true 如果为WhatsApp客户端，否则为 false
 	 */
 	public Boolean isWhatsApp() {
-		// 忽略大小写
-		return this.channel.toLowerCase().contains(ChannelEnum.WHATSAPP.name().toLowerCase());
+		// 忽略大小写，常量放在前面避免空指针异常
+		return this.channel != null && ChannelEnum.WHATSAPP.name().toLowerCase().contains(this.channel.toLowerCase());
 	}
 
 	public void setWorkgroupType() {

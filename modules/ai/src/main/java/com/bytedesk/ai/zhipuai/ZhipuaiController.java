@@ -724,6 +724,25 @@ public class ZhipuaiController {
     }
 
     /**
+     * 简单流式测试 - 完全按照官方示例代码实现
+     * GET http://127.0.0.1:9003/zhipuai/test-simple-stream
+     */
+    @GetMapping("/test-simple-stream")
+    public ResponseEntity<JsonResult<?>> testSimpleStream() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+        }
+        
+        try {
+            zhipuaiService.testSimpleStream();
+            return ResponseEntity.ok(JsonResult.success("Simple stream test completed. Check logs for details."));
+        } catch (Exception e) {
+            log.error("Error testing simple stream", e);
+            return ResponseEntity.ok(JsonResult.error("Error testing simple stream: " + e.getMessage()));
+        }
+    }
+
+    /**
      * 在 Bean 销毁时关闭线程池
      */
     public void destroy() {

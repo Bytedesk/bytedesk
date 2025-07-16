@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 10:10:37
+ * @LastEditTime: 2025-07-16 10:18:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -391,6 +391,10 @@ public class ZhipuaiService extends BaseSpringAIService {
             
             if (response.isSuccess()) {
                 log.info("Zhipuai API websocket response success, starting stream processing");
+                
+                // 使用AtomicBoolean来标记是否是第一个消息，参考官方示例
+                java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
+                
                 response.getFlowable().subscribe(
                     accumulator -> {
                         try {
@@ -555,7 +559,10 @@ public class ZhipuaiService extends BaseSpringAIService {
             
             if (response.isSuccess()) {
                 log.info("Zhipuai API SSE response success, starting stream processing");
-                // AtomicBoolean isFirst = new AtomicBoolean(true);
+                
+                // 使用AtomicBoolean来标记是否是第一个消息，参考官方示例
+                // java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
+                
                 response.getFlowable()
                         .doOnNext(accumulator -> {
                             try {
@@ -1224,6 +1231,9 @@ public class ZhipuaiService extends BaseSpringAIService {
                 
                 final int[] messageCount = {0};
                 
+                // 使用AtomicBoolean来标记是否是第一个消息，参考官方示例
+                java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
+                
                 response.getFlowable().subscribe(
                     accumulator -> {
                         messageCount[0]++;
@@ -1254,6 +1264,71 @@ public class ZhipuaiService extends BaseSpringAIService {
             
         } catch (Exception e) {
             log.error("Zhipuai API test stream response error", e);
+        }
+    }
+
+    /**
+     * 简单流式测试 - 完全按照官方示例代码实现
+     * 用于调试流式响应问题
+     */
+    public void testSimpleStream() {
+        try {
+            log.info("Zhipuai API testing simple stream response...");
+            
+            if (client == null) {
+                log.error("Zhipuai API client is null");
+                return;
+            }
+            
+            // 完全按照官方示例代码实现
+            List<ChatMessage> messages = new ArrayList<>();
+            ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+            messages.add(chatMessage);
+            
+            String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                    .model(Constants.ModelChatGLM4)
+                    .stream(Boolean.TRUE)
+                    .messages(messages)
+                    .requestId(requestId)
+                    .build();
+            
+            log.info("Zhipuai API making simple stream test call with requestId: {}", requestId);
+            
+            ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+            
+            if (sseModelApiResp.isSuccess()) {
+                log.info("Zhipuai API simple stream test response success");
+                
+                java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
+                final int[] messageCount = {0};
+                
+                sseModelApiResp.getFlowable()
+                        .doOnNext(accumulator -> {
+                            messageCount[0]++;
+                            log.info("Zhipuai API simple stream test message #{}: accumulator: {}", messageCount[0], accumulator);
+                            
+                            Object delta = accumulator.getDelta();
+                            log.info("Zhipuai API simple stream test message #{}: delta: {}", messageCount[0], delta);
+                            
+                            if (delta instanceof com.zhipu.oapi.service.v4.model.ChatMessage) {
+                                Object content = ((com.zhipu.oapi.service.v4.model.ChatMessage) delta).getContent();
+                                log.info("Zhipuai API simple stream test message #{}: content: {}", messageCount[0], content);
+                            }
+                        })
+                        .doOnComplete(() -> {
+                            log.info("Zhipuai API simple stream test completed, total messages: {}", messageCount[0]);
+                        })
+                        .doOnError(error -> {
+                            log.error("Zhipuai API simple stream test error: ", error);
+                        })
+                        .subscribe();
+            } else {
+                log.error("Zhipuai API simple stream test failed: {}", sseModelApiResp.getError());
+            }
+            
+        } catch (Exception e) {
+            log.error("Zhipuai API test simple stream error", e);
         }
     }
 
