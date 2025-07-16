@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:28:53
+ * @LastEditTime: 2025-07-16 10:22:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 
 import lombok.Data;
 /**
+ * @deprecated 使用ZhipuaiChatConfig
  * https://open.bigmodel.cn/dev/api#sdk_install
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
  * 
