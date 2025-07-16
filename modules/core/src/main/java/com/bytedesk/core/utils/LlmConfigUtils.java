@@ -36,9 +36,9 @@ public class LlmConfigUtils {
         String defaultVisionProvider = environment.getProperty("spring.ai.model.vision", LlmConsts.DEFAULT_VISION_PROVIDER);
         String defaultVisionModel = getVisionModel(environment, defaultVisionProvider);
 
-        // Get the default speech provider and model
-        String defaultSpeechProvider = environment.getProperty("spring.ai.model.voice", LlmConsts.DEFAULT_VOICE_PROVIDER);
-        String defaultSpeechModel = getVoiceModel(environment, defaultSpeechProvider);
+        // Get the default voice provider and model
+        String defaultVoiceProvider = environment.getProperty("spring.ai.model.voice", LlmConsts.DEFAULT_VOICE_PROVIDER);
+        String defaultVoiceModel = getVoiceModel(environment, defaultVoiceProvider);
 
         // Get the default rerank provider and model
         String defaultRerankProvider = environment.getProperty("spring.ai.model.rerank", LlmConsts.DEFAULT_RERANK_PROVIDER);
@@ -51,8 +51,8 @@ public class LlmConfigUtils {
                 .defaultEmbeddingModel(defaultEmbeddingModel)
                 .defaultVisionProvider(defaultVisionProvider)
                 .defaultVisionModel(defaultVisionModel)
-                .defaultSpeechProvider(defaultSpeechProvider)
-                .defaultSpeechModel(defaultSpeechModel)
+                .defaultVoiceProvider(defaultVoiceProvider)
+                .defaultVoiceModel(defaultVoiceModel)
                 .defaultRerankProvider(defaultRerankProvider)
                 .defaultRerankModel(defaultRerankModel)
                 .build();
@@ -120,11 +120,11 @@ public class LlmConfigUtils {
     private String getVoiceModel(Environment environment, String provider) {
         switch (provider) {
             case LlmConsts.ZHIPUAI:
-                return environment.getProperty("spring.ai.zhipuai.speech.options.model", "mxbai-tts:latest");
+                return environment.getProperty("spring.ai.zhipuai.voice.options.model", "mxbai-tts:latest");
             case LlmConsts.OLLAMA:
-                return environment.getProperty("spring.ai.ollama.speech.options.model", "mxbai-tts:latest");
+                return environment.getProperty("spring.ai.ollama.voice.options.model", "mxbai-tts:latest");
             case LlmConsts.OPENAI:
-                return environment.getProperty("spring.ai.openai.audio.speech.options.model", "tts-1");
+                return environment.getProperty("spring.ai.openai.audio.voice.options.model", "tts-1");
             default:
                 return LlmConsts.DEFAULT_VOICE_MODEL;
         }

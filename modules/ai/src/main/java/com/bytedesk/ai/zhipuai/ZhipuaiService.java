@@ -1053,7 +1053,7 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 自定义语音合成 - 暂不支持，需要等待SDK更新
      */
     public File generateCustomSpeech(String text, String voiceText, File voiceData, String responseFormat) {
-        log.warn("Custom speech synthesis is not supported in current SDK version");
+        log.warn("Custom voice synthesis is not supported in current SDK version");
         return null;
     }
 

@@ -174,7 +174,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
                 llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() : modelConfig.getDefaultVisionModel());
             }
             
-            // Set default speech provider and model if not provided
+            // Set default voice provider and model if not provided
             if (!StringUtils.hasText(llm.getVoiceProvider()) || !StringUtils.hasText(llm.getVoiceModel())) {
                 llm.setVoiceProvider(llm.getVoiceProvider() != null ? llm.getVoiceProvider() : modelConfig.getDefaultVoiceProvider());
                 llm.setVoiceModel(llm.getVoiceModel() != null ? llm.getVoiceModel() : modelConfig.getDefaultVoiceModel());

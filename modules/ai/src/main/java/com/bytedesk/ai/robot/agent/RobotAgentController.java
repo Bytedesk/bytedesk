@@ -222,7 +222,7 @@ public class RobotAgentController {
         return ResponseEntity.ok(JsonResult.success("success", response));
     }
 
-    @PostMapping("/text/part-of-speech-tagging")
+    @PostMapping("/text/part-of-voice-tagging")
     public ResponseEntity<?> partOfSpeechTagging(@RequestBody RobotAgentRequest request) {
         String response = robotAgentService.partOfSpeechTagging(request.getContent(), request.getOrgUid());
         return ResponseEntity.ok(JsonResult.success("success", response));

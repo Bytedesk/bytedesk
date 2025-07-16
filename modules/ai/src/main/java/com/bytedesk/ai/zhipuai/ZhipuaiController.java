@@ -438,9 +438,9 @@ public class ZhipuaiController {
 
     /**
      * 语音合成
-     * POST http://127.0.0.1:9003/zhipuai/speech
+     * POST http://127.0.0.1:9003/zhipuai/voice
      */
-    @PostMapping("/speech")
+    @PostMapping("/voice")
     public ResponseEntity<JsonResult<?>> generateSpeech(@RequestBody Map<String, String> request) {
         if (!bytedeskProperties.getDebug()) {
             return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
@@ -459,19 +459,19 @@ public class ZhipuaiController {
             if (result != null) {
                 return ResponseEntity.ok(JsonResult.success("Speech generated: " + result.getAbsolutePath()));
             } else {
-                return ResponseEntity.ok(JsonResult.error("Failed to generate speech"));
+                return ResponseEntity.ok(JsonResult.error("Failed to generate voice"));
             }
         } catch (Exception e) {
-            log.error("Error in speech generation", e);
+            log.error("Error in voice generation", e);
             return ResponseEntity.ok(JsonResult.error("Error: " + e.getMessage()));
         }
     }
 
     /**
      * 自定义语音合成
-     * POST http://127.0.0.1:9003/zhipuai/speech/custom
+     * POST http://127.0.0.1:9003/zhipuai/voice/custom
      */
-    @PostMapping("/speech/custom")
+    @PostMapping("/voice/custom")
     public ResponseEntity<JsonResult<?>> generateCustomSpeech(@RequestBody Map<String, Object> request) {
         if (!bytedeskProperties.getDebug()) {
             return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
@@ -498,12 +498,12 @@ public class ZhipuaiController {
             
             File result = zhipuaiService.generateCustomSpeech(text, voiceText, voiceData, responseFormat);
             if (result != null) {
-                return ResponseEntity.ok(JsonResult.success("Custom speech generated: " + result.getAbsolutePath()));
+                return ResponseEntity.ok(JsonResult.success("Custom voice generated: " + result.getAbsolutePath()));
             } else {
-                return ResponseEntity.ok(JsonResult.error("Failed to generate custom speech"));
+                return ResponseEntity.ok(JsonResult.error("Failed to generate custom voice"));
             }
         } catch (Exception e) {
-            log.error("Error in custom speech generation", e);
+            log.error("Error in custom voice generation", e);
             return ResponseEntity.ok(JsonResult.error("Error: " + e.getMessage()));
         }
     }
