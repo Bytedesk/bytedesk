@@ -114,11 +114,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                 });
     }
 
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        return processPromptSync(message, robot, "");
-    }
+
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
@@ -243,7 +239,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             return false;
         }
         try {
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Baidu service is not available");
         } catch (Exception e) {
             log.error("Error checking Baidu service health", e);
