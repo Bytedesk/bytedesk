@@ -62,6 +62,26 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
     }
 
     @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+        log.info("SpringAIVolcengineService processPromptWebsocket with full prompt content: {}", fullPromptContent);
+        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply);
+    }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        log.info("SpringAIVolcengineService processPromptSync with full prompt content: {}", fullPromptContent);
+        return processPromptSync(message, robot);
+    }
+
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        log.info("SpringAIVolcengineService processPromptSse with full prompt content: {}", fullPromptContent);
+        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
+    }
+
+    @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();

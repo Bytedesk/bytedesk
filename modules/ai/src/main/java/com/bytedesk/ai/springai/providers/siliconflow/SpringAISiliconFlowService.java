@@ -67,8 +67,15 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
+    }
+
+    @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("SiliconFlow API websocket fullPromptContent: {}", fullPromptContent);
         
         if (!siliconFlowChatModel.isPresent()) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, "SiliconFlow服务不可用", messageProtobufReply);
@@ -123,9 +130,17 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        return processPromptSync(message, robot, "");
+    }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        log.info("SiliconFlow API sync fullPromptContent: {}", fullPromptContent);
         
         try {
             if (!siliconFlowChatModel.isPresent()) {
@@ -173,8 +188,16 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
+    }
+
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("SiliconFlow API SSE fullPromptContent: {}", fullPromptContent);
 
         if (!siliconFlowChatModel.isPresent()) {
             handleSseError(new RuntimeException("SiliconFlow service not available"), messageProtobufQuery,
@@ -225,9 +248,9 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("SiliconFlow API SSE complete");
-                    // 发送流结束消息，包含token使用情况
+                    // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent);
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.SILICONFLOW;

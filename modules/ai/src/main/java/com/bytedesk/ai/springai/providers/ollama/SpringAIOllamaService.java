@@ -224,9 +224,16 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        // 调用带prompt参数的重载方法，传入空prompt
+        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
+    }
+
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
+        log.info("Ollama API SSE fullPromptContent: {}", fullPromptContent);
 
         // 获取适当的模型实例并配置较长的超时时间
         OllamaChatModel chatModel = bytedeskOllamaChatModel;
@@ -279,9 +286,9 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     },
                     () -> {
                         log.info("Ollama API SSE complete");
-                        // 发送流结束消息，包含token使用情况
+                        // 发送流结束消息，包含token使用情况和prompt内容
                         sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
+                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent);
                         // 记录token使用情况
                         long responseTime = System.currentTimeMillis() - startTime;
                         String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "llama2";

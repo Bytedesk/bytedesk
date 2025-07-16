@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 09:37:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 11:24:42
+ * @LastEditTime: 2025-07-16 12:33:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ package com.bytedesk.core.group;
 public enum GroupTypeEnum {
     NORMAL, // 普通群组
     TOPIC, // 话题群组
+    CHANNEL, // 频道群组
     PROJECT; // 项目群组
 
     // 根据字符串查找对应的枚举常量
