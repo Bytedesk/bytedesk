@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 16:13:40
+ * @LastEditTime: 2025-07-16 17:28:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,8 +73,6 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Builder.Default
     private Boolean forceValidateMobile = false;
     
-    // TODO: Identity Verification 实名认证
-
     // 认证类型：企业认证、个人认证、政府事业单位认证
     @Builder.Default
     private String verifiedType = OrganizationVerifyTypeEnum.COMPANY.name();

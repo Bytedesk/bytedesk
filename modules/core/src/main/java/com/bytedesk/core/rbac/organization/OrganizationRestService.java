@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:25:34
+ * @LastEditTime: 2025-07-16 17:27:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -153,12 +153,28 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
         // 获取要更新的组织实体
         OrganizationEntity organization = organizationOptional.get();
+        
+        // 检查 name 唯一性（排除当前组织）
+        if (!organization.getName().equals(organizationRequest.getName())) {
+            if (organizationRepository.existsByNameAndDeletedAndUidNot(organizationRequest.getName(), false, organizationRequest.getUid())) {
+                throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+            }
+        }
+        
+        // 检查 code 唯一性（排除当前组织）
+        if (!organization.getCode().equals(organizationRequest.getCode())) {
+            if (organizationRepository.existsByCodeAndDeletedAndUidNot(organizationRequest.getCode(), false, organizationRequest.getUid())) {
+                throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+            }
+        }
+        
         // 使用ModelMapper进行属性拷贝，避免逐一设置字段
         // modelMapper.map(organizationRequest, organization); // 一些默认值会被清空，待前端支持完善之后再启用
         organization.setName(organizationRequest.getName());
         organization.setLogo(organizationRequest.getLogo());
         organization.setCode(organizationRequest.getCode());
         organization.setDescription(organizationRequest.getDescription());
+        organization.setEnabled(organizationRequest.getEnabled());
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
         if (updatedOrganization == null) {
@@ -207,6 +223,20 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             Optional<OrganizationEntity> latest = organizationRepository.findByUid(organization.getUid());
             if (latest.isPresent()) {
                 OrganizationEntity latestEntity = latest.get();
+
+                // 检查 name 唯一性（排除当前组织）
+                if (!latestEntity.getName().equals(organization.getName())) {
+                    if (organizationRepository.existsByNameAndDeletedAndUidNot(organization.getName(), false, organization.getUid())) {
+                        throw new RuntimeException("组织名: " + organization.getName() + " 已经存在，请修改组织名称.");
+                    }
+                }
+                
+                // 检查 code 唯一性（排除当前组织）
+                if (!latestEntity.getCode().equals(organization.getCode())) {
+                    if (organizationRepository.existsByCodeAndDeletedAndUidNot(organization.getCode(), false, organization.getUid())) {
+                        throw new RuntimeException("组织代码: " + organization.getCode() + " 已经存在。");
+                    }
+                }
 
                 // 合并需要保留的数据
                 latestEntity.setName(organization.getName());

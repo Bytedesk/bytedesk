@@ -66,6 +66,12 @@ public interface OrganizationRepository
 
         Boolean existsByCodeAndDeleted(String code, Boolean deleted);
 
+        // 检查 name 唯一性（排除指定 uid）
+        Boolean existsByNameAndDeletedAndUidNot(String name, Boolean deleted, String uid);
+
+        // 检查 code 唯一性（排除指定 uid）
+        Boolean existsByCodeAndDeletedAndUidNot(String code, Boolean deleted, String uid);
+
         // @RestResource(exported = false)
         void deleteById(@NonNull Long id);
 
