@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * Gitee 聊天配置
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.gitee.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.gitee.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGiteeChatConfig {
 
     @Value("${spring.ai.gitee.base-url:https://api.gitee.com}")

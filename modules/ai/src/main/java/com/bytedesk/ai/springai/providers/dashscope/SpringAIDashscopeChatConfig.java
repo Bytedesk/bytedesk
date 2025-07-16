@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * 阿里云 Dashscope 聊天配置
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.dashscope.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeChatConfig {
 
     @Value("${spring.ai.dashscope.base-url:https://dashscope.aliyuncs.com/compatible-mode}")

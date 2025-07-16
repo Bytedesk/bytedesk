@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * OpenRouter 聊天配置
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.openrouter.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.openrouter.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOpenrouterChatConfig {
 
     @Value("${spring.ai.openrouter.base-url:https://api.openrouter.com}")

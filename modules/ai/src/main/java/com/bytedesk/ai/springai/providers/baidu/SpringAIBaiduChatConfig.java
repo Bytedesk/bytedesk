@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 10:47:33
+ * @LastEditTime: 2025-07-16 11:37:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  * 百度智能云聊天配置
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.baidu.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.baidu.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIBaiduChatConfig {
 
     @Value("${spring.ai.baidu.base-url:https://qianfan.baidubce.com/v2}")

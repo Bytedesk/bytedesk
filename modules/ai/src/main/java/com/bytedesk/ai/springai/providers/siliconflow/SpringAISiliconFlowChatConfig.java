@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * date: 2025-03-19
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.siliconflow.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.siliconflow.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowChatConfig {
 
     @Value("${spring.ai.siliconflow.base-url}")

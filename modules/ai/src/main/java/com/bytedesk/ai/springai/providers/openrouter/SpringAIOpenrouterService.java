@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:47:50
+ * @LastEditTime: 2025-07-16 11:38:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "spring.ai.openrouter.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.openrouter.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOpenrouterService extends BaseSpringAIService {
 
     @Autowired(required = false)

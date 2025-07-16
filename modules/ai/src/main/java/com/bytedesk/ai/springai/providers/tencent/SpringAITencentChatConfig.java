@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * https://cloud.tencent.com/document/product/1729/111007
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.tencent.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.tencent.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAITencentChatConfig {
 
     @Value("${spring.ai.tencent.base-url:https://api.hunyuan.cloud.tencent.com}")
