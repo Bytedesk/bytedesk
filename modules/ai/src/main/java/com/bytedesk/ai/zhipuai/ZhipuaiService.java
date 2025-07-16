@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:55:05
+ * @LastEditTime: 2025-07-16 10:10:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -365,6 +365,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         String message = extractTextFromPrompt(prompt);
+        log.info("Zhipuai API websocket message: {}", message);
 
         // 添加请求日志
         log.info("Zhipuai API websocket request - model: {}, message length: {}, robot: {}", 
@@ -393,11 +394,29 @@ public class ZhipuaiService extends BaseSpringAIService {
                 response.getFlowable().subscribe(
                     accumulator -> {
                         try {
+                            log.info("Zhipuai API websocket accumulator received: {}", accumulator);
+                            log.info("Zhipuai API websocket accumulator class: {}", accumulator.getClass().getName());
+                            
                             Object delta = accumulator.getDelta();
+                            log.info("Zhipuai API websocket delta: {}", delta);
+                            log.info("Zhipuai API websocket delta class: {}", delta != null ? delta.getClass().getName() : "null");
+                            
                             if (delta instanceof com.zhipu.oapi.service.v4.model.ChatMessage) {
                                 Object content = ((com.zhipu.oapi.service.v4.model.ChatMessage) delta).getContent();
+                                log.info("Zhipuai API websocket content: {}", content);
                                 if (content != null) {
                                     sendMessageWebsocket(MessageTypeEnum.STREAM, content.toString(), messageProtobufReply);
+                                }
+                            } else {
+                                log.info("Zhipuai API websocket delta is not ChatMessage instance, delta type: {}", 
+                                        delta != null ? delta.getClass().getName() : "null");
+                                // 尝试直接处理delta
+                                if (delta != null) {
+                                    String deltaStr = delta.toString();
+                                    log.info("Zhipuai API websocket delta as string: {}", deltaStr);
+                                    if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
+                                        sendMessageWebsocket(MessageTypeEnum.STREAM, deltaStr, messageProtobufReply);
+                                    }
                                 }
                             }
                             success[0] = true;
@@ -507,6 +526,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         String message = extractTextFromPrompt(prompt);
+        log.info("Zhipuai API SSE message: {}", message);
         
         // 添加请求日志
         log.info("Zhipuai API SSE request - model: {}, message length: {}, robot: {}", 
@@ -539,11 +559,32 @@ public class ZhipuaiService extends BaseSpringAIService {
                 response.getFlowable()
                         .doOnNext(accumulator -> {
                             try {
+                                log.info("Zhipuai API SSE accumulator received: {}", accumulator);
+                                log.info("Zhipuai API SSE accumulator class: {}", accumulator.getClass().getName());
+                                
                                 Object delta = accumulator.getDelta();
+                                log.info("Zhipuai API SSE delta: {}", delta);
+                                log.info("Zhipuai API SSE delta class: {}", delta != null ? delta.getClass().getName() : "null");
+                                
                                 if (delta instanceof com.zhipu.oapi.service.v4.model.ChatMessage) {
                                     Object content = ((com.zhipu.oapi.service.v4.model.ChatMessage) delta).getContent();
+                                    log.info("Zhipuai API SSE content: {}", content);
                                     if (content != null) {
+                                        log.info("Zhipuai API SSE content: {}", content);
                                         sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, content.toString());
+                                    } else {
+                                        log.info("Zhipuai API SSE content is null");
+                                    }
+                                } else {
+                                    log.info("Zhipuai API SSE delta is not ChatMessage instance, delta type: {}", 
+                                            delta != null ? delta.getClass().getName() : "null");
+                                    // 尝试直接处理delta
+                                    if (delta != null) {
+                                        String deltaStr = delta.toString();
+                                        log.info("Zhipuai API SSE delta as string: {}", deltaStr);
+                                        if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, deltaStr);
+                                        }
                                     }
                                 }
                                 success[0] = true;
@@ -794,12 +835,21 @@ public class ZhipuaiService extends BaseSpringAIService {
             
             if (response.isSuccess()) {
                 return Flux.from(response.getFlowable().map(accumulator -> {
+                    log.info("Zhipuai API function calling accumulator received: {}", accumulator);
+                    log.info("Zhipuai API function calling accumulator class: {}", accumulator.getClass().getName());
+                    
                     Object delta = accumulator.getDelta();
+                    log.info("Zhipuai API function calling delta: {}", delta);
+                    log.info("Zhipuai API function calling delta class: {}", delta != null ? delta.getClass().getName() : "null");
+                    
                     if (delta instanceof com.zhipu.oapi.service.v4.model.ChatMessage) {
                         Object content = ((com.zhipu.oapi.service.v4.model.ChatMessage) delta).getContent();
+                        log.info("Zhipuai API function calling content: {}", content);
                         return content != null ? content.toString() : "";
                     } else if (delta != null) {
-                        return delta.toString();
+                        String deltaStr = delta.toString();
+                        log.info("Zhipuai API function calling delta as string: {}", deltaStr);
+                        return deltaStr;
                     }
                     return "";
                 }));
@@ -1073,9 +1123,15 @@ public class ZhipuaiService extends BaseSpringAIService {
      */
     private Flux<String> mapStreamToFlux(io.reactivex.Flowable<ChatMessageAccumulator> flowable) {
         return Flux.from(flowable.map(accumulator -> {
+            log.info("Zhipuai API mapStreamToFlux accumulator received: {}", accumulator);
+            log.info("Zhipuai API mapStreamToFlux accumulator class: {}", accumulator.getClass().getName());
+            
             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                return accumulator.getDelta().getContent();
+                Object content = accumulator.getDelta().getContent();
+                log.info("Zhipuai API mapStreamToFlux content: {}", content);
+                return content.toString();
             }
+            log.info("Zhipuai API mapStreamToFlux no content found");
             return "";
         }));
     }
@@ -1136,6 +1192,68 @@ public class ZhipuaiService extends BaseSpringAIService {
             
         } catch (Exception e) {
             log.error("Zhipuai API test token extraction error", e);
+        }
+    }
+
+    /**
+     * 测试流式响应功能
+     * 用于调试流式响应问题
+     */
+    public void testStreamResponse() {
+        try {
+            log.info("Zhipuai API testing stream response...");
+            
+            if (client == null) {
+                log.error("Zhipuai API client is null");
+                return;
+            }
+            
+            // 创建一个简单的测试请求
+            String testMessage = "Hello, this is a test message for stream response.";
+            ChatCompletionRequest chatCompletionRequest = createDynamicRequest(null, testMessage, true);
+            
+            log.info("Zhipuai API making stream test call with message: {}", testMessage);
+            
+            // 调用API
+            ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
+            
+            log.info("Zhipuai API stream test response success: {}", response.isSuccess());
+            
+            if (response.isSuccess()) {
+                log.info("Zhipuai API stream test starting flowable processing");
+                
+                final int[] messageCount = {0};
+                
+                response.getFlowable().subscribe(
+                    accumulator -> {
+                        messageCount[0]++;
+                        log.info("Zhipuai API stream test message #{}: accumulator={}", messageCount[0], accumulator);
+                        log.info("Zhipuai API stream test message #{}: accumulator class={}", messageCount[0], accumulator.getClass().getName());
+                        
+                        Object delta = accumulator.getDelta();
+                        log.info("Zhipuai API stream test message #{}: delta={}", messageCount[0], delta);
+                        log.info("Zhipuai API stream test message #{}: delta class={}", messageCount[0], delta != null ? delta.getClass().getName() : "null");
+                        
+                        if (delta instanceof com.zhipu.oapi.service.v4.model.ChatMessage) {
+                            Object content = ((com.zhipu.oapi.service.v4.model.ChatMessage) delta).getContent();
+                            log.info("Zhipuai API stream test message #{}: content={}", messageCount[0], content);
+                        } else {
+                            log.info("Zhipuai API stream test message #{}: delta is not ChatMessage", messageCount[0]);
+                        }
+                    },
+                    error -> {
+                        log.error("Zhipuai API stream test error: ", error);
+                    },
+                    () -> {
+                        log.info("Zhipuai API stream test completed, total messages: {}", messageCount[0]);
+                    }
+                );
+            } else {
+                log.error("Zhipuai API stream test failed: {}", response.getError());
+            }
+            
+        } catch (Exception e) {
+            log.error("Zhipuai API test stream response error", e);
         }
     }
 

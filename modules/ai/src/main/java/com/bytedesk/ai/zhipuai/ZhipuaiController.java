@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:58:31
+ * @LastEditTime: 2025-07-16 10:00:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,7 +72,7 @@ public class ZhipuaiController {
 
     /**
      * 流式调用 - 使用新的统一接口
-     * GET /zhipuai/stream?message=xxx
+     * GET http://127.0.0.1:9003/zhipuai/stream?message=hello
      */
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@RequestParam("message") String message) {
@@ -86,7 +86,7 @@ public class ZhipuaiController {
 
     /**
      * SSE调用 - 使用新的统一接口
-     * GET /zhipuai/sse?message=xxx
+     * GET http://127.0.0.1:9003/zhipuai/sse?message=hello
      */
     @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSse(@RequestParam("message") String message) {
@@ -125,7 +125,7 @@ public class ZhipuaiController {
 
     /**
      * 角色扮演
-     * GET /zhipuai/roleplay?message=xxx&userInfo=...&botInfo=...&botName=...&userName=...
+     * GET http://127.0.0.1:9003/zhipuai/roleplay?message=hello&userInfo=...&botInfo=...&botName=...&userName=...
      */
     @GetMapping("/roleplay")
     public ResponseEntity<JsonResult<?>> rolePlayChat(
@@ -168,7 +168,7 @@ public class ZhipuaiController {
 
     /**
      * Function Calling 同步调用
-     * POST /zhipuai/function-call
+     * POST http://127.0.0.1:9003/zhipuai/function-call
      */
     @PostMapping("/function-call")
     public ResponseEntity<JsonResult<?>> functionCallingChat(@RequestBody Map<String, Object> request) {
@@ -201,7 +201,7 @@ public class ZhipuaiController {
 
     /**
      * Function Calling 流式调用
-     * POST /zhipuai/function-call/stream
+     * POST http://127.0.0.1:9003/zhipuai/function-call/stream
      */
     @PostMapping(value = "/function-call/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> functionCallingChatStream(@RequestBody Map<String, Object> request) {
@@ -255,7 +255,7 @@ public class ZhipuaiController {
 
     /**
      * 示例：查询天气的 Function Calling
-     * GET /zhipuai/weather?city=北京
+     * GET http://127.0.0.1:9003/zhipuai/weather?city=北京
      */
     @GetMapping("/weather")
     public ResponseEntity<JsonResult<?>> weatherFunctionCall(@RequestParam("city") String city) {
@@ -297,7 +297,7 @@ public class ZhipuaiController {
 
     /**
      * 示例：查询航班信息的 Function Calling
-     * GET /zhipuai/flight?from=成都&to=北京
+     * GET http://127.0.0.1:9003/zhipuai/flight?from=成都&to=北京
      */
     @GetMapping("/flight")
     public ResponseEntity<JsonResult<?>> flightFunctionCall(
@@ -345,7 +345,7 @@ public class ZhipuaiController {
 
     /**
      * 图像生成
-     * POST /zhipuai/image
+     * POST http://127.0.0.1:9003/zhipuai/image
      */
     @PostMapping("/image")
     public ResponseEntity<JsonResult<?>> generateImage(@RequestBody Map<String, String> request) {
@@ -371,7 +371,7 @@ public class ZhipuaiController {
 
     /**
      * 向量嵌入
-     * POST /zhipuai/embedding
+     * POST http://127.0.0.1:9003/zhipuai/embedding
      */
     @PostMapping("/embedding")
     public ResponseEntity<JsonResult<?>> getEmbedding(@RequestBody Map<String, String> request) {
@@ -396,7 +396,7 @@ public class ZhipuaiController {
 
     /**
      * 批量向量嵌入
-     * POST /zhipuai/embeddings
+     * POST http://127.0.0.1:9003/zhipuai/embeddings
      */
     @PostMapping("/embeddings")
     public ResponseEntity<JsonResult<?>> getEmbeddings(@RequestBody Map<String, Object> request) {
@@ -422,7 +422,7 @@ public class ZhipuaiController {
 
     /**
      * 语音合成
-     * POST /zhipuai/speech
+     * POST http://127.0.0.1:9003/zhipuai/speech
      */
     @PostMapping("/speech")
     public ResponseEntity<JsonResult<?>> generateSpeech(@RequestBody Map<String, String> request) {
@@ -453,7 +453,7 @@ public class ZhipuaiController {
 
     /**
      * 自定义语音合成
-     * POST /zhipuai/speech/custom
+     * POST http://127.0.0.1:9003/zhipuai/speech/custom
      */
     @PostMapping("/speech/custom")
     public ResponseEntity<JsonResult<?>> generateCustomSpeech(@RequestBody Map<String, Object> request) {
@@ -494,7 +494,7 @@ public class ZhipuaiController {
 
     /**
      * 文件上传
-     * POST /zhipuai/file/upload
+     * POST http://127.0.0.1:9003/zhipuai/file/upload
      */
     @PostMapping("/file/upload")
     public ResponseEntity<JsonResult<?>> uploadFile(@RequestBody Map<String, String> request) {
@@ -524,7 +524,7 @@ public class ZhipuaiController {
 
     /**
      * 查询文件列表
-     * GET /zhipuai/files
+     * GET http://127.0.0.1:9003/zhipuai/files
      */
     @GetMapping("/files")
     public ResponseEntity<JsonResult<?>> queryFiles() {
@@ -543,7 +543,7 @@ public class ZhipuaiController {
 
     /**
      * 下载文件
-     * POST /zhipuai/file/download
+     * POST http://127.0.0.1:9003/zhipuai/file/download
      */
     @PostMapping("/file/download")
     public ResponseEntity<JsonResult<?>> downloadFile(@RequestBody Map<String, String> request) {
@@ -577,7 +577,7 @@ public class ZhipuaiController {
 
     /**
      * 创建微调任务
-     * POST /zhipuai/finetune/create
+     * POST http://127.0.0.1:9003/zhipuai/finetune/create
      */
     @PostMapping("/finetune/create")
     public ResponseEntity<JsonResult<?>> createFineTuningJob(@RequestBody Map<String, String> request) {
@@ -607,7 +607,7 @@ public class ZhipuaiController {
 
     /**
      * 查询微调任务
-     * GET /zhipuai/finetune/{jobId}
+     * GET http://127.0.0.1:9003/zhipuai/finetune/{jobId}
      */
     @GetMapping("/finetune/{jobId}")
     public ResponseEntity<JsonResult<?>> queryFineTuningJob(@PathVariable String jobId) {
@@ -626,7 +626,7 @@ public class ZhipuaiController {
 
     /**
      * 异步聊天
-     * POST /zhipuai/async
+     * POST http://127.0.0.1:9003/zhipuai/async
      */
     @PostMapping("/async")
     public ResponseEntity<JsonResult<?>> chatAsync(@RequestBody Map<String, String> request) {
@@ -651,7 +651,7 @@ public class ZhipuaiController {
 
     /**
      * 带Web搜索的聊天
-     * POST /zhipuai/websearch
+     * POST http://127.0.0.1:9003/zhipuai/websearch
      */
     @PostMapping("/websearch")
     public ResponseEntity<JsonResult<?>> chatWithWebSearch(@RequestBody Map<String, String> request) {
@@ -681,7 +681,7 @@ public class ZhipuaiController {
 
     /**
      * 语音模型聊天
-     * POST /zhipuai/voice
+     * POST http://127.0.0.1:9003/zhipuai/voice
      */
     @PostMapping("/voice")
     public ResponseEntity<JsonResult<?>> chatWithVoice(@RequestBody Map<String, String> request) {
@@ -701,6 +701,25 @@ public class ZhipuaiController {
         } catch (Exception e) {
             log.error("Error in voice chat", e);
             return ResponseEntity.ok(JsonResult.error("Error: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 测试流式响应功能
+     * GET http://127.0.0.1:9003/zhipuai/test-stream
+     */
+    @GetMapping("/test-stream")
+    public ResponseEntity<JsonResult<?>> testStreamResponse() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+        }
+        
+        try {
+            zhipuaiService.testStreamResponse();
+            return ResponseEntity.ok(JsonResult.success("Stream response test completed. Check logs for details."));
+        } catch (Exception e) {
+            log.error("Error testing stream response", e);
+            return ResponseEntity.ok(JsonResult.error("Error testing stream response: " + e.getMessage()));
         }
     }
 

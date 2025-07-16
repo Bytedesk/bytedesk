@@ -811,6 +811,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, String content) {
+        log.info("BaseSpringAIService sendStreamMessage content {}", content);
         try {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
                 messageProtobufReply.setContent(content);
