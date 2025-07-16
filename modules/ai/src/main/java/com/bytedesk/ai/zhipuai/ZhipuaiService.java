@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:06:05
+ * @LastEditTime: 2025-07-16 14:44:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -1473,7 +1473,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 final int[] messageCount = {0};
                 
                 // 使用AtomicBoolean来标记是否是第一个消息，参考官方示例
-                java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
+                // java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
                 
                 mapStreamToAccumulator(response.getFlowable())
                         .doOnNext(accumulator -> {
@@ -1541,7 +1541,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             if (sseModelApiResp.isSuccess()) {
                 log.info("Zhipuai API simple stream test response success");
                 
-                java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
+                // java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
                 final int[] messageCount = {0};
                 
                 mapStreamToAccumulator(sseModelApiResp.getFlowable())
@@ -1636,4 +1636,5 @@ public class ZhipuaiService extends BaseSpringAIService {
             return false;
         }
     }
-} 
+
+}
