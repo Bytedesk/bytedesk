@@ -56,7 +56,7 @@ public class SpringAITencentService extends BaseSpringAIService {
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             OpenAiChatOptions.builder()
-                .model(robotLlm.getChatModel())
+                .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .build()
@@ -111,7 +111,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "hunyuan-pro";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "hunyuan-pro";
                     recordAiTokenUsage(robot, LlmConsts.TENCENT, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -163,8 +163,8 @@ public class SpringAITencentService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
-                    ? robot.getLlm().getChatModel() : "hunyuan-pro";
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
+                    ? robot.getLlm().getTextModel() : "hunyuan-pro";
             recordAiTokenUsage(robot, LlmConsts.TENCENT, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -226,10 +226,10 @@ public class SpringAITencentService extends BaseSpringAIService {
                     log.info("Tencent API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.TENCENT, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "hunyuan-pro");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.TENCENT, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "hunyuan-pro");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "hunyuan-pro";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "hunyuan-pro";
                     recordAiTokenUsage(robot, LlmConsts.TENCENT, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });

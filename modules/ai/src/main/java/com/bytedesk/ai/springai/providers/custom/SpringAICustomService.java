@@ -53,19 +53,19 @@ public class SpringAICustomService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getChatModel())) {
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
         
         try {
             // 创建自定义的选项对象
             return OpenAiChatOptions.builder()
-                .model(llm.getChatModel())
+                .model(llm.getTextModel())
                 .temperature(llm.getTemperature())
                 .topP(llm.getTopP())
                 .build();
         } catch (Exception e) {
-            log.error("Error creating dynamic options for model {}", llm.getChatModel(), e);
+            log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
             return null;
         }
     }
@@ -199,7 +199,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                 () -> {
                     log.info("Custom API SSE complete");
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            0, 0, 0, "", "custom", (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "custom-chat");
+                            0, 0, 0, "", "custom", (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "custom-chat");
                 });
     }
 

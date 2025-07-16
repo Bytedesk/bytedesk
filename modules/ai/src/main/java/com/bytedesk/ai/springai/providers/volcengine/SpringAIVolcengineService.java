@@ -54,7 +54,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             OpenAiChatOptions.builder()
-                .model(robotLlm.getChatModel())
+                .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .build()
@@ -110,7 +110,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "volcengine-chat";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat";
                     recordAiTokenUsage(robot, LlmConsts.VOLCENGINE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -159,8 +159,8 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
-                    ? robot.getLlm().getChatModel() : "volcengine-chat";
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
+                    ? robot.getLlm().getTextModel() : "volcengine-chat";
             recordAiTokenUsage(robot, LlmConsts.VOLCENGINE, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -225,10 +225,10 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                     log.info("Volcengine API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.VOLCENGINE, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "volcengine-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.VOLCENGINE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "volcengine-chat";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat";
                     recordAiTokenUsage(robot, LlmConsts.VOLCENGINE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });

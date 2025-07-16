@@ -163,9 +163,9 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             LlmProviderConfigDefault modelConfig = llmProviderRestService.getLlmProviderConfigDefault();
             
             // Set default chat provider and model if not provided
-            if (!StringUtils.hasText(llm.getChatProvider()) || !StringUtils.hasText(llm.getChatModel())) {
-                llm.setChatProvider(llm.getChatProvider() != null ? llm.getChatProvider() : modelConfig.getDefaultChatProvider());
-                llm.setChatModel(llm.getChatModel() != null ? llm.getChatModel() : modelConfig.getDefaultChatModel());
+            if (!StringUtils.hasText(llm.getTextProvider()) || !StringUtils.hasText(llm.getTextModel())) {
+                llm.setTextProvider(llm.getTextProvider() != null ? llm.getTextProvider() : modelConfig.getDefaultChatProvider());
+                llm.setTextModel(llm.getTextModel() != null ? llm.getTextModel() : modelConfig.getDefaultChatModel());
             }
             
             // Set default vision provider and model if not provided
@@ -273,7 +273,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         ThreadEntity thread = threadOptional.get();
         // 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService
-                .findByNameAndOrgUid(robotProtobuf.getLlm().getChatProvider(), thread.getOrgUid());
+                .findByNameAndOrgUid(robotProtobuf.getLlm().getTextProvider(), thread.getOrgUid());
         if (!llmProviderOptional.isPresent()) {
             throw new RuntimeException("llm provider not found");
         }
@@ -676,8 +676,8 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         //
         RobotLlm llm = robot.getLlm();
         llm.setPrompt(request.getLlm().getPrompt());
-        llm.setChatProvider(request.getLlm().getChatProvider());
-        llm.setChatModel(request.getLlm().getChatModel());
+        llm.setTextProvider(request.getLlm().getTextProvider());
+        llm.setTextModel(request.getLlm().getTextModel());
         robot.setLlm(llm);
         //
         RobotEntity savedRobot = save(robot);

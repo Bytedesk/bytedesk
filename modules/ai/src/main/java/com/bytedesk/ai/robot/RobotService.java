@@ -152,7 +152,7 @@ public class RobotService {
         // 获取提供商名称，默认为智谱AI
         String provider = LlmConsts.ZHIPUAI;
         if (robot.getLlm() != null) {
-            provider = robot.getLlm().getChatProvider().toLowerCase();
+            provider = robot.getLlm().getTextProvider().toLowerCase();
         }
         
         try {

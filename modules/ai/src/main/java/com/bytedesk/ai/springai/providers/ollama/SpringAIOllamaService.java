@@ -63,7 +63,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     private OllamaOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             OllamaOptions.builder()
-                .model(robotLlm.getChatModel())
+                .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .topK(robotLlm.getTopK())
@@ -78,7 +78,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
      * @return 配置了特定模型的OllamaChatModel
      */
     private OllamaChatModel createDynamicChatModel(RobotLlm llm) {
-        if (llm == null || !StringUtils.hasText(llm.getChatModel())) {
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             // 如果没有指定模型或设置，使用默认配置
             return bytedeskOllamaChatModel;
         }
@@ -94,7 +94,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     .defaultOptions(options)
                     .build();
         } catch (Exception e) {
-            log.error("Error creating dynamic chat model for model {}", llm.getChatModel(), e);
+            log.error("Error creating dynamic chat model for model {}", llm.getTextModel(), e);
             return bytedeskOllamaChatModel;
         }
     }
@@ -144,7 +144,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "llama2";
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
                     recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -154,7 +154,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             success[0] = false;
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "llama2";
+            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
             recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
@@ -203,8 +203,8 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
-                    ? robot.getLlm().getChatModel() : "llama2";
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
+                    ? robot.getLlm().getTextModel() : "llama2";
             recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -228,7 +228,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         if (chatModel == null) {
             log.info("Ollama API not available");
             // 使用sendStreamEndMessage方法替代重复的代码
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent, LlmConsts.OLLAMA, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "llama2");
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent, LlmConsts.OLLAMA, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
             return;
         }
 
@@ -270,10 +270,10 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                         log.info("Ollama API SSE complete");
                         // 发送流结束消息，包含token使用情况和prompt内容
                         sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.OLLAMA, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "llama2");
+                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.OLLAMA, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
                         // 记录token使用情况
                         long responseTime = System.currentTimeMillis() - startTime;
-                        String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "llama2";
+                        String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
                         recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                     });
@@ -283,7 +283,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             success[0] = false;
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "llama2";
+            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
             recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }

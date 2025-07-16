@@ -84,7 +84,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         String requestId = String.format("zhipuai-%d", System.currentTimeMillis());
         
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(llm != null && llm.getChatModel() != null ? llm.getChatModel() : zhipuaiChatConfig.getModel())
+                .model(llm != null && llm.getTextModel() != null ? llm.getTextModel() : zhipuaiChatConfig.getModel())
                 .stream(stream)
                 .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
@@ -130,7 +130,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         String requestId = String.format("zhipuai-%d", System.currentTimeMillis());
         
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(llm != null && llm.getChatModel() != null ? llm.getChatModel() : zhipuaiChatConfig.getModel())
+                .model(llm != null && llm.getTextModel() != null ? llm.getTextModel() : zhipuaiChatConfig.getModel())
                 .stream(stream)
                 .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
@@ -416,7 +416,7 @@ public class ZhipuaiService extends BaseSpringAIService {
 
         // 添加请求日志
         log.info("Zhipuai API websocket request - model: {}, prompt instructions count: {}, robot: {}", 
-                (llm != null && llm.getChatModel() != null) ? llm.getChatModel() : zhipuaiChatConfig.getModel(), 
+                (llm != null && llm.getTextModel() != null) ? llm.getTextModel() : zhipuaiChatConfig.getModel(), 
                 prompt != null && prompt.getInstructions() != null ? prompt.getInstructions().size() : 0, 
                 robot != null ? robot.getUid() : "null");
 
@@ -520,7 +520,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                             
                             // 记录token使用情况
                             long responseTime = System.currentTimeMillis() - startTime;
-                            String modelType = (llm != null && llm.getChatModel() != null) ? llm.getChatModel() : zhipuaiChatConfig.getModel();
+                            String modelType = (llm != null && llm.getTextModel() != null) ? llm.getTextModel() : zhipuaiChatConfig.getModel();
                             log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
                                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType, responseTime);
                             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
@@ -553,7 +553,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 添加请求日志
         RobotLlm llm = robot != null ? robot.getLlm() : null;
         log.info("Zhipuai API sync request - model: {}, message length: {}, robot: {}", 
-                (llm != null && llm.getChatModel() != null) ? llm.getChatModel() : zhipuaiChatConfig.getModel(), 
+                (llm != null && llm.getTextModel() != null) ? llm.getTextModel() : zhipuaiChatConfig.getModel(), 
                 message.length(), robot != null ? robot.getUid() : "null");
         log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
 
@@ -592,7 +592,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && llm.getChatModel() != null) ? llm.getChatModel() : zhipuaiChatConfig.getModel();
+            String modelType = (llm != null && llm.getTextModel() != null) ? llm.getTextModel() : zhipuaiChatConfig.getModel();
             log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType, responseTime);
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
@@ -614,7 +614,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         
         // 添加请求日志
         log.info("Zhipuai API SSE request - model: {}, prompt instructions count: {}, robot: {}", 
-                (llm != null && llm.getChatModel() != null) ? llm.getChatModel() : zhipuaiChatConfig.getModel(), 
+                (llm != null && llm.getTextModel() != null) ? llm.getTextModel() : zhipuaiChatConfig.getModel(), 
                 prompt != null && prompt.getInstructions() != null ? prompt.getInstructions().size() : 0, 
                 robot != null ? robot.getUid() : "null");
         
@@ -625,7 +625,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         final boolean[] success = {false};
         final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
         final ChatMessageAccumulator[] finalAccumulator = {null};
-        final String modelType = (llm != null && llm.getChatModel() != null) ? llm.getChatModel() : zhipuaiChatConfig.getModel();
+        final String modelType = (llm != null && llm.getTextModel() != null) ? llm.getTextModel() : zhipuaiChatConfig.getModel();
 
         try {
             if (client == null) {

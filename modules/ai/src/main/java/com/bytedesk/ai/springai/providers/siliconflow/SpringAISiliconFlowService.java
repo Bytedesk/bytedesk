@@ -58,7 +58,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             OpenAiChatOptions.builder()
-                .model(robotLlm.getChatModel())
+                .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
                 .build()
@@ -113,7 +113,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : LlmConsts.SILICONFLOW;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.SILICONFLOW;
                     recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
@@ -166,8 +166,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getChatModel())) 
-                    ? robot.getLlm().getChatModel() : LlmConsts.SILICONFLOW;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
+                    ? robot.getLlm().getTextModel() : LlmConsts.SILICONFLOW;
             recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -232,10 +232,10 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     // 发送流结束消息，包含token使用情况和prompt内容
                     // String promptText = extractTextFromPrompt(prompt);
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : "siliconflow-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "siliconflow-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getChatModel())) ? llm.getChatModel() : LlmConsts.SILICONFLOW;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.SILICONFLOW;
                     recordAiTokenUsage(robot, LlmConsts.SILICONFLOW, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
