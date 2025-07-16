@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:19:20
+ * @LastEditTime: 2025-07-16 13:46:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -544,14 +544,6 @@ public class ZhipuaiService extends BaseSpringAIService {
         }
     }
 
-    /**
-     * 方式2：同步调用 - 实现BaseSpringAIService的抽象方法
-     */
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        return processPromptSync(message, robot, "");
-    }
 
     /**
      * 方式2：同步调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）

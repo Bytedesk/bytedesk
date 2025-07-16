@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:43:28
+ * @LastEditTime: 2025-07-16 13:46:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -151,15 +151,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
-    }
-
-    /**
-     * 方式2：同步调用
-     */
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        return processPromptSync(message, robot, "");
     }
 
     /**

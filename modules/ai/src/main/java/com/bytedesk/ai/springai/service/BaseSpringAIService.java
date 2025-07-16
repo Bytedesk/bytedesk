@@ -1397,7 +1397,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent);
 
-    protected abstract String processPromptSync(String message, RobotProtobuf robot);
+    // protected abstract String processPromptSync(String message, RobotProtobuf robot);
 
     // protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
     //         MessageProtobuf messageProtobufReply, SseEmitter emitter);
