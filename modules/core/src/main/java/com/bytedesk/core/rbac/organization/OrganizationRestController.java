@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 16:17:08
+ * @LastEditTime: 2025-07-16 16:32:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,14 +58,12 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
-    @GetMapping("/uid")
+    @Override
     public ResponseEntity<?> queryByUid(OrganizationRequest request) {
         //
-        Optional<OrganizationEntity> org = organizationRestService.findByUid(request.getUid());
-        if (!org.isPresent()) {
-            return ResponseEntity.ok(JsonResult.error("组织不存在"));
-        }
-        return ResponseEntity.ok(JsonResult.success(organizationRestService.convertToResponse(org.get())));
+        OrganizationResponse response = organizationRestService.queryByUid(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @ActionAnnotation(title = "组织", action = "新建", description = "organization create")

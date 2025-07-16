@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 16:18:29
+ * @LastEditTime: 2025-07-16 16:19:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
@@ -67,11 +68,21 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return queryByOrg(request);
     }
 
+    @Override
+    public OrganizationResponse queryByUid(OrganizationRequest request) {
+        Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
+        if (!organizationOptional.isPresent()) {
+            throw new RuntimeException("Organization with UID: " + request.getUid() + " not found.");
+        }
+        return convertToResponse(organizationOptional.get());
+    }
+
     public List<OrganizationEntity> findAll() {
         return organizationRepository.findAll();
     }
 
     @Transactional
+    @Override
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
         //
         if (existsByName(organizationRequest.getName())) {
@@ -102,8 +113,17 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     }
 
     // 超级管理员创建组织
+    @Transactional
     public OrganizationResponse createByAdmin(OrganizationRequest organizationRequest) {
-        //
+        // 
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new NotLoginException("login required");
+        }
+        if (!authUser.isSuperUser()) {
+            throw new RuntimeException("super admin required");
+        }
+        // 
         OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
         organization.setUid(uidUtils.getUid());
         // 
@@ -114,8 +134,9 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return convertToResponse(savedOrganization);
     }
 
+    @Transactional
+    @Override
     public OrganizationResponse update(OrganizationRequest organizationRequest) {
-
         // 查找要更新的组织
         Optional<OrganizationEntity> organizationOptional = findByUid(organizationRequest.getUid());
         if (!organizationOptional.isPresent()) {
@@ -214,12 +235,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     public OrganizationResponse convertToResponse(OrganizationEntity organization) {
         return modelMapper.map(organization, OrganizationResponse.class);
-    }
-
-    @Override
-    public OrganizationResponse queryByUid(OrganizationRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
 }
