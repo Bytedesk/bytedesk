@@ -214,7 +214,8 @@ public class SpringAICustomService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Custom API SSE complete");
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent);
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+                            0, 0, 0, "", "custom", (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "custom-chat");
                 });
     }
 

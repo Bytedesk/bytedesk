@@ -250,7 +250,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     log.info("SiliconFlow API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent);
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), "", LlmConsts.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "siliconflow-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.SILICONFLOW;
