@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 21:20:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:36:28
+ * @LastEditTime: 2025-07-16 18:02:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,12 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseResponseNoOrg;
 import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,7 +60,7 @@ public class OrganizationResponse extends BaseResponseNoOrg {
     private String identityNumber;
 
     // 认证时间
-    private Date verifyDate;
+    private ZonedDateTime verifyDate;
 
     // 认证状态：未认证、已认证、审核中、审核失败
     private String verifyStatus;
@@ -70,12 +72,20 @@ public class OrganizationResponse extends BaseResponseNoOrg {
     private Boolean vip;
 
     // 会员截止日期
-    private Date vipExpireDate;
+    private ZonedDateTime vipExpireDate;
 
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
 
     // 组织管理员
     private UserResponse user;
+
+    public String getVerifyDate() {
+        return BdDateUtils.formatDatetimeToString(verifyDate);
+    }
+
+    public String getVipExpireDate() {
+        return BdDateUtils.formatDatetimeToString(vipExpireDate);
+    }
 
 }

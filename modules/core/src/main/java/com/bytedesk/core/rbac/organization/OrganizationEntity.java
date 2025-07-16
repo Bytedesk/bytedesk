@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:36:38
+ * @LastEditTime: 2025-07-16 18:03:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import com.bytedesk.core.base.BaseEntityNoOrg;
@@ -90,7 +91,7 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     private String identityNumber = BytedeskConsts.EMPTY_STRING;
 
     // 认证时间
-    private Date verifyDate;
+    private ZonedDateTime verifyDate;
 
     // 认证状态：未认证、已认证、审核中、审核失败
     @Builder.Default
@@ -105,7 +106,7 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     private Boolean vip = false;
 
     // 会员截止日期
-    private Date vipExpireDate;
+    private ZonedDateTime vipExpireDate;
 
     // 是否启用，状态：启用/禁用
     @Builder.Default
