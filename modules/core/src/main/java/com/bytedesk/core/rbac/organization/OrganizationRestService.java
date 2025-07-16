@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 16:19:34
+ * @LastEditTime: 2025-07-16 17:25:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,7 +89,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
         }
         if (existsByCode(organizationRequest.getCode())) {
-            throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。一个用户目前只能创建一个组织.");
+            throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
         }
         //
         UserEntity authUser = authService.getUser();
@@ -122,6 +122,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         }
         if (!authUser.isSuperUser()) {
             throw new RuntimeException("super admin required");
+        }
+        //
+        if (existsByName(organizationRequest.getName())) {
+            throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+        }
+        if (existsByCode(organizationRequest.getCode())) {
+            throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
         }
         // 
         OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
