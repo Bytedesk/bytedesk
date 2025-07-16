@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 10:24:39
+ * @LastEditTime: 2025-07-16 10:43:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -407,6 +407,9 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 log.info("Zhipuai API websocket accumulator received: {}", accumulator);
                                 log.info("Zhipuai API websocket accumulator class: {}", accumulator.getClass().getName());
                                 
+                                // 保存最新的accumulator用于token统计
+                                finalAccumulator[0] = accumulator;
+                                
                                 Object delta = accumulator.getDelta();
                                 log.info("Zhipuai API websocket delta: {}", delta);
                                 log.info("Zhipuai API websocket delta class: {}", delta != null ? delta.getClass().getName() : "null");
@@ -432,11 +435,18 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 } else {
                                     log.info("Zhipuai API websocket delta is not ChatMessage instance, delta type: {}", 
                                             delta != null ? delta.getClass().getName() : "null");
-                                    // 尝试直接处理delta
+                                    // 尝试解析delta字符串为JSON并提取content
                                     if (delta != null) {
                                         String deltaStr = delta.toString();
                                         log.info("Zhipuai API websocket delta as string: {}", deltaStr);
-                                        if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
+                                        
+                                        // 尝试从JSON字符串中提取content字段
+                                        String extractedContent = extractContentFromDeltaString(deltaStr);
+                                        if (extractedContent != null && !extractedContent.isEmpty()) {
+                                            log.info("Zhipuai API websocket extracted content: {}", extractedContent);
+                                            sendMessageWebsocket(MessageTypeEnum.STREAM, extractedContent, messageProtobufReply);
+                                        } else if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
+                                            // 如果无法提取content，则发送原始delta字符串
                                             sendMessageWebsocket(MessageTypeEnum.STREAM, deltaStr, messageProtobufReply);
                                         }
                                     }
@@ -475,9 +485,6 @@ public class ZhipuaiService extends BaseSpringAIService {
                         })
                         .lastElement()
                         .blockingGet();
-                
-                // 保存最终的accumulator用于token统计
-                finalAccumulator[0] = chatMessageAccumulator;
                 
             } else {
                 log.error("Zhipuai API websocket error: {}", response.getError());
@@ -586,7 +593,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
                 
                 // 使用mapStreamToAccumulator方法处理流式响应，参考官方示例
-                ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(response.getFlowable())
+                mapStreamToAccumulator(response.getFlowable())
                         .doOnNext(accumulator -> {
                             try {
                                 if (isFirst.getAndSet(false)) {
@@ -595,6 +602,10 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 
                                 log.info("Zhipuai API SSE accumulator received: {}", accumulator);
                                 log.info("Zhipuai API SSE accumulator class: {}", accumulator.getClass().getName());
+                                log.info("Zhipuai API SSE accumulator tokenUsage: {}", accumulator.getUsage());
+                                
+                                // 保存最新的accumulator用于token统计
+                                finalAccumulator[0] = accumulator;
                                 
                                 Object delta = accumulator.getDelta();
                                 log.info("Zhipuai API SSE delta: {}", delta);
@@ -621,11 +632,18 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 } else {
                                     log.info("Zhipuai API SSE delta is not ChatMessage instance, delta type: {}", 
                                             delta != null ? delta.getClass().getName() : "null");
-                                    // 尝试直接处理delta
+                                    // 尝试解析delta字符串为JSON并提取content
                                     if (delta != null) {
                                         String deltaStr = delta.toString();
                                         log.info("Zhipuai API SSE delta as string: {}", deltaStr);
-                                        if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
+                                        
+                                        // 尝试从JSON字符串中提取content字段
+                                        String extractedContent = extractContentFromDeltaString(deltaStr);
+                                        if (extractedContent != null && !extractedContent.isEmpty()) {
+                                            log.info("Zhipuai API SSE extracted content: {}", extractedContent);
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, extractedContent);
+                                        } else if (!deltaStr.isEmpty() && !deltaStr.equals("null")) {
+                                            // 如果无法提取content，则发送原始delta字符串
                                             sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, deltaStr);
                                         }
                                     }
@@ -663,9 +681,6 @@ public class ZhipuaiService extends BaseSpringAIService {
                         })
                         .lastElement()
                         .blockingGet();
-                
-                // 保存最终的accumulator用于token统计
-                finalAccumulator[0] = chatMessageAccumulator;
                 
             } else {
                 log.error("Zhipuai API SSE error: {}", response.getError());
@@ -904,7 +919,15 @@ public class ZhipuaiService extends BaseSpringAIService {
                     } else if (delta != null) {
                         String deltaStr = delta.toString();
                         log.info("Zhipuai API function calling delta as string: {}", deltaStr);
-                        return deltaStr;
+                        
+                        // 尝试从JSON字符串中提取content字段
+                        String extractedContent = extractContentFromDeltaString(deltaStr);
+                        if (extractedContent != null && !extractedContent.isEmpty()) {
+                            log.info("Zhipuai API function calling extracted content: {}", extractedContent);
+                            return extractedContent;
+                        } else {
+                            return deltaStr;
+                        }
                     }
                     return "";
                 }));
@@ -1190,6 +1213,73 @@ public class ZhipuaiService extends BaseSpringAIService {
     }
 
     /**
+     * 从delta字符串中提取content字段
+     * 处理JSON格式的ChatMessage字符串，如：{"role":"assistant","content":"的","tool_calls":[]}
+     */
+    private String extractContentFromDeltaString(String deltaStr) {
+        try {
+            if (deltaStr == null || deltaStr.isEmpty() || deltaStr.equals("null")) {
+                return null;
+            }
+            
+            // 检查是否是JSON格式
+            if (deltaStr.trim().startsWith("{") && deltaStr.trim().endsWith("}")) {
+                // 使用简单的字符串解析来提取content字段
+                // 查找 "content":" 的位置
+                int contentStart = deltaStr.indexOf("\"content\":\"");
+                if (contentStart != -1) {
+                    contentStart += 11; // 跳过 "content":"
+                    int contentEnd = deltaStr.indexOf("\"", contentStart);
+                    if (contentEnd != -1) {
+                        String content = deltaStr.substring(contentStart, contentEnd);
+                        log.debug("Zhipuai API extracted content from delta string: {}", content);
+                        return content;
+                    }
+                }
+                
+                // 如果上面的方法失败，尝试查找 "content": 的位置（不带引号的情况）
+                contentStart = deltaStr.indexOf("\"content\":");
+                if (contentStart != -1) {
+                    contentStart += 10; // 跳过 "content":
+                    // 跳过可能的空格
+                    while (contentStart < deltaStr.length() && Character.isWhitespace(deltaStr.charAt(contentStart))) {
+                        contentStart++;
+                    }
+                    
+                    // 检查是否以引号开始
+                    if (contentStart < deltaStr.length() && deltaStr.charAt(contentStart) == '"') {
+                        contentStart++; // 跳过开始的引号
+                        int contentEnd = deltaStr.indexOf("\"", contentStart);
+                        if (contentEnd != -1) {
+                            String content = deltaStr.substring(contentStart, contentEnd);
+                            log.debug("Zhipuai API extracted content from delta string (with quotes): {}", content);
+                            return content;
+                        }
+                    } else {
+                        // 没有引号的情况，找到下一个逗号或大括号
+                        int contentEnd = deltaStr.indexOf(",", contentStart);
+                        if (contentEnd == -1) {
+                            contentEnd = deltaStr.indexOf("}", contentStart);
+                        }
+                        if (contentEnd != -1) {
+                            String content = deltaStr.substring(contentStart, contentEnd).trim();
+                            log.debug("Zhipuai API extracted content from delta string (without quotes): {}", content);
+                            return content;
+                        }
+                    }
+                }
+            }
+            
+            log.debug("Zhipuai API could not extract content from delta string: {}", deltaStr);
+            return null;
+            
+        } catch (Exception e) {
+            log.error("Error extracting content from delta string: {}", deltaStr, e);
+            return null;
+        }
+    }
+
+    /**
      * 从ChatMessageAccumulator中提取token使用情况
      */
     private TokenUsage extractTokenUsageFromAccumulator(ChatMessageAccumulator accumulator) {
@@ -1253,83 +1343,6 @@ public class ZhipuaiService extends BaseSpringAIService {
         } catch (Exception e) {
             log.error("Error extracting token usage from accumulator", e);
             return new TokenUsage(0, 0, 0);
-        }
-    }
-
-    /**
-     * 将流式响应转换为Flux
-     */
-    private Flux<String> mapStreamToFlux(io.reactivex.Flowable<ChatMessageAccumulator> flowable) {
-        return Flux.from(flowable.map(accumulator -> {
-            log.info("Zhipuai API mapStreamToFlux accumulator received: {}", accumulator);
-            log.info("Zhipuai API mapStreamToFlux accumulator class: {}", accumulator.getClass().getName());
-            
-            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                Object content = accumulator.getDelta().getContent();
-                log.info("Zhipuai API mapStreamToFlux content: {}", content);
-                return content.toString();
-            }
-            log.info("Zhipuai API mapStreamToFlux no content found");
-            return "";
-        }));
-    }
-
-    /**
-     * 测试token提取功能
-     * 用于调试token计数问题
-     */
-    public void testTokenExtraction() {
-        try {
-            log.info("Zhipuai API testing token extraction...");
-            
-            if (client == null) {
-                log.error("Zhipuai API client is null");
-                return;
-            }
-            
-            // 创建一个简单的测试请求
-            String testMessage = "Hello, this is a test message for token counting.";
-            ChatCompletionRequest chatCompletionRequest = createDynamicRequest(null, testMessage, false);
-            
-            log.info("Zhipuai API making test call with message: {}", testMessage);
-            
-            // 调用API
-            ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
-            
-            log.info("Zhipuai API test response success: {}", response.isSuccess());
-            log.info("Zhipuai API test response has data: {}", response.getData() != null);
-            
-            if (response.getData() != null) {
-                log.info("Zhipuai API test response data class: {}", response.getData().getClass().getName());
-                log.info("Zhipuai API test response data: {}", response.getData());
-            }
-            
-            // 测试手动token提取
-            TokenUsage manualUsage = extractZhipuaiTokenUsage(response);
-            log.info("Zhipuai API test manual token extraction result: {}", manualUsage);
-            
-            // 测试token估算功能
-            TokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
-            log.info("Zhipuai API test estimated token usage result: {}", estimatedUsage);
-            
-            // 测试token估算算法
-            String testText = "这是一个测试文本，包含中英文混合内容。This is a test text with mixed Chinese and English content.";
-            long estimatedTokens = estimateTokens(testText);
-            log.info("Zhipuai API test token estimation for text '{}': {} tokens", testText, estimatedTokens);
-            
-            // 提取文本内容
-            String textContent = "";
-            if (response.isSuccess() && response.getData() != null && 
-                response.getData().getChoices() != null && !response.getData().getChoices().isEmpty()) {
-                var choice = response.getData().getChoices().get(0);
-                if (choice.getMessage() != null && choice.getMessage().getContent() != null) {
-                    textContent = choice.getMessage().getContent().toString();
-                }
-            }
-            log.info("Zhipuai API test response text: {}", textContent);
-            
-        } catch (Exception e) {
-            log.error("Zhipuai API test token extraction error", e);
         }
     }
 
@@ -1461,6 +1474,46 @@ public class ZhipuaiService extends BaseSpringAIService {
         } catch (Exception e) {
             log.error("Zhipuai API test simple stream error", e);
         }
+    }
+
+    /**
+     * 测试content提取功能
+     */
+    public void testContentExtraction() {
+        log.info("Zhipuai API testing content extraction...");
+        
+        // 测试用例1：标准的JSON格式
+        String test1 = "{\"role\":\"assistant\",\"content\":\"的\",\"tool_calls\":[]}";
+        String result1 = extractContentFromDeltaString(test1);
+        log.info("Test 1 - Input: {}, Result: {}", test1, result1);
+        
+        // 测试用例2：content为空的情况
+        String test2 = "{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]}";
+        String result2 = extractContentFromDeltaString(test2);
+        log.info("Test 2 - Input: {}, Result: {}", test2, result2);
+        
+        // 测试用例3：content为null的情况
+        String test3 = "{\"role\":\"assistant\",\"content\":null,\"tool_calls\":[]}";
+        String result3 = extractContentFromDeltaString(test3);
+        log.info("Test 3 - Input: {}, Result: {}", test3, result3);
+        
+        // 测试用例4：包含特殊字符的content
+        String test4 = "{\"role\":\"assistant\",\"content\":\"Hello, world! 你好世界！\",\"tool_calls\":[]}";
+        String result4 = extractContentFromDeltaString(test4);
+        log.info("Test 4 - Input: {}, Result: {}", test4, result4);
+        
+        // 测试用例5：不是JSON格式的字符串
+        String test5 = "Hello, world!";
+        String result5 = extractContentFromDeltaString(test5);
+        log.info("Test 5 - Input: {}, Result: {}", test5, result5);
+        
+        // 测试用例6：null输入
+        String result6 = extractContentFromDeltaString(null);
+        log.info("Test 6 - Input: null, Result: {}", result6);
+        
+        // 测试用例7：空字符串
+        String result7 = extractContentFromDeltaString("");
+        log.info("Test 7 - Input: empty string, Result: {}", result7);
     }
 
     /**
