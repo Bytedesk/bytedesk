@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 12:33:19
+ * @LastEditTime: 2025-07-16 12:57:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -652,6 +652,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         final boolean[] success = {false};
         final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
         final ChatMessageAccumulator[] finalAccumulator = {null};
+        final String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
 
         try {
             if (client == null) {
@@ -749,7 +750,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 }
                                 
                                 sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent);
+                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.ZHIPUAI, modelType);
                             } catch (Exception e) {
                                 log.error("Zhipuai API SSE error completing stream: ", e);
                             }
@@ -773,7 +774,6 @@ public class ZhipuaiService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
             log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType, responseTime);
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 

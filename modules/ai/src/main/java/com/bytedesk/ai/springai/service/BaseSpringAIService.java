@@ -217,8 +217,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 messageProtobufReply.setType(MessageTypeEnum.TEXT);
                 log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 1 {}", messageProtobufReply);
                 
-                // 保存消息，包含prompt内容
-                persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent());
+                // 保存消息，包含prompt内容和AI模型信息
+                String modelType = robot.getLlm() != null && robot.getLlm().getModel() != null ? robot.getLlm().getModel() : "";
+                persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent(), "", modelType);
                 
                 // 发送消息
                 messageSendService.sendProtobufMessage(messageProtobufReply);
@@ -259,8 +260,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     messageProtobufReply.setType(MessageTypeEnum.TEXT);
                     log.info("BaseSpringAIService sendSyncMessage messageProtobufReply 3 {}", messageProtobufReply);
                     
-                    // 保存消息，包含prompt内容
-                    persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent());
+                    // 保存消息，包含prompt内容和AI模型信息
+                    String modelType = robot.getLlm() != null && robot.getLlm().getModel() != null ? robot.getLlm().getModel() : "";
+                    persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0, 0, promptResult.getFullPromptContent(), "", modelType);
                     
                     // 发送消息
                     messageSendService.sendProtobufMessage(messageProtobufReply);
@@ -899,11 +901,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            SseEmitter emitter) {
-        // 调用重载方法，传入默认的token使用情况（0）和空prompt
-        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, "");
-    }
+    // protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+    //         SseEmitter emitter) {
+    //     // 调用重载方法，传入默认的token使用情况（0）和空prompt
+    //     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, "");
+    // }
 
     /**
      * 发送流结束消息，包含token使用情况
@@ -915,11 +917,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @param completionTokens completion token数量
      * @param totalTokens 总token数量
      */
-    protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens) {
-        // 调用重载方法，传入空prompt
-        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, promptTokens, completionTokens, totalTokens, "");
-    }
+    // protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+    //         SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens) {
+    //     // 调用重载方法，传入空prompt
+    //     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, promptTokens, completionTokens, totalTokens, "");
+    // }
 
     /**
      * 发送流结束消息，包含token使用情况和prompt内容
@@ -932,18 +934,56 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @param totalTokens 总token数量
      * @param prompt 传入到大模型的完整prompt内容
      */
+    // protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+    //         SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens, String prompt) {
+    //     log.info("BaseSpringAIService sendStreamEndMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}", 
+    //         messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
+    //         promptTokens, completionTokens, totalTokens, prompt);
+    //     try {
+    //         if (!isEmitterCompleted(emitter)) {
+    //             // 发送流结束标记
+    //             messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+    //             messageProtobufReply.setContent("");
+    //             // 保存消息到数据库，包含token使用情况和prompt内容
+    //             persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens, prompt);
+    //             String messageJson = messageProtobufReply.toJson();
+    //             //
+    //             emitter.send(SseEmitter.event()
+    //                     .data(messageJson)
+    //                     .id(messageProtobufReply.getUid())
+    //                     .name("message"));
+    //             emitter.complete();
+    //         }
+    //     } catch (Exception e) {
+    //         log.error("Error sending stream end message", e);
+    //     }
+    // }
+
+    /**
+     * 发送流结束消息，包含token使用情况、prompt内容和AI模型信息
+     *
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param emitter SSE发射器
+     * @param promptTokens prompt token数量
+     * @param completionTokens completion token数量
+     * @param totalTokens 总token数量
+     * @param prompt 传入到大模型的完整prompt内容
+     * @param aiProvider 大模型提供商
+     * @param aiModel 大模型名称
+     */
     protected void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens, String prompt) {
-        log.info("BaseSpringAIService sendStreamEndMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}", 
+            SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens, String prompt, String aiProvider, String aiModel) {
+        log.info("BaseSpringAIService sendStreamEndMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}, aiProvider {}, aiModel {}", 
             messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
-            promptTokens, completionTokens, totalTokens, prompt);
+            promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
         try {
             if (!isEmitterCompleted(emitter)) {
                 // 发送流结束标记
                 messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
                 messageProtobufReply.setContent("");
-                // 保存消息到数据库，包含token使用情况和prompt内容
-                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens, prompt);
+                // 保存消息到数据库，包含token使用情况、prompt内容和AI模型信息
+                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
                 String messageJson = messageProtobufReply.toJson();
                 //
                 emitter.send(SseEmitter.event()
