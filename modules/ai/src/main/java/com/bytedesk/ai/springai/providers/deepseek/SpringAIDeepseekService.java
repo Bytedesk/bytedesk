@@ -67,24 +67,6 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
         log.info("SpringAIDeepseekService processPromptWebsocket with full prompt content: {}", fullPromptContent);
-        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply);
-    }
-
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("SpringAIDeepseekService processPromptSync with full prompt content: {}", fullPromptContent);
-        return processPromptSync(message, robot);
-    }
-
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-        log.info("SpringAIDeepseekService processPromptSse with full prompt content: {}", fullPromptContent);
-        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
-    }
-
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
@@ -135,6 +117,81 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        log.info("SpringAIDeepseekService processPromptSync with full prompt content: {}", fullPromptContent);
+        return processPromptSync(message, robot);
+    }
+
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        log.info("SpringAIDeepseekService processPromptSse with full prompt content: {}", fullPromptContent);
+        // 从robot中获取llm配置
+        RobotLlm llm = robot.getLlm();
+
+        if (deepseekChatModel == null) {
+            handleSseError(new RuntimeException("Deepseek service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
+
+        // 发送起始消息
+        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+
+        // 如果有自定义选项，创建新的Prompt
+        Prompt requestPrompt = prompt;
+        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        if (customOptions != null) {
+            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+        }
+
+        long startTime = System.currentTimeMillis();
+        final boolean[] success = {false};
+        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+
+        deepseekChatModel.stream(requestPrompt).subscribe(
+                response -> {
+                    try {
+                        if (response != null) {
+                            List<Generation> generations = response.getResults();
+                            for (Generation generation : generations) {
+                                AssistantMessage assistantMessage = generation.getOutput();
+                                String textContent = assistantMessage.getText();
+                                log.info("Deepseek API response metadata: {}, text {}",
+                                        response.getMetadata(), textContent);
+                                
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
+                            }
+                            // 提取token使用情况
+                            tokenUsage[0] = extractTokenUsage(response);
+                            success[0] = true;
+                        }
+                    } catch (Exception e) {
+                        log.error("Error sending SSE event", e);
+                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        success[0] = false;
+                    }
+                },
+                error -> {
+                    log.error("Deepseek API SSE error: ", error);
+                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    success[0] = false;
+                },
+                () -> {
+                    log.info("Deepseek API SSE complete");
+                    // 发送流结束消息，包含token使用情况
+                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.DEEPSEEK, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.DEEPSEEK);
+                    // 记录token使用情况
+                    long responseTime = System.currentTimeMillis() - startTime;
+                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.DEEPSEEK;
+                    recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+                });
+    }
+
+
 
     // @Override
     // protected String generateFaqPairs(String prompt) {
@@ -190,70 +247,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         }
     }
 
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
 
-        if (deepseekChatModel == null) {
-            handleSseError(new RuntimeException("Deepseek service not available"), messageProtobufQuery, messageProtobufReply, emitter);
-            return;
-        }
-
-        // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
-
-        // 如果有自定义选项，创建新的Prompt
-        Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
-        if (customOptions != null) {
-            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
-        }
-
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
-
-        deepseekChatModel.stream(requestPrompt).subscribe(
-                response -> {
-                    try {
-                        if (response != null) {
-                            List<Generation> generations = response.getResults();
-                            for (Generation generation : generations) {
-                                AssistantMessage assistantMessage = generation.getOutput();
-                                String textContent = assistantMessage.getText();
-                                log.info("Deepseek API response metadata: {}, text {}",
-                                        response.getMetadata(), textContent);
-                                
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
-                            }
-                            // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
-                            success[0] = true;
-                        }
-                    } catch (Exception e) {
-                        log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
-                        success[0] = false;
-                    }
-                },
-                error -> {
-                    log.error("Deepseek API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
-                    success[0] = false;
-                },
-                () -> {
-                    log.info("Deepseek API SSE complete");
-                    // 发送流结束消息，包含token使用情况
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), "", LlmConsts.DEEPSEEK, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.DEEPSEEK);
-                    // 记录token使用情况
-                    long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : LlmConsts.DEEPSEEK;
-                    recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-                });
-    }
 
     public OpenAiChatModel getChatModel() {
         return deepseekChatModel;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:47:46
+ * @LastEditTime: 2025-07-16 13:43:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,16 +100,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             log.error("Error creating dynamic chat model for model {}", llm.getModel(), e);
             return bytedeskZhipuaiChatModel;
         }
-    }
-
-    /**
-     * 方式1：异步流式调用
-     */
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
     }
 
     /**
@@ -262,16 +252,6 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
-    }
-
-    /**
-     * 方式3：SSE方式调用
-     */
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
     }
 
     /**

@@ -71,12 +71,6 @@ public class SpringAICustomService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
-    }
-
-    @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
@@ -160,12 +154,6 @@ public class SpringAICustomService extends BaseSpringAIService {
             log.error("Custom API sync error: ", e);
             return "服务暂时不可用，请稍后重试";
         }
-    }
-
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
     }
 
     @Override

@@ -63,12 +63,6 @@ public class SpringAIBaiduService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply, "");
-    }
-
-    @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
@@ -175,12 +169,6 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             recordAiTokenUsage(robot, LlmConsts.BAIDU, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
-    }
-
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, "");
     }
 
     @Override

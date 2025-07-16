@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 11:37:57
+ * @LastEditTime: 2025-07-16 13:23:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -67,24 +67,6 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
         log.info("SpringAIGiteeService processPromptWebsocket with full prompt content: {}", fullPromptContent);
-        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply);
-    }
-
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("SpringAIGiteeService processPromptSync with full prompt content: {}", fullPromptContent);
-        return processPromptSync(message, robot);
-    }
-
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-        log.info("SpringAIGiteeService processPromptSse with full prompt content: {}", fullPromptContent);
-        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
-    }
-
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
@@ -137,56 +119,16 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        long startTime = System.currentTimeMillis();
-        boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
-        
-        try {
-            if (giteeChatModel == null) {
-                return "Gitee service is not available";
-            }
-
-            try {
-                // 如果有robot参数，尝试创建自定义选项
-                if (robot != null && robot.getLlm() != null) {
-                    // 创建自定义选项
-                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
-                    if (customOptions != null) {
-                        // 使用自定义选项创建Prompt
-                        Prompt prompt = new Prompt(message, customOptions);
-                        var response = giteeChatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
-                        success = true;
-                        return extractTextFromResponse(response);
-                    }
-                }
-                
-                var response = giteeChatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
-                success = true;
-                return extractTextFromResponse(response);
-            } catch (Exception e) {
-                log.error("Gitee API call error: ", e);
-                success = false;
-                return "服务暂时不可用，请稍后重试";
-            }
-        } catch (Exception e) {
-            log.error("Gitee API sync error: ", e);
-            success = false;
-            return "服务暂时不可用，请稍后重试";
-        } finally {
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : "gitee-chat";
-            recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
-                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
-        }
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        log.info("SpringAIGiteeService processPromptSync with full prompt content: {}", fullPromptContent);
+        return processPromptSync(message, robot);
     }
 
     @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        log.info("SpringAIGiteeService processPromptSse with full prompt content: {}", fullPromptContent);
+        // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         RobotLlm llm = robot.getLlm();
 
         if (giteeChatModel == null) {
@@ -239,9 +181,9 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Gitee API SSE complete");
-                    // 发送流结束消息，包含token使用情况
+                    // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), "", LlmConsts.GITEE, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.GITEE, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "gitee-chat";
@@ -249,6 +191,59 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
+
+
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot) {
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        try {
+            if (giteeChatModel == null) {
+                return "Gitee service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = giteeChatModel.call(prompt);
+                        tokenUsage = extractTokenUsage(response);
+                        success = true;
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = giteeChatModel.call(message);
+                tokenUsage = extractTokenUsage(response);
+                success = true;
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Gitee API call error: ", e);
+                success = false;
+                return "服务暂时不可用，请稍后重试";
+            }
+        } catch (Exception e) {
+            log.error("Gitee API sync error: ", e);
+            success = false;
+            return "服务暂时不可用，请稍后重试";
+        } finally {
+            // 记录token使用情况
+            long responseTime = System.currentTimeMillis() - startTime;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
+                    ? robot.getLlm().getModel() : "gitee-chat";
+            recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
+        }
+    }
+
+
 
     public OpenAiChatModel getChatModel() {
         return giteeChatModel;

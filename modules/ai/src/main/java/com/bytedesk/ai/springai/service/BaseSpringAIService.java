@@ -1390,8 +1390,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 抽象方法
-    protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply);
+    // protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply);
 
     // 带prompt参数的抽象方法重载
     protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
@@ -1399,8 +1399,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected abstract String processPromptSync(String message, RobotProtobuf robot);
 
-    protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter);
+    // protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply, SseEmitter emitter);
 
     // 带prompt参数的抽象方法重载
     protected abstract String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent);

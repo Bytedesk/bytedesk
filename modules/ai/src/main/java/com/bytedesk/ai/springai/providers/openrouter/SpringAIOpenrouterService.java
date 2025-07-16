@@ -66,24 +66,6 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
         log.info("SpringAIOpenrouterService processPromptWebsocket with full prompt content: {}", fullPromptContent);
-        processPromptWebsocket(prompt, robot, messageProtobufQuery, messageProtobufReply);
-    }
-
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("SpringAIOpenrouterService processPromptSync with full prompt content: {}", fullPromptContent);
-        return processPromptSync(message, robot);
-    }
-
-    @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-        log.info("SpringAIOpenrouterService processPromptSse with full prompt content: {}", fullPromptContent);
-        processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
-    }
-
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
@@ -135,56 +117,17 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                 });
     }
 
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return openrouterChatModel != null ? openrouterChatModel.call(prompt) : "";
-    // }
-
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        long startTime = System.currentTimeMillis();
-        boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
-        
-        try {
-            if (openrouterChatModel == null) {
-                return "Openrouter service is not available";
-            }
-            
-            // 如果有robot参数，尝试创建自定义选项
-            if (robot != null && robot.getLlm() != null) {
-                // 创建自定义选项
-                OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
-                if (customOptions != null) {
-                    // 使用自定义选项创建Prompt
-                    Prompt prompt = new Prompt(message, customOptions);
-                    var response = openrouterChatModel.call(prompt);
-                    tokenUsage = extractTokenUsage(response);
-                    success = true;
-                    return extractTextFromResponse(response);
-                }
-            }
-            
-            var response = openrouterChatModel.call(message);
-            tokenUsage = extractTokenUsage(response);
-            success = true;
-            return extractTextFromResponse(response);
-        } catch (Exception e) {
-            log.error("Openrouter API sync error: ", e);
-            success = false;
-            return "服务暂时不可用，请稍后重试";
-        } finally {
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : "openrouter-chat";
-            recordAiTokenUsage(robot, LlmConsts.OPENROUTER, modelType, 
-                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
-        }
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        log.info("SpringAIOpenrouterService processPromptSync with full prompt content: {}", fullPromptContent);
+        return processPromptSync(message, robot);
     }
 
     @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        log.info("SpringAIOpenrouterService processPromptSse with full prompt content: {}", fullPromptContent);
+        // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         RobotLlm llm = robot.getLlm();
 
         if (openrouterChatModel == null) {
@@ -235,9 +178,9 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("OpenRouter API SSE complete");
-                    // 发送流结束消息，包含token使用情况
+                    // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), "", LlmConsts.OPENROUTER, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "openrouter-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.OPENROUTER, (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "openrouter-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getModel())) ? llm.getModel() : "openrouter-chat";
@@ -245,6 +188,58 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
+
+
+
+    // @Override
+    // protected String generateFaqPairs(String prompt) {
+    //     return openrouterChatModel != null ? openrouterChatModel.call(prompt) : "";
+    // }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot) {
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        try {
+            if (openrouterChatModel == null) {
+                return "Openrouter service is not available";
+            }
+            
+            // 如果有robot参数，尝试创建自定义选项
+            if (robot != null && robot.getLlm() != null) {
+                // 创建自定义选项
+                OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                if (customOptions != null) {
+                    // 使用自定义选项创建Prompt
+                    Prompt prompt = new Prompt(message, customOptions);
+                    var response = openrouterChatModel.call(prompt);
+                    tokenUsage = extractTokenUsage(response);
+                    success = true;
+                    return extractTextFromResponse(response);
+                }
+            }
+            
+            var response = openrouterChatModel.call(message);
+            tokenUsage = extractTokenUsage(response);
+            success = true;
+            return extractTextFromResponse(response);
+        } catch (Exception e) {
+            log.error("Openrouter API sync error: ", e);
+            success = false;
+            return "服务暂时不可用，请稍后重试";
+        } finally {
+            // 记录token使用情况
+            long responseTime = System.currentTimeMillis() - startTime;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
+                    ? robot.getLlm().getModel() : "openrouter-chat";
+            recordAiTokenUsage(robot, LlmConsts.OPENROUTER, modelType, 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
+        }
+    }
+
+
 
     public OpenAiChatModel getChatModel() {
         return openrouterChatModel;
