@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 12:16:29
+ * @LastEditTime: 2025-07-16 12:35:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,9 +95,8 @@ public class RobotMessageEntity extends AbstractMessageEntity {
     private String rateDownReason;    
 
     // 存储传入到大模型的完整prompt内容
-    @Builder.Default
-    @Column(name = "prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String prompt = "";
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String prompt;
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
     public UserProtobuf getUserProtobuf() {
