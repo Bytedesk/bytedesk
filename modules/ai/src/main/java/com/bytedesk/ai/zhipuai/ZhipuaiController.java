@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:48:48
+ * @LastEditTime: 2025-07-16 15:45:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -438,9 +438,9 @@ public class ZhipuaiController {
 
     /**
      * 语音合成
-     * POST http://127.0.0.1:9003/zhipuai/voice
+     * POST http://127.0.0.1:9003/zhipuai/speech
      */
-    @PostMapping("/voice")
+    @PostMapping("/speech")
     public ResponseEntity<JsonResult<?>> generateSpeech(@RequestBody Map<String, String> request) {
         if (!bytedeskProperties.getDebug()) {
             return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));

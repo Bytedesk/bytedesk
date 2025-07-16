@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 11:36:33
+ * @LastEditTime: 2025-07-16 16:00:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.ai.utils.output.ActorsFilms;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import java.util.HashMap;
@@ -64,9 +65,10 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/prompt")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.ollama.chat.enabled", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIPromptController {
 
+	private final BytedeskProperties bytedeskProperties;
 	private final ChatClient bytedeskOllamaChatClient;
 
 	@Qualifier("elasticsearchVectorStore")
@@ -95,6 +97,11 @@ public class SpringAIPromptController {
 	public ResponseEntity<JsonResult<?>> templating(
 			@RequestParam(value = "adjective", defaultValue = "funny") String adjective,
 			@RequestParam(value = "topic", defaultValue = "cows") String topic) {
+		
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+		
 		// 使用prompt模板
 		PromptTemplate promptTemplate = new PromptTemplate(jokeResource);
 		Prompt prompt = promptTemplate.create(Map.of("adjective", adjective, "topic", topic));
@@ -112,6 +119,10 @@ public class SpringAIPromptController {
 			@RequestParam(value = "message", defaultValue = "Tell me about three famous pirates from the Golden Age of Piracy and why they did.  Write at least a sentence for each pirate.") String message,
 			@RequestParam(value = "name", defaultValue = "Bob") String name,
 			@RequestParam(value = "voice", defaultValue = "pirate") String voice) {
+
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
 
 		// 使用prompt模板
 		// name, The name of the AI assistant. The default value is Bob
@@ -135,6 +146,10 @@ public class SpringAIPromptController {
 	public ResponseEntity<JsonResult<?>> stuff(
 			@RequestParam(value = "message", defaultValue = "Which athletes won the mixed doubles gold medal in curling at the 2022 Winter Olympics?'") String message,
 			@RequestParam(value = "stuff", defaultValue = "false") boolean stuff) {
+
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
 
 		// 使用prompt模板
 		PromptTemplate promptTemplate = new PromptTemplate(qaPromptResource);
@@ -163,6 +178,11 @@ public class SpringAIPromptController {
 	@GetMapping("/rag")
 	public ResponseEntity<JsonResult<?>> rag(
 			@RequestParam(value = "message", defaultValue = "What is the most popular bike brand?") String message) {
+		
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+		
 		// Step 1 - Load JSON document as Documents
 
 		log.info("Loading JSON as Documents");
@@ -204,6 +224,10 @@ public class SpringAIPromptController {
 	public ResponseEntity<JsonResult<?>> generate(
 			@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
 
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+
 		// using the low-level ChatModel API directly:
 		var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
 
@@ -244,6 +268,10 @@ public class SpringAIPromptController {
 	@GetMapping("/structured")
 	public ResponseEntity<JsonResult<?>> structured(
 			@RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
+		
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
 		 
 		StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
 		String userInputTemplate = """

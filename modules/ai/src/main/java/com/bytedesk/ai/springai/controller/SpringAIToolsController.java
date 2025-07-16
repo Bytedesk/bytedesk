@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.ai.utils.tools.DateTimeTools;
 import com.bytedesk.ai.utils.tools.WeatherRequest;
 import com.bytedesk.ai.utils.tools.WeatherService;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -51,6 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIToolsController {
 
+    private final BytedeskProperties bytedeskProperties;
     // private final ChatClient defaultChatClient;
     @Qualifier("bytedeskZhipuaiChatClient")
     private final ChatClient bytedeskZhipuaiChatClient;
@@ -68,6 +70,10 @@ public class SpringAIToolsController {
     @GetMapping("/time")
     public ResponseEntity<JsonResult<?>> time(
             @RequestParam(value = "message", defaultValue = "What day is tomorrow?") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         String response = bytedeskZhipuaiChatClient
                 .prompt(message)
@@ -92,6 +98,10 @@ public class SpringAIToolsController {
     public ResponseEntity<JsonResult<?>> alarm(
             @RequestParam(value = "message", defaultValue = "Can you set an alarm 10 minutes from now?") String message) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         String response = bytedeskZhipuaiChatClient
                 .prompt(message)
                 .tools(new DateTimeTools())
@@ -107,6 +117,10 @@ public class SpringAIToolsController {
     @GetMapping("/method-tool-callback")
     public ResponseEntity<JsonResult<?>> methodToolCallback(
             @RequestParam(value = "message", defaultValue = "What is the current date and time?") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         Method method = ReflectionUtils.findMethod(DateTimeTools.class, "getCurrentDateTimeMethodToolCallback");
         ToolCallback toolCallback = MethodToolCallback.builder()
@@ -134,6 +148,10 @@ public class SpringAIToolsController {
     @GetMapping("/weather")
     public ResponseEntity<JsonResult<?>> weather(
             @RequestParam(value = "message", defaultValue = "What is the weather in Beijing?") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         ToolCallback toolCallback = FunctionToolCallback
                 .builder("currentWeather", new WeatherService())

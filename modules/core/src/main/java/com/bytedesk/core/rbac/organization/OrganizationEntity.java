@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 14:07:11
+ * @LastEditTime: 2025-07-16 16:13:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,6 +108,11 @@ public class OrganizationEntity extends BaseEntityNoOrg {
 
     // 会员截止日期
     private Date vipExpireDate;
+
+    // 是否启用，状态：启用/禁用
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

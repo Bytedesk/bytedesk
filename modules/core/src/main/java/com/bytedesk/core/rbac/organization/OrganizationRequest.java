@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-06 16:02:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 14:07:52
+ * @LastEditTime: 2025-07-16 16:14:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,5 +69,8 @@ public class OrganizationRequest extends BaseRequest {
 
     // 会员截止日期
     private Date vipExpireDate;
+
+    // 是否启用，状态：启用/禁用
+    private Boolean enabled;
 
 }

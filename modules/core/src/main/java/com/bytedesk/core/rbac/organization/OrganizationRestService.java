@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:33:00
+ * @LastEditTime: 2025-07-16 16:18:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,8 +41,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     private final AuthService authService;
 
     private final UserService userService;
-
-    // private final RoleService roleService;
 
     private final OrganizationRepository organizationRepository;
 
@@ -101,7 +99,19 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         userService.addRoleAdmin(user);
         //
         return convertToResponse(savedOrganization);
+    }
 
+    // 超级管理员创建组织
+    public OrganizationResponse createByAdmin(OrganizationRequest organizationRequest) {
+        //
+        OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
+        organization.setUid(uidUtils.getUid());
+        // 
+        OrganizationEntity savedOrganization = save(organization);
+        if (savedOrganization == null) {
+            throw new RuntimeException("Failed to create organization.");
+        }
+        return convertToResponse(savedOrganization);
     }
 
     public OrganizationResponse update(OrganizationRequest organizationRequest) {

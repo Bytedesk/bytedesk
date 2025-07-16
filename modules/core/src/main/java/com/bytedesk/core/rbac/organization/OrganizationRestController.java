@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 16:15:07
+ * @LastEditTime: 2025-07-16 16:17:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,6 +73,16 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
         //
         OrganizationResponse response = organizationRestService.create(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // create/by/admin
+    @ActionAnnotation(title = "组织", action = "新建", description = "organization create by admin")
+    @PostMapping("/create/by/admin")
+    public ResponseEntity<?> createByAdmin(@RequestBody OrganizationRequest request) {
+        //
+        OrganizationResponse response = organizationRestService.createByAdmin(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }
