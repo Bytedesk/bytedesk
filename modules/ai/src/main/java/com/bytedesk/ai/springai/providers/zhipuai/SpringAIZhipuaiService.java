@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:46:49
+ * @LastEditTime: 2025-07-16 13:58:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -667,7 +667,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     public Boolean isServiceHealthy() {
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用");
         } catch (Exception e) {
             log.error("Error checking Zhipuai service health", e);

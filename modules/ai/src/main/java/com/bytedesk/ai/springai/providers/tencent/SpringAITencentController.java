@@ -65,7 +65,7 @@ public class SpringAITencentController {
             return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
         }
         
-        String response = springAITencentService.processPromptSync(message, null);
+        String response = springAITencentService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

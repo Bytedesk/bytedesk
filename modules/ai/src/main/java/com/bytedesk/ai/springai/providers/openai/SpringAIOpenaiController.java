@@ -64,7 +64,7 @@ public class SpringAIOpenaiController {
             return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
         }
         
-        String response = springAIOpenaiService.processPromptSync(message, null);
+        String response = springAIOpenaiService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

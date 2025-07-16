@@ -64,7 +64,7 @@ public class SpringAIOpenrouterController {
             return ResponseEntity.ok(JsonResult.error("Openrouter service is not available"));
         }
         
-        String response = springAIOpenrouterService.processPromptSync(message, null);
+        String response = springAIOpenrouterService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

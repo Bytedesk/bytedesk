@@ -242,57 +242,6 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     //     return deepseekChatModel != null ? deepseekChatModel.call(prompt) : "";
     // }
 
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        long startTime = System.currentTimeMillis();
-        boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
-        
-        try {
-            if (deepseekChatModel == null) {
-                return "Deepseek service is not available";
-            }
-
-            try {
-                // 如果有robot参数，尝试创建自定义选项
-                if (robot != null && robot.getLlm() != null) {
-                    // 创建自定义选项
-                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
-                    if (customOptions != null) {
-                        // 使用自定义选项创建Prompt
-                        Prompt prompt = new Prompt(message, customOptions);
-                        var response = deepseekChatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
-                        success = true;
-                        return extractTextFromResponse(response);
-                    }
-                }
-                
-                var response = deepseekChatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
-                success = true;
-                return extractTextFromResponse(response);
-            } catch (Exception e) {
-                log.error("Deepseek API call error: ", e);
-                success = false;
-                return "服务暂时不可用，请稍后重试";
-            }
-        } catch (Exception e) {
-            log.error("Deepseek API sync error: ", e);
-            success = false;
-            return "服务暂时不可用，请稍后重试";
-        } finally {
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : LlmConsts.DEEPSEEK;
-            recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
-                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
-        }
-    }
-
-
-
     public OpenAiChatModel getChatModel() {
         return deepseekChatModel;
     }
@@ -303,7 +252,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Deepseek service is not available");
         } catch (Exception e) {
             log.error("Error checking Deepseek service health", e);

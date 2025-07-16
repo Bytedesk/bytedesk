@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:24:21
+ * @LastEditTime: 2025-07-16 13:58:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -233,16 +233,6 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
-
-
-
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return volcengineChatModel != null ? volcengineChatModel.call(prompt) : "";
-    // }
-
-
-
 
 
     public OpenAiChatModel getChatModel() {

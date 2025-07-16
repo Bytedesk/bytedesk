@@ -65,7 +65,7 @@ public class SpringAIGiteeController {
             return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
         }
         
-        String response = springAIGiteeService.processPromptSync(message, null);
+        String response = springAIGiteeService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

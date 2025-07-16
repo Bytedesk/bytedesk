@@ -65,7 +65,7 @@ public class SpringAIVolcengineController {
             return ResponseEntity.ok(JsonResult.error("Volcengine service is not available"));
         }
         
-        String response = springAIVolcengineService.processPromptSync(message, null);
+        String response = springAIVolcengineService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

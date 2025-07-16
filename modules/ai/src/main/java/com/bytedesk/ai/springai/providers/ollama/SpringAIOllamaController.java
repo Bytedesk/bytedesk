@@ -63,7 +63,7 @@ public class SpringAIOllamaController {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }
 
-        String response = springAIOllamaService.processPromptSync(message, null);
+        String response = springAIOllamaService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

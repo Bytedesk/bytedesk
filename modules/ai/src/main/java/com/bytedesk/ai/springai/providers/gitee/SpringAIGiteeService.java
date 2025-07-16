@@ -121,7 +121,51 @@ public class SpringAIGiteeService extends BaseSpringAIService {
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         log.info("SpringAIGiteeService processPromptSync with full prompt content: {}", fullPromptContent);
-        return processPromptSync(message, robot);
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        
+        try {
+            if (giteeChatModel == null) {
+                return "Gitee service is not available";
+            }
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = giteeChatModel.call(prompt);
+                        tokenUsage = extractTokenUsage(response);
+                        success = true;
+                        return extractTextFromResponse(response);
+                    }
+                }
+                
+                var response = giteeChatModel.call(message);
+                tokenUsage = extractTokenUsage(response);
+                success = true;
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Gitee API call error: ", e);
+                success = false;
+                return "服务暂时不可用，请稍后重试";
+            }
+        } catch (Exception e) {
+            log.error("Gitee API sync error: ", e);
+            success = false;
+            return "服务暂时不可用，请稍后重试";
+        } finally {
+            // 记录token使用情况
+            long responseTime = System.currentTimeMillis() - startTime;
+            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
+                    ? robot.getLlm().getModel() : "gitee-chat";
+            recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
+        }
     }
 
     @Override
@@ -194,57 +238,6 @@ public class SpringAIGiteeService extends BaseSpringAIService {
 
 
 
-    @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        long startTime = System.currentTimeMillis();
-        boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
-        
-        try {
-            if (giteeChatModel == null) {
-                return "Gitee service is not available";
-            }
-
-            try {
-                // 如果有robot参数，尝试创建自定义选项
-                if (robot != null && robot.getLlm() != null) {
-                    // 创建自定义选项
-                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
-                    if (customOptions != null) {
-                        // 使用自定义选项创建Prompt
-                        Prompt prompt = new Prompt(message, customOptions);
-                        var response = giteeChatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
-                        success = true;
-                        return extractTextFromResponse(response);
-                    }
-                }
-                
-                var response = giteeChatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
-                success = true;
-                return extractTextFromResponse(response);
-            } catch (Exception e) {
-                log.error("Gitee API call error: ", e);
-                success = false;
-                return "服务暂时不可用，请稍后重试";
-            }
-        } catch (Exception e) {
-            log.error("Gitee API sync error: ", e);
-            success = false;
-            return "服务暂时不可用，请稍后重试";
-        } finally {
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getModel())) 
-                    ? robot.getLlm().getModel() : "gitee-chat";
-            recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
-                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
-        }
-    }
-
-
-
     public OpenAiChatModel getChatModel() {
         return giteeChatModel;
     }
@@ -255,7 +248,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Gitee service is not available");
         } catch (Exception e) {
             log.error("Error checking Gitee service health", e);

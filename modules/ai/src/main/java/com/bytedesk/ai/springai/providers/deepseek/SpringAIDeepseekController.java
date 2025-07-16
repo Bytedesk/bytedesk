@@ -65,7 +65,7 @@ public class SpringAIDeepseekController {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
         
-        String response = springAIDeepseekService.processPromptSync(message, null);
+        String response = springAIDeepseekService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

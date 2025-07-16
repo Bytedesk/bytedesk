@@ -161,12 +161,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot) {
-        // 调用带prompt参数的重载方法，传入空prompt
-        return processPromptSync(message, robot, "");
-    }
-
-    @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
@@ -332,7 +326,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test", null);
+            String response = processPromptSync("test", null, "");
             return !response.contains("不可用") && !response.equals("Ollama service is not available");
         } catch (Exception e) {
             log.error("Error checking Ollama service health", e);

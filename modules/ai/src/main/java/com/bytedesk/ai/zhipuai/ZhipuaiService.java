@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:49:44
+ * @LastEditTime: 2025-07-16 13:55:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -606,6 +606,7 @@ public class ZhipuaiService extends BaseSpringAIService {
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        // if (robot)
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API SSE prompt: {}", prompt);

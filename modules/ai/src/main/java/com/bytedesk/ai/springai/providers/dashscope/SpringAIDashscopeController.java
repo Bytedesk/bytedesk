@@ -63,7 +63,7 @@ public class SpringAIDashscopeController {
             return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
         
-        String response = springAIDashscopeService.processPromptSync(message, null);
+        String response = springAIDashscopeService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

@@ -67,7 +67,7 @@ public class SpringAISiliconFlowController {
             return ResponseEntity.ok(JsonResult.error("SiliconFlow service is not available"));
         }
         
-        String response = springAISiliconFlowService.processPromptSync(message, null);
+        String response = springAISiliconFlowService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
