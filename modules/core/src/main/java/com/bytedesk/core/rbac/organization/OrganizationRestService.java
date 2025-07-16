@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:39:35
+ * @LastEditTime: 2025-07-16 18:22:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.exception.ExistsException;
+import com.bytedesk.core.exception.ForbiddenException;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -73,7 +76,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public OrganizationResponse queryByUid(OrganizationRequest request) {
         Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
         if (!organizationOptional.isPresent()) {
-            throw new RuntimeException("Organization with UID: " + request.getUid() + " not found.");
+            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
         }
         return convertToResponse(organizationOptional.get());
     }
@@ -87,15 +90,15 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public OrganizationResponse create(OrganizationRequest organizationRequest) {
         //
         if (existsByName(organizationRequest.getName())) {
-            throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+            throw new ExistsException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
         }
         if (existsByCode(organizationRequest.getCode())) {
-            throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+            throw new ExistsException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
         }
         //
         UserEntity authUser = authService.getUser();
         UserEntity user = userService.findByUid(authUser.getUid())
-                .orElseThrow(() -> new RuntimeException("用户不存在."));
+                .orElseThrow(() -> new NotFoundException("用户不存在."));
         String orgUid = uidUtils.getUid();
         //
         OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
@@ -122,14 +125,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             throw new NotLoginException("login required");
         }
         if (!authUser.isSuperUser()) {
-            throw new RuntimeException("super admin required");
+            throw new ForbiddenException("super admin required");
         }
         //
         if (existsByName(organizationRequest.getName())) {
-            throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+            throw new ExistsException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
         }
         if (existsByCode(organizationRequest.getCode())) {
-            throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+            throw new ExistsException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
         }
         // 
         OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
@@ -137,13 +140,18 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 使用 userUid 查询用户
         if (StringUtils.hasText(organizationRequest.getUserUid())) {
             UserEntity user = userService.findByUid(organizationRequest.getUserUid())
-                    .orElseThrow(() -> new RuntimeException("用户不存在."));
+                    .orElseThrow(() -> new NotFoundException("用户不存在."));
             organization.setUser(user);
+            
         }
         // 
         OrganizationEntity savedOrganization = save(organization);
         if (savedOrganization == null) {
             throw new RuntimeException("Failed to create organization.");
+        }
+        if (organization.getUser() != null) {
+            organization.getUser().setCurrentOrganization(organization);
+            userService.addRoleAdmin(organization.getUser());
         }
         return convertToResponse(savedOrganization);
     }
@@ -155,7 +163,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         Optional<OrganizationEntity> organizationOptional = findByUid(organizationRequest.getUid());
         if (!organizationOptional.isPresent()) {
             // 如果组织不存在，可以抛出一个自定义异常，例如OrganizationNotFoundException
-            throw new RuntimeException("Organization with UID: " + organizationRequest.getUid() + " not found.");
+            throw new NotFoundException("Organization with UID: " + organizationRequest.getUid() + " not found.");
         }
 
         // 获取要更新的组织实体
@@ -164,14 +172,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 检查 name 唯一性（排除当前组织）
         if (!organization.getName().equals(organizationRequest.getName())) {
             if (organizationRepository.existsByNameAndDeletedAndUidNot(organizationRequest.getName(), false, organizationRequest.getUid())) {
-                throw new RuntimeException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
+                throw new ExistsException("组织名: " + organizationRequest.getName() + " 已经存在，请修改组织名称.");
             }
         }
         
         // 检查 code 唯一性（排除当前组织）
         if (!organization.getCode().equals(organizationRequest.getCode())) {
             if (organizationRepository.existsByCodeAndDeletedAndUidNot(organizationRequest.getCode(), false, organizationRequest.getUid())) {
-                throw new RuntimeException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
+                throw new ExistsException("组织代码: " + organizationRequest.getCode() + " 已经存在。");
             }
         }
         
@@ -181,11 +189,23 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setLogo(organizationRequest.getLogo());
         organization.setCode(organizationRequest.getCode());
         organization.setDescription(organizationRequest.getDescription());
+        // 认证
+        organization.setVerifiedType(organizationRequest.getVerifiedType());
+        organization.setIdentityType(organizationRequest.getIdentityType());
+        organization.setIdentityImage(organizationRequest.getIdentityImage());
+        organization.setIdentityNumber(organizationRequest.getIdentityNumber());
+        organization.setVerifyDate(organizationRequest.getVerifyDate());
+        organization.setVerifyStatus(organizationRequest.getVerifyStatus());
+        organization.setRejectReason(organizationRequest.getRejectReason());
+        // 
+        organization.setVip(organizationRequest.getVip());
+        organization.setVipExpireDate(organizationRequest.getVipExpireDate());
+        // 
         organization.setEnabled(organizationRequest.getEnabled());
         // 使用 userUid 查询用户
         if (StringUtils.hasText(organizationRequest.getUserUid())) {
             UserEntity user = userService.findByUid(organizationRequest.getUserUid())
-                    .orElseThrow(() -> new RuntimeException("用户不存在."));
+                    .orElseThrow(() -> new NotFoundException("用户不存在."));
             organization.setUser(user);
         }
         // 保存更新后的组织
@@ -193,6 +213,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (updatedOrganization == null) {
             throw new RuntimeException("Failed to update organization.");
         }
+        // TODO: 超级管理员更新用户当前组织
         // 转换为响应对象
         return convertToResponse(updatedOrganization);
     }
@@ -240,14 +261,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 // 检查 name 唯一性（排除当前组织）
                 if (!latestEntity.getName().equals(organization.getName())) {
                     if (organizationRepository.existsByNameAndDeletedAndUidNot(organization.getName(), false, organization.getUid())) {
-                        throw new RuntimeException("组织名: " + organization.getName() + " 已经存在，请修改组织名称.");
+                        throw new ExistsException("组织名: " + organization.getName() + " 已经存在，请修改组织名称.");
                     }
                 }
                 
                 // 检查 code 唯一性（排除当前组织）
                 if (!latestEntity.getCode().equals(organization.getCode())) {
                     if (organizationRepository.existsByCodeAndDeletedAndUidNot(organization.getCode(), false, organization.getUid())) {
-                        throw new RuntimeException("组织代码: " + organization.getCode() + " 已经存在。");
+                        throw new ExistsException("组织代码: " + organization.getCode() + " 已经存在。");
                     }
                 }
 
@@ -274,7 +295,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             organization.setDeleted(true); // 逻辑删除
             save(organization);
         } else {
-            throw new RuntimeException("Organization with UID: " + uid + " not found.");
+            throw new NotFoundException("Organization with UID: " + uid + " not found.");
         }
     }
 

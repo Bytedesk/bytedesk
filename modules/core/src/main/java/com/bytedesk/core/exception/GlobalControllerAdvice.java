@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:26:14
+ * @LastEditTime: 2025-07-16 18:17:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -116,6 +116,11 @@ public class GlobalControllerAdvice {
         // // 也可以使用HttpStatus.FOUND（302），但303更明确地表示应使用GET方法重定向
         // return
         // ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(redirectUrl)).build();
+    }
+
+    @ExceptionHandler(ExistsException.class)
+    public ResponseEntity<?> handleExistsException(ExistsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
