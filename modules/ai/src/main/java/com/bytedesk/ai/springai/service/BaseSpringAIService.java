@@ -359,11 +359,31 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens, String prompt) {
+        // 调用重载方法，传入空的AI提供商和模型信息
+        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, promptTokens, completionTokens, totalTokens, prompt, "", "");
+    }
+
+    /**
+     * 持久化消息，包含token使用情况、prompt内容和AI模型信息
+     * 
+     * @param messageProtobufQuery 查询消息
+     * @param messageProtobufReply 回复消息
+     * @param isUnanswered 是否未回答
+     * @param promptTokens prompt token数量
+     * @param completionTokens completion token数量
+     * @param totalTokens 总token数量
+     * @param prompt 传入到大模型的完整prompt内容
+     * @param aiProvider 大模型提供商
+     * @param aiModel 大模型名称
+     */
+    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens, String prompt, 
+            String aiProvider, String aiModel) {
         Assert.notNull(messageProtobufQuery, "MessageProtobufQuery must not be null");
         Assert.notNull(messageProtobufReply, "MessageProtobufReply must not be null");
-        log.info("BaseSpringAIService persistMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}", 
+        log.info("BaseSpringAIService persistMessage messageProtobufQuery {}, messageProtobufReply {}, promptTokens {}, completionTokens {}, totalTokens {}, prompt {}, aiProvider {}, aiModel {}", 
             messageProtobufQuery.getContent(), messageProtobufReply.getContent(), 
-            promptTokens, completionTokens, totalTokens, prompt);
+            promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
         messagePersistCache.pushForPersist(messageProtobufReply.toJson());
         //
         MessageExtra extraObject = MessageExtra.fromJson(messageProtobufReply.getExtra());
@@ -392,6 +412,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 //
                 // 添加完整prompt内容
                 .prompt(prompt)
+                //
+                // 添加AI模型信息
+                .aiProvider(aiProvider)
+                .aiModel(aiModel)
                 //
                 .build();
         robotMessageCache.pushRequest(robotMessage);

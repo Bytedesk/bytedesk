@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-04 16:09:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 12:35:54
+ * @LastEditTime: 2025-07-16 12:55:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -97,6 +97,16 @@ public class RobotMessageEntity extends AbstractMessageEntity {
     // 存储传入到大模型的完整prompt内容
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt;
+
+    // 大模型提供商（如：openai、zhipuai、baidu等）
+    @Builder.Default
+    @Column(name = "ai_provider", length = 50)
+    private String aiProvider = "";
+
+    // 大模型名称（如：gpt-4、glm-4、ernie-bot-4等）
+    @Builder.Default
+    @Column(name = "ai_model", length = 100)
+    private String aiModel = "";
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
     public UserProtobuf getUserProtobuf() {

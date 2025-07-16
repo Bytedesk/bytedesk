@@ -64,4 +64,10 @@ public class RobotMessageRequest extends BaseRequest {
 
     // 存储传入到大模型的完整prompt内容
     private String prompt;
+
+    // 大模型提供商（如：openai、zhipuai、baidu等）
+    private String aiProvider;
+
+    // 大模型名称（如：gpt-4、glm-4、ernie-bot-4等）
+    private String aiModel;
 }
