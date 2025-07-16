@@ -444,7 +444,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
                 
                 // 使用mapStreamToAccumulator方法处理流式响应，参考官方示例
-                ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(response.getFlowable())
+                mapStreamToAccumulator(response.getFlowable())
                         .doOnNext(accumulator -> {
                             try {
                                 if (isFirst.getAndSet(false)) {
