@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 19:49:07
+ * @LastEditTime: 2025-07-16 08:35:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
     @Autowired
     @Qualifier("bytedeskZhipuaiApi")
-    private ZhiPuAiApi zhipuaiApi;
+    private ZhiPuAiApi bytedeskZhipuaiApi;
 
     
     public SpringAIZhipuaiService() {
@@ -91,7 +91,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                 return bytedeskZhipuaiChatModel;
             }
 
-            return new ZhiPuAiChatModel(zhipuaiApi, options);
+            return new ZhiPuAiChatModel(bytedeskZhipuaiApi, options);
         } catch (Exception e) {
             log.error("Error creating dynamic chat model for model {}", llm.getModel(), e);
             return bytedeskZhipuaiChatModel;
@@ -495,12 +495,20 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         key, value, value != null ? value.getClass().getName() : "null");
             }
             
-            // 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
+            // 方法4: 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
             log.info("Zhipuai API manual extraction failed, trying original extractTokenUsage method");
             TokenUsage fallbackUsage = extractTokenUsage(response);
             if (fallbackUsage.getTotalTokens() > 0) {
                 log.info("Zhipuai API fallback extraction successful: {}", fallbackUsage);
                 return fallbackUsage;
+            }
+            
+            // 方法5: 如果所有方法都失败，尝试估算token使用量
+            log.info("Zhipuai API all extraction methods failed, attempting to estimate token usage");
+            TokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
+            if (estimatedUsage.getTotalTokens() > 0) {
+                log.info("Zhipuai API estimated token usage: {}", estimatedUsage);
+                return estimatedUsage;
             }
             
         } catch (Exception e) {
@@ -521,6 +529,69 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         
         log.warn("Zhipuai API all token extraction methods failed, returning zeros");
         return new TokenUsage(0, 0, 0);
+    }
+
+    /**
+     * 估算token使用量（当无法从API获取实际token信息时使用）
+     * 
+     * @param response ChatResponse对象
+     * @return 估算的TokenUsage对象
+     */
+    private TokenUsage estimateTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
+        try {
+            if (response == null) {
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            // 获取输出文本
+            String outputText = extractTextFromResponse(response);
+            
+            // 由于无法从ChatResponse直接获取输入文本，我们使用一个保守的估算
+            // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
+            long completionTokens = estimateTokens(outputText);
+            long promptTokens = (long) (completionTokens * 0.3);
+            long totalTokens = promptTokens + completionTokens;
+            
+            log.info("Zhipuai API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens", 
+                    outputText.length(), completionTokens, promptTokens, totalTokens);
+            
+            return new TokenUsage(promptTokens, completionTokens, totalTokens);
+            
+        } catch (Exception e) {
+            log.error("Error estimating token usage", e);
+            return new TokenUsage(0, 0, 0);
+        }
+    }
+    
+    /**
+     * 估算文本的token数量
+     * 
+     * @param text 输入文本
+     * @return 估算的token数量
+     */
+    private long estimateTokens(String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+        
+        // 简单的token估算算法
+        // 中文约1.5字符/token，英文约4字符/token
+        int chineseChars = 0;
+        int englishChars = 0;
+        
+        for (char c : text.toCharArray()) {
+            if (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN) {
+                chineseChars++;
+            } else if (Character.isLetterOrDigit(c)) {
+                englishChars++;
+            }
+        }
+        
+        // 计算估算的token数量
+        long estimatedTokens = (long) (chineseChars / 1.5 + englishChars / 4.0);
+        
+        // 确保至少返回1个token
+        return Math.max(1, estimatedTokens);
     }
 
     /**
@@ -566,6 +637,15 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             // 测试原始token提取
             TokenUsage originalUsage = extractTokenUsage(response);
             log.info("Zhipuai API test original token extraction result: {}", originalUsage);
+            
+            // 测试token估算功能
+            TokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
+            log.info("Zhipuai API test estimated token usage result: {}", estimatedUsage);
+            
+            // 测试token估算算法
+            String testText = "这是一个测试文本，包含中英文混合内容。This is a test text with mixed Chinese and English content.";
+            long estimatedTokens = estimateTokens(testText);
+            log.info("Zhipuai API test token estimation for text '{}': {} tokens", testText, estimatedTokens);
             
             // 提取文本内容
             String textContent = extractTextFromResponse(response);
