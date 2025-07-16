@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:48:24
+ * @LastEditTime: 2025-07-16 09:55:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,8 +15,6 @@ package com.bytedesk.ai.zhipuai;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,10 +28,8 @@ import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
-import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ChatMessage;
 import com.zhipu.oapi.service.v4.model.ChatMessageRole;
@@ -95,7 +91,269 @@ public class ZhipuaiService extends BaseSpringAIService {
                 .temperature(llm != null ? llm.getTemperature().floatValue() : (float) zhipuaiChatConfig.getTemperature())
                 .build();
 
+        // 添加请求日志
+        log.info("Zhipuai API creating request - model: {}, stream: {}, requestId: {}, temperature: {}, message length: {}", 
+                chatCompletionRequest.getModel(), stream, requestId, chatCompletionRequest.getTemperature(), message.length());
+
         return chatCompletionRequest;
+    }
+
+    /**
+     * 手动提取智谱AI的token使用情况
+     * 从ModelApiResponse中提取token使用信息
+     * 
+     * @param response ModelApiResponse对象
+     * @return TokenUsage对象
+     */
+    private TokenUsage extractZhipuaiTokenUsage(ModelApiResponse response) {
+        try {
+            if (response == null) {
+                log.warn("Zhipuai API response is null");
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            log.info("Zhipuai API manual token extraction - response success: {}, has data: {}", 
+                    response.isSuccess(), response.getData() != null);
+            
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Zhipuai API response is not successful or has no data");
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            // 尝试从response.getData()中获取usage信息
+            var data = response.getData();
+            log.info("Zhipuai API response data class: {}", data.getClass().getName());
+            
+            // 检查是否有usage字段
+            try {
+                java.lang.reflect.Field usageField = data.getClass().getDeclaredField("usage");
+                usageField.setAccessible(true);
+                Object usage = usageField.get(data);
+                
+                if (usage != null) {
+                    log.info("Zhipuai API found usage field: {}", usage);
+                    
+                    if (usage instanceof java.util.Map) {
+                        java.util.Map<?, ?> usageMap = (java.util.Map<?, ?>) usage;
+                        
+                        long promptTokens = 0;
+                        long completionTokens = 0;
+                        long totalTokens = 0;
+                        
+                        // 提取prompt_tokens
+                        Object promptObj = usageMap.get("prompt_tokens");
+                        if (promptObj instanceof Number) {
+                            promptTokens = ((Number) promptObj).longValue();
+                        }
+                        
+                        // 提取completion_tokens
+                        Object completionObj = usageMap.get("completion_tokens");
+                        if (completionObj instanceof Number) {
+                            completionTokens = ((Number) completionObj).longValue();
+                        }
+                        
+                        // 提取total_tokens
+                        Object totalObj = usageMap.get("total_tokens");
+                        if (totalObj instanceof Number) {
+                            totalTokens = ((Number) totalObj).longValue();
+                        }
+                        
+                        // 如果没有total_tokens，计算它
+                        if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
+                            totalTokens = promptTokens + completionTokens;
+                        }
+                        
+                        log.info("Zhipuai API manual token extraction result - prompt: {}, completion: {}, total: {}", 
+                                promptTokens, completionTokens, totalTokens);
+                        
+                        return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Could not get usage field via reflection: {}", e.getMessage());
+            }
+            
+            // 如果无法通过反射获取，尝试从toString()中解析
+            String dataStr = data.toString();
+            log.info("Zhipuai API parsing data string: {}", dataStr);
+            
+            // 查找usage信息
+            if (dataStr.contains("usage") || dataStr.contains("tokens")) {
+                // 提取prompt_tokens
+                int promptStart = dataStr.indexOf("prompt_tokens=");
+                if (promptStart == -1) promptStart = dataStr.indexOf("promptTokens=");
+                int promptEnd = -1;
+                if (promptStart > 0) {
+                    promptEnd = dataStr.indexOf(",", promptStart);
+                    if (promptEnd == -1) promptEnd = dataStr.indexOf("}", promptStart);
+                }
+                
+                // 提取completion_tokens
+                int completionStart = dataStr.indexOf("completion_tokens=");
+                if (completionStart == -1) completionStart = dataStr.indexOf("completionTokens=");
+                int completionEnd = -1;
+                if (completionStart > 0) {
+                    completionEnd = dataStr.indexOf(",", completionStart);
+                    if (completionEnd == -1) completionEnd = dataStr.indexOf("}", completionStart);
+                }
+                
+                // 提取total_tokens
+                int totalStart = dataStr.indexOf("total_tokens=");
+                if (totalStart == -1) totalStart = dataStr.indexOf("totalTokens=");
+                int totalEnd = -1;
+                if (totalStart > 0) {
+                    totalEnd = dataStr.indexOf("}", totalStart);
+                }
+                
+                long promptTokens = 0;
+                long completionTokens = 0;
+                long totalTokens = 0;
+                
+                if (promptStart > 0 && promptEnd > promptStart) {
+                    try {
+                        String promptStr = dataStr.substring(promptStart + 13, promptEnd);
+                        promptTokens = Long.parseLong(promptStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Could not parse prompt_tokens from: {}", dataStr.substring(promptStart + 13, promptEnd));
+                    }
+                }
+                
+                if (completionStart > 0 && completionEnd > completionStart) {
+                    try {
+                        String completionStr = dataStr.substring(completionStart + 17, completionEnd);
+                        completionTokens = Long.parseLong(completionStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Could not parse completion_tokens from: {}", dataStr.substring(completionStart + 17, completionEnd));
+                    }
+                }
+                
+                if (totalStart > 0 && totalEnd > totalStart) {
+                    try {
+                        String totalStr = dataStr.substring(totalStart + 12, totalEnd);
+                        totalTokens = Long.parseLong(totalStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Could not parse total_tokens from: {}", dataStr.substring(totalStart + 12, totalEnd));
+                    }
+                }
+                
+                // 如果没有total_tokens，计算它
+                if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
+                    totalTokens = promptTokens + completionTokens;
+                }
+                
+                log.info("Zhipuai API manual token extraction result from string parsing - prompt: {}, completion: {}, total: {}", 
+                        promptTokens, completionTokens, totalTokens);
+                
+                return new TokenUsage(promptTokens, completionTokens, totalTokens);
+            }
+            
+            // 如果所有方法都失败，尝试估算token使用量
+            log.info("Zhipuai API all extraction methods failed, attempting to estimate token usage");
+            return estimateTokenUsageFromResponse(response);
+            
+        } catch (Exception e) {
+            log.error("Error in manual Zhipuai token extraction", e);
+            return new TokenUsage(0, 0, 0);
+        }
+    }
+
+    /**
+     * 估算token使用量（当无法从API获取实际token信息时使用）
+     * 
+     * @param response ModelApiResponse对象
+     * @return 估算的TokenUsage对象
+     */
+    private TokenUsage estimateTokenUsageFromResponse(ModelApiResponse response) {
+        try {
+            if (response == null || response.getData() == null) {
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            // 获取输出文本
+            String outputText = "";
+            if (response.getData().getChoices() != null && !response.getData().getChoices().isEmpty()) {
+                var choice = response.getData().getChoices().get(0);
+                if (choice.getMessage() != null && choice.getMessage().getContent() != null) {
+                    outputText = choice.getMessage().getContent().toString();
+                }
+            }
+            
+            // 由于无法从ModelApiResponse直接获取输入文本，我们使用一个保守的估算
+            // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
+            long completionTokens = estimateTokens(outputText);
+            long promptTokens = (long) (completionTokens * 0.3);
+            long totalTokens = promptTokens + completionTokens;
+            
+            log.info("Zhipuai API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens", 
+                    outputText.length(), completionTokens, promptTokens, totalTokens);
+            
+            return new TokenUsage(promptTokens, completionTokens, totalTokens);
+            
+        } catch (Exception e) {
+            log.error("Error estimating token usage", e);
+            return new TokenUsage(0, 0, 0);
+        }
+    }
+    
+    /**
+     * 估算文本的token数量
+     * 
+     * @param text 输入文本
+     * @return 估算的token数量
+     */
+    private long estimateTokens(String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+        
+        // 简单的token估算算法
+        // 中文约1.5字符/token，英文约4字符/token
+        int chineseChars = 0;
+        int englishChars = 0;
+        
+        for (char c : text.toCharArray()) {
+            if (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN) {
+                chineseChars++;
+            } else if (Character.isLetterOrDigit(c)) {
+                englishChars++;
+            }
+        }
+        
+        // 计算估算的token数量
+        long estimatedTokens = (long) (chineseChars / 1.5 + englishChars / 4.0);
+        
+        // 确保至少返回1个token
+        return Math.max(1, estimatedTokens);
+    }
+
+    /**
+     * 从消息估算token使用量
+     * 
+     * @param message 输入消息
+     * @return 估算的TokenUsage对象
+     */
+    private TokenUsage estimateTokenUsageFromMessage(String message) {
+        try {
+            if (message == null || message.isEmpty()) {
+                return new TokenUsage(0, 0, 0);
+            }
+            
+            // 估算输入token数量
+            long promptTokens = estimateTokens(message);
+            
+            // 假设输出长度约为输入的2倍（这是一个常见的比例）
+            long completionTokens = promptTokens * 2;
+            long totalTokens = promptTokens + completionTokens;
+            
+            log.info("Zhipuai API estimated token usage from message - input: {} chars -> {} tokens, estimated output: {} tokens, total: {} tokens", 
+                    message.length(), promptTokens, completionTokens, totalTokens);
+            
+            return new TokenUsage(promptTokens, completionTokens, totalTokens);
+            
+        } catch (Exception e) {
+            log.error("Error estimating token usage from message", e);
+            return new TokenUsage(0, 0, 0);
+        }
     }
 
     /**
@@ -108,21 +366,30 @@ public class ZhipuaiService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         String message = extractTextFromPrompt(prompt);
 
+        // 添加请求日志
+        log.info("Zhipuai API websocket request - model: {}, message length: {}, robot: {}", 
+                (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel(), 
+                message.length(), robot != null ? robot.getUid() : "null");
+
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
         final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ModelApiResponse[] lastResponse = {null};
 
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 sendMessageWebsocket(MessageTypeEnum.ERROR, "Zhipuai client is not available", messageProtobufReply);
                 return;
             }
 
             ChatCompletionRequest chatCompletionRequest = createDynamicRequest(llm, message, true);
             
+            log.info("Zhipuai API invoking model with requestId: {}", chatCompletionRequest.getRequestId());
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess()) {
+                log.info("Zhipuai API websocket response success, starting stream processing");
                 response.getFlowable().subscribe(
                     accumulator -> {
                         try {
@@ -140,21 +407,35 @@ public class ZhipuaiService extends BaseSpringAIService {
                         }
                     },
                     error -> {
-                        log.error("Zhipuai API error: ", error);
+                        log.error("Zhipuai API websocket stream error: ", error);
                         sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                         success[0] = false;
                     },
                     () -> {
-                        log.info("Zhipuai chat stream completed");
+                        log.info("Zhipuai API websocket stream completed");
+                        
+                        // 尝试从流式响应中提取token使用情况
+                        // 注意：流式响应可能不包含完整的token信息，我们使用估算
+                        if (lastResponse[0] != null) {
+                            tokenUsage[0] = extractZhipuaiTokenUsage(lastResponse[0]);
+                            log.info("Zhipuai API websocket tokenUsage after extraction: {}", tokenUsage[0]);
+                        } else {
+                            // 如果无法获取实际token信息，使用估算
+                            tokenUsage[0] = estimateTokenUsageFromMessage(message);
+                            log.info("Zhipuai API websocket estimated tokenUsage: {}", tokenUsage[0]);
+                        }
+                        
                         // 记录token使用情况
                         long responseTime = System.currentTimeMillis() - startTime;
                         String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
+                        log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
+                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType, responseTime);
                         recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                     }
                 );
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API websocket error: {}", response.getError());
                 sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
             }
         } catch (Exception e) {
@@ -168,26 +449,39 @@ public class ZhipuaiService extends BaseSpringAIService {
      */
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // 添加请求日志
+        RobotLlm llm = robot != null ? robot.getLlm() : null;
+        log.info("Zhipuai API sync request - model: {}, message length: {}, robot: {}", 
+                (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel(), 
+                message.length(), robot != null ? robot.getUid() : "null");
+
         long startTime = System.currentTimeMillis();
         boolean success = false;
         TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
         
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 return "Zhipuai client is not available";
             }
 
-            RobotLlm llm = robot != null ? robot.getLlm() : null;
             ChatCompletionRequest chatCompletionRequest = createDynamicRequest(llm, message, false);
             
+            log.info("Zhipuai API invoking sync model with requestId: {}", chatCompletionRequest.getRequestId());
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess() && response.getData() != null) {
+                log.info("Zhipuai API sync response success");
+                
+                // 提取token使用情况
+                tokenUsage = extractZhipuaiTokenUsage(response);
+                log.info("Zhipuai API sync tokenUsage after extraction: {}", tokenUsage);
+                
                 Object content = response.getData().getChoices().get(0).getMessage().getContent();
                 success = true;
                 return content != null ? content.toString() : null;
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API sync error: {}", response.getError());
                 return "Error: " + (response.getError() != null ? response.getError().getMessage() : "Unknown error");
             }
         } catch (Exception e) {
@@ -196,8 +490,9 @@ public class ZhipuaiService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && robot.getLlm().getModel() != null) 
-                    ? robot.getLlm().getModel() : zhipuaiChatConfig.getModel();
+            String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
+            log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
+                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType, responseTime);
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -213,24 +508,33 @@ public class ZhipuaiService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         String message = extractTextFromPrompt(prompt);
         
+        // 添加请求日志
+        log.info("Zhipuai API SSE request - model: {}, message length: {}, robot: {}", 
+                (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel(), 
+                message.length(), robot != null ? robot.getUid() : "null");
+        
         // 发送起始消息
         sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
         final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ModelApiResponse[] lastResponse = {null};
 
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 handleSseError(new Exception("Zhipuai client is not available"), messageProtobufQuery, messageProtobufReply, emitter);
                 return;
             }
 
             ChatCompletionRequest chatCompletionRequest = createDynamicRequest(llm, message, true);
             
+            log.info("Zhipuai API invoking SSE model with requestId: {}", chatCompletionRequest.getRequestId());
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess()) {
+                log.info("Zhipuai API SSE response success, starting stream processing");
                 // AtomicBoolean isFirst = new AtomicBoolean(true);
                 response.getFlowable()
                         .doOnNext(accumulator -> {
@@ -244,36 +548,51 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 }
                                 success[0] = true;
                             } catch (Exception e) {
-                                log.error("Error sending SSE data", e);
+                                log.error("Zhipuai API SSE error sending data: ", e);
                                 success[0] = false;
                             }
                         })
                         .doOnComplete(() -> {
                             try {
+                                log.info("Zhipuai API SSE stream completed");
+                                
+                                // 尝试从流式响应中提取token使用情况
+                                // 注意：流式响应可能不包含完整的token信息，我们使用估算
+                                if (lastResponse[0] != null) {
+                                    tokenUsage[0] = extractZhipuaiTokenUsage(lastResponse[0]);
+                                    log.info("Zhipuai API SSE tokenUsage after extraction: {}", tokenUsage[0]);
+                                } else {
+                                    // 如果无法获取实际token信息，使用估算
+                                    tokenUsage[0] = estimateTokenUsageFromMessage(message);
+                                    log.info("Zhipuai API SSE estimated tokenUsage: {}", tokenUsage[0]);
+                                }
+                                
                                 sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                                         tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens());
                             } catch (Exception e) {
-                                log.error("Error completing SSE", e);
+                                log.error("Zhipuai API SSE error completing stream: ", e);
                             }
                         })
                         .doOnError(error -> {
-                            log.error("Error in SSE stream", error);
+                            log.error("Zhipuai API SSE stream error: ", error);
                             handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                             success[0] = false;
                         })
                         .subscribe();
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API SSE error: {}", response.getError());
                 handleSseError(new Exception(response.getError() != null ? response.getError().getMessage() : "Unknown error"), 
                         messageProtobufQuery, messageProtobufReply, emitter);
             }
         } catch (Exception e) {
-            log.error("Error in processPromptSse", e);
+            log.error("Zhipuai API SSE error in processPromptSse: ", e);
             handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
+            log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
+                    tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType, responseTime);
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
@@ -300,8 +619,15 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 角色扮演聊天
      */
     public String rolePlayChat(String message, String userInfo, String botInfo, String botName, String userName) {
+        // 添加请求日志
+        log.info("Zhipuai API roleplay request - message length: {}, userInfo: {}, botInfo: {}, botName: {}, userName: {}", 
+                message.length(), userInfo, botInfo, botName, userName);
+        
+        long startTime = System.currentTimeMillis();
+        
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 return "Zhipuai client is not available";
             }
 
@@ -326,18 +652,28 @@ public class ZhipuaiService extends BaseSpringAIService {
                     .requestId(requestId)
                     .build();
             
+            log.info("Zhipuai API roleplay invoking model with requestId: {}", requestId);
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess() && response.getData() != null) {
+                log.info("Zhipuai API roleplay response success");
+                
+                // 提取token使用情况
+                TokenUsage tokenUsage = extractZhipuaiTokenUsage(response);
+                log.info("Zhipuai API roleplay tokenUsage: {}", tokenUsage);
+                
                 Object content = response.getData().getChoices().get(0).getMessage().getContent();
                 return content != null ? content.toString() : null;
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API roleplay error: {}", response.getError());
                 return "Error: " + (response.getError() != null ? response.getError().getMessage() : "Unknown error");
             }
         } catch (Exception e) {
-            log.error("Error in rolePlayChat", e);
+            log.error("Zhipuai API roleplay error: ", e);
             return "Error: " + e.getMessage();
+        } finally {
+            long responseTime = System.currentTimeMillis() - startTime;
+            log.info("Zhipuai API roleplay completed in {}ms", responseTime);
         }
     }
 
@@ -352,8 +688,15 @@ public class ZhipuaiService extends BaseSpringAIService {
      * Function Calling 聊天（带自定义参数）
      */
     public String functionCallingChat(String message, String model, Double temperature, List<ChatFunction> functions) {
+        // 添加请求日志
+        log.info("Zhipuai API function calling request - message length: {}, model: {}, temperature: {}, functions count: {}", 
+                message.length(), model, temperature, functions != null ? functions.size() : 0);
+        
+        long startTime = System.currentTimeMillis();
+        
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 return "Zhipuai client is not available";
             }
 
@@ -382,18 +725,28 @@ public class ZhipuaiService extends BaseSpringAIService {
                     .toolChoice("auto")
                     .build();
             
+            log.info("Zhipuai API function calling invoking model with requestId: {}", requestId);
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess() && response.getData() != null) {
+                log.info("Zhipuai API function calling response success");
+                
+                // 提取token使用情况
+                TokenUsage tokenUsage = extractZhipuaiTokenUsage(response);
+                log.info("Zhipuai API function calling tokenUsage: {}", tokenUsage);
+                
                 Object content = response.getData().getChoices().get(0).getMessage().getContent();
                 return content != null ? content.toString() : null;
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API function calling error: {}", response.getError());
                 return "Error: " + (response.getError() != null ? response.getError().getMessage() : "Unknown error");
             }
         } catch (Exception e) {
-            log.error("Error in functionCallingChat", e);
+            log.error("Zhipuai API function calling error: ", e);
             return "Error: " + e.getMessage();
+        } finally {
+            long responseTime = System.currentTimeMillis() - startTime;
+            log.info("Zhipuai API function calling completed in {}ms", responseTime);
         }
     }
 
@@ -685,6 +1038,65 @@ public class ZhipuaiService extends BaseSpringAIService {
             }
             return "";
         }));
+    }
+
+    /**
+     * 测试token提取功能
+     * 用于调试token计数问题
+     */
+    public void testTokenExtraction() {
+        try {
+            log.info("Zhipuai API testing token extraction...");
+            
+            if (client == null) {
+                log.error("Zhipuai API client is null");
+                return;
+            }
+            
+            // 创建一个简单的测试请求
+            String testMessage = "Hello, this is a test message for token counting.";
+            ChatCompletionRequest chatCompletionRequest = createDynamicRequest(null, testMessage, false);
+            
+            log.info("Zhipuai API making test call with message: {}", testMessage);
+            
+            // 调用API
+            ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
+            
+            log.info("Zhipuai API test response success: {}", response.isSuccess());
+            log.info("Zhipuai API test response has data: {}", response.getData() != null);
+            
+            if (response.getData() != null) {
+                log.info("Zhipuai API test response data class: {}", response.getData().getClass().getName());
+                log.info("Zhipuai API test response data: {}", response.getData());
+            }
+            
+            // 测试手动token提取
+            TokenUsage manualUsage = extractZhipuaiTokenUsage(response);
+            log.info("Zhipuai API test manual token extraction result: {}", manualUsage);
+            
+            // 测试token估算功能
+            TokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
+            log.info("Zhipuai API test estimated token usage result: {}", estimatedUsage);
+            
+            // 测试token估算算法
+            String testText = "这是一个测试文本，包含中英文混合内容。This is a test text with mixed Chinese and English content.";
+            long estimatedTokens = estimateTokens(testText);
+            log.info("Zhipuai API test token estimation for text '{}': {} tokens", testText, estimatedTokens);
+            
+            // 提取文本内容
+            String textContent = "";
+            if (response.isSuccess() && response.getData() != null && 
+                response.getData().getChoices() != null && !response.getData().getChoices().isEmpty()) {
+                var choice = response.getData().getChoices().get(0);
+                if (choice.getMessage() != null && choice.getMessage().getContent() != null) {
+                    textContent = choice.getMessage().getContent().toString();
+                }
+            }
+            log.info("Zhipuai API test response text: {}", textContent);
+            
+        } catch (Exception e) {
+            log.error("Zhipuai API test token extraction error", e);
+        }
     }
 
     /**
