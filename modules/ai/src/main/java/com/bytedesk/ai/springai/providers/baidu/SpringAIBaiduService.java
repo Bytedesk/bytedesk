@@ -64,9 +64,9 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
+        log.info("SpringAIBaiduService processPromptWebsocket with full prompt content: {}", fullPromptContent);
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Baidu API websocket fullPromptContent: {}", fullPromptContent);
         
         if (baiduChatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, "百度服务不可用", messageProtobufReply);
@@ -118,11 +118,10 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        log.info("SpringAIBaiduService processPromptSync with full prompt content: {}", fullPromptContent);
         long startTime = System.currentTimeMillis();
         boolean success = false;
         TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
-        
-        log.info("Baidu API sync fullPromptContent: {}", fullPromptContent);
         
         try {
             if (baiduChatModel == null) {
@@ -169,8 +168,9 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        log.info("SpringAIBaiduService processPromptSse with full prompt content: {}", fullPromptContent);
+        // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Baidu API SSE fullPromptContent: {}", fullPromptContent);
 
         if (baiduChatModel == null) {
             handleSseError(new RuntimeException("Baidu service not available"), messageProtobufQuery, messageProtobufReply, emitter);
