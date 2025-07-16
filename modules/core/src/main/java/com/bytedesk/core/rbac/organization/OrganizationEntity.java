@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:28:34
+ * @LastEditTime: 2025-07-16 17:36:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -112,7 +112,7 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
-
+    // 组织管理员
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private UserEntity user;

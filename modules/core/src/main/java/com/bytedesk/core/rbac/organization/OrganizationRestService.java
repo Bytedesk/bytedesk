@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 17:27:50
+ * @LastEditTime: 2025-07-16 17:39:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.exception.NotLoginException;
@@ -133,6 +134,12 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 
         OrganizationEntity organization = modelMapper.map(organizationRequest, OrganizationEntity.class);
         organization.setUid(uidUtils.getUid());
+        // 使用 userUid 查询用户
+        if (StringUtils.hasText(organizationRequest.getUserUid())) {
+            UserEntity user = userService.findByUid(organizationRequest.getUserUid())
+                    .orElseThrow(() -> new RuntimeException("用户不存在."));
+            organization.setUser(user);
+        }
         // 
         OrganizationEntity savedOrganization = save(organization);
         if (savedOrganization == null) {
@@ -175,6 +182,12 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setCode(organizationRequest.getCode());
         organization.setDescription(organizationRequest.getDescription());
         organization.setEnabled(organizationRequest.getEnabled());
+        // 使用 userUid 查询用户
+        if (StringUtils.hasText(organizationRequest.getUserUid())) {
+            UserEntity user = userService.findByUid(organizationRequest.getUserUid())
+                    .orElseThrow(() -> new RuntimeException("用户不存在."));
+            organization.setUser(user);
+        }
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
         if (updatedOrganization == null) {

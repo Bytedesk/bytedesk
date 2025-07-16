@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 21:20:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 16:14:36
+ * @LastEditTime: 2025-07-16 17:36:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,9 @@ package com.bytedesk.core.rbac.organization;
 
 import java.util.Date;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.base.BaseResponseNoOrg;
+import com.bytedesk.core.rbac.user.UserResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +31,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class OrganizationResponse extends BaseResponse {
+public class OrganizationResponse extends BaseResponseNoOrg {
 
     private static final long serialVersionUID = 1L;
     
@@ -40,8 +42,6 @@ public class OrganizationResponse extends BaseResponse {
     private String code;
 
     private String description;
-
-    // TODO: Identity Verification 实名认证
 
     // 认证类型：企业认证、个人认证、政府事业单位认证
     private String verifiedType;
@@ -74,5 +74,8 @@ public class OrganizationResponse extends BaseResponse {
 
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
+
+    // 组织管理员
+    private UserResponse user;
 
 }
