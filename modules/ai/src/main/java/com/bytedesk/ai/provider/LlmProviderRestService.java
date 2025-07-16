@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:26:30
+ * @LastEditTime: 2025-07-16 14:36:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -222,8 +222,6 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     public LlmProviderResponse convertToResponse(LlmProviderEntity entity) {
         return modelMapper.map(entity, LlmProviderResponse.class);
     }
-
-    
 
     public LlmProviderConfigDefault getLlmProviderConfigDefault() {
         return LlmConfigUtils.getLlmProviderConfigDefault(environment);

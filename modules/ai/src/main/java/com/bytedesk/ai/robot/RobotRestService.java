@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:25:51
+ * @LastEditTime: 2025-07-16 14:40:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -160,14 +160,34 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (request.getLlm() != null) {
             RobotLlm llm = request.getLlm();
             // Get default model config if not provided
+            LlmProviderConfigDefault modelConfig = llmProviderRestService.getLlmProviderConfigDefault();
+            
+            // Set default chat provider and model if not provided
             if (!StringUtils.hasText(llm.getChatProvider()) || !StringUtils.hasText(llm.getChatModel())) {
-                LlmProviderConfigDefault modelConfig = llmProviderRestService.getLlmProviderConfigDefault();
                 llm.setChatProvider(llm.getChatProvider() != null ? llm.getChatProvider() : modelConfig.getDefaultChatProvider());
                 llm.setChatModel(llm.getChatModel() != null ? llm.getChatModel() : modelConfig.getDefaultChatModel());
             }
+            
+            // Set default vision provider and model if not provided
+            if (!StringUtils.hasText(llm.getVisionProvider()) || !StringUtils.hasText(llm.getVisionModel())) {
+                llm.setVisionProvider(llm.getVisionProvider() != null ? llm.getVisionProvider() : modelConfig.getDefaultVisionProvider());
+                llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() : modelConfig.getDefaultVisionModel());
+            }
+            
+            // Set default speech provider and model if not provided
+            if (!StringUtils.hasText(llm.getSpeechProvider()) || !StringUtils.hasText(llm.getSpeechModel())) {
+                llm.setSpeechProvider(llm.getSpeechProvider() != null ? llm.getSpeechProvider() : modelConfig.getDefaultSpeechProvider());
+                llm.setSpeechModel(llm.getSpeechModel() != null ? llm.getSpeechModel() : modelConfig.getDefaultSpeechModel());
+            }
+            
+            // Set default rerank provider and model if not provided
+            if (!StringUtils.hasText(llm.getRerankProvider()) || !StringUtils.hasText(llm.getRerankModel())) {
+                llm.setRerankProvider(llm.getRerankProvider() != null ? llm.getRerankProvider() : modelConfig.getDefaultRerankProvider());
+                llm.setRerankModel(llm.getRerankModel() != null ? llm.getRerankModel() : modelConfig.getDefaultRerankModel());
+            }
+            
             robot.setLlm(llm);
         }
-        
         // Set common settings
         setRobotSettings(robot, request);
         //
@@ -175,7 +195,6 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (updatedRobot == null) {
             throw new RuntimeException("save robot failed");
         }
-
         return convertToResponse(updatedRobot);
     }
 

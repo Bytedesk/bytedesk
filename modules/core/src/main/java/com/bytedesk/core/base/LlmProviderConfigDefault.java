@@ -27,8 +27,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LlmProviderConfigDefault implements Serializable {
     
+    // Chat 配置
     private String defaultChatProvider;
     private String defaultChatModel;
+    
+    // Embedding 配置
     private String defaultEmbeddingProvider;
     private String defaultEmbeddingModel;
+    
+    // Vision 配置
+    private String defaultVisionProvider;
+    private String defaultVisionModel;
+    
+    // Speech 配置
+    private String defaultSpeechProvider;
+    private String defaultSpeechModel;
+    
+    // Rerank 配置
+    private String defaultRerankProvider;
+    private String defaultRerankModel;
 } 
