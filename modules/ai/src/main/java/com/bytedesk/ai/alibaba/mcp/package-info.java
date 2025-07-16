@@ -1,4 +1,4 @@
 @NonNullApi
-package com.bytedesk.ai.springai.alibaba.mcp;
+package com.bytedesk.ai.alibaba.mcp;
 
 import org.springframework.lang.NonNullApi;

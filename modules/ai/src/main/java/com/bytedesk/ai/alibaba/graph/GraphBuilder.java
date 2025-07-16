@@ -1,4 +1,4 @@
-package com.bytedesk.ai.springai.alibaba.graph;
+package com.bytedesk.ai.alibaba.graph;
 
 import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.KeyStrategy;

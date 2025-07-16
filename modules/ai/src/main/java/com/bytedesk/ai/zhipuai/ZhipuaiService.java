@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:21:55
+ * @LastEditTime: 2025-07-16 09:48:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,10 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,15 +43,10 @@ import com.zhipu.oapi.service.v4.model.ChatMessageAccumulator;
 import com.zhipu.oapi.service.v4.model.ChatTool;
 import com.zhipu.oapi.service.v4.model.ChatToolType;
 import com.zhipu.oapi.service.v4.model.ChatFunction;
-import com.zhipu.oapi.service.v4.model.ChatFunctionParameters;
 import com.zhipu.oapi.service.v4.model.QueryModelResultRequest;
 import com.zhipu.oapi.service.v4.model.QueryModelResultResponse;
 import com.zhipu.oapi.service.v4.model.WebSearch;
-import com.zhipu.oapi.service.v4.model.Choice;
-import com.zhipu.oapi.service.v4.model.ModelData;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -68,17 +59,15 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "zhipuai", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ZhipuaiService extends BaseSpringAIService {
 
     @Autowired
-    @Qualifier("zhipuaiClient")
+    @Qualifier("zhipuaiChatClient")
     private ClientV4 client;
 
     @Autowired
-    private ZhipuaiConfig zhipuaiConfig;
-
-    private final ObjectMapper objectMapper = MessageDeserializeFactory.defaultObjectMapper();
+    private ZhipuaiChatConfig zhipuaiChatConfig;
 
     /**
      * 构造函数
@@ -98,12 +87,12 @@ public class ZhipuaiService extends BaseSpringAIService {
         String requestId = String.format("zhipuai-%d", System.currentTimeMillis());
         
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(llm != null && llm.getModel() != null ? llm.getModel() : zhipuaiConfig.getModel())
+                .model(llm != null && llm.getModel() != null ? llm.getModel() : zhipuaiChatConfig.getModel())
                 .stream(stream)
                 .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
                 .requestId(requestId)
-                .temperature(llm != null ? llm.getTemperature().floatValue() : (float) zhipuaiConfig.getTemperature())
+                .temperature(llm != null ? llm.getTemperature().floatValue() : (float) zhipuaiChatConfig.getTemperature())
                 .build();
 
         return chatCompletionRequest;
@@ -159,7 +148,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                         log.info("Zhipuai chat stream completed");
                         // 记录token使用情况
                         long responseTime = System.currentTimeMillis() - startTime;
-                        String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiConfig.getModel();
+                        String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
                         recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                     }
@@ -208,7 +197,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && robot.getLlm().getModel() != null) 
-                    ? robot.getLlm().getModel() : zhipuaiConfig.getModel();
+                    ? robot.getLlm().getModel() : zhipuaiChatConfig.getModel();
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
@@ -242,7 +231,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess()) {
-                AtomicBoolean isFirst = new AtomicBoolean(true);
+                // AtomicBoolean isFirst = new AtomicBoolean(true);
                 response.getFlowable()
                         .doOnNext(accumulator -> {
                             try {
@@ -284,7 +273,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiConfig.getModel();
+            String modelType = (llm != null && llm.getModel() != null) ? llm.getModel() : zhipuaiChatConfig.getModel();
             recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
@@ -383,12 +372,12 @@ public class ZhipuaiService extends BaseSpringAIService {
             String requestId = String.format("function-%d", System.currentTimeMillis());
             
             ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                    .model(model != null ? model : zhipuaiConfig.getModel())
+                    .model(model != null ? model : zhipuaiChatConfig.getModel())
                     .stream(Boolean.FALSE)
                     .invokeMethod(Constants.invokeMethod)
                     .messages(messages)
                     .requestId(requestId)
-                    .temperature(temperature != null ? temperature.floatValue() : (float) zhipuaiConfig.getTemperature())
+                    .temperature(temperature != null ? temperature.floatValue() : (float) zhipuaiChatConfig.getTemperature())
                     .tools(chatToolList)
                     .toolChoice("auto")
                     .build();
@@ -439,11 +428,11 @@ public class ZhipuaiService extends BaseSpringAIService {
             String requestId = String.format("function-stream-%d", System.currentTimeMillis());
             
             ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                    .model(model != null ? model : zhipuaiConfig.getModel())
+                    .model(model != null ? model : zhipuaiChatConfig.getModel())
                     .stream(Boolean.TRUE)
                     .messages(messages)
                     .requestId(requestId)
-                    .temperature(temperature != null ? temperature.floatValue() : (float) zhipuaiConfig.getTemperature())
+                    .temperature(temperature != null ? temperature.floatValue() : (float) zhipuaiChatConfig.getTemperature())
                     .tools(chatToolList)
                     .toolChoice("auto")
                     .build();
@@ -569,7 +558,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             messages.add(chatMessage);
 
             ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                    .model(zhipuaiConfig.getModel())
+                    .model(zhipuaiChatConfig.getModel())
                     .stream(Boolean.FALSE)
                     .invokeMethod(Constants.invokeMethodAsync)
                     .messages(messages)
@@ -654,7 +643,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             String requestId = String.format("websearch-%d", System.currentTimeMillis());
             
             ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                    .model(zhipuaiConfig.getModel())
+                    .model(zhipuaiChatConfig.getModel())
                     .stream(Boolean.FALSE)
                     .invokeMethod(Constants.invokeMethod)
                     .messages(messages)
