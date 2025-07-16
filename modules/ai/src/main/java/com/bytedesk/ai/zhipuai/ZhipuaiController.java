@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:40:26
+ * @LastEditTime: 2025-07-16 09:58:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,7 +53,7 @@ public class ZhipuaiController {
 
     /**
      * 同步调用 - 使用新的统一接口
-     * GET /zhipuai/sync?message=xxx
+     * GET http://127.0.0.1:9003/zhipuai/sync?message=hello
      */
     @GetMapping("/sync")
     public ResponseEntity<JsonResult<?>> chatSync(@RequestParam("message") String message) {

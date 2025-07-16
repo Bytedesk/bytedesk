@@ -901,8 +901,14 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 异步聊天
      */
     public String chatAsync(String message) {
+        // 添加请求日志
+        log.info("Zhipuai API async request - message length: {}", message.length());
+        
+        long startTime = System.currentTimeMillis();
+        
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 return "Zhipuai client is not available";
             }
 
@@ -917,20 +923,25 @@ public class ZhipuaiService extends BaseSpringAIService {
                     .messages(messages)
                     .build();
             
+            log.info("Zhipuai API async invoking model");
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess() && response.getData() != null) {
                 String taskId = response.getData().getId();
+                log.info("Zhipuai API async task created with taskId: {}", taskId);
                 
                 // 轮询获取结果
                 return pollAsyncResult(taskId);
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API async error: {}", response.getError());
                 return "Error: " + (response.getError() != null ? response.getError().getMessage() : "Unknown error");
             }
         } catch (Exception e) {
-            log.error("Error in chatAsync", e);
+            log.error("Zhipuai API async error: ", e);
             return "Error: " + e.getMessage();
+        } finally {
+            long responseTime = System.currentTimeMillis() - startTime;
+            log.info("Zhipuai API async completed in {}ms", responseTime);
         }
     }
 
@@ -938,32 +949,44 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 轮询异步结果
      */
     private String pollAsyncResult(String taskId) {
+        log.info("Zhipuai API starting async result polling for taskId: {}", taskId);
+        
         try {
             int maxAttempts = 30; // 最多轮询30次
             int attempt = 0;
             
             while (attempt < maxAttempts) {
+                log.debug("Zhipuai API polling attempt {}/{} for taskId: {}", attempt + 1, maxAttempts, taskId);
+                
                 QueryModelResultRequest request = new QueryModelResultRequest();
                 request.setTaskId(taskId);
                 
                 QueryModelResultResponse response = client.queryModelResult(request);
                 
                 if (response.isSuccess() && response.getData() != null) {
-                    if ("SUCCESS".equals(response.getData().getTaskStatus())) {
+                    Object taskStatus = response.getData().getTaskStatus();
+                    log.debug("Zhipuai API task status: {} for taskId: {}", taskStatus, taskId);
+                    
+                    if ("SUCCESS".equals(taskStatus.toString())) {
+                        log.info("Zhipuai API async task completed successfully for taskId: {}", taskId);
                         Object content = response.getData().getChoices().get(0).getMessage().getContent();
                         return content != null ? content.toString() : null;
-                    } else if ("FAILED".equals(response.getData().getTaskStatus())) {
+                    } else if ("FAILED".equals(taskStatus.toString())) {
+                        log.error("Zhipuai API async task failed for taskId: {}", taskId);
                         return "Task failed";
                     }
+                } else {
+                    log.warn("Zhipuai API async polling response not successful for taskId: {}", taskId);
                 }
                 
                 attempt++;
                 Thread.sleep(2000); // 等待2秒后重试
             }
             
+            log.error("Zhipuai API async task timeout after {} attempts for taskId: {}", maxAttempts, taskId);
             return "Task timeout after " + maxAttempts + " attempts";
         } catch (Exception e) {
-            log.error("Error polling async result", e);
+            log.error("Zhipuai API error polling async result for taskId: {}", taskId, e);
             return "Error: " + e.getMessage();
         }
     }
@@ -972,8 +995,15 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 带Web搜索的聊天
      */
     public String chatWithWebSearch(String message, String searchQuery) {
+        // 添加请求日志
+        log.info("Zhipuai API web search request - message length: {}, searchQuery: {}", 
+                message.length(), searchQuery);
+        
+        long startTime = System.currentTimeMillis();
+        
         try {
             if (client == null) {
+                log.error("Zhipuai API client is null");
                 return "Zhipuai client is not available";
             }
 
@@ -1005,18 +1035,28 @@ public class ZhipuaiService extends BaseSpringAIService {
                     .toolChoice("auto")
                     .build();
             
+            log.info("Zhipuai API web search invoking model with requestId: {}", requestId);
             ModelApiResponse response = client.invokeModelApi(chatCompletionRequest);
             
             if (response.isSuccess() && response.getData() != null) {
+                log.info("Zhipuai API web search response success");
+                
+                // 提取token使用情况
+                TokenUsage tokenUsage = extractZhipuaiTokenUsage(response);
+                log.info("Zhipuai API web search tokenUsage: {}", tokenUsage);
+                
                 Object content = response.getData().getChoices().get(0).getMessage().getContent();
                 return content != null ? content.toString() : null;
             } else {
-                log.error("Zhipuai API error: {}", response.getError());
+                log.error("Zhipuai API web search error: {}", response.getError());
                 return "Error: " + (response.getError() != null ? response.getError().getMessage() : "Unknown error");
             }
         } catch (Exception e) {
-            log.error("Error in chatWithWebSearch", e);
+            log.error("Zhipuai API web search error: ", e);
             return "Error: " + e.getMessage();
+        } finally {
+            long responseTime = System.currentTimeMillis() - startTime;
+            log.info("Zhipuai API web search completed in {}ms", responseTime);
         }
     }
 
@@ -1103,16 +1143,22 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 检查服务健康状态
      */
     public boolean isHealthy() {
+        log.info("Zhipuai API health check started");
+        
         try {
             if (client == null) {
+                log.error("Zhipuai API health check failed: client is null");
                 return false;
             }
             
             // 发送一个简单的测试请求
             String response = processPromptSync("Hello", null);
-            return response != null && !response.startsWith("Error");
+            boolean isHealthy = response != null && !response.startsWith("Error");
+            
+            log.info("Zhipuai API health check result: {}", isHealthy);
+            return isHealthy;
         } catch (Exception e) {
-            log.error("Health check failed", e);
+            log.error("Zhipuai API health check failed", e);
             return false;
         }
     }
