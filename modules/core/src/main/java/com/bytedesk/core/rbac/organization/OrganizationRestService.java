@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 07:42:04
+ * @LastEditTime: 2025-07-17 07:45:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -224,6 +224,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 if (originalUser != null) {
                     originalUser.setCurrentOrganization(null);
                     originalUser.removeOrganizationRoles();
+                    userService.removeRoleAdmin(originalUser);
                     userService.save(originalUser);
                     log.info("Cleared original user's current organization and roles: {}", originalUser.getUid());
                 }
@@ -240,6 +241,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             // 新用户为空，但原先有用户，需要清除原先用户的组织和角色
             originalUser.setCurrentOrganization(null);
             originalUser.removeOrganizationRoles();
+            userService.removeRoleAdmin(originalUser);
             userService.save(originalUser);
             log.info("Cleared original user's current organization and roles (new user is null): {}", originalUser.getUid());
         }
