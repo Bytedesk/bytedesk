@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:05:46
+ * @LastEditTime: 2025-07-17 10:29:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.utils.PasswordHashUtils;
+import com.bytedesk.core.rbac.user.UserDetailsImpl;
+import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @RestController
@@ -55,6 +61,8 @@ public class AuthController {
     private KaptchaCacheService kaptchaCacheService;
 
     private AuthenticationManager authenticationManager;
+
+    private UserDetailsServiceImpl userDetailsService;
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
@@ -83,12 +91,63 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        Authentication authentication;
+        // 判断是否使用密码哈希登录
+        if (StringUtils.hasText(authRequest.getPassword())) {
+            // 使用现有登录逻辑（明文密码）
+            log.debug("Using plain password authentication");
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        } else if (StringUtils.hasText(authRequest.getPasswordHash()) && StringUtils.hasText(authRequest.getPasswordSalt())) {
+            // 使用密码哈希登录
+            log.debug("Using password hash authentication");
+            authentication = authenticateWithPasswordHash(authRequest);
+            if (authentication == null) {
+                return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+            }
+        } else {
+            return ResponseEntity.ok().body(JsonResult.error("Password or password hash is required", -1, false));
+        }
         //
         AuthResponse authResponse = authService.formatResponse(authentication);
-
         return ResponseEntity.ok(JsonResult.success(authResponse));
+    }
+
+    /**
+     * 密码哈希登录
+     */
+    private Authentication authenticateWithPasswordHash(AuthRequest authRequest) {
+        // 1. 查询用户
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(authRequest.getUsername());
+        if (userDetails == null) {
+            log.warn("User not found: {}", authRequest.getUsername());
+            return null;
+        }
+        // 2. 验证哈希
+        // String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
+        // 由于数据库存储的是BCrypt加密后的密码，无法直接反向获取明文
+        // 这里假设数据库还存储了明文密码或有其他方式校验（实际生产环境不推荐明文存储）
+        // 这里演示：如果数据库存储明文密码，则直接用PasswordHashUtils校验
+        // 如果存储的是BCrypt，则无法支持前端hash+salt方式，建议前端直接传明文密码
+        //
+        // 这里假设数据库存储明文密码（仅演示，实际应存BCrypt）
+        // String plainPassword = dbPassword;
+        // boolean valid = PasswordHashUtils.verifyPasswordHash(plainPassword, authRequest.getPasswordSalt(), authRequest.getPasswordHash());
+        //
+        // 实际情况：如果数据库存储BCrypt，则无法支持前端hash+salt方式
+        // 这里直接返回null，提示不支持
+        log.warn("当前系统仅支持明文密码登录，BCrypt加密无法支持前端hash+salt方式");
+        return null;
+
+        // 3. 用 passwordHash 作为“明文”去匹配
+        // org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+        // boolean valid = encoder.matches(authRequest.getPasswordHash(), dbPassword);
+        // if (!valid) {
+        //     log.warn("Password hash verification failed for user: {}", authRequest.getUsername());
+        //     return null;
+        // }
+        // 4. 构造认证对象
+        // return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     // @ActionAnnotation(title = "auth", action = "sendMobileCode", description = "Send mobile code")
