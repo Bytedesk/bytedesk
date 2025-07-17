@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 11:55:49
+ * @LastEditTime: 2025-07-17 12:17:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,25 +16,29 @@ package com.bytedesk.core.rbac.user;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Description;
-// import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
-// @Tag(name = "User Management", description = "User management APIs")
+@Tag(name = "User Management", description = "User management APIs")
 @Description("User Management Controller - User management APIs for user CRUD operations")
 public class UserRestController extends BaseRestController<UserRequest> {
 
@@ -159,9 +163,14 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody String accessToken) {
+    public ResponseEntity<?> logout(@RequestBody AuthRequest request) {
+        log.debug("logout {}", request.getAccessToken());
 
-        userService.logout(accessToken);
+        if (!StringUtils.hasText(request.getAccessToken())) {
+            return ResponseEntity.ok().body(JsonResult.error("accessToken is empty", -1, false));
+        }
+
+        userService.logout(request.getAccessToken());
 
         return ResponseEntity.ok().body(JsonResult.success());
     }

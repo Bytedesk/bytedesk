@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 11:34:31
+ * @LastEditTime: 2025-07-17 12:07:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -207,16 +207,20 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      */
     public boolean validateAccessToken(String accessToken) {
         if (!StringUtils.hasText(accessToken)) {
+            log.debug("accessToken is empty");
             return false;
         }
         try {
+            log.debug("validate accessToken {}", accessToken);
             // 首先验证JWT格式和签名
             if (!JwtUtils.validateJwtToken(accessToken)) {
+                log.debug("accessToken is invalid");
                 return false;
             }
             // 从数据库验证token是否有效（未被撤销且未过期）
             Optional<TokenEntity> tokenOpt = findByAccessToken(accessToken);
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
+                log.debug("accessToken is valid");
                 return true;
             } else {
                 log.debug("Token is invalid or revoked");

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 11:46:00
+ * @LastEditTime: 2025-07-17 12:16:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,10 +37,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.rbac.token.TokenRequest;
+import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.rbac.token.TokenRestService;
-import com.bytedesk.core.rbac.user.UserDetailsImpl;
-import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 import org.springframework.util.StringUtils;
 
 @Slf4j
@@ -66,7 +64,8 @@ public class AuthController {
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
-        if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(), userRequest.getChannel())) {
+        if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(),
+                userRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
@@ -86,7 +85,8 @@ public class AuthController {
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getChannel())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+                authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
@@ -97,8 +97,9 @@ public class AuthController {
             log.debug("Using plain password authentication");
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        } else if (StringUtils.hasText(authRequest.getPasswordHash()) && StringUtils.hasText(authRequest.getPasswordSalt())) {
-            // 使用密码哈希登录
+        } else if (StringUtils.hasText(authRequest.getPasswordHash())
+                && StringUtils.hasText(authRequest.getPasswordSalt())) {
+            // TODO: 使用密码哈希登录
             log.debug("Using password hash authentication");
             authentication = authService.authenticateWithPasswordHash(authRequest);
             if (authentication == null) {
@@ -117,7 +118,8 @@ public class AuthController {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getChannel(),
                 authRequest.getType());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getChannel())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+                authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
@@ -135,7 +137,8 @@ public class AuthController {
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getChannel())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+                authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // validate mobile & code
@@ -173,7 +176,8 @@ public class AuthController {
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(), authRequest.getChannel())) {
+        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+                authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // send email code
@@ -219,16 +223,26 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    @PostMapping("/validate/accessToken")
-    @ActionAnnotation(title = "用户", action = "validate_token", description = "Validate Access Token")
-    public ResponseEntity<?> validateAccessToken(@RequestBody String accessToken) {
-        log.debug("validate accessToken {}", accessToken);
+    @PostMapping("/login/accessToken")
+    @ActionAnnotation(title = "用户", action = "login_accessToken", description = "Login With Access Token")
+    public ResponseEntity<?> loginWithAccessToken(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
+        log.debug("validate accessToken {}", authRequest.getAccessToken());
 
-        boolean isValid = tokenRestService.validateAccessToken(accessToken);
+        boolean isValid = tokenRestService.validateAccessToken(authRequest.getAccessToken());
         if (!isValid) {
             return ResponseEntity.ok(JsonResult.error("accessToken is invalid", -1, false));
         }
-        return ResponseEntity.ok(JsonResult.success("success", isValid));
+
+        // Extract subject (username) from the access token
+        String subject = JwtUtils.getSubjectFromJwtToken(authRequest.getAccessToken());
+        
+        // Get authentication using the subject
+        Authentication authentication = authService.getAuthentication(request, subject);
+        
+        // Format response similar to other login methods
+        AuthResponse authResponse = authService.formatResponse(authentication);
+        
+        return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
 }
