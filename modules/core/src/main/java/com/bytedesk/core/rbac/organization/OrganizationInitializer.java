@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:48:46
+ * @LastEditTime: 2025-07-17 10:03:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,7 +78,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
                     .vip(true)
-                    .vipExpireDate(BdDateUtils.now().plusYears(100)) // 超级管理员不过期，100年
+                    .vipExpireDate(BdDateUtils.now().plusDays(30))
                     .user(user)
                     .build();
             //
