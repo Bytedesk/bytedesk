@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-23 10:31:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-23 10:32:02
+ * @LastEditTime: 2025-07-17 16:27:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,11 +11,13 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.observability;
+package com.bytedesk.ai.springai.config;
 
 import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.bytedesk.ai.springai.observability.CustomChatClientObservationConvention;
 
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.aop.ObservedAspect;

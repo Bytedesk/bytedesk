@@ -1,4 +1,4 @@
-package com.bytedesk.ai.springai.config;
+package com.bytedesk.ai.springai.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

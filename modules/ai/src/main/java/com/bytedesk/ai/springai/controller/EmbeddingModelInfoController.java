@@ -14,7 +14,7 @@
 package com.bytedesk.ai.springai.controller;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.ai.springai.config.EmbeddingModelInfoService;
+import com.bytedesk.ai.springai.service.EmbeddingModelInfoService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

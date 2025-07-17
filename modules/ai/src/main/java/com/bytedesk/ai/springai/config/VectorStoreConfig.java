@@ -1,4 +1,4 @@
-package com.bytedesk.ai.springai.rag;
+package com.bytedesk.ai.springai.config;
 
 import org.elasticsearch.client.RestClient;
 import org.springframework.ai.embedding.EmbeddingModel;
