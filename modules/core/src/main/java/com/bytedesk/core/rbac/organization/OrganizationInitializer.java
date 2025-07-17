@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-12 22:36:08
+ * @LastEditTime: 2025-07-17 09:47:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserInitializer;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.utils.BdDateUtils;
 
 // import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -75,6 +76,8 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                     .name(bytedeskProperties.getOrganizationName())
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
+                    .vip(true)
+                    .vipExpireDate(BdDateUtils.now().plusYears(100)) // 超级管理员不过期，100年
                     .user(user)
                     .build();
             //

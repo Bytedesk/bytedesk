@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 09:13:33
+ * @LastEditTime: 2025-07-17 09:43:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,7 @@ public class UserInitializer {
         }
         log.info("init super administrator account...");
         // 创建超级管理员账号
-        UserEntity admin = UserEntity.builder()
+        UserEntity superAdmin = UserEntity.builder()
                 .uid(uidUtils.getUid())
                 .email(bytedeskProperties.getEmail())
                 .username(bytedeskProperties.getEmail())
@@ -59,8 +59,7 @@ public class UserInitializer {
                 .emailVerified(true)
                 .mobileVerified(true)
                 .build();
-        // admin.setUid(uidUtils.getUid());
-        userService.save(admin);
+        userService.save(superAdmin);
     }
 
     
