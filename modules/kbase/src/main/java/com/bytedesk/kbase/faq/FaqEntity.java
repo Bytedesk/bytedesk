@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:25:41
+ * @LastEditTime: 2025-07-17 13:57:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -211,6 +211,16 @@ public class FaqEntity extends BaseEntity {
     // set Error
     public FaqEntity setElasticError() {
         this.setElasticStatus(FaqStatusEnum.ERROR.name());
+        return this;
+    }
+
+    public FaqEntity setVectorSuccess() {
+        this.setVectorStatus(FaqStatusEnum.SUCCESS.name());
+        return this;
+    }
+    
+    public FaqEntity setVectorError() {
+        this.setVectorStatus(FaqStatusEnum.ERROR.name());
         return this;
     }
 

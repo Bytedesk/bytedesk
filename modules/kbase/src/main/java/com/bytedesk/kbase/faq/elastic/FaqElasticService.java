@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-28 21:31:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 15:10:12
+ * @LastEditTime: 2025-07-17 13:57:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -106,7 +106,7 @@ public class FaqElasticService {
             elasticsearchOperations.save(faqElastic);
             
             // 更新索引状态
-            faq.setElasticStatus(FaqStatusEnum.SUCCESS.name());
+            faq.setElasticSuccess();
             faqRestService.save(faq);
 
             log.info("FAQ索引成功: uid={}", faq.getUid());
