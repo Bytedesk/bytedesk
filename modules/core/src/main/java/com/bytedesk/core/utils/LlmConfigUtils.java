@@ -98,7 +98,7 @@ public class LlmConfigUtils {
             case LlmConsts.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.embedding.options.model", "bge-m3:latest");
             case LlmConsts.DASHSCOPE:
-                return environment.getProperty("spring.ai.dashscope.embedding.options.model", "");
+                return environment.getProperty("spring.ai.dashscope.embedding.options.model", "text-embedding-v1");
             default:
                 return LlmConsts.DEFAULT_EMBEDDING_MODEL;
         }

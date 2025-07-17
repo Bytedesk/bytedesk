@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:39:01
+ * @LastEditTime: 2025-07-17 14:20:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,7 +46,6 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderResponse.class)))
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(LlmProviderRequest request) {
         
@@ -129,7 +128,9 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         schema = @Schema(implementation = LlmProviderConfigDefault.class)))
     @GetMapping("/config/default")
     public ResponseEntity<?> getLlmProviderConfigDefault() {
+
         LlmProviderConfigDefault response = llmProviderRestService.getLlmProviderConfigDefault();
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 }

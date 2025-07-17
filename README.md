@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 18:36:52
+ * @LastEditTime: 2025-07-17 14:02:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,20 +161,6 @@ http://127.0.0.1:9003/
 # open port: 9003, 9885
 demo username: admin@email.com
 demo password: admin
-```
-
-## Appkey
-
-```bash
-# Community
-bytedesk.appkey=ZjoyMDI1LTA4LTA2OkNPTU1VTklUWTo6Ojo=
-BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OkNPTU1VTklUWTo6Ojo=
-# Enterprise Trial: 2025-08-06
-bytedesk.appkey=ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
-BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
-# Platform Trial: 2025-08-06
-bytedesk.appkey=ZjoyMDI1LTA4LTA2OlBMQVRGT1JNOjo6Og==
-BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OlBMQVRGT1JNOjo6Og==
 ```
 
 ## architecture

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-18 10:45:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-27 11:12:14
+ * @LastEditTime: 2025-07-17 14:31:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,6 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,6 +76,8 @@ public class SpringAIRagController {
 
     private final ObservationRegistry observationRegistry;
 
+    private final BytedeskProperties bytedeskProperties;
+
     // rag
     // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_questionansweradvisor
     // http://127.0.0.1:9003/spring/ai/rag?message=什么时间考试？
@@ -81,6 +85,10 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> rag(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message, 
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         // 创建qaAdvisor - 使用构建器模式替代已弃用的构造函数
         var qaAdvisor = QuestionAnswerAdvisor.builder(this.vectorStore)
@@ -111,6 +119,10 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         ChatClient chatClient = ChatClient.builder(bytedeskZhipuaiChatModel)
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(SearchRequest.builder().build())
@@ -134,6 +146,10 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> naiveRag(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
@@ -164,6 +180,10 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> advancedRag(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
@@ -477,6 +497,9 @@ public class SpringAIRagController {
             } else if (className.contains("Zhipuai") || className.contains("ZhiPu")) {
                 embeddingModelInfo.put("modelType", "Zhipuai Embedding Model");
                 embeddingModelInfo.put("description", "Zhipuai cloud embedding model");
+            } else if (className.contains("OpenAi")) {
+                embeddingModelInfo.put("modelType", "Dashscope Embedding Model");
+                embeddingModelInfo.put("description", "Dashscope cloud embedding model");
             } else {
                 embeddingModelInfo.put("modelType", "Unknown Embedding Model");
             }
