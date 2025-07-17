@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 09:19:58
+ * @LastEditTime: 2025-07-17 09:00:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -131,13 +131,27 @@ public class UserService {
             }
             user.setNum(request.getEmail());
             // 默认注册时，仅验证手机号，无需验证邮箱
-            user.setEmailVerified(false);
+            if (request.getEmailVerified() != null) {
+                user.setEmailVerified(request.getEmailVerified());
+            } else {
+                user.setEmailVerified(false);
+            }
         }
         // 只有经过验证的手机号，才真正执行注册
         if (StringUtils.hasText(request.getMobile())) {
+            if (!StringUtils.hasText(request.getUsername()) 
+                && !StringUtils.hasText(request.getEmail())) {
+                user.setUsername(request.getMobile());
+            } else {
+                user.setUsername(request.getUsername());
+            }
             // 如果有手机号，则使用手机号作为num
             user.setNum(request.getMobile());
-            user.setMobileVerified(true);
+            if (request.getMobileVerified() != null) {
+                user.setMobileVerified(request.getMobileVerified());
+            } else {
+                user.setMobileVerified(true);
+            }
         }
         user.setEnabled(true);
         //

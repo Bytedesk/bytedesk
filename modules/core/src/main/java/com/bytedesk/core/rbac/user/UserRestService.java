@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 18:49:57
+ * @LastEditTime: 2025-07-17 09:14:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -162,8 +162,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         return ConvertUtils.convertToUserResponse(entity);
     }
 
-    
-
     public List<UserEntity> findAll(UserRequest request) {
         Specification<UserEntity> specification = UserSpecification.search(request);
         return userRepository.findAll(specification);
@@ -176,9 +174,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         excel.setEmail(entity.getEmail());
         excel.setMobile(entity.getMobile());
         excel.setDescription(entity.getDescription());
-        // excel.setAvatar(entity.getAvatar());
-        // excel.setPlatform(entity.getPlatform());
-        // excel.setOrgUid(entity.getOrgUid());
         return excel;
     }
 

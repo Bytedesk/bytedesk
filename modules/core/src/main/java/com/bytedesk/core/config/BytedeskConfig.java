@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 07:52:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 11:45:28
+ * @LastEditTime: 2025-07-17 09:10:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -90,18 +90,5 @@ public class BytedeskConfig {
     public ApplicationContextHolder applicationContextHolder() {
         return new ApplicationContextHolder();
     }
-
-    // @Bean
-    // public OpenAPI apiInfo() {
-    //     return new OpenAPI().info(new Info().title("bytedesk apis").version(appVersion));
-    // }
-
-    // @Bean
-    // public GroupedOpenApi httpApi() {
-    // return GroupedOpenApi.builder()
-    // .group("http")
-    // .pathsToMatch("/**")
-    // .build();
-    // }
 
 }

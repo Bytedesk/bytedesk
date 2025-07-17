@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 10:20:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-22 19:31:51
+ * @LastEditTime: 2025-07-17 09:03:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.core.rbac.user;
 
 import java.util.Set;
 
-// import com.bytedesk.core.rbac.organization.OrganizationResponse;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.rbac.role.RoleResponse;
 

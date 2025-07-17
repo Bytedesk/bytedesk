@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:35:18
+ * @LastEditTime: 2025-07-17 09:05:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,13 +50,12 @@ public class AuthController {
 
     private AuthService authService;
 
-    private PushRestService pushService;
+    private PushRestService pushRestService;
 
     private KaptchaCacheService kaptchaCacheService;
 
     private AuthenticationManager authenticationManager;
 
-    // @ActionAnnotation(title = "auth", action = "register", description = "register")
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
@@ -66,7 +65,7 @@ public class AuthController {
 
         // validate sms code
         // 验证手机验证码
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushRestService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -103,7 +102,7 @@ public class AuthController {
         }
 
         // send mobile code
-        Boolean result = pushService.sendCode(authRequest, request);
+        Boolean result = pushRestService.sendCode(authRequest, request);
         if (!result) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
         }
@@ -121,7 +120,7 @@ public class AuthController {
         }
         // validate mobile & code
         // 验证手机验证码
-        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+        if (!pushRestService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -133,6 +132,9 @@ public class AuthController {
             userRequest.setNum(authRequest.getMobile());
             userRequest.setMobile(authRequest.getMobile());
             userRequest.setPlatform(authRequest.getPlatform());
+            userRequest.setEmailVerified(false);
+            // 默认注册时，仅验证手机号，无需验证邮箱
+            userRequest.setMobileVerified(true);
             userService.register(userRequest);
         }
 
@@ -156,7 +158,7 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // send email code
-        Boolean result = pushService.sendCode(authRequest, request);
+        Boolean result = pushRestService.sendCode(authRequest, request);
         if (!result) {
             return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
         }
@@ -170,7 +172,7 @@ public class AuthController {
         log.debug("login email {}", authRequest.toString());
 
         // validate email & code
-        if (!pushService.validateCode(authRequest.getEmail(), authRequest.getCode(), request)) {
+        if (!pushRestService.validateCode(authRequest.getEmail(), authRequest.getCode(), request)) {
             return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -182,6 +184,8 @@ public class AuthController {
             userRequest.setNum(authRequest.getEmail());
             userRequest.setEmail(authRequest.getEmail());
             userRequest.setPlatform(authRequest.getPlatform());
+            userRequest.setEmailVerified(true);
+            userRequest.setMobileVerified(false);
             userService.register(userRequest);
         }
 
@@ -195,11 +199,5 @@ public class AuthController {
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
-
-
-    // TODO: 刷新token
-    // @PostMapping("/refreshToken")
-    // public JwtResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequestDTO) {
-    // }
 
 }
