@@ -21,6 +21,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
+import com.bytedesk.ai.statistic_token.StatisticTokenRestService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -51,7 +52,6 @@ import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.vector.TextVector;
 import com.bytedesk.kbase.llm_text.vector.TextVectorSearchResult;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
-import com.bytedesk.ai.statistic_token.StatisticTokenRestService;
 
 import lombok.extern.slf4j.Slf4j;
 
