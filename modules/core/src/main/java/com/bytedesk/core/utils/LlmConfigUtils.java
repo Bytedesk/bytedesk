@@ -25,7 +25,7 @@ public class LlmConfigUtils {
 
     public LlmProviderConfigDefault getLlmProviderConfigDefault(Environment environment) {
         // Get the default chat provider and model
-        String defaultChatProvider = environment.getProperty("spring.ai.model.chat", LlmConsts.DEFAULT_CHAT_PROVIDER);
+        String defaultChatProvider = environment.getProperty("spring.ai.model.chat", LlmConsts.DEFAULT_TEXT_PROVIDER);
         String defaultChatModel = getChatModel(environment, defaultChatProvider);
 
         // Get the default embedding provider and model
@@ -37,7 +37,7 @@ public class LlmConfigUtils {
         String defaultVisionModel = getVisionModel(environment, defaultVisionProvider);
 
         // Get the default voice provider and model
-        String defaultVoiceProvider = environment.getProperty("spring.ai.model.voice", LlmConsts.DEFAULT_VOICE_PROVIDER);
+        String defaultVoiceProvider = environment.getProperty("spring.ai.model.audio", LlmConsts.DEFAULT_AUDIO_PROVIDER);
         String defaultVoiceModel = getVoiceModel(environment, defaultVoiceProvider);
 
         // Get the default rerank provider and model
@@ -87,7 +87,7 @@ public class LlmConfigUtils {
             case LlmConsts.MINIMAX:
                 return environment.getProperty("spring.ai.minimax.chat.options.model", "minimax-v1");
             default:
-                return LlmConsts.DEFAULT_CHAT_MODEL;
+                return LlmConsts.DEFAULT_TEXT_MODEL;
         }
     }
 
@@ -126,7 +126,7 @@ public class LlmConfigUtils {
             case LlmConsts.OPENAI:
                 return environment.getProperty("spring.ai.openai.audio.voice.options.model", "tts-1");
             default:
-                return LlmConsts.DEFAULT_VOICE_MODEL;
+                return LlmConsts.DEFAULT_AUDIO_MODEL;
         }
     }
 

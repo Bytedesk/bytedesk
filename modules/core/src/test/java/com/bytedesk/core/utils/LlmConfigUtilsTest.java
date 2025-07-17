@@ -30,7 +30,7 @@ class LlmConfigUtilsTest {
         environment.setProperty("spring.ai.model.chat", "zhipuai");
         environment.setProperty("spring.ai.model.embedding", "zhipuai");
         environment.setProperty("spring.ai.model.vision", "zhipuai");
-        environment.setProperty("spring.ai.model.voice", "zhipuai");
+        environment.setProperty("spring.ai.model.audio", "zhipuai");
         environment.setProperty("spring.ai.model.rerank", "zhipuai");
         environment.setProperty("spring.ai.zhipuai.chat.options.model", "glm-4-flash");
         environment.setProperty("spring.ai.zhipuai.embedding.options.model", "embedding-2");
@@ -59,7 +59,7 @@ class LlmConfigUtilsTest {
         environment.setProperty("spring.ai.model.chat", "ollama");
         environment.setProperty("spring.ai.model.embedding", "ollama");
         environment.setProperty("spring.ai.model.vision", "ollama");
-        environment.setProperty("spring.ai.model.voice", "ollama");
+        environment.setProperty("spring.ai.model.audio", "ollama");
         environment.setProperty("spring.ai.model.rerank", "ollama");
         environment.setProperty("spring.ai.ollama.chat.options.model", "qwen3:0.6b");
         environment.setProperty("spring.ai.ollama.embedding.options.model", "bge-m3:latest");
@@ -91,14 +91,14 @@ class LlmConfigUtilsTest {
 
         // Then
         assertNotNull(config);
-        assertEquals(LlmConsts.DEFAULT_CHAT_PROVIDER, config.getDefaultChatProvider());
-        assertEquals(LlmConsts.DEFAULT_CHAT_MODEL, config.getDefaultChatModel());
+        assertEquals(LlmConsts.DEFAULT_TEXT_PROVIDER, config.getDefaultChatProvider());
+        assertEquals(LlmConsts.DEFAULT_TEXT_MODEL, config.getDefaultChatModel());
         assertEquals(LlmConsts.DEFAULT_EMBEDDING_PROVIDER, config.getDefaultEmbeddingProvider());
         assertEquals(LlmConsts.DEFAULT_EMBEDDING_MODEL, config.getDefaultEmbeddingModel());
         assertEquals(LlmConsts.DEFAULT_VISION_PROVIDER, config.getDefaultVisionProvider());
         assertEquals(LlmConsts.DEFAULT_VISION_MODEL, config.getDefaultVisionModel());
-        assertEquals(LlmConsts.DEFAULT_VOICE_PROVIDER, config.getDefaultVoiceProvider());
-        assertEquals(LlmConsts.DEFAULT_VOICE_MODEL, config.getDefaultVoiceModel());
+        assertEquals(LlmConsts.DEFAULT_AUDIO_PROVIDER, config.getDefaultVoiceProvider());
+        assertEquals(LlmConsts.DEFAULT_AUDIO_MODEL, config.getDefaultVoiceModel());
         assertEquals(LlmConsts.DEFAULT_RERANK_PROVIDER, config.getDefaultRerankProvider());
         assertEquals(LlmConsts.DEFAULT_RERANK_MODEL, config.getDefaultRerankModel());
     }

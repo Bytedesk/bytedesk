@@ -66,7 +66,6 @@ public class SpringAIOllamaChatConfig {
                 .build();
     }
 
-    @Primary
     @Bean("bytedeskOllamaChatModel")
     OllamaChatModel bytedeskOllamaChatModel() {
         return OllamaChatModel.builder()
@@ -76,7 +75,6 @@ public class SpringAIOllamaChatConfig {
     }
 
     // https://docs.spring.io/spring-ai/reference/api/chatclient.html
-    @Primary
     @Bean("bytedeskOllamaChatClient")
     ChatClient bytedeskOllamaChatClient() {
         return ChatClient.builder(bytedeskOllamaChatModel())

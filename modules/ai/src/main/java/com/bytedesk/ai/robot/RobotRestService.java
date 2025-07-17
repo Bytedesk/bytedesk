@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 15:37:24
+ * @LastEditTime: 2025-07-17 15:41:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
-// import com.bytedesk.ai.demo.utils.FileContent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
@@ -175,9 +174,9 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             }
             
             // Set default voice provider and model if not provided
-            if (!StringUtils.hasText(llm.getVoiceProvider()) || !StringUtils.hasText(llm.getVoiceModel())) {
-                llm.setVoiceProvider(llm.getVoiceProvider() != null ? llm.getVoiceProvider() : modelConfig.getDefaultVoiceProvider());
-                llm.setVoiceModel(llm.getVoiceModel() != null ? llm.getVoiceModel() : modelConfig.getDefaultVoiceModel());
+            if (!StringUtils.hasText(llm.getAudioProvider()) || !StringUtils.hasText(llm.getAudioModel())) {
+                llm.setAudioProvider(llm.getAudioProvider() != null ? llm.getAudioProvider() : modelConfig.getDefaultVoiceProvider());
+                llm.setAudioModel(llm.getAudioModel() != null ? llm.getAudioModel() : modelConfig.getDefaultVoiceModel());
             }
             
             // Set default rerank provider and model if not provided

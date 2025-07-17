@@ -40,12 +40,12 @@ public class RobotLlm {
     // 文本对话模型提供商
     @Builder.Default
     @Column(name = "llm_text_provider")
-    private String textProvider = LlmConsts.DEFAULT_CHAT_PROVIDER;
+    private String textProvider = LlmConsts.DEFAULT_TEXT_PROVIDER;
     
     // text chat model name
     @Builder.Default
     @Column(name = "llm_text_model")
-    private String textModel = LlmConsts.DEFAULT_CHAT_MODEL; 
+    private String textModel = LlmConsts.DEFAULT_TEXT_MODEL; 
 
     // 视觉模型
     // 启用vision
@@ -65,18 +65,18 @@ public class RobotLlm {
 
     // 语音模型
     @Builder.Default
-    @Column(name = "is_voice_enabled")
-    private Boolean voiceEnabled = false;
+    @Column(name = "is_audio_enabled")
+    private Boolean audioEnabled = false;
 
     // 语音模型提供商
     @Builder.Default
-    @Column(name = "llm_voice_provider")
-    private String voiceProvider = LlmConsts.DEFAULT_VOICE_PROVIDER;
+    @Column(name = "llm_audio_provider")
+    private String audioProvider = LlmConsts.DEFAULT_AUDIO_PROVIDER;
 
     // 语音模型名称
     @Builder.Default
-    @Column(name = "llm_voice_model")
-    private String voiceModel = LlmConsts.DEFAULT_VOICE_MODEL;
+    @Column(name = "llm_audio_model")
+    private String audioModel = LlmConsts.DEFAULT_AUDIO_MODEL;
 
     // 启用rerank
     @Builder.Default
