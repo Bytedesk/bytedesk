@@ -87,7 +87,7 @@ public class TokenEntity extends BaseEntity {
 
     // 验证token是否有效
     public Boolean isValid() {
-        return !revoked && expiresAt.isAfter(BdDateUtils.now());
+        return !revoked && !isDeleted() && expiresAt.isAfter(BdDateUtils.now());
     }
 
     // 撤销token
