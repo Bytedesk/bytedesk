@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 19:03:08
+ * @LastEditTime: 2025-07-17 09:36:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,9 +29,7 @@ import com.bytedesk.core.utils.JsonResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/org")
@@ -89,6 +87,16 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
         //
         OrganizationResponse response = organizationRestService.update(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = "组织", action = "更新", description = "organization update by super")
+    @PostMapping("/update/by/super")
+    public ResponseEntity<?> updateBySuper(@RequestBody OrganizationRequest request) {
+        //
+        OrganizationResponse response = organizationRestService.updateBySuper(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }

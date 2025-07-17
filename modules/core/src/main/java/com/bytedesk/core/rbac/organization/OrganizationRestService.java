@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 07:45:15
+ * @LastEditTime: 2025-07-17 09:34:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -154,6 +154,50 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     @Transactional
     @Override
     public OrganizationResponse update(OrganizationRequest request) {
+        // 查找要更新的组织
+        Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
+        if (!organizationOptional.isPresent()) {
+            // 如果组织不存在，可以抛出一个自定义异常，例如OrganizationNotFoundException
+            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
+        }
+
+        // 获取要更新的组织实体
+        OrganizationEntity organization = organizationOptional.get();
+        
+        // 检查 name 唯一性（排除当前组织）
+        if (!organization.getName().equals(request.getName())) {
+            if (organizationRepository.existsByNameAndDeletedAndUidNot(request.getName(), false, request.getUid())) {
+                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
+            }
+        }
+        
+        // 检查 code 唯一性（排除当前组织）
+        if (!organization.getCode().equals(request.getCode())) {
+            if (organizationRepository.existsByCodeAndDeletedAndUidNot(request.getCode(), false, request.getUid())) {
+                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
+            }
+        }
+        
+        // 使用ModelMapper进行属性拷贝，避免逐一设置字段
+        // modelMapper.map(organizationRequest, organization); // 一些默认值会被清空，待前端支持完善之后再启用
+        organization.setName(request.getName());
+        organization.setLogo(request.getLogo());
+        organization.setCode(request.getCode());
+        organization.setDescription(request.getDescription());
+
+        // 保存更新后的组织
+        OrganizationEntity updatedOrganization = save(organization);
+        if (updatedOrganization == null) {
+            throw new RuntimeException("Failed to update organization.");
+        }
+        
+        // 转换为响应对象
+        return convertToResponse(updatedOrganization);
+    }
+
+    // update by super
+    @Transactional
+    public OrganizationResponse updateBySuper(OrganizationRequest request) {
         // 查找要更新的组织
         Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
         if (!organizationOptional.isPresent()) {

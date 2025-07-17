@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:17:45
+ * @LastEditTime: 2025-07-17 09:25:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -61,7 +62,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
     public Page<UserResponse> queryByUser(UserRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotFoundException("User not found.");
+            throw new NotLoginException("login required.");
         }
         request.setUserUid(user.getUid());
         return queryByOrg(request);
@@ -107,6 +108,7 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         Optional<UserEntity> userOptional = userRepository.findByUid(request.getUid());
         if (userOptional.isPresent()) {
             UserEntity userEntity = userOptional.get();
+            userEntity.setUsername(request.getUsername());
             userEntity.setNickname(request.getNickname());
             userEntity.setAvatar(request.getAvatar());
             userEntity.setDescription(request.getDescription());
