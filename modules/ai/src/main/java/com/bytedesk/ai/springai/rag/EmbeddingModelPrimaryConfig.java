@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 14:51:00
+ * @LastEditTime: 2025-07-17 15:33:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,8 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,8 +43,8 @@ public class EmbeddingModelPrimaryConfig {
     @Qualifier("bytedeskOllamaEmbeddingModel")
     private EmbeddingModel ollamaEmbeddingModel;
 
-    @Autowired(required = false)
-    private DashScopeEmbeddingModel dashscopeEmbeddingModel;
+    // @Autowired(required = false)
+    // private DashScopeEmbeddingModel dashscopeEmbeddingModel;
 
     @Bean
     @Primary
@@ -73,16 +71,16 @@ public class EmbeddingModelPrimaryConfig {
     /**
      * spring.ai.model.embedding=dashscope时，spring-ai-alibaba-starter-dashscope 中自动定义
      */
-    @Bean
-    @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.embedding", havingValue = "dashscope")
-    public EmbeddingModel primaryDashscopeEmbeddingModel() {
-        log.info("Setting Dashscope embedding model as Primary");
-        if (dashscopeEmbeddingModel == null) {
-            throw new IllegalStateException("Dashscope embedding model is not available. Please check if spring.ai.dashscope.embedding.enabled=true");
-        }
-        return dashscopeEmbeddingModel;
-    }
+    // @Bean
+    // @Primary
+    // @ConditionalOnProperty(name = "spring.ai.model.embedding", havingValue = "dashscope")
+    // public EmbeddingModel primaryDashscopeEmbeddingModel() {
+    //     log.info("Setting Dashscope embedding model as Primary");
+    //     if (dashscopeEmbeddingModel == null) {
+    //         throw new IllegalStateException("Dashscope embedding model is not available. Please check if spring.ai.dashscope.embedding.enabled=true");
+    //     }
+    //     return dashscopeEmbeddingModel;
+    // }
 
     @Bean
     @Primary
