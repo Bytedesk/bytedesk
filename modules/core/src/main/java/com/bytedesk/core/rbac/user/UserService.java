@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:00:48
+ * @LastEditTime: 2025-07-17 09:17:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -117,8 +117,7 @@ public class UserService {
         }
         //
         if (StringUtils.hasText(request.getPassword())) {
-            String rawPassword = request.getPassword();
-            String encodedPassword = passwordEncoder.encode(rawPassword);
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
             user.setPassword(encodedPassword);
         }
         // 只有经过验证的邮箱，才真正执行注册
