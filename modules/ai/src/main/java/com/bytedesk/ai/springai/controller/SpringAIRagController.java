@@ -72,7 +72,7 @@ public class SpringAIRagController {
 
     private final EmbeddingModel embeddingModel;
 
-    private final ChatModel bytedeskZhipuaiChatModel;
+    private final ChatModel primaryChatModel;
 
     private final ObservationRegistry observationRegistry;
 
@@ -99,7 +99,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
         // 使用chatClient，添加ObservationRegistry
-        ChatResponse response = ChatClient.builder(bytedeskZhipuaiChatModel, observationRegistry, null)
+        ChatResponse response = ChatClient.builder(primaryChatModel, observationRegistry, null)
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -123,7 +123,7 @@ public class SpringAIRagController {
             return ResponseEntity.ok(JsonResult.error("Service is not available"));
         }
 
-        ChatClient chatClient = ChatClient.builder(bytedeskZhipuaiChatModel)
+        ChatClient chatClient = ChatClient.builder(primaryChatModel)
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(SearchRequest.builder().build())
                         .build())
@@ -162,7 +162,7 @@ public class SpringAIRagController {
         // .build())
                 .build();
 
-        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
+        String answer = ChatClient.builder(primaryChatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -187,7 +187,7 @@ public class SpringAIRagController {
 
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .queryTransformers(RewriteQueryTransformer.builder()
-                        .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
+                        .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
                         .build())
                 .documentRetriever(VectorStoreDocumentRetriever.builder()
                         .similarityThreshold(0.50)
@@ -195,7 +195,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
 
-        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
+        String answer = ChatClient.builder(primaryChatModel)
                 .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -234,13 +234,13 @@ public class SpringAIRagController {
         // conversation history and a follow-up query into a standalone query that
         // captures the essence of the conversation.
         CompressionQueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
+        String answer = ChatClient.builder(primaryChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -273,13 +273,13 @@ public class SpringAIRagController {
         // to provide better results when querying a target system, such as a vector
         // store or a web search engine.
         QueryTransformer queryTransformer = RewriteQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
+        String answer = ChatClient.builder(primaryChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -308,14 +308,14 @@ public class SpringAIRagController {
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
         QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
                 .targetLanguage("english")
                 .build();
 
         Query transformedQuery = queryTransformer.transform(query);
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
+        String answer = ChatClient.builder(primaryChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -342,14 +342,14 @@ public class SpringAIRagController {
         }
 
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
-                .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
+                .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
                 .numberOfQueries(3)
                 // .includeOriginal(false)
                 .build();
         List<Query> queries = queryExpander.expand(new Query("How to run a Spring Boot app?"));
 
         // 使用chatClient
-        String answer = ChatClient.builder(bytedeskZhipuaiChatModel)
+        String answer = ChatClient.builder(primaryChatModel)
                 // .defaultAdvisors(retrievalAugmentationAdvisor)
                 .build()
                 .prompt()
@@ -449,7 +449,7 @@ public class SpringAIRagController {
             return ResponseEntity.ok(JsonResult.error("Service is not available"));
         }
 
-        ChatClient chatClient = ChatClient.builder(bytedeskZhipuaiChatModel, observationRegistry, null)
+        ChatClient chatClient = ChatClient.builder(primaryChatModel, observationRegistry, null)
                 .build();
                 
         ChatResponse response = chatClient.prompt()

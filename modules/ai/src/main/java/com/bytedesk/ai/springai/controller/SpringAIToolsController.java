@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-14 17:49:10
+ * @LastEditTime: 2025-07-17 18:53:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -53,9 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIToolsController {
 
     private final BytedeskProperties bytedeskProperties;
-    // private final ChatClient defaultChatClient;
-    @Qualifier("bytedeskZhipuaiChatClient")
-    private final ChatClient bytedeskZhipuaiChatClient;
+    private final ChatClient primaryChatClient;
 
     // ollama deepseek-r1 does not support tools:
     // registry.ollama.ai/library/deepseek-r1:latest does not support tools
@@ -75,7 +73,7 @@ public class SpringAIToolsController {
             return ResponseEntity.ok(JsonResult.error("Service is not available"));
         }
 
-        String response = bytedeskZhipuaiChatClient
+        String response = primaryChatClient
                 .prompt(message)
                 .tools(new DateTimeTools())
                 .call()
@@ -102,7 +100,7 @@ public class SpringAIToolsController {
             return ResponseEntity.ok(JsonResult.error("Service is not available"));
         }
 
-        String response = bytedeskZhipuaiChatClient
+        String response = primaryChatClient
                 .prompt(message)
                 .tools(new DateTimeTools())
                 .call()
@@ -132,7 +130,7 @@ public class SpringAIToolsController {
                 .toolObject(new DateTimeTools())
                 .build();
 
-        String response = bytedeskZhipuaiChatClient
+        String response = primaryChatClient
                 .prompt(message)
                 .tools(toolCallback)
                 .call()
@@ -159,7 +157,7 @@ public class SpringAIToolsController {
                 .inputType(WeatherRequest.class)
                 .build();
 
-        String response = bytedeskZhipuaiChatClient
+        String response = primaryChatClient
                 .prompt(message)
                 .tools(toolCallback)
                 // .tools("currentWeather")
