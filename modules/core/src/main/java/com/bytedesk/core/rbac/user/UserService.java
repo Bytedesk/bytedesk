@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:17:34
+ * @LastEditTime: 2025-07-17 11:51:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -615,6 +615,14 @@ public class UserService {
 
     public void logout() {
         // TODO: 清理token，使其过期
+
+        // 删除token
+        TokenEntity token = tokenRepository.findByUid(user.getUid());
+        if (token != null) {
+            token.setRevoked(true);
+            tokenRepository.save(token);
+        }
+
         UserEntity user = authService.getUser();
         bytedeskEventPublisher.publishEvent(new UserLogoutEvent(this, user));
     }

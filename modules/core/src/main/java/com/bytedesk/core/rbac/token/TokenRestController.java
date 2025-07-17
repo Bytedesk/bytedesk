@@ -100,5 +100,7 @@ public class TokenRestController extends BaseRestController<TokenRequest> {
 
         return ResponseEntity.ok(JsonResult.success("success", accessToken));
     }
+
+    
     
 }

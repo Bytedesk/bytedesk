@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 19:01:13
+ * @LastEditTime: 2025-07-17 11:50:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -167,23 +167,5 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
         return ResponseEntity.ok().body(JsonResult.success());
     }
-
-
-    // 静态权限配置，测试
-    /** for testing，client will return 403, if don't have authority/role */
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_ANY)
-    // @GetMapping("/test/super")
-    // public ResponseEntity<?> testSuperAuthority() {
-    //     return ResponseEntity.ok("you have super authority");
-    // }
-
-    /** no need to add ROLE_ prefix, system will auto add */
-    // @GetMapping(value = "/test/cs")
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
-    // // @PreAuthorize("hasRole('CS')")
-    // public ResponseEntity<?> testCsRole() {
-    //     return ResponseEntity.ok("you have admin or cs role");
-    // }
-
     
 }

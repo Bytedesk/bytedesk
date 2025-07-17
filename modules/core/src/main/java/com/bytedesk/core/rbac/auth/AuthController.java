@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 10:29:20
+ * @LastEditTime: 2025-07-17 11:46:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,11 +37,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.core.utils.PasswordHashUtils;
+import com.bytedesk.core.rbac.token.TokenRequest;
+import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 
 @Slf4j
@@ -62,7 +61,7 @@ public class AuthController {
 
     private AuthenticationManager authenticationManager;
 
-    private UserDetailsServiceImpl userDetailsService;
+    private TokenRestService tokenRestService;
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
@@ -101,7 +100,7 @@ public class AuthController {
         } else if (StringUtils.hasText(authRequest.getPasswordHash()) && StringUtils.hasText(authRequest.getPasswordSalt())) {
             // 使用密码哈希登录
             log.debug("Using password hash authentication");
-            authentication = authenticateWithPasswordHash(authRequest);
+            authentication = authService.authenticateWithPasswordHash(authRequest);
             if (authentication == null) {
                 return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
             }
@@ -113,44 +112,6 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    /**
-     * 密码哈希登录
-     */
-    private Authentication authenticateWithPasswordHash(AuthRequest authRequest) {
-        // 1. 查询用户
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(authRequest.getUsername());
-        if (userDetails == null) {
-            log.warn("User not found: {}", authRequest.getUsername());
-            return null;
-        }
-        // 2. 验证哈希
-        // String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
-        // 由于数据库存储的是BCrypt加密后的密码，无法直接反向获取明文
-        // 这里假设数据库还存储了明文密码或有其他方式校验（实际生产环境不推荐明文存储）
-        // 这里演示：如果数据库存储明文密码，则直接用PasswordHashUtils校验
-        // 如果存储的是BCrypt，则无法支持前端hash+salt方式，建议前端直接传明文密码
-        //
-        // 这里假设数据库存储明文密码（仅演示，实际应存BCrypt）
-        // String plainPassword = dbPassword;
-        // boolean valid = PasswordHashUtils.verifyPasswordHash(plainPassword, authRequest.getPasswordSalt(), authRequest.getPasswordHash());
-        //
-        // 实际情况：如果数据库存储BCrypt，则无法支持前端hash+salt方式
-        // 这里直接返回null，提示不支持
-        log.warn("当前系统仅支持明文密码登录，BCrypt加密无法支持前端hash+salt方式");
-        return null;
-
-        // 3. 用 passwordHash 作为“明文”去匹配
-        // org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
-        // boolean valid = encoder.matches(authRequest.getPasswordHash(), dbPassword);
-        // if (!valid) {
-        //     log.warn("Password hash verification failed for user: {}", authRequest.getUsername());
-        //     return null;
-        // }
-        // 4. 构造认证对象
-        // return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-    }
-
-    // @ActionAnnotation(title = "auth", action = "sendMobileCode", description = "Send mobile code")
     @PostMapping("/send/mobile")
     public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getChannel(),
@@ -169,7 +130,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    // @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
+    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code")
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
@@ -208,7 +169,6 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    // @ActionAnnotation(title = "auth", action = "sendEmailCode", description = "Send email code")
     @PostMapping("/send/email")
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
@@ -257,6 +217,18 @@ public class AuthController {
         AuthResponse authResponse = authService.formatResponse(authentication);
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
+    }
+
+    @PostMapping("/validate/accessToken")
+    @ActionAnnotation(title = "用户", action = "validate_token", description = "Validate Access Token")
+    public ResponseEntity<?> validateAccessToken(@RequestBody String accessToken) {
+        log.debug("validate accessToken {}", accessToken);
+
+        boolean isValid = tokenRestService.validateAccessToken(accessToken);
+        if (!isValid) {
+            return ResponseEntity.ok(JsonResult.error("accessToken is invalid", -1, false));
+        }
+        return ResponseEntity.ok(JsonResult.success("success", isValid));
     }
 
 }

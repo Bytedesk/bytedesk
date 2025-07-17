@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:33:37
+ * @LastEditTime: 2025-07-17 11:37:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -163,5 +163,43 @@ public class AuthService {
                 .user(userResponse)
                 .build();
     }
+
+    /**
+     * TODO: 密码哈希登录
+     */
+    public Authentication authenticateWithPasswordHash(AuthRequest authRequest) {
+        // 1. 查询用户
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(authRequest.getUsername());
+        if (userDetails == null) {
+            log.warn("User not found: {}", authRequest.getUsername());
+            return null;
+        }
+        // 2. 验证哈希
+        // String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
+        // 由于数据库存储的是BCrypt加密后的密码，无法直接反向获取明文
+        // 这里假设数据库还存储了明文密码或有其他方式校验（实际生产环境不推荐明文存储）
+        // 这里演示：如果数据库存储明文密码，则直接用PasswordHashUtils校验
+        // 如果存储的是BCrypt，则无法支持前端hash+salt方式，建议前端直接传明文密码
+        //
+        // 这里假设数据库存储明文密码（仅演示，实际应存BCrypt）
+        // String plainPassword = dbPassword;
+        // boolean valid = PasswordHashUtils.verifyPasswordHash(plainPassword, authRequest.getPasswordSalt(), authRequest.getPasswordHash());
+        //
+        // 实际情况：如果数据库存储BCrypt，则无法支持前端hash+salt方式
+        // 这里直接返回null，提示不支持
+        log.warn("当前系统仅支持明文密码登录，BCrypt加密无法支持前端hash+salt方式");
+        return null;
+
+        // 3. 用 passwordHash 作为“明文”去匹配
+        // org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+        // boolean valid = encoder.matches(authRequest.getPasswordHash(), dbPassword);
+        // if (!valid) {
+        //     log.warn("Password hash verification failed for user: {}", authRequest.getUsername());
+        //     return null;
+        // }
+        // 4. 构造认证对象
+        // return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
 
 }
