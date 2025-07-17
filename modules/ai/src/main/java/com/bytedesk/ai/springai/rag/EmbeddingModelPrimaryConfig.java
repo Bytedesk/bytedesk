@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 14:26:08
+ * @LastEditTime: 2025-07-17 14:51:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,8 +46,7 @@ public class EmbeddingModelPrimaryConfig {
     private EmbeddingModel ollamaEmbeddingModel;
 
     @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeEmbeddingModel")
-    private EmbeddingModel dashscopeEmbeddingModel;
+    private DashScopeEmbeddingModel dashscopeEmbeddingModel;
 
     @Bean
     @Primary
@@ -69,6 +70,9 @@ public class EmbeddingModelPrimaryConfig {
         return ollamaEmbeddingModel;
     }
 
+    /**
+     * spring.ai.model.embedding=dashscope时，spring-ai-alibaba-starter-dashscope 中自动定义
+     */
     @Bean
     @Primary
     @ConditionalOnProperty(name = "spring.ai.model.embedding", havingValue = "dashscope")

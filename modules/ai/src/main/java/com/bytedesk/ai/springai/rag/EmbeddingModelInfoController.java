@@ -14,6 +14,7 @@
 package com.bytedesk.ai.springai.rag;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -37,13 +38,17 @@ import java.util.Map;
 public class EmbeddingModelInfoController {
 
     private final EmbeddingModelInfoService embeddingModelInfoService;
+    private final BytedeskProperties bytedeskProperties;
 
     /**
      * 获取所有EmbeddingModel信息
-     * GET /api/v1/embedding-models/info
+     * GET http://127.0.0.1:9003/spring/ai/api/v1/embedding-models/info
      */
     @GetMapping("/info")
     public ResponseEntity<JsonResult<?>> getAllEmbeddingModelsInfo() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         log.info("Getting all EmbeddingModel information");
         Map<String, Object> result = embeddingModelInfoService.getAllEmbeddingModelsInfo();
         return ResponseEntity.ok(JsonResult.success(result));
@@ -55,6 +60,9 @@ public class EmbeddingModelInfoController {
      */
     @GetMapping("/primary")
     public ResponseEntity<JsonResult<?>> getPrimaryEmbeddingModelInfo() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         log.info("Getting Primary EmbeddingModel information");
         Map<String, Object> result = embeddingModelInfoService.getPrimaryEmbeddingModelInfo();
         return ResponseEntity.ok(JsonResult.success(result));
@@ -66,6 +74,9 @@ public class EmbeddingModelInfoController {
      */
     @GetMapping("/vectorstore")
     public ResponseEntity<JsonResult<?>> getVectorStoreEmbeddingModelInfo() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         log.info("Getting VectorStore EmbeddingModel information");
         Map<String, Object> result = embeddingModelInfoService.getVectorStoreEmbeddingModelInfo();
         return ResponseEntity.ok(JsonResult.success(result));

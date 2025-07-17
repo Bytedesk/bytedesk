@@ -284,6 +284,7 @@ services:
       # https://bailian.console.aliyun.com/?apiKey=1#/api-key
       # 阿里云百炼大模型模型列表：
       # https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
+      SPRING_AI_DASHSCOPE_ENABLED: "false"
       SPRING_AI_DASHSCOPE_BASE_URL: https://dashscope.aliyuncs.com/compatible-mode
       SPRING_AI_DASHSCOPE_API_KEY: 'sk-xxx'
       SPRING_AI_DASHSCOPE_CHAT_ENABLED: "false"

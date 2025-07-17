@@ -216,6 +216,10 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_compressionquerytransformer
         // 压缩查询
 
@@ -258,6 +262,10 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         Query query = new Query("I'm studying machine learning. What is an LLM?");
 
         // 重写查询
@@ -293,6 +301,10 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         Query query = new Query("Hvad er Danmarks hovedstad?");
 
         QueryTransformer queryTransformer = TranslationQueryTransformer.builder()
@@ -325,6 +337,10 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         MultiQueryExpander queryExpander = MultiQueryExpander.builder()
                 .chatClientBuilder(ChatClient.builder(bytedeskZhipuaiChatModel).build().mutate())
                 .numberOfQueries(3)
@@ -353,6 +369,10 @@ public class SpringAIRagController {
     ResponseEntity<JsonResult<?>> vectorStoreDocumentRetriever(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
 
         DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
                 .vectorStore(vectorStore)
@@ -388,6 +408,10 @@ public class SpringAIRagController {
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
             @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         ContextualQueryAugmenter queryAugmenter = ContextualQueryAugmenter.builder()
                 // .allowEmptyContext(true)
                 .build();
@@ -405,6 +429,10 @@ public class SpringAIRagController {
             @RequestParam(value = "query", defaultValue = "什么时间考试？") String query,
             @RequestParam(value = "kbUid", required = true) String kbUid) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         log.info("搜索向量数据，query: {}, kbUid: {}", query, kbUid);
         // List<String> results = springAIVectorService.searchText(query, kbUid);
 
@@ -416,7 +444,11 @@ public class SpringAIRagController {
     @GetMapping("/observed")
     ResponseEntity<JsonResult<?>> observedChat(
             @RequestParam(value = "message", defaultValue = "什么时间考试？") String message) {
-            
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         ChatClient chatClient = ChatClient.builder(bytedeskZhipuaiChatModel, observationRegistry, null)
                 .build();
                 
@@ -434,6 +466,9 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/rag/vector-store-info
     @GetMapping("/vector-store-info")
     ResponseEntity<JsonResult<?>> getVectorStoreInfo() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         log.info("Getting VectorStore info");
         
         Map<String, Object> vectorStoreInfo = new HashMap<>();
@@ -468,6 +503,9 @@ public class SpringAIRagController {
     // http://127.0.0.1:9003/spring/ai/rag/embedding-model-info
     @GetMapping("/embedding-model-info")
     ResponseEntity<JsonResult<?>> getEmbeddingModelInfo() {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         log.info("Getting EmbeddingModel info");
         
         Map<String, Object> embeddingModelInfo = new HashMap<>();
