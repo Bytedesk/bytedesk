@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 15:32:35
+ * @LastEditTime: 2025-07-17 18:26:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,8 +42,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     @Autowired(required = false)
     private OpenAiChatModel bytedeskDashscopeChatModel;
 
-
-
     public SpringAIDashscopeService() {
         super(); // 调用基类的无参构造函数
     }
@@ -63,8 +61,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 .build()
         );
     }
-
-
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
