@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 12:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 18:53:05
+ * @LastEditTime: 2025-07-17 18:56:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.tool.method.MethodToolCallback;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
@@ -49,20 +48,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/tools")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "zhipuai", matchIfMissing = false)
 public class SpringAIToolsController {
 
     private final BytedeskProperties bytedeskProperties;
+    
     private final ChatClient primaryChatClient;
-
-    // ollama deepseek-r1 does not support tools:
-    // registry.ollama.ai/library/deepseek-r1:latest does not support tools
-    // private final ChatClient ollamaChatClient;
-
-    // private final ChatClient dashScopeChatClient; // not support tools
-
-    // private final ChatClient deepSeekChatClient;
-
+    
     // http://127.0.0.1:9003/springai/tools/time?message=
     // get current date and time
     @GetMapping("/time")

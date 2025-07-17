@@ -65,7 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/springai/prompt")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "ollama", matchIfMissing = false)
 public class SpringAIPromptController {
 
 	private final BytedeskProperties bytedeskProperties;
@@ -106,7 +106,7 @@ public class SpringAIPromptController {
 		PromptTemplate promptTemplate = new PromptTemplate(jokeResource);
 		Prompt prompt = promptTemplate.create(Map.of("adjective", adjective, "topic", topic));
 
-		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
+		ChatResponse response = primaryChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
@@ -133,7 +133,7 @@ public class SpringAIPromptController {
 		Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", name, "voice", voice));
 		Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 
-		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
+		ChatResponse response = primaryChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
@@ -166,7 +166,7 @@ public class SpringAIPromptController {
 		Prompt prompt = promptTemplate.create(map);
 		log.info("prompt: {}", prompt);
 
-		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
+		ChatResponse response = primaryChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
@@ -210,7 +210,7 @@ public class SpringAIPromptController {
 		Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
 		log.info(prompt.toString());
 
-		ChatResponse chatResponse = bytedeskOllamaChatClient.prompt(prompt)
+		ChatResponse chatResponse = primaryChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 		log.info("AI responded.");
@@ -245,14 +245,14 @@ public class SpringAIPromptController {
 				.build();
 		Prompt prompt = promptTemplate.create();
 
-		String response = bytedeskOllamaChatClient.prompt(prompt)
+		String response = primaryChatClient.prompt(prompt)
 				.call()
 				.content();
 		log.info("response: " + response);
 
 		// 或者 使用structured output
 		// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
-		ActorsFilms actorsFilms = bytedeskOllamaChatClient.prompt()
+		ActorsFilms actorsFilms = primaryChatClient.prompt()
 				.user(u -> u.text("Generate the filmography of 5 movies for {actor}.")
 						.param("actor", "Tom Hanks"))
 				.call()
@@ -291,7 +291,7 @@ public class SpringAIPromptController {
 						.build()
 						.createMessage());
 
-		ChatResponse response = bytedeskOllamaChatClient.prompt(prompt)
+		ChatResponse response = primaryChatClient.prompt(prompt)
 				.call()
 				.chatResponse();
 
