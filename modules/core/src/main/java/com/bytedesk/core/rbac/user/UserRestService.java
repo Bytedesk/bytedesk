@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:02:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:14:42
+ * @LastEditTime: 2025-07-17 09:16:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.exception.NotFoundException;
@@ -112,6 +113,12 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
             userEntity.setEmailVerified(request.getEmailVerified());
             // 支持禁用用户
             userEntity.setEnabled(request.getEnabled());
+            //
+            if (StringUtils.hasText(request.getPassword())) {
+                String rawPassword = request.getPassword();
+                String encodedPassword = passwordEncoder.encode(rawPassword);
+                user.setPassword(encodedPassword);
+            }   
             // 
             UserEntity savedUserEntity = save(userEntity);
             if (savedUserEntity == null) {
