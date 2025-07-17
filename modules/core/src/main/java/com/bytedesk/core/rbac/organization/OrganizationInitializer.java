@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:47:13
+ * @LastEditTime: 2025-07-17 09:48:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.exception.NotFoundException;
 // import com.bytedesk.core.rbac.authority.AuthorityInitializer;
 import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -89,7 +90,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                 throw new RuntimeException("Organization: Default Organization Save Failed");
             }
         } else {
-            throw new RuntimeException("Organization: Super User Not Found");
+            throw new NotFoundException("Organization: Super User Not Found");
         }
     }
     
