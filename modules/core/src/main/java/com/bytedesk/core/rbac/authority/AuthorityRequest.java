@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:15:14
+ * @LastEditTime: 2025-07-17 11:53:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,13 +35,4 @@ public class AuthorityRequest extends BaseRequest {
     private String value;
 
     private String description;
-
-    // // platform: 只有超级管理员才有权限
-    // // organization: 管理员才有权限
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // // 默认bytedesk平台
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
 }

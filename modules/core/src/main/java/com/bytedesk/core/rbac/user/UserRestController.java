@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 11:50:23
+ * @LastEditTime: 2025-07-17 11:55:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -143,12 +143,10 @@ public class UserRestController extends BaseRestController<UserRequest> {
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-
     @ActionAnnotation(title = "user", action = "changeMobile", description = "changeMobile")
     @PostMapping("/change/mobile")
     public ResponseEntity<?> changeMobile(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
-        // validate mobile & code
         // 验证手机验证码
         if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
@@ -161,9 +159,9 @@ public class UserRestController extends BaseRestController<UserRequest> {
 
     @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<?> logout(@RequestBody String accessToken) {
 
-        userService.logout();
+        userService.logout(accessToken);
 
         return ResponseEntity.ok().body(JsonResult.success());
     }
