@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 16:26:01
+ * @LastEditTime: 2025-07-17 18:18:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -74,8 +74,8 @@ public class MessageSpecification extends BaseSpecification {
                 }
             }
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 
-            if (StringUtils.hasText(request.getOrgUid())) {
+            // 如果前端设置了isSuperUser标志，则不需要过滤orgUid
+            if (!Boolean.TRUE.equals(request.getIsSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
             //

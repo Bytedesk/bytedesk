@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:27:40
+ * @LastEditTime: 2025-07-17 18:07:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,6 +79,18 @@ public class ThreadRestService
 
     @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
+        // 如果前端设置了isSuperUser标志，则需要判断一下，当前用户是否是超级管理员
+        if (Boolean.TRUE.equals(request.getIsSuperUser())) {
+            UserEntity user = authService.getUser();
+            if (user == null) {
+                throw new NotLoginException("login first");
+            }
+            if (!user.isSuperUser()) {
+                // 如果是不是超级管理员，则设置为false
+                request.setIsSuperUser(false);
+            }
+        }
+        // 
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.search(request);
         return threadRepository.findAll(specs, pageable);
