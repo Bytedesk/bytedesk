@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:45:41
+ * @LastEditTime: 2025-07-17 09:51:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.rbac.user.UserResponse;
 
 @Slf4j
 @Service
@@ -381,7 +382,65 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     }
 
     public OrganizationResponse convertToResponse(OrganizationEntity organization) {
-        return modelMapper.map(organization, OrganizationResponse.class);
+        OrganizationResponse response = new OrganizationResponse();
+        
+        // 映射基本字段
+        response.setUid(organization.getUid());
+        response.setName(organization.getName());
+        response.setLogo(organization.getLogo());
+        response.setCode(organization.getCode());
+        response.setDescription(organization.getDescription());
+        response.setVerifiedType(organization.getVerifiedType());
+        response.setIdentityType(organization.getIdentityType());
+        response.setIdentityImage(organization.getIdentityImage());
+        response.setIdentityNumber(organization.getIdentityNumber());
+        response.setVerifyDate(organization.getVerifyDate());
+        response.setVerifyStatus(organization.getVerifyStatus());
+        response.setRejectReason(organization.getRejectReason());
+        response.setVip(organization.getVip());
+        response.setVipExpireDate(organization.getVipExpireDate());
+        response.setEnabled(organization.getEnabled());
+        response.setCreatedAt(organization.getCreatedAt());
+        response.setUpdatedAt(organization.getUpdatedAt());
+        
+        // 手动映射用户信息
+        if (organization.getUser() != null) {
+            UserResponse userResponse = new UserResponse();
+            userResponse.setUid(organization.getUser().getUid());
+            userResponse.setUsername(organization.getUser().getUsername());
+            userResponse.setNickname(organization.getUser().getNickname());
+            userResponse.setEmail(organization.getUser().getEmail());
+            userResponse.setMobile(organization.getUser().getMobile());
+            userResponse.setCountry(organization.getUser().getCountry());
+            userResponse.setAvatar(organization.getUser().getAvatar());
+            userResponse.setDescription(organization.getUser().getDescription());
+            userResponse.setPlatform(organization.getUser().getPlatform());
+            
+            // 将字符串转换为 Sex 枚举
+            if (organization.getUser().getSex() != null) {
+                try {
+                    userResponse.setSex(UserEntity.Sex.valueOf(organization.getUser().getSex()));
+                } catch (IllegalArgumentException e) {
+                    userResponse.setSex(UserEntity.Sex.UNKNOWN);
+                }
+            } else {
+                userResponse.setSex(UserEntity.Sex.UNKNOWN);
+            }
+            
+            userResponse.setEnabled(organization.getUser().isEnabled());
+            userResponse.setSuperUser(organization.getUser().isSuperUser());
+            userResponse.setEmailVerified(organization.getUser().isEmailVerified());
+            userResponse.setMobileVerified(organization.getUser().isMobileVerified());
+            userResponse.setCreatedAt(organization.getUser().getCreatedAt());
+            userResponse.setUpdatedAt(organization.getUser().getUpdatedAt());
+            
+            // 设置用户的当前组织为 null，避免循环引用
+            userResponse.setCurrentOrganization(null);
+            
+            response.setUser(userResponse);
+        }
+        
+        return response;
     }
 
 }
