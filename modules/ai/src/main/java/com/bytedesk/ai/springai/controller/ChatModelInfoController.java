@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-17 14:24:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 15:42:13
+ * @LastEditTime: 2025-07-17 16:20:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,9 +11,10 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.rag;
+package com.bytedesk.ai.springai.controller;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.ai.springai.config.ChatModelInfoService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -8,6 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.context.ApplicationContext;
 
+import com.bytedesk.ai.springai.config.EmbeddingModelInfoService;
+
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
