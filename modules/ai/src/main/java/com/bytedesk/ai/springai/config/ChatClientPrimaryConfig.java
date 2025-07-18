@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 18:54:03
+ * @LastEditTime: 2025-07-18 13:58:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,8 @@
 package com.bytedesk.ai.springai.config;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.model.SpringAIModelProperties;
+import org.springframework.ai.model.SpringAIModels;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,7 +83,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "zhipuai")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = SpringAIModels.ZHIPUAI)
     public ChatClient primaryZhipuaiChatClient() {
         log.info("Setting ZhiPuAI chat client as Primary");
         if (zhipuaiChatClient == null) {
@@ -92,7 +94,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "ollama")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = SpringAIModels.OLLAMA)
     public ChatClient primaryOllamaChatClient() {
         log.info("Setting Ollama chat client as Primary");
         if (ollamaChatClient == null) {
@@ -103,7 +105,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "dashscope")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "dashscope")
     public ChatClient primaryDashscopeChatClient() {
         log.info("Setting Dashscope chat client as Primary");
         if (dashscopeChatClient == null) {
@@ -114,7 +116,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "deepseek")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = SpringAIModels.DEEPSEEK)
     public ChatClient primaryDeepseekChatClient() {
         log.info("Setting Deepseek chat client as Primary");
         if (deepseekChatClient == null) {
@@ -125,7 +127,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "baidu")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "baidu")
     public ChatClient primaryBaiduChatClient() {
         log.info("Setting Baidu chat client as Primary");
         if (baiduChatClient == null) {
@@ -136,7 +138,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "tencent")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "tencent")
     public ChatClient primaryTencentChatClient() {
         log.info("Setting Tencent chat client as Primary");
         if (tencentChatClient == null) {
@@ -147,7 +149,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "volcengine")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "volcengine")
     public ChatClient primaryVolcengineChatClient() {
         log.info("Setting Volcengine chat client as Primary");
         if (volcengineChatClient == null) {
@@ -158,7 +160,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "openai")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = SpringAIModels.OPENAI)
     public ChatClient primaryOpenaiChatClient() {
         log.info("Setting OpenAI chat client as Primary");
         if (openaiChatClient == null) {
@@ -169,7 +171,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "openrouter")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "openrouter")
     public ChatClient primaryOpenrouterChatClient() {
         log.info("Setting OpenRouter chat client as Primary");
         if (openrouterChatClient == null) {
@@ -180,7 +182,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "siliconflow")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "siliconflow")
     public ChatClient primarySiliconflowChatClient() {
         log.info("Setting SiliconFlow chat client as Primary");
         if (siliconflowChatClient == null) {
@@ -191,7 +193,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "gitee")
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "gitee")
     public ChatClient primaryGiteeChatClient() {
         log.info("Setting Gitee chat client as Primary");
         if (giteeChatClient == null) {
@@ -203,7 +205,7 @@ public class ChatClientPrimaryConfig {
     // 当没有配置chat model时，不创建任何Primary bean，避免冲突
     // @Bean
     // @Primary
-    // @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "none", matchIfMissing = true)
+    // @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "none", matchIfMissing = true)
     // public ChatClient noPrimaryChatClient() {
     //     log.warn("No chat client configured as Primary. Set spring.ai.model.chat to 'zhipuai', 'ollama', 'dashscope', 'deepseek', 'baidu', 'tencent', 'volcengine', 'openai', 'openrouter', 'siliconflow', or 'gitee' to use chat features.");
     //     throw new IllegalStateException("No chat client configured. Please set spring.ai.model.chat to 'zhipuai', 'ollama', 'dashscope', 'deepseek', 'baidu', 'tencent', 'volcengine', 'openai', 'openrouter', 'siliconflow', or 'gitee'");

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 09:15:55
+ * @LastEditTime: 2025-07-18 14:29:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,8 @@
 package com.bytedesk.ai.springai.providers.zhipuai;
 
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.model.SpringAIModelProperties;
+import org.springframework.ai.model.SpringAIModels;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import lombok.Data;
 /**
  * @deprecated 使用ZhipuaiEmbeddingConfig
@@ -41,12 +41,22 @@ public class SpringAIZhipuaiEmbeddingConfig {
     @Value("${spring.ai.zhipuai.api-key:}")
     String zhipuaiApiKey;
 
+    @Value("${spring.ai.zhipuai.base-url:https://open.bigmodel.cn/api/paas}")
+    String zhipuaiBaseUrl;
+
+    @Value("${spring.ai.zhipuai.embedding.api-key:${spring.ai.zhipuai.api-key:}}")
+    String zhipuaiEmbeddingApiKey;
+
     @Value("${spring.ai.zhipuai.embedding.options.model:embedding-2}")
     String zhipuaiEmbeddingModel;
 
     @Bean("bytedeskZhipuaiEmbeddingApi")
     ZhiPuAiApi bytedeskZhipuaiEmbeddingApi() {
-        return new ZhiPuAiApi(zhipuaiApiKey);
+        if (zhipuaiEmbeddingApiKey != null && !zhipuaiEmbeddingApiKey.isEmpty()) {
+            return new ZhiPuAiApi(zhipuaiEmbeddingApiKey);
+        } else {
+            return new ZhiPuAiApi(zhipuaiApiKey);
+        }
     }
 
     // https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
@@ -58,9 +68,9 @@ public class SpringAIZhipuaiEmbeddingConfig {
                 .build();
     }
 
-    @Bean("bytedeskZhipuaiEmbeddingModel")
-    @ConditionalOnProperty(name = "spring.ai.model.embedding", havingValue = "zhipuai", matchIfMissing = false)
-    EmbeddingModel bytedeskZhipuaiEmbeddingModel() {
+    @Bean("zhiPuAiEmbeddingModel")
+    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = SpringAIModels.ZHIPUAI, matchIfMissing = false)
+    ZhiPuAiEmbeddingModel zhiPuAiEmbeddingModel() {
         return new ZhiPuAiEmbeddingModel(bytedeskZhipuaiEmbeddingApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
     }
 

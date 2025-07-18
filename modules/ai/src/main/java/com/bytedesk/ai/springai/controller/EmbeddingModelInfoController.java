@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-17 14:24:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 15:54:52
+ * @LastEditTime: 2025-07-18 14:17:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,8 +18,6 @@ import com.bytedesk.ai.springai.service.EmbeddingModelInfoService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +32,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/spring/ai/api/v1/embedding-models")
 @RequiredArgsConstructor
-@ConditionalOnBean(EmbeddingModel.class)
 public class EmbeddingModelInfoController {
 
     private final EmbeddingModelInfoService embeddingModelInfoService;
@@ -79,21 +76,6 @@ public class EmbeddingModelInfoController {
         }
         log.info("Getting VectorStore EmbeddingModel information");
         Map<String, Object> result = embeddingModelInfoService.getVectorStoreEmbeddingModelInfo();
-        return ResponseEntity.ok(JsonResult.success(result));
-    }
-
-    /**
-     * 测试 DashScope 配置
-     * GET http://127.0.0.1:9003/spring/ai/api/v1/embedding-models/test-dashscope
-     */
-    @GetMapping("/test-dashscope")
-    public ResponseEntity<JsonResult<?>> testDashScopeConfig() {
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
-        }
-        log.info("Testing DashScope configuration");
-        
-        Map<String, Object> result = embeddingModelInfoService.testDashScopeConfig();
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
