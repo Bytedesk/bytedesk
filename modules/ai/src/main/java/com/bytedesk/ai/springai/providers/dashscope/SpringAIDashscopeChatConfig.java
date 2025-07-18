@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 11:44:44
+ * @LastEditTime: 2025-07-18 12:00:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -40,7 +40,7 @@ public class SpringAIDashscopeChatConfig {
     @Value("${spring.ai.dashscope.api-key:sk-xxx}")
     private String apiKey;
 
-    @Value("${spring.ai.dashscope.chat.options.model:deepseek-r1}")
+    @Value("${spring.ai.dashscope.chat.options.model:qwen-max}")
     private String model;
 
     @Value("${spring.ai.dashscope.chat.options.temperature:0.7}")
