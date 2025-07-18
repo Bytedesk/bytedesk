@@ -21,7 +21,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
-import com.bytedesk.ai.statistic_token.StatisticTokenRestService;
+// import com.bytedesk.ai.statistic_token.StatisticTokenRestService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -97,8 +97,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired
     protected MessageRestService messageRestService;
 
-    @Autowired
-    protected StatisticTokenRestService statisticTokenRestService;
+    // @Autowired
+    // protected StatisticTokenRestService statisticTokenRestService;
 
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
@@ -1024,16 +1024,16 @@ public abstract class BaseSpringAIService implements SpringAIService {
             java.math.BigDecimal tokenUnitPrice = getTokenUnitPrice(aiProvider, aiModelType);
             
             // 记录token使用情况
-            statisticTokenRestService.recordAiTokenUsage(
-                robot.getOrgUid(), 
-                aiProvider, 
-                aiModelType, 
-                promptTokens, 
-                completionTokens, 
-                success, 
-                responseTime, 
-                tokenUnitPrice
-            );
+            // statisticTokenRestService.recordAiTokenUsage(
+            //     robot.getOrgUid(), 
+            //     aiProvider, 
+            //     aiModelType, 
+            //     promptTokens, 
+            //     completionTokens, 
+            //     success, 
+            //     responseTime, 
+            //     tokenUnitPrice
+            // );
             
             log.info("Recorded AI token usage: provider={}, model={}, tokens={}+{}={}, success={}, responseTime={}ms", 
                     aiProvider, aiModelType, promptTokens, completionTokens, promptTokens + completionTokens, success, responseTime);
