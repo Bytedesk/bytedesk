@@ -1370,7 +1370,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @param responseTime 响应时间（毫秒）
      * @param tokenUnitPrice Token单价
      */
-    @Async
     public void publishAiTokenUsageEvent(String orgUid, String aiProvider, String aiModelType,
             long promptTokens, long completionTokens, boolean success, long responseTime, BigDecimal tokenUnitPrice) {
         
@@ -1418,18 +1417,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         public long getTotalTokens() { return totalTokens; }
     }
 
-    // 抽象方法
-    // protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-    //         MessageProtobuf messageProtobufReply);
-
     // 带prompt参数的抽象方法重载
     protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent);
-
-    // protected abstract String processPromptSync(String message, RobotProtobuf robot);
-
-    // protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-    //         MessageProtobuf messageProtobufReply, SseEmitter emitter);
 
     // 带prompt参数的抽象方法重载
     protected abstract String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 10:09:00
+ * @LastEditTime: 2025-07-18 17:04:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,7 +51,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     }
 
     /**
-     * 根据机器人配置创建动态的OpenAiChatOptions
+     * 根据机器人配置创建动态的DeepSeekChatOptions
      * 
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
@@ -285,10 +285,6 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             log.error("Error in Deepseek token extraction", e);
             return new TokenUsage(0, 0, 0);
         }
-    }
-
-    public ChatModel getChatModel() {
-        return deepseekChatModel;
     }
     
     public Boolean isServiceHealthy() {

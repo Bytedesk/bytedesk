@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 11:48:53
+ * @LastEditTime: 2025-07-18 17:05:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,6 +21,8 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,10 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeController {
+
+    @Autowired(required = false)
+    @Qualifier("bytedeskDashscopeChatModel")
+    private ChatModel bytedeskDashscopeChatModel;
 
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIDashscopeService springAIDashscopeService;
@@ -82,7 +88,7 @@ public class SpringAIDashscopeController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        ChatModel model = springAIDashscopeService.getChatModel();
+        ChatModel model = bytedeskDashscopeChatModel;
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -107,7 +113,7 @@ public class SpringAIDashscopeController {
         executorService.execute(() -> {
             try {
                 Prompt prompt = new Prompt(new UserMessage(message));
-                ChatModel model = springAIDashscopeService.getChatModel();
+                ChatModel model = bytedeskDashscopeChatModel;
                 if (model != null) {
                     model.stream(prompt).subscribe(
                             response -> {
@@ -164,7 +170,7 @@ public class SpringAIDashscopeController {
             return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
         
-        ChatModel model = springAIDashscopeService.getChatModel();
+        ChatModel model = bytedeskDashscopeChatModel;
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
