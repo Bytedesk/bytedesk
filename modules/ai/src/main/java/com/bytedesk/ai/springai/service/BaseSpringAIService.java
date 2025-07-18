@@ -1,5 +1,6 @@
 package com.bytedesk.ai.springai.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -11,6 +12,8 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -21,7 +24,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
-// import com.bytedesk.ai.statistic_token.StatisticTokenRestService;
+import com.bytedesk.ai.springai.event.LlmTokenUsageEvent;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -97,8 +100,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired
     protected MessageRestService messageRestService;
 
-    // @Autowired
-    // protected StatisticTokenRestService statisticTokenRestService;
+    @Autowired
+    protected ApplicationEventPublisher applicationEventPublisher;
 
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
@@ -1002,7 +1005,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // ==================== AI Token Statistics Methods ====================
     
     /**
-     * Record AI token usage statistics
+     * Record AI token usage statistics by publishing an event
      * 
      * @param robot Robot configuration
      * @param aiProvider AI provider name
@@ -1023,22 +1026,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 获取token单价（这里可以根据不同的模型和提供商设置不同的价格）
             java.math.BigDecimal tokenUnitPrice = getTokenUnitPrice(aiProvider, aiModelType);
             
-            // 记录token使用情况
-            // statisticTokenRestService.recordAiTokenUsage(
-            //     robot.getOrgUid(), 
-            //     aiProvider, 
-            //     aiModelType, 
-            //     promptTokens, 
-            //     completionTokens, 
-            //     success, 
-            //     responseTime, 
-            //     tokenUnitPrice
-            // );
+            // 发布AI Token使用事件
+            publishAiTokenUsageEvent(
+                robot.getOrgUid(), 
+                aiProvider, 
+                aiModelType, 
+                promptTokens, 
+                completionTokens, 
+                success, 
+                responseTime, 
+                tokenUnitPrice
+            );
             
-            log.info("Recorded AI token usage: provider={}, model={}, tokens={}+{}={}, success={}, responseTime={}ms", 
+            log.info("Published AI token usage event: provider={}, model={}, tokens={}+{}={}, success={}, responseTime={}ms", 
                     aiProvider, aiModelType, promptTokens, completionTokens, promptTokens + completionTokens, success, responseTime);
         } catch (Exception e) {
-            log.error("Error recording AI token usage", e);
+            log.error("Error publishing AI token usage event", e);
         }
     }
 
@@ -1352,6 +1355,32 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
         
         return fullPrompt.toString().trim();
+    }
+
+
+    /**
+     * 发布AI Token使用事件
+     * 
+     * @param orgUid 组织UID
+     * @param aiProvider AI提供商
+     * @param aiModelType AI模型类型
+     * @param promptTokens Prompt token数量
+     * @param completionTokens Completion token数量
+     * @param success 请求是否成功
+     * @param responseTime 响应时间（毫秒）
+     * @param tokenUnitPrice Token单价
+     */
+    @Async
+    public void publishAiTokenUsageEvent(String orgUid, String aiProvider, String aiModelType,
+            long promptTokens, long completionTokens, boolean success, long responseTime, BigDecimal tokenUnitPrice) {
+        
+        LlmTokenUsageEvent event = new LlmTokenUsageEvent(this, orgUid, aiProvider, aiModelType,
+                promptTokens, completionTokens, success, responseTime, tokenUnitPrice);
+        
+        applicationEventPublisher.publishEvent(event);
+        
+        log.debug("Published AI token usage event: provider={}, model={}, tokens={}+{}={}, success={}, responseTime={}ms", 
+                aiProvider, aiModelType, promptTokens, completionTokens, promptTokens + completionTokens, success, responseTime);
     }
 
     /**
