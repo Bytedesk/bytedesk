@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:57:52
+ * @LastEditTime: 2025-07-18 10:09:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,11 +16,13 @@ package com.bytedesk.ai.springai.providers.deepseek;
 import java.util.List;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -41,7 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Autowired(required = false)
-    private OpenAiChatModel deepseekChatModel;
+    @Qualifier("deepseekChatModel")
+    private ChatModel deepseekChatModel;
 
     public SpringAIDeepseekService() {
         super(); // 调用基类的无参构造函数
@@ -53,9 +56,9 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private DeepSeekChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
-            OpenAiChatOptions.builder()
+            DeepSeekChatOptions.builder()
                 .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
@@ -77,7 +80,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        DeepSeekChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
@@ -99,7 +102,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                             sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
+                        tokenUsage[0] = extractDeepSeekTokenUsage(response);
                         success[0] = true;
                     }
                 },
@@ -134,19 +137,19 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                 // 如果有robot参数，尝试创建自定义选项
                 if (robot != null && robot.getLlm() != null) {
                     // 创建自定义选项
-                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    DeepSeekChatOptions customOptions = createDynamicOptions(robot.getLlm());
                     if (customOptions != null) {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = deepseekChatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
+                        tokenUsage = extractDeepSeekTokenUsage(response);
                         success = true;
                         return extractTextFromResponse(response);
                     }
                 }
                 
-                var response = deepseekChatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
+                ChatResponse response = deepseekChatModel.call(new Prompt(message));
+                tokenUsage = extractDeepSeekTokenUsage(response);
                 success = true;
                 return extractTextFromResponse(response);
             } catch (Exception e) {
@@ -185,7 +188,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        DeepSeekChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
@@ -208,7 +211,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = extractDeepSeekTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
@@ -235,14 +238,56 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                 });
     }
 
+    /**
+     * 专门为Deepseek API提取token使用情况
+     * 由于Deepseek API返回的usage字段是EmptyUsage对象，需要特殊处理
+     * 
+     * @param response ChatResponse对象
+     * @return TokenUsage对象
+     */
+    private TokenUsage extractDeepSeekTokenUsage(ChatResponse response) {
+        try {
+            if (response == null) {
+                log.warn("Deepseek API response is null");
+                return new TokenUsage(0, 0, 0);
+            }
 
+            var metadata = response.getMetadata();
+            if (metadata == null) {
+                log.warn("Deepseek API response metadata is null");
+                return new TokenUsage(0, 0, 0);
+            }
 
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return deepseekChatModel != null ? deepseekChatModel.call(prompt) : "";
-    // }
+            log.info("Deepseek API token extraction - metadata: {}", metadata);
 
-    public OpenAiChatModel getChatModel() {
+            // 直接通过getUsage()方法获取token使用情况，无需反射
+            try {
+                var usage = metadata.getUsage();
+                if (usage != null) {
+                    long promptTokens = usage.getPromptTokens();
+                    long completionTokens = usage.getCompletionTokens();
+                    long totalTokens = usage.getTotalTokens();
+                    
+                    log.info("Deepseek API direct usage extraction - prompt: {}, completion: {}, total: {}", 
+                            promptTokens, completionTokens, totalTokens);
+                    
+                    if (totalTokens > 0) {
+                        return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Could not get usage via getUsage() method: {}", e.getMessage());
+            }
+
+            return new TokenUsage(0, 0, 0);
+            
+        } catch (Exception e) {
+            log.error("Error in Deepseek token extraction", e);
+            return new TokenUsage(0, 0, 0);
+        }
+    }
+
+    public ChatModel getChatModel() {
         return deepseekChatModel;
     }
     
@@ -259,4 +304,5 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             return false;
         }
     }
+
 }

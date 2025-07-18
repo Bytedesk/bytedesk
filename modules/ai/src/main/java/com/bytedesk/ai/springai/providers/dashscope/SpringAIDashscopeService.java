@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 09:48:08
+ * @LastEditTime: 2025-07-18 10:10:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -117,14 +117,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Chat stream completed");
-                    
-                    // 如果token提取失败，使用累积的完整响应文本来估算token
-                    if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                        log.info("Dashscope API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
-                        TokenUsage estimatedUsage = estimateDashscopeTokenUsageFromText(fullResponseText[0].toString(), fullPromptContent);
-                        tokenUsage[0] = estimatedUsage;
-                        log.info("Dashscope API final estimated token usage: {}", estimatedUsage);
-                    }
                     
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
@@ -247,14 +239,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 () -> {
                     log.info("Dashscope API SSE complete");
                     
-                    // 如果token提取失败，使用累积的完整响应文本来估算token
-                    if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                        log.info("Dashscope API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
-                        TokenUsage estimatedUsage = estimateDashscopeTokenUsageFromText(fullResponseText[0].toString(), fullPromptContent);
-                        tokenUsage[0] = estimatedUsage;
-                        log.info("Dashscope API final estimated token usage: {}", estimatedUsage);
-                    }
-                    
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.DASHSCOPE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "qwen-turbo");
@@ -267,99 +251,13 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     }
 
     /**
-     * 从文本估算token使用量（包含prompt和completion）
-     * 
-     * @param responseText 响应文本
-     * @param promptContent prompt内容
-     * @return TokenUsage对象
-     */
-    private TokenUsage estimateDashscopeTokenUsageFromText(String responseText, String promptContent) {
-        try {
-            if (responseText == null || responseText.isEmpty()) {
-                return new TokenUsage(0, 0, 0);
-            }
-
-            log.info("Dashscope API estimating token usage from text - response length: {}, prompt length: {}", 
-                    responseText.length(), promptContent != null ? promptContent.length() : 0);
-
-            // 估算completion tokens
-            long completionTokens = estimateTokensFromText(responseText);
-            
-            // 估算prompt tokens
-            long promptTokens = 0;
-            if (promptContent != null && !promptContent.isEmpty()) {
-                promptTokens = estimateTokensFromText(promptContent);
-            }
-            
-            // 如果没有prompt内容，使用默认比例
-            if (promptTokens == 0) {
-                promptTokens = (long) (completionTokens * 0.3);
-            }
-            
-            long totalTokens = promptTokens + completionTokens;
-
-            log.info("Dashscope API estimated token usage from text - prompt: {}, completion: {}, total: {}", 
-                    promptTokens, completionTokens, totalTokens);
-
-            return new TokenUsage(promptTokens, completionTokens, totalTokens);
-
-        } catch (Exception e) {
-            log.error("Error estimating Dashscope token usage from text", e);
-            return new TokenUsage(0, 0, 0);
-        }
-    }
-
-    /**
-     * 从文本估算token数量
-     * 
-     * @param text 输入文本
-     * @return 估算的token数量
-     */
-    private long estimateTokensFromText(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0;
-        }
-
-        long tokenCount = 0;
-        
-        // 简单的估算方法：
-        // 1. 中文字符：每个字符约等于1个token
-        // 2. 英文单词：每个单词约等于1.3个token
-        // 3. 数字：每个数字约等于0.5个token
-        // 4. 标点符号：每个约等于0.5个token
-        
-        // 计算中文字符数量
-        long chineseChars = text.chars().filter(ch -> Character.UnicodeScript.of(ch) == Character.UnicodeScript.HAN).count();
-        
-        // 计算英文单词数量
-        String[] words = text.split("\\s+");
-        long englishWords = 0;
-        for (String word : words) {
-            if (word.matches("^[a-zA-Z]+$")) {
-                englishWords++;
-            }
-        }
-        
-        // 计算数字数量
-        long digits = text.chars().filter(Character::isDigit).count();
-        
-        // 计算标点符号数量
-        long punctuation = text.chars().filter(ch -> !Character.isLetterOrDigit(ch) && !Character.isWhitespace(ch)).count();
-        
-        tokenCount = chineseChars + (long)(englishWords * 1.3) + (long)(digits * 0.5) + (long)(punctuation * 0.5);
-        
-        // 确保至少返回1个token
-        return Math.max(1, tokenCount);
-    }
-
-    /**
      * 专门为Dashscope API提取token使用情况
      * 由于Dashscope API返回的usage字段是EmptyUsage对象，需要特殊处理
      * 
      * @param response ChatResponse对象
      * @return TokenUsage对象
      */
-    private TokenUsage extractDashscopeTokenUsage(org.springframework.ai.chat.model.ChatResponse response) {
+    private TokenUsage extractDashscopeTokenUsage(ChatResponse response) {
         try {
             if (response == null) {
                 log.warn("Dashscope API response is null");

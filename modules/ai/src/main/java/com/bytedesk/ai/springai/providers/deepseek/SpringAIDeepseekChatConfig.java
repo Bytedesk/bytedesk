@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:20:28
+ * @LastEditTime: 2025-07-18 09:59:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,9 @@
 package com.bytedesk.ai.springai.providers.deepseek;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -42,25 +45,25 @@ public class SpringAIDeepseekChatConfig {
     private Double temperature;
 
     @Bean("deepseekApi")
-    OpenAiApi deepseekApi() {
-        return OpenAiApi.builder()
+    DeepSeekApi deepseekApi() {
+        return DeepSeekApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .build();
     }
 
     @Bean("deepseekChatOptions")
-    OpenAiChatOptions deepseekChatOptions() {
-        return OpenAiChatOptions.builder()
+    DeepSeekChatOptions deepseekChatOptions() {
+        return DeepSeekChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
     }
 
     @Bean("deepseekChatModel")
-    OpenAiChatModel deepseekChatModel() {
-        return OpenAiChatModel.builder()
-                .openAiApi(deepseekApi())
+    DeepSeekChatModel deepseekChatModel() {
+        return DeepSeekChatModel.builder()
+                .deepSeekApi(deepseekApi())
                 .defaultOptions(deepseekChatOptions())
                 .build();
     }

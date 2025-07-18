@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:48:35
+ * @LastEditTime: 2025-07-18 10:00:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,10 +17,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-// import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -82,7 +81,7 @@ public class SpringAIDeepseekController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIDeepseekService.getChatModel();
+        ChatModel model = springAIDeepseekService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -138,7 +137,7 @@ public class SpringAIDeepseekController {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
         
-        OpenAiChatModel model = springAIDeepseekService.getChatModel();
+        ChatModel model = springAIDeepseekService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
@@ -147,7 +146,7 @@ public class SpringAIDeepseekController {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    OpenAiChatOptions.builder()
+                    DeepSeekChatOptions.builder()
                         .model("deepseek-chat")
                         .temperature(0.7)
                         .topP(0.9)
