@@ -17,10 +17,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
@@ -80,7 +80,7 @@ public class SpringAIDashscopeController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIDashscopeService.getChatModel();
+        ChatModel model = springAIDashscopeService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -92,40 +92,66 @@ public class SpringAIDashscopeController {
      * 方式3：SSE调用
      * http://127.0.0.1:9003/springai/dashscope/chat/sse?message=hello
      */
-    @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatSSE(
+    @GetMapping("/chat/sse")
+    public SseEmitter chatSse(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
             return null;
         }
         
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        SseEmitter emitter = new SseEmitter();
         
         executorService.execute(() -> {
             try {
-                // springAIDashscopeService.processPromptSSE(message, emitter);
+                Prompt prompt = new Prompt(new UserMessage(message));
+                ChatModel model = springAIDashscopeService.getChatModel();
+                if (model != null) {
+                    model.stream(prompt).subscribe(
+                            response -> {
+                                try {
+                                    emitter.send(response, MediaType.APPLICATION_JSON);
+                                } catch (Exception e) {
+                                    log.error("Error sending SSE event", e);
+                                }
+                            },
+                            error -> {
+                                log.error("Error in chat stream", error);
+                                try {
+                                    emitter.send(SseEmitter.event().name("error").data(error.getMessage()));
+                                } catch (Exception e) {
+                                    log.error("Error sending error event", e);
+                                }
+                            },
+                            () -> {
+                                try {
+                                    emitter.send(SseEmitter.event().name("complete").data(""));
+                                    emitter.complete();
+                                } catch (Exception e) {
+                                    log.error("Error sending complete event", e);
+                                }
+                            }
+                    );
+                } else {
+                    emitter.send(SseEmitter.event().name("error").data("Chat model not available"));
+                    emitter.complete();
+                }
             } catch (Exception e) {
-                log.error("Error processing SSE request", e);
-                emitter.completeWithError(e);
+                log.error("Error in SSE execution", e);
+                try {
+                    emitter.send(SseEmitter.event().name("error").data(e.getMessage()));
+                    emitter.complete();
+                } catch (Exception ex) {
+                    log.error("Error sending error event", ex);
+                }
             }
-        });
-        
-        // 添加超时和完成时的回调
-        emitter.onTimeout(() -> {
-            log.warn("SSE connection timed out");
-            emitter.complete();
-        });
-        
-        emitter.onCompletion(() -> {
-            log.info("SSE connection completed");
         });
         
         return emitter;
     }
 
     /**
-     * 自定义模型参数的调用示例
+     * 方式4：自定义参数调用
      * http://127.0.0.1:9003/springai/dashscope/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
@@ -136,7 +162,7 @@ public class SpringAIDashscopeController {
             return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
         
-        OpenAiChatModel model = springAIDashscopeService.getChatModel();
+        ChatModel model = springAIDashscopeService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
@@ -145,10 +171,10 @@ public class SpringAIDashscopeController {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    OpenAiChatOptions.builder()
-                        .model("dashscope-chat")
-                        .temperature(0.7)
-                        .topP(0.9)
+                    DashScopeChatOptions.builder()
+                        .withModel("dashscope-chat")
+                        .withTemperature(0.7)
+                        .withTopP(0.9)
                         .build()
                 ));
             

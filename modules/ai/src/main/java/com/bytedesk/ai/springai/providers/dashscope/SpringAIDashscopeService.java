@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 07:01:55
+ * @LastEditTime: 2025-07-18 09:48:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,15 +16,17 @@ package com.bytedesk.ai.springai.providers.dashscope;
 import java.util.List;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -40,24 +42,25 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIDashscopeService extends BaseSpringAIService {
 
     @Autowired(required = false)
-    private OpenAiChatModel bytedeskDashscopeChatModel;
+    @Qualifier("bytedeskDashscopeChatModel")
+    private ChatModel bytedeskDashscopeChatModel;
 
     public SpringAIDashscopeService() {
         super(); // 调用基类的无参构造函数
     }
 
     /**
-     * 根据机器人配置创建动态的OpenAiChatOptions
+     * 根据机器人配置创建动态的DashScopeChatOptions
      * 
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private DashScopeChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
-            OpenAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
+            DashScopeChatOptions.builder()
+                .withModel(robotLlm.getTextModel())
+                .withTemperature(robotLlm.getTemperature())
+                .withTopP(robotLlm.getTopP())
                 .build()
         );
     }
@@ -75,7 +78,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        DashScopeChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
@@ -148,7 +151,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 // 如果有robot参数，尝试创建自定义选项
                 if (robot != null && robot.getLlm() != null) {
                     // 创建自定义选项
-                    OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    DashScopeChatOptions customOptions = createDynamicOptions(robot.getLlm());
                     if (customOptions != null) {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
@@ -159,12 +162,10 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                     }
                 }
                 
-                var response = bytedeskDashscopeChatModel.call(message);
-                // Since call() returns String, we can't extract token usage directly
-                // Use estimation based on response length
-                tokenUsage = estimateDashscopeTokenUsageFromText(response, fullPromptContent);
+                ChatResponse response = bytedeskDashscopeChatModel.call(new Prompt(message));
+                tokenUsage = extractDashscopeTokenUsage(response);
                 success = true;
-                return response;
+                return extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Dashscope API call error: ", e);
                 success = false;
@@ -200,7 +201,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        DashScopeChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
@@ -309,51 +310,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     }
 
     /**
-     * 估算Dashscope API的token使用量（当无法从API获取实际token信息时使用）
-     * 
-     * @param response ChatResponse对象
-     * @return 估算的TokenUsage对象
-     */
-    private TokenUsage estimateDashscopeTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
-        try {
-            if (response == null || response.getResults() == null || response.getResults().isEmpty()) {
-                return new TokenUsage(0, 0, 0);
-            }
-
-            // 计算响应文本的总长度
-            StringBuilder fullResponseText = new StringBuilder();
-            for (org.springframework.ai.chat.model.Generation generation : response.getResults()) {
-                if (generation.getOutput() != null && generation.getOutput().getText() != null) {
-                    fullResponseText.append(generation.getOutput().getText());
-                }
-            }
-
-            String responseText = fullResponseText.toString();
-            log.info("Dashscope API estimating token usage from response text length: {}", responseText.length());
-
-            // 更准确的token估算：
-            // 1. 中文：每个字符约等于1个token
-            // 2. 英文：每个单词约等于1.3个token
-            // 3. 标点符号：每个约等于0.5个token
-            
-            long completionTokens = estimateTokensFromText(responseText);
-            
-            // 假设prompt占30%，completion占70%
-            long totalTokens = (long) (completionTokens / 0.7);
-            long promptTokens = totalTokens - completionTokens;
-
-            log.info("Dashscope API estimated token usage - prompt: {}, completion: {}, total: {}", 
-                    promptTokens, completionTokens, totalTokens);
-
-            return new TokenUsage(promptTokens, completionTokens, totalTokens);
-
-        } catch (Exception e) {
-            log.error("Error estimating Dashscope token usage", e);
-            return new TokenUsage(0, 0, 0);
-        }
-    }
-
-    /**
      * 从文本估算token数量
      * 
      * @param text 输入文本
@@ -416,111 +372,36 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 return new TokenUsage(0, 0, 0);
             }
 
-            log.info("Dashscope API manual token extraction - metadata: {}", metadata);
+            log.info("Dashscope API token extraction - metadata: {}", metadata);
 
-            // Dashscope API的token使用情况通常在以下字段中：
-            // 1. usage.prompt_tokens
-            // 2. usage.completion_tokens
-            // 3. usage.total_tokens
-
-            // 尝试从metadata中直接获取usage对象
-            Object usage = null;
-
-            // 方法1: 尝试通过反射获取usage字段
+            // 直接通过getUsage()方法获取token使用情况，无需反射
             try {
-                java.lang.reflect.Field usageField = metadata.getClass().getDeclaredField("usage");
-                usageField.setAccessible(true);
-                usage = usageField.get(metadata);
-                log.info("Dashscope API found usage field via reflection: {}", usage);
-            } catch (Exception e) {
-                log.debug("Could not get usage field via reflection: {}", e.getMessage());
-            }
-
-            // 方法2: 如果反射失败，尝试从metadata的toString()中解析
-            if (usage == null || usage.toString().contains("EmptyUsage")) {
-                log.info("Dashscope API usage field is EmptyUsage, trying to parse from metadata string");
-                String metadataStr = metadata.toString();
-                
-                // 查找usage信息，格式通常是: DefaultUsage{promptTokens=16, completionTokens=14, totalTokens=30}
-                if (metadataStr.contains("DefaultUsage{") || metadataStr.contains("usage:")) {
-                    // 提取promptTokens
-                    int promptStart = metadataStr.indexOf("promptTokens=");
-                    int promptEnd = metadataStr.indexOf(",", promptStart);
-                    if (promptEnd == -1) promptEnd = metadataStr.indexOf("}", promptStart);
+                var usage = metadata.getUsage();
+                if (usage != null) {
+                    long promptTokens = usage.getPromptTokens();
+                    long completionTokens = usage.getCompletionTokens();
+                    long totalTokens = usage.getTotalTokens();
                     
-                    // 提取completionTokens
-                    int completionStart = metadataStr.indexOf("completionTokens=");
-                    int completionEnd = metadataStr.indexOf(",", completionStart);
-                    if (completionEnd == -1) completionEnd = metadataStr.indexOf("}", completionStart);
-                    
-                    // 提取totalTokens
-                    int totalStart = metadataStr.indexOf("totalTokens=");
-                    int totalEnd = metadataStr.indexOf("}", totalStart);
-                    
-                    long promptTokens = 0, completionTokens = 0, totalTokens = 0;
-                    
-                    if (promptStart > 0 && promptEnd > promptStart) {
-                        try {
-                            promptTokens = Long.parseLong(metadataStr.substring(promptStart + 13, promptEnd));
-                        } catch (NumberFormatException e) {
-                            log.warn("Could not parse promptTokens from: {}", metadataStr.substring(promptStart + 13, promptEnd));
-                        }
-                    }
-                    
-                    if (completionStart > 0 && completionEnd > completionStart) {
-                        try {
-                            completionTokens = Long.parseLong(metadataStr.substring(completionStart + 17, completionEnd));
-                        } catch (NumberFormatException e) {
-                            log.warn("Could not parse completionTokens from: {}", metadataStr.substring(completionStart + 17, completionEnd));
-                        }
-                    }
-                    
-                    if (totalStart > 0 && totalEnd > totalStart) {
-                        try {
-                            totalTokens = Long.parseLong(metadataStr.substring(totalStart + 12, totalEnd));
-                        } catch (NumberFormatException e) {
-                            log.warn("Could not parse totalTokens from: {}", metadataStr.substring(totalStart + 12, totalEnd));
-                        }
-                    }
-                    
-                    log.info("Dashscope API parsed from string - prompt: {}, completion: {}, total: {}", 
+                    log.info("Dashscope API direct usage extraction - prompt: {}, completion: {}, total: {}", 
                             promptTokens, completionTokens, totalTokens);
                     
                     if (totalTokens > 0) {
                         return new TokenUsage(promptTokens, completionTokens, totalTokens);
                     }
                 }
+            } catch (Exception e) {
+                log.debug("Could not get usage via getUsage() method: {}", e.getMessage());
             }
 
-            // 如果usage字段不存在，尝试其他可能的字段
-            log.info("Dashscope API usage field not found, checking other fields");
-            for (String key : metadata.keySet()) {
-                Object value = metadata.get(key);
-                log.info("Dashscope API metadata [{}]: {} (class: {})",
-                        key, value, value != null ? value.getClass().getName() : "null");
-            }
-
-            // 方法3: 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
-            log.info("Dashscope API manual extraction failed, trying original extractTokenUsage method");
-            TokenUsage fallbackUsage = extractTokenUsage(response);
-            if (fallbackUsage.getTotalTokens() > 0) {
-                log.info("Dashscope API fallback extraction successful: {}", fallbackUsage);
-                return fallbackUsage;
-            }
-
-            // 方法4: 如果所有方法都失败，尝试估算token使用量
-            log.info("Dashscope API all extraction methods failed, attempting to estimate token usage");
-            TokenUsage estimatedUsage = estimateDashscopeTokenUsageFromResponse(response);
-            log.info("Dashscope API estimated token usage: {}", estimatedUsage);
-            return estimatedUsage;
-
+            return new TokenUsage(0, 0, 0);
+            
         } catch (Exception e) {
-            log.error("Error in manual Dashscope token extraction", e);
+            log.error("Error in Dashscope token extraction", e);
             return new TokenUsage(0, 0, 0);
         }
     }
 
-    public OpenAiChatModel getChatModel() {
+    public ChatModel getChatModel() {
         return bytedeskDashscopeChatModel;
     }
     
