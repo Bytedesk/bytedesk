@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 15:33:26
+ * @LastEditTime: 2025-07-18 10:22:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,10 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "is_llm_enabled")
     private Boolean enabled = true;
+
+    @Builder.Default
+    @Column(name = "is_thinking_enabled")
+    private Boolean enableThinking = false;
 
     // 文本对话模型提供商
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-19 13:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 11:29:35
+ * @LastEditTime: 2025-07-18 10:27:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
 import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
-// import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;

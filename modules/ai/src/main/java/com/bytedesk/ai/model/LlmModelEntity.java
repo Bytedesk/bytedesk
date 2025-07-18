@@ -65,11 +65,11 @@ public class LlmModelEntity extends BaseEntity {
     private String description = BytedeskConsts.EMPTY_STRING;
 
     /**
-     * Type of LLM model (CHAT, EMBEDDING, etc.)
+     * Type of LLM model (TEXT, EMBEDDING, etc.)
      */
     @Builder.Default
     @Column(name = "model_type")
-    private String type = LlmModelTypeEnum.CHAT.name();
+    private String type = LlmModelTypeEnum.TEXT.name();
 
     /**
      * Associated provider UID
