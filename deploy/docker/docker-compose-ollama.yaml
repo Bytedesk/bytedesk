@@ -232,9 +232,18 @@ services:
       SPRING_SECURITY_BASIC_ENABLED: true
       # ai config
       # 默认对话配置
+      # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_text
       SPRING_AI_MODEL_CHAT: ollama
       # 默认向量模型
+      # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_embedding
       SPRING_AI_MODEL_EMBEDDING: ollama
+      # 默认视觉模型
+      # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_vision
+      SPRING_AI_MODEL_VISION: ollama
+      # 默认语音模型
+      SPRING_AI_MODEL_AUDIO: ollama
+      # 默认重排序模型
+      SPRING_AI_MODEL_RERANK: dashscope
       # ollama
       SPRING_AI_OLLAMA_BASE_URL: http://ollama-bytedesk:11434
       SPRING_AI_OLLAMA_CHAT_ENABLED: "true"
@@ -257,6 +266,14 @@ services:
       SPRING_AI_ZHIPUAI_CHAT_ENABLED: "false"
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TOP_P: 0.9
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MAX_TOKENS: 4096
+      SPRING_AI_ZHIPUAI_CONNECTION_TIMEOUT: 30
+      SPRING_AI_ZHIPUAI_READ_TIMEOUT: 10
+      SPRING_AI_ZHIPUAI_WRITE_TIMEOUT: 10
+      SPRING_AI_ZHIPUAI_PING_INTERVAL: 10
+      SPRING_AI_ZHIPUAI_MAX_IDLE_CONNECTIONS: 8
+      SPRING_AI_ZHIPUAI_KEEP_ALIVE_DURATION: 1
       SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "false"
       # SPRING_AI_ZHIPUAI_EMBEDDING_BASE_URL: https://api.bigmodel.cn
       # SPRING_AI_ZHIPUAI_EMBEDDING_API_KEY: 'sk-xxx'
@@ -285,15 +302,18 @@ services:
       # 阿里云百炼大模型模型列表：
       # https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
       SPRING_AI_DASHSCOPE_ENABLED: "false"
-      SPRING_AI_DASHSCOPE_BASE_URL: https://dashscope.aliyuncs.com/compatible-mode
+      SPRING_AI_DASHSCOPE_BASE_URL: https://dashscope.aliyuncs.com
       SPRING_AI_DASHSCOPE_API_KEY: 'sk-xxx'
       SPRING_AI_DASHSCOPE_CHAT_ENABLED: "false"
-      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_MODEL: deepseek-r1
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_MODEL: qwen-max
       SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TOP_P: 3
       SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_ENABLED: "false"
       SPRING_AI_DASHSCOPE_IMAGE_ENABLED: "false"
       SPRING_AI_DASHSCOPE_EMBEDDING_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_EMBEDDING_OPTIONS_MODEL: text-embedding-v1
       SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_ENABLED: "false"
+      SPRING_AI_ALIBABA_DASHSCOPE_VIDEO_ENABLED: "false"
       SPRING_AI_NACOS_PROMPT_TEMPLATE_ENABLED: "false"
       # logging config
       LOGGING_LEVEL_COM_BYTEDESK_AI: DEBUG
