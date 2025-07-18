@@ -28,9 +28,7 @@ import com.alibaba.cloud.ai.graph.node.VariableAggregatorNode;
 public class GraphBuilder {
 
     @Bean
-    public CompiledGraph buildGraph(ChatModel chatModel
-
-    ) throws GraphStateException {
+    public CompiledGraph buildGraph(ChatModel chatModel) throws GraphStateException {
         ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 
         // new stateGraph
