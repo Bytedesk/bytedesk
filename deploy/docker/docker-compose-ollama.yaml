@@ -230,6 +230,11 @@ services:
       MANAGEMENT_SERVER_PORT: -1
       MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
       SPRING_SECURITY_BASIC_ENABLED: true
+      # Zipkin Tracing Configuration
+      MANAGEMENT_TRACING_ENABLED: false
+      MANAGEMENT_ZIPKIN_TRACING_ENABLED: false
+      # MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:9411/api/v2/spans
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
       # ai config
       # 默认对话配置
       # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_text
