@@ -112,6 +112,7 @@ services:
   # Zipkin 分布式追踪系统- Spring Ai Observability
   bytedesk-zipkin:
     image: 'openzipkin/zipkin:latest'
+    container_name: zipkin-bytedesk
     ports:
       - '9411:9411'
     volumes:

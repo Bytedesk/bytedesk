@@ -61,6 +61,8 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                 .withModel(robotLlm.getTextModel())
                 .withTemperature(robotLlm.getTemperature())
                 .withTopP(robotLlm.getTopP())
+                // .withEnableSearch(robotLlm.getEnableSearch())
+                // .withEnableThinking(robotLlm.getEnableThinking())
                 .build()
         );
     }

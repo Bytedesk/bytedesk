@@ -91,6 +91,22 @@ services:
     #   timeout: 10s
     #   retries: 5
 
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  bytedesk-zipkin:
+    image: 'openzipkin/zipkin:latest'
+    container_name: zipkin-bytedesk
+    ports:
+      - '9411:9411'
+    volumes:
+      - zipkin_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
     # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
@@ -102,6 +118,7 @@ services:
       - bytedesk-redis
       - bytedesk-elasticsearch
       - bytedesk-artemis
+      - bytedesk-zipkin
       # bytedesk-mysql:
       #   condition: service_healthy
       # bytedesk-redis:
@@ -297,8 +314,6 @@ services:
       SPRING_AI_DASHSCOPE_EMBEDDING_ENABLED: "false"
       SPRING_AI_DASHSCOPE_EMBEDDING_OPTIONS_MODEL: text-embedding-v1
       SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_ENABLED: "false"
-      SPRING_AI_ALIBABA_DASHSCOPE_VIDEO_ENABLED: "false"
-      SPRING_AI_NACOS_PROMPT_TEMPLATE_ENABLED: "false"
       # siliconflow
       # https://siliconflow.com/
       # https://docs.spring.io/spring-ai/reference/api/chat/siliconflow-chat.html
@@ -440,6 +455,8 @@ volumes:
     name: bytedesk_upload_data
   artemis_data:
     name: bytedesk_artemis_data
+  zipkin_data:
+    name: bytedesk_zipkin_data
 
 networks:
   bytedesk-network:
