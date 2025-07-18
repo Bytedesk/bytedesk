@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:24:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 10:15:38
+ * @LastEditTime: 2025-07-18 11:46:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.ai.springai.providers.ollama;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
@@ -77,6 +78,7 @@ public class SpringAIOllamaChatConfig {
     ChatClient bytedeskOllamaChatClient() {
         return ChatClient.builder(bytedeskOllamaChatModel())
                 .defaultOptions(bytedeskOllamaChatOptions())
+                .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }
 

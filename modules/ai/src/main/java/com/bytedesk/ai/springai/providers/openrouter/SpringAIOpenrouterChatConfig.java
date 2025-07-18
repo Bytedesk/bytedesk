@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-04 11:21:14
+ * @LastEditTime: 2025-07-18 11:46:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
 package com.bytedesk.ai.springai.providers.openrouter;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -69,6 +70,7 @@ public class SpringAIOpenrouterChatConfig {
     ChatClient openrouterChatClient() {
         return  ChatClient.builder(openrouterChatModel())
                 .defaultOptions(openrouterChatOptions())
+                .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }
 

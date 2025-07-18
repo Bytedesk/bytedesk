@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 09:08:50
+ * @LastEditTime: 2025-07-18 11:48:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.ai.springai.providers.dashscope;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -49,6 +50,7 @@ public class SpringAIDashscopeController {
 
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIDashscopeService springAIDashscopeService;
+    private final ChatClient bytedeskDashscopeChatClient;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
@@ -182,6 +184,88 @@ public class SpringAIDashscopeController {
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 方式5：使用 ChatClient 调用演示
+     * http://127.0.0.1:9003/springai/dashscope/chat/client?message=hello
+     */
+    @GetMapping("/chat/client")
+    public ResponseEntity<JsonResult<?>> chatWithClient(
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
+        }
+        
+        try {
+            // 使用 ChatClient 进行同步调用
+            var response = bytedeskDashscopeChatClient.prompt()
+                    .user(message)
+                    .call()
+                    .chatResponse();
+            String result = response.getResult().getOutput().getText();
+            
+            log.info("ChatClient response: {}", result);
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (Exception e) {
+            log.error("Error in ChatClient call", e);
+            return ResponseEntity.ok(JsonResult.error("ChatClient error: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 方式6：使用 ChatClient 流式调用演示
+     * http://127.0.0.1:9003/springai/dashscope/chat/client/stream?message=hello
+     */
+    @GetMapping("/chat/client/stream")
+    public Flux<ChatResponse> chatWithClientStream(
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
+        
+        try {
+            // 使用 ChatClient 进行流式调用
+            return bytedeskDashscopeChatClient.prompt()
+                    .user(message)
+                    .stream()
+                    .chatResponse();
+        } catch (Exception e) {
+            log.error("Error in ChatClient stream", e);
+            return Flux.empty();
+        }
+    }
+
+    /**
+     * 方式7：使用 ChatClient 带系统提示的调用演示
+     * http://127.0.0.1:9003/springai/dashscope/chat/client/system?message=hello
+     */
+    @GetMapping("/chat/client/system")
+    public ResponseEntity<JsonResult<?>> chatWithClientSystem(
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message,
+            @RequestParam(value = "systemPrompt", defaultValue = "You are a helpful assistant.") String systemPrompt) {
+        
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
+        }
+        
+        try {
+            // 使用 ChatClient 带系统提示的调用
+            var response = bytedeskDashscopeChatClient.prompt()
+                    .system(systemPrompt)
+                    .user(message)
+                    .call()
+                    .chatResponse();
+            String result = response.getResult().getOutput().getText();
+            
+            log.info("ChatClient with system prompt response: {}", result);
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (Exception e) {
+            log.error("Error in ChatClient system call", e);
+            return ResponseEntity.ok(JsonResult.error("ChatClient system error: " + e.getMessage()));
         }
     }
 
