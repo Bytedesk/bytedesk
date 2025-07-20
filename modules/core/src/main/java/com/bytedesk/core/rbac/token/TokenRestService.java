@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-20 16:04:10
+ * @LastEditTime: 2025-07-20 16:11:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.rbac.token;
 
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -32,7 +31,6 @@ import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
 import lombok.AllArgsConstructor;
@@ -101,6 +99,12 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
         entity.setUid(uidUtils.getUid());
+        // 
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        entity.setUserUid(user.getUid());
         
         // 统一设置过期时间，如果请求中没有设置过期时间，则使用JWT配置的过期时间
         if (entity.getExpiresAt() == null) {
