@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 12:26:45
+ * @LastEditTime: 2025-07-20 15:42:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,14 +99,16 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
         entity.setUid(uidUtils.getUid());
-        //
+        
+        // 统一设置过期时间，如果请求中没有设置过期时间，则使用JWT配置的过期时间
+        if (entity.getExpiresAt() == null) {
+            entity.setExpiresAt(calculateExpirationTime(request.getChannel()));
+        }
+        
         TokenEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create token failed");
         }
-
-        // 手动将实体放入缓存
-        // cacheToken(savedEntity);
 
         return convertToResponse(savedEntity);
     }
