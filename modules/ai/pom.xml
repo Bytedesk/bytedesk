@@ -275,6 +275,7 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<!-- https://oss.sonatype.org/content/repositories/snapshots/com/alibaba/cloud/ai/spring-ai-alibaba-bom/1.0.0.3-SNAPSHOT/maven-metadata.xml -->
 		<repository>
 			<name>Central Portal Snapshots</name>
 			<id>central-portal-snapshots</id>
