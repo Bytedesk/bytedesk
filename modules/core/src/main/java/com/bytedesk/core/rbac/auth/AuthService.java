@@ -14,6 +14,8 @@
  */
 package com.bytedesk.core.rbac.auth;
 
+import java.time.ZonedDateTime;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -117,14 +119,14 @@ public class AuthService {
 
         UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
-        String accessToken = JwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform());
-        
         // 登录成功后，将生成的accessToken同时保存到数据库中
         String channel = userDetails.getChannel();
         if (channel == null || channel.isEmpty()) {
             // 如果UserDetailsImpl中没有client信息，使用默认值
             channel = ChannelEnum.WEB.name();
         }
+
+        String accessToken = JwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform(), channel);
         
         String device = userDetails.getDevice();
         if (device == null || device.isEmpty()) {
@@ -143,21 +145,19 @@ public class AuthService {
             .device(device)
             .userUid(userDetails.getUid())
             .build();
-        // 只有当client中含有web字样时，expiresAt有效期24小时，否则为365天
-        if (channel.toLowerCase().contains("web")) {
-            tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(30)); // 默认30天过期
-        } else {
-            tokenRequest.setExpiresAt(BdDateUtils.now().plusDays(365)); // 其他客户端默认365天过期
-        }
         
+        // 使用TokenRestService来创建token，它会统一处理过期时间
         TokenEntity entity = modelMapper.map(tokenRequest, TokenEntity.class);
         entity.setUid(uidUtils.getUid());
-        //
+        
+        // 统一设置过期时间，与JWT配置保持一致
+        entity.setExpiresAt(JwtUtils.calculateExpirationTime(channel));
+        
         TokenEntity savedEntity = tokenRepository.save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create token failed");
         }
-        // 手动将实体放入缓存
+        
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .user(userResponse)

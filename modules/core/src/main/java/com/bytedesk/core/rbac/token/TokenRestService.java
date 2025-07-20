@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-20 15:42:31
+ * @LastEditTime: 2025-07-20 16:04:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.token;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -31,6 +32,7 @@ import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
 import lombok.AllArgsConstructor;
@@ -69,7 +71,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     public TokenResponse queryByUid(TokenRequest request) {
-        Optional<TokenEntity> optional = tokenRepository.findByUid(request.getUid());
+        Optional<TokenEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             TokenEntity entity = optional.get();
             return convertToResponse(entity);
@@ -102,7 +104,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         
         // 统一设置过期时间，如果请求中没有设置过期时间，则使用JWT配置的过期时间
         if (entity.getExpiresAt() == null) {
-            entity.setExpiresAt(calculateExpirationTime(request.getChannel()));
+            entity.setExpiresAt(JwtUtils.calculateExpirationTime(request.getChannel()));
         }
         
         TokenEntity savedEntity = save(entity);
@@ -112,13 +114,6 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
         return convertToResponse(savedEntity);
     }
-
-    // 添加一个新方法来处理缓存
-    // @CachePut(cacheNames = "token", key = "#entity.accessToken")
-    // private TokenEntity cacheToken(TokenEntity entity) {
-    //     log.debug("Manually caching token with key: {}", entity.getAccessToken());
-    //     return entity;
-    // }
 
     @Override
     public TokenResponse update(TokenRequest request) {
@@ -196,8 +191,10 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         if (!StringUtils.hasText(platform)) {
             platform = PlatformEnum.BYTEDESK.name(); // 默认平台
         }
-        // 生成访问令牌
-        return JwtUtils.generateJwtToken(username, platform);
+        String channel = request.getChannel();
+        
+        // 生成访问令牌，传递渠道信息以设置合适的过期时间
+        return JwtUtils.generateJwtToken(username, platform, channel);
     }
 
     /**

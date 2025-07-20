@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:54:52
+ * @LastEditTime: 2025-07-20 15:52:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.utils;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -39,18 +40,66 @@ public class JwtUtils {
 
     /**
      * https://github.com/jwtk/jjwt?tab=readme-ov-file#creating-a-jwt
+     * 根据渠道类型生成JWT token，支持不同的过期时间
      * 
-     * @param username
-     * @return
+     * @param username 用户名
+     * @param platform 平台
+     * @param channel 渠道类型（web/mobile等）
+     * @return JWT token字符串
      */
-    public String generateJwtToken(String username, String platform) {
+    public String generateJwtToken(String username, String platform, String channel) {
         JwtSubject jwtSubject = new JwtSubject(username.toLowerCase(), platform.toLowerCase());
+        
+        // 根据渠道类型计算过期时间
+        long expirationMs = calculateExpirationMs(channel);
+        
         return Jwts.builder()
             .subject(jwtSubject.toJson())
             .issuedAt(new Date())
-            .expiration(new Date((new Date()).getTime() + Long.parseLong(getBytedeskProperties().getJwt().getExpiration())))
+            .expiration(new Date((new Date()).getTime() + expirationMs))
             .signWith(secretKey())
             .compact();
+    }
+
+    /**
+     * 根据渠道类型计算过期时间（毫秒）
+     * 
+     * @param channel 渠道类型
+     * @return 过期时间（毫秒）
+     */
+    private long calculateExpirationMs(String channel) {
+        // 获取JWT配置的过期时间（毫秒）
+        long jwtExpirationMs = Long.parseLong(getBytedeskProperties().getJwt().getExpiration());
+        
+        // 根据渠道类型调整过期时间
+        if (channel != null && channel.toLowerCase().contains("web")) {
+            // Web端使用JWT配置的过期时间（默认30天）
+            return jwtExpirationMs;
+        } else {
+            // 移动端等其他客户端使用更长的过期时间（365天）
+            return 365L * 24 * 60 * 60 * 1000; // 365天转换为毫秒
+        }
+    }
+
+    /**
+     * 根据渠道类型计算过期时间（ZonedDateTime）
+     * 统一JWT和数据库token的过期时间处理
+     * 
+     * @param channel 渠道类型
+     * @return ZonedDateTime 过期时间
+     */
+    public static ZonedDateTime calculateExpirationTime(String channel) {
+        // 获取JWT配置的过期时间（毫秒）
+        long jwtExpirationMs = Long.parseLong(getBytedeskProperties().getJwt().getExpiration());
+        
+        // 根据渠道类型调整过期时间
+        if (channel != null && channel.toLowerCase().contains("web")) {
+            // Web端使用JWT配置的过期时间（默认30天）
+            return BdDateUtils.now().plusSeconds(jwtExpirationMs / 1000);
+        } else {
+            // 移动端等其他客户端使用更长的过期时间（365天）
+            return BdDateUtils.now().plusDays(365);
+        }
     }
 
     public Boolean validateJwtToken(String authToken) {
