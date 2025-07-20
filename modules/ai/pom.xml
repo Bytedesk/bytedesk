@@ -296,7 +296,7 @@
 		<!-- <repository>
 			<id>alibaba-cloud-ai</id>
 			<name>Alibaba Cloud AI</name>
-			<url>https://maven.aliyun.com/repository/public</url>
+			<url>https://maven.aliyun.com/repository/snapshots</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
