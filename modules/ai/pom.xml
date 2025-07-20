@@ -284,17 +284,19 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<!-- Alibaba Cloud AI 仓库 -->
 		<!-- https://maven.aliyun.com/mvn/guide -->
-		<!-- <repository>
-			<id>central</id>
-			<url>https://maven.aliyun.com/repository/central</url>
+		<repository>
+			<id>alibaba-cloud-ai</id>
+			<name>Alibaba Cloud AI</name>
+			<url>https://maven.aliyun.com/repository/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository> -->
+		</repository>
 	</repositories>
 
 </project>
