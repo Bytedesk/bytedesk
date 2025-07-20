@@ -164,12 +164,16 @@
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
+			<!-- <scope>system</scope> -->
+			<!-- <systemPath>${project.basedir}/libs/spring-ai-alibaba-starter-dashscope/1.0.0.3-SNAPSHOT/spring-ai-alibaba-starter-dashscope-1.0.0.3-SNAPSHOT.jar</systemPath> -->
 		</dependency>
 		<!-- 工作流或多智能体 -->
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-graph-core</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
+			<!-- <scope>system</scope> -->
+			<!-- <systemPath>${project.basedir}/libs/spring-ai-alibaba-graph-core/1.0.0.3-SNAPSHOT/spring-ai-alibaba-graph-core-1.0.0.3-SNAPSHOT.jar</systemPath> -->
 		</dependency>
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
