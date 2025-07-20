@@ -165,7 +165,7 @@
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 			<!-- <scope>system</scope> -->
-			<!-- <systemPath>${project.basedir}/libs/spring-ai-alibaba-starter-dashscope/1.0.0.3-SNAPSHOT/spring-ai-alibaba-starter-dashscope-1.0.0.3-SNAPSHOT.jar</systemPath> -->
+			<!-- <systemPath>${project.basedir}/src/main/resources/lib/spring-ai-alibaba-starter-dashscope/1.0.0.3-SNAPSHOT/spring-ai-alibaba-starter-dashscope-1.0.0.3-SNAPSHOT.jar</systemPath> -->
 		</dependency>
 		<!-- 工作流或多智能体 -->
 		<dependency>
@@ -173,7 +173,7 @@
 			<artifactId>spring-ai-alibaba-graph-core</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 			<!-- <scope>system</scope> -->
-			<!-- <systemPath>${project.basedir}/libs/spring-ai-alibaba-graph-core/1.0.0.3-SNAPSHOT/spring-ai-alibaba-graph-core-1.0.0.3-SNAPSHOT.jar</systemPath> -->
+			<!-- <systemPath>${project.basedir}/src/main/resources/lib/spring-ai-alibaba-graph-core/1.0.0.3-SNAPSHOT/spring-ai-alibaba-graph-core-1.0.0.3-SNAPSHOT.jar</systemPath> -->
 		</dependency>
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
@@ -223,7 +223,6 @@
 			<groupId>io.zipkin.reporter2</groupId>
 			<artifactId>zipkin-reporter-brave</artifactId>
 		</dependency>
-
 
 	</dependencies>
 
