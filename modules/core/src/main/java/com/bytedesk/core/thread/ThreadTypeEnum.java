@@ -36,8 +36,8 @@ public enum ThreadTypeEnum {
     LLM(14), // 机器人-直接调用大模型
     UNIFIED(15), // 统一客服入口
     HISTORY(16), // 历史对话，用于管理后台查看历史对话
-    WORKFLOW(17), // 工作流对话
-    AI_TOOL(18), // AI工具对话
+    // WORKFLOW(17), // 工作流对话
+    // AI_TOOL(18), // AI工具对话
     ;
 
     private final int value;
