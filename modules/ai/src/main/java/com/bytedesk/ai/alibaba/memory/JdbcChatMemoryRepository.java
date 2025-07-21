@@ -31,21 +31,21 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class JdbcChatMemoryRepository implements ChatMemoryRepository {
 
-	public static final String TABLE_NAME = "ai_chat_memory";
+	public static final String TABLE_NAME = "bytedesk_ai_chat_memory";
 
 	private static final String QUERY_GET_IDS = """
-			SELECT DISTINCT conversation_id FROM ai_chat_memory
+			SELECT DISTINCT conversation_id FROM bytedesk_ai_chat_memory
 			""";
 
 	private static final String QUERY_ADD = """
-			INSERT INTO ai_chat_memory (conversation_id, content, type, "timestamp") VALUES (?, ?, ?, ?)
+			INSERT INTO bytedesk_ai_chat_memory (conversation_id, content, type, "timestamp") VALUES (?, ?, ?, ?)
 			""";
 
 	private static final String QUERY_GET = """
-			SELECT content, type FROM ai_chat_memory WHERE conversation_id = ? ORDER BY "timestamp"
+			SELECT content, type FROM bytedesk_ai_chat_memory WHERE conversation_id = ? ORDER BY "timestamp"
 			""";
 
-	private static final String QUERY_CLEAR = "DELETE FROM ai_chat_memory WHERE conversation_id = ?";
+	private static final String QUERY_CLEAR = "DELETE FROM bytedesk_ai_chat_memory WHERE conversation_id = ?";
 
 	private final JdbcTemplate jdbcTemplate;
 
