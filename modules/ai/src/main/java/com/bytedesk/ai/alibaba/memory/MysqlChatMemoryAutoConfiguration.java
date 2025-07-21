@@ -16,8 +16,6 @@
 
 package com.bytedesk.ai.alibaba.memory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -28,11 +26,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
+
+import jakarta.activation.DataSource;
 
 /**
  * Auto-configuration for MySQL chat memory repository.
  */
+@Slf4j
 @AutoConfiguration(after = JdbcTemplateAutoConfiguration.class)
 @ConditionalOnClass({ MysqlChatMemoryRepository.class, DataSource.class, JdbcTemplate.class })
 @ConditionalOnProperty(prefix = "spring.ai.memory.mysql", name = "enabled", havingValue = "true",
@@ -40,13 +41,11 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties(MysqlChatMemoryProperties.class)
 public class MysqlChatMemoryAutoConfiguration {
 
-	private static final Logger logger = LoggerFactory.getLogger(MysqlChatMemoryAutoConfiguration.class);
-
 	@Bean
 	@Qualifier("mysqlChatMemoryRepository")
 	@ConditionalOnMissingBean(name = "mysqlChatMemoryRepository")
 	MysqlChatMemoryRepository mysqlChatMemoryRepository(JdbcTemplate jdbcTemplate) {
-		logger.info("Configuring MySQL chat memory repository");
+		log.info("Configuring MySQL chat memory repository");
 		return MysqlChatMemoryRepository.mysqlBuilder().jdbcTemplate(jdbcTemplate).build();
 	}
 
