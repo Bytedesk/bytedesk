@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 15:41:19
+ * @LastEditTime: 2025-07-21 16:41:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,6 +39,7 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -200,7 +201,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     public ThreadResponse createLlmThread(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("should login first");
+            throw new NotLoginException("login required");
         }
         RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getRobot()); 
         if (robotProtobuf == null) {
