@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 13:15:30
+ * @LastEditTime: 2025-07-21 16:25:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -230,13 +230,12 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            
             ConsumerResponse consumerResponse = consumerRestService.create(consumerRequest);
             
             // 创建预订
             BookingClassEnum bookingClass = BookingClassEnum.values()[random.nextInt(BookingClassEnum.values().length)];
             LocalDate date = LocalDate.now().plusDays(2 * (i + 1));
-            
+            // 
             BookingRequest bookingRequest = BookingRequest.builder()
                     .uid(Utils.formatUid(orgUid, "booking_" + (i + 1)))
                     .bookingNumber("10" + (i + 1))
@@ -246,6 +245,7 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
                     .to(to)
                     .bookingClass(bookingClass.name())
                     .consumerUid(consumerResponse.getUid())
+                    .orgUid(orgUid)
                     .build();
             
             // 创建预订实体并设置详细信息
