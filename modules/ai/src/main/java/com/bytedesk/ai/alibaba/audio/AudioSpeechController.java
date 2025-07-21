@@ -17,7 +17,6 @@
 package com.bytedesk.ai.alibaba.audio;
 
 
-import com.alibaba.cloud.ai.dashscope.audio.synthesis.SpeechSynthesisModel;
 import jakarta.annotation.PreDestroy;
 import org.apache.commons.io.FileUtils;
 import org.springframework.boot.ApplicationArguments;
@@ -48,10 +47,10 @@ public class AudioSpeechController implements ApplicationRunner {
 
 	private static final String FILE_PATH = "spring-ai-alibaba-audio-example/dashscope-audio/src/main/resources/gen/tts";
 
-	public AudioSpeechController(SpeechSynthesisModel speechSynthesisModel) {
+	// public AudioSpeechController(SpeechSynthesisModel speechSynthesisModel) {
 
-		// this.speechSynthesisModel = speechSynthesisModel;
-	}
+	// 	// this.speechSynthesisModel = speechSynthesisModel;
+	// }
 
 	@GetMapping
 	public void tts() throws IOException {
