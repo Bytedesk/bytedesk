@@ -11,12 +11,12 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.demo.airline.services;
+package com.bytedesk.ai.alibaba.demo.airline.services;
 
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.ai.demo.airline.data.*;
-import com.bytedesk.ai.demo.airline.services.BookingTools.BookingDetails;
+import com.bytedesk.ai.alibaba.demo.airline.data.*;
+import com.bytedesk.ai.alibaba.demo.airline.services.BookingTools.BookingDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

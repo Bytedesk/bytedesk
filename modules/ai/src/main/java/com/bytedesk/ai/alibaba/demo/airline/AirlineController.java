@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.demo.airline;
+package com.bytedesk.ai.alibaba.demo.airline;
 
 // import java.time.LocalDate;
 // import java.util.List;

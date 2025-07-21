@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-27 11:18:12
+ * @Date: 2025-03-25 09:26:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-27 11:19:04
+ * @LastEditTime: 2025-07-21 07:51:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-@NonNullApi
-package com.bytedesk.ai.demo.airline;
+package com.bytedesk.ai.alibaba.manus;
 
-import org.springframework.lang.NonNullApi;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ManusConfig {
+
+    // public ChromeDriver chromeDriver() {
+    //     return new ChromeDriver();
+    // }
+    
+}

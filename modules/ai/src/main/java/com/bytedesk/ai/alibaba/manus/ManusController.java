@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 202ManusControllerT4
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 13:08:49
+ * @LastEditTime: 2025-07-21 07:52:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.demo.manus;
+package com.bytedesk.ai.alibaba.manus;
 
 // import org.openqa.selenium.WebDriver;
 // import org.openqa.selenium.chrome.ChromeDriver;

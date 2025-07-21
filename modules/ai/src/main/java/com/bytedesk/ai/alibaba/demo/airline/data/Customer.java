@@ -6,7 +6,7 @@
  * @FilePath: /playground-flight-booking/src/main/java/ai/spring/demo/ai/playground/data/Customer.java
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-package com.bytedesk.ai.demo.airline.data;
+package com.bytedesk.ai.alibaba.demo.airline.data;
 
 import java.util.ArrayList;
 import java.util.List;

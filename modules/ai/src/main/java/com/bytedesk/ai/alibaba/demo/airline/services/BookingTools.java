@@ -11,12 +11,12 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.demo.airline.services;
+package com.bytedesk.ai.alibaba.demo.airline.services;
 
 import java.time.LocalDate;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.demo.airline.data.BookingStatus;
+import com.bytedesk.ai.alibaba.demo.airline.data.BookingStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
