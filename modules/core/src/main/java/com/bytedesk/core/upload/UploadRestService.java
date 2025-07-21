@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 17:30:49
+ * @LastEditTime: 2025-07-22 06:42:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -267,8 +267,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 
 		// 检查图片尺寸
-		try {
-			BufferedImage image = ImageIO.read(file.getInputStream());
+		try (InputStream inputStream = file.getInputStream()) {
+			BufferedImage image = ImageIO.read(inputStream);
 			if (image != null) {
 				int width = image.getWidth();
 				int height = image.getHeight();
