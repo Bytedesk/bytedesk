@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 16:41:28
+ * @LastEditTime: 2025-07-21 17:53:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,17 +70,17 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
 
     private final AuthService authService;
 
-    private final FaqRestService faqService;
+    private final FaqRestService faqRestService;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     private final RobotJsonLoader robotJsonLoader;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
     private final LlmProviderRestService llmProviderRestService;
 
@@ -226,12 +226,11 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             // org/robot/robotUid/userUid/randomUid
             topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
         }
-        
         // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
         if (!request.getForceNew()) {
-            Optional<ThreadEntity> threadOptional = threadService.findFirstByTopicAndOwner(topic, owner);
+            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicAndOwner(topic, owner);
             if (threadOptional.isPresent()) {
-                return threadService.convertToResponse(threadOptional.get());
+                return threadRestService.convertToResponse(threadOptional.get());
             }
         }
         //
@@ -254,11 +253,11 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
                 .orgUid(owner.getOrgUid())
                 .build();
         //
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        return threadService.convertToResponse(savedThread);
+        return threadRestService.convertToResponse(savedThread);
     }
 
     public ThreadResponse updateLlmThread(ThreadRequest request) {
@@ -266,7 +265,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         String topic = request.getTopic();
         RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getAgent());
         // 
-        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("thread not found");
         }
@@ -284,7 +283,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         thread.setUser(robotProtobuf.toJson());
         log.info("update thread robot: {}", robotProtobuf.toJson());
         //
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("thread save failed");
         }
@@ -342,7 +341,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (request.getServiceSettings().getWelcomeFaqUids() != null
                 && request.getServiceSettings().getWelcomeFaqUids().size() > 0) {
             for (String welcomeFaqUid : request.getServiceSettings().getWelcomeFaqUids()) {
-                Optional<FaqEntity> welcomeFaqOptional = faqService.findByUid(welcomeFaqUid);
+                Optional<FaqEntity> welcomeFaqOptional = faqRestService.findByUid(welcomeFaqUid);
                 if (welcomeFaqOptional.isPresent()) {
                     FaqEntity welcomeFaqEntity = welcomeFaqOptional.get();
                     // log.info("welcomeFaqUid added {}", welcomeFaqUid);
@@ -357,7 +356,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (request.getServiceSettings().getFaqUids() != null
                 && request.getServiceSettings().getFaqUids().size() > 0) {
             for (String faqUid : request.getServiceSettings().getFaqUids()) {
-                Optional<FaqEntity> faqOptional = faqService.findByUid(faqUid);
+                Optional<FaqEntity> faqOptional = faqRestService.findByUid(faqUid);
                 if (faqOptional.isPresent()) {
                     FaqEntity faqEntity = faqOptional.get();
                     log.info("faqUid added {}", faqUid);
@@ -373,7 +372,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
                 && request.getServiceSettings().getQuickFaqUids() != null
                 && request.getServiceSettings().getQuickFaqUids().size() > 0) {
             for (String quickFaqUid : request.getServiceSettings().getQuickFaqUids()) {
-                Optional<FaqEntity> quickFaqOptional = faqService.findByUid(quickFaqUid);
+                Optional<FaqEntity> quickFaqOptional = faqRestService.findByUid(quickFaqUid);
                 if (quickFaqOptional.isPresent()) {
                     FaqEntity quickFaqEntity = quickFaqOptional.get();
                     log.info("quickFaqUid added {}", quickFaqUid);
@@ -388,7 +387,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (request.getServiceSettings().getGuessFaqUids() != null
                 && request.getServiceSettings().getGuessFaqUids().size() > 0) {
             for (String guessFaqUid : request.getServiceSettings().getGuessFaqUids()) {
-                Optional<FaqEntity> guessFaqOptional = faqService.findByUid(guessFaqUid);
+                Optional<FaqEntity> guessFaqOptional = faqRestService.findByUid(guessFaqUid);
                 if (guessFaqOptional.isPresent()) {
                     FaqEntity guessFaq = guessFaqOptional.get();
                     log.info("guessFaqUid added {}", guessFaqUid);
@@ -403,7 +402,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (request.getServiceSettings().getHotFaqUids() != null
                 && request.getServiceSettings().getHotFaqUids().size() > 0) {
             for (String hotFaqUid : request.getServiceSettings().getHotFaqUids()) {
-                Optional<FaqEntity> hotFaqOptional = faqService.findByUid(hotFaqUid);
+                Optional<FaqEntity> hotFaqOptional = faqRestService.findByUid(hotFaqUid);
                 if (hotFaqOptional.isPresent()) {
                     FaqEntity hotFaq = hotFaqOptional.get();
                     log.info("hotFaqUid added {}", hotFaqUid);
@@ -418,7 +417,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         if (request.getServiceSettings().getShortcutFaqUids() != null
                 && request.getServiceSettings().getShortcutFaqUids().size() > 0) {
             for (String shortcutFaqUid : request.getServiceSettings().getShortcutFaqUids()) {
-                Optional<FaqEntity> shortcutFaqOptional = faqService.findByUid(shortcutFaqUid);
+                Optional<FaqEntity> shortcutFaqOptional = faqRestService.findByUid(shortcutFaqUid);
                 if (shortcutFaqOptional.isPresent()) {
                     FaqEntity shortcutFaq = shortcutFaqOptional.get();
                     log.info("shortcutFaqUid added {}", shortcutFaqUid);
@@ -592,7 +591,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
             Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(name, orgUid);
             if (!robotOptional.isPresent()) {
                 String categoryUid = null;
-                Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
+                Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
                         robotJson.getCategory(), CategoryTypeEnum.ROBOT.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
                 if (!categoryOptional.isPresent()) {
                     CategoryRequest categoryRequest = CategoryRequest.builder()
@@ -603,7 +602,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
                             .type(CategoryTypeEnum.ROBOT.name())
                             .orgUid(orgUid)
                             .build();
-                    CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+                    CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
                     if (categoryResponse != null) {
                         categoryUid = categoryResponse.getUid();
                     } else {
