@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 10:28:07
+ * @LastEditTime: 2025-07-21 11:55:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
     private final BookingRestService bookingRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query booking by org")
+    @ActionAnnotation(title = "Booking", action = "org query", description = "query booking by org")
     @Operation(summary = "Query Bookings by Organization", description = "Retrieve bookings for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(BookingRequest request) {
@@ -50,7 +50,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
         return ResponseEntity.ok(JsonResult.success(bookings));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query booking by user")
+    @ActionAnnotation(title = "Booking", action = "user query", description = "query booking by user")
     @Operation(summary = "Query Bookings by User", description = "Retrieve bookings for the current user")
     @Override
     public ResponseEntity<?> queryByUser(BookingRequest request) {
@@ -60,7 +60,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
         return ResponseEntity.ok(JsonResult.success(bookings));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query booking by uid")
+    @ActionAnnotation(title = "Booking", action = "detail query", description = "query booking by uid")
     @Operation(summary = "Query Booking by UID", description = "Retrieve a specific booking by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(BookingRequest request) {
@@ -70,7 +70,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
         return ResponseEntity.ok(JsonResult.success(booking));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create booking")
+    @ActionAnnotation(title = "Booking", action = "create", description = "create booking")
     @Operation(summary = "Create Booking", description = "Create a new booking")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -81,7 +81,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
         return ResponseEntity.ok(JsonResult.success(booking));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update booking")
+    @ActionAnnotation(title = "Booking", action = "update", description = "update booking")
     @Operation(summary = "Update Booking", description = "Update an existing booking")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -92,7 +92,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
         return ResponseEntity.ok(JsonResult.success(booking));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete booking")
+    @ActionAnnotation(title = "Booking", action = "delete", description = "delete booking")
     @Operation(summary = "Delete Booking", description = "Delete a booking")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -103,7 +103,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export booking")
+    @ActionAnnotation(title = "Booking", action = "export", description = "export booking")
     @Operation(summary = "Export Bookings", description = "Export bookings to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -114,7 +114,7 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
             response,
             bookingRestService,
             BookingExcel.class,
-            "标签",
+            "Booking",
             "booking"
         );
     }
