@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 18:08:07
+ * @LastEditTime: 2025-07-21 18:57:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,8 +113,10 @@ public class ThreadSpecification extends BaseSpecification {
                             criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.toString())));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
                     predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.toString()));
+                } else if (TypeConsts.COMPONENT_TYPE_VISITOR.equals(request.getComponentType())) {
+                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.LLM.toString()));
                 } else if (TypeConsts.COMPONENT_TYPE_CHANNEL.equals(request.getComponentType())) {
-                    
+                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.CHANNEL.toString()));
                 }
             } else if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
@@ -214,7 +216,6 @@ public class ThreadSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.or(filterPredicates.toArray(new Predicate[0])));
             }
 
-            //
             // user 使用 string 存储，此处暂时用like查询
             if (StringUtils.hasText(request.getUserNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));
