@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:55:58
+ * @LastEditTime: 2025-07-21 12:01:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,7 +73,6 @@ public class ConsumerRestController extends BaseRestController<ConsumerRequest> 
     @ActionAnnotation(title = "Consumer", action = "create", description = "create consumer")
     @Operation(summary = "Create Consumer", description = "Create a new consumer")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(ConsumerRequest request) {
         
         ConsumerResponse consumer = consumerRestService.create(request);
@@ -84,7 +83,6 @@ public class ConsumerRestController extends BaseRestController<ConsumerRequest> 
     @ActionAnnotation(title = "Consumer", action = "update", description = "update consumer")
     @Operation(summary = "Update Consumer", description = "Update an existing consumer")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(ConsumerRequest request) {
         
         ConsumerResponse consumer = consumerRestService.update(request);
@@ -95,7 +93,6 @@ public class ConsumerRestController extends BaseRestController<ConsumerRequest> 
     @ActionAnnotation(title = "Consumer", action = "delete", description = "delete consumer")
     @Operation(summary = "Delete Consumer", description = "Delete a consumer")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(ConsumerRequest request) {
         
         consumerRestService.delete(request);
@@ -106,7 +103,6 @@ public class ConsumerRestController extends BaseRestController<ConsumerRequest> 
     @ActionAnnotation(title = "Consumer", action = "export", description = "export consumer")
     @Operation(summary = "Export Consumers", description = "Export consumers to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
     public Object export(ConsumerRequest request, HttpServletResponse response) {
         return exportTemplate(

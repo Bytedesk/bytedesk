@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:55:52
+ * @LastEditTime: 2025-07-21 12:02:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,6 @@ package com.bytedesk.ai.alibaba.booking;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +38,6 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
 
     private final BookingRestService bookingRestService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "Booking", action = "org query", description = "query booking by org")
     @Operation(summary = "Query Bookings by Organization", description = "Retrieve bookings for the current organization")
     @Override
@@ -73,7 +71,6 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
     @ActionAnnotation(title = "Booking", action = "create", description = "create booking")
     @Operation(summary = "Create Booking", description = "Create a new booking")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
     public ResponseEntity<?> create(BookingRequest request) {
         
         BookingResponse booking = bookingRestService.create(request);
@@ -84,7 +81,6 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
     @ActionAnnotation(title = "Booking", action = "update", description = "update booking")
     @Operation(summary = "Update Booking", description = "Update an existing booking")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
     public ResponseEntity<?> update(BookingRequest request) {
         
         BookingResponse booking = bookingRestService.update(request);
@@ -95,7 +91,6 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
     @ActionAnnotation(title = "Booking", action = "delete", description = "delete booking")
     @Operation(summary = "Delete Booking", description = "Delete a booking")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(BookingRequest request) {
         
         bookingRestService.delete(request);
@@ -106,7 +101,6 @@ public class BookingRestController extends BaseRestController<BookingRequest> {
     @ActionAnnotation(title = "Booking", action = "export", description = "export booking")
     @Operation(summary = "Export Bookings", description = "Export bookings to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
     public Object export(BookingRequest request, HttpServletResponse response) {
         return exportTemplate(
