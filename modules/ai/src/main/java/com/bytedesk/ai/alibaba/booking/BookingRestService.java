@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 12:56:32
+ * @LastEditTime: 2025-07-21 13:15:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -211,7 +211,7 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
         log.info("Initializing demo bookings for orgUid: {}", orgUid);
 
         
-        List<String> names = List.of("云小宝", "李千问", "张百炼", "王通义", "刘魔搭");
+        List<String> names = List.of("张三", "李四", "王五", "赵六", "钱七");
         List<String> airportCodes = List.of("北京", "上海", "广州", "深圳", "杭州", "南京", "青岛", "成都", "武汉", "西安", "重庆", "大连", "天津");
         Random random = new Random();
 

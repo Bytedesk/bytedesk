@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 10:37:18
+ * @LastEditTime: 2025-07-21 13:16:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,5 +14,8 @@
 package com.bytedesk.ai.alibaba.booking;
 
 public enum BookingClassEnum {
-    ECONOMY, PREMIUM_ECONOMY, BUSINESS
+    ECONOMY,  // 经济舱
+    BUSINESS, // 商务舱
+    FIRST,    // 头等舱
+    PREMIUM   // 豪华舱
 }
