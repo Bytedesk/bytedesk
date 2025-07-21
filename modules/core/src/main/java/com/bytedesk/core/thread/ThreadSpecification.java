@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 18:57:00
+ * @LastEditTime: 2025-07-21 19:49:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ThreadSpecification extends BaseSpecification {
 
     public static Specification<ThreadEntity> search(ThreadRequest request) {
+        log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder,request.getOrgUid()));
