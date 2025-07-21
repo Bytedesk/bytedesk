@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:36:28
+ * @LastEditTime: 2025-07-21 12:56:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,9 @@
  */
 package com.bytedesk.ai.alibaba.booking;
 
+import java.time.ZonedDateTime;
 
+import com.bytedesk.ai.alibaba.consumer.ConsumerResponse;
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -31,14 +33,20 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class BookingResponse extends BaseResponse {
 
-    private String name;
+    // Booking specific fields
+    private String bookingNumber;
 
-    private String description;
+    private ZonedDateTime bookingDate;
 
-    private String type;
+    private String from;
 
-    private String color;
+    private String to;
 
-    private Integer order;
+    private String status;
+
+    private String bookingClass;
+
+    // Consumer related field - full object for responses
+    private ConsumerResponse consumer;
 
 }

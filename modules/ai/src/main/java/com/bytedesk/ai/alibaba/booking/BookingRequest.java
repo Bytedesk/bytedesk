@@ -13,8 +13,11 @@
  */
 package com.bytedesk.ai.alibaba.booking;
 
+import java.time.ZonedDateTime;
+
 import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,14 +32,22 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class BookingRequest extends BaseRequest {
 
-    private String name;
+    // Booking specific fields
+    private String bookingNumber;
 
-    private String description;
+    private ZonedDateTime bookingDate;
 
-    // @Builder.Default
-    // private String type = BookingTypeEnum.CUSTOMER.name();
+    private String from;
 
-    private String color;
+    private String to;
 
-    private Integer order;
+    @Builder.Default
+    private String status = BookingStatusEnum.CONFIRMED.name();
+
+    @Builder.Default
+    private String bookingClass = BookingClassEnum.ECONOMY.name();
+
+    // Consumer related field - typically just the ID for requests
+    private String consumerUid;
+
 }

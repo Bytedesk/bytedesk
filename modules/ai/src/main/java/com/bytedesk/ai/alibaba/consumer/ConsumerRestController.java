@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 12:01:56
+ * @LastEditTime: 2025-07-21 12:49:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/consumer")
+@RequestMapping("/ai/api/v1/consumer")
 @AllArgsConstructor
 @Tag(name = "Consumer Management", description = "Consumer management APIs for organizing and categorizing content with consumers")
 @Description("Consumer Management Controller - Content consumer and categorization APIs")

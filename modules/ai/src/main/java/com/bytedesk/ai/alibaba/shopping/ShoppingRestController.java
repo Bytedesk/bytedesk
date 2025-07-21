@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 12:39:37
+ * @LastEditTime: 2025-07-21 12:50:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
     private final ShoppingRestService shoppingRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query shopping by org")
+    @ActionAnnotation(title = "shopping", action = "org query", description = "query shopping by org")
     @Operation(summary = "Query Shoppings by Organization", description = "Retrieve shoppings for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(ShoppingRequest request) {
@@ -50,7 +50,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
         return ResponseEntity.ok(JsonResult.success(shoppings));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query shopping by user")
+    @ActionAnnotation(title = "shopping", action = "user query", description = "query shopping by user")
     @Operation(summary = "Query Shoppings by User", description = "Retrieve shoppings for the current user")
     @Override
     public ResponseEntity<?> queryByUser(ShoppingRequest request) {
@@ -60,7 +60,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
         return ResponseEntity.ok(JsonResult.success(shoppings));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query shopping by uid")
+    @ActionAnnotation(title = "shopping", action = "detail query", description = "query shopping by uid")
     @Operation(summary = "Query Shopping by UID", description = "Retrieve a specific shopping by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(ShoppingRequest request) {
@@ -70,7 +70,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
         return ResponseEntity.ok(JsonResult.success(shopping));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create shopping")
+    @ActionAnnotation(title = "shopping", action = "create", description = "create shopping")
     @Operation(summary = "Create Shopping", description = "Create a new shopping")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -81,7 +81,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
         return ResponseEntity.ok(JsonResult.success(shopping));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update shopping")
+    @ActionAnnotation(title = "shopping", action = "update", description = "update shopping")
     @Operation(summary = "Update Shopping", description = "Update an existing shopping")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -92,7 +92,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
         return ResponseEntity.ok(JsonResult.success(shopping));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete shopping")
+    @ActionAnnotation(title = "shopping", action = "delete", description = "delete shopping")
     @Operation(summary = "Delete Shopping", description = "Delete a shopping")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -103,7 +103,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export shopping")
+    @ActionAnnotation(title = "shopping", action = "export", description = "export shopping")
     @Operation(summary = "Export Shoppings", description = "Export shoppings to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -114,7 +114,7 @@ public class ShoppingRestController extends BaseRestController<ShoppingRequest> 
             response,
             shoppingRestService,
             ShoppingExcel.class,
-            "标签",
+            "shopping",
             "shopping"
         );
     }
