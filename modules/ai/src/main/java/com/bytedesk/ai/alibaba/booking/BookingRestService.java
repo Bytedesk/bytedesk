@@ -36,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ai.alibaba.consumer.ConsumerRestService;
+import com.bytedesk.ai.alibaba.consumer.ConsumerEntity;
 import com.bytedesk.ai.alibaba.consumer.ConsumerRequest;
 import com.bytedesk.ai.alibaba.consumer.ConsumerResponse;
 import com.bytedesk.ai.alibaba.consumer.ConsumerTypeEnum;
@@ -249,14 +250,14 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
             // 创建预订实体并设置详细信息
             BookingEntity bookingEntity = modelMapper.map(bookingRequest, BookingEntity.class);
             bookingEntity.setBookingNumber("10" + (i + 1));
-            bookingEntity.setDate(date.atStartOfDay(ZoneId.systemDefault()));
+            bookingEntity.setBookingDate(date.atStartOfDay(ZoneId.systemDefault()));
             bookingEntity.setStatus(BookingStatusEnum.CONFIRMED.name());
             bookingEntity.setFrom(from);
             bookingEntity.setTo(to);
             bookingEntity.setBookingClass(bookingClass.name());
             
             // 设置消费者关联
-            Optional<com.bytedesk.ai.alibaba.consumer.ConsumerEntity> consumerEntity = 
+            Optional<ConsumerEntity> consumerEntity = 
                 consumerRestService.findByUid(consumerResponse.getUid());
             if (consumerEntity.isPresent()) {
                 bookingEntity.setConsumer(consumerEntity.get());

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 11:18:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:29:28
+ * @LastEditTime: 2025-07-21 11:38:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
@@ -129,7 +128,7 @@ public class BookingTools {
 			@Override
 			public String call(String json) {
 				try {
-					BookingDetailsRequest request = JSON.parseObject(json, BookingDetailsRequest.class);
+					// BookingDetailsRequest request = JSON.parseObject(json, BookingDetailsRequest.class);
 					// BookingDetails details = flightBookingService.getBookingDetails(request.bookingNumber(), request.name());
 					// return JSON.toJSONString(details);
 					return "获取预订信息失败";

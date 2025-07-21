@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 11:18:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:36:29
+ * @LastEditTime: 2025-07-21 11:41:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,14 +46,12 @@ public class BookingEntity extends BaseEntity {
 
 	private String bookingNumber;
 
-	private ZonedDateTime date;
+	private ZonedDateTime bookingDate;
 
-	private ZonedDateTime bookingTo;
-
-	@Column(name = "departure_from")
+	@Column(name = "booking_from")
 	private String from;
 
-	@Column(name = "destination_to")
+	@Column(name = "booking_to")
 	private String to;
 
 	@Builder.Default
