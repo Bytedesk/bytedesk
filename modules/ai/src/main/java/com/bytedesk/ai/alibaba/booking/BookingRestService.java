@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:00:02
+ * @LastEditTime: 2025-07-21 11:37:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,11 @@
  */
 package com.bytedesk.ai.alibaba.booking;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,6 +35,10 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.ai.alibaba.consumer.ConsumerRestService;
+import com.bytedesk.ai.alibaba.consumer.ConsumerRequest;
+import com.bytedesk.ai.alibaba.consumer.ConsumerResponse;
+import com.bytedesk.ai.alibaba.consumer.ConsumerTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +55,8 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final ConsumerRestService consumerRestService;
 
     @Override
     public Page<BookingEntity> queryByOrgEntity(BookingRequest request) {
@@ -89,11 +99,6 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
         return bookingRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "booking", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<BookingEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return bookingRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
-    }
-
     public Boolean existsByUid(String uid) {
         return bookingRepository.existsByUid(uid);
     }
@@ -104,13 +109,6 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
-        }
-        // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<BookingEntity> booking = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-            if (booking.isPresent()) {
-                return convertToResponse(booking.get());
-            }
         }
         // 
         UserEntity user = authService.getUser();
@@ -202,20 +200,75 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
         return modelMapper.map(entity, BookingExcel.class);
     }
     
+    // 初始化预订，来自于spring ai alibaba demo
     public void initBookings(String orgUid) {
-        // log.info("initThreadBooking");
-        // for (String booking : BookingInitData.getAllBookings()) {
-        //     BookingRequest bookingRequest = BookingRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, booking))
-        //             .name(booking)
-        //             .order(0)
-        //             .type(BookingClassEnum.ECONOMY.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     create(bookingRequest);
-        // }
+
+        if (bookingRepository.count() > 0) {
+            log.info("Bookings already initialized for orgUid: {}", orgUid);
+            return;
+        }
+        log.info("Initializing demo bookings for orgUid: {}", orgUid);
+
+        
+        List<String> names = List.of("云小宝", "李千问", "张百炼", "王通义", "刘魔搭");
+        List<String> airportCodes = List.of("北京", "上海", "广州", "深圳", "杭州", "南京", "青岛", "成都", "武汉", "西安", "重庆", "大连", "天津");
+        Random random = new Random();
+
+        for (int i = 0; i < 5; i++) {
+            String name = names.get(i);
+            String from = airportCodes.get(random.nextInt(airportCodes.size()));
+            String to = airportCodes.get(random.nextInt(airportCodes.size()));
+            
+            // 创建消费者
+            ConsumerRequest consumerRequest = ConsumerRequest.builder()
+                    .uid(Utils.formatUid(orgUid, "consumer_" + (i + 1)))
+                    .name(name)
+                    .description("Demo consumer " + (i + 1))
+                    .type(ConsumerTypeEnum.BOOKING.name())
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
+                    .build();
+            
+            ConsumerResponse consumerResponse = consumerRestService.create(consumerRequest);
+            
+            // 创建预订
+            BookingClassEnum bookingClass = BookingClassEnum.values()[random.nextInt(BookingClassEnum.values().length)];
+            LocalDate date = LocalDate.now().plusDays(2 * (i + 1));
+            
+            BookingRequest bookingRequest = BookingRequest.builder()
+                    .uid(Utils.formatUid(orgUid, "booking_" + (i + 1)))
+                    .name("预订" + (i + 1))
+                    .description("Demo booking " + (i + 1))
+                    .type(bookingClass.name())
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
+                    .build();
+            
+            // 创建预订实体并设置详细信息
+            BookingEntity bookingEntity = modelMapper.map(bookingRequest, BookingEntity.class);
+            bookingEntity.setBookingNumber("10" + (i + 1));
+            bookingEntity.setDate(date.atStartOfDay(ZoneId.systemDefault()));
+            bookingEntity.setStatus(BookingStatusEnum.CONFIRMED.name());
+            bookingEntity.setFrom(from);
+            bookingEntity.setTo(to);
+            bookingEntity.setBookingClass(bookingClass.name());
+            
+            // 设置消费者关联
+            Optional<com.bytedesk.ai.alibaba.consumer.ConsumerEntity> consumerEntity = 
+                consumerRestService.findByUid(consumerResponse.getUid());
+            if (consumerEntity.isPresent()) {
+                bookingEntity.setConsumer(consumerEntity.get());
+            }
+            
+            // 保存预订
+            save(bookingEntity);
+            
+            log.info("Created booking: {} for consumer: {}", bookingEntity.getBookingNumber(), name);
+        }
+        
+        log.info("Demo bookings initialization completed for orgUid: {}", orgUid);
     }
     
 }

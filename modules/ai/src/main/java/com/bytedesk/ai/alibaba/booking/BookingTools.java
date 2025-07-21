@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-27 11:18:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:10:20
+ * @LastEditTime: 2025-07-21 11:29:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,8 +33,8 @@ import org.springframework.core.NestedExceptionUtils;
 @Configuration
 public class BookingTools {
 
-	@Autowired
-	private BookingService flightBookingService;
+	// @Autowired
+	// private BookingRestService bookingRestService;
 
 	private static final String BOOKING_DETAILS_SCHEMA = """
 			{
@@ -158,9 +158,10 @@ public class BookingTools {
 			public String call(String json) {
 				try {
 					ChangeBookingDatesRequest request = JSON.parseObject(json, ChangeBookingDatesRequest.class);
-					flightBookingService.changeBooking(request.bookingNumber(), request.name(), request.date(),
-							request.from(), request.to());
-					return "预订已修改成功";
+					// TODO: 实现通过 BookingRestService 修改预订的逻辑
+					// 需要先根据 bookingNumber 查找预订，然后更新相关信息
+					log.info("Change booking request: {}", request);
+					return "预订修改功能暂未实现，请联系客服";
 				} catch (Exception e) {
 					log.warn("Change booking: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
 					return "修改预订失败: " + e.getMessage();
@@ -186,8 +187,10 @@ public class BookingTools {
 			public String call(String json) {
 				try {
 					CancelBookingRequest request = JSON.parseObject(json, CancelBookingRequest.class);
-					flightBookingService.cancelBooking(request.bookingNumber(), request.name());
-					return "预订已取消成功";
+					// TODO: 实现通过 BookingRestService 取消预订的逻辑
+					// 需要先根据 bookingNumber 查找预订，然后更新状态为 CANCELLED
+					log.info("Cancel booking request: {}", request);
+					return "预订取消功能暂未实现，请联系客服";
 				} catch (Exception e) {
 					log.warn("Cancel booking: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
 					return "取消预订失败: " + e.getMessage();

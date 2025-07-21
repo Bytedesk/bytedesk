@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:16:49
+ * @LastEditTime: 2025-07-21 11:32:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,15 @@
  */
 package com.bytedesk.ai.alibaba.consumer;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bytedesk.ai.alibaba.booking.BookingEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -57,9 +62,13 @@ public class ConsumerEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of consumer (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of consumer (BOOKING, SHOPPING, etc.)
      */
     @Builder.Default
     @Column(name = "consumer_type")
-    private String type = ConsumerTypeEnum.CUSTOMER.name();
+    private String type = ConsumerTypeEnum.BOOKING.name();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "consumer")
+	private List<BookingEntity> bookings = new ArrayList<>();
 }
