@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-19 16:16:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 16:01:48
+ * @LastEditTime: 2025-07-22 23:49:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -117,6 +117,11 @@ public abstract class WorkflowBaseNode implements Serializable {
          * 节点标题
          */
         private String title;
+
+        /**
+         * 节点内容
+         */
+        private String content;
         
         /**
          * 输入值映射

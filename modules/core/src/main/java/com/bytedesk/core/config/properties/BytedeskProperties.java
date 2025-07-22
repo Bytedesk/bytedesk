@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 13:44:27
+ * @LastEditTime: 2025-07-23 06:53:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -147,7 +147,7 @@ public class BytedeskProperties {
 
     private String version;
 
-    private String appkey;
+    private String licenseKey;
 
     // 自定义配置
     private Custom custom = new Custom();
@@ -501,20 +501,20 @@ public class BytedeskProperties {
     }
 
     /**
-     * 获取加密后的appkey
-     * @return 加密后的appkey字符串
+     * 获取加密后的licenseKey
+     * @return 加密后的licenseKey字符串
      */
-    public String getAppkey() {
-        // 原始appkey已经是Base64编码的许可证信息，直接AES加密
-        return encryptString(this.appkey);
+    public String getLicenseKey() {
+        // 原始licenseKey已经是Base64编码的许可证信息，直接AES加密
+        return encryptString(this.licenseKey);
     }
 
     /**
-     * 获取原始appkey（仅用于内部使用）
-     * @return 原始appkey字符串
+     * 获取原始licenseKey（仅用于内部使用）
+     * @return 原始licenseKey字符串
      */
     public String getOriginalAppkey() {
-        return this.appkey;
+        return this.licenseKey;
     }
 
 }

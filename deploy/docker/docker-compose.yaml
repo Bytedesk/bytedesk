@@ -133,7 +133,7 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: "false"
       BYTEDESK_VERSION: 0.8.8
-      BYTEDESK_APPKEY: ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
+      BYTEDESK_LICENSE_KEY: ZjoyMDI1LTA4LTA2OkVOVEVSUFJJU0U6Ojo6
       # enable custom config: name, logo, description
       BYTEDESK_CUSTOM_ENABLED: "false"
       BYTEDESK_CUSTOM_NAME: 
