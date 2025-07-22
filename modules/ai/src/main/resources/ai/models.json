@@ -538,6 +538,32 @@
             "type": "VISION"
         }
     ],
+    "minimax": [
+        {
+            "name": "abab6.5s-chat",
+            "nickname": "abab6.5s",
+            "description": "MiniMax的abab 6.5标准版聊天模型，提供全面对话能力",
+            "type": "CHAT"
+        },
+        {
+            "name": "abab6.5g-chat",
+            "nickname": "abab6.5g",
+            "description": "MiniMax的abab 6.5高级版聊天模型，提供增强对话能力",
+            "type": "CHAT"
+        },
+        {
+            "name": "abab6.5t-chat",
+            "nickname": "abab6.5t",
+            "description": "MiniMax的abab 6.5旗舰版聊天模型，提供最强对话体验",
+            "type": "CHAT"
+        },
+        {
+            "name": "abab5.5s-chat",
+            "nickname": "abab5.5s",
+            "description": "MiniMax的abab 5.5标准版聊天模型，经典稳定的对话能力",
+            "type": "CHAT"
+        }
+    ],
     "openai": [
         {
             "name": "gpt-4o",
@@ -725,32 +751,6 @@
             "name": "step-1-flash",
             "nickname": "Step 1 Flash",
             "description": "Step函数团队的快速响应模型，优化速度和效率",
-            "type": "CHAT"
-        }
-    ],
-    "minimax": [
-        {
-            "name": "abab6.5s-chat",
-            "nickname": "abab6.5s",
-            "description": "MiniMax的abab 6.5标准版聊天模型，提供全面对话能力",
-            "type": "CHAT"
-        },
-        {
-            "name": "abab6.5g-chat",
-            "nickname": "abab6.5g",
-            "description": "MiniMax的abab 6.5高级版聊天模型，提供增强对话能力",
-            "type": "CHAT"
-        },
-        {
-            "name": "abab6.5t-chat",
-            "nickname": "abab6.5t",
-            "description": "MiniMax的abab 6.5旗舰版聊天模型，提供最强对话体验",
-            "type": "CHAT"
-        },
-        {
-            "name": "abab5.5s-chat",
-            "nickname": "abab5.5s",
-            "description": "MiniMax的abab 5.5标准版聊天模型，经典稳定的对话能力",
             "type": "CHAT"
         }
     ],

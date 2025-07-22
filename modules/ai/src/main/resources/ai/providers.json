@@ -62,6 +62,13 @@
         "webUrl": "https://console.volcengine.com/ark/",
         "status": "PRODUCTION"
     },
+    "minimax": {
+        "nickname": "Minimax",
+        "logo": "minimax.png",
+        "apiUrl": "https://api.minimax.chat/v1/",
+        "webUrl": "https://platform.minimaxi.com/",
+        "status": "PRODUCTION"
+    },
     "openai": {
         "nickname": "OpenAI",
         "logo": "openai.png",
@@ -97,13 +104,7 @@
         "webUrl": "https://www.baichuan-ai.com/",
         "status": "DEVELOPMENT"
     },
-    "minimax": {
-        "nickname": "Minimax",
-        "logo": "minimax.png",
-        "apiUrl": "https://api.minimax.chat/v1/",
-        "webUrl": "https://platform.minimaxi.com/",
-        "status": "DEVELOPMENT"
-    },
+    
     "yi": {
         "nickname": "Yi",
         "logo": "yi.png",

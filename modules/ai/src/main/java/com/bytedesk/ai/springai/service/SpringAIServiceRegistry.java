@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-19 13:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 10:27:01
+ * @LastEditTime: 2025-07-22 08:35:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,7 @@ import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
 import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
+import com.bytedesk.ai.springai.providers.minimax.SpringAIMinimaxService;
 import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
 import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
@@ -53,6 +54,7 @@ public class SpringAIServiceRegistry {
     private final Optional<SpringAITencentService> springAITencentService;
     private final Optional<SpringAIBaiduService> springAIBaiduService;
     private final Optional<SpringAIVolcengineService> springAIVolcengineService;
+    private final Optional<SpringAIMinimaxService> springAIMinimaxService;
 
     // 服务注册表，用于存储各种AI服务提供商的实现
     private final Map<String, SpringAIService> serviceRegistry = new HashMap<>();
@@ -70,6 +72,7 @@ public class SpringAIServiceRegistry {
         registerService(LlmConsts.TENCENT, springAITencentService.orElse(null));
         registerService(LlmConsts.BAIDU, springAIBaiduService.orElse(null));
         registerService(LlmConsts.VOLCENGINE, springAIVolcengineService.orElse(null));
+        registerService(LlmConsts.MINIMAX, springAIMinimaxService.orElse(null));
         
         log.info("SpringAI服务注册表初始化完成，注册了{}个服务", serviceRegistry.size());
     }
