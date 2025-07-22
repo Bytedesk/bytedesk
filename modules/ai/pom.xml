@@ -171,6 +171,11 @@
 			<artifactId>spring-ai-alibaba-graph-core</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
+		<!-- <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-starter-graph-observation</artifactId>
+            <version>${spring-ai-alibaba.version}</version>
+        </dependency> -->
 
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
