@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:51:49
+ * @LastEditTime: 2025-07-22 23:26:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,6 +34,8 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.rbac.user.UserResponse;
@@ -93,6 +95,10 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         }
         //
         UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new NotLoginException("login required");
+        }
+        // 
         UserEntity user = userService.findByUid(authUser.getUid())
                 .orElseThrow(() -> new NotFoundException("用户不存在."));
         String orgUid = uidUtils.getUid();
@@ -101,6 +107,8 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
+        organization.setVip(true);
+        organization.setVipExpireDate(BdDateUtils.now().plusDays(30));
         //
         OrganizationEntity savedOrganization = save(organization);
         if (savedOrganization == null) {
