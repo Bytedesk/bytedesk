@@ -14,7 +14,6 @@
 package com.bytedesk.core.workflow.node;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class WorkflowEndNode extends BaseNode {
+public class WorkflowEndNode extends WorkflowBaseNode {
 
     public static WorkflowEndNode fromJson(String json) {
         return JSON.parseObject(json, WorkflowEndNode.class);

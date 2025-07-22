@@ -13,8 +13,6 @@
  */
 package com.bytedesk.core.workflow.node;
 
-import com.bytedesk.core.base.BaseNode;
-
 /**
  * 工作流节点工厂类
  * 用于根据节点类型创建相应的节点实例
@@ -24,7 +22,7 @@ public class WorkflowNodeFactory {
     /**
      * 根据节点类型创建节点实例
      */
-    public static BaseNode createNode(String nodeType) {
+    public static WorkflowBaseNode createNode(String nodeType) {
         WorkflowNodeTypeEnum type = WorkflowNodeTypeEnum.fromValue(nodeType);
         
         switch (type) {
@@ -52,8 +50,8 @@ public class WorkflowNodeFactory {
     /**
      * 根据节点类型创建节点实例（带ID）
      */
-    public static BaseNode createNode(String nodeType, String id) {
-        BaseNode node = createNode(nodeType);
+    public static WorkflowBaseNode createNode(String nodeType, String id) {
+        WorkflowBaseNode node = createNode(nodeType);
         node.setId(id);
         return node;
     }
@@ -61,8 +59,8 @@ public class WorkflowNodeFactory {
     /**
      * 根据节点类型创建节点实例（带ID和名称）
      */
-    public static BaseNode createNode(String nodeType, String uid, String name) {
-        BaseNode node = createNode(nodeType, uid);
+    public static WorkflowBaseNode createNode(String nodeType, String uid, String name) {
+        WorkflowBaseNode node = createNode(nodeType, uid);
         node.setName(name);
         return node;
     }

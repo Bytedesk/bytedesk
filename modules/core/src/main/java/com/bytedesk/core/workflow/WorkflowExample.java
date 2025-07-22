@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bytedesk.core.base.BaseNode;
-import com.bytedesk.core.base.NodeMeta;
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
+import com.bytedesk.core.workflow.node.WorkflowBaseNode;
+import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
 import com.bytedesk.core.workflow.node.WorkflowConditionNode;
 import com.bytedesk.core.workflow.node.WorkflowEndNode;
 import com.bytedesk.core.workflow.node.WorkflowLLMNode;
@@ -36,7 +36,7 @@ public class WorkflowExample {
      * 创建示例工作流文档
      */
     public static WorkflowDocument createExampleWorkflow() {
-        List<BaseNode> nodes = new ArrayList<>();
+        List<WorkflowBaseNode> nodes = new ArrayList<>();
         List<WorkflowEdge> edges = new ArrayList<>();
         
         // 创建开始节点
@@ -44,13 +44,13 @@ public class WorkflowExample {
                 .id("start_0")
                 .type("start")
                 .name("Start")
-                .meta(NodeMeta.builder()
-                        .position(NodeMeta.Position.builder()
+                .meta(WorkflowNodeMeta.builder()
+                        .position(WorkflowNodeMeta.Position.builder()
                                 .x(180.0)
                                 .y(298.0)
                                 .build())
                         .build())
-                .data(BaseNode.NodeData.builder()
+                .data(WorkflowBaseNode.NodeData.builder()
                         .title("Start")
                         .outputs(createOutputs("query", "string", "Hello Flow."))
                         .build())
@@ -62,13 +62,13 @@ public class WorkflowExample {
                 .id("condition_0")
                 .type("condition")
                 .name("Condition")
-                .meta(NodeMeta.builder()
-                        .position(NodeMeta.Position.builder()
+                .meta(WorkflowNodeMeta.builder()
+                        .position(WorkflowNodeMeta.Position.builder()
                                 .x(640.0)
                                 .y(279.5)
                                 .build())
                         .build())
-                .data(BaseNode.NodeData.builder()
+                .data(WorkflowBaseNode.NodeData.builder()
                         .title("Condition")
                         .inputsValues(createConditionInputsValues())
                         .inputs(createConditionInputs())
@@ -81,8 +81,8 @@ public class WorkflowExample {
                 .id("llm_0")
                 .type("llm")
                 .name("LLM_0")
-                .meta(NodeMeta.builder()
-                        .position(NodeMeta.Position.builder()
+                .meta(WorkflowNodeMeta.builder()
+                        .position(WorkflowNodeMeta.Position.builder()
                                 .x(1660.1942854301792)
                                 .y(1.8635936030104148)
                                 .build())
@@ -91,7 +91,7 @@ public class WorkflowExample {
                 .temperature(0.5)
                 .systemPrompt("You are an AI assistant.")
                 .prompt("")
-                .data(BaseNode.NodeData.builder()
+                .data(WorkflowBaseNode.NodeData.builder()
                         .title("LLM_0")
                         .inputsValues(createLLMInputsValues())
                         .inputs(createLLMInputs())
@@ -105,14 +105,14 @@ public class WorkflowExample {
                 .id("loop_H8M3U")
                 .type("loop")
                 .name("Loop_2")
-                .meta(NodeMeta.builder()
-                        .position(NodeMeta.Position.builder()
+                .meta(WorkflowNodeMeta.builder()
+                        .position(WorkflowNodeMeta.Position.builder()
                                 .x(1020.0)
                                 .y(452.0)
                                 .build())
                         .build())
                 .loopTimes(2)
-                .data(BaseNode.NodeData.builder()
+                .data(WorkflowBaseNode.NodeData.builder()
                         .title("Loop_2")
                         .inputsValues(createLoopInputsValues())
                         .inputs(createLoopInputs())
@@ -126,13 +126,13 @@ public class WorkflowExample {
                 .id("end_0")
                 .type("end")
                 .name("End")
-                .meta(NodeMeta.builder()
-                        .position(NodeMeta.Position.builder()
+                .meta(WorkflowNodeMeta.builder()
+                        .position(WorkflowNodeMeta.Position.builder()
                                 .x(2220.0)
                                 .y(298.0)
                                 .build())
                         .build())
-                .data(BaseNode.NodeData.builder()
+                .data(WorkflowBaseNode.NodeData.builder()
                         .title("End")
                         .outputs(createOutputs("result", "string", null))
                         .build())

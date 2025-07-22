@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
+import com.bytedesk.core.workflow.edge.WorkflowEdge;
+import com.bytedesk.core.workflow.node.WorkflowBaseNode;
+import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -27,13 +32,13 @@ public class BaseNodeTest {
     @Test
     public void testBaseNodeCreation() {
         // 创建节点元数据
-        NodeMeta meta = NodeMeta.startNode(100.0, 200.0);
+        WorkflowNodeMeta meta = WorkflowNodeMeta.startNode(100.0, 200.0);
         
         // 创建节点数据
-        BaseNode.NodeData data = BaseNode.NodeData.of("测试节点");
+        WorkflowBaseNode.NodeData data = WorkflowBaseNode.NodeData.of("测试节点");
         
         // 创建基础节点（这里使用匿名内部类，实际使用中应该创建具体的实现类）
-        BaseNode node = new BaseNode() {
+        WorkflowBaseNode node = new WorkflowBaseNode() {
             // 匿名实现
         };
         node.setId("node-1");
@@ -59,17 +64,17 @@ public class BaseNodeTest {
     @Test
     public void testNodeDataCreation() {
         // 测试基础节点数据
-        BaseNode.NodeData data = BaseNode.NodeData.of("基础节点");
+        WorkflowBaseNode.NodeData data = WorkflowBaseNode.NodeData.of("基础节点");
         assertEquals("基础节点", data.getTitle());
         
         // 测试注释节点数据
-        BaseNode.NodeData commentData = BaseNode.NodeData.comment("这是一个注释", 200, 100);
+        WorkflowBaseNode.NodeData commentData = WorkflowBaseNode.NodeData.comment("这是一个注释", 200, 100);
         assertEquals("这是一个注释", commentData.getNote());
         assertEquals(200, commentData.getWidth());
         assertEquals(100, commentData.getHeight());
         
         // 测试组节点数据
-        BaseNode.NodeData groupData = BaseNode.NodeData.group("组节点", "#ff0000");
+        WorkflowBaseNode.NodeData groupData = WorkflowBaseNode.NodeData.group("组节点", "#ff0000");
         assertEquals("组节点", groupData.getTitle());
         assertEquals("#ff0000", groupData.getColor());
         
@@ -86,22 +91,22 @@ public class BaseNodeTest {
     @Test
     public void testNodeMetaCreation() {
         // 测试开始节点
-        NodeMeta startMeta = NodeMeta.startNode(100.0, 200.0);
+        WorkflowNodeMeta startMeta = WorkflowNodeMeta.startNode(100.0, 200.0);
         assertTrue(startMeta.getIsStart());
         assertEquals(100.0, startMeta.getPosition().getX());
         assertEquals(200.0, startMeta.getPosition().getY());
         
         // 测试容器节点
-        NodeMeta containerMeta = NodeMeta.containerNode(300.0, 400.0);
+        WorkflowNodeMeta containerMeta = WorkflowNodeMeta.containerNode(300.0, 400.0);
         assertTrue(containerMeta.getIsContainer());
         assertEquals(300.0, containerMeta.getPosition().getX());
         assertEquals(400.0, containerMeta.getPosition().getY());
         
         // 测试完整配置
-        NodeMeta fullMeta = NodeMeta.builder()
-                .position(NodeMeta.Position.of(500.0, 600.0))
-                .size(NodeMeta.Size.of(200.0, 150.0))
-                .padding(NodeMeta.Padding.of(10))
+        WorkflowNodeMeta fullMeta = WorkflowNodeMeta.builder()
+                .position(WorkflowNodeMeta.Position.of(500.0, 600.0))
+                .size(WorkflowNodeMeta.Size.of(200.0, 150.0))
+                .padding(WorkflowNodeMeta.Padding.of(10))
                 .draggable(true)
                 .selectable(true)
                 .deleteDisable(false)
@@ -126,12 +131,12 @@ public class BaseNodeTest {
         edgeProperties.put("condition", "success");
         edgeProperties.put("priority", 1);
         
-        BaseEdge.EdgeData edgeData = BaseEdge.EdgeData.builder()
+        WorkflowEdge.EdgeData edgeData = WorkflowEdge.EdgeData.builder()
                 .properties(edgeProperties)
                 .build();
         
         // 创建基础边（这里使用匿名内部类，实际使用中应该创建具体的实现类）
-        BaseEdge edge = new BaseEdge() {
+        WorkflowEdge edge = new WorkflowEdge() {
             // 匿名实现
         };
         edge.setId("edge-1");
@@ -164,10 +169,10 @@ public class BaseNodeTest {
         // 创建复杂的工作流结构
         
         // 1. 创建开始节点
-        NodeMeta startMeta = NodeMeta.startNode(100.0, 100.0);
-        BaseNode.NodeData startData = BaseNode.NodeData.of("开始");
+        WorkflowNodeMeta startMeta = WorkflowNodeMeta.startNode(100.0, 100.0);
+        WorkflowBaseNode.NodeData startData = WorkflowBaseNode.NodeData.of("开始");
         
-        BaseNode startNode = new BaseNode() {};
+        WorkflowBaseNode startNode = new WorkflowBaseNode() {};
         startNode.setId("start");
         startNode.setName("开始节点");
         startNode.setType("start");
@@ -175,20 +180,20 @@ public class BaseNodeTest {
         startNode.setData(startData);
         
         // 2. 创建动作节点
-        NodeMeta actionMeta = NodeMeta.builder()
-                .position(NodeMeta.Position.of(300.0, 100.0))
-                .size(NodeMeta.Size.of(150.0, 80.0))
+        WorkflowNodeMeta actionMeta = WorkflowNodeMeta.builder()
+                .position(WorkflowNodeMeta.Position.of(300.0, 100.0))
+                .size(WorkflowNodeMeta.Size.of(150.0, 80.0))
                 .build();
         
         Map<String, Object> actionInputs = new HashMap<>();
         actionInputs.put("message", "Hello World");
         
-        BaseNode.NodeData actionData = BaseNode.NodeData.builder()
+        WorkflowBaseNode.NodeData actionData = WorkflowBaseNode.NodeData.builder()
                 .title("发送消息")
                 .inputs(actionInputs)
                 .build();
         
-        BaseNode actionNode = new BaseNode() {};
+        WorkflowBaseNode actionNode = new WorkflowBaseNode() {};
         actionNode.setId("action-1");
         actionNode.setName("发送消息");
         actionNode.setType("action");
@@ -196,7 +201,7 @@ public class BaseNodeTest {
         actionNode.setData(actionData);
         
         // 3. 创建边
-        BaseEdge edge = new BaseEdge() {};
+        WorkflowEdge edge = new WorkflowEdge() {};
         edge.setId("edge-1");
         edge.setSourceNodeID("start");
         edge.setTargetNodeID("action-1");
@@ -204,10 +209,10 @@ public class BaseNodeTest {
         edge.setTargetPortID("input");
         
         // 4. 创建组节点（容器）
-        NodeMeta groupMeta = NodeMeta.containerNode(200.0, 200.0);
-        BaseNode.NodeData groupData = BaseNode.NodeData.group("消息处理组", "#e6f3ff");
+        WorkflowNodeMeta groupMeta = WorkflowNodeMeta.containerNode(200.0, 200.0);
+        WorkflowBaseNode.NodeData groupData = WorkflowBaseNode.NodeData.group("消息处理组", "#e6f3ff");
         
-        BaseNode groupNode = new BaseNode() {};
+        WorkflowBaseNode groupNode = new WorkflowBaseNode() {};
         groupNode.setId("group-1");
         groupNode.setName("消息处理组");
         groupNode.setType("group");

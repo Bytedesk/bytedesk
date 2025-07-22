@@ -14,7 +14,6 @@
 package com.bytedesk.core.workflow.node;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkflowTextNode extends BaseNode {
+public class WorkflowTextNode extends WorkflowBaseNode {
 
     private String text;
 

@@ -18,9 +18,9 @@ import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
-import com.bytedesk.core.base.BaseNode;
-import com.bytedesk.core.base.NodeMeta;
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
+import com.bytedesk.core.workflow.node.WorkflowBaseNode;
+import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
 
 /**
  * 工作流工具类
@@ -37,8 +37,8 @@ public class WorkflowUtils {
     /**
      * 从JSON字符串解析节点列表
      */
-    public static List<BaseNode> parseNodes(String json) {
-        return JSON.parseObject(json, new TypeReference<List<BaseNode>>() {});
+    public static List<WorkflowBaseNode> parseNodes(String json) {
+        return JSON.parseObject(json, new TypeReference<List<WorkflowBaseNode>>() {});
     }
     
     /**
@@ -58,7 +58,7 @@ public class WorkflowUtils {
     /**
      * 将节点列表转换为JSON字符串
      */
-    public static String nodesToJson(List<BaseNode> nodes) {
+    public static String nodesToJson(List<WorkflowBaseNode> nodes) {
         return JSON.toJSONString(nodes);
     }
     
@@ -91,21 +91,21 @@ public class WorkflowUtils {
     /**
      * 获取节点的元数据信息
      */
-    public static NodeMeta getNodeMeta(BaseNode node) {
+    public static WorkflowNodeMeta getNodeMeta(WorkflowBaseNode node) {
         return node.getMeta();
     }
     
     /**
      * 设置节点的元数据信息
      */
-    public static void setNodeMeta(BaseNode node, NodeMeta meta) {
+    public static void setNodeMeta(WorkflowBaseNode node, WorkflowNodeMeta meta) {
         node.setMeta(meta);
     }
     
     /**
      * 从Map创建NodeMeta对象
      */
-    public static NodeMeta createNodeMetaFromMap(Map<String, Object> metaMap) {
+    public static WorkflowNodeMeta createNodeMetaFromMap(Map<String, Object> metaMap) {
         if (metaMap == null) {
             return null;
         }
@@ -121,12 +121,12 @@ public class WorkflowUtils {
         Double y = positionMap.get("y") instanceof Number ? 
             ((Number) positionMap.get("y")).doubleValue() : null;
         
-        NodeMeta.Position position = NodeMeta.Position.builder()
+        WorkflowNodeMeta.Position position = WorkflowNodeMeta.Position.builder()
                 .x(x)
                 .y(y)
                 .build();
         
-        return NodeMeta.builder()
+        return WorkflowNodeMeta.builder()
                 .position(position)
                 .build();
     }
@@ -134,7 +134,7 @@ public class WorkflowUtils {
     /**
      * 将NodeMeta转换为Map
      */
-    public static Map<String, Object> nodeMetaToMap(NodeMeta meta) {
+    public static Map<String, Object> nodeMetaToMap(WorkflowNodeMeta meta) {
         if (meta == null || meta.getPosition() == null) {
             return null;
         }

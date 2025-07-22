@@ -16,7 +16,6 @@ package com.bytedesk.core.workflow.node;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class WorkflowConditionNode extends BaseNode {
+public class WorkflowConditionNode extends WorkflowBaseNode {
 
     // 条件节点特有的字段
     private List<ConditionItem> conditions;

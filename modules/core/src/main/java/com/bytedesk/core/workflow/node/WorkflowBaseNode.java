@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-19 16:16:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 15:20:11
+ * @LastEditTime: 2025-07-22 16:01:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,13 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.base;
+package com.bytedesk.core.workflow.node;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.workflow.edge.WorkflowEdge;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -34,7 +35,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
-public abstract class BaseNode implements Serializable {
+public abstract class WorkflowBaseNode implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,17 +67,17 @@ public abstract class BaseNode implements Serializable {
     /**
      * 入边列表
      */
-    private List<BaseEdge> inEdges;
+    private List<WorkflowEdge> inEdges;
     
     /**
      * 出边列表
      */
-    private List<BaseEdge> outEdges;
+    private List<WorkflowEdge> outEdges;
 
     /**
      * 节点元数据（UI相关配置）
      */
-    private NodeMeta meta;
+    private WorkflowNodeMeta meta;
 
     /**
      * 节点数据（表单数据）
@@ -86,12 +87,12 @@ public abstract class BaseNode implements Serializable {
     /**
      * 子节点列表（用于group和loop节点）
      */
-    private List<BaseNode> blocks;
+    private List<WorkflowBaseNode> blocks;
     
     /**
      * 子节点间连线（用于group和loop节点）
      */
-    private List<BaseEdge> edges;
+    private List<WorkflowEdge> edges;
 
     /**
      * 转换为JSON字符串

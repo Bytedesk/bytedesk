@@ -17,8 +17,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
+import com.bytedesk.core.workflow.node.WorkflowBaseNode;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +38,7 @@ public class WorkflowDocument implements Serializable {
     /**
      * 节点列表
      */
-    private List<BaseNode> nodes;
+    private List<WorkflowBaseNode> nodes;
     
     /**
      * 边列表

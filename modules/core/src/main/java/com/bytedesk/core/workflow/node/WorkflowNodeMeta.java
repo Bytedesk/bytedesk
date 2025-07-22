@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-25 11:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:10:00
+ * @LastEditTime: 2025-07-22 15:47:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.base;
+package com.bytedesk.core.workflow.node;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -32,7 +32,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class NodeMeta implements Serializable {
+public class WorkflowNodeMeta implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
@@ -341,8 +341,8 @@ public class NodeMeta implements Serializable {
     /**
      * 创建NodeMeta实例的便捷方法
      */
-    public static NodeMeta of(Double x, Double y) {
-        return NodeMeta.builder()
+    public static WorkflowNodeMeta of(Double x, Double y) {
+        return WorkflowNodeMeta.builder()
                 .position(Position.of(x, y))
                 .build();
     }
@@ -350,8 +350,8 @@ public class NodeMeta implements Serializable {
     /**
      * 创建NodeMeta实例的便捷方法
      */
-    public static NodeMeta of(Position position) {
-        return NodeMeta.builder()
+    public static WorkflowNodeMeta of(Position position) {
+        return WorkflowNodeMeta.builder()
                 .position(position)
                 .build();
     }
@@ -359,8 +359,8 @@ public class NodeMeta implements Serializable {
     /**
      * 创建开始节点的便捷方法
      */
-    public static NodeMeta startNode(Double x, Double y) {
-        return NodeMeta.builder()
+    public static WorkflowNodeMeta startNode(Double x, Double y) {
+        return WorkflowNodeMeta.builder()
                 .position(Position.of(x, y))
                 .isStart(true)
                 .build();
@@ -369,8 +369,8 @@ public class NodeMeta implements Serializable {
     /**
      * 创建容器节点的便捷方法
      */
-    public static NodeMeta containerNode(Double x, Double y) {
-        return NodeMeta.builder()
+    public static WorkflowNodeMeta containerNode(Double x, Double y) {
+        return WorkflowNodeMeta.builder()
                 .position(Position.of(x, y))
                 .isContainer(true)
                 .build();

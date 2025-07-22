@@ -14,7 +14,6 @@
 package com.bytedesk.core.workflow.node;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class WorkflowLoopNode extends BaseNode {
+public class WorkflowLoopNode extends WorkflowBaseNode {
 
     // 循环节点特有的字段
     private Integer loopTimes;

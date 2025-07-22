@@ -16,7 +16,6 @@ package com.bytedesk.core.workflow.node;
 import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseNode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class WorkflowCommentNode extends BaseNode {
+public class WorkflowCommentNode extends WorkflowBaseNode {
 
     // 注释节点特有的字段
     private Map<String, Object> size; // width, height
