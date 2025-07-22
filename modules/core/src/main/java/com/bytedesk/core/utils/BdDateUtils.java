@@ -73,6 +73,19 @@ public class BdDateUtils {
         return DateTimeFormatter.ofPattern(datetimeFormat).format(chinaTime);
     }
 
+    public static String formatDateToString(ZonedDateTime zonedDateTime) {
+        if (zonedDateTime == null) {
+            return null;
+        }
+        // 如果已经是 Asia/Shanghai 时区，直接格式化
+        if (zonedDateTime.getZone().equals(getDisplayZoneId())) {
+            return DateTimeFormatter.ofPattern(dateFormat).format(zonedDateTime);
+        }
+        // 否则转换为 Asia/Shanghai 时区
+        ZonedDateTime chinaTime = zonedDateTime.toInstant().atZone(getDisplayZoneId());
+        return DateTimeFormatter.ofPattern(dateFormat).format(chinaTime);
+    }
+
     public static Date formatStringToDateTime(String date) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat(datetimeFormat);
         try {
@@ -180,13 +193,6 @@ public class BdDateUtils {
         calendar.setTime(date);
         calendar.add(Calendar.DATE, 1); // 把日期往后增加一天,整数 往后推,负数往前移动
         return calendar.getTime(); // 这个时间就是日期往后推一天的结果
-    }
-
-    // 将英文日期格式 转未 中文日期格式
-    // 日期 + 1
-    public static String transformDateForVoa(String enDate) {
-        String cnDate = transformEnDateToCnDate(enDate);
-        return dateStringAddOneDayToString(cnDate);
     }
 
     public static int getHourOfDay() {
