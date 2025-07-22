@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 17:23:41
+ * @LastEditTime: 2025-07-22 14:53:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ public class WorkflowExample {
         
         // 创建开始节点
         WorkflowStartNode startNode = WorkflowStartNode.builder()
-                .uid("start_0")
+                .id("start_0")
                 .type("start")
                 .name("Start")
                 .meta(NodeMeta.builder()
@@ -59,7 +59,7 @@ public class WorkflowExample {
         
         // 创建条件节点
         WorkflowConditionNode conditionNode = WorkflowConditionNode.builder()
-                .uid("condition_0")
+                .id("condition_0")
                 .type("condition")
                 .name("Condition")
                 .meta(NodeMeta.builder()
@@ -78,7 +78,7 @@ public class WorkflowExample {
         
         // 创建LLM节点
         WorkflowLLMNode llmNode = WorkflowLLMNode.builder()
-                .uid("llm_0")
+                .id("llm_0")
                 .type("llm")
                 .name("LLM_0")
                 .meta(NodeMeta.builder()
@@ -102,7 +102,7 @@ public class WorkflowExample {
         
         // 创建循环节点
         WorkflowLoopNode loopNode = WorkflowLoopNode.builder()
-                .uid("loop_H8M3U")
+                .id("loop_H8M3U")
                 .type("loop")
                 .name("Loop_2")
                 .meta(NodeMeta.builder()
@@ -123,7 +123,7 @@ public class WorkflowExample {
         
         // 创建结束节点
         WorkflowEndNode endNode = WorkflowEndNode.builder()
-                .uid("end_0")
+                .id("end_0")
                 .type("end")
                 .name("End")
                 .meta(NodeMeta.builder()

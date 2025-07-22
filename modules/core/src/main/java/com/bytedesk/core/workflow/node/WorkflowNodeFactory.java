@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 21:05:54
+ * @LastEditTime: 2025-07-22 14:53:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,9 +52,9 @@ public class WorkflowNodeFactory {
     /**
      * 根据节点类型创建节点实例（带ID）
      */
-    public static BaseNode createNode(String nodeType, String uid) {
+    public static BaseNode createNode(String nodeType, String id) {
         BaseNode node = createNode(nodeType);
-        node.setUid(uid);
+        node.setId(id);
         return node;
     }
     

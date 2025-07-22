@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-25 09:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 09:51:50
+ * @LastEditTime: 2025-07-22 14:56:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,7 +52,7 @@ public class WorkflowService {
         String currentNodeUid = workflow.getCurrentNode();
         if (currentNodeUid == null || currentNodeUid.isEmpty()) {
             // 如果未指定当前节点，则查找开始节点
-            currentNodeUid = findStartNodeUid(content);
+            currentNodeUid = findStartNodeId(content);
             workflow.setCurrentNode(currentNodeUid);
             workflowRestService.save(workflow);
         }
@@ -70,12 +70,12 @@ public class WorkflowService {
     }
     
     /**
-     * 查找工作流中的开始节点UID
+     * 查找工作流中的开始节点ID
      * 
      * @param content 工作流JSON内容
      * @return 开始节点的UID
      */
-    private String findStartNodeUid(String content) {
+    private String findStartNodeId(String content) {
         try {
             // 解析工作流JSON，查找类型为"start"的节点
             com.alibaba.fastjson2.JSONObject jsonObject = com.alibaba.fastjson2.JSON.parseObject(content);
