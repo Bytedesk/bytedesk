@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-25 09:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-23 23:10:55
+ * @LastEditTime: 2025-07-24 06:42:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -105,7 +105,7 @@ public class WorkflowService {
      * @param nodeId 当前节点UID
      * @param request 请求参数
      */
-    private void executeWorkflowFromNode(WorkflowEntity workflow, String nodeId, WorkflowRequest request) {
+    private WorkflowEntity executeWorkflowFromNode(WorkflowEntity workflow, String nodeId, WorkflowRequest request) {
         try {
             log.debug("Executing from node: {}", nodeId);
             
@@ -130,8 +130,8 @@ public class WorkflowService {
                     if (nextNodeUid != null) {
                         // 更新当前节点并继续执行
                         workflow.setCurrentNodeId(nextNodeUid);
-                        workflowRestService.save(workflow);
-                        executeWorkflowFromNode(workflow, nextNodeUid, request);
+                        workflow = workflowRestService.save(workflow);
+                        workflow = executeWorkflowFromNode(workflow, nextNodeUid, request);
                     }
                     break;
                     
@@ -145,8 +145,8 @@ public class WorkflowService {
                     // 处理条件节点逻辑
                     String conditionResult = evaluateCondition(currentNode, request);
                     workflow.setCurrentNodeId(conditionResult);
-                    workflowRestService.save(workflow);
-                    executeWorkflowFromNode(workflow, conditionResult, request);
+                    workflow = workflowRestService.save(workflow);
+                    workflow = executeWorkflowFromNode(workflow, conditionResult, request);
                     break;
                     
                 case LOOP:
@@ -162,8 +162,8 @@ public class WorkflowService {
                     String llmNextNodeUid = findNextNode(jsonObject, nodeId);
                     if (llmNextNodeUid != null) {
                         workflow.setCurrentNodeId(llmNextNodeUid);
-                        workflowRestService.save(workflow);
-                        executeWorkflowFromNode(workflow, llmNextNodeUid, request);
+                        workflow = workflowRestService.save(workflow);
+                        workflow = executeWorkflowFromNode(workflow, llmNextNodeUid, request);
                     }
                     break;
                     
@@ -174,8 +174,8 @@ public class WorkflowService {
                     String textNextNodeUid = findNextNode(jsonObject, nodeId);
                     if (textNextNodeUid != null) {
                         workflow.setCurrentNodeId(textNextNodeUid);
-                        workflowRestService.save(workflow);
-                        executeWorkflowFromNode(workflow, textNextNodeUid, request);
+                        workflow = workflowRestService.save(workflow);
+                        workflow = executeWorkflowFromNode(workflow, textNextNodeUid, request);
                     }
                     break;
                     
@@ -185,8 +185,8 @@ public class WorkflowService {
                     String commentNextNodeUid = findNextNode(jsonObject, nodeId);
                     if (commentNextNodeUid != null) {
                         workflow.setCurrentNodeId(commentNextNodeUid);
-                        workflowRestService.save(workflow);
-                        executeWorkflowFromNode(workflow, commentNextNodeUid, request);
+                        workflow = workflowRestService.save(workflow);
+                        workflow = executeWorkflowFromNode(workflow, commentNextNodeUid, request);
                     }
                     break;
                     
@@ -204,6 +204,7 @@ public class WorkflowService {
             log.error("执行节点失败: {}", e.getMessage(), e);
             throw new RuntimeException("执行节点失败: " + e.getMessage(), e);
         }
+        return workflow;
     }
     
     /**
@@ -291,7 +292,7 @@ public class WorkflowService {
     /**
      * 执行LLM节点
      */
-    private void executeLLMNode(WorkflowEntity workflow, JSONObject llmNode, WorkflowRequest request) {
+    private WorkflowEntity executeLLMNode(WorkflowEntity workflow, JSONObject llmNode, WorkflowRequest request) {
         // LLM节点的逻辑实现
         log.debug("执行LLM节点: {}", llmNode.getString("name"));
         
@@ -312,12 +313,13 @@ public class WorkflowService {
                 // 简化处理，不保存实际响应
             }
         }
+        return workflow;
     }
     
     /**
      * 执行文本节点
      */
-    private void executeTextNode(WorkflowEntity workflow, JSONObject textNode, WorkflowRequest request) {
+    private WorkflowEntity executeTextNode(WorkflowEntity workflow, JSONObject textNode, WorkflowRequest request) {
         // 文本节点的逻辑实现
         log.debug("执行文本节点: {}", textNode.getString("name"));
         
@@ -333,12 +335,13 @@ public class WorkflowService {
                 // 简化处理，不做实际处理
             }
         }
+        return workflow;
     }
     
     /**
      * 执行分组节点
      */
-    private void executeGroupNode(WorkflowEntity workflow, JSONObject groupNode, WorkflowRequest request) {
+    private WorkflowEntity executeGroupNode(WorkflowEntity workflow, JSONObject groupNode, WorkflowRequest request) {
         // 分组节点的逻辑实现
         log.debug("执行分组节点: {}", groupNode.getString("name"));
         
@@ -356,6 +359,7 @@ public class WorkflowService {
                 // 简化处理，不实际执行分组内的子流程
             }
         }
+        return workflow;
     }
     
     /**

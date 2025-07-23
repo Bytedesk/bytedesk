@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 10:51:37
+ * @LastEditTime: 2025-07-24 06:36:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.workflow;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -131,7 +132,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest> 
     @ApiResponse(responseCode = "200", description = "执行成功")
     @ActionAnnotation(title = "工作流", action = "执行", description = "execute workflow")
     @PostMapping("/execute")
-    public ResponseEntity<?> execute(WorkflowRequest request) {
+    public ResponseEntity<?> execute(@RequestBody WorkflowRequest request) {
         
         WorkflowResponse workflow = workflowService.execute(request);
 
