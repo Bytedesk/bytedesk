@@ -43,7 +43,7 @@ public class WorkflowService {
         log.debug("Workflow found: {}, type: {}", workflow.getName(), workflow.getType());
         
         // 2. 解析工作流内容
-        String content = workflow.getContent();
+        String content = workflow.getSchema();
         if (content == null || content.isEmpty()) {
             throw new RuntimeException("工作流内容为空");
         }
@@ -107,7 +107,7 @@ public class WorkflowService {
             log.debug("Executing from node: {}", nodeUid);
             
             // 1. 从工作流内容中解析当前节点
-            com.alibaba.fastjson2.JSONObject jsonObject = com.alibaba.fastjson2.JSON.parseObject(workflow.getContent());
+            com.alibaba.fastjson2.JSONObject jsonObject = com.alibaba.fastjson2.JSON.parseObject(workflow.getSchema());
             com.alibaba.fastjson2.JSONArray nodes = jsonObject.getJSONArray("nodes");
             com.alibaba.fastjson2.JSONObject currentNode = findNodeById(nodes, nodeUid);
             

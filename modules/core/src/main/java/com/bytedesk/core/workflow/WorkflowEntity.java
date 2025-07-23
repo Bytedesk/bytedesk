@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 06:38:21
+ * @LastEditTime: 2025-07-23 19:25:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,8 +43,8 @@ public class WorkflowEntity extends BaseEntity {
 
     private String description;
 
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String content;
+    @Column(name = "workflow_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String schema;
 
     @Builder.Default
     @Column(name = "workflow_type")
