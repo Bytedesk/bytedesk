@@ -159,6 +159,16 @@ public class AuthController {
             // 默认注册时，仅验证手机号，无需验证邮箱
             userRequest.setMobileVerified(true);
             userService.register(userRequest);
+        } else {
+            // 如果用户已存在，检查并更新手机验证状态
+            userService.findByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())
+                .ifPresent(user -> {
+                    if (!user.isMobileVerified()) {
+                        user.setMobileVerified(true);
+                        userService.save(user);
+                        log.info("Updated mobile verification status for user: {}", user.getUid());
+                    }
+                });
         }
 
         Authentication authentication = authService.authenticationWithMobileAndPlatform(
@@ -210,6 +220,16 @@ public class AuthController {
             userRequest.setEmailVerified(true);
             userRequest.setMobileVerified(false);
             userService.register(userRequest);
+        } else {
+            // 如果用户已存在，检查并更新邮箱验证状态
+            userService.findByEmailAndPlatform(authRequest.getEmail(), authRequest.getPlatform())
+                .ifPresent(user -> {
+                    if (!user.isEmailVerified()) {
+                        user.setEmailVerified(true);
+                        userService.save(user);
+                        log.info("Updated email verification status for user: {}", user.getUid());
+                    }
+                });
         }
 
         Authentication authentication = authService.authenticationWithEmailAndPlatform(
