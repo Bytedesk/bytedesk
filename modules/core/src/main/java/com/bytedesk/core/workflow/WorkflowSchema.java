@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 17:22:14
+ * @LastEditTime: 2025-07-23 22:45:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-public class WorkflowDocument implements Serializable {
+public class WorkflowSchema implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,8 +48,8 @@ public class WorkflowDocument implements Serializable {
     /**
      * 从JSON字符串创建WorkflowDocument
      */
-    public static WorkflowDocument fromJson(String json) {
-        return JSON.parseObject(json, WorkflowDocument.class);
+    public static WorkflowSchema fromJson(String json) {
+        return JSON.parseObject(json, WorkflowSchema.class);
     }
     
     /**

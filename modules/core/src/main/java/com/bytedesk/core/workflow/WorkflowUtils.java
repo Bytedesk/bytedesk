@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:06:30
+ * @LastEditTime: 2025-07-23 22:47:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,8 +30,8 @@ public class WorkflowUtils {
     /**
      * 从JSON字符串解析工作流文档
      */
-    public static WorkflowDocument parseWorkflowDocument(String json) {
-        return JSON.parseObject(json, WorkflowDocument.class);
+    public static WorkflowSchema parseWorkflowSchema(String json) {
+        return JSON.parseObject(json, WorkflowSchema.class);
     }
     
     /**
@@ -51,8 +51,8 @@ public class WorkflowUtils {
     /**
      * 将工作流文档转换为JSON字符串
      */
-    public static String toJson(WorkflowDocument document) {
-        return JSON.toJSONString(document);
+    public static String toJson(WorkflowSchema schema) {
+        return JSON.toJSONString(schema);
     }
     
     /**
@@ -72,7 +72,7 @@ public class WorkflowUtils {
     /**
      * 验证工作流文档的完整性
      */
-    public static boolean validateWorkflowDocument(WorkflowDocument document) {
+    public static boolean validateWorkflowDocument(WorkflowSchema document) {
         if (document == null || document.getNodes() == null || document.getEdges() == null) {
             return false;
         }

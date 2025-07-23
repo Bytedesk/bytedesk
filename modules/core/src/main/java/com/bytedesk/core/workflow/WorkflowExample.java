@@ -35,7 +35,7 @@ public class WorkflowExample {
     /**
      * 创建示例工作流文档
      */
-    public static WorkflowDocument createExampleWorkflow() {
+    public static WorkflowSchema createExampleWorkflow() {
         List<WorkflowBaseNode> nodes = new ArrayList<>();
         List<WorkflowEdge> edges = new ArrayList<>();
         
@@ -159,7 +159,7 @@ public class WorkflowExample {
                 .build();
         edges.add(edge3);
         
-        return WorkflowDocument.builder()
+        return WorkflowSchema.builder()
                 .nodes(nodes)
                 .edges(edges)
                 .build();
@@ -325,7 +325,7 @@ public class WorkflowExample {
      */
     public static void main(String[] args) {
         // 创建示例工作流
-        WorkflowDocument document = createExampleWorkflow();
+        WorkflowSchema document = createExampleWorkflow();
         
         // 验证工作流
         boolean isValid = WorkflowUtils.validateWorkflowDocument(document);
@@ -336,7 +336,7 @@ public class WorkflowExample {
         System.out.println("Workflow JSON: " + json);
         
         // 从JSON解析
-        WorkflowDocument parsedDocument = WorkflowUtils.parseWorkflowDocument(json);
+        WorkflowSchema parsedDocument = WorkflowUtils.parseWorkflowSchema(json);
         System.out.println("Parsed document nodes count: " + parsedDocument.getNodes().size());
         System.out.println("Parsed document edges count: " + parsedDocument.getEdges().size());
     }
