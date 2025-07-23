@@ -37,7 +37,7 @@ class J {
       isDebug: !1,
       // isPreload: false,
       forceRefresh: !1,
-      baseUrl: "https://cdn.weiyuai.cn/chat",
+      htmlUrl: "https://cdn.weiyuai.cn/chat",
       apiUrl: "https://api.weiyuai.cn",
       placement: "bottom-right",
       marginBottom: 20,
@@ -510,7 +510,7 @@ class J {
     }), Object.entries(this.config.theme || {}).forEach(([s, a]) => {
       e.append(s, String(a));
     }), e.append("lang", this.config.locale || "zh-cn");
-    const n = `${this.config.baseUrl}?${e.toString()}`;
+    const n = `${this.config.htmlUrl}?${e.toString()}`;
     return console.log("chat url: ", n), n;
   }
   setupMessageListener() {

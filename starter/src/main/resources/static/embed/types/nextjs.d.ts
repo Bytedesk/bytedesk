@@ -32,8 +32,8 @@ declare interface ButtonConfig {
 declare interface BytedeskConfig {
     isDebug?: boolean;
     forceRefresh?: boolean;
-    baseUrl?: string;
     apiUrl?: string;
+    htmlUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
