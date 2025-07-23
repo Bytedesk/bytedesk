@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-23 19:25:04
+ * @LastEditTime: 2025-07-23 23:13:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,7 +54,7 @@ public class WorkflowEntity extends BaseEntity {
     @Column(name = "workflow_status")
     private String status = WorkflowStatusEnum.IDLE.name();
 
-    private String currentNode;
+    private String currentNodeId;
 
     private String categoryUid;
 

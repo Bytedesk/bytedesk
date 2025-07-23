@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-25 09:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 14:56:44
+ * @LastEditTime: 2025-07-23 23:10:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.workflow.node.WorkflowNodeTypeEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -49,17 +52,17 @@ public class WorkflowService {
         }
         
         // 3. 确定开始节点
-        String currentNodeUid = workflow.getCurrentNode();
-        if (currentNodeUid == null || currentNodeUid.isEmpty()) {
+        String currentNodeId = workflow.getCurrentNodeId();
+        if (currentNodeId == null || currentNodeId.isEmpty()) {
             // 如果未指定当前节点，则查找开始节点
-            currentNodeUid = findStartNodeId(content);
-            workflow.setCurrentNode(currentNodeUid);
+            currentNodeId = findStartNodeId(content);
+            workflow.setCurrentNodeId(currentNodeId);
             workflowRestService.save(workflow);
         }
         
         // 4. 执行工作流逻辑
         try {
-            executeWorkflowFromNode(workflow, currentNodeUid, request);
+            executeWorkflowFromNode(workflow, currentNodeId, request);
             
             // 5. 返回更新后的工作流响应
             return workflowRestService.convertToResponse(workflow);
@@ -78,11 +81,11 @@ public class WorkflowService {
     private String findStartNodeId(String content) {
         try {
             // 解析工作流JSON，查找类型为"start"的节点
-            com.alibaba.fastjson2.JSONObject jsonObject = com.alibaba.fastjson2.JSON.parseObject(content);
-            com.alibaba.fastjson2.JSONArray nodes = jsonObject.getJSONArray("nodes");
+            JSONObject jsonObject = JSON.parseObject(content);
+            JSONArray nodes = jsonObject.getJSONArray("nodes");
             if (nodes != null) {
                 for (int i = 0; i < nodes.size(); i++) {
-                    com.alibaba.fastjson2.JSONObject node = nodes.getJSONObject(i);
+                    JSONObject node = nodes.getJSONObject(i);
                     if ("start".equals(node.getString("type"))) {
                         return node.getString("id");
                     }
@@ -99,20 +102,20 @@ public class WorkflowService {
      * 从指定节点开始执行工作流
      * 
      * @param workflow 工作流实体
-     * @param nodeUid 当前节点UID
+     * @param nodeId 当前节点UID
      * @param request 请求参数
      */
-    private void executeWorkflowFromNode(WorkflowEntity workflow, String nodeUid, WorkflowRequest request) {
+    private void executeWorkflowFromNode(WorkflowEntity workflow, String nodeId, WorkflowRequest request) {
         try {
-            log.debug("Executing from node: {}", nodeUid);
+            log.debug("Executing from node: {}", nodeId);
             
             // 1. 从工作流内容中解析当前节点
-            com.alibaba.fastjson2.JSONObject jsonObject = com.alibaba.fastjson2.JSON.parseObject(workflow.getSchema());
-            com.alibaba.fastjson2.JSONArray nodes = jsonObject.getJSONArray("nodes");
-            com.alibaba.fastjson2.JSONObject currentNode = findNodeById(nodes, nodeUid);
+            JSONObject jsonObject = JSON.parseObject(workflow.getSchema());
+            JSONArray nodes = jsonObject.getJSONArray("nodes");
+            JSONObject currentNode = findNodeById(nodes, nodeId);
             
             if (currentNode == null) {
-                throw new RuntimeException("未找到节点: " + nodeUid);
+                throw new RuntimeException("未找到节点: " + nodeId);
             }
             
             // 2. 获取节点类型并执行相应逻辑
@@ -122,73 +125,73 @@ public class WorkflowService {
             // 3. 根据节点类型执行不同逻辑
             switch (type) {
                 case START:
-                    log.debug("执行开始节点: {}", nodeUid);
-                    String nextNodeUid = findNextNode(jsonObject, nodeUid);
+                    log.debug("执行开始节点: {}", nodeId);
+                    String nextNodeUid = findNextNode(jsonObject, nodeId);
                     if (nextNodeUid != null) {
                         // 更新当前节点并继续执行
-                        workflow.setCurrentNode(nextNodeUid);
+                        workflow.setCurrentNodeId(nextNodeUid);
                         workflowRestService.save(workflow);
                         executeWorkflowFromNode(workflow, nextNodeUid, request);
                     }
                     break;
                     
                 case END:
-                    log.debug("执行结束节点: {}", nodeUid);
+                    log.debug("执行结束节点: {}", nodeId);
                     // 工作流执行完毕，无需进一步操作
                     break;
                     
                 case CONDITION:
-                    log.debug("执行条件节点: {}", nodeUid);
+                    log.debug("执行条件节点: {}", nodeId);
                     // 处理条件节点逻辑
                     String conditionResult = evaluateCondition(currentNode, request);
-                    workflow.setCurrentNode(conditionResult);
+                    workflow.setCurrentNodeId(conditionResult);
                     workflowRestService.save(workflow);
                     executeWorkflowFromNode(workflow, conditionResult, request);
                     break;
                     
                 case LOOP:
-                    log.debug("执行循环节点: {}", nodeUid);
+                    log.debug("执行循环节点: {}", nodeId);
                     // 处理循环节点逻辑
                     executeLoopNode(workflow, currentNode, request);
                     break;
                     
                 case LLM:
-                    log.debug("执行LLM节点: {}", nodeUid);
+                    log.debug("执行LLM节点: {}", nodeId);
                     // 处理LLM节点逻辑
                     executeLLMNode(workflow, currentNode, request);
-                    String llmNextNodeUid = findNextNode(jsonObject, nodeUid);
+                    String llmNextNodeUid = findNextNode(jsonObject, nodeId);
                     if (llmNextNodeUid != null) {
-                        workflow.setCurrentNode(llmNextNodeUid);
+                        workflow.setCurrentNodeId(llmNextNodeUid);
                         workflowRestService.save(workflow);
                         executeWorkflowFromNode(workflow, llmNextNodeUid, request);
                     }
                     break;
                     
                 case TEXT:
-                    log.debug("执行文本节点: {}", nodeUid);
+                    log.debug("执行文本节点: {}", nodeId);
                     // 处理文本节点逻辑
                     executeTextNode(workflow, currentNode, request);
-                    String textNextNodeUid = findNextNode(jsonObject, nodeUid);
+                    String textNextNodeUid = findNextNode(jsonObject, nodeId);
                     if (textNextNodeUid != null) {
-                        workflow.setCurrentNode(textNextNodeUid);
+                        workflow.setCurrentNodeId(textNextNodeUid);
                         workflowRestService.save(workflow);
                         executeWorkflowFromNode(workflow, textNextNodeUid, request);
                     }
                     break;
                     
                 case COMMENT:
-                    log.debug("执行注释节点: {}", nodeUid);
+                    log.debug("执行注释节点: {}", nodeId);
                     // 注释节点无需执行特定逻辑，直接进入下一个节点
-                    String commentNextNodeUid = findNextNode(jsonObject, nodeUid);
+                    String commentNextNodeUid = findNextNode(jsonObject, nodeId);
                     if (commentNextNodeUid != null) {
-                        workflow.setCurrentNode(commentNextNodeUid);
+                        workflow.setCurrentNodeId(commentNextNodeUid);
                         workflowRestService.save(workflow);
                         executeWorkflowFromNode(workflow, commentNextNodeUid, request);
                     }
                     break;
                     
                 case GROUP:
-                    log.debug("执行分组节点: {}", nodeUid);
+                    log.debug("执行分组节点: {}", nodeId);
                     // 处理分组节点逻辑
                     executeGroupNode(workflow, currentNode, request);
                     break;
@@ -206,9 +209,9 @@ public class WorkflowService {
     /**
      * 在节点数组中查找指定ID的节点
      */
-    private com.alibaba.fastjson2.JSONObject findNodeById(com.alibaba.fastjson2.JSONArray nodes, String nodeId) {
+    private JSONObject findNodeById(JSONArray nodes, String nodeId) {
         for (int i = 0; i < nodes.size(); i++) {
-            com.alibaba.fastjson2.JSONObject node = nodes.getJSONObject(i);
+            JSONObject node = nodes.getJSONObject(i);
             if (nodeId.equals(node.getString("id"))) {
                 return node;
             }
@@ -219,11 +222,11 @@ public class WorkflowService {
     /**
      * 查找当前节点的下一个节点ID
      */
-    private String findNextNode(com.alibaba.fastjson2.JSONObject workflow, String currentNodeId) {
-        com.alibaba.fastjson2.JSONArray edges = workflow.getJSONArray("edges");
+    private String findNextNode(JSONObject workflow, String currentNodeId) {
+        JSONArray edges = workflow.getJSONArray("edges");
         if (edges != null) {
             for (int i = 0; i < edges.size(); i++) {
-                com.alibaba.fastjson2.JSONObject edge = edges.getJSONObject(i);
+                JSONObject edge = edges.getJSONObject(i);
                 String sourceNodeId = edge.getString("sourceNodeId");
                 if (currentNodeId.equals(sourceNodeId)) {
                     return edge.getString("targetNodeId");
@@ -236,15 +239,15 @@ public class WorkflowService {
     /**
      * 评估条件节点并返回下一个节点ID
      */
-    private String evaluateCondition(com.alibaba.fastjson2.JSONObject conditionNode, WorkflowRequest request) {
+    private String evaluateCondition(JSONObject conditionNode, WorkflowRequest request) {
         // 这里是条件节点逻辑的简化实现，实际应用中需要根据条件表达式进行评估
         // 可以从conditionNode中获取条件表达式，然后根据request参数进行评估
         log.debug("评估条件: {}", conditionNode.getString("name"));
         
         // 从节点数据中获取条件表达式
-        com.alibaba.fastjson2.JSONObject data = conditionNode.getJSONObject("data");
+        JSONObject data = conditionNode.getJSONObject("data");
         if (data != null && data.containsKey("outputs")) {
-            com.alibaba.fastjson2.JSONObject outputs = data.getJSONObject("outputs");
+            JSONObject outputs = data.getJSONObject("outputs");
             // 这里应该有条件评估逻辑，目前简化为取第一个输出端口对应的边
             // 实际实现中应该根据条件表达式评估结果选择输出端口
             if (outputs != null && !outputs.isEmpty()) {
@@ -261,21 +264,21 @@ public class WorkflowService {
     /**
      * 执行循环节点
      */
-    private void executeLoopNode(WorkflowEntity workflow, com.alibaba.fastjson2.JSONObject loopNode, WorkflowRequest request) {
+    private void executeLoopNode(WorkflowEntity workflow, JSONObject loopNode, WorkflowRequest request) {
         // 循环节点的逻辑实现
         log.debug("执行循环节点: {}", loopNode.getString("name"));
         
         // 从节点数据中获取循环条件和循环体
-        com.alibaba.fastjson2.JSONObject data = loopNode.getJSONObject("data");
+        JSONObject data = loopNode.getJSONObject("data");
         if (data != null) {
             // 这里应该有循环条件的评估逻辑
             // 实际实现中需要执行循环体中的每个节点
             
             // 简化实现: 直接执行一次循环体中的所有节点
-            com.alibaba.fastjson2.JSONArray blocks = loopNode.getJSONArray("blocks");
+            JSONArray blocks = loopNode.getJSONArray("blocks");
             if (blocks != null && !blocks.isEmpty()) {
                 for (int i = 0; i < blocks.size(); i++) {
-                    com.alibaba.fastjson2.JSONObject blockNode = blocks.getJSONObject(i);
+                    JSONObject blockNode = blocks.getJSONObject(i);
                     String blockNodeId = blockNode.getString("id");
                     // 可以在这里递归执行循环体中的每个节点
                     // 简化处理，不实际执行
@@ -288,14 +291,14 @@ public class WorkflowService {
     /**
      * 执行LLM节点
      */
-    private void executeLLMNode(WorkflowEntity workflow, com.alibaba.fastjson2.JSONObject llmNode, WorkflowRequest request) {
+    private void executeLLMNode(WorkflowEntity workflow, JSONObject llmNode, WorkflowRequest request) {
         // LLM节点的逻辑实现
         log.debug("执行LLM节点: {}", llmNode.getString("name"));
         
         // 从节点数据中获取LLM参数
-        com.alibaba.fastjson2.JSONObject data = llmNode.getJSONObject("data");
+        JSONObject data = llmNode.getJSONObject("data");
         if (data != null && data.containsKey("inputs")) {
-            com.alibaba.fastjson2.JSONObject inputs = data.getJSONObject("inputs");
+            JSONObject inputs = data.getJSONObject("inputs");
             if (inputs != null) {
                 // 这里应该有LLM调用逻辑，根据输入参数调用LLM服务
                 // 实际实现中需要调用相应的API或服务
@@ -314,14 +317,14 @@ public class WorkflowService {
     /**
      * 执行文本节点
      */
-    private void executeTextNode(WorkflowEntity workflow, com.alibaba.fastjson2.JSONObject textNode, WorkflowRequest request) {
+    private void executeTextNode(WorkflowEntity workflow, JSONObject textNode, WorkflowRequest request) {
         // 文本节点的逻辑实现
         log.debug("执行文本节点: {}", textNode.getString("name"));
         
         // 从节点数据中获取文本内容
-        com.alibaba.fastjson2.JSONObject data = textNode.getJSONObject("data");
+        JSONObject data = textNode.getJSONObject("data");
         if (data != null && data.containsKey("inputs")) {
-            com.alibaba.fastjson2.JSONObject inputs = data.getJSONObject("inputs");
+            JSONObject inputs = data.getJSONObject("inputs");
             if (inputs != null && inputs.containsKey("text")) {
                 String text = inputs.getString("text");
                 log.debug("文本内容: {}", text);
@@ -335,13 +338,13 @@ public class WorkflowService {
     /**
      * 执行分组节点
      */
-    private void executeGroupNode(WorkflowEntity workflow, com.alibaba.fastjson2.JSONObject groupNode, WorkflowRequest request) {
+    private void executeGroupNode(WorkflowEntity workflow, JSONObject groupNode, WorkflowRequest request) {
         // 分组节点的逻辑实现
         log.debug("执行分组节点: {}", groupNode.getString("name"));
         
         // 获取分组中的所有节点和边
-        com.alibaba.fastjson2.JSONArray blocks = groupNode.getJSONArray("blocks");
-        com.alibaba.fastjson2.JSONArray edges = groupNode.getJSONArray("edges");
+        JSONArray blocks = groupNode.getJSONArray("blocks");
+        JSONArray edges = groupNode.getJSONArray("edges");
         
         if (blocks != null && !blocks.isEmpty()) {
             // 找到分组中的入口节点（没有输入边的节点）
@@ -358,7 +361,7 @@ public class WorkflowService {
     /**
      * 查找分组中的入口节点（没有输入边的节点）
      */
-    private String findEntryNode(com.alibaba.fastjson2.JSONArray blocks, com.alibaba.fastjson2.JSONArray edges) {
+    private String findEntryNode(JSONArray blocks, JSONArray edges) {
         if (blocks == null || blocks.isEmpty()) {
             return null;
         }
@@ -367,14 +370,14 @@ public class WorkflowService {
         java.util.Set<String> nodesWithInputs = new java.util.HashSet<>();
         if (edges != null) {
             for (int i = 0; i < edges.size(); i++) {
-                com.alibaba.fastjson2.JSONObject edge = edges.getJSONObject(i);
+                JSONObject edge = edges.getJSONObject(i);
                 nodesWithInputs.add(edge.getString("targetNodeId"));
             }
         }
         
         // 查找没有输入边的节点
         for (int i = 0; i < blocks.size(); i++) {
-            com.alibaba.fastjson2.JSONObject node = blocks.getJSONObject(i);
+            JSONObject node = blocks.getJSONObject(i);
             String nodeId = node.getString("id");
             if (!nodesWithInputs.contains(nodeId)) {
                 return nodeId;

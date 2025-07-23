@@ -142,7 +142,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 // latestEntity.setStatus(entity.getStatus());
                 // latestEntity.setType(entity.getType());
                 latestEntity.setSchema(entity.getSchema());
-                latestEntity.setCurrentNode(entity.getCurrentNode());
+                latestEntity.setCurrentNodeId(entity.getCurrentNodeId());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
                 // 
                 return workflowRepository.save(latestEntity);
