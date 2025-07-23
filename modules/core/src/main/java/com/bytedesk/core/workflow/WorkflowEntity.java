@@ -50,6 +50,10 @@ public class WorkflowEntity extends BaseEntity {
     @Column(name = "workflow_type")
     private String type = WorkflowTypeEnum.WORKFLOW.name();
 
+    @Builder.Default
+    @Column(name = "workflow_status")
+    private String status = WorkflowStatusEnum.IDLE.name();
+
     private String currentNode;
 
     private String categoryUid;
