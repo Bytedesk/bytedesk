@@ -145,10 +145,10 @@ public class ThreadEntity extends AbstractThreadEntity {
         return this;
     }
 
-    public ThreadEntity setLlmIng() {
-        setStatus(ThreadProcessStatusEnum.LLMING.name());
-        return this;
-    }
+    // public ThreadEntity setLlmIng() {
+    //     setStatus(ThreadProcessStatusEnum.LLMING.name());
+    //     return this;
+    // }
 
     public ThreadEntity setOffline() {
         setStatus(ThreadProcessStatusEnum.OFFLINE.name());

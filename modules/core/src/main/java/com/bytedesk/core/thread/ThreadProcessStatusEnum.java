@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 11:22:00
+ * @LastEditTime: 2025-07-24 11:30:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,8 +62,8 @@ public enum ThreadProcessStatusEnum {
                 return "新会话";
             case ROBOTING:
                 return "机器人接待中";
-            case LLMING:
-                return "大模型对话中";
+            // case LLMING:
+            //     return "大模型对话中";
             case OFFLINE:
                 return "客服离线";
             case QUEUING:
