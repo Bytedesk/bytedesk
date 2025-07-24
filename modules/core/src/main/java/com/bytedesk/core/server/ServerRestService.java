@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 21:02:57
+ * @LastEditTime: 2025-07-25 07:42:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -364,25 +364,25 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         ServerResponse response = modelMapper.map(entity, ServerResponse.class);
         
         // Set display names
-        if (entity.getType() != null) {
-            try {
-                ServerTypeEnum typeEnum = ServerTypeEnum.valueOf(entity.getType());
-                response.setServerTypeDisplay(typeEnum.getChineseName());
-            } catch (IllegalArgumentException e) {
-                response.setServerTypeDisplay(entity.getType());
-            }
-        }
+        // if (entity.getType() != null) {
+        //     try {
+        //         // ServerTypeEnum typeEnum = ServerTypeEnum.valueOf(entity.getType());
+        //         // response.setServerTypeDisplay(typeEnum.getChineseName());
+        //     } catch (IllegalArgumentException e) {
+        //         // response.setServerTypeDisplay(entity.getType());
+        //     }
+        // }
         
-        if (entity.getStatus() != null) {
-            try {
-                ServerStatusEnum statusEnum = ServerStatusEnum.valueOf(entity.getStatus());
-                response.setServerStatusDisplay(statusEnum.getChineseName());
-                response.setIsHealthy(statusEnum.isHealthy());
-                response.setIsOperational(statusEnum.isOperational());
-            } catch (IllegalArgumentException e) {
-                response.setServerStatusDisplay(entity.getStatus());
-            }
-        }
+        // if (entity.getStatus() != null) {
+        //     try {
+        //         ServerStatusEnum statusEnum = ServerStatusEnum.valueOf(entity.getStatus());
+        //         // response.setServerStatusDisplay(statusEnum.getChineseName());
+        //         response.setIsHealthy(statusEnum.isHealthy());
+        //         response.setIsOperational(statusEnum.isOperational());
+        //     } catch (IllegalArgumentException e) {
+        //         // response.setServerStatusDisplay(entity.getStatus());
+        //     }
+        // }
         
         // Set health indicators
         response.setHasHighCpuUsage(entity.getCpuUsage() != null && entity.getCpuUsage() > 80);
