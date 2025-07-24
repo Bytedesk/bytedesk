@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 21:36:17
+ * @LastEditTime: 2025-07-24 23:24:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,12 +13,13 @@
  */
 package com.bytedesk.core.server;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
-import com.bytedesk.core.server_metrics.ServerMetricsService;
+import com.bytedesk.core.server_metrics.ServerMetricsRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -29,9 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ServerEventListener {
 
+    @Value("${server.port}")
+    private Integer serverPort;
+
     private final BytedeskProperties bytedeskProperties;
     private final ServerRestService serverRestService;
-    private final ServerMetricsService serverMetricsService;
+    private final ServerMetricsRestService serverMetricsRestService;
     private final UidUtils uidUtils;
 
     /**
@@ -54,6 +58,7 @@ public class ServerEventListener {
             
             if (existingServer != null) {
                 // 更新现有服务器基本信息（保持最新状态）
+                existingServer.setServerPort(serverPort);
                 existingServer.setCpuUsage(currentMetrics.getCpuUsage());
                 existingServer.setMemoryUsage(currentMetrics.getMemoryUsage());
                 existingServer.setDiskUsage(currentMetrics.getDiskUsage());
@@ -78,12 +83,13 @@ public class ServerEventListener {
                 serverRestService.updateServer(existingServer);
                 
                 // 记录历史指标数据（每次创建新记录）
-                serverMetricsService.recordMetrics(existingServer);
+                serverMetricsRestService.recordMetrics(existingServer);
                 
                 log.debug("Updated server and recorded metrics for: {}", serverName);
             } else {
                 // 创建新的服务器记录
                 currentMetrics.setUid(uidUtils.getUid());
+                currentMetrics.setServerPort(serverPort);
                 currentMetrics.setServerIp(currentMetrics.getServerIp());
                 currentMetrics.setType(ServerTypeEnum.APPLICATION.name());
                 currentMetrics.setStatus(ServerStatusEnum.ONLINE.name());
@@ -94,7 +100,7 @@ public class ServerEventListener {
                 ServerEntity savedServer = serverRestService.createServer(currentMetrics);
                 
                 // 记录历史指标数据
-                serverMetricsService.recordMetrics(savedServer);
+                serverMetricsRestService.recordMetrics(savedServer);
                 
                 log.info("Created new server and recorded metrics for: {}", serverName);
             }

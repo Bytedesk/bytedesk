@@ -51,7 +51,7 @@ import java.util.Optional;
 @Description("Server Metrics Management Controller - Server performance monitoring and metrics analysis APIs")
 public class ServerMetricsRestController extends BaseRestController<ServerMetricsRequest> {
 
-    private final ServerMetricsService serverMetricsService;
+    private final ServerMetricsRestService serverMetricsRestService;
     private final ServerRestService serverRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
@@ -60,7 +60,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     @Override
     public ResponseEntity<?> queryByOrg(ServerMetricsRequest request) {
         
-        Page<ServerMetricsResponse> metrics = serverMetricsService.queryByOrg(request);
+        Page<ServerMetricsResponse> metrics = serverMetricsRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
@@ -70,7 +70,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     @Override
     public ResponseEntity<?> queryByUser(ServerMetricsRequest request) {
         
-        Page<ServerMetricsResponse> metrics = serverMetricsService.queryByUser(request);
+        Page<ServerMetricsResponse> metrics = serverMetricsRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
@@ -80,7 +80,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     @Override
     public ResponseEntity<?> queryByUid(ServerMetricsRequest request) {
         
-        ServerMetricsResponse metrics = serverMetricsService.queryByUid(request);
+        ServerMetricsResponse metrics = serverMetricsRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
@@ -90,7 +90,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     @Override
     public ResponseEntity<?> create(ServerMetricsRequest request) {
         
-        ServerMetricsResponse metrics = serverMetricsService.create(request);
+        ServerMetricsResponse metrics = serverMetricsRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
@@ -100,7 +100,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     @Override
     public ResponseEntity<?> update(ServerMetricsRequest request) {
         
-        ServerMetricsResponse metrics = serverMetricsService.update(request);
+        ServerMetricsResponse metrics = serverMetricsRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
@@ -110,7 +110,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     @Override
     public ResponseEntity<?> delete(ServerMetricsRequest request) {
         
-        serverMetricsService.delete(request);
+        serverMetricsRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -137,7 +137,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
-        List<ServerMetricsEntity> metrics = serverMetricsService.getMetricsHistory(serverUid, startTime, endTime);
+        List<ServerMetricsEntity> metrics = serverMetricsRestService.getMetricsHistory(serverUid, startTime, endTime);
         return ResponseEntity.ok(metrics);
     }
 
@@ -150,7 +150,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     public ResponseEntity<ServerMetricsEntity> getLatestMetrics(@PathVariable String serverUid) {
         log.info("Getting latest metrics for server UID: {}", serverUid);
         
-        Optional<ServerMetricsEntity> metrics = serverMetricsService.getLatestMetrics(serverUid);
+        Optional<ServerMetricsEntity> metrics = serverMetricsRestService.getLatestMetrics(serverUid);
         return metrics.map(ResponseEntity::ok)
                      .orElse(ResponseEntity.notFound().build());
     }
@@ -163,14 +163,14 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @return average metrics
      */
     @GetMapping("/average/{serverUid}")
-    public ResponseEntity<ServerMetricsService.ServerMetricsAverage> getAverageMetrics(
+    public ResponseEntity<ServerMetricsRestService.ServerMetricsAverage> getAverageMetrics(
             @PathVariable String serverUid,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Getting average metrics for server UID: {} from {} to {}", serverUid, startTime, endTime);
         
-        ServerMetricsService.ServerMetricsAverage average = serverMetricsService.getAverageMetrics(serverUid, startTime, endTime);
+        ServerMetricsRestService.ServerMetricsAverage average = serverMetricsRestService.getAverageMetrics(serverUid, startTime, endTime);
         return ResponseEntity.ok(average);
     }
 
@@ -182,14 +182,14 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @return peak metrics
      */
     @GetMapping("/peak/{serverUid}")
-    public ResponseEntity<ServerMetricsService.ServerMetricsPeak> getPeakMetrics(
+    public ResponseEntity<ServerMetricsRestService.ServerMetricsPeak> getPeakMetrics(
             @PathVariable String serverUid,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Getting peak metrics for server UID: {} from {} to {}", serverUid, startTime, endTime);
         
-        ServerMetricsService.ServerMetricsPeak peak = serverMetricsService.getPeakMetrics(serverUid, startTime, endTime);
+        ServerMetricsRestService.ServerMetricsPeak peak = serverMetricsRestService.getPeakMetrics(serverUid, startTime, endTime);
         return ResponseEntity.ok(peak);
     }
 
@@ -213,7 +213,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         log.info("Finding high usage metrics from {} to {} with thresholds: CPU={}, Memory={}, Disk={}", 
                 startTime, endTime, cpuThreshold, memoryThreshold, diskThreshold);
         
-        List<ServerMetricsEntity> metrics = serverMetricsService.findHighUsageMetrics(
+        List<ServerMetricsEntity> metrics = serverMetricsRestService.findHighUsageMetrics(
                 cpuThreshold, memoryThreshold, diskThreshold, startTime, endTime);
         return ResponseEntity.ok(metrics);
     }
@@ -227,7 +227,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     public ResponseEntity<Long> getMetricsCount(@PathVariable String serverUid) {
         log.info("Getting metrics count for server UID: {}", serverUid);
         
-        long count = serverMetricsService.getMetricsCount(serverUid);
+        long count = serverMetricsRestService.getMetricsCount(serverUid);
         return ResponseEntity.ok(count);
     }
 
@@ -240,7 +240,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     public ResponseEntity<Integer> cleanupOldMetrics(@RequestParam(defaultValue = "30") Integer retentionDays) {
         log.info("Cleaning up old metrics data with {} days retention", retentionDays);
         
-        int deletedCount = serverMetricsService.cleanupOldMetrics(retentionDays);
+        int deletedCount = serverMetricsRestService.cleanupOldMetrics(retentionDays);
         return ResponseEntity.ok(deletedCount);
     }
 
@@ -267,7 +267,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
             return ResponseEntity.notFound().build();
         }
         
-        List<ServerMetricsEntity> metrics = serverMetricsService.getMetricsHistory(
+        List<ServerMetricsEntity> metrics = serverMetricsRestService.getMetricsHistory(
                 existingServer.getUid(), startTime, endTime);
         return ResponseEntity.ok(metrics);
     }

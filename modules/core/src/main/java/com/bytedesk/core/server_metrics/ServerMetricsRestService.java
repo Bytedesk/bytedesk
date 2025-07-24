@@ -23,7 +23,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ServerMetricsService extends BaseRestService<ServerMetricsEntity, ServerMetricsRequest, ServerMetricsResponse> {
+public class ServerMetricsRestService extends BaseRestService<ServerMetricsEntity, ServerMetricsRequest, ServerMetricsResponse> {
 
     private final ServerMetricsRepository serverMetricsRepository;
     private final ModelMapper modelMapper;
@@ -71,7 +71,9 @@ public class ServerMetricsService extends BaseRestService<ServerMetricsEntity, S
         Optional<ServerMetricsEntity> optional = serverMetricsRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             ServerMetricsEntity existingEntity = optional.get();
-            existingEntity = modelMapper.map(request, ServerMetricsEntity.class);
+            // 使用 modelMapper 更新字段，但保持 uid 不变
+            modelMapper.map(request, existingEntity);
+            existingEntity.setUid(request.getUid()); // 确保 uid 不被覆盖
             ServerMetricsEntity savedEntity = save(existingEntity);
             return convertToResponse(savedEntity);
         }
@@ -134,6 +136,7 @@ public class ServerMetricsService extends BaseRestService<ServerMetricsEntity, S
     @Transactional
     public ServerMetricsEntity recordMetrics(ServerEntity serverEntity) {
         ServerMetricsEntity metrics = ServerMetricsEntity.builder()
+                .uid(uidUtils.getUid())
                 .serverUid(serverEntity.getUid())
                 .timestamp(ZonedDateTime.now())
                 .cpuUsage(serverEntity.getCpuUsage())

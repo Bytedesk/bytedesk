@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ServerMetricsCleanupTask {
 
-    private final ServerMetricsService serverMetricsService;
+    private final ServerMetricsRestService serverMetricsService;
 
     /**
      * Clean up old server metrics data daily at 2:00 AM
