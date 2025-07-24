@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 20:36:13
+ * @LastEditTime: 2025-07-24 20:51:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -83,8 +83,6 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     public ServerResponse create(ServerRequest request) {
         ServerEntity entity = convertToEntity(request);
         entity.setUid(uidUtils.getUid());
-        entity.setCreatedAt(ZonedDateTime.now());
-        entity.setUpdatedAt(ZonedDateTime.now());
         
         ServerEntity savedEntity = serverService.createServer(entity);
         return convertToResponse(savedEntity);
@@ -161,7 +159,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     }
 
     @Override
-    protected ServerEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ServerEntity entity) {
+    public ServerEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ServerEntity entity) {
         log.warn("Optimistic locking failure for server: {}", entity.getUid());
         return entity;
     }
