@@ -1,6 +1,7 @@
 package com.bytedesk.core.server_metrics;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -146,6 +147,7 @@ public class ServerMetricsRestService extends BaseRestService<ServerMetricsEntit
                 .usedDiskGb(serverEntity.getUsedDiskGb())
                 .uptimeSeconds(serverEntity.getUptimeSeconds())
                 .collectionInterval(5)
+                .level(LevelEnum.PLATFORM.name())
                 .build();
 
         return serverMetricsRepository.save(metrics);
