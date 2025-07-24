@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 22:20:00
+ * @LastEditTime: 2025-07-24 23:06:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,7 +49,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Tag(name = "Server Metrics Management", description = "Server metrics management APIs for monitoring and analyzing server performance data")
 @Description("Server Metrics Management Controller - Server performance monitoring and metrics analysis APIs")
-public class ServerMetricsController extends BaseRestController<ServerMetricsRequest> {
+public class ServerMetricsRestController extends BaseRestController<ServerMetricsRequest> {
 
     private final ServerMetricsService serverMetricsService;
     private final ServerRestService serverRestService;
