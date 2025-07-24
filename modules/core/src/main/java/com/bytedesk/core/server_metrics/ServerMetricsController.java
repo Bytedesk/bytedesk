@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 22:16:08
+ * @LastEditTime: 2025-07-24 22:20:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,14 +13,27 @@
  */
 package com.bytedesk.core.server_metrics;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Description;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.JsonResult;
 
 import com.bytedesk.core.server.ServerEntity;
 import com.bytedesk.core.server.ServerRestService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -28,16 +41,88 @@ import java.util.Optional;
 
 /**
  * REST controller for server metrics operations
- * Provides APIs for querying server metrics historical data
+ * Provides APIs for server metrics CRUD operations and historical data queries
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/server-metrics")
 @AllArgsConstructor
-public class ServerMetricsController {
+@Tag(name = "Server Metrics Management", description = "Server metrics management APIs for monitoring and analyzing server performance data")
+@Description("Server Metrics Management Controller - Server performance monitoring and metrics analysis APIs")
+public class ServerMetricsController extends BaseRestController<ServerMetricsRequest> {
 
     private final ServerMetricsService serverMetricsService;
     private final ServerRestService serverRestService;
+
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @ActionAnnotation(title = "服务器指标", action = "组织查询", description = "query server metrics by org")
+    @Operation(summary = "Query Server Metrics by Organization", description = "Retrieve server metrics for the current organization")
+    @Override
+    public ResponseEntity<?> queryByOrg(ServerMetricsRequest request) {
+        
+        Page<ServerMetricsResponse> metrics = serverMetricsService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(metrics));
+    }
+
+    @ActionAnnotation(title = "服务器指标", action = "用户查询", description = "query server metrics by user")
+    @Operation(summary = "Query Server Metrics by User", description = "Retrieve server metrics for the current user")
+    @Override
+    public ResponseEntity<?> queryByUser(ServerMetricsRequest request) {
+        
+        Page<ServerMetricsResponse> metrics = serverMetricsService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(metrics));
+    }
+
+    @ActionAnnotation(title = "服务器指标", action = "查询详情", description = "query server metrics by uid")
+    @Operation(summary = "Query Server Metrics by UID", description = "Retrieve a specific server metrics by its unique identifier")
+    @Override
+    public ResponseEntity<?> queryByUid(ServerMetricsRequest request) {
+        
+        ServerMetricsResponse metrics = serverMetricsService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(metrics));
+    }
+
+    @ActionAnnotation(title = "服务器指标", action = "新建", description = "create server metrics")
+    @Operation(summary = "Create Server Metrics", description = "Create a new server metrics record")
+    @Override
+    public ResponseEntity<?> create(ServerMetricsRequest request) {
+        
+        ServerMetricsResponse metrics = serverMetricsService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(metrics));
+    }
+
+    @ActionAnnotation(title = "服务器指标", action = "更新", description = "update server metrics")
+    @Operation(summary = "Update Server Metrics", description = "Update an existing server metrics record")
+    @Override
+    public ResponseEntity<?> update(ServerMetricsRequest request) {
+        
+        ServerMetricsResponse metrics = serverMetricsService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(metrics));
+    }
+
+    @ActionAnnotation(title = "服务器指标", action = "删除", description = "delete server metrics")
+    @Operation(summary = "Delete Server Metrics", description = "Delete a server metrics record")
+    @Override
+    public ResponseEntity<?> delete(ServerMetricsRequest request) {
+        
+        serverMetricsService.delete(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @ActionAnnotation(title = "服务器指标", action = "导出", description = "export server metrics")
+    @Operation(summary = "Export Server Metrics", description = "Export server metrics to Excel format")
+    @Override
+    @GetMapping("/export")
+    public Object export(ServerMetricsRequest request, HttpServletResponse response) {
+        // TODO: 实现 ServerMetricsExcel 导出功能
+        throw new UnsupportedOperationException("Export functionality not implemented yet");
+    }
 
     /**
      * Get metrics history for a server
@@ -51,8 +136,6 @@ public class ServerMetricsController {
             @PathVariable String serverUid,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
-        
-        log.info("Getting metrics history for server UID: {} from {} to {}", serverUid, startTime, endTime);
         
         List<ServerMetricsEntity> metrics = serverMetricsService.getMetricsHistory(serverUid, startTime, endTime);
         return ResponseEntity.ok(metrics);

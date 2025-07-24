@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository for ServerMetricsEntity
@@ -29,6 +30,13 @@ import java.util.List;
  */
 @Repository
 public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEntity, Long>, JpaSpecificationExecutor<ServerMetricsEntity> {
+
+    /**
+     * Find metrics by UID
+     * @param uid metrics UID
+     * @return Optional<ServerMetricsEntity>
+     */
+    Optional<ServerMetricsEntity> findByUid(String uid);
 
     /**
      * Find metrics by server UID

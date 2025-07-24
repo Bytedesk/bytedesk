@@ -1,45 +1,136 @@
-/*
- * @Author: jackning 270580156@qq.com
- * @Date: 2025-07-24 21:36:17
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 22:18:53
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- * 
- * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
- */
 package com.bytedesk.core.server_metrics;
 
+import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.server.ServerEntity;
+import com.bytedesk.core.server.ServerRestService;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for managing server metrics data
- * Provides business logic for server metrics operations
- */
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ServerMetricsService {
+public class ServerMetricsService extends BaseRestService<ServerMetricsEntity, ServerMetricsRequest, ServerMetricsResponse> {
 
     private final ServerMetricsRepository serverMetricsRepository;
+    private final ModelMapper modelMapper;
+    private final UidUtils uidUtils;
+    private final ServerRestService serverRestService;
 
-    /**
-     * Record server metrics
-     * @param serverEntity server entity with current metrics
-     * @return created metrics entity
-     */
+    @Override
+    public Page<ServerMetricsResponse> queryByOrg(ServerMetricsRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<ServerMetricsEntity> spec = ServerMetricsSpecification.search(request);
+        Page<ServerMetricsEntity> page = serverMetricsRepository.findAll(spec, pageable);
+        return page.map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<ServerMetricsResponse> queryByUser(ServerMetricsRequest request) {
+        return queryByOrg(request);
+    }
+
+    @Override
+    public ServerMetricsResponse queryByUid(ServerMetricsRequest request) {
+        Optional<ServerMetricsEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        }
+        return null;
+    }
+
+    @Cacheable(value = "server_metrics", key = "#uid", unless="#result==null")
+    @Override
+    public Optional<ServerMetricsEntity> findByUid(String uid) {
+        return serverMetricsRepository.findByUid(uid);
+    }
+
+    @Override
+    public ServerMetricsResponse create(ServerMetricsRequest request) {
+        ServerMetricsEntity entity = modelMapper.map(request, ServerMetricsEntity.class);
+        entity.setUid(uidUtils.getUid());
+        ServerMetricsEntity savedEntity = save(entity);
+        return convertToResponse(savedEntity);
+    }
+
+    @Override
+    public ServerMetricsResponse update(ServerMetricsRequest request) {
+        Optional<ServerMetricsEntity> optional = serverMetricsRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            ServerMetricsEntity existingEntity = optional.get();
+            existingEntity = modelMapper.map(request, ServerMetricsEntity.class);
+            ServerMetricsEntity savedEntity = save(existingEntity);
+            return convertToResponse(savedEntity);
+        }
+        throw new RuntimeException("Server metrics not found");
+    }
+
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<ServerMetricsEntity> optional = serverMetricsRepository.findByUid(uid);
+        if (optional.isPresent()) {
+            ServerMetricsEntity metrics = optional.get();
+            metrics.setDeleted(true);
+            serverMetricsRepository.save(metrics);
+        }
+    }
+
+    @Override
+    public void delete(ServerMetricsRequest request) {
+        deleteByUid(request.getUid());
+    }
+    
+    @Override
+    protected String getUidFromRequest(ServerMetricsRequest request) {
+        return request.getUid();
+    }
+
+    @Override
+    public ServerMetricsEntity doSave(ServerMetricsEntity entity) {
+        return serverMetricsRepository.save(entity);
+    }
+
+    @Override
+    public ServerMetricsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ServerMetricsEntity entity) {
+        log.warn("Optimistic locking failure for server metrics: {}", entity.getUid());
+        return entity;
+    }
+
+    @Override
+    public ServerMetricsResponse convertToResponse(ServerMetricsEntity entity) {
+        ServerMetricsResponse response = modelMapper.map(entity, ServerMetricsResponse.class);
+        
+        if (entity.getServerUid() != null) {
+            Optional<ServerEntity> serverOptional = serverRestService.findByUid(entity.getServerUid());
+            if (serverOptional.isPresent()) {
+                response.setServerName(serverOptional.get().getServerName());
+            }
+        }
+        
+        response.setHasHighCpuUsage(entity.getCpuUsage() != null && entity.getCpuUsage() > 80);
+        response.setHasHighMemoryUsage(entity.getMemoryUsage() != null && entity.getMemoryUsage() > 80);
+        response.setHasHighDiskUsage(entity.getDiskUsage() != null && entity.getDiskUsage() > 85);
+        response.setIsHealthy(entity.getCpuUsage() != null && entity.getCpuUsage() < 90 && 
+                            entity.getMemoryUsage() != null && entity.getMemoryUsage() < 90 && 
+                            entity.getDiskUsage() != null && entity.getDiskUsage() < 95);
+        
+        return response;
+    }
+
+    // 原有的业务方法
     @Transactional
     public ServerMetricsEntity recordMetrics(ServerEntity serverEntity) {
         ServerMetricsEntity metrics = ServerMetricsEntity.builder()
@@ -51,42 +142,21 @@ public class ServerMetricsService {
                 .usedMemoryMb(serverEntity.getUsedMemoryMb())
                 .usedDiskGb(serverEntity.getUsedDiskGb())
                 .uptimeSeconds(serverEntity.getUptimeSeconds())
-                .collectionInterval(5) // 5-minute intervals
+                .collectionInterval(5)
                 .build();
 
-        ServerMetricsEntity savedMetrics = serverMetricsRepository.save(metrics);
-        log.debug("Recorded metrics for server: {} at {}", serverEntity.getServerName(), savedMetrics.getTimestamp());
-        return savedMetrics;
+        return serverMetricsRepository.save(metrics);
     }
 
-    /**
-     * Get metrics history for a server
-     * @param serverUid server UID
-     * @param startTime start time
-     * @param endTime end time
-     * @return list of metrics
-     */
     public List<ServerMetricsEntity> getMetricsHistory(String serverUid, ZonedDateTime startTime, ZonedDateTime endTime) {
         return serverMetricsRepository.findByServerUidAndTimeRange(serverUid, startTime, endTime);
     }
 
-    /**
-     * Get latest metrics for a server
-     * @param serverUid server UID
-     * @return latest metrics or empty
-     */
     public Optional<ServerMetricsEntity> getLatestMetrics(String serverUid) {
         List<ServerMetricsEntity> latestMetrics = serverMetricsRepository.findLatestMetricsByServerUid(serverUid);
         return latestMetrics.isEmpty() ? Optional.empty() : Optional.of(latestMetrics.get(0));
     }
 
-    /**
-     * Get average metrics for a server in a time range
-     * @param serverUid server UID
-     * @param startTime start time
-     * @param endTime end time
-     * @return average metrics data
-     */
     public ServerMetricsAverage getAverageMetrics(String serverUid, ZonedDateTime startTime, ZonedDateTime endTime) {
         Object[] result = serverMetricsRepository.findAverageMetricsByServerUidAndTimeRange(serverUid, startTime, endTime);
         
@@ -103,13 +173,6 @@ public class ServerMetricsService {
         return ServerMetricsAverage.builder().build();
     }
 
-    /**
-     * Get peak metrics for a server in a time range
-     * @param serverUid server UID
-     * @param startTime start time
-     * @param endTime end time
-     * @return peak metrics data
-     */
     public ServerMetricsPeak getPeakMetrics(String serverUid, ZonedDateTime startTime, ZonedDateTime endTime) {
         Object[] result = serverMetricsRepository.findPeakMetricsByServerUidAndTimeRange(serverUid, startTime, endTime);
         
@@ -126,25 +189,11 @@ public class ServerMetricsService {
         return ServerMetricsPeak.builder().build();
     }
 
-    /**
-     * Find metrics with high resource usage
-     * @param cpuThreshold CPU usage threshold
-     * @param memoryThreshold memory usage threshold
-     * @param diskThreshold disk usage threshold
-     * @param startTime start time
-     * @param endTime end time
-     * @return list of metrics with high usage
-     */
     public List<ServerMetricsEntity> findHighUsageMetrics(Double cpuThreshold, Double memoryThreshold, 
                                                          Double diskThreshold, ZonedDateTime startTime, ZonedDateTime endTime) {
         return serverMetricsRepository.findMetricsWithHighUsage(cpuThreshold, memoryThreshold, diskThreshold, startTime, endTime);
     }
 
-    /**
-     * Clean up old metrics data
-     * @param retentionDays number of days to retain
-     * @return number of deleted records
-     */
     @Transactional
     public int cleanupOldMetrics(int retentionDays) {
         ZonedDateTime cutoffTime = ZonedDateTime.now().minusDays(retentionDays);
@@ -153,18 +202,10 @@ public class ServerMetricsService {
         return deletedCount;
     }
 
-    /**
-     * Get metrics count for a server
-     * @param serverUid server UID
-     * @return count of metrics records
-     */
     public long getMetricsCount(String serverUid) {
         return serverMetricsRepository.countByServerUidAndDeletedFalse(serverUid);
     }
 
-    /**
-     * Data class for average metrics
-     */
     @lombok.Data
     @lombok.Builder
     @lombok.NoArgsConstructor
@@ -177,9 +218,6 @@ public class ServerMetricsService {
         private Double avgUsedDiskGb;
     }
 
-    /**
-     * Data class for peak metrics
-     */
     @lombok.Data
     @lombok.Builder
     @lombok.NoArgsConstructor
@@ -191,4 +229,4 @@ public class ServerMetricsService {
         private Long peakUsedMemoryMb;
         private Long peakUsedDiskGb;
     }
-} 
+}

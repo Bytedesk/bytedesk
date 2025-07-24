@@ -89,7 +89,7 @@ public class ServerMetricsResponse extends BaseResponseNoOrg {
     /**
      * Server uptime formatted string
      */
-    private String uptimeFormatted;
+    // private String uptimeFormatted;
 
     /**
      * Collection interval in minutes
