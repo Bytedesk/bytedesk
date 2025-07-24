@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 12:58:09
+ * @LastEditTime: 2025-07-24 11:36:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -221,7 +221,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
         Assert.notNull(ip, "IP address must not be null");
         Assert.notNull(endpoint, "Endpoint must not be null");
         //
-        if (endpoint.equals("/visitor/api/v1/ping")) {
+        if (endpoint.contains("/visitor/api/v1/ping")) {
             return;
         }
         //

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:14:32
+ * @LastEditTime: 2025-07-24 11:35:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,7 @@ import com.bytedesk.core.ip.IpUtils;
 public class IpAccessInterceptor implements HandlerInterceptor {
     
     @Autowired
-    private IpAccessRestService ipAccessService;
+    private IpAccessRestService ipAccessRestService;
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -33,14 +33,14 @@ public class IpAccessInterceptor implements HandlerInterceptor {
         String endpoint = request.getRequestURI();
         
         // 检查是否被封禁
-        if (ipAccessService.isIpBlocked(ip)) {
+        if (ipAccessRestService.isIpBlocked(ip)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("IP has been blocked due to excessive requests");
             return false;
         }
         
         // 记录访问
-        ipAccessService.recordAccess(ip, endpoint, request.getQueryString());
+        ipAccessRestService.recordAccess(ip, endpoint, request.getQueryString());
 
         return true;
     }
