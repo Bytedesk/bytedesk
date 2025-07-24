@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 11:36:00
+ * @LastEditTime: 2025-07-24 11:37:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     private final IpWhitelistRepository whitelistRepository;
 
-    private final IpBlacklistRestService ipBlacklistService;
+    private final IpBlacklistRestService ipBlacklistRestService;
 
     private final IpService ipService;
 
@@ -167,7 +167,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
                 // 如果访问次数超过限制，加入黑名单
                 if (fresh.getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
-                    ipBlacklistService.addToBlacklistSystem(fresh.getIp());
+                    ipBlacklistRestService.addToBlacklistSystem(fresh.getIp());
                 }
 
                 return fresh;
@@ -208,7 +208,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
         }
 
         // 检查是否在黑名单中且未过期
-        Optional<IpBlacklistEntity> blacklist = ipBlacklistService.findByIp(ip);
+        Optional<IpBlacklistEntity> blacklist = ipBlacklistRestService.findByIp(ip);
         if (blacklist.isPresent() && blacklist.get().getEndTime().isAfter(BdDateUtils.now())) {
             return true;
         }
@@ -221,7 +221,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
         Assert.notNull(ip, "IP address must not be null");
         Assert.notNull(endpoint, "Endpoint must not be null");
         //
-        if (endpoint.contains("/visitor/api/v1/ping")) {
+        if (endpoint.toLowerCase().contains("ping")) {
             return;
         }
         //
@@ -276,7 +276,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                         // 由于原子更新无法返回更新后的计数，我们需要重新查询
                         Optional<IpAccessEntity> updatedAccess = ipAccessRepository.findById(existingAccess.getId());
                         if (updatedAccess.isPresent() && updatedAccess.get().getAccessCount() > MAX_REQUESTS_PER_MINUTE) {
-                            ipBlacklistService.addToBlacklistSystem(ip);
+                            ipBlacklistRestService.addToBlacklistSystem(ip);
                         }
                     }
                 }
@@ -292,7 +292,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
                 if (retryCount >= MAX_RETRY_COUNT) {
                     log.warn("Failed to update IP access record after {} retries for IP: {}", MAX_RETRY_COUNT, ip);
                     // 尝试添加到黑名单，以防止潜在的攻击
-                    ipBlacklistService.addToBlacklistSystem(ip);
+                    ipBlacklistRestService.addToBlacklistSystem(ip);
                     break;
                 }
                 
