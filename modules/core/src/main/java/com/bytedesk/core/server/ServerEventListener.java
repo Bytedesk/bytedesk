@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 21:24:37
+ * @LastEditTime: 2025-07-24 21:36:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,7 @@ package com.bytedesk.core.server;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -27,7 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ServerEventListener {
 
+    private final BytedeskProperties bytedeskProperties;
     private final ServerRestService serverRestService;
+    private final ServerMetricsService serverMetricsService;
     private final UidUtils uidUtils;
 
     /**
@@ -49,7 +52,7 @@ public class ServerEventListener {
             ServerEntity existingServer = serverRestService.findByServerName(serverName);
             
             if (existingServer != null) {
-                // 更新现有服务器信息
+                // 更新现有服务器基本信息（保持最新状态）
                 existingServer.setCpuUsage(currentMetrics.getCpuUsage());
                 existingServer.setMemoryUsage(currentMetrics.getMemoryUsage());
                 existingServer.setDiskUsage(currentMetrics.getDiskUsage());
@@ -59,6 +62,8 @@ public class ServerEventListener {
                 existingServer.setLastHeartbeat(currentMetrics.getLastHeartbeat());
                 existingServer.setOsInfo(currentMetrics.getOsInfo());
                 existingServer.setJavaVersion(currentMetrics.getJavaVersion());
+                existingServer.setAppVersion(bytedeskProperties.getVersion());
+                existingServer.setEnvironment(bytedeskProperties.getDebug() ? "DEV" : "PROD");
                 
                 // 根据资源使用情况更新状态
                 if (currentMetrics.getCpuUsage() > 90 || currentMetrics.getMemoryUsage() > 90 || currentMetrics.getDiskUsage() > 95) {
@@ -70,18 +75,27 @@ public class ServerEventListener {
                 }
                 
                 serverRestService.updateServer(existingServer);
-                log.debug("Updated server metrics for: {}", serverName);
+                
+                // 记录历史指标数据（每次创建新记录）
+                serverMetricsService.recordMetrics(existingServer);
+                
+                log.debug("Updated server and recorded metrics for: {}", serverName);
             } else {
                 // 创建新的服务器记录
                 currentMetrics.setUid(uidUtils.getUid());
                 currentMetrics.setServerIp(currentMetrics.getServerIp());
                 currentMetrics.setType(ServerTypeEnum.APPLICATION.name());
                 currentMetrics.setStatus(ServerStatusEnum.ONLINE.name());
-                currentMetrics.setEnvironment("PROD");
+                currentMetrics.setAppVersion(bytedeskProperties.getVersion());
+                currentMetrics.setEnvironment(bytedeskProperties.getDebug() ? "DEV" : "PROD");
                 currentMetrics.setMonitoringEnabled(true);
                 
-                serverRestService.createServer(currentMetrics);
-                log.info("Created new server record for: {}", serverName);
+                ServerEntity savedServer = serverRestService.createServer(currentMetrics);
+                
+                // 记录历史指标数据
+                serverMetricsService.recordMetrics(savedServer);
+                
+                log.info("Created new server and recorded metrics for: {}", serverName);
             }
             
         } catch (Exception e) {
