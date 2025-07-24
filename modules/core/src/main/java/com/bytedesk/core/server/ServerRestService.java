@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 20:51:19
+ * @LastEditTime: 2025-07-24 21:02:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,11 +21,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.OperatingSystemMXBean;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,15 +43,14 @@ import java.util.Optional;
 public class ServerRestService extends BaseRestService<ServerEntity, ServerRequest, ServerResponse> {
 
     private final ServerRepository serverRepository;
-    private final ServerService serverService;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
 
     // Helper method for internal use
     private Page<ServerEntity> queryByOrgEntity(ServerRequest request) {
         Pageable pageable = request.getPageable();
-        // TODO: Implement ServerSpecification.search(request)
-        return serverRepository.findAll(pageable);
+        Specification<ServerEntity> spec = ServerSpecification.search(request);
+        return serverRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -81,10 +84,13 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
 
     @Override
     public ServerResponse create(ServerRequest request) {
-        ServerEntity entity = convertToEntity(request);
+        ServerEntity entity = modelMapper.map(request, ServerEntity.class);
         entity.setUid(uidUtils.getUid());
         
-        ServerEntity savedEntity = serverService.createServer(entity);
+        ServerEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create server failed");
+        }
         return convertToResponse(savedEntity);
     }
 
@@ -93,10 +99,12 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         Optional<ServerEntity> optional = serverRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             ServerEntity existingEntity = optional.get();
-            updateEntityFromRequest(existingEntity, request);
-            existingEntity.setUpdatedAt(ZonedDateTime.now());
+            existingEntity = modelMapper.map(request, ServerEntity.class);
             
-            ServerEntity savedEntity = serverService.updateServer(existingEntity);
+            ServerEntity savedEntity = save(existingEntity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update server failed");
+            }
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Server not found");
@@ -105,12 +113,235 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
 
     @Override
     public void deleteByUid(String uid) {
-        serverService.deleteServer(uid);
+        Optional<ServerEntity> optional = serverRepository.findByUid(uid);
+        if (optional.isPresent()) {
+            ServerEntity server = optional.get();
+            server.setDeleted(true);
+            serverRepository.save(server);
+            log.info("Deleted server: {}", server.getServerName());
+        }
     }
 
     @Override
     public void delete(ServerRequest request) {
         deleteByUid(request.getUid());
+    }
+    
+    @Override
+    protected String getUidFromRequest(ServerRequest request) {
+        return request.getUid();
+    }
+
+    @Override
+    public ServerEntity doSave(ServerEntity entity) {
+        return serverRepository.save(entity);
+    }
+
+    @Override
+    public ServerEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ServerEntity entity) {
+        log.warn("Optimistic locking failure for server: {}", entity.getUid());
+        return entity;
+    }
+
+    // ========== 从 ServerService 迁移的方法 ==========
+
+    /**
+     * Find all servers for an organization
+     * @param orgUid organization UID
+     * @return List<ServerEntity>
+     */
+    public List<ServerEntity> findByOrgUid(String orgUid) {
+        return serverRepository.findByOrgUidAndDeletedFalseOrderByCreatedAtDesc(orgUid);
+    }
+
+    /**
+     * Find servers by type
+     * @param type server type
+     * @param orgUid organization UID
+     * @return List<ServerEntity>
+     */
+    public List<ServerEntity> findByType(String type, String orgUid) {
+        return serverRepository.findByTypeAndOrgUidAndDeletedFalse(type, orgUid);
+    }
+
+    /**
+     * Find servers by status
+     * @param status server status
+     * @param orgUid organization UID
+     * @return List<ServerEntity>
+     */
+    public List<ServerEntity> findByStatus(String status, String orgUid) {
+        return serverRepository.findByStatusAndOrgUidAndDeletedFalse(status, orgUid);
+    }
+
+    /**
+     * Find servers with high resource usage
+     * @param orgUid organization UID
+     * @return List<ServerEntity>
+     */
+    public List<ServerEntity> findServersWithHighUsage(String orgUid) {
+        return serverRepository.findServersWithHighUsage(orgUid, 80.0, 80.0, 85.0);
+    }
+
+    /**
+     * Find servers without recent heartbeat
+     * @param orgUid organization UID
+     * @param minutesThreshold minutes threshold for heartbeat
+     * @return List<ServerEntity>
+     */
+    public List<ServerEntity> findServersWithoutRecentHeartbeat(String orgUid, int minutesThreshold) {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(minutesThreshold);
+        return serverRepository.findServersWithoutRecentHeartbeat(orgUid, cutoffTime);
+    }
+
+    /**
+     * Update server heartbeat
+     * @param uid server UID
+     * @return updated server entity
+     */
+    @Transactional
+    public Optional<ServerEntity> updateHeartbeat(String uid) {
+        Optional<ServerEntity> optional = serverRepository.findByUid(uid);
+        if (optional.isPresent()) {
+            ServerEntity server = optional.get();
+            server.setLastHeartbeat(LocalDateTime.now());
+            return Optional.of(serverRepository.save(server));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Update server resource usage
+     * @param uid server UID
+     * @param cpuUsage CPU usage percentage
+     * @param memoryUsage memory usage percentage
+     * @param diskUsage disk usage percentage
+     * @return updated server entity
+     */
+    @Transactional
+    public Optional<ServerEntity> updateResourceUsage(String uid, Double cpuUsage, Double memoryUsage, Double diskUsage) {
+        Optional<ServerEntity> optional = serverRepository.findByUid(uid);
+        if (optional.isPresent()) {
+            ServerEntity server = optional.get();
+            server.setCpuUsage(cpuUsage);
+            server.setMemoryUsage(memoryUsage);
+            server.setDiskUsage(diskUsage);
+            server.setLastHeartbeat(LocalDateTime.now());
+            
+            // Update status based on resource usage
+            if (cpuUsage > 90 || memoryUsage > 90 || diskUsage > 95) {
+                server.setStatus(ServerStatusEnum.OVERLOADED.name());
+            } else if (cpuUsage > 80 || memoryUsage > 80 || diskUsage > 85) {
+                server.setStatus(ServerStatusEnum.WARNING.name());
+            } else {
+                server.setStatus(ServerStatusEnum.ONLINE.name());
+            }
+            
+            return Optional.of(serverRepository.save(server));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Get current server metrics (for self-monitoring)
+     * @return ServerEntity with current metrics
+     */
+    public ServerEntity getCurrentServerMetrics() {
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+        
+        // Calculate memory usage
+        long totalMemory = memoryBean.getHeapMemoryUsage().getMax();
+        long usedMemory = memoryBean.getHeapMemoryUsage().getUsed();
+        double memoryUsagePercent = (double) usedMemory / totalMemory * 100;
+        
+        // Get CPU usage (approximate)
+        double cpuUsage = osBean.getSystemLoadAverage() * 100;
+        if (cpuUsage > 100) cpuUsage = 100;
+        
+        // Create server entity with current metrics
+        return ServerEntity.builder()
+                .serverName(System.getProperty("os.name") + " - " + System.getProperty("user.name"))
+                .serverIp("127.0.0.1")
+                .type(ServerTypeEnum.APPLICATION.name())
+                .status(ServerStatusEnum.ONLINE.name())
+                .cpuUsage(cpuUsage)
+                .memoryUsage(memoryUsagePercent)
+                .totalMemoryMb(totalMemory / (1024 * 1024))
+                .usedMemoryMb(usedMemory / (1024 * 1024))
+                .uptimeSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000)
+                .startTime(LocalDateTime.now().minusSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000))
+                .lastHeartbeat(LocalDateTime.now())
+                .osInfo(System.getProperty("os.name") + " " + System.getProperty("os.version"))
+                .javaVersion(System.getProperty("java.version"))
+                .environment("DEV")
+                .monitoringEnabled(true)
+                .build();
+    }
+
+    /**
+     * Find server by server name and organization UID
+     * @param serverName server name
+     * @param orgUid organization UID
+     * @return ServerEntity or null if not found
+     */
+    public ServerEntity findByServerNameAndOrgUid(String serverName, String orgUid) {
+        Optional<ServerEntity> optional = serverRepository.findByServerNameAndOrgUidAndDeletedFalse(serverName, orgUid);
+        return optional.orElse(null);
+    }
+
+    /**
+     * Create server entity directly
+     * @param serverEntity server entity to create
+     * @return created server entity
+     */
+    @Transactional
+    public ServerEntity createServer(ServerEntity serverEntity) {
+        if (serverEntity.getUid() == null) {
+            serverEntity.setUid(uidUtils.getUid());
+        }
+        return serverRepository.save(serverEntity);
+    }
+
+    /**
+     * Update server entity directly
+     * @param serverEntity server entity to update
+     * @return updated server entity
+     */
+    @Transactional
+    public ServerEntity updateServer(ServerEntity serverEntity) {
+        return serverRepository.save(serverEntity);
+    }
+
+    /**
+     * Get server statistics for an organization
+     * @param orgUid organization UID
+     * @return ServerStatistics object
+     */
+    public ServerStatistics getServerStatistics(String orgUid) {
+        List<ServerEntity> servers = findByOrgUid(orgUid);
+        
+        long totalServers = servers.size();
+        long onlineServers = servers.stream()
+                .filter(s -> ServerStatusEnum.ONLINE.name().equals(s.getStatus()))
+                .count();
+        long offlineServers = servers.stream()
+                .filter(s -> ServerStatusEnum.OFFLINE.name().equals(s.getStatus()))
+                .count();
+        long warningServers = servers.stream()
+                .filter(s -> ServerStatusEnum.WARNING.name().equals(s.getStatus()))
+                .count();
+        long overloadedServers = servers.stream()
+                .filter(s -> ServerStatusEnum.OVERLOADED.name().equals(s.getStatus()))
+                .count();
+        
+        return ServerStatistics.builder()
+                .totalServers(totalServers)
+                .onlineServers(onlineServers)
+                .offlineServers(offlineServers)
+                .warningServers(warningServers)
+                .overloadedServers(overloadedServers)
+                .build();
     }
 
     @Override
@@ -148,83 +379,69 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         return response;
     }
 
-    @Override
-    protected String getUidFromRequest(ServerRequest request) {
-        return request.getUid();
-    }
+    /**
+     * Server statistics data class
+     */
+    public static class ServerStatistics {
+        private long totalServers;
+        private long onlineServers;
+        private long offlineServers;
+        private long warningServers;
+        private long overloadedServers;
 
-    @Override
-    public ServerEntity doSave(ServerEntity entity) {
-        return serverRepository.save(entity);
-    }
-
-    @Override
-    public ServerEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ServerEntity entity) {
-        log.warn("Optimistic locking failure for server: {}", entity.getUid());
-        return entity;
-    }
-
-    // Helper methods
-    private ServerEntity convertToEntity(ServerRequest request) {
-        ServerEntity entity = new ServerEntity();
-        entity.setServerName(request.getServerName());
-        entity.setServerIp(request.getServerIp());
-        entity.setType(request.getServerType());
-        entity.setStatus(request.getServerStatus());
-        entity.setDescription(request.getDescription());
-        entity.setCpuUsage(request.getCpuUsage());
-        entity.setMemoryUsage(request.getMemoryUsage());
-        entity.setTotalMemoryMb(request.getTotalMemoryMb());
-        entity.setUsedMemoryMb(request.getUsedMemoryMb());
-        entity.setDiskUsage(request.getDiskUsage());
-        entity.setTotalDiskGb(request.getTotalDiskGb());
-        entity.setUsedDiskGb(request.getUsedDiskGb());
-        entity.setUptimeSeconds(request.getUptimeSeconds());
-        entity.setStartTime(request.getStartTime());
-        entity.setLastHeartbeat(request.getLastHeartbeat());
-        entity.setServerPort(request.getServerPort());
-        entity.setOsInfo(request.getOsInfo());
-        entity.setJavaVersion(request.getJavaVersion());
-        entity.setAppVersion(request.getAppVersion());
-        entity.setEnvironment(request.getEnvironment());
-        entity.setLocation(request.getLocation());
-        entity.setMonitoringEnabled(request.getMonitoringEnabled());
-        entity.setCpuAlertThreshold(request.getCpuAlertThreshold());
-        entity.setMemoryAlertThreshold(request.getMemoryAlertThreshold());
-        entity.setDiskAlertThreshold(request.getDiskAlertThreshold());
-        entity.setOrgUid(request.getOrgUid());
-        entity.setDeleted(false);
+        // Getters and setters
+        public long getTotalServers() { return totalServers; }
+        public void setTotalServers(long totalServers) { this.totalServers = totalServers; }
         
-        return entity;
+        public long getOnlineServers() { return onlineServers; }
+        public void setOnlineServers(long onlineServers) { this.onlineServers = onlineServers; }
+        
+        public long getOfflineServers() { return offlineServers; }
+        public void setOfflineServers(long offlineServers) { this.offlineServers = offlineServers; }
+        
+        public long getWarningServers() { return warningServers; }
+        public void setWarningServers(long warningServers) { this.warningServers = warningServers; }
+        
+        public long getOverloadedServers() { return overloadedServers; }
+        public void setOverloadedServers(long overloadedServers) { this.overloadedServers = overloadedServers; }
+
+        // Builder pattern
+        public static ServerStatisticsBuilder builder() {
+            return new ServerStatisticsBuilder();
+        }
+
+        public static class ServerStatisticsBuilder {
+            private ServerStatistics statistics = new ServerStatistics();
+
+            public ServerStatisticsBuilder totalServers(long totalServers) {
+                statistics.totalServers = totalServers;
+                return this;
+            }
+
+            public ServerStatisticsBuilder onlineServers(long onlineServers) {
+                statistics.onlineServers = onlineServers;
+                return this;
+            }
+
+            public ServerStatisticsBuilder offlineServers(long offlineServers) {
+                statistics.offlineServers = offlineServers;
+                return this;
+            }
+
+            public ServerStatisticsBuilder warningServers(long warningServers) {
+                statistics.warningServers = warningServers;
+                return this;
+            }
+
+            public ServerStatisticsBuilder overloadedServers(long overloadedServers) {
+                statistics.overloadedServers = overloadedServers;
+                return this;
+            }
+
+            public ServerStatistics build() {
+                return statistics;
+            }
+        }
     }
 
-    private void updateEntityFromRequest(ServerEntity entity, ServerRequest request) {
-        if (request.getServerName() != null) {
-            entity.setServerName(request.getServerName());
-        }
-        if (request.getServerType() != null) {
-            entity.setType(request.getServerType());
-        }
-        if (request.getServerStatus() != null) {
-            entity.setStatus(request.getServerStatus());
-        }
-        if (request.getDescription() != null) {
-            entity.setDescription(request.getDescription());
-        }
-        if (request.getCpuUsage() != null) {
-            entity.setCpuUsage(request.getCpuUsage());
-        }
-        if (request.getMemoryUsage() != null) {
-            entity.setMemoryUsage(request.getMemoryUsage());
-        }
-        if (request.getDiskUsage() != null) {
-            entity.setDiskUsage(request.getDiskUsage());
-        }
-        if (request.getEnvironment() != null) {
-            entity.setEnvironment(request.getEnvironment());
-        }
-        if (request.getLocation() != null) {
-            entity.setLocation(request.getLocation());
-        }
-    }
 } 

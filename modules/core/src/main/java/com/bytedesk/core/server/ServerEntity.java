@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 20:36:13
+ * @LastEditTime: 2025-07-24 21:23:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,8 @@
  */
 package com.bytedesk.core.server;
 
-import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.base.BaseEntityNoOrg;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -42,7 +43,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_core_server")
-public class ServerEntity extends BaseEntity {
+public class ServerEntity extends BaseEntityNoOrg {
 
     /**
      * Server hostname or identifier
