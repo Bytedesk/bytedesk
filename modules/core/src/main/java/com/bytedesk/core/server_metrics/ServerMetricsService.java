@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 21:36:17
+ * @LastEditTime: 2025-07-24 22:18:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.server.ServerEntity;
-import com.bytedesk.core.server.ServerRestService;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -35,7 +34,6 @@ import java.util.Optional;
 public class ServerMetricsService {
 
     private final ServerMetricsRepository serverMetricsRepository;
-    private final ServerRestService serverRestService;
 
     /**
      * Record server metrics
