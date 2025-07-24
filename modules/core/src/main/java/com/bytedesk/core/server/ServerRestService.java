@@ -26,6 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
@@ -254,6 +255,24 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         double cpuUsage = osBean.getSystemLoadAverage() * 100;
         if (cpuUsage > 100) cpuUsage = 100;
         
+        // Calculate disk usage
+        double diskUsage = 0.0;
+        long totalDiskGb = 0L;
+        long usedDiskGb = 0L;
+        
+        try {
+            File root = new File("/");
+            long totalSpace = root.getTotalSpace();
+            long usableSpace = root.getUsableSpace();
+            long usedSpace = totalSpace - usableSpace;
+            
+            totalDiskGb = totalSpace / (1024 * 1024 * 1024);
+            usedDiskGb = usedSpace / (1024 * 1024 * 1024);
+            diskUsage = (double) usedSpace / totalSpace * 100;
+        } catch (Exception e) {
+            log.warn("Failed to get disk usage information: {}", e.getMessage());
+        }
+        
         // Create server entity with current metrics
         return ServerEntity.builder()
                 .serverName(System.getProperty("os.name") + " - " + System.getProperty("user.name"))
@@ -262,8 +281,11 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
                 .status(ServerStatusEnum.ONLINE.name())
                 .cpuUsage(cpuUsage)
                 .memoryUsage(memoryUsagePercent)
+                .diskUsage(diskUsage)
                 .totalMemoryMb(totalMemory / (1024 * 1024))
                 .usedMemoryMb(usedMemory / (1024 * 1024))
+                .totalDiskGb(totalDiskGb)
+                .usedDiskGb(usedDiskGb)
                 .uptimeSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000)
                 .startTime(ZonedDateTime.now().minusSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000))
                 .lastHeartbeat(ZonedDateTime.now())

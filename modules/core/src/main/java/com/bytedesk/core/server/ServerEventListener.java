@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 23:24:38
+ * @LastEditTime: 2025-07-24 23:27:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,12 +22,10 @@ import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 import com.bytedesk.core.server_metrics.ServerMetricsRestService;
 import com.bytedesk.core.uid.UidUtils;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
 public class ServerEventListener {
 
     @Value("${server.port}")
@@ -37,6 +35,16 @@ public class ServerEventListener {
     private final ServerRestService serverRestService;
     private final ServerMetricsRestService serverMetricsRestService;
     private final UidUtils uidUtils;
+
+    public ServerEventListener(BytedeskProperties bytedeskProperties, 
+                             ServerRestService serverRestService, 
+                             ServerMetricsRestService serverMetricsRestService, 
+                             UidUtils uidUtils) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.serverRestService = serverRestService;
+        this.serverMetricsRestService = serverMetricsRestService;
+        this.uidUtils = uidUtils;
+    }
 
     /**
      * 监听5分钟定时事件，更新服务器信息
@@ -64,6 +72,8 @@ public class ServerEventListener {
                 existingServer.setDiskUsage(currentMetrics.getDiskUsage());
                 existingServer.setTotalMemoryMb(currentMetrics.getTotalMemoryMb());
                 existingServer.setUsedMemoryMb(currentMetrics.getUsedMemoryMb());
+                existingServer.setTotalDiskGb(currentMetrics.getTotalDiskGb());
+                existingServer.setUsedDiskGb(currentMetrics.getUsedDiskGb());
                 existingServer.setUptimeSeconds(currentMetrics.getUptimeSeconds());
                 existingServer.setLastHeartbeat(currentMetrics.getLastHeartbeat());
                 existingServer.setOsInfo(currentMetrics.getOsInfo());
