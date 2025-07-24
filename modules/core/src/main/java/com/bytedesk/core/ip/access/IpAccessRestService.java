@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 17:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 11:37:12
+ * @LastEditTime: 2025-07-24 11:40:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     private final IpAccessRepository ipAccessRepository;
 
-    private final IpWhitelistRepository whitelistRepository;
+    private final IpWhitelistRepository ipWhitelistRepository;
 
     private final IpBlacklistRestService ipBlacklistRestService;
 
@@ -203,7 +203,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     public Boolean isIpBlocked(String ip) {
         // 检查是否在白名单中
-        if (whitelistRepository.existsByIp(ip)) {
+        if (ipWhitelistRepository.existsByIp(ip)) {
             return false;
         }
 
