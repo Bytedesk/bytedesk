@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 22:20:00
+ * @LastEditTime: 2025-07-25 06:03:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -85,16 +85,4 @@ public class ServerMetricsRequest extends BaseRequestNoOrg {
      */
     @Builder.Default
     private Integer collectionInterval = 5;
-
-    /**
-     * Search filters
-     */
-    private String serverUidFilter;
-    private ZonedDateTime startTime;
-    private ZonedDateTime endTime;
-    private Double cpuThreshold;
-    private Double memoryThreshold;
-    private Double diskThreshold;
-    private Boolean highUsageFilter; // true to show only metrics with high resource usage
-    private Integer retentionDays; // for cleanup operations
 } 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 23:27:20
+ * @LastEditTime: 2025-07-25 06:06:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 import com.bytedesk.core.server_metrics.ServerMetricsRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -80,6 +81,7 @@ public class ServerEventListener {
                 existingServer.setJavaVersion(currentMetrics.getJavaVersion());
                 existingServer.setAppVersion(bytedeskProperties.getVersion());
                 existingServer.setEnvironment(bytedeskProperties.getDebug() ? "DEV" : "PROD");
+                existingServer.setLevel(LevelEnum.PLATFORM.name());
                 
                 // 根据资源使用情况更新状态
                 if (currentMetrics.getCpuUsage() > 90 || currentMetrics.getMemoryUsage() > 90 || currentMetrics.getDiskUsage() > 95) {
@@ -106,6 +108,7 @@ public class ServerEventListener {
                 currentMetrics.setAppVersion(bytedeskProperties.getVersion());
                 currentMetrics.setEnvironment(bytedeskProperties.getDebug() ? "DEV" : "PROD");
                 currentMetrics.setMonitoringEnabled(true);
+                currentMetrics.setLevel(LevelEnum.PLATFORM.name());
                 
                 ServerEntity savedServer = serverRestService.createServer(currentMetrics);
                 
