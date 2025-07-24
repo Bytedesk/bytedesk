@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:22:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 14:37:07
+ * @LastEditTime: 2025-07-24 12:59:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,6 +54,27 @@ public class ThreadMessageUtil {
     }
 
     public static MessageEntity getThreadRobotWelcomeMessage(String content, ThreadEntity thread) {
+
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        // 
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .thread(thread)
+                .type(MessageTypeEnum.WELCOME.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(thread.getRobot())
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        //
+        return message;
+    }
+
+    public static MessageEntity getThreadWorkflowWelcomeMessage(String content, ThreadEntity thread) {
 
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         // 

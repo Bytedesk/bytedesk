@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:55:36
+ * @LastEditTime: 2025-07-24 12:54:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,6 +33,7 @@ import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserOrganizationRoleResponse;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
@@ -41,6 +42,7 @@ import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadResponse;
+import com.bytedesk.core.workflow.WorkflowEntity;
 
 import lombok.experimental.UtilityClass;
 
@@ -130,6 +132,17 @@ public class ConvertUtils {
 
     public static UserProtobuf convertToUserProtobuf(UserEntity user) {
         return modelMapper.map(user, UserProtobuf.class);
+    }
+
+    public static UserProtobuf convertToUserProtobuf(WorkflowEntity workflow) {
+        UserProtobuf userProtobuf = modelMapper.map(workflow, UserProtobuf.class);
+        userProtobuf.setType(UserTypeEnum.WORKFLOW.name());
+        return userProtobuf;
+    }
+
+    public static String convertToUserProtobufString(WorkflowEntity workflow) {
+        UserProtobuf userProtobuf = convertToUserProtobuf(workflow);
+        return JSON.toJSONString(userProtobuf);
     }
 
     public static String convertToUserProtobufString(UserEntity user) {

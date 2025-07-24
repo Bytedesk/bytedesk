@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 12:06:08
+ * @LastEditTime: 2025-07-24 12:56:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,6 +49,7 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.workflow.WorkflowEntity;
 
 import lombok.AllArgsConstructor;
@@ -256,22 +257,18 @@ public class VisitorThreadService
 
     public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {
         //
-        String robotString = ConvertAiUtils.convertToRobotProtobufString(workflow);
+        String workflowString = ConvertUtils.convertToUserProtobufString(workflow);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(workflow.getServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.WORKFLOW.name())
-                // .agent(robotString) // 人工客服
-                .robot(robotString) // 机器人
-                .userUid(workflow.getUid()) // 机器人uid
+                .robot(workflowString) // 工作流
+                .userUid(workflow.getUid()) // 工作流uid
                 .user(visitor)
                 .channel(visitorRequest.getChannel())
                 .orgUid(workflow.getOrgUid())
-                .extra(extra)
                 .build();
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {
@@ -280,15 +277,10 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkflowThreadExtra(ThreadEntity thread, RobotEntity robot) {
+    public ThreadEntity reInitWorkflowThreadExtra(ThreadEntity thread, WorkflowEntity workflow) {
         //
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
-        thread.setExtra(extra);
-        // 使用agent的serviceSettings配置
-        String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
-        // thread.setAgent(robotString); // 人工客服
-        thread.setRobot(robotString); // 机器人
+        String workflowString = ConvertUtils.convertToUserProtobufString(workflow);
+        thread.setRobot(workflowString); // 工作流
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {

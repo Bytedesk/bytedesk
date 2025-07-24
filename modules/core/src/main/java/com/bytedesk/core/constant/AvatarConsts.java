@@ -249,6 +249,11 @@ public class AvatarConsts {
         return getDefaultHost() + "/avatars/robot.png";
     }
 
+    // workflow avatar  
+    public static String getDefaultWorkflowAvatar() {
+        return getDefaultHost() + "/avatars/workflow.png";
+    }
+
     public static String getAvatar(String channel) {
         if (channel == null) {
             return AvatarConsts.getDefaultVisitorAvatarUrl();

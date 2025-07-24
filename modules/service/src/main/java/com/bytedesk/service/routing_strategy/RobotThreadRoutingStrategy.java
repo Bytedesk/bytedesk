@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 11:50:50
+ * @LastEditTime: 2025-07-24 13:05:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,15 +47,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
 
-    private final RobotRestService robotService;
+    private final RobotRestService robotRestService;
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     private final VisitorThreadService visitorThreadService;
 
     private final QueueService queueService;
 
-    private final QueueMemberRestService queueMemberRestService;;
+    private final QueueMemberRestService queueMemberRestService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -69,12 +69,12 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
     // 机器人对话，不支持转人工
     public MessageProtobuf createRobotThread(VisitorRequest request) {
         String robotUid = request.getSid();
-        RobotEntity robotEntity = robotService.findByUid(robotUid)
+        RobotEntity robotEntity = robotRestService.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot uid " + robotUid + " not found"));
         //
         String topic = TopicUtils.formatOrgRobotThreadTopic(robotEntity.getUid(), request.getUid());
         ThreadEntity thread = null;
-        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             // 
             if (threadOptional.get().isNew()) {
@@ -109,7 +109,7 @@ public class RobotThreadRoutingStrategy implements ThreadRoutingStrategy {
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         thread.setRobot(robotString);
         // 
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }

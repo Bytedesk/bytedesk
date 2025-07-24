@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 12:28:16
+ * @LastEditTime: 2025-07-24 12:50:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.core.workflow;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +42,8 @@ public class WorkflowEntity extends BaseEntity {
 
     private String nickname;
 
-    private String avatar;
+    @Builder.Default
+    private String avatar = AvatarConsts.getDefaultWorkflowAvatar();
 
     private String description;
 
