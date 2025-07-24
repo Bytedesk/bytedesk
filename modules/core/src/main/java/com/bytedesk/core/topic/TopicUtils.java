@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:51:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 17:37:09
+ * @LastEditTime: 2025-07-24 09:33:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,6 +45,7 @@ public class TopicUtils {
     public static final String TOPIC_ORG_KB_PREFIX = "org/kb/";
     public static final String TOPIC_ORG_KBDOC_PREFIX = "org/kbdoc/";
     public static final String TOPIC_ORG_QUEUE_PREFIX = "org/queue/";
+    public static final String TOPIC_ORG_WORKFLOW_PREFIX = "org/workflow/";
     // 
     // public static final String TOPIC_ORG_AGENT_TICKET_THREAD_PREFIX = "org/ticket/agent/";
     // public static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX = "org/ticket/workgroup/";
@@ -100,6 +101,7 @@ public class TopicUtils {
     private static final String TOPIC_ORG_UNIFIED_THREAD_PATTERN = TOPIC_ORG_UNIFIED_PREFIX + "%s/%s"; // "org/unified/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
     private static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN = TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/department/%s/%s";
+    private static final String TOPIC_ORG_WORKFLOW_THREAD_PATTERN = TOPIC_ORG_WORKFLOW_PREFIX + "%s/%s"; // "org/workflow/%s/%s";
 
 
     /**
@@ -339,5 +341,18 @@ public class TopicUtils {
     public static final String formatTopicInternal(String topic) {
         return topic + TOPIC_INTERNAL_SUFFIX;
     }
+
+    //////////////////////////////////////////////////////////////////////////
+    // 工作流
+
+    public static Boolean isOrgWorkflowTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_WORKFLOW_PREFIX);
+    }
+    
+    // userUid or visitorUid
+    public static String formatOrgWorkflowThreadTopic(String workflowUid, String userUid) {
+        return String.format(TOPIC_ORG_WORKFLOW_THREAD_PATTERN, workflowUid, userUid);
+    }
+
 
 }

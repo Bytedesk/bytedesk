@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 09:22:53
+ * @LastEditTime: 2025-07-24 09:33:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,16 +65,16 @@ public class WorkflowThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
-        return createRobotThread(visitorRequest);
+        return createWorkflowThread(visitorRequest);
     }
 
-    // 机器人对话，不支持转人工
-    public MessageProtobuf createRobotThread(VisitorRequest request) {
-        String robotUid = request.getSid();
-        WorkflowEntity workflowEntity = workflowRestService.findByUid(robotUid)
-                .orElseThrow(() -> new RuntimeException("Workflow uid " + robotUid + " not found"));
+    // 工作流对话，不支持转人工
+    public MessageProtobuf createWorkflowThread(VisitorRequest request) {
+        String workflowUid = request.getSid();
+        WorkflowEntity workflowEntity = workflowRestService.findByUid(workflowUid)
+                .orElseThrow(() -> new RuntimeException("Workflow uid " + workflowUid + " not found"));
         //
-        String topic = TopicUtils.formatOrgRobotThreadTopic(workflowEntity.getUid(), request.getUid());
+        String topic = TopicUtils.formatOrgWorkflowThreadTopic(workflowEntity.getUid(), request.getUid());
         ThreadEntity thread = null;
         Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
@@ -129,7 +129,7 @@ public class WorkflowThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private MessageProtobuf getWorkflowContinueMessage(WorkflowEntity workflow, @Nonnull ThreadEntity thread) {
 
-        String content = workflow.getServiceSettings().getWelcomeTip();
+        String content = "您好，请问有什么可以帮助您？";
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
