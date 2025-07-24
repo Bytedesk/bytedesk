@@ -26,6 +26,7 @@ import java.util.Optional;
 /**
  * Repository for ServerEntity
  * Provides database operations for server monitoring data
+ * Note: Only super administrators can access server monitoring data
  */
 @Repository
 public interface ServerRepository extends JpaRepository<ServerEntity, Long>, JpaSpecificationExecutor<ServerEntity> {
@@ -38,91 +39,79 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     Optional<ServerEntity> findByUid(String uid);
 
     /**
-     * Find server by server name and organization UID
+     * Find server by server name
      * @param serverName server name
-     * @param orgUid organization UID
      * @return Optional<ServerEntity>
      */
-    Optional<ServerEntity> findByServerNameAndOrgUidAndDeletedFalse(String serverName, String orgUid);
+    Optional<ServerEntity> findByServerNameAndDeletedFalse(String serverName);
 
     /**
-     * Find servers by organization UID
-     * @param orgUid organization UID
+     * Find all servers
      * @return List<ServerEntity>
      */
-    List<ServerEntity> findByOrgUidAndDeletedFalseOrderByCreatedAtDesc(String orgUid);
+    List<ServerEntity> findByDeletedFalseOrderByCreatedAtDesc();
 
     /**
      * Find servers by type
      * @param type server type
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    List<ServerEntity> findByTypeAndOrgUidAndDeletedFalse(String type, String orgUid);
+    List<ServerEntity> findByTypeAndDeletedFalse(String type);
 
     /**
      * Find servers by status
      * @param status server status
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    List<ServerEntity> findByStatusAndOrgUidAndDeletedFalse(String status, String orgUid);
+    List<ServerEntity> findByStatusAndDeletedFalse(String status);
 
     /**
      * Find servers with high resource usage
-     * @param orgUid organization UID
      * @param cpuThreshold CPU usage threshold
      * @param memoryThreshold memory usage threshold
      * @param diskThreshold disk usage threshold
      * @return List<ServerEntity>
      */
-    @Query("SELECT s FROM ServerEntity s WHERE s.orgUid = :orgUid AND s.deleted = false " +
+    @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.cpuUsage >= :cpuThreshold OR s.memoryUsage >= :memoryThreshold OR s.diskUsage >= :diskThreshold)")
-    List<ServerEntity> findServersWithHighUsage(@Param("orgUid") String orgUid,
-                                               @Param("cpuThreshold") Double cpuThreshold,
+    List<ServerEntity> findServersWithHighUsage(@Param("cpuThreshold") Double cpuThreshold,
                                                @Param("memoryThreshold") Double memoryThreshold,
                                                @Param("diskThreshold") Double diskThreshold);
 
     /**
      * Find servers that haven't sent heartbeat recently
-     * @param orgUid organization UID
      * @param cutoffTime cutoff time for heartbeat
      * @return List<ServerEntity>
      */
-    @Query("SELECT s FROM ServerEntity s WHERE s.orgUid = :orgUid AND s.deleted = false " +
+    @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.lastHeartbeat IS NULL OR s.lastHeartbeat < :cutoffTime)")
-    List<ServerEntity> findServersWithoutRecentHeartbeat(@Param("orgUid") String orgUid,
-                                                        @Param("cutoffTime") LocalDateTime cutoffTime);
+    List<ServerEntity> findServersWithoutRecentHeartbeat(@Param("cutoffTime") LocalDateTime cutoffTime);
 
     /**
      * Count servers by status
      * @param status server status
-     * @param orgUid organization UID
      * @return count
      */
-    long countByStatusAndOrgUidAndDeletedFalse(String status, String orgUid);
+    long countByStatusAndDeletedFalse(String status);
 
     /**
      * Count servers by type
      * @param type server type
-     * @param orgUid organization UID
      * @return count
      */
-    long countByTypeAndOrgUidAndDeletedFalse(String type, String orgUid);
+    long countByTypeAndDeletedFalse(String type);
 
     /**
      * Find servers by environment
      * @param environment environment (DEV, TEST, PROD, etc.)
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    List<ServerEntity> findByEnvironmentAndOrgUidAndDeletedFalse(String environment, String orgUid);
+    List<ServerEntity> findByEnvironmentAndDeletedFalse(String environment);
 
     /**
      * Find servers by location
      * @param location server location
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    List<ServerEntity> findByLocationAndOrgUidAndDeletedFalse(String location, String orgUid);
+    List<ServerEntity> findByLocationAndDeletedFalse(String location);
 } 

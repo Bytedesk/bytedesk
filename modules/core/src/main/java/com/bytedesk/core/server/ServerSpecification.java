@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 20:39:01
+ * @LastEditTime: 2025-07-24 21:26:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,11 +27,11 @@ import lombok.extern.slf4j.Slf4j;
 public class ServerSpecification extends BaseSpecification {
     
     public static Specification<ServerEntity> search(ServerRequest request) {
-        log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
-            request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
+        log.info("request: {} userUid: {} pageNumber: {} pageSize: {}", 
+            request, request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getUserUid()));
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

@@ -13,7 +13,8 @@
  */
 package com.bytedesk.core.server;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.base.BaseResponseNoOrg;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +34,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServerResponse extends BaseResponse {
+public class ServerResponse extends BaseResponseNoOrg {
 
     /**
      * Server hostname or identifier
