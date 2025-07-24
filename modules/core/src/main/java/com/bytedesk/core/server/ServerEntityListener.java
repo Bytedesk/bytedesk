@@ -11,14 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.host;
+package com.bytedesk.core.server;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.host.event.HostCreateEvent;
-import com.bytedesk.core.host.event.HostUpdateEvent;
+import com.bytedesk.core.server.event.ServerCreateEvent;
+import com.bytedesk.core.server.event.ServerUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
@@ -28,24 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class HostEntityListener {
+public class ServerEntityListener {
 
     @PostPersist
-    public void onPostPersist(HostEntity host) {
-        log.info("onPostPersist: {}", host);
-        HostEntity cloneHost = SerializationUtils.clone(host);
+    public void onPostPersist(ServerEntity server) {
+        log.info("onPostPersist: {}", server);
+        ServerEntity cloneServer = SerializationUtils.clone(server);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new HostCreateEvent(cloneHost));
+        bytedeskEventPublisher.publishEvent(new ServerCreateEvent(cloneServer));
     }
 
     @PostUpdate
-    public void onPostUpdate(HostEntity host) {
-        log.info("onPostUpdate: {}", host);
-        HostEntity cloneHost = SerializationUtils.clone(host);
+    public void onPostUpdate(ServerEntity server) {
+        log.info("onPostUpdate: {}", server);
+        ServerEntity cloneServer = SerializationUtils.clone(server);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new HostUpdateEvent(cloneHost));
+        bytedeskEventPublisher.publishEvent(new ServerUpdateEvent(cloneServer));
     }
     
 }

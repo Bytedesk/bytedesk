@@ -11,10 +11,10 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.host;
+package com.bytedesk.core.server;
 
 import com.bytedesk.core.base.BasePermissions;
 
-public class HostPermissions extends BasePermissions {
+public class ServerPermissions extends BasePermissions {
 
 }

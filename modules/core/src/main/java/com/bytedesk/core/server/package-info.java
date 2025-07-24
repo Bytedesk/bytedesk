@@ -1,5 +1,5 @@
 
 @NonNullApi
-package com.bytedesk.core.host;
+package com.bytedesk.core.server;
 
 import org.springframework.lang.NonNullApi;

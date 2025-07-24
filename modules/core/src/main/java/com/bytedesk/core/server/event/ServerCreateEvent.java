@@ -11,26 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.host.event;
+package com.bytedesk.core.server.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.host.HostEntity;
+import com.bytedesk.core.server.ServerEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class HostCreateEvent extends ApplicationEvent {
+public class ServerCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private HostEntity host;
+    private ServerEntity server;
 
-    public HostCreateEvent(HostEntity host) {
-        super(host);
-        this.host = host;
+    public ServerCreateEvent(ServerEntity server) {
+        super(server);
+        this.server = server;
     }
 
 }
