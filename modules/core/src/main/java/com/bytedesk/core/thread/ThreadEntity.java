@@ -79,9 +79,9 @@ public class ThreadEntity extends AbstractThreadEntity {
     }
 
     // LLMING
-    public Boolean isLlmIng() {
-        return ThreadProcessStatusEnum.LLMING.name().equals(getStatus());
-    }
+    // public Boolean isLlmIng() {
+    //     return ThreadProcessStatusEnum.LLMING.name().equals(getStatus());
+    // }
 
     // queuing
     public Boolean isQueuing() {
