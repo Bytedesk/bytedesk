@@ -203,7 +203,7 @@ public class IpAccessRestService extends BaseRestService<IpAccessEntity, IpAcces
 
     public Boolean isIpBlocked(String ip) {
         // 检查是否在白名单中
-        if (ipWhitelistRepository.existsByIp(ip)) {
+        if (ipWhitelistRepository.existsByIpAndDeletedFalse(ip)) {
             return false;
         }
 

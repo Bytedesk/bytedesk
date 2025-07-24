@@ -84,7 +84,7 @@ public class WorkflowThreadRoutingStrategy implements ThreadRoutingStrategy {
             } else if (threadOptional.get().isRoboting()) {
                 thread = threadOptional.get();
                 // 
-                thread = visitorThreadService.reInitRobotThreadExtra(thread, robotEntity); // 方便测试
+                thread = visitorThreadService.reInitRobotThreadExtra(thread, workflowEntity); // 方便测试
                 // 返回未关闭，或 非留言状态的会话
                 log.info("Already have a processing robot thread {}", topic);
                 return getRobotContinueMessage(robotEntity, thread);

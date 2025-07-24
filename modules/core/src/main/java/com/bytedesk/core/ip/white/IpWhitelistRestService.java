@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-24 22:18:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 12:59:53
+ * @LastEditTime: 2025-07-24 11:45:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,7 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
 
     @Cacheable(value = "ipWhitelist", key = "#ip", unless = "#result == null")
     public Optional<IpWhitelistEntity> findByIp(String ip) {
-        return ipWhitelistRepository.findByIp(ip);
+        return ipWhitelistRepository.findByIpAndDeletedFalse(ip);
     }
 
     @Override
@@ -77,14 +77,14 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
     public IpWhitelistResponse create(IpWhitelistRequest request) {
         Optional<IpWhitelistEntity> ipWhitelist = findByIp(request.getIp());
         if (ipWhitelist.isPresent()) {
-            throw new RuntimeException("ipWhitelist is present");
+            throw new RuntimeException("ipWhitelist already exists");
         }
         IpWhitelistEntity ipWhitelistEntity = modelMapper.map(request, IpWhitelistEntity.class);
         ipWhitelistEntity.setUid(uidUtils.getUid());
         // 保存
         IpWhitelistEntity savedIpWhitelistEntity = ipWhitelistRepository.save(ipWhitelistEntity);
         if (savedIpWhitelistEntity == null) {
-            throw new RuntimeException("ipWhitelist is null");
+            throw new RuntimeException("ipWhitelist save failed");
         }
         return convertToResponse(savedIpWhitelistEntity);
     }
@@ -96,7 +96,11 @@ public class IpWhitelistRestService extends BaseRestService<IpWhitelistEntity, I
             throw new RuntimeException("ipWhitelist is not present");
         }
         IpWhitelistEntity ipWhitelistEntity = modelMapper.map(request, IpWhitelistEntity.class);
-        return convertToResponse(ipWhitelistRepository.save(ipWhitelistEntity));
+        IpWhitelistEntity savedIpWhitelistEntity = ipWhitelistRepository.save(ipWhitelistEntity);
+        if (savedIpWhitelistEntity == null) {
+            throw new RuntimeException("ipWhitelist save failed");
+        }
+        return convertToResponse(savedIpWhitelistEntity);
     }
 
     public long count() { 
