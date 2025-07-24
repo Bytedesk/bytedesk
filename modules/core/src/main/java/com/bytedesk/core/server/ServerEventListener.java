@@ -44,10 +44,9 @@ public class ServerEventListener {
             
             // 查找当前服务器是否已存在
             String serverName = currentMetrics.getServerName();
-            String orgUid = "system"; // 系统级服务器监控
             
             // 尝试查找现有服务器记录
-            ServerEntity existingServer = serverRestService.findByServerNameAndOrgUid(serverName, orgUid);
+            ServerEntity existingServer = serverRestService.findByServerName(serverName);
             
             if (existingServer != null) {
                 // 更新现有服务器信息

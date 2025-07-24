@@ -146,52 +146,47 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     // ========== 从 ServerService 迁移的方法 ==========
 
     /**
-     * Find all servers for an organization
-     * @param orgUid organization UID
+     * Find all servers
      * @return List<ServerEntity>
      */
-    public List<ServerEntity> findByOrgUid(String orgUid) {
-        return serverRepository.findByOrgUidAndDeletedFalseOrderByCreatedAtDesc(orgUid);
+    public List<ServerEntity> findAllServers() {
+        return serverRepository.findByDeletedFalseOrderByCreatedAtDesc();
     }
 
     /**
      * Find servers by type
      * @param type server type
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    public List<ServerEntity> findByType(String type, String orgUid) {
-        return serverRepository.findByTypeAndOrgUidAndDeletedFalse(type, orgUid);
+    public List<ServerEntity> findByType(String type) {
+        return serverRepository.findByTypeAndDeletedFalse(type);
     }
 
     /**
      * Find servers by status
      * @param status server status
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    public List<ServerEntity> findByStatus(String status, String orgUid) {
-        return serverRepository.findByStatusAndOrgUidAndDeletedFalse(status, orgUid);
+    public List<ServerEntity> findByStatus(String status) {
+        return serverRepository.findByStatusAndDeletedFalse(status);
     }
 
     /**
      * Find servers with high resource usage
-     * @param orgUid organization UID
      * @return List<ServerEntity>
      */
-    public List<ServerEntity> findServersWithHighUsage(String orgUid) {
-        return serverRepository.findServersWithHighUsage(orgUid, 80.0, 80.0, 85.0);
+    public List<ServerEntity> findServersWithHighUsage() {
+        return serverRepository.findServersWithHighUsage(80.0, 80.0, 85.0);
     }
 
     /**
      * Find servers without recent heartbeat
-     * @param orgUid organization UID
      * @param minutesThreshold minutes threshold for heartbeat
      * @return List<ServerEntity>
      */
-    public List<ServerEntity> findServersWithoutRecentHeartbeat(String orgUid, int minutesThreshold) {
+    public List<ServerEntity> findServersWithoutRecentHeartbeat(int minutesThreshold) {
         LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(minutesThreshold);
-        return serverRepository.findServersWithoutRecentHeartbeat(orgUid, cutoffTime);
+        return serverRepository.findServersWithoutRecentHeartbeat(cutoffTime);
     }
 
     /**
@@ -280,13 +275,12 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     }
 
     /**
-     * Find server by server name and organization UID
+     * Find server by server name
      * @param serverName server name
-     * @param orgUid organization UID
      * @return ServerEntity or null if not found
      */
-    public ServerEntity findByServerNameAndOrgUid(String serverName, String orgUid) {
-        Optional<ServerEntity> optional = serverRepository.findByServerNameAndOrgUidAndDeletedFalse(serverName, orgUid);
+    public ServerEntity findByServerName(String serverName) {
+        Optional<ServerEntity> optional = serverRepository.findByServerNameAndDeletedFalse(serverName);
         return optional.orElse(null);
     }
 
@@ -314,12 +308,11 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     }
 
     /**
-     * Get server statistics for an organization
-     * @param orgUid organization UID
+     * Get server statistics
      * @return ServerStatistics object
      */
-    public ServerStatistics getServerStatistics(String orgUid) {
-        List<ServerEntity> servers = findByOrgUid(orgUid);
+    public ServerStatistics getServerStatistics() {
+        List<ServerEntity> servers = findAllServers();
         
         long totalServers = servers.size();
         long onlineServers = servers.stream()
