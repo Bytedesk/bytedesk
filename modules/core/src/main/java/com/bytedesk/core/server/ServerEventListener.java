@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
+import com.bytedesk.core.server_metrics.ServerMetricsService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;

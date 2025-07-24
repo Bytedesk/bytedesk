@@ -11,14 +11,17 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.server;
+package com.bytedesk.core.server_metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import com.bytedesk.core.server.ServerEntity;
+import com.bytedesk.core.server.ServerRestService;
+
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +46,7 @@ public class ServerMetricsService {
     public ServerMetricsEntity recordMetrics(ServerEntity serverEntity) {
         ServerMetricsEntity metrics = ServerMetricsEntity.builder()
                 .serverUid(serverEntity.getUid())
-                .timestamp(LocalDateTime.now())
+                .timestamp(ZonedDateTime.now())
                 .cpuUsage(serverEntity.getCpuUsage())
                 .memoryUsage(serverEntity.getMemoryUsage())
                 .diskUsage(serverEntity.getDiskUsage())
@@ -65,7 +68,7 @@ public class ServerMetricsService {
      * @param endTime end time
      * @return list of metrics
      */
-    public List<ServerMetricsEntity> getMetricsHistory(String serverUid, LocalDateTime startTime, LocalDateTime endTime) {
+    public List<ServerMetricsEntity> getMetricsHistory(String serverUid, ZonedDateTime startTime, ZonedDateTime endTime) {
         return serverMetricsRepository.findByServerUidAndTimeRange(serverUid, startTime, endTime);
     }
 
@@ -86,7 +89,7 @@ public class ServerMetricsService {
      * @param endTime end time
      * @return average metrics data
      */
-    public ServerMetricsAverage getAverageMetrics(String serverUid, LocalDateTime startTime, LocalDateTime endTime) {
+    public ServerMetricsAverage getAverageMetrics(String serverUid, ZonedDateTime startTime, ZonedDateTime endTime) {
         Object[] result = serverMetricsRepository.findAverageMetricsByServerUidAndTimeRange(serverUid, startTime, endTime);
         
         if (result != null && result.length >= 5) {
@@ -109,7 +112,7 @@ public class ServerMetricsService {
      * @param endTime end time
      * @return peak metrics data
      */
-    public ServerMetricsPeak getPeakMetrics(String serverUid, LocalDateTime startTime, LocalDateTime endTime) {
+    public ServerMetricsPeak getPeakMetrics(String serverUid, ZonedDateTime startTime, ZonedDateTime endTime) {
         Object[] result = serverMetricsRepository.findPeakMetricsByServerUidAndTimeRange(serverUid, startTime, endTime);
         
         if (result != null && result.length >= 5) {
@@ -135,7 +138,7 @@ public class ServerMetricsService {
      * @return list of metrics with high usage
      */
     public List<ServerMetricsEntity> findHighUsageMetrics(Double cpuThreshold, Double memoryThreshold, 
-                                                         Double diskThreshold, LocalDateTime startTime, LocalDateTime endTime) {
+                                                         Double diskThreshold, ZonedDateTime startTime, ZonedDateTime endTime) {
         return serverMetricsRepository.findMetricsWithHighUsage(cpuThreshold, memoryThreshold, diskThreshold, startTime, endTime);
     }
 
@@ -146,7 +149,7 @@ public class ServerMetricsService {
      */
     @Transactional
     public int cleanupOldMetrics(int retentionDays) {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusDays(retentionDays);
+        ZonedDateTime cutoffTime = ZonedDateTime.now().minusDays(retentionDays);
         int deletedCount = serverMetricsRepository.deleteOldMetrics(cutoffTime);
         log.info("Cleaned up {} old metrics records older than {} days", deletedCount, retentionDays);
         return deletedCount;

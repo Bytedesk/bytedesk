@@ -19,7 +19,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +85,7 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
      */
     @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.lastHeartbeat IS NULL OR s.lastHeartbeat < :cutoffTime)")
-    List<ServerEntity> findServersWithoutRecentHeartbeat(@Param("cutoffTime") LocalDateTime cutoffTime);
+    List<ServerEntity> findServersWithoutRecentHeartbeat(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     /**
      * Count servers by status

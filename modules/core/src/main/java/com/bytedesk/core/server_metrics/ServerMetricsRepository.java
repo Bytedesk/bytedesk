@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.server;
+package com.bytedesk.core.server_metrics;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -110,8 +110,8 @@ public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEnti
            "AND m.serverUid = :serverUid " +
            "AND m.timestamp BETWEEN :startTime AND :endTime")
     Object[] findPeakMetricsByServerUidAndTimeRange(@Param("serverUid") String serverUid,
-                                                   @Param("startTime") LocalDateTime startTime,
-                                                   @Param("endTime") LocalDateTime endTime);
+                                                   @Param("startTime") ZonedDateTime startTime,
+                                                   @Param("endTime") ZonedDateTime endTime);
 
     /**
      * Delete old metrics data (for data retention)
@@ -120,7 +120,7 @@ public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEnti
      */
     @Query("DELETE FROM ServerMetricsEntity m WHERE m.deleted = false " +
            "AND m.timestamp < :cutoffTime")
-    int deleteOldMetrics(@Param("cutoffTime") LocalDateTime cutoffTime);
+    int deleteOldMetrics(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     /**
      * Count metrics records for a server

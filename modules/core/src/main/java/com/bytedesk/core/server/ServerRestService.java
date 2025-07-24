@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -185,7 +185,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
      * @return List<ServerEntity>
      */
     public List<ServerEntity> findServersWithoutRecentHeartbeat(int minutesThreshold) {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(minutesThreshold);
+        ZonedDateTime cutoffTime = ZonedDateTime.now().minusMinutes(minutesThreshold);
         return serverRepository.findServersWithoutRecentHeartbeat(cutoffTime);
     }
 
@@ -199,7 +199,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         Optional<ServerEntity> optional = serverRepository.findByUid(uid);
         if (optional.isPresent()) {
             ServerEntity server = optional.get();
-            server.setLastHeartbeat(LocalDateTime.now());
+            server.setLastHeartbeat(ZonedDateTime.now());
             return Optional.of(serverRepository.save(server));
         }
         return Optional.empty();
@@ -221,7 +221,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
             server.setCpuUsage(cpuUsage);
             server.setMemoryUsage(memoryUsage);
             server.setDiskUsage(diskUsage);
-            server.setLastHeartbeat(LocalDateTime.now());
+            server.setLastHeartbeat(ZonedDateTime.now());
             
             // Update status based on resource usage
             if (cpuUsage > 90 || memoryUsage > 90 || diskUsage > 95) {
@@ -265,8 +265,8 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
                 .totalMemoryMb(totalMemory / (1024 * 1024))
                 .usedMemoryMb(usedMemory / (1024 * 1024))
                 .uptimeSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000)
-                .startTime(LocalDateTime.now().minusSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000))
-                .lastHeartbeat(LocalDateTime.now())
+                .startTime(ZonedDateTime.now().minusSeconds(ManagementFactory.getRuntimeMXBean().getUptime() / 1000))
+                .lastHeartbeat(ZonedDateTime.now())
                 .osInfo(System.getProperty("os.name") + " " + System.getProperty("os.version"))
                 .javaVersion(System.getProperty("java.version"))
                 .environment("DEV")
@@ -367,7 +367,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         response.setHasHighMemoryUsage(entity.getMemoryUsage() != null && entity.getMemoryUsage() > 80);
         response.setHasHighDiskUsage(entity.getDiskUsage() != null && entity.getDiskUsage() > 85);
         response.setHasRecentHeartbeat(entity.getLastHeartbeat() != null && 
-                                     entity.getLastHeartbeat().isAfter(java.time.LocalDateTime.now().minusMinutes(5)));
+                                     entity.getLastHeartbeat().isAfter(java.time.ZonedDateTime.now().minusMinutes(5)));
         
         return response;
     }

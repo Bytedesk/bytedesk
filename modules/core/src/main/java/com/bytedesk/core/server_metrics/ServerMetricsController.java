@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 21:36:17
+ * @LastEditTime: 2025-07-24 22:16:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.server;
+package com.bytedesk.core.server_metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import com.bytedesk.core.server.ServerEntity;
+import com.bytedesk.core.server.ServerRestService;
+
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,15 +42,15 @@ public class ServerMetricsController {
     /**
      * Get metrics history for a server
      * @param serverUid server UID
-     * @param startTime start time (ISO format: yyyy-MM-ddTHH:mm:ss)
-     * @param endTime end time (ISO format: yyyy-MM-ddTHH:mm:ss)
+     * @param startTime start time (ISO format: yyyy-MM-ddTHH:mm:ssZ)
+     * @param endTime end time (ISO format: yyyy-MM-ddTHH:mm:ssZ)
      * @return list of metrics
      */
     @GetMapping("/history/{serverUid}")
     public ResponseEntity<List<ServerMetricsEntity>> getMetricsHistory(
             @PathVariable String serverUid,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Getting metrics history for server UID: {} from {} to {}", serverUid, startTime, endTime);
         
@@ -79,8 +82,8 @@ public class ServerMetricsController {
     @GetMapping("/average/{serverUid}")
     public ResponseEntity<ServerMetricsService.ServerMetricsAverage> getAverageMetrics(
             @PathVariable String serverUid,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Getting average metrics for server UID: {} from {} to {}", serverUid, startTime, endTime);
         
@@ -98,8 +101,8 @@ public class ServerMetricsController {
     @GetMapping("/peak/{serverUid}")
     public ResponseEntity<ServerMetricsService.ServerMetricsPeak> getPeakMetrics(
             @PathVariable String serverUid,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Getting peak metrics for server UID: {} from {} to {}", serverUid, startTime, endTime);
         
@@ -121,8 +124,8 @@ public class ServerMetricsController {
             @RequestParam(defaultValue = "80.0") Double cpuThreshold,
             @RequestParam(defaultValue = "80.0") Double memoryThreshold,
             @RequestParam(defaultValue = "85.0") Double diskThreshold,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Finding high usage metrics from {} to {} with thresholds: CPU={}, Memory={}, Disk={}", 
                 startTime, endTime, cpuThreshold, memoryThreshold, diskThreshold);
@@ -166,8 +169,8 @@ public class ServerMetricsController {
      */
     @GetMapping("/current/history")
     public ResponseEntity<List<ServerMetricsEntity>> getCurrentServerMetricsHistory(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
         
         log.info("Getting current server metrics history from {} to {}", startTime, endTime);
         

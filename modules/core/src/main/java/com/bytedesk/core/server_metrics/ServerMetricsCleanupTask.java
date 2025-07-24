@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.server;
+package com.bytedesk.core.server_metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

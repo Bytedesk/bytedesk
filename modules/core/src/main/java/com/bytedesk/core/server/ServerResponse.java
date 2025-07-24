@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * Server response DTO
@@ -119,7 +119,7 @@ public class ServerResponse extends BaseResponseNoOrg {
     /**
      * Server start time
      */
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     /**
      * Server start time formatted string
@@ -129,7 +129,7 @@ public class ServerResponse extends BaseResponseNoOrg {
     /**
      * Last heartbeat time
      */
-    private LocalDateTime lastHeartbeat;
+    private ZonedDateTime lastHeartbeat;
 
     /**
      * Last heartbeat time formatted string
