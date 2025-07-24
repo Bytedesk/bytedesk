@@ -137,7 +137,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             Optional<WorkflowEntity> latest = workflowRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 WorkflowEntity latestEntity = latest.get();
-                latestEntity.setName(entity.getName());
+                latestEntity.setNickname(entity.getNickname());
                 latestEntity.setDescription(entity.getDescription());
                 // latestEntity.setStatus(entity.getStatus());
                 // latestEntity.setType(entity.getType());

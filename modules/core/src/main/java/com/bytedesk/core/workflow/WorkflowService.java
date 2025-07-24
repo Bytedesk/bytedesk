@@ -43,7 +43,7 @@ public class WorkflowService {
         }
         
         WorkflowEntity workflow = optional.get();
-        log.debug("Workflow found: {}, type: {}", workflow.getName(), workflow.getType());
+        log.debug("Workflow found: {}, type: {}", workflow.getNickname(), workflow.getType());
         
         // 2. 解析工作流内容
         String content = workflow.getSchema();
