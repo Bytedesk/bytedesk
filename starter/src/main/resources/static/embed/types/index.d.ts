@@ -84,6 +84,7 @@ declare class BytedeskWeb {
     getUnreadMessageCount(): Promise<any>;
     initVisitor(): Promise<any>;
     browseVisitor(): Promise<void>;
+    clearBrowseFailedLimit(): void;
     clearVisitorInfo(): void;
     forceInitVisitor(): Promise<any>;
     private showUnreadBadge;

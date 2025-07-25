@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 06:36:37
+ * @LastEditTime: 2025-07-25 16:39:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class WorkflowRestController extends BaseRestController<WorkflowRequest> {
 
     private final WorkflowRestService workflowRestService;
+    
     private final WorkflowService workflowService;
 
     @Operation(summary = "查询组织下的工作流", description = "根据组织ID查询工作流列表")

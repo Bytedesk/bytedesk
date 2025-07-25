@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[8250],{21285:function(n,u,e){e.r(u);var i=e(31549);u.default=function(){return(0,i.jsx)("div",{children:"Github"})}}}]);
