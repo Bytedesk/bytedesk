@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:57:33
+ * @LastEditTime: 2025-07-25 18:06:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,6 +61,7 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String contentHtml;
 
+    @Builder.Default
     @Column(name = "article_type")
     private String type = MessageTypeEnum.TEXT.name();
 
@@ -103,21 +104,17 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     private Boolean needAudit = false;
 
     // 审核状态 - 具体枚举值由子类定义
-    @Column(name = "audit_status")
     private String auditStatus;
 
     // 审核意见
-    @Column(name = "audit_opinion")
     @Builder.Default
     private String auditOpinion = BytedeskConsts.EMPTY_STRING;
 
     // 审核人
-    @Column(name = "audit_user")
     @Builder.Default
     private String auditUser = BytedeskConsts.EMPTY_STRING;
 
     // 是否需要密码访问
-    @Column(name = "is_password_protected")
     @Builder.Default
     private Boolean isPasswordProtected = false;
 
