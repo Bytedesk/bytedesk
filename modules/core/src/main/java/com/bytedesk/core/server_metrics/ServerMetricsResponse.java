@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 22:20:00
+ * @LastEditTime: 2025-07-25 07:50:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
 package com.bytedesk.core.server_metrics;
 
 import com.bytedesk.core.base.BaseResponseNoOrg;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,11 +51,6 @@ public class ServerMetricsResponse extends BaseResponseNoOrg {
      * Timestamp when metrics were recorded
      */
     private ZonedDateTime timestamp;
-
-    /**
-     * Timestamp formatted string
-     */
-    private String timestampFormatted;
 
     /**
      * CPU usage percentage (0-100)
@@ -124,5 +120,9 @@ public class ServerMetricsResponse extends BaseResponseNoOrg {
         } else {
             return String.format("%d minutes", minutes);
         }
+    }
+
+    public String getTimestamp() {
+        return BdDateUtils.formatDatetimeToString(timestamp);
     }
 } 

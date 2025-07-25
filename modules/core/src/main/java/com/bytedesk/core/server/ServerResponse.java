@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-25 07:41:39
+ * @LastEditTime: 2025-07-25 07:48:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,6 +14,7 @@
 package com.bytedesk.core.server;
 
 import com.bytedesk.core.base.BaseResponseNoOrg;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -102,29 +103,14 @@ public class ServerResponse extends BaseResponseNoOrg {
     private Long uptimeSeconds;
 
     /**
-     * Server uptime formatted string (e.g., "2 days 3 hours 45 minutes")
-     */
-    // private String uptimeFormatted;
-
-    /**
      * Server start time
      */
     private ZonedDateTime startTime;
 
     /**
-     * Server start time formatted string
-     */
-    private String startTimeFormatted;
-
-    /**
      * Last heartbeat time
      */
     private ZonedDateTime lastHeartbeat;
-
-    /**
-     * Last heartbeat time formatted string
-     */
-    private String lastHeartbeatFormatted;
 
     /**
      * Server port (if applicable)
@@ -187,16 +173,6 @@ public class ServerResponse extends BaseResponseNoOrg {
     private Boolean hasRecentHeartbeat;
 
     /**
-     * Status color for UI display
-     */
-    // private String statusColor;
-
-    /**
-     * Status icon for UI display
-     */
-    // private String statusIcon;
-
-    /**
      * Get formatted uptime string
      * @return formatted uptime string
      */
@@ -226,5 +202,13 @@ public class ServerResponse extends BaseResponseNoOrg {
         return (cpuUsage != null && cpuUsage > 80) ||
                (memoryUsage != null && memoryUsage > 80) ||
                (diskUsage != null && diskUsage > 85);
+    }
+
+    public String getStartTime() {
+        return BdDateUtils.formatDatetimeToString(startTime);
+    }
+
+    public String getLastHeartbeat() {
+        return BdDateUtils.formatDatetimeToString(lastHeartbeat);
     }
 }
