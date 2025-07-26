@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 16:20:36
+ * @LastEditTime: 2025-07-26 08:02:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,6 +53,10 @@ public enum MessageTypeEnum {
     // 
     LEAVE_MSG, // 留言
     LEAVE_MSG_SUBMIT, // 留言提交
+    LEAVE_MSG_REPLIED, // 留言回复
+    //
+    CUSTOMER_SUBMIT, // 客户留资提交
+    SYSTEM_ALARM, // 系统报警
     // 
     TICKET, // 工单消息
     TICKET_SUBMIT, // 工单提交
@@ -94,6 +98,7 @@ public enum MessageTypeEnum {
     // 
     AUTO_CLOSED, // 自动关闭
     AGENT_CLOSED, // 客服关闭
+    //     
     // 
     TRANSFER,
     TRANSFER_REJECT,
