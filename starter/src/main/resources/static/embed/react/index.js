@@ -1,26 +1,33 @@
-import { jsx as o } from "react/jsx-runtime";
-import { useRef as d, useEffect as m } from "react";
-import { IntlProvider as s } from "react-intl";
-import i from "../core/BytedeskWeb/index.js";
-import { messages as u } from "../locales/index/index.js";
-const b = ({ locale: e = "zh-cn", ...t }) => /* @__PURE__ */ o(
-  s,
+import { jsx as d } from "react/jsx-runtime";
+import { useRef as s, useEffect as i } from "react";
+import { IntlProvider as r } from "react-intl";
+import u from "../core/BytedeskWeb/index.js";
+import { messages as m } from "../locales/index/index.js";
+const w = ({ locale: e = "zh-cn", ...o }) => /* @__PURE__ */ d(
+  r,
   {
-    messages: u[e],
+    messages: m[e],
     locale: e,
     defaultLocale: "zh-cn",
-    children: /* @__PURE__ */ o(c, { ...t, locale: e })
+    children: /* @__PURE__ */ d(f, { ...o, locale: e })
   }
-), c = (e) => {
-  const t = d(null);
-  return m(() => {
-    var n;
-    return t.current = new i(e), t.current.init(), (n = e.onInit) == null || n.call(e), window.bytedesk = t.current, () => {
-      var r;
-      (r = t.current) == null || r.destroy(), delete window.bytedesk;
+);
+let t = null, n = 0;
+const f = (e) => {
+  const o = s(null);
+  return i(() => {
+    var l, c;
+    if (n++, t) {
+      console.log("BytedeskReact: 使用现有全局实例，当前活跃组件数:", n), o.current = t, window.bytedesk = t, (l = e.onInit) == null || l.call(e);
+      return;
+    }
+    return console.log("BytedeskReact: 创建新的全局实例"), t = new u(e), o.current = t, t.init(), (c = e.onInit) == null || c.call(e), window.bytedesk = t, () => {
+      n--, console.log("BytedeskReact: 组件卸载，当前活跃组件数:", n), o.current = null, n <= 0 && (console.log("BytedeskReact: 没有活跃组件，清理全局实例"), setTimeout(() => {
+        t && n <= 0 && (t.destroy(), t = null, delete window.bytedesk, n = 0);
+      }, 100));
     };
   }, [e]), null;
 };
 export {
-  b as BytedeskReact
+  w as BytedeskReact
 };
