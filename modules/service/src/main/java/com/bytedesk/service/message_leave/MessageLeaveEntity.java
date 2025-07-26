@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 18:55:59
+ * @LastEditTime: 2025-07-26 11:52:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.utils.BdDateUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +42,6 @@ import lombok.experimental.Accessors;
  * Database Table: bytedesk_service_message_leave
  * Purpose: Stores offline messages from customers when agents are unavailable
  * 
- * TODO: Convert leave messages to tickets
  */
 @Entity
 @Data
@@ -50,6 +50,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({MessageLeaveEntityListener.class})
 @Table(name = "bytedesk_service_message_leave")
 public class MessageLeaveEntity extends BaseEntity {
 

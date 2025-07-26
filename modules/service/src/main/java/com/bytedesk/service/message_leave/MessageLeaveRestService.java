@@ -145,6 +145,17 @@ public class MessageLeaveRestService extends
         MessageLeaveEntity messageLeave = modelMapper.map(request, MessageLeaveEntity.class);
         messageLeave.setUid(uidUtils.getUid());
         messageLeave.setStatus(MessageLeaveStatusEnum.PENDING.name());
+        
+        // 确保设置正确的orgUid
+        if (messageLeave.getOrgUid() == null || messageLeave.getOrgUid().isEmpty()) {
+            UserEntity user = authService.getUser();
+            if (user != null && user.getOrgUid() != null && !user.getOrgUid().isEmpty()) {
+                messageLeave.setOrgUid(user.getOrgUid());
+            } else if (request.getOrgUid() != null && !request.getOrgUid().isEmpty()) {
+                messageLeave.setOrgUid(request.getOrgUid());
+            }
+        }
+        
         //
         // 保存留言
         MessageLeaveEntity savedMessageLeave = save(messageLeave);
