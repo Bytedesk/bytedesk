@@ -163,24 +163,7 @@
 			<artifactId>angus-mail</artifactId>
 		</dependency> -->
 
-        <!-- LDAP Security -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-ldap</artifactId>
-		</dependency>
-        <!-- 添加 LDAP 支持 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-ldap</artifactId>
-            <scope>provided</scope>
-		</dependency>
-         <!-- LDAP 服务器模拟，用于测试 -->
-		<dependency>
-			<groupId>com.unboundid</groupId>
-			<artifactId>unboundid-ldapsdk</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
+        
         <!--
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
         <dependency>

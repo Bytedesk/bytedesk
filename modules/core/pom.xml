@@ -39,18 +39,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- sso/ OpenID Connect (OIDC)  -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-			<scope>provided</scope>
-		</dependency>
+		
 
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		<!-- https://github.com/spring-projects/spring-statemachine -->
