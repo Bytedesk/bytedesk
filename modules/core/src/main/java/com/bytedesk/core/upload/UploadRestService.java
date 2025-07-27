@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-27 17:54:44
+ * @LastEditTime: 2025-07-27 22:08:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,8 +27,6 @@ import java.util.stream.Stream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javax.imageio.ImageIO;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -49,8 +47,6 @@ import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.ConvertUtils;
-
-
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +71,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	private final UploadWatermarkService uploadWatermarkService;
 
-	private final UploadMinioService minioService;
+	private final UploadMinioService uploadMinioService;
 
 	@Override
 	public Page<UploadResponse> queryByOrg(UploadRequest request) {
@@ -390,7 +386,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			String folder = getMinioFolderByFileType(file, request);
 			
 			// 上传到 MinIO
-			String fileUrl = minioService.uploadFile(file, fileName, folder);
+			String fileUrl = uploadMinioService.uploadFile(file, fileName, folder);
 			
 			log.info("文件已成功上传到 MinIO: {}", fileUrl);
 			return fileUrl;
@@ -425,7 +421,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			String folder = getMinioFolderByFileName(fileName, request);
 			
 			// 上传到 MinIO
-			String fileUrl = minioService.uploadFile(localFile, fileName, folder);
+			String fileUrl = uploadMinioService.uploadFile(localFile, fileName, folder);
 			
 			log.info("本地文件已成功上传到 MinIO: {}", fileUrl);
 			return fileUrl;
@@ -455,7 +451,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			String folder = getMinioFolderByFileName(fileName, request);
 			
 			// 从 URL 下载并上传到 MinIO
-			String fileUrl = minioService.uploadFromUrl(url, fileName, folder);
+			String fileUrl = uploadMinioService.uploadFromUrl(url, fileName, folder);
 			
 			log.info("URL 文件已成功上传到 MinIO: {}", fileUrl);
 			return fileUrl;
@@ -583,7 +579,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 		
 		try {
-			minioService.deleteFile(objectPath);
+			uploadMinioService.deleteFile(objectPath);
 			log.info("成功删除 MinIO 文件: {}", objectPath);
 		} catch (Exception e) {
 			log.error("删除 MinIO 文件失败: {}", e.getMessage(), e);
@@ -602,7 +598,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			return false;
 		}
 		
-		return minioService.fileExists(objectPath);
+		return uploadMinioService.fileExists(objectPath);
 	}
 
 	/**
@@ -617,7 +613,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			throw new RuntimeException("MinIO 存储未启用");
 		}
 		
-		return minioService.getDownloadUrl(objectPath, expiry);
+		return uploadMinioService.getDownloadUrl(objectPath, expiry);
 	}
 
 	/**
@@ -632,7 +628,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			throw new RuntimeException("MinIO 存储未启用");
 		}
 		
-		return minioService.getUploadUrl(objectPath, expiry);
+		return uploadMinioService.getUploadUrl(objectPath, expiry);
 	}
 
 	
