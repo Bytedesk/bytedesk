@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UploadServiceFactory {
 
-    @Value("${upload.provider:aliyun}")
+    @Value("${bytedesk.upload.provider:aliyun}")
     private String uploadProvider;
 
     @Autowired
@@ -46,11 +46,19 @@ public class UploadServiceFactory {
         switch (uploadProvider.toLowerCase()) {
             case "tencent":
             case "cos":
-                return tencentUploadService;
+                if (tencentUploadService != null) {
+                    return tencentUploadService;
+                } else {
+                    throw new IllegalStateException("腾讯云COS未启用，请设置 bytedesk.tencent.enabled=true");
+                }
             case "aliyun":
             case "oss":
             default:
-                return aliyunUploadService;
+                if (aliyunUploadService != null) {
+                    return aliyunUploadService;
+                } else {
+                    throw new IllegalStateException("阿里云OSS未启用，请设置 bytedesk.aliyun.enabled=true");
+                }
         }
     }
 

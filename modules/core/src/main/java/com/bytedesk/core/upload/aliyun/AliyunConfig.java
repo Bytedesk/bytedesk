@@ -14,6 +14,7 @@
 package com.bytedesk.core.upload.aliyun;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,12 +30,14 @@ public class AliyunConfig {
     AliyunProperties aliyunProperties;
 
     @Bean
+    @ConditionalOnProperty(name = "bytedesk.aliyun.enabled", havingValue = "true", matchIfMissing = false)
     public OSSClient createOSSClient() {
+        if (!aliyunProperties.isEnabled()) {
+            throw new IllegalStateException("阿里云OSS未启用，请设置 bytedesk.aliyun.enabled=true");
+        }
         CredentialsProvider credentialsProvider = new DefaultCredentialProvider(aliyunProperties.getAccessKeyId(), aliyunProperties.getAccessKeySecret());
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         return new OSSClient(aliyunProperties.getOssEndpoint(), credentialsProvider, clientConfiguration);
     }
-
-    
 
 }

@@ -24,6 +24,9 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "tencent")
 public class TencentProperties {
 
+    @Value("${bytedesk.tencent.enabled:false}")
+    private boolean enabled;
+
     @Value("${tencent.bucket.location:ap-shanghai}")
     private String bucketLocation;
 
@@ -42,7 +45,7 @@ public class TencentProperties {
     @Value("${tencent.secretkey:}")
     private String secretKey;
 
-    @Value("${upload.dir.prefix:}")
+    @Value("${bytedesk.upload.dir.prefix:}")
     private String uploadDirPrefix;
 
 } 

@@ -24,6 +24,9 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "aliyun")
 public class AliyunProperties {
 
+    @Value("${bytedesk.aliyun.enabled:false}")
+    private boolean enabled;
+
     private String regionId;
 
     @Value("${aliyun.access.key.id:placeholder}")
@@ -41,7 +44,7 @@ public class AliyunProperties {
     @Value("${aliyun.oss.base.url:https://bytedesk.oss-cn-shenzhen.aliyuncs.com}")
     private String ossBaseUrl;
 
-    @Value("${upload.dir.prefix:}")
+    @Value("${bytedesk.upload.dir.prefix:}")
     private String uploadDirPrefix;
 
 }

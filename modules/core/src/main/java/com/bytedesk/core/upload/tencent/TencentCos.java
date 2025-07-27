@@ -32,6 +32,10 @@ public class TencentCos {
 
     private String uploadDirPrefix = "";
 
+    public TencentCos() {
+        // 构造函数
+    }
+
     @Autowired
     private TencentProperties tencentProperties;
 

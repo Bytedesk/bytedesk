@@ -35,6 +35,10 @@ public class AliyunOss {
 
     private String uploadDirPrefix = "";
 
+    public AliyunOss() {
+        // 构造函数
+    }
+
     @Autowired
     private AliyunProperties aliyunProperties;
 
