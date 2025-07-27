@@ -4,6 +4,7 @@ import com.aliyun.oss.OSS;
 // import com.aliyun.oss.model.PutObjectResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -28,10 +29,8 @@ import java.net.URL;
  * @author bytedesk.com
  */
 @Component
+@ConditionalOnProperty(name = "bytedesk.aliyun.enabled", havingValue = "true", matchIfMissing = false)
 public class AliyunOss {
-    
-    // @Autowired
-    // AttachmentService attachmentService;
 
     private String uploadDirPrefix = "";
 

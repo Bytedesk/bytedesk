@@ -1,10 +1,10 @@
 package com.bytedesk.core.upload.tencent;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -25,10 +25,9 @@ import java.net.URL;
  * @author bytedesk.com
  */
 @Component
+@ConditionalOnProperty(name = "bytedesk.tencent.enabled", havingValue = "true", matchIfMissing = false)
 public class TencentCos {
     
-    // @Autowired
-    // AttachmentService attachmentService;
 
     private String uploadDirPrefix = "";
 
