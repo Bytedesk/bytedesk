@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.upload;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -53,6 +54,7 @@ import com.bytedesk.core.utils.ConvertUtils;
 
 import com.bytedesk.core.upload.watermark.WatermarkConfig;
 import com.bytedesk.core.upload.watermark.WatermarkService;
+import com.bytedesk.core.upload.cloud.MinioService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +80,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private final WatermarkService watermarkService;
 
 	private final WatermarkConfig watermarkConfig;
+
+	private final MinioService minioService;
 
 	@Override
 	public Page<UploadResponse> queryByOrg(UploadRequest request) {
@@ -527,6 +531,276 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		request.setUser(userProtobuf.toJson());
 		// 
 		return create(request);
+	}
+
+	// ==================== MinIO 存储方法 ====================
+
+	/**
+	 * 将文件存储到 MinIO
+	 * 
+	 * @param file MultipartFile 文件
+	 * @param fileName 文件名
+	 * @param request 上传请求
+	 * @return 文件访问URL
+	 */
+	public String storeToMinio(MultipartFile file, String fileName, UploadRequest request) {
+		// 检查 MinIO 是否启用
+		if (!bytedeskProperties.getMinioEnabled()) {
+			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+		}
+
+		try {
+			if (file.isEmpty()) {
+				throw new UploadStorageException("Failed to store empty file.");
+			}
+
+			// 根据文件类型选择存储文件夹
+			String folder = getMinioFolderByFileType(file, request);
+			
+			// 上传到 MinIO
+			String fileUrl = minioService.uploadFile(file, fileName, folder);
+			
+			log.info("文件已成功上传到 MinIO: {}", fileUrl);
+			return fileUrl;
+
+		} catch (Exception e) {
+			log.error("上传文件到 MinIO 失败: {}", e.getMessage(), e);
+			throw new UploadStorageException("Failed to store file to MinIO.", e);
+		}
+	}
+
+	/**
+	 * 将本地文件存储到 MinIO
+	 * 
+	 * @param localFilePath 本地文件路径
+	 * @param fileName 文件名
+	 * @param request 上传请求
+	 * @return 文件访问URL
+	 */
+	public String storeLocalFileToMinio(String localFilePath, String fileName, UploadRequest request) {
+		// 检查 MinIO 是否启用
+		if (!bytedeskProperties.getMinioEnabled()) {
+			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+		}
+
+		try {
+			File localFile = new File(localFilePath);
+			if (!localFile.exists()) {
+				throw new UploadStorageException("Local file not found: " + localFilePath);
+			}
+
+			// 根据文件类型选择存储文件夹
+			String folder = getMinioFolderByFileName(fileName, request);
+			
+			// 上传到 MinIO
+			String fileUrl = minioService.uploadFile(localFile, fileName, folder);
+			
+			log.info("本地文件已成功上传到 MinIO: {}", fileUrl);
+			return fileUrl;
+
+		} catch (Exception e) {
+			log.error("上传本地文件到 MinIO 失败: {}", e.getMessage(), e);
+			throw new UploadStorageException("Failed to store local file to MinIO.", e);
+		}
+	}
+
+	/**
+	 * 从 URL 下载并存储到 MinIO
+	 * 
+	 * @param url 文件URL
+	 * @param fileName 文件名
+	 * @param request 上传请求
+	 * @return 文件访问URL
+	 */
+	public String storeUrlToMinio(String url, String fileName, UploadRequest request) {
+		// 检查 MinIO 是否启用
+		if (!bytedeskProperties.getMinioEnabled()) {
+			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+		}
+
+		try {
+			// 根据文件类型选择存储文件夹
+			String folder = getMinioFolderByFileName(fileName, request);
+			
+			// 从 URL 下载并上传到 MinIO
+			String fileUrl = minioService.uploadFromUrl(url, fileName, folder);
+			
+			log.info("URL 文件已成功上传到 MinIO: {}", fileUrl);
+			return fileUrl;
+
+		} catch (Exception e) {
+			log.error("从 URL 上传文件到 MinIO 失败: {}", e.getMessage(), e);
+			throw new UploadStorageException("Failed to store URL file to MinIO.", e);
+		}
+	}
+
+	/**
+	 * 根据文件类型和请求信息确定 MinIO 存储文件夹
+	 * 
+	 * @param file MultipartFile 文件
+	 * @param request 上传请求
+	 * @return 存储文件夹路径
+	 */
+	private String getMinioFolderByFileType(MultipartFile file, UploadRequest request) {
+		String contentType = file.getContentType();
+		String fileName = file.getOriginalFilename();
+		
+		if (contentType != null) {
+			if (contentType.startsWith("image/")) {
+				return "images";
+			} else if (contentType.startsWith("audio/")) {
+				return "audios";
+			} else if (contentType.startsWith("video/")) {
+				return "videos";
+			} else if (contentType.equals("application/pdf") || 
+					   contentType.contains("document") || 
+					   contentType.contains("word") || 
+					   contentType.contains("excel") || 
+					   contentType.contains("powerpoint")) {
+				return "documents";
+			}
+		}
+		
+		// 根据文件名扩展名判断
+		return getMinioFolderByFileName(fileName, request);
+	}
+
+	/**
+	 * 根据文件名确定 MinIO 存储文件夹
+	 * 
+	 * @param fileName 文件名
+	 * @param request 上传请求
+	 * @return 存储文件夹路径
+	 */
+	private String getMinioFolderByFileName(String fileName, UploadRequest request) {
+		if (fileName == null) {
+			return "others";
+		}
+		
+		String lowerFileName = fileName.toLowerCase();
+		
+		// 图片文件
+		if (lowerFileName.endsWith(".jpg") || lowerFileName.endsWith(".jpeg") || 
+			lowerFileName.endsWith(".png") || lowerFileName.endsWith(".gif") || 
+			lowerFileName.endsWith(".webp") || lowerFileName.endsWith(".bmp") || 
+			lowerFileName.endsWith(".svg")) {
+			return "images";
+		}
+		
+		// 音频文件
+		if (lowerFileName.endsWith(".mp3") || lowerFileName.endsWith(".wav") || 
+			lowerFileName.endsWith(".aac") || lowerFileName.endsWith(".ogg") || 
+			lowerFileName.endsWith(".flac") || lowerFileName.endsWith(".m4a")) {
+			return "audios";
+		}
+		
+		// 视频文件
+		if (lowerFileName.endsWith(".mp4") || lowerFileName.endsWith(".avi") || 
+			lowerFileName.endsWith(".mov") || lowerFileName.endsWith(".wmv") || 
+			lowerFileName.endsWith(".flv") || lowerFileName.endsWith(".mkv") || 
+			lowerFileName.endsWith(".webm")) {
+			return "videos";
+		}
+		
+		// 文档文件
+		if (lowerFileName.endsWith(".pdf") || lowerFileName.endsWith(".doc") || 
+			lowerFileName.endsWith(".docx") || lowerFileName.endsWith(".xls") || 
+			lowerFileName.endsWith(".xlsx") || lowerFileName.endsWith(".ppt") || 
+			lowerFileName.endsWith(".pptx") || lowerFileName.endsWith(".txt")) {
+			return "documents";
+		}
+		
+		// 压缩文件
+		if (lowerFileName.endsWith(".zip") || lowerFileName.endsWith(".rar") || 
+			lowerFileName.endsWith(".7z") || lowerFileName.endsWith(".tar") || 
+			lowerFileName.endsWith(".gz")) {
+			return "archives";
+		}
+		
+		// 根据请求类型判断
+		if (request != null && request.getKbType() != null) {
+			switch (request.getKbType().toLowerCase()) {
+				case "avatar":
+					return "avatars";
+				case "attachment":
+					return "attachments";
+				case "image":
+					return "images";
+				case "audio":
+					return "audios";
+				case "video":
+					return "videos";
+				case "document":
+					return "documents";
+				default:
+					break;
+			}
+		}
+		
+		return "others";
+	}
+
+	/**
+	 * 删除 MinIO 中的文件
+	 * 
+	 * @param objectPath 对象路径
+	 */
+	public void deleteFromMinio(String objectPath) {
+		if (!bytedeskProperties.getMinioEnabled()) {
+			throw new RuntimeException("MinIO 存储未启用");
+		}
+		
+		try {
+			minioService.deleteFile(objectPath);
+			log.info("成功删除 MinIO 文件: {}", objectPath);
+		} catch (Exception e) {
+			log.error("删除 MinIO 文件失败: {}", e.getMessage(), e);
+			throw new RuntimeException("删除 MinIO 文件失败: " + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 检查 MinIO 中文件是否存在
+	 * 
+	 * @param objectPath 对象路径
+	 * @return 是否存在
+	 */
+	public boolean fileExistsInMinio(String objectPath) {
+		if (!bytedeskProperties.getMinioEnabled()) {
+			return false;
+		}
+		
+		return minioService.fileExists(objectPath);
+	}
+
+	/**
+	 * 获取 MinIO 文件下载URL（预签名URL）
+	 * 
+	 * @param objectPath 对象路径
+	 * @param expiry 过期时间（秒）
+	 * @return 预签名URL
+	 */
+	public String getMinioDownloadUrl(String objectPath, int expiry) {
+		if (!bytedeskProperties.getMinioEnabled()) {
+			throw new RuntimeException("MinIO 存储未启用");
+		}
+		
+		return minioService.getDownloadUrl(objectPath, expiry);
+	}
+
+	/**
+	 * 获取 MinIO 文件上传URL（预签名URL）
+	 * 
+	 * @param objectPath 对象路径
+	 * @param expiry 过期时间（秒）
+	 * @return 预签名URL
+	 */
+	public String getMinioUploadUrl(String objectPath, int expiry) {
+		if (!bytedeskProperties.getMinioEnabled()) {
+			throw new RuntimeException("MinIO 存储未启用");
+		}
+		
+		return minioService.getUploadUrl(objectPath, expiry);
 	}
 
 	

@@ -191,6 +191,9 @@ public class BytedeskProperties {
     // 腾讯云配置
     private Tencent tencent = new Tencent();
 
+    // MinIO 配置
+    private Minio minio = new Minio();
+
     // 微信支付配置
     private WechatPay wechatPay = new WechatPay();
 
@@ -352,6 +355,17 @@ public class BytedeskProperties {
         private String notifyUrl;
     }
 
+    @Data
+    public static class Minio {
+        private Boolean enabled = false;
+        private String endpoint = "http://localhost:19000";
+        private String accessKey = "minioadmin";
+        private String secretKey = "minioadmin123";
+        private String bucketName = "bytedesk";
+        private String region = "us-east-1";
+        private Boolean secure = false;
+    }
+
     // 为了保持向后兼容,添加getter方法
     public String getEmail() {
         return admin.getEmail();
@@ -480,6 +494,34 @@ public class BytedeskProperties {
 
     public String getKbaseApiUrl() {
         return kbase.getApiUrl();
+    }
+
+    public Boolean getMinioEnabled() {
+        return minio.getEnabled();
+    }
+
+    public String getMinioEndpoint() {
+        return minio.getEndpoint();
+    }
+
+    public String getMinioAccessKey() {
+        return minio.getAccessKey();
+    }
+
+    public String getMinioSecretKey() {
+        return minio.getSecretKey();
+    }
+
+    public String getMinioBucketName() {
+        return minio.getBucketName();
+    }
+
+    public String getMinioRegion() {
+        return minio.getRegion();
+    }
+
+    public Boolean getMinioSecure() {
+        return minio.getSecure();
     }
 
     public Boolean isAdmin(@NonNull String receiver) {
