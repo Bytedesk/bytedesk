@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.upload;
+package com.bytedesk.core.upload.minio;
 
 import java.io.File;
 import java.io.InputStream;

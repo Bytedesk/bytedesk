@@ -1,4 +1,4 @@
-package com.bytedesk.core.upload.cloud;
+package com.bytedesk.core.upload.aliyun;
 
 import com.aliyun.oss.OSS;
 // import com.aliyun.oss.model.PutObjectResult;

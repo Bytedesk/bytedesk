@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.upload.cloud;
+package com.bytedesk.core.upload.tencent;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,27 +21,28 @@ import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "aliyun")
-public class AliyunProperties {
+@ConfigurationProperties(prefix = "tencent")
+public class TencentProperties {
 
-    private String regionId;
+    @Value("${tencent.bucket.location:ap-shanghai}")
+    private String bucketLocation;
 
-    @Value("${aliyun.access.key.id:placeholder}")
-    private String accessKeyId;
+    @Value("${tencent.bucket.name:}")
+    private String bucketName;
 
-    @Value("${aliyun.access.key.secret:placeholder}")
-    private String accessKeySecret;
+    @Value("${tencent.bucket.domain:}")
+    private String bucketDomain;
 
-    @Value("${aliyun.oss.endpoint:https://oss-cn-shenzhen.aliyuncs.com}")
-    private String ossEndpoint;
+    @Value("${tencent.appid:}")
+    private String appId;
 
-    @Value("${aliyun.oss.bucket.name:}")
-    private String ossBucketName;
+    @Value("${tencent.secretid:}")
+    private String secretId;
 
-    @Value("${aliyun.oss.base.url:https://bytedesk.oss-cn-shenzhen.aliyuncs.com}")
-    private String ossBaseUrl;
+    @Value("${tencent.secretkey:}")
+    private String secretKey;
 
     @Value("${upload.dir.prefix:}")
     private String uploadDirPrefix;
 
-}
+} 

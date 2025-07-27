@@ -45,6 +45,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.upload.minio.UploadMinioService;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
 import com.bytedesk.core.utils.BdDateUtils;

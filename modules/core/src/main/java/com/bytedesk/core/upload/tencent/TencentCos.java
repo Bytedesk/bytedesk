@@ -1,4 +1,4 @@
-package com.bytedesk.core.upload.cloud;
+package com.bytedesk.core.upload.tencent;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;

@@ -107,6 +107,30 @@ services:
       timeout: 10s
       retries: 5
 
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   bytedesk:
     # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
     # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
@@ -119,6 +143,7 @@ services:
       - bytedesk-elasticsearch
       - bytedesk-artemis
       - bytedesk-zipkin
+      - bytedesk-minio
       # bytedesk-mysql:
       #   condition: service_healthy
       # bytedesk-redis:
@@ -199,6 +224,14 @@ services:
       BYTEDESK_UPLOAD_DIR: /app/uploads
       # 上传文件的访问地址，请修改为服务器实际的地址
       BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
+      # MinIO配置（当使用MinIO时）
+      BYTEDESK_MINIO_ENABLED: "false"
+      BYTEDESK_MINIO_ENDPOINT: http://bytedesk-minio:9000  # Docker内部通信使用服务名
+      BYTEDESK_MINIO_ACCESS_KEY: minioadmin
+      BYTEDESK_MINIO_SECRET_KEY: minioadmin123
+      BYTEDESK_MINIO_BUCKET_NAME: bytedesk
+      BYTEDESK_MINIO_REGION: us-east-1
+      BYTEDESK_MINIO_SECURE: false
       # Knowledge base config
       BYTEDESK_KBASE_THEME: default
       BYTEDESK_KBASE_HTML_PATH: helpcenter
@@ -459,6 +492,8 @@ volumes:
     name: bytedesk_artemis_data
   zipkin_data:
     name: bytedesk_zipkin_data
+  minio_data:
+    name: bytedesk_minio_data
 
 networks:
   bytedesk-network:
