@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -210,11 +212,42 @@ public class BdDateUtils {
     }
     
     public static ZonedDateTime parseZonedDateTime(String dateTime) {
-        return ZonedDateTime.parse(dateTime, BdDateUtils.getDateTimeFormatter());
+        if (!StringUtils.hasText(dateTime)) {
+            return null;
+        }
+        try {
+            // 尝试直接解析为ZonedDateTime（如果包含时区信息）
+            return ZonedDateTime.parse(dateTime, BdDateUtils.getDateTimeFormatter().withZone(getDisplayZoneId()));
+        } catch (Exception e) {
+            // 如果失败，尝试解析为LocalDateTime然后转换为ZonedDateTime
+            try {
+                return LocalDateTime.parse(dateTime, BdDateUtils.getDateTimeFormatter()).atZone(getDisplayZoneId());
+            } catch (Exception e2) {
+                // 如果还是失败，尝试解析为LocalDate然后转换为ZonedDateTime
+                try {
+                    return LocalDate.parse(dateTime, BdDateUtils.getDateFormatter()).atStartOfDay(getDisplayZoneId());
+                } catch (Exception e3) {
+                    throw new RuntimeException("Unable to parse date time: " + dateTime, e3);
+                }
+            }
+        }
     }
 
     public static ZonedDateTime parseZonedDateTime(String dateTime, DateTimeFormatter formatter) {
-        return ZonedDateTime.parse(dateTime, formatter);
+        if (!StringUtils.hasText(dateTime)) {
+            return null;
+        }
+        try {
+            // 尝试直接解析为ZonedDateTime（如果包含时区信息）
+            return ZonedDateTime.parse(dateTime, formatter.withZone(getDisplayZoneId()));
+        } catch (Exception e) {
+            // 如果失败，尝试解析为LocalDateTime然后转换为ZonedDateTime
+            try {
+                return LocalDateTime.parse(dateTime, formatter).atZone(getDisplayZoneId());
+            } catch (Exception e2) {
+                throw new RuntimeException("Unable to parse date time: " + dateTime, e2);
+            }
+        }
     }
     
     public static String getCurrentZonedDateTime() {
