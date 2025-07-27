@@ -11,13 +11,14 @@ import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.upload.watermark.WatermarkConfig;
 import com.bytedesk.core.upload.watermark.WatermarkService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,10 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "bytedesk.watermark.enabled", havingValue = "true", matchIfMissing = false)
 public class UploadWatermarkService {
 
     private final WatermarkService watermarkService;
+    
     private final WatermarkConfig watermarkConfig;
 
     /**

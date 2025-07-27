@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-27 22:08:46
+ * @LastEditTime: 2025-07-27 22:35:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -48,13 +50,13 @@ import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 // https://spring.io/guides/gs/uploading-files
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UploadRestService extends BaseRestService<UploadEntity, UploadRequest, UploadResponse> {
 
 	private final Path uploadDir;
@@ -71,6 +73,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	private final UploadWatermarkService uploadWatermarkService;
 
+	@Autowired(required = false)
 	private final UploadMinioService uploadMinioService;
 
 	@Override
@@ -311,9 +314,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
 	// 删除整个上传文件夹，危险操作，暂时注释掉
-	// public void deleteAll() {
-	// FileSystemUtils.deleteRecursively(uploadDir.toFile());
-	// }
+	public void deleteAll() {
+		FileSystemUtils.deleteRecursively(uploadDir.toFile());
+	}
 
 	@Override
 	public void deleteByUid(String uid) {
@@ -352,8 +355,18 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			userProtobuf = ConvertUtils.convertToUserProtobuf(user);
 			request.setUserUid(user.getUid());
 			request.setOrgUid(user.getOrgUid());
-		}		
-		String fileUrl = store(file, request.getFileName(), request);
+		}
+		
+		// 根据配置选择存储方式：优先使用 MinIO，否则使用本地文件系统
+		String fileUrl;
+		if (bytedeskProperties.getMinioEnabled()) {
+			log.info("MinIO 已启用，使用 MinIO 存储文件");
+			fileUrl = storeToMinio(file, request.getFileName(), request);
+		} else {
+			log.info("MinIO 未启用，使用本地文件系统存储文件");
+			fileUrl = store(file, request.getFileName(), request);
+		}
+		
 		request.setFileUrl(fileUrl);
 		request.setType(request.getKbType());
 		request.setUser(userProtobuf.toJson());
@@ -375,6 +388,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		// 检查 MinIO 是否启用
 		if (!bytedeskProperties.getMinioEnabled()) {
 			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+		}
+
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
 		}
 
 		try {
@@ -411,6 +429,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
 		}
 
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+		}
+
 		try {
 			File localFile = new File(localFilePath);
 			if (!localFile.exists()) {
@@ -444,6 +467,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		// 检查 MinIO 是否启用
 		if (!bytedeskProperties.getMinioEnabled()) {
 			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+		}
+
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
 		}
 
 		try {
@@ -577,6 +605,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		if (!bytedeskProperties.getMinioEnabled()) {
 			throw new RuntimeException("MinIO 存储未启用");
 		}
+
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+		}
 		
 		try {
 			uploadMinioService.deleteFile(objectPath);
@@ -597,6 +630,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		if (!bytedeskProperties.getMinioEnabled()) {
 			return false;
 		}
+
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			return false;
+		}
 		
 		return uploadMinioService.fileExists(objectPath);
 	}
@@ -612,6 +650,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		if (!bytedeskProperties.getMinioEnabled()) {
 			throw new RuntimeException("MinIO 存储未启用");
 		}
+
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+		}
 		
 		return uploadMinioService.getDownloadUrl(objectPath, expiry);
 	}
@@ -626,6 +669,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	public String getMinioUploadUrl(String objectPath, int expiry) {
 		if (!bytedeskProperties.getMinioEnabled()) {
 			throw new RuntimeException("MinIO 存储未启用");
+		}
+
+		// 检查 MinIO 服务是否可用
+		if (uploadMinioService == null) {
+			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
 		}
 		
 		return uploadMinioService.getUploadUrl(objectPath, expiry);

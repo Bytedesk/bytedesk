@@ -14,14 +14,18 @@
 package com.bytedesk.core.upload.cloud;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 
 import io.minio.MinioClient;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
+@ConditionalOnProperty(name = "bytedesk.minio.enabled", havingValue = "true", matchIfMissing = false)
 public class MinioConfig {
 
     @Autowired
@@ -32,10 +36,16 @@ public class MinioConfig {
      */
     @Bean
     public MinioClient getMinioClient() {
+        log.info("初始化 MinIO 客户端: endpoint={}, bucket={}", 
+                bytedeskProperties.getMinioEndpoint(), 
+                bytedeskProperties.getMinioBucketName());
+        
         MinioClient minioClient = MinioClient.builder()
                     .endpoint(bytedeskProperties.getMinioEndpoint())
                     .credentials(bytedeskProperties.getMinioAccessKey(), bytedeskProperties.getMinioSecretKey())
                     .build();
+        
+        log.info("MinIO 客户端初始化成功");
         return minioClient;
     }
 

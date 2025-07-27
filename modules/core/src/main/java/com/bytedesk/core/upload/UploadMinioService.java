@@ -19,9 +19,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.SetBucketPolicyArgs;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -43,12 +50,65 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "bytedesk.minio.enabled", havingValue = "true", matchIfMissing = false)
 public class UploadMinioService {
 
     @Autowired
     private BytedeskProperties bytedeskProperties;
 
+    @Autowired
     private MinioClient minioClient;
+
+    /**
+     * 初始化 MinIO 存储桶和策略
+     */
+    @PostConstruct
+    public void initMinio() {
+        try {
+            String bucketName = bytedeskProperties.getMinioBucketName();
+            
+            // 检查存储桶是否存在，如果不存在则创建
+            boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+            if (!bucketExists) {
+                log.info("创建 MinIO 存储桶: {}", bucketName);
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            }
+            
+            // 设置存储桶策略为公开读取
+            String bucketPolicy = String.format("""
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": "*"
+                            },
+                            "Action": [
+                                "s3:GetObject"
+                            ],
+                            "Resource": [
+                                "arn:aws:s3:::%s/*"
+                            ]
+                        }
+                    ]
+                }
+                """, bucketName);
+            
+            log.info("设置 MinIO 存储桶 {} 为公开读取", bucketName);
+            minioClient.setBucketPolicy(
+                SetBucketPolicyArgs.builder()
+                    .bucket(bucketName)
+                    .config(bucketPolicy)
+                    .build()
+            );
+            
+            log.info("MinIO 初始化完成，存储桶: {}, 策略: 公开读取", bucketName);
+            
+        } catch (Exception e) {
+            log.error("MinIO 初始化失败: {}", e.getMessage(), e);
+        }
+    }
 
     /**
      * 上传文件到 MinIO
