@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 20:24:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-27 23:38:52
+ * @LastEditTime: 2025-07-27 23:45:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.core.upload;
 import org.springframework.http.MediaType;
 
 import java.io.File;
-import java.io.InputStream;
 
 /**
  * 统一上传服务接口

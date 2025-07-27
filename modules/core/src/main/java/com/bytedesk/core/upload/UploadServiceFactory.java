@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 20:24:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 23:20:59
+ * @LastEditTime: 2025-07-27 23:51:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,10 +31,10 @@ public class UploadServiceFactory {
     @Value("${bytedesk.upload.provider:aliyun}")
     private String uploadProvider;
 
-    @Autowired
+    @Autowired(required = false)
     private AliyunUploadService aliyunUploadService;
 
-    @Autowired
+    @Autowired(required = false)
     private TencentUploadService tencentUploadService;
 
     /**
@@ -43,6 +43,11 @@ public class UploadServiceFactory {
      * @return UploadService
      */
     public UploadService getUploadService() {
+        // 首先检查是否有任何可用的上传服务
+        if (!hasAvailableUploadService()) {
+            throw new IllegalStateException("没有可用的云存储服务，请至少启用一个云存储服务（设置 bytedesk.aliyun.enabled=true 或 bytedesk.tencent.enabled=true）");
+        }
+        
         switch (uploadProvider.toLowerCase()) {
             case "tencent":
             case "cos":
@@ -60,6 +65,29 @@ public class UploadServiceFactory {
                     throw new IllegalStateException("阿里云OSS未启用，请设置 bytedesk.aliyun.enabled=true");
                 }
         }
+    }
+
+    /**
+     * 检查是否有可用的上传服务
+     *
+     * @return 是否有可用的上传服务
+     */
+    public boolean hasAvailableUploadService() {
+        return aliyunUploadService != null || tencentUploadService != null;
+    }
+
+    /**
+     * 获取可用的上传服务（如果有的话）
+     *
+     * @return 可用的上传服务，如果没有则返回null
+     */
+    public UploadService getAvailableUploadService() {
+        if (aliyunUploadService != null) {
+            return aliyunUploadService;
+        } else if (tencentUploadService != null) {
+            return tencentUploadService;
+        }
+        return null;
     }
 
     /**

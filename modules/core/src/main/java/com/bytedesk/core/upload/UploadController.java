@@ -34,7 +34,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/upload")
 public class UploadController {
 
-    @Autowired
+    @Autowired(required = false)
     private UploadServiceFactory uploadServiceFactory;
 
     /**
@@ -42,6 +42,13 @@ public class UploadController {
      */
     @PostMapping("/avatar")
     public ResponseEntity<Map<String, Object>> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        if (uploadServiceFactory == null) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", false);
+            result.put("error", "没有可用的云存储服务，请至少启用一个云存储服务");
+            return ResponseEntity.badRequest().body(result);
+        }
+        
         try {
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             File tempFile = File.createTempFile("upload_", "_" + fileName);
@@ -72,6 +79,13 @@ public class UploadController {
      */
     @PostMapping("/image")
     public ResponseEntity<Map<String, Object>> uploadImage(@RequestParam("file") MultipartFile file) {
+        if (uploadServiceFactory == null) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", false);
+            result.put("error", "没有可用的云存储服务，请至少启用一个云存储服务");
+            return ResponseEntity.badRequest().body(result);
+        }
+        
         try {
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             File tempFile = File.createTempFile("upload_", "_" + fileName);
