@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-23 06:53:17
+ * @LastEditTime: 2025-07-27 22:53:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -358,7 +358,7 @@ public class BytedeskProperties {
     @Data
     public static class Minio {
         private Boolean enabled = false;
-        private String endpoint = "http://localhost:19000";
+        private String endpoint = "http://127.0.0.1:19000";
         private String accessKey = "minioadmin";
         private String secretKey = "minioadmin123";
         private String bucketName = "bytedesk";

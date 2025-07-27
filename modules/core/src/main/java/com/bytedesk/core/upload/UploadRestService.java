@@ -74,7 +74,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private final UploadWatermarkService uploadWatermarkService;
 
 	@Autowired(required = false)
-	private final UploadMinioService uploadMinioService;
+	private UploadMinioService uploadMinioService;
 
 	@Override
 	public Page<UploadResponse> queryByOrg(UploadRequest request) {
