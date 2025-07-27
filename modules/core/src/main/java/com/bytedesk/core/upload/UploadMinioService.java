@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-20 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-20 10:00:00
+ * @LastEditTime: 2025-07-27 17:38:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,39 +11,26 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.upload.cloud;
+package com.bytedesk.core.upload;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.BdDateUtils;
 
-import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.StatObjectArgs;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.InternalException;
-import io.minio.errors.InvalidResponseException;
-import io.minio.errors.ServerException;
-import io.minio.errors.XmlParserException;
 import io.minio.http.Method;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,25 +43,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class MinioService {
+public class UploadMinioService {
 
     @Autowired
     private BytedeskProperties bytedeskProperties;
 
     private MinioClient minioClient;
-
-    /**
-     * 初始化 MinIO 客户端
-     */
-    private MinioClient getMinioClient() {
-        if (minioClient == null) {
-            minioClient = MinioClient.builder()
-                    .endpoint(bytedeskProperties.getMinioEndpoint())
-                    .credentials(bytedeskProperties.getMinioAccessKey(), bytedeskProperties.getMinioSecretKey())
-                    .build();
-        }
-        return minioClient;
-    }
 
     /**
      * 上传文件到 MinIO
@@ -99,7 +73,7 @@ public class MinioService {
             }
 
             // 上传文件到 MinIO
-            getMinioClient().putObject(
+            minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bytedeskProperties.getMinioBucketName())
                     .object(objectPath)
@@ -137,7 +111,7 @@ public class MinioService {
             String contentType = getContentType(fileName);
 
             // 上传文件到 MinIO
-            getMinioClient().putObject(
+            minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bytedeskProperties.getMinioBucketName())
                     .object(objectPath)
@@ -177,7 +151,7 @@ public class MinioService {
             // 从 URL 下载文件并上传到 MinIO
             URL fileUrl = new URL(url);
             try (InputStream inputStream = fileUrl.openStream()) {
-                getMinioClient().putObject(
+                minioClient.putObject(
                     PutObjectArgs.builder()
                         .bucket(bytedeskProperties.getMinioBucketName())
                         .object(objectPath)
@@ -269,7 +243,7 @@ public class MinioService {
      */
     public void deleteFile(String objectPath) {
         try {
-            getMinioClient().removeObject(
+            minioClient.removeObject(
                 RemoveObjectArgs.builder()
                     .bucket(bytedeskProperties.getMinioBucketName())
                     .object(objectPath)
@@ -290,7 +264,7 @@ public class MinioService {
      */
     public boolean fileExists(String objectPath) {
         try {
-            getMinioClient().statObject(
+            minioClient.statObject(
                 StatObjectArgs.builder()
                     .bucket(bytedeskProperties.getMinioBucketName())
                     .object(objectPath)
@@ -311,7 +285,7 @@ public class MinioService {
      */
     public String getDownloadUrl(String objectPath, int expiry) {
         try {
-            return getMinioClient().getPresignedObjectUrl(
+            return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
                     .bucket(bytedeskProperties.getMinioBucketName())
@@ -334,7 +308,7 @@ public class MinioService {
      */
     public String getUploadUrl(String objectPath, int expiry) {
         try {
-            return getMinioClient().getPresignedObjectUrl(
+            return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .method(Method.PUT)
                     .bucket(bytedeskProperties.getMinioBucketName())

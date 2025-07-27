@@ -54,7 +54,6 @@ import com.bytedesk.core.utils.ConvertUtils;
 
 import com.bytedesk.core.upload.watermark.WatermarkConfig;
 import com.bytedesk.core.upload.watermark.WatermarkService;
-import com.bytedesk.core.upload.cloud.MinioService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +80,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	private final WatermarkConfig watermarkConfig;
 
-	private final MinioService minioService;
+	private final UploadMinioService minioService;
 
 	@Override
 	public Page<UploadResponse> queryByOrg(UploadRequest request) {
