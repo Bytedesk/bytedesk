@@ -50,12 +50,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ QueueEntityListener.class })
-@Table(name = "bytedesk_service_queue"
-// , uniqueConstraints = {
-// @UniqueConstraint(columnNames = { "queue_topic", "queue_day",
-// "is_deleted" }, name = "uk_queue_topic_day_deleted")
-// }
-)
+@Table(name = "bytedesk_service_queue")
 public class QueueEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

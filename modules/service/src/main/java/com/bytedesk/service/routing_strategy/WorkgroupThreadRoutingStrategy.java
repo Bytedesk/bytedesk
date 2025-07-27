@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 13:37:34
+ * @LastEditTime: 2025-07-28 07:35:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,9 +61,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
-    private final WorkgroupRestService workgroupService;
+    private final WorkgroupRestService workgroupRestService;
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     private final VisitorThreadService visitorThreadService;
 
@@ -96,7 +96,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         WorkgroupEntity workgroup = null;
         
         // 从数据库重新获取工作组信息，确保拿到最新的数据
-        Optional<WorkgroupEntity> workgroupOptional = workgroupService.findByUid(workgroupUid);
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
         if (workgroupOptional.isPresent()) {
             workgroup = workgroupOptional.get();
             log.info("已获取工作组最新数据，在线客服数量: {}", workgroup.getConnectedAgentCount());
@@ -104,7 +104,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
             throw new RuntimeException("Workgroup uid " + workgroupUid + " not found");
         }
         // 
-        Optional<ThreadEntity> threadOptional = threadService.findFirstByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             if (threadOptional.get().isNew()) {
                 log.info("createWorkgroupThread: thread is new");
@@ -124,7 +124,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                     // 返回未关闭，或 非留言状态的会话
                     String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
                     thread.setRobot(robotString);
-                    ThreadEntity savedThread = threadService.save(thread);
+                    ThreadEntity savedThread = threadRestService.save(thread);
                     if (savedThread == null) {
                         throw new RuntimeException("Failed to save thread");
                     }
@@ -225,7 +225,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
     private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
         log.info("handleAvailableWorkgroup {}", agentEntity.getNickname());
         // 未满则接待
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
         // 
@@ -249,7 +249,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
         log.info("before save agent: {}, owner {}", thread.getAgent(), thread.getOwner());
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         log.info("after save agent: {}, owner {}", savedThread.getAgent(), thread.getOwner());
         // 客服接待时，通过消息队列异步自动接受会话
         queueMemberEntity.agentAutoAcceptThread();
@@ -269,7 +269,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
         log.info("handleQueuedWorkgroup {}", agentEntity.getNickname());
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
 
@@ -286,7 +286,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 进入排队队列
         thread.setUserUid(agentEntity.getUid());
         thread.setQueuing().setContent(content).setUnreadCount(0);
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
@@ -300,7 +300,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
 
     public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agentEntity, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
         log.info("getOfflineMessage {}", agentEntity.getNickname());
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         ThreadEntity thread = threadOptional.get();
         //
@@ -311,7 +311,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         thread.setOffline().setContent(content);
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
@@ -359,7 +359,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         Assert.notNull(robotEntity, "RobotEntity must not be null");
 
         // 直接使用threadFromRequest，修改保存报错，所以重新查询，待完善
-        Optional<ThreadEntity> threadOptional = threadService.findByUid(threadFromRequest.getUid());
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
         Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
         // 
         ThreadEntity thread = threadOptional.get();
@@ -377,7 +377,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         thread.setRobot(robotString);
-        ThreadEntity savedThread = threadService.save(thread);
+        ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
         }
