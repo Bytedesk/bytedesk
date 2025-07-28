@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 11:40:25
+ * @LastEditTime: 2025-07-28 14:04:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -161,7 +161,7 @@ public class QueueMemberResponse extends BaseResponse {
 
     private ZonedDateTime systemLastResponseAt;  // 系统最后响应时间
 
-    private ZonedDateTime systemCloseAt;  // 系统结束时间
+    private ZonedDateTime systemClosedAt;  // 系统结束时间
 
     @Builder.Default
     private Boolean systemClose = false;  // 是否系统自动结束
@@ -297,8 +297,8 @@ public class QueueMemberResponse extends BaseResponse {
         return BdDateUtils.formatDatetimeToString(systemLastResponseAt);
     }
 
-    public String getSystemCloseAt() {
-        return BdDateUtils.formatDatetimeToString(systemCloseAt);
+    public String getSystemClosedAt() {
+        return BdDateUtils.formatDatetimeToString(systemClosedAt);
     }
 
     public String getRateAt() {

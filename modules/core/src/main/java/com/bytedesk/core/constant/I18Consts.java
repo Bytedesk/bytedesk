@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 11:26:51
+ * @LastEditTime: 2025-07-28 13:55:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,7 +47,7 @@ public class I18Consts {
     // public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION = I18N_PREFIX + "intent.classification.assistant.description"; // 用于识别客户意图
     // public static final String I18N_EMOTION_ASSISTANT_DESCRIPTION = I18N_PREFIX + "emotion.assistant.description"; // 用于分析客户情绪
     // // 系统通知
-    // public static final String I18N_SYSTEM_NOTIFICATION_NAME = I18N_PREFIX + "system.notification"; // 系统通知
+    public static final String I18N_SYSTEM_NOTIFICATION_NAME = I18N_PREFIX + "system.notification"; // 系统通知
     // public static final String I18N_SYSTEM_NOTIFICATION_DESCRIPTION = I18N_PREFIX + "system.notification.description"; // 系统通知消息
     // // 用户相关
     // public static final String I18N_USER_OLD_PASSWORD_WRONG = I18N_PREFIX + "old.password.wrong"; // 旧密码错误
@@ -204,7 +204,7 @@ public class I18Consts {
     public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION = "用于识别客户意图"; // 用于识别客户意图
     public static final String I18N_EMOTION_ASSISTANT_DESCRIPTION = "用于分析客户情绪"; // 用于分析客户情绪
     // 系统通知
-    public static final String I18N_SYSTEM_NOTIFICATION_NAME = "系统通知"; // 系统通知
+    // public static final String I18N_SYSTEM_NOTIFICATION_NAME = "系统通知"; // 系统通知
     public static final String I18N_SYSTEM_NOTIFICATION_DESCRIPTION = "系统通知消息"; // 系统通知消息
     // 用户相关
     public static final String I18N_USER_OLD_PASSWORD_WRONG = "旧密码错误"; // 旧密码错误

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 10:09:18
+ * @LastEditTime: 2025-07-28 14:05:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -201,7 +201,7 @@ public class QueueMemberEntity extends BaseEntity {
 
     private ZonedDateTime systemLastResponseAt;  // 系统最后响应时间
 
-    private ZonedDateTime systemCloseAt;  // 系统结束时间，即：autoCloseTime
+    private ZonedDateTime systemClosedAt;  // 系统结束时间，即：autoCloseTime
 
     @Builder.Default
     @Column(name = "is_system_close")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 12:23:06
+ * @LastEditTime: 2025-07-28 13:38:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -108,7 +108,6 @@ public class QueueMemberRequest extends BaseRequest {
     // 人工对话超时时间
     private ZonedDateTime agentTimeoutAt;
 
-
     @Builder.Default
     private Integer visitorPriority = 0;  // 优先级(0-100)
 
@@ -136,8 +135,6 @@ public class QueueMemberRequest extends BaseRequest {
     // 是否已经小结
     @Builder.Default
     private Boolean summarized = false;
-
-    
 
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检

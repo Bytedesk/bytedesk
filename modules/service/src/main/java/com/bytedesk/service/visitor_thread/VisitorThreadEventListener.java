@@ -73,7 +73,7 @@ public class VisitorThreadEventListener {
             Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOptional.isPresent()) {
                 QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setSystemCloseAt(BdDateUtils.now());
+                queueMember.setSystemClosedAt(BdDateUtils.now());
                 queueMember.setSystemClose(true);
                 queueMemberRestService.save(queueMember);
                 if (queueMember.getAgentOffline()) {
