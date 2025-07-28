@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:12:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 18:28:37
+ * @LastEditTime: 2025-07-28 10:08:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -366,37 +366,4 @@ public class QueueEntity extends BaseEntity {
         return status.equals(QueueStatusEnum.ACTIVE.name());
     }
 
-    /**
-     * 获取直接分配的会话数量
-     */
-    // public int getDirectAssignCount() {
-    // int count1 = (int) queueMembers.stream()
-    // .filter(member ->
-    // QueueMemberSourceEnum.DIRECT.name().equals(member.getSourceType()))
-    // .count();
-
-    // int count2 = (int) workgroupQueueMembers.stream()
-    // .filter(member ->
-    // QueueMemberSourceEnum.DIRECT.name().equals(member.getSourceType()))
-    // .count();
-
-    // return count1 + count2;
-    // }
-
-    /**
-     * 获取从工作组分配的会话数量
-     */
-    // public int getWorkgroupAssignCount() {
-    // int count1 = (int) queueMembers.stream()
-    // .filter(member ->
-    // QueueMemberSourceEnum.WORKGROUP.name().equals(member.getSourceType()))
-    // .count();
-
-    // int count2 = (int) workgroupQueueMembers.stream()
-    // .filter(member ->
-    // QueueMemberSourceEnum.WORKGROUP.name().equals(member.getSourceType()))
-    // .count();
-
-    // return count1 + count2;
-    // }
 }

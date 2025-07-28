@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 14:34:18
+ * @LastEditTime: 2025-07-28 10:09:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,10 +62,6 @@ public class QueueMemberEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // 多个queueMember对应一个queue
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private QueueEntity queue;
-    
     // 作为工作组队列成员关系
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workgroup_queue_id")
