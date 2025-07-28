@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 07:51:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 14:47:11
+ * @LastEditTime: 2025-07-28 17:04:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -131,8 +131,8 @@ public class QueueMemberEventListener {
         if (message == null) {
             return;
         }
-        // log.debug("QueueMemberEventListener 接收到新消息事件: messageUid={}, threadUid={}, content={}",
-        //         message.getUid(), message.getThread().getUid(), message.getContent()); 
+        log.debug("QueueMemberEventListener 接收到新消息事件: messageUid={}, threadUid={}, content={}",
+                message.getUid(), message.getThread().getUid(), message.getContent()); 
         
         // 获取消息对应的会话线程
         ThreadEntity thread = null;
