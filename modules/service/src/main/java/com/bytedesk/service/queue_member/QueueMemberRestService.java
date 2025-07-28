@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-18 15:01:58
+ * @LastEditTime: 2025-07-28 11:40:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,8 +93,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     @Override
     public QueueMemberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             QueueMemberEntity entity) {
-        log.error("处理乐观锁异常: {}", e.getMessage());
-        
+        log.error("处理乐观锁异常: {}", e.getMessage());      
         try {
             // 获取最新的实体
             Optional<QueueMemberEntity> latestEntityOpt = queueMemberRepository.findByUid(entity.getUid());
@@ -152,7 +151,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         
         QueueMemberEntity savedQueueMember = save(counter);
         if (savedQueueMember == null) {
-            throw new RuntimeException("save counter failed");
+            throw new RuntimeException("save queue member failed");
         }
         return convertToResponse(savedQueueMember);
     }
@@ -169,7 +168,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
 
         QueueMemberEntity savedCounter = save(entity);
         if (savedCounter == null) {
-            throw new RuntimeException("save counter failed");
+            throw new RuntimeException("save queue member failed");
         }
         return convertToResponse(savedCounter);
     }
@@ -254,6 +253,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
         
         // 评价与服务质量
         excel.setRated(booleanToString(response.getRated()));
+        excel.setRateScore(response.getRateScore());
         // excel.setRateLevel(response.getRateLevel());
         excel.setResolved(booleanToString(response.getResolved()));
         // excel.setQualityChecked(booleanToString(response.getQualityChecked()));

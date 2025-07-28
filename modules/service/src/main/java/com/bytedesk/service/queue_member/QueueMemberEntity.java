@@ -216,6 +216,8 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "is_rated")
     private Boolean rated = false;
 
+    private Integer rateScore;  // 评分
+
     // 评分时间
     private ZonedDateTime rateAt;  // 评分时间
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580206@qq.com
  * @Date: 2024-08-01 06:18:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 10:14:25
+ * @LastEditTime: 2025-07-28 11:41:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,6 +101,10 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "是否已评价")
     @ColumnWidth(20)
     private String rated;
+
+    @ExcelProperty(value = "评分")
+    @ColumnWidth(20)
+    private Integer rateScore;
 
     @ExcelProperty(value = "评分时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
