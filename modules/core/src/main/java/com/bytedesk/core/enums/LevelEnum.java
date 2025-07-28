@@ -19,6 +19,7 @@ public enum LevelEnum {
     DEPARTMENT,
     WORKGROUP,
     AGENT,
+    ROBOT,
     GROUP,
     USER;
 
