@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +79,22 @@ public class QueueMemberSpecification extends BaseSpecification {
             // 根据client查询
             if (StringUtils.hasText(request.getChannel())) {
                 predicates.add(criteriaBuilder.like(root.get("thread").get("channel"), "%" + request.getChannel() + "%"));
+            }
+
+            // startDate - 与 createdAt 对比搜索
+            if (StringUtils.hasText(request.getStartDate())) {
+                ZonedDateTime startDate = BdDateUtils.parseZonedDateTime(request.getStartDate());
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate));
+            }
+
+            // endDate - 与 createdAt 对比搜索
+            if (StringUtils.hasText(request.getEndDate())) {
+                ZonedDateTime endDate = BdDateUtils.parseZonedDateTime(request.getEndDate());
+                // 如果是日期格式（不包含时间），则设置为当天的结束时间（23:59:59.999999999）
+                if (request.getEndDate().length() == 10) { // "yyyy-MM-dd" 格式
+                    endDate = endDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+                }
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
