@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 14:05:01
+ * @LastEditTime: 2025-07-29 14:45:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -289,7 +289,7 @@ public class QueueMemberEntity extends BaseEntity {
      */
     public long getWaitLength() {
         if (visitorEnqueueAt == null) return 0;
-        if (thread.isOffline()) return 0;
+        if (thread.isOffline() || agentOffline) return 0;
         // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
         if (robotAcceptedAt != null) {
             return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
