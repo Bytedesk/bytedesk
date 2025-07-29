@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 13:38:45
+ * @LastEditTime: 2025-07-29 21:41:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
-import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
@@ -141,6 +140,9 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private Boolean qualityChecked = false;
 
+    // 质检结果
+    private Integer qualityCheckScore;
+
     // 重构到相应的表里面
     // 意图类型
     @Builder.Default
@@ -149,10 +151,6 @@ public class QueueMemberRequest extends BaseRequest {
     // 情绪类型
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
-
-    // 质检结果
-    @Builder.Default
-    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
 
     // 处理状态（待处理、已处理、已关闭等）
     @Builder.Default

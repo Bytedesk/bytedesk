@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-29 15:14:04
+ * @LastEditTime: 2025-07-29 21:43:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.ThreadInviteStatusEnum;
-import com.bytedesk.core.thread.ThreadQualityCheckResultEnum;
 import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.ThreadTransferStatusEnum;
 import com.bytedesk.service.queue.QueueEntity;
@@ -247,13 +246,12 @@ public class QueueMemberEntity extends BaseEntity {
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检
     @Builder.Default
-    @Column(name = "is_quality_checked")
+    @Column(name = "is_thread_quality_checked")
     private Boolean qualityChecked = false;
 
     // 质检结果
-    @Builder.Default
-    @Column(name = "thread_quality_check_result")
-    private String qualityCheckResult = ThreadQualityCheckResultEnum.OTHER.name();
+    @Column(name = "thread_quality_check_score")
+    private Integer qualityCheckScore;
 
     // 意图类型
     @Builder.Default

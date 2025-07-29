@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 11:05:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 10:05:06
+ * @LastEditTime: 2025-07-29 21:42:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -381,8 +381,8 @@ public class QueueMemberConsumer implements MessageListener {
                 case "qualityChecked":
                     member.setQualityChecked((Boolean) value);
                     break;
-                case "qualityCheckResult":
-                    member.setQualityCheckResult((String) value);
+                case "qualityCheckScore":
+                    member.setQualityCheckScore((Integer) value);
                     break;
                 case "messageLeave":
                     member.setMessageLeave((Boolean) value);

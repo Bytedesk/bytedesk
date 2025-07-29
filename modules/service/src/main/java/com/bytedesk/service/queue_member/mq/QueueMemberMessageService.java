@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 11:05:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-02 10:04:53
+ * @LastEditTime: 2025-07-29 21:43:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -225,7 +225,7 @@ public class QueueMemberMessageService {
         // updates.put("rateLevel", member.getRateLevel());
         updates.put("resolved", member.getResolved());
         updates.put("qualityChecked", member.getQualityChecked());
-        updates.put("qualityCheckResult", member.getQualityCheckResult());
+        updates.put("qualityCheckScore", member.getQualityCheckScore());
         updates.put("messageLeave", member.getMessageLeave());
         // updates.put("leaveMsg", member.getLeaveMsg());
         updates.put("summarized", member.getSummarized());
