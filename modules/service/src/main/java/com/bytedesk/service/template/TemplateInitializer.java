@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 21:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 17:09:29
+ * @LastEditTime: 2025-07-29 08:27:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,22 +16,20 @@ package com.bytedesk.service.template;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
-
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class TemplateInitializer implements SmartInitializingSingleton {
 
-    private final TemplateRestService templateRestService;
+    // private final TemplateRestService templateRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // 创建默认的工单分类
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        templateRestService.initTemplates(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // templateRestService.initTemplates(orgUid);
     }
 
     private void initPermissions() {
