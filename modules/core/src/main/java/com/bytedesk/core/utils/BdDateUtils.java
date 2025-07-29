@@ -276,4 +276,52 @@ public class BdDateUtils {
         return ZonedDateTime.now(getDisplayZoneId());
     }
 
+    /**
+     * 解析结束日期，如果是日期格式（不包含时间），则设置为当天的结束时间（23:59:59.999999999）
+     * 这个方法专门用于处理查询条件中的结束日期
+     * @param endDate 结束日期字符串，支持 "yyyy-MM-dd" 或 "yyyy-MM-dd HH:mm:ss" 格式
+     * @return 解析后的ZonedDateTime对象，如果是日期格式则设置为当天结束时间
+     */
+    public static ZonedDateTime parseEndDate(String endDate) {
+        if (!StringUtils.hasText(endDate)) {
+            return null;
+        }
+        
+        ZonedDateTime parsedDate = parseZonedDateTime(endDate);
+        if (parsedDate == null) {
+            return null;
+        }
+        
+        // 如果是日期格式（不包含时间），则设置为当天的结束时间（23:59:59.999999999）
+        if (endDate.length() == 10) { // "yyyy-MM-dd" 格式
+            return parsedDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+        }
+        
+        return parsedDate;
+    }
+
+    /**
+     * 解析开始日期，如果是日期格式（不包含时间），则设置为当天的开始时间（00:00:00.000000000）
+     * 这个方法专门用于处理查询条件中的开始日期
+     * @param startDate 开始日期字符串，支持 "yyyy-MM-dd" 或 "yyyy-MM-dd HH:mm:ss" 格式
+     * @return 解析后的ZonedDateTime对象，如果是日期格式则设置为当天开始时间
+     */
+    public static ZonedDateTime parseStartDate(String startDate) {
+        if (!StringUtils.hasText(startDate)) {
+            return null;
+        }
+        
+        ZonedDateTime parsedDate = parseZonedDateTime(startDate);
+        if (parsedDate == null) {
+            return null;
+        }
+        
+        // 如果是日期格式（不包含时间），则设置为当天的开始时间（00:00:00.000000000）
+        if (startDate.length() == 10) { // "yyyy-MM-dd" 格式
+            return parsedDate.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        }
+        
+        return parsedDate;
+    }
+
 }

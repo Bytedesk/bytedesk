@@ -83,17 +83,13 @@ public class QueueMemberSpecification extends BaseSpecification {
 
             // startDate - 与 createdAt 对比搜索
             if (StringUtils.hasText(request.getStartDate())) {
-                ZonedDateTime startDate = BdDateUtils.parseZonedDateTime(request.getStartDate());
+                ZonedDateTime startDate = BdDateUtils.parseStartDate(request.getStartDate());
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate));
             }
 
             // endDate - 与 createdAt 对比搜索
             if (StringUtils.hasText(request.getEndDate())) {
-                ZonedDateTime endDate = BdDateUtils.parseZonedDateTime(request.getEndDate());
-                // 如果是日期格式（不包含时间），则设置为当天的结束时间（23:59:59.999999999）
-                if (request.getEndDate().length() == 10) { // "yyyy-MM-dd" 格式
-                    endDate = endDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-                }
+                ZonedDateTime endDate = BdDateUtils.parseEndDate(request.getEndDate());
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate));
             }
             //
