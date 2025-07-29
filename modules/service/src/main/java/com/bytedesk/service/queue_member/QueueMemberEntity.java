@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-29 14:45:27
+ * @LastEditTime: 2025-07-29 15:14:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -318,24 +318,4 @@ public class QueueMemberEntity extends BaseEntity {
         this.robotToAgentAt = BdDateUtils.now();
     }
 
-
-    // 
-    // public Boolean isRobotToAgent() {
-    //     return !ThreadTransferStatusEnum.NONE.name().equals(robotToAgentStatus);
-    // }
-
-    /**
-     * 标记为离线状态
-     */
-    // public void markAsOffline() {
-    //     this.wasOffline = true;
-    // }
-
-    /**
-     * 检查是否曾经是离线状态
-     */
-    // public Boolean wasOffline() {
-    //     // return this.wasOffline || (thread != null && thread.isOffline());
-    //     return this.wasOffline || (thread != null && thread.isOffline());
-    // }
 }
