@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 12:23:24
+ * @LastEditTime: 2025-07-29 08:36:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *  Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,10 @@ public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long
     Optional<WorkgroupEntity> findByUid(String uid);
 
     boolean existsByUid(String uid);
+
+    List<WorkgroupEntity> findByDeletedFalse();
+
+    List<WorkgroupEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
     /**
      * 查找包含指定客服的所有工作组

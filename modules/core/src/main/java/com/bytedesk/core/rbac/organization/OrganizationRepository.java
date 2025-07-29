@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-03 13:02:51
+ * @LastEditTime: 2025-07-29 08:37:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.util.List;
 import java.util.Optional;
 
 // import org.springframework.cache.annotation.Cacheable;
@@ -53,6 +54,8 @@ public interface OrganizationRepository
         Optional<OrganizationEntity> findByNameAndDeleted(String name, Boolean deleted);
 
         Optional<OrganizationEntity> findByCodeAndDeleted(String code, Boolean deleted);
+
+        List<OrganizationEntity> findByDeletedFalse();
 
         //
         // @NonNull

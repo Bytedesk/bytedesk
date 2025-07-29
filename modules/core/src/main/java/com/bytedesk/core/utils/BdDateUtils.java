@@ -155,10 +155,6 @@ public class BdDateUtils {
         if (!StringUtils.hasText(enDate)) {
             return "";
         }
-        // String str = "Wed Apr 22 05:12:10 CST 2020";
-        // SimpleDateFormat sdf1 = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy",
-        // Locale.ENGLISH);
-
         SimpleDateFormat fromFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.ENGLISH);
         if (enDate.contains(",")) {
             fromFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.ENGLISH);
