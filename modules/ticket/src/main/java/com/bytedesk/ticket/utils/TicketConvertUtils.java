@@ -14,20 +14,25 @@
 package com.bytedesk.ticket.utils;
 
 import org.modelmapper.ModelMapper;
+import lombok.experimental.UtilityClass;
 
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketResponse;
 
+@UtilityClass
 public class TicketConvertUtils {
 
-    private static final ModelMapper modelMapper = new ModelMapper();
+    private static ModelMapper getModelMapper() {
+        return ApplicationContextHolder.getBean(ModelMapper.class);
+    }
 
     public static TicketResponse convertToResponse(TicketEntity entity) {
         // 
-        TicketResponse ticketResponse = modelMapper.map(entity, TicketResponse.class);
+        TicketResponse ticketResponse = getModelMapper().map(entity, TicketResponse.class);
         // 
         // if (StringUtils.hasText(entity.getUserString())) {
         //     UserProtobuf user = entity.getUser();

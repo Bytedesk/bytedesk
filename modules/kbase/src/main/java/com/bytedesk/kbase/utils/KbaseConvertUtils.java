@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import lombok.experimental.UtilityClass;
 
+import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
@@ -29,30 +31,31 @@ import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqResponse;
 import com.bytedesk.kbase.faq.FaqResponseSimple;
 
+@UtilityClass
 public class KbaseConvertUtils {
 
-    private static final ModelMapper modelMapper = new ModelMapper();
-
-    private KbaseConvertUtils() {}
+    private static ModelMapper getModelMapper() {
+        return ApplicationContextHolder.getBean(ModelMapper.class);
+    }
 
     public static KbaseResponse convertToKbaseResponse(KbaseEntity entity) {
-        return modelMapper.map(entity, KbaseResponse.class);
+        return getModelMapper().map(entity, KbaseResponse.class);
     }
 
     public static ArticleResponse convertToArticleResponse(ArticleEntity entity) {
-        ArticleResponse articleResponse = modelMapper.map(entity, ArticleResponse.class);
+        ArticleResponse articleResponse = getModelMapper().map(entity, ArticleResponse.class);
         articleResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
         return articleResponse;
     }
 
     public static ArticleArchiveResponse convertToArticleArchiveResponse(ArticleArchiveEntity entity) {
-        ArticleArchiveResponse articleResponse = modelMapper.map(entity, ArticleArchiveResponse.class);
+        ArticleArchiveResponse articleResponse = getModelMapper().map(entity, ArticleArchiveResponse.class);
         articleResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
         return articleResponse;
     }
 
     public static FaqResponse convertToFaqResponse(FaqEntity entity) {
-        FaqResponse response = modelMapper.map(entity, FaqResponse.class);
+        FaqResponse response = getModelMapper().map(entity, FaqResponse.class);
 
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedFaqs() != null) {
@@ -66,6 +69,6 @@ public class KbaseConvertUtils {
     }
 
     public static FaqResponseSimple convertToFaqResponseSimple(FaqEntity entity) {
-        return modelMapper.map(entity, FaqResponseSimple.class);
+        return getModelMapper().map(entity, FaqResponseSimple.class);
     }
 }

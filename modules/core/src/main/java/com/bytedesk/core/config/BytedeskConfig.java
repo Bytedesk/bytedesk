@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 07:52:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 09:10:48
+ * @LastEditTime: 2025-07-30 21:45:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,6 @@ public class BytedeskConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        // return new ModelMapper();
         ModelMapper modelMapper = new ModelMapper();
         
         // 设置更严格的匹配策略
@@ -58,6 +57,7 @@ public class BytedeskConfig {
             .setMatchingStrategy(MatchingStrategies.STRICT)
             .setSkipNullEnabled(true)
             .setFieldMatchingEnabled(true)
+            .setAmbiguityIgnored(true)
             .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
         
         return modelMapper;

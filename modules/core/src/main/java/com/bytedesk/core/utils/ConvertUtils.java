@@ -49,22 +49,17 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ConvertUtils {
 
-    private static final ModelMapper modelMapper = new ModelMapper(); // 添加静态ModelMapper实例
-
-    // 静态初始化块，配置 ModelMapper
-    static {
-        // 配置 ModelMapper 忽略模糊映射
-        modelMapper.getConfiguration()
-            .setAmbiguityIgnored(true);
+    private static ModelMapper getModelMapper() {
+        return ApplicationContextHolder.getBean(ModelMapper.class);
     }
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
         // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities
-        return modelMapper.map(userDetails, UserResponse.class);
+        return getModelMapper().map(userDetails, UserResponse.class);
     }
 
     public static UserResponse convertToUserResponse(UserEntity user) {
-        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        UserResponse userResponse = getModelMapper().map(user, UserResponse.class);
         
         // 手动处理 userOrganizationRoles 映射
         if (user.getUserOrganizationRoles() != null) {
@@ -131,11 +126,11 @@ public class ConvertUtils {
     }
 
     public static UserProtobuf convertToUserProtobuf(UserEntity user) {
-        return modelMapper.map(user, UserProtobuf.class);
+        return getModelMapper().map(user, UserProtobuf.class);
     }
 
     public static UserProtobuf convertToUserProtobuf(WorkflowEntity workflow) {
-        UserProtobuf userProtobuf = modelMapper.map(workflow, UserProtobuf.class);
+        UserProtobuf userProtobuf = getModelMapper().map(workflow, UserProtobuf.class);
         userProtobuf.setType(UserTypeEnum.WORKFLOW.name());
         return userProtobuf;
     }
@@ -151,7 +146,7 @@ public class ConvertUtils {
     }
 
     public static ThreadProtobuf convertToThreadProtobuf(ThreadEntity thread) {
-        ThreadProtobuf threadProtobuf = modelMapper.map(thread, ThreadProtobuf.class);
+        ThreadProtobuf threadProtobuf = getModelMapper().map(thread, ThreadProtobuf.class);
         //
         if (thread.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
@@ -167,7 +162,7 @@ public class ConvertUtils {
     }
 
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
-        ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
+        ThreadResponse threadResponse = getModelMapper().map(thread, ThreadResponse.class);
         // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
         // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
         // if (thread.getAgent() != null) {
@@ -231,7 +226,7 @@ public class ConvertUtils {
 
     public static RoleResponse convertToRoleResponse(RoleEntity entity) {
         // return modelMapper.map(role, RoleResponse.class);
-        RoleResponse roleResponse = modelMapper.map(entity, RoleResponse.class);
+        RoleResponse roleResponse = getModelMapper().map(entity, RoleResponse.class);
         // 将Set<AuthorityEntity> authorities转换为Set<AuthorityResponse> authorities
         roleResponse.setAuthorities(
                 entity.getAuthorities().stream()
@@ -243,7 +238,7 @@ public class ConvertUtils {
 
     public static MessageResponse convertToMessageResponse(MessageEntity message) {
 
-        MessageResponse messageResponse = modelMapper.map(message, MessageResponse.class);
+        MessageResponse messageResponse = getModelMapper().map(message, MessageResponse.class);
         //
         if (message.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(message.getUser());
@@ -277,13 +272,13 @@ public class ConvertUtils {
     }
 
     public static AuthorityResponse convertToAuthorityResponse(AuthorityEntity authorityEntity) {
-        return modelMapper.map(authorityEntity, AuthorityResponse.class);
+        return getModelMapper().map(authorityEntity, AuthorityResponse.class);
     }
 
     public static BytedeskPropertiesResponse convertToBytedeskPropertiesResponse(
             BytedeskProperties bytedeskProperties) {
         // return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
-        BytedeskPropertiesResponse response = modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
+        BytedeskPropertiesResponse response = getModelMapper().map(bytedeskProperties, BytedeskPropertiesResponse.class);
         
         // 确保使用加密后的licenseKey
         response.setLicenseKey(bytedeskProperties.getLicenseKey());
@@ -308,7 +303,7 @@ public class ConvertUtils {
     }
 
     public static UploadResponse convertToUploadResponse(UploadEntity entity) {
-        UploadResponse uploadResponse = modelMapper.map(entity, UploadResponse.class);
+        UploadResponse uploadResponse = getModelMapper().map(entity, UploadResponse.class);
         // 上一行没有自动初始化isLlm字段，所以这里需要手动设置
         // uploadResponse.setIsLlm(entity.isLlm());
         return uploadResponse;

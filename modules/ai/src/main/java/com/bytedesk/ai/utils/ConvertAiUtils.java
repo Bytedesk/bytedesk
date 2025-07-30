@@ -14,6 +14,7 @@
 package com.bytedesk.ai.utils;
 
 import org.modelmapper.ModelMapper;
+import lombok.experimental.UtilityClass;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -22,24 +23,26 @@ import com.bytedesk.ai.robot_message.RobotMessageEntity;
 import com.bytedesk.ai.robot_message.RobotMessageResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 
+@UtilityClass
 public class ConvertAiUtils {
 
-    public static final ModelMapper modelMapper = new ModelMapper();
-
-    private ConvertAiUtils() {}
+    private static ModelMapper getModelMapper() {
+        return ApplicationContextHolder.getBean(ModelMapper.class);
+    }
 
     public static RobotResponse convertToRobotResponse(RobotEntity entity) {
-        return modelMapper.map(entity, RobotResponse.class);
+        return getModelMapper().map(entity, RobotResponse.class);
     }
 
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
-        RobotProtobuf robotProtobuf =  modelMapper.map(entity, RobotProtobuf.class);
+        RobotProtobuf robotProtobuf =  getModelMapper().map(entity, RobotProtobuf.class);
         robotProtobuf.setKbEnabled(entity.getKbEnabled());
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return robotProtobuf;
@@ -52,18 +55,18 @@ public class ConvertAiUtils {
 
     // convertToUserProtobufString
     public static String convertToUserProtobufString(RobotEntity entity) {
-        UserProtobuf robotProtobuf = modelMapper.map(entity, UserProtobuf.class);
+        UserProtobuf robotProtobuf = getModelMapper().map(entity, UserProtobuf.class);
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return JSON.toJSONString(robotProtobuf);
     }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettings serviceSettings) {
-        return modelMapper.map(serviceSettings, ServiceSettingsResponseVisitor.class);
+        return getModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
     public static RobotMessageResponse convertToRobotMessageResponse(RobotMessageEntity message) {
-        RobotMessageResponse messageResponse = modelMapper.map(message, RobotMessageResponse.class);
+        RobotMessageResponse messageResponse = getModelMapper().map(message, RobotMessageResponse.class);
         // 
         if (message.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(message.getUser());

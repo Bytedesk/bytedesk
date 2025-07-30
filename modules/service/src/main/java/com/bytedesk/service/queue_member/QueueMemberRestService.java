@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-30 20:32:27
+ * @LastEditTime: 2025-07-30 21:53:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,9 +30,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
-import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -189,7 +187,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     public void delete(QueueMemberRequest entity) {
         deleteByUid(entity.getUid());
     }
-
     public void deleteAll() {
         queueMemberRepository.deleteAll();
     }
