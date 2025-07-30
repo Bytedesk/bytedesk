@@ -83,7 +83,15 @@ public class QueueMemberSpecification extends BaseSpecification {
 
             // qualityChecked
             if (request.getQualityChecked() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("qualityChecked"), request.getQualityChecked()));
+                if (request.getQualityChecked() == false) {
+                    // 当 qualityChecked=false 时，同时查询 qualityChecked=null 的数据
+                    Predicate isFalse = criteriaBuilder.equal(root.get("qualityChecked"), false);
+                    Predicate isNull = criteriaBuilder.isNull(root.get("qualityChecked"));
+                    predicates.add(criteriaBuilder.or(isFalse, isNull));
+                } else {
+                    // 当 qualityChecked=true 时，只查询 qualityChecked=true 的数据
+                    predicates.add(criteriaBuilder.equal(root.get("qualityChecked"), true));
+                }
             }
 
             // startDate - 与 createdAt 对比搜索
