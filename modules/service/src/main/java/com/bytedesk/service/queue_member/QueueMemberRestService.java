@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 11:40:45
+ * @LastEditTime: 2025-07-30 20:32:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -196,19 +196,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
 
     @Override
     public QueueMemberResponse convertToResponse(QueueMemberEntity entity) {
-        QueueMemberResponse response = modelMapper.map(entity, QueueMemberResponse.class);
-        response.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
-        if (entity.getThread() != null && entity.getThread().getType() != null) {
-            // 处理不同类型的队列
-            if (entity.getThread().getType().equals(ThreadTypeEnum.AGENT.name())) {
-                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getAgentQueue()));
-            } else if (entity.getThread().getType().equals(ThreadTypeEnum.ROBOT.name())) {
-                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getRobotQueue()));
-            } else if (entity.getThread().getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getWorkgroupQueue()));
-            }
-        }
-        return response;
+        return ServiceConvertUtils.convertToQueueMemberResponse(entity);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:21:59
+ * @LastEditTime: 2025-07-30 20:31:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.service.utils;
 import org.modelmapper.ModelMapper;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
@@ -32,6 +33,8 @@ import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.message_unread.MessageUnreadEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueResponse;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberResponse;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -190,6 +193,91 @@ public class ServiceConvertUtils {
         }
         
         return messageLeaveResponse;
+    }
+
+    public static QueueMemberResponse convertToQueueMemberResponse(QueueMemberEntity entity) {
+        // 手动创建响应对象，避免 ModelMapper 的映射冲突
+        QueueMemberResponse response = new QueueMemberResponse();
+        
+        // 复制基本属性（从 BaseEntity 继承的属性）
+        response.setUid(entity.getUid());
+        response.setPlatform(entity.getPlatform());
+        response.setLevel(entity.getLevel());
+        response.setCreatedAt(entity.getCreatedAt());
+        response.setUpdatedAt(entity.getUpdatedAt());
+        
+        // 复制 QueueMemberEntity 特有的属性
+        response.setQueueNumber(entity.getQueueNumber());
+        response.setWaitLength((int) entity.getWaitLength());
+        response.setVisitorEnqueueAt(entity.getVisitorEnqueueAt());
+        response.setVisitorFirstMessageAt(entity.getVisitorFirstMessageAt());
+        response.setVisitorLastMessageAt(entity.getVisitorLastMessageAt());
+        response.setVisitorMessageCount(entity.getVisitorMessageCount());
+        response.setVisitorLeavedAt(entity.getVisitorLeavedAt());
+        response.setVisitorPriority(entity.getVisitorPriority());
+        response.setAgentAcceptType(entity.getAgentAcceptType());
+        response.setAgentAcceptedAt(entity.getAgentAcceptedAt());
+        response.setAgentFirstResponse(entity.getAgentFirstResponse());
+        response.setAgentFirstResponseAt(entity.getAgentFirstResponseAt());
+        response.setAgentLastResponseAt(entity.getAgentLastResponseAt());
+        response.setAgentClosedAt(entity.getAgentClosedAt());
+        response.setAgentClose(entity.getAgentClose());
+        response.setAgentAvgResponseLength(entity.getAgentAvgResponseLength());
+        response.setAgentMaxResponseLength(entity.getAgentMaxResponseLength());
+        response.setAgentMessageCount(entity.getAgentMessageCount());
+        response.setAgentTimeoutAt(entity.getAgentTimeoutAt());
+        response.setAgentTimeout(entity.getAgentTimeout());
+        response.setAgentTimeoutCount(entity.getAgentTimeoutCount());
+        response.setAgentOffline(entity.getAgentOffline());
+        response.setRobotAcceptType(entity.getRobotAcceptType());
+        response.setRobotAcceptedAt(entity.getRobotAcceptedAt());
+        response.setRobotFirstResponse(entity.getRobotFirstResponse());
+        response.setRobotFirstResponseAt(entity.getRobotFirstResponseAt());
+        response.setRobotLastResponseAt(entity.getRobotLastResponseAt());
+        response.setRobotClosedAt(entity.getRobotClosedAt());
+        response.setRobotAvgResponseLength(entity.getRobotAvgResponseLength());
+        response.setRobotMaxResponseLength(entity.getRobotMaxResponseLength());
+        response.setRobotMessageCount(entity.getRobotMessageCount());
+        response.setRobotTimeoutAt(entity.getRobotTimeoutAt());
+        response.setRobotTimeout(entity.getRobotTimeout());
+        response.setSystemFirstResponseAt(entity.getSystemFirstResponseAt());
+        response.setSystemLastResponseAt(entity.getSystemLastResponseAt());
+        response.setSystemClosedAt(entity.getSystemClosedAt());
+        response.setSystemClose(entity.getSystemClose());
+        response.setSystemMessageCount(entity.getSystemMessageCount());
+        response.setRated(entity.getRated());
+        response.setRateScore(entity.getRateScore());
+        response.setRateAt(entity.getRateAt());
+        response.setResolved(entity.getResolved());
+        response.setMessageLeave(entity.getMessageLeave());
+        response.setMessageLeaveAt(entity.getMessageLeaveAt());
+        response.setSummarized(entity.getSummarized());
+        response.setResolvedStatus(entity.getResolvedStatus());
+        response.setQualityChecked(entity.getQualityChecked());
+        response.setQualityCheckScore(entity.getQualityCheckScore());
+        response.setQualityCheckedAt(entity.getQualityCheckedAt());
+        response.setIntentionType(entity.getIntentionType());
+        response.setEmotionType(entity.getEmotionType());
+        response.setRobotToAgent(entity.getRobotToAgent());
+        response.setRobotToAgentAt(entity.getRobotToAgentAt());
+        response.setTransferStatus(entity.getTransferStatus());
+        response.setInviteStatus(entity.getInviteStatus());
+        
+        // 设置线程信息
+        response.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
+        
+        // 根据线程类型设置对应的队列
+        if (entity.getThread() != null && entity.getThread().getType() != null) {
+            if (entity.getThread().getType().equals(ThreadTypeEnum.AGENT.name())) {
+                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getAgentQueue()));
+            } else if (entity.getThread().getType().equals(ThreadTypeEnum.ROBOT.name())) {
+                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getRobotQueue()));
+            } else if (entity.getThread().getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+                response.setQueue(ServiceConvertUtils.convertToQueueResponse(entity.getWorkgroupQueue()));
+            }
+        }
+        
+        return response;
     }
     
 

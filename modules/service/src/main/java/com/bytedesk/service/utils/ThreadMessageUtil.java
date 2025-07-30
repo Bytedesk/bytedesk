@@ -254,9 +254,9 @@ public class ThreadMessageUtil {
                 // TODO: 发送主动推送消息
                 // sendProactiveMessage(userId, condition.getMessage());
             });
-
-        
     }
+
+    
 
 
 }
