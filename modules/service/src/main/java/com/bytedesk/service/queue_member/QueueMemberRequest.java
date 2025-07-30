@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:57:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-30 14:38:02
+ * @LastEditTime: 2025-07-30 15:13:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -137,8 +137,7 @@ public class QueueMemberRequest extends BaseRequest {
 
     // 直接在质检表里面根据threadUid查询是否已经质检
     // 是否已经质检
-    @Builder.Default
-    private Boolean qualityChecked = false;
+    private Boolean qualityChecked;
 
     // 质检结果
     private Integer qualityCheckScore;
