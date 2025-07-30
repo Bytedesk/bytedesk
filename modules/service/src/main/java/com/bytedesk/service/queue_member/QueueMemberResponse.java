@@ -310,6 +310,10 @@ public class QueueMemberResponse extends BaseResponse {
         return BdDateUtils.formatDatetimeToString(messageLeaveAt);
     }
 
+    public String getQualityCheckedAt() {
+        return BdDateUtils.formatDatetimeToString(qualityCheckedAt);
+    }
+
     public String getRobotToAgentAt() {
         return BdDateUtils.formatDatetimeToString(robotToAgentAt);
     }
