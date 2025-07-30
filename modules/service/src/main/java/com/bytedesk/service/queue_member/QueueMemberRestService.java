@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-18 09:24:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-30 21:53:11
+ * @LastEditTime: 2025-07-30 22:05:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadProcessStatusEnum;
@@ -63,11 +64,10 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     public Page<QueueMemberResponse> queryByUser(QueueMemberRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("user is null");
+            throw new NotLoginException("login required");
         }
         // set user uid
         request.setUserUid(user.getUid());
-        // 
         return queryByOrg(request);
     }
 
