@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 13:57:08
+ * @LastEditTime: 2025-07-30 09:21:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -237,21 +237,8 @@ public class FaqEntity extends BaseEntity {
                     return vipAnswer.getAnswer();
                 }
             }
-            
             // 如果没有完全匹配的，返回默认答案answer
             return answer;
-
-            // FaqAnswer highestMatch = null;
-            // for (FaqAnswer vipAnswer : answerList) {
-            //     if (vipAnswer.getVipLevel() < vipLevel && 
-            //         (highestMatch == null || vipAnswer.getVipLevel() > highestMatch.getVipLevel())) {
-            //         highestMatch = vipAnswer;
-            //     }
-            // }
-            
-            // if (highestMatch != null) {
-            //     return highestMatch.getAnswer();
-            // }
         }
         
         // 如果没有找到匹配的VIP答案，返回默认答案
