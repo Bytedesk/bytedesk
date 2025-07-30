@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-06 07:21:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 11:16:51
+ * @LastEditTime: 2025-07-30 14:32:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,9 +76,14 @@ public class QueueMemberSpecification extends BaseSpecification {
                 predicates.add(criteriaBuilder.like(root.get("thread").get("robot"), "%" + request.getRobotNickname() + "%"));
             }
             
-            // 根据client查询
+            // 根据channel查询
             if (StringUtils.hasText(request.getChannel())) {
                 predicates.add(criteriaBuilder.like(root.get("thread").get("channel"), "%" + request.getChannel() + "%"));
+            }
+
+            // qualityChecked
+            if (request.getQualityChecked() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("qualityChecked"), request.getQualityChecked()));
             }
 
             // startDate - 与 createdAt 对比搜索

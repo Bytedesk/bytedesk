@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-29 21:43:37
+ * @LastEditTime: 2025-07-30 14:38:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -252,6 +252,10 @@ public class QueueMemberEntity extends BaseEntity {
     // 质检结果
     @Column(name = "thread_quality_check_score")
     private Integer qualityCheckScore;
+
+    // 质检时间
+    @Column(name = "thread_quality_checked_at")
+    private ZonedDateTime qualityCheckedAt;
 
     // 意图类型
     @Builder.Default
