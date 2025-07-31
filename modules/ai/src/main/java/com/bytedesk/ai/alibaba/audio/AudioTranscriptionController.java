@@ -15,7 +15,6 @@
  */
 package com.bytedesk.ai.alibaba.audio;
 
-import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionModel;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeException;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -48,10 +47,9 @@ public class AudioTranscriptionController {
 
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-	public AudioTranscriptionController(AudioTranscriptionModel transcriptionModel) {
-
-		// this.transcriptionModel = transcriptionModel;
-	}
+	// public AudioTranscriptionController(AudioTranscriptionModel transcriptionModel) {
+	// 	// this.transcriptionModel = transcriptionModel;
+	// }
 
 	@GetMapping
 	public String stt() {

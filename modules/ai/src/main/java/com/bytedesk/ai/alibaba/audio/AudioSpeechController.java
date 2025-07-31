@@ -48,7 +48,6 @@ public class AudioSpeechController implements ApplicationRunner {
 	private static final String FILE_PATH = "spring-ai-alibaba-audio-example/dashscope-audio/src/main/resources/gen/tts";
 
 	// public AudioSpeechController(SpeechSynthesisModel speechSynthesisModel) {
-
 	// 	// this.speechSynthesisModel = speechSynthesisModel;
 	// }
 
