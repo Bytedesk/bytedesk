@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.bytedesk.ai.alibaba.audio;
-
 
 import jakarta.annotation.PreDestroy;
 import org.apache.commons.io.FileUtils;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +38,7 @@ import java.util.concurrent.CountDownLatch;
 
 @RestController
 @RequestMapping("/ai/speech")
+@ConditionalOnProperty(prefix = "spring.ai.dashscope.audio.synthesis", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class AudioSpeechController implements ApplicationRunner {
 
 	// private final SpeechSynthesisModel speechSynthesisModel;

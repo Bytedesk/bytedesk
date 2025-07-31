@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.bytedesk.ai.alibaba.audio;
 
 import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionModel;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeException;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +36,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @RestController
 @RequestMapping("/ai/transcription")
+@ConditionalOnProperty(prefix = "spring.ai.dashscope.audio.synthesis", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class AudioTranscriptionController {
 
 	// private final AudioTranscriptionModel transcriptionModel;
