@@ -35,6 +35,22 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid")
     Optional<QueueMemberEntity> findByThreadUid(@Param("threadUid") String threadUid);
 
+    // 统计指定组织在指定日期范围内的会话总数
+    @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.orgUid = :orgUid AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
+    Long countByOrgUidAndDateBetween(@Param("orgUid") String orgUid, @Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate);
+
+    // 统计指定工作组在指定日期范围内的会话总数
+    @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.orgUid = :orgUid AND qm.workgroupQueue IS NOT NULL AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
+    Long countByWorkgroupUidAndDateBetween(@Param("orgUid") String orgUid, @Param("workgroupUid") String workgroupUid, @Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate);
+
+    // 统计指定客服在指定日期范围内的会话总数
+    @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.thread.agent LIKE CONCAT('%', :agentUid, '%') AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
+    Long countByAgentUidAndDateBetween(@Param("agentUid") String agentUid, @Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate);
+
+    // 统计指定机器人在指定日期范围内的会话总数
+    @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.orgUid = :orgUid AND qm.robotQueue IS NOT NULL AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
+    Long countByRobotUidAndDateBetween(@Param("orgUid") String orgUid, @Param("robotUid") String robotUid, @Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate);
+
 //     List<QueueMemberEntity> findBySummaryStatus(String summaryStatus);
 
 //     List<QueueMemberEntity> findBySummaryStatusOrderByPriorityDesc(String summaryStatus);
