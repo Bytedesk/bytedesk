@@ -166,7 +166,7 @@
 
 #### 6.1.1 JMeter脚本结构
 
-```
+```bash
 jmeter/
   ├── scripts/
   │   ├── 01_login_test.jmx
