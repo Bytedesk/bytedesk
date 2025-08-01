@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 07:17:13
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 12:22:55
+ * @LastEditTime: 2025-08-01 10:00:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RobotEventListener {
 
     private final RobotRestService robotRestService;
+    
     private final UploadRestService uploadRestService;
 
     @Order(5)
@@ -51,9 +52,8 @@ public class RobotEventListener {
         // 为新创建组织创建一个默认机器人
         String robotUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
         robotRestService.initDefaultRobot(orgUid, robotUid);
-        //
-        String level = LevelEnum.ORGANIZATION.name();
         // 导入组织智能体
+        String level = LevelEnum.ORGANIZATION.name();
         robotRestService.initRobotJson(level, orgUid);
     }
 
