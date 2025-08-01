@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 13:10:59
+ * @LastEditTime: 2025-08-01 10:00:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,9 +32,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
 
     private final RobotRestService robotRestService;
 
-    private final AuthorityRestService authorityService;
-
-    // private final RobotRepository robotRepository;
+    private final AuthorityRestService authorityRestService;
     
     @Override
     public void afterSingletonsInstantiated() {
@@ -44,11 +42,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
     
     public void init() {
         log.info("Initializing robot data...");
-        // if (robotRepository.count() > 0) {
-        //     log.info("Robot data already initialized.");
-        //     return;
-        // }
-
+        // 
         String level = LevelEnum.PLATFORM.name();
         // 导入平台智能体
         robotRestService.initRobotJson(level, "");
@@ -65,7 +59,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = RobotPermissions.ROBOT_PREFIX + permission.name();
-            authorityService.createForPlatform(permissionValue);
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
 

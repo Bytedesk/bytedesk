@@ -198,6 +198,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return convertToResponse(updatedRobot);
     }
 
+    @Transactional
     public ThreadResponse createLlmThread(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
@@ -260,6 +261,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return threadRestService.convertToResponse(savedThread);
     }
 
+    @Transactional
     public ThreadResponse updateLlmThread(ThreadRequest request) {
         //
         String topic = request.getTopic();
