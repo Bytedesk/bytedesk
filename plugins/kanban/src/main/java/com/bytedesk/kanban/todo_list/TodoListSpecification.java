@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TodoListSpecification extends BaseSpecification {
+public class TodoListSpecification extends BaseSpecification<TodoListEntity, TodoListRequest> {
     
     public static Specification<TodoListEntity> search(TodoListRequest request) {
         log.info("request: {}", request);
