@@ -244,7 +244,7 @@ public class BytedeskProperties {
     }
 
     @Data
-    private static class Testing {
+    public static class Testing {
         private Boolean enabled = false;
         private Integer accountCount = 300;
         private String accountUsername = "test";
@@ -522,6 +522,10 @@ public class BytedeskProperties {
 
     public Boolean getMinioSecure() {
         return minio.getSecure();
+    }
+
+    public Testing getTesting() {
+        return testing;
     }
 
     public Boolean isAdmin(@NonNull String receiver) {
