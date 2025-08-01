@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 12:43:43
+ * @LastEditTime: 2025-08-01 13:28:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -169,7 +169,6 @@ public class UserService {
 
     @Transactional
     public UserResponse update(UserRequest request) {
-
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
@@ -235,7 +234,6 @@ public class UserService {
 
     @Transactional
     public UserResponse changePassword(UserRequest request) {
-
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
@@ -343,9 +341,10 @@ public class UserService {
                 .build();
         user.setUid(uidUtils.getUid());
         //
-        if (StringUtils.hasText(request.getUsername())) {
-            user.setUsername(request.getUsername());
-        } else if (StringUtils.hasText(request.getEmail())) {
+        // if (StringUtils.hasText(request.getUsername())) {
+        //     user.setUsername(request.getUsername());
+        // } else 
+        if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
         } else if (StringUtils.hasText(request.getMobile())) {
             user.setUsername(request.getMobile());
