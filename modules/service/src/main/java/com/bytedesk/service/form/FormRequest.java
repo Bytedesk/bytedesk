@@ -20,8 +20,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)

@@ -16,9 +16,11 @@ package com.bytedesk.ai.robot_message;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class RobotMessageExcel {
     
     @ExcelProperty(value = "内容")

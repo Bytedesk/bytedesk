@@ -17,10 +17,12 @@ import org.springframework.context.ApplicationEvent;
 
 import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class ServiceSettingsCreateEvent extends ApplicationEvent {
 

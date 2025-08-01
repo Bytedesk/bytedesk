@@ -16,12 +16,14 @@ package com.bytedesk.kbase.settings_service;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * https://github.com/alibaba/easyexcel
  */
-@Data
+@Getter
+@Setter
 public class ServiceSettingsExcel {
 
     @ExcelProperty(index = 0, value = "Name")
