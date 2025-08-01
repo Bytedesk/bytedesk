@@ -17,10 +17,12 @@ import org.springframework.context.ApplicationEvent;
 
 import com.bytedesk.kbase.material.MaterialEntity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class MaterialUpdateEvent extends ApplicationEvent {
 

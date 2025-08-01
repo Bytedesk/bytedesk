@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-13 20:16:13
+ * @LastEditTime: 2025-08-02 07:53:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,9 +40,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class TabooMessageRequest extends BaseRequest {
     
-    private String content;
+    // private String content;
 
-    private String type;
+    // private String type;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
@@ -50,12 +50,6 @@ public class TabooMessageRequest extends BaseRequest {
     private ZonedDateTime startDate;
 
     private ZonedDateTime endDate;
-
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
-
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
 
     private String categoryUid;
 

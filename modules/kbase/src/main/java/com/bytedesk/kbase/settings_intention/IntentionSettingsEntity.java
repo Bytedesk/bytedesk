@@ -33,15 +33,18 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Entity
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({IntentionSettingsEntityListener.class})
+@Entity
 @Table(name = "bytedesk_kbase_settings_intention")
 public class IntentionSettingsEntity extends BaseEntity {
 
