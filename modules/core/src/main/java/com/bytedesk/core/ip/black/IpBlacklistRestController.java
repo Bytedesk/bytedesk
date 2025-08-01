@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:17:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-06 10:45:14
+ * @LastEditTime: 2025-08-01 16:56:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,8 +54,10 @@ public class IpBlacklistRestController extends BaseRestController<IpBlacklistReq
 
     @Override
     public ResponseEntity<?> queryByUid(IpBlacklistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        IpBlacklistResponse response = ipBlacklistRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Operation(summary = "Create IP Blacklist Entry", description = "Add an IP address to the blacklist")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-17 15:18:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:36:09
+ * @LastEditTime: 2025-08-01 16:58:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.ip.white;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,25 +37,45 @@ public class IpWhitelistRestController extends BaseRestController<IpWhitelistReq
     @Operation(summary = "Query IP Whitelist by Organization", description = "Retrieve IP whitelist for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(IpWhitelistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipWhitelistRestService.queryByOrg(request)));
+
+        Page<IpWhitelistResponse> page = ipWhitelistRestService.queryByOrg(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
     }
 
     @Operation(summary = "Query IP Whitelist by User", description = "Retrieve IP whitelist for the current user")
     @Override
     public ResponseEntity<?> queryByUser(IpWhitelistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipWhitelistRestService.queryByUser(request)));
+
+        Page<IpWhitelistResponse> page = ipWhitelistRestService.queryByUser(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @Override
+    public ResponseEntity<?> queryByUid(IpWhitelistRequest request) {
+        
+        IpWhitelistResponse response = ipWhitelistRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Operation(summary = "Create IP Whitelist Entry", description = "Add an IP address to the whitelist")
     @Override
     public ResponseEntity<?> create(IpWhitelistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipWhitelistRestService.create(request)));
+
+        IpWhitelistResponse response = ipWhitelistRestService.create(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Operation(summary = "Update IP Whitelist Entry", description = "Update an existing IP whitelist entry")
     @Override
     public ResponseEntity<?> update(IpWhitelistRequest request) {
-        return ResponseEntity.ok(JsonResult.success(ipWhitelistRestService.update(request)));
+
+        IpWhitelistResponse response = ipWhitelistRestService.update(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @Operation(summary = "Delete IP Whitelist Entry", description = "Remove an IP address from the whitelist")
@@ -71,13 +92,5 @@ public class IpWhitelistRestController extends BaseRestController<IpWhitelistReq
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
-
-    @Override
-    public ResponseEntity<?> queryByUid(IpWhitelistRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
-    
 
 }
