@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 08:48:56
+ * @LastEditTime: 2025-08-01 09:25:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -231,7 +231,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return visitorRepository.updateStatusByUid(uid, newStatus);
     }
 
-    @CachePut(value = "visitor", key = "#entity.uid")
+    @CachePut(value = "visitor", key = "#entity.uid", unless = "#entity == null")
     @Override
     protected VisitorEntity doSave(VisitorEntity entity) {
         return visitorRepository.save(entity);

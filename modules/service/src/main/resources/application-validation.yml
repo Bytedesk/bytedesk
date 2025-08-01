@@ -1,0 +1,12 @@
+# 参数验证配置
+bytedesk:
+  validation:
+    nonnull:
+      # 是否启用 @NonNull 参数验证
+      enabled: true
+      # 是否抛出异常（false 时只记录日志）
+      throw-exception: true
+      # 日志级别：ERROR, WARN, INFO, DEBUG
+      log-level: WARN
+      # 是否包含参数值在日志中（生产环境建议关闭）
+      include-parameter-values: false 
