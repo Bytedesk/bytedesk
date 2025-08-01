@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 12:19:08
+ * @LastEditTime: 2025-08-01 12:43:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,6 +37,7 @@ import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
+import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
 // import com.bytedesk.core.rbac.auth.AuthUser;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -342,7 +343,9 @@ public class UserService {
                 .build();
         user.setUid(uidUtils.getUid());
         //
-        if (StringUtils.hasText(request.getEmail())) {
+        if (StringUtils.hasText(request.getUsername())) {
+            user.setUsername(request.getUsername());
+        } else if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
         } else if (StringUtils.hasText(request.getMobile())) {
             user.setUsername(request.getMobile());
@@ -364,7 +367,9 @@ public class UserService {
         return addRoleMember(user);
     }
 
-    public UserEntity updateUserRolesFromMember(UserEntity user, Set<String> roleUids) {
+    public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
+        Set<String> roleUids = request.getRoleUids();
+
         // 首先判断是否有变化，如果无变化则不更新
         if (user.getRoleUids() != null && user.getRoleUids().equals(roleUids)) {
             return user;
@@ -399,13 +404,7 @@ public class UserService {
             }
         }
 
-        // 使用直接的repository调用而非包装方法
-        try {
-            return userRepository.save(user);
-        } catch (Exception e) {
-            log.error("Failed to update user roles from member", e);
-            throw new RuntimeException("User role update failed", e);
-        }
+        return save(user);
     }
 
     // add/remove role methods

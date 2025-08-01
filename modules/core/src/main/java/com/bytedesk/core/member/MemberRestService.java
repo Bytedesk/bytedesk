@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 12:25:03
+ * @LastEditTime: 2025-08-01 12:33:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -206,7 +206,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         member.setRoleUids(request.getRoleUids());
         // 
         UserEntity user = member.getUser();
-        userService.updateUserRolesFromMember(user, request.getRoleUids());
+        userService.updateUserFromMember(user, request);
         //
         MemberEntity savedMember = save(member);
         if (savedMember == null) {
@@ -215,7 +215,6 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
  
         return convertToResponse(savedMember);
     }
-
 
     // activate
     @Transactional
