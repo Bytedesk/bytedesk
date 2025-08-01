@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 12:13:06
+ * @LastEditTime: 2025-08-01 15:39:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -200,7 +200,6 @@ public class VisitorRestControllerVisitor {
         
         // 延长超时时间至10分钟
         SseEmitter emitter = new SseEmitter(600_000L);
-        
         // 添加心跳机制，每30秒发送一个保活消息
         // KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
         
@@ -236,7 +235,6 @@ public class VisitorRestControllerVisitor {
         
         // 延长超时时间至10分钟
         SseEmitter emitter = new SseEmitter(600_000L);
-        
         // 添加心跳机制，每30秒发送一个保活消息
         // KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
         

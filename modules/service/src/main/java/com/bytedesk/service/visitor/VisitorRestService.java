@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 09:25:40
+ * @LastEditTime: 2025-08-01 15:39:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,7 +53,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
 
     private final UidUtils uidUtils;
 
-    private final ThreadRoutingContext csThreadCreationContext;
+    private final ThreadRoutingContext threadCreationContext;
 
     @Override
     public Page<VisitorEntity> queryByOrgEntity(VisitorRequest request) {
@@ -144,7 +144,6 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         if (!StringUtils.hasText(request.getVisitorUid())) {
             request.setVisitorUid(request.getUid());
         }
-        // 
         log.info("request {}", request);
         VisitorEntity visitor = modelMapper.map(request, VisitorEntity.class);
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
@@ -200,7 +199,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     }
 
     public MessageProtobuf requestThread(VisitorRequest request) {
-        return csThreadCreationContext.createCsThread(request);
+        return threadCreationContext.createCsThread(request);
     }
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
