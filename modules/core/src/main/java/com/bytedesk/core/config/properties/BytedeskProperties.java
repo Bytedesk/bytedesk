@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-27 22:53:32
+ * @LastEditTime: 2025-08-01 16:28:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -247,7 +247,7 @@ public class BytedeskProperties {
     public static class Testing {
         private Boolean enabled = false;
         private Integer accountCount = 300;
-        private String accountUsername = "test";
+        private String accountUsername = "test_user";
         private String accountPassword = "password";
         private Boolean disableCaptcha = true;
         private Boolean disableIpFilter = true;
@@ -526,6 +526,22 @@ public class BytedeskProperties {
 
     public Testing getTesting() {
         return testing;
+    }
+
+    /**
+     * 检查是否启用性能测试模式
+     * @return 如果启用性能测试且禁用IP过滤，返回true；否则返回false
+     */
+    public boolean isPerformanceTestingEnabled() {
+        try {
+            return testing != null && 
+                   Boolean.TRUE.equals(testing.getEnabled()) && 
+                   Boolean.TRUE.equals(testing.getDisableIpFilter());
+        } catch (Exception e) {
+            // 记录错误但不抛出异常，避免影响其他功能
+            System.err.println("Error checking performance testing configuration: " + e.getMessage());
+            return false;
+        }
     }
 
     public Boolean isAdmin(@NonNull String receiver) {
