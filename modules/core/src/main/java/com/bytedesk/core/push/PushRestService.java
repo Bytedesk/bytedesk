@@ -31,13 +31,13 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
-import com.bytedesk.core.ip.IpService;
-import com.bytedesk.core.ip.IpUtils;
+import com.bytedesk.core.ip_access.IpService;
 import com.bytedesk.core.push.sms.PushServiceImplSms;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;

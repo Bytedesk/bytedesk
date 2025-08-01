@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 12:49:47
+ * @LastEditTime: 2025-08-01 21:56:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip_access;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,14 +33,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/ip/api/v1")
+@RequestMapping("/visitor/api/v1/ip")
 @Tag(name = "IP Management", description = "IP address management and location services APIs")
-public class IpRestController {
+public class IpAccessRestControllerVisitor {
 
     private final IpService ipService;
 
     /**
-     * http://127.0.0.1:9003/ip/api/v1/
+     * http://127.0.0.1:9003/visitor/api/v1/ip/
      *
      * @return json
      */
@@ -50,8 +51,8 @@ public class IpRestController {
     }
 
     /**
-     * http://127.0.0.1:9003/ip/api/v1/location
-     * https://api.weiyuai.cn/ip/api/v1/location
+     * http://127.0.0.1:9003/visitor/api/v1/ip/location
+     * https://api.weiyuai.cn/visitor/api/v1/ip/location
      * location: "国家|区域|省份|城市|ISP"
      * location: "中国|0|湖北省|武汉市|联通"，缺省的地域信息默认是0。
      * 
@@ -74,7 +75,7 @@ public class IpRestController {
     }
 
     /**
-     * http://127.0.0.1:9003/ip/api/v1/ip/location?ip=202.106.212.226
+     * http://127.0.0.1:9003/visitor/api/v1/ip/ip/location?ip=202.106.212.226
      * 
      * @param request
      * @return
@@ -94,12 +95,12 @@ public class IpRestController {
         return new JsonResult<>("ip location", 200, jsonObject);
     }
 
-    // http://127.0.0.1:9003/ip/api/v1/ip/inrange?ip=192.168.1.100
+    // http://127.0.0.1:9003/visitor/api/v1/ip/ip/range?ip=192.168.1.100
     @Operation(summary = "Check IP in Range", description = "Check if an IP address is within a specific range")
-    @GetMapping("/ip/inrange")
+    @GetMapping("/ip/range")
     public JsonResult<?> ipInRange(@RequestParam String ip) {
 
-        boolean isInRange = IpService.testIsIpInRange(ip);
+        boolean isInRange = IpUtils.testIsIpInRange(ip);
         //
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ip", ip);
@@ -109,7 +110,7 @@ public class IpRestController {
     }
 
     // for testing
-    // http://127.0.0.1:9003/ip/api/v1/ip/province?ip=202.106.212.226
+    // http://127.0.0.1:9003/visitor/api/v1/ip/ip/province?ip=202.106.212.226
     @Operation(summary = "Get IP Province", description = "Get province information for a specific IP address")
     @GetMapping("/ip/province")
     public JsonResult<?> ipProvince(@RequestParam String ip) {
@@ -140,7 +141,7 @@ public class IpRestController {
     /**
      * comment out for safety reason
      * server host info
-     * http://127.0.0.1:9003/ip/api/v1/server
+     * http://127.0.0.1:9003/api/v1/ip/server
      * @return
      */
     // @GetMapping("/server")

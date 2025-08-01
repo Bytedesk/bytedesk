@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-16 13:28:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 12:49:44
+ * @LastEditTime: 2025-08-01 21:57:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,15 +11,14 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip;
+package com.bytedesk.core.ip_access;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.IpUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,43 +70,7 @@ public class IpService {
         return false;
     }
 
-    // 将IPv4地址转换为长整型
-    public static long ipToLong(InetAddress ip) {
-        byte[] octets = ip.getAddress();
-        ByteBuffer buffer = ByteBuffer.wrap(octets);
-        return buffer.getInt() & 0xFFFFFFFFL; // Ensure positive value
-    }
-
-    // 检查IP是否在指定的范围内
-    public static boolean isIpInRange(InetAddress ip, InetAddress rangeStart, InetAddress rangeEnd) {
-        long ipValue = ipToLong(ip);
-        long rangeStartValue = ipToLong(rangeStart);
-        long rangeEndValue = ipToLong(rangeEnd);
-
-        return ipValue >= rangeStartValue && ipValue <= rangeEndValue;
-    }
-
-    public static boolean testIsIpInRange(String ip) {
-
-        InetAddress ipToCheck;
-        try {
-            ipToCheck = InetAddress.getByName(ip);
-            InetAddress rangeStart = InetAddress.getByName("192.168.1.1");
-            InetAddress rangeEnd = InetAddress.getByName("192.168.1.254");
-
-            if (isIpInRange(ipToCheck, rangeStart, rangeEnd)) {
-                log.info("The IP is within the specified range.");
-                return true;
-            } else {
-                log.info("The IP is not within the specified range.");
-                return false;
-            }
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return false;
-    }
+    
 
     // TODO: 昵称国际化：英语、中文、繁体、日文
     public String createVisitorNickname(HttpServletRequest request) {
@@ -131,27 +94,5 @@ public class IpService {
 
         return "Visitor";
     }
-
-    // Optional<IpEntity> findByUid(String uid) {
-    //     return ipRepository.findByUid(uid);
-    // }
-
-    // Optional<IpEntity> findByOrgUid(String orgUid) {
-    //     return ipRepository.findFirstByOrgUid(orgUid);
-    // }
-
-    // private IpEntity save(IpEntity ip) {
-    //     try {
-    //         return ipRepository.save(ip);
-    //     } catch (Exception e) {
-    //         // TODO: handle exception
-    //         e.printStackTrace();
-    //     }
-    //     return null;
-    // }
-
-    // public IpResponse convertToResponse(IpEntity ip) {
-    //     return modelMapper.map(ip, IpResponse.class);
-    // }
 
 }

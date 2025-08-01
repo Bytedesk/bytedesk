@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:17:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-15 16:26:11
+ * @LastEditTime: 2025-08-01 21:56:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,18 +11,18 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip;
+package com.bytedesk.core.utils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class IpUtils {
-
-    private IpUtils() {
-    }
     
     // 正则表达式用于匹配IPv4地址
     private static final String IPV4_PATTERN = "(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
@@ -156,6 +156,44 @@ public class IpUtils {
             e.printStackTrace();
         }
         return "0.0.0.0";
+    }
+
+    // 将IPv4地址转换为长整型
+    public static long ipToLong(InetAddress ip) {
+        byte[] octets = ip.getAddress();
+        ByteBuffer buffer = ByteBuffer.wrap(octets);
+        return buffer.getInt() & 0xFFFFFFFFL; // Ensure positive value
+    }
+
+    // 检查IP是否在指定的范围内
+    public static boolean isIpInRange(InetAddress ip, InetAddress rangeStart, InetAddress rangeEnd) {
+        long ipValue = ipToLong(ip);
+        long rangeStartValue = ipToLong(rangeStart);
+        long rangeEndValue = ipToLong(rangeEnd);
+
+        return ipValue >= rangeStartValue && ipValue <= rangeEndValue;
+    }
+
+    public static boolean testIsIpInRange(String ip) {
+
+        InetAddress ipToCheck;
+        try {
+            ipToCheck = InetAddress.getByName(ip);
+            InetAddress rangeStart = InetAddress.getByName("192.168.1.1");
+            InetAddress rangeEnd = InetAddress.getByName("192.168.1.254");
+
+            if (isIpInRange(ipToCheck, rangeStart, rangeEnd)) {
+                // log.info("The IP is within the specified range.");
+                return true;
+            } else {
+                // log.info("The IP is not within the specified range.");
+                return false;
+            }
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

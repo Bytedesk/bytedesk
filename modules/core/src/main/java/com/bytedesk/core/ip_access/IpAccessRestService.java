@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip_black.IpBlackEntity;
 import com.bytedesk.core.ip_black.IpBlackRestService;
 import com.bytedesk.core.ip_white.IpWhiteRepository;

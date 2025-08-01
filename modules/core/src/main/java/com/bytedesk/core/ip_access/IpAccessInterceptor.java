@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.bytedesk.core.ip.IpUtils;
+import com.bytedesk.core.utils.IpUtils;
 
 @Component
 public class IpAccessInterceptor implements HandlerInterceptor {
