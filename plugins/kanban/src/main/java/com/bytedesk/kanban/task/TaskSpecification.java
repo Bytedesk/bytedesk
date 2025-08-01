@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TaskSpecification extends BaseSpecification {
+public class TaskSpecification extends BaseSpecification<TaskEntity, TaskRequest> {
     
     public static Specification<TaskEntity> search(TaskRequest request) {
         log.info("request: {}", request);

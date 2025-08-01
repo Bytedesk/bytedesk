@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CommentSpecification extends BaseSpecification {
+public class CommentSpecification extends BaseSpecification<CommentEntity, CommentRequest> {
     
     public static Specification<CommentEntity> search(CommentRequest request) {
         log.info("request: {}", request);

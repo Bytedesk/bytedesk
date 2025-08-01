@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.utils.BdDateUtils;
 
 @Slf4j
-public class FaqSpecification extends BaseSpecification {
+public class FaqSpecification extends BaseSpecification<FaqEntity, FaqRequest> {
 
     public static Specification<FaqEntity> search(FaqRequest request) {
         // log.info("request: {}", request);
