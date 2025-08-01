@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:15:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 21:56:57
+ * @LastEditTime: 2025-08-01 22:11:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.ip_access;
+package com.bytedesk.core.ip;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +29,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * for testing
  */
 @Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/visitor/api/v1/ip")
 @Tag(name = "IP Management", description = "IP address management and location services APIs")
-public class IpAccessRestControllerVisitor {
+public class IpRestControllerVisitor {
 
     private final IpService ipService;
 
@@ -45,7 +46,7 @@ public class IpAccessRestControllerVisitor {
      * @return json
      */
     @Operation(summary = "Get Client IP", description = "Get the client's IP address")
-    @GetMapping({"", "/"})
+    @GetMapping({ "", "/" })
     public JsonResult<?> ip(HttpServletRequest request) {
         return new JsonResult<>("your ip", 200, IpUtils.getClientIp(request));
     }
@@ -66,11 +67,11 @@ public class IpAccessRestControllerVisitor {
         String ip = IpUtils.getClientIp(request);
         // location: "中国|0|湖北省|武汉市|联通"
         String location = ipService.getIpLocation(ip);
-        // 
+        //
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ip", ip);
         jsonObject.put("location", location);
-        // 
+        //
         return new JsonResult<>("your ip location", 200, jsonObject);
     }
 
@@ -87,7 +88,7 @@ public class IpAccessRestControllerVisitor {
         // location: "国家|区域|省份|城市|ISP"
         // location: "中国|0|湖北省|武汉市|联通"
         String location = ipService.getIpLocation(ip);
-        // 
+        //
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ip", ip);
         jsonObject.put("location", location);
@@ -119,9 +120,10 @@ public class IpAccessRestControllerVisitor {
         // location: "中国|0|湖北省|武汉市|联通"
         // 0|0|0|内网IP|内网IP
         String location = ipService.getIpLocation(ip);
-        // 
+        //
         String[] locals = location.split("\\|");
-        log.info("location {} locals {}", location, (Object[]) locals); // Cast to Object[] to confirm the non-varargs invocation
+        log.info("location {} locals {}", location, (Object[]) locals); // Cast to Object[] to confirm the non-varargs
+                                                                        // invocation
         String province = "";
         if (locals.length > 2) {
             if (locals[2].equals("0")) {
@@ -142,20 +144,20 @@ public class IpAccessRestControllerVisitor {
      * comment out for safety reason
      * server host info
      * http://127.0.0.1:9003/api/v1/ip/server
+     * 
      * @return
      */
     // @GetMapping("/server")
     // public JsonResult<?> ipServer() {
 
-    //     String serverIp = IpUtils.getServerIp();
-    //     String serverHostname = IpUtils.hostname();
-    //     // 
-    //     JSONObject jsonObject = new JSONObject();
-    //     jsonObject.put("ip", serverIp);
-    //     jsonObject.put("hostname", serverHostname);
-    //     // 
-    //     return new JsonResult<>("server info", 200, jsonObject);
+    // String serverIp = IpUtils.getServerIp();
+    // String serverHostname = IpUtils.hostname();
+    // //
+    // JSONObject jsonObject = new JSONObject();
+    // jsonObject.put("ip", serverIp);
+    // jsonObject.put("hostname", serverHostname);
+    // //
+    // return new JsonResult<>("server info", 200, jsonObject);
     // }
-
 
 }

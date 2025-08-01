@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 21:45:55
+ * @LastEditTime: 2025-08-01 22:08:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,21 +15,14 @@
 package com.bytedesk.core.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-// import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.bytedesk.core.ip_access.IpAccessInterceptor;
 
-// import com.bytedesk.core.config.BytedeskProperties;
-
-// import lombok.extern.slf4j.Slf4j;
-
-// @Slf4j
 @Configuration
 @Description("Web MVC Configuration - Web MVC配置类，配置跨域、拦截器、消息转换器等")
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -46,9 +39,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private IpAccessInterceptor ipAccessInterceptor;
 
-//     @Autowired
-//     private BlackAccessInterceptor visitorAccessInterceptor;
-
     /**
      * @{VisitorAnonymousController}
      */
@@ -57,27 +47,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 注册IP访问拦截器
         registry.addInterceptor(ipAccessInterceptor)
                 .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
-                
-        // 注册Visitor访问拦截器，只拦截visitor相关接口
-        // registry.addInterceptor(visitorAccessInterceptor)
-                // .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
     }
-
-    /**
-     * 跨域配置: 允许跨域访问
-     * 在 CorsConfig.java中配置，此处没有必要？
-     */
-    // https://spring.io/guides/gs/rest-service-cors
-    // @Override
-    // public void addCorsMappings(CorsRegistry registry) {
-    // //
-    // registry.addMapping("/**")
-    // .allowedMethods("*")
-    // .allowedOriginPatterns("*")
-    // // allow cookies
-    // .allowCredentials(true);
-    // }
-
+    
     /**
      * https://www.baeldung.com/spring-mvc-static-resources
      * spring.mvc.static-path-pattern=/**
@@ -85,9 +56,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // for (String path : CLASSPATH_RESOURCE_LOCATIONS) {
-        // log.info("CLASSPATH_RESOURCE_LOCATIONS: {}", path);
-        // }
         registry.addResourceHandler("/**")
                 .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
     }

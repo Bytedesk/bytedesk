@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-19 11:39:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-29 17:10:13
+ * @LastEditTime: 2025-08-01 22:09:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,33 +43,12 @@ public class CorsConfig {
         // configuration.setAllowedOriginPatterns(List.of("*")); // 不能启用
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
-        // configuration.setAllowedMethods(List.of("GET", "POST", "PUT", DELETE,
-        // "OPTIONS"));
+        // configuration.setAllowedMethods(List.of("GET", "POST", "PUT", DELETE, "OPTIONS"));
         // configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         //
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-    // @Bean
-    // public CorsFilter corsFilter() {
-    // log.info("CorsConfig.corsFilter()");
-    // CorsConfiguration corsConfiguration = new CorsConfiguration();
-    // //1,允许任何来源
-    // corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
-    // //2,允许任何请求头
-    // corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-    // //3,允许任何方法
-    // corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
-    // //4,允许凭证
-    // corsConfiguration.setAllowCredentials(true);
-    // //
-    // UrlBasedCorsConfigurationSource source = new
-    // UrlBasedCorsConfigurationSource();
-    // source.registerCorsConfiguration("/**", corsConfiguration);
-    // //
-    // return new CorsFilter(source);
-    // }
 
 }

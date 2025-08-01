@@ -27,7 +27,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.annotation.ActionAnnotation;
-import com.bytedesk.core.ip_access.IpService;
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.utils.IpUtils;
 
 import jakarta.servlet.http.HttpServletRequest;

@@ -34,7 +34,7 @@ import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
-import com.bytedesk.core.ip_access.IpService;
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRequest;

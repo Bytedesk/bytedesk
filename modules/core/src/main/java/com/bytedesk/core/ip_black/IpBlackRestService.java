@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.black.BlackEntity;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.ip_access.IpService;
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;

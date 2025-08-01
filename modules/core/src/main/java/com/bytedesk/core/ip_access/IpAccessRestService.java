@@ -27,6 +27,7 @@ import com.bytedesk.core.ip_black.IpBlackRestService;
 import com.bytedesk.core.ip_white.IpWhiteRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
