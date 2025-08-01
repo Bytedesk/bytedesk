@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
@@ -32,16 +33,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ThreadSpecification extends BaseSpecification {
 
-    public static Specification<ThreadEntity> search(ThreadRequest request) {
+    public static Specification<ThreadEntity> search(ThreadRequest request, AuthService authService) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder,request.getOrgUid()));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 如果前端设置了isSuperUser标志，则不需要过滤orgUid
-            if (!Boolean.TRUE.equals(request.getIsSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-            }
+            // 使用基类方法处理超级管理员权限和组织过滤
+            addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             
             // 仅当mergeByTopic为true时才应用topic合并逻辑
             if (Boolean.TRUE.equals(request.getMergeByTopic())) {

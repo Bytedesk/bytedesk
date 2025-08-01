@@ -53,20 +53,8 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
 
     @Override
     public Page<MessageEntity> queryByOrgEntity(MessageRequest request) {
-        // 如果前端设置了isSuperUser标志，则需要判断一下，当前用户是否是超级管理员
-        if (Boolean.TRUE.equals(request.getIsSuperUser())) {
-            UserEntity user = authService.getUser();
-            if (user == null) {
-                throw new NotLoginException("login first");
-            }
-            if (!user.isSuperUser()) {
-                // 如果是不是超级管理员，则设置为false
-                request.setIsSuperUser(false);
-            }
-        }
-        // 
         Pageable pageable = request.getPageable();
-        Specification<MessageEntity> specs = MessageSpecification.search(request);
+        Specification<MessageEntity> specs = MessageSpecification.search(request, authService);
         return messageRepository.findAll(specs, pageable);
     }
 
