@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AutoReplyKeywordSpecification extends BaseSpecification {
+public class AutoReplyKeywordSpecification extends BaseSpecification<AutoReplyKeywordEntity, AutoReplyKeywordRequest> {
     
     public static Specification<AutoReplyKeywordEntity> search(AutoReplyKeywordRequest request) {
         // log.info("request: {}", request);

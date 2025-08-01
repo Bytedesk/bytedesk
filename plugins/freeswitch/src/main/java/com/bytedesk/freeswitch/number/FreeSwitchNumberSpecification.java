@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FreeSwitchNumberSpecification extends BaseSpecification {
+public class FreeSwitchNumberSpecification extends BaseSpecification<FreeSwitchNumberEntity, FreeSwitchNumberRequest> {
     
     public static Specification<FreeSwitchNumberEntity> search(FreeSwitchNumberRequest request) {
         log.info("request: {}", request);

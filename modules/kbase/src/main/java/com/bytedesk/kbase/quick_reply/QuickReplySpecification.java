@@ -27,7 +27,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class QuickReplySpecification extends BaseSpecification {
+public class QuickReplySpecification extends BaseSpecification<QuickReplyEntity, QuickReplyRequest> {
 
     public static Specification<QuickReplyEntity> search(QuickReplyRequest request) {
         log.info("request: {}", request);

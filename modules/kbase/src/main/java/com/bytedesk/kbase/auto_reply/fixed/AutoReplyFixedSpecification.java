@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AutoReplyFixedSpecification extends BaseSpecification {
+public class AutoReplyFixedSpecification extends BaseSpecification<AutoReplyFixedEntity, AutoReplyFixedRequest> {
     
     public static Specification<AutoReplyFixedEntity> search(AutoReplyFixedRequest request) {
         // log.info("request: {}", request);

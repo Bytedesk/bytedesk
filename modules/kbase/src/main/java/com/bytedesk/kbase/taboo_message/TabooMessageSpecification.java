@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TabooMessageSpecification extends BaseSpecification {
+public class TabooMessageSpecification extends BaseSpecification<TabooMessageEntity, TabooMessageRequest> {
     
     public static Specification<TabooMessageEntity> search(TabooMessageRequest request) {
         log.info("request: {}", request);

@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FreeSwitchCdrSpecification extends BaseSpecification {
+public class FreeSwitchCdrSpecification extends BaseSpecification<FreeSwitchCdrEntity, FreeSwitchCdrRequest> {
     
     public static Specification<FreeSwitchCdrEntity> search(FreeSwitchCdrRequest request) {
         log.info("request: {}", request);

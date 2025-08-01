@@ -29,7 +29,7 @@ import java.util.List;
  * FreeSwitch网关查询规格
  */
 @Slf4j
-public class FreeSwitchGatewaySpecification extends BaseSpecification {
+public class FreeSwitchGatewaySpecification extends BaseSpecification<FreeSwitchGatewayEntity, FreeSwitchGatewayRequest> {
 
     /**
      * 查询规格

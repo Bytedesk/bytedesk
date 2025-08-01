@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MaterialSpecification extends BaseSpecification {
+public class MaterialSpecification extends BaseSpecification<MaterialEntity, MaterialRequest> {
     
     public static Specification<MaterialEntity> search(MaterialRequest request) {
         log.info("request: {}", request);

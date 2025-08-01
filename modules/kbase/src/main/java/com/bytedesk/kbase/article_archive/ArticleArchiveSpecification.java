@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ArticleArchiveSpecification extends BaseSpecification {
+public class ArticleArchiveSpecification extends BaseSpecification<ArticleArchiveEntity, ArticleArchiveRequest> {
 
     public static Specification<ArticleArchiveEntity> search(ArticleArchiveRequest request) {
         log.info("request: {}", request);
