@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class IntentionSettingsSpecification extends BaseSpecification {
+public class IntentionSettingsSpecification extends BaseSpecification<IntentionSettingsEntity, IntentionSettingsRequest> {
     
     public static Specification<IntentionSettingsEntity> search(IntentionSettingsRequest request) {
         log.info("request: {}", request);

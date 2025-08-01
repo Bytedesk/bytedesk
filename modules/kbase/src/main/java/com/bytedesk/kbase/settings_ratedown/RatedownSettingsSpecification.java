@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RatedownSettingsSpecification extends BaseSpecification {
+public class RatedownSettingsSpecification extends BaseSpecification<RatedownSettingsEntity, RatedownSettingsRequest> {
     
     public static Specification<RatedownSettingsEntity> search(RatedownSettingsRequest request) {
         log.info("request: {}", request);

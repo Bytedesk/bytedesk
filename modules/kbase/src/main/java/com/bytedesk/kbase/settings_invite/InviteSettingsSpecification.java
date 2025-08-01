@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InviteSettingsSpecification extends BaseSpecification {
+public class InviteSettingsSpecification extends BaseSpecification<InviteSettingsEntity, InviteSettingsRequest> {
     
     public static Specification<InviteSettingsEntity> search(InviteSettingsRequest request) {
         log.info("request: {}", request);

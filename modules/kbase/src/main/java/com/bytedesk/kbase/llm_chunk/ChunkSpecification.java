@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ChunkSpecification extends BaseSpecification {
+public class ChunkSpecification extends BaseSpecification<ChunkEntity, ChunkRequest> {
     
     public static Specification<ChunkEntity> search(ChunkRequest request) {
         log.info("request: {}", request);

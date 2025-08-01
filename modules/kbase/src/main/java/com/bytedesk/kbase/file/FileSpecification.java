@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FileSpecification extends BaseSpecification {
+public class FileSpecification extends BaseSpecification<FileEntity, FileRequest> {
     
     public static Specification<FileEntity> search(FileRequest request) {
         log.info("request: {}", request);
