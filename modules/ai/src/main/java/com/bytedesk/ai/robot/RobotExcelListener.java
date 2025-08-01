@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-30 21:02:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 12:18:58
+ * @LastEditTime: 2025-08-01 10:33:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,10 +82,6 @@ public class RobotExcelListener implements ReadListener<RobotExcel> {
      * 加上存储数据库
      */
     private void saveData() {
-        // if (cachedDataList.size() > 0) {
-        //     // 删除第一行标头
-        //     cachedDataList.remove(0);
-        // }
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
         robotRestService.save(cachedDataList);
         log.info("存储数据库成功！");
