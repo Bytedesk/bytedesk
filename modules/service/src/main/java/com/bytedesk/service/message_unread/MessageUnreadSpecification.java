@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MessageUnreadSpecification extends BaseSpecification {
+public class MessageUnreadSpecification extends BaseSpecification<MessageUnreadEntity, MessageUnreadRequest> {
 
     public static Specification<MessageUnreadEntity> search(MessageUnreadRequest request) {
         return (root, query, criteriaBuilder) -> {

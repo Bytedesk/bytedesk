@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TemplateSpecification extends BaseSpecification {
+public class TemplateSpecification extends BaseSpecification<TemplateEntity, TemplateRequest> {
     
     public static Specification<TemplateEntity> search(TemplateRequest request) {
         log.info("request: {}", request);

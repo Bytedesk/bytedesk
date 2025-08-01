@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ChannelAppSpecification extends BaseSpecification {
+public class ChannelAppSpecification extends BaseSpecification<ChannelAppEntity, ChannelAppRequest> {
     
     public static Specification<ChannelAppEntity> search(ChannelAppRequest request) {
         log.info("request: {}", request);
