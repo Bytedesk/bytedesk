@@ -24,9 +24,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.experimental.Accessors;
 
-@Data
-@SuperBuilder
+@Getter
+@Setter
+@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor

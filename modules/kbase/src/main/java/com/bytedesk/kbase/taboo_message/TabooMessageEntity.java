@@ -23,18 +23,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.Setter;
 
 
-@Entity
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-// @NoArgsConstructor
-@EntityListeners({TabooMessageEntityListener.class})
+@NoArgsConstructor
+@Entity
 @Table(name = "bytedesk_kbase_taboo_message")
-public class TabooMessageEntity  extends AbstractMessageEntity  {
+public class TabooMessageEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
