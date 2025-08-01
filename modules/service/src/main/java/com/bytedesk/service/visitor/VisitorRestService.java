@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 09:31:20
+ * @LastEditTime: 2025-08-01 08:48:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -204,7 +205,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<VisitorEntity> findByUid(String uid) {
+    public Optional<VisitorEntity> findByUid(@NonNull String uid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(uid)) {
             return Optional.empty();
@@ -214,7 +215,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     
     @Transactional
     @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
-    public Optional<VisitorEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
+    public Optional<VisitorEntity> findByVisitorUidAndOrgUid(@NonNull String visitorUid, @NonNull String orgUid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(visitorUid) || !StringUtils.hasText(orgUid)) {
             return Optional.empty();
@@ -222,11 +223,11 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         return visitorRepository.findByVisitorUidAndOrgUidAndDeleted(visitorUid, orgUid, false);
     }
 
-    public List<VisitorEntity> findByStatus(String status) {
+    public List<VisitorEntity> findByStatus(@NonNull String status) {
         return visitorRepository.findByStatusAndDeleted(status, false);
     }
 
-    public int updateStatus(String uid, String newStatus) {
+    public int updateStatus(@NonNull String uid, @NonNull String newStatus) {
         return visitorRepository.updateStatusByUid(uid, newStatus);
     }
 
