@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 21:41:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-07-09 22:09:15
+ * @LastEditTime: 2025-08-01 23:33:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class PushSpecification extends BaseSpecification {
+public class PushSpecification extends BaseSpecification<PushEntity, PushRequest> {
     
     public static Specification<PushEntity> search(PushRequest request) {
         log.info("request: {}", request);

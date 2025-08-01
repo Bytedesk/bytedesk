@@ -23,7 +23,7 @@ import com.bytedesk.core.base.BaseSpecification;
 
 import jakarta.persistence.criteria.Predicate;
 
-public class ActionSpecification extends BaseSpecification {
+public class ActionSpecification extends BaseSpecification<ActionEntity, ActionRequest> {
 
     public static Specification<ActionEntity> search(ActionRequest request) {
         return (root, query, criteriaBuilder) -> {

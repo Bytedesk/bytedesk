@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 11:15:25
+ * @LastEditTime: 2025-08-01 23:35:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WorkflowSpecification extends BaseSpecification {
+public class WorkflowSpecification extends BaseSpecification<WorkflowEntity, WorkflowRequest> {
     
     public static Specification<WorkflowEntity> search(WorkflowRequest request) {
         // log.info("request: {}", request);

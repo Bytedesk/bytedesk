@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:29:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-08 07:24:42
+ * @LastEditTime: 2025-08-01 23:33:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import com.bytedesk.core.base.BaseSpecification;
 
 import jakarta.persistence.criteria.Predicate;
 
-public class NoticeSpecification extends BaseSpecification {
+public class NoticeSpecification extends BaseSpecification<NoticeEntity, NoticeRequest> {
     
     public static Specification<NoticeEntity> search(NoticeRequest request) {
         return (root, query, criteriaBuilder) -> {
