@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-26 15:28:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-26 17:36:27
+ * @LastEditTime: 2025-08-01 21:45:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,8 +23,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// import com.bytedesk.core.black.BlackAccessInterceptor;
-import com.bytedesk.core.ip.access.IpAccessInterceptor;
+import com.bytedesk.core.ip_access.IpAccessInterceptor;
 
 // import com.bytedesk.core.config.BytedeskProperties;
 
