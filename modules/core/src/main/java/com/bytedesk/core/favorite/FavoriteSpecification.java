@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FavoriteSpecification extends BaseSpecification {
+public class FavoriteSpecification extends BaseSpecification<FavoriteEntity, FavoriteRequest> {
     
     public static Specification<FavoriteEntity> search(FavoriteRequest request) {
         log.info("request: {}", request);

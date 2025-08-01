@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 23:19:15
+ * @LastEditTime: 2025-08-01 23:29:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.base;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.exception.NotLoginException;
@@ -30,7 +31,29 @@ import jakarta.persistence.criteria.Root;
  * 基础Specification类
  * 提供通用的查询条件构建方法
  */
-public abstract class BaseSpecification {
+public abstract class BaseSpecification<T, TRequest> {
+
+    /**
+     * 通用的搜索方法，需要子类实现具体的查询逻辑
+     * 
+     * @param request 请求对象
+     * @param authService 认证服务
+     * @return Specification对象
+     */
+    public static <T, TRequest extends BaseRequest> Specification<T> search(TRequest request) {
+        throw new UnsupportedOperationException("Method search needs to be implemented in child class");
+    }
+
+    /**
+     * 通用的搜索方法，需要子类实现具体的查询逻辑
+     * 
+     * @param request 请求对象
+     * @param authService 认证服务
+     * @return Specification对象
+     */
+    public static <T, TRequest extends BaseRequest> Specification<T> search(TRequest request, AuthService authService) {
+        throw new UnsupportedOperationException("Method search needs to be implemented in child class");
+    }
 
     /**
      * 获取基础查询条件
