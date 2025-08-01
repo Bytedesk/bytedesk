@@ -14,17 +14,13 @@
 //  */
 package com.bytedesk.core.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.ip_access.IpAccessInterceptor;
-
 @Configuration
-@Description("Web MVC Configuration - Web MVC配置类，配置跨域、拦截器、消息转换器等")
+@Description("Core Web MVC Configuration - 核心Web MVC配置类，配置静态资源等基础功能")
 public class WebMvcConfig implements WebMvcConfigurer {
 
     // https://www.baeldung.com/spring-mvc-static-resources
@@ -35,19 +31,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "classpath:/templates/",
             "classpath:/public/",
     };
-
-    @Autowired
-    private IpAccessInterceptor ipAccessInterceptor;
-
-    /**
-     * @{VisitorAnonymousController}
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        // 注册IP访问拦截器
-        registry.addInterceptor(ipAccessInterceptor)
-                .addPathPatterns("/visitor/**"); // 仅拦截visitor相关接口，如需拦截其他接口，请直接在此数组中添加即可
-    }
     
     /**
      * https://www.baeldung.com/spring-mvc-static-resources
