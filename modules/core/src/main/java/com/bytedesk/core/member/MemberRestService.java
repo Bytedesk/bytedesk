@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:30:01
+ * @LastEditTime: 2025-08-01 12:25:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -179,7 +179,6 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         if (saveMember == null) {
             throw new RuntimeException("Failed to save member.");
         }
-        // TODO: 发送邀请通知：push推送、邮件、短信，只有用户登录并accept邀请后，才真正加入组织
         // 
         return convertToResponse(saveMember);
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 18:09:10
+ * @LastEditTime: 2025-08-01 12:25:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -71,6 +71,17 @@ public class MemberEntity extends BaseEntity {
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
     /**
+     * Email address of the member
+     */
+    @Email(message = "email format error")
+    private String email;
+
+    /**
+     * Mobile phone number (Chinese format supported)
+     */
+    private String mobile;
+
+    /**
      * Employee job number or ID
      */
     private String jobNo;
@@ -89,17 +100,6 @@ public class MemberEntity extends BaseEntity {
      * Office telephone number
      */
     private String telephone;
-
-    /**
-     * Email address of the member
-     */
-    @Email(message = "email format error")
-    private String email;
-
-    /**
-     * Mobile phone number (Chinese format supported)
-     */
-    private String mobile;
 
     /**
      * Current status of the member (INVITING, ACTIVE, INACTIVE, etc.)

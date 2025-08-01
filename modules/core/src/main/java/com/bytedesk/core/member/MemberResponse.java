@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-25 15:36:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-25 11:57:27
+ * @LastEditTime: 2025-08-01 12:25:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,10 @@ public class MemberResponse extends BaseResponse {
 
     private String description;
 
+    private String email;
+
+    private String mobile;
+
     private String seatNo;
 
     private String jobNo;
@@ -49,10 +53,6 @@ public class MemberResponse extends BaseResponse {
 
     private String telephone;
     
-    private String email;
-
-    private String mobile;
-
     private String status;
 
     private String deptUid;
