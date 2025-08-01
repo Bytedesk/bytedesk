@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WorktimeSettingSpecification extends BaseSpecification {
+public class WorktimeSettingSpecification extends BaseSpecification<WorktimeSettingEntity, WorktimeSettingRequest> {
     
     public static Specification<WorktimeSettingEntity> search(WorktimeSettingRequest request) {
         // log.info("request: {}", request);

@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FormSpecification extends BaseSpecification {
+public class FormSpecification extends BaseSpecification<FormEntity, FormRequest> {
     
     public static Specification<FormEntity> search(FormRequest request) {
         log.info("request: {}", request);

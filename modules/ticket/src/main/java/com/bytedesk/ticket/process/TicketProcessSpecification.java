@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TicketProcessSpecification extends BaseSpecification {
+public class TicketProcessSpecification extends BaseSpecification<TicketProcessEntity, TicketProcessRequest> {
     
     public static Specification<TicketProcessEntity> search(TicketProcessRequest request) {
         log.info("request: {}", request);

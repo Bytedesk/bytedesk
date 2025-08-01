@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class BookingSpecification extends BaseSpecification {
+public class BookingSpecification extends BaseSpecification<BookingEntity, BookingRequest> {
     
     public static Specification<BookingEntity> search(BookingRequest request) {
         log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 

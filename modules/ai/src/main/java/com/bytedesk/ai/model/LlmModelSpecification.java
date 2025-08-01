@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LlmModelSpecification extends BaseSpecification {
+public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, LlmModelRequest> {
 
     public static Specification<LlmModelEntity> search(LlmModelRequest request) {
         log.info("request: {}", request);

@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ShoppingSpecification extends BaseSpecification {
+public class ShoppingSpecification extends BaseSpecification<ShoppingEntity, ShoppingRequest> {
     
     public static Specification<ShoppingEntity> search(ShoppingRequest request) {
         log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 

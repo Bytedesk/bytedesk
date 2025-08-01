@@ -23,7 +23,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RobotThreadSpecification extends BaseSpecification {
+public class RobotThreadSpecification extends BaseSpecification<RobotThreadEntity, RobotThreadRequest> {
     
     public static Specification<RobotThreadEntity> search(RobotThreadRequest request) {
         log.info("request: {}", request);

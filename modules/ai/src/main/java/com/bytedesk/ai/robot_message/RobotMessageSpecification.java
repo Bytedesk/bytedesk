@@ -26,7 +26,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RobotMessageSpecification extends BaseSpecification {
+public class RobotMessageSpecification extends BaseSpecification<RobotMessageEntity, RobotMessageRequest> {
     
     public static Specification<RobotMessageEntity> search(RobotMessageRequest request) {
         // log.info("request: {}", request);

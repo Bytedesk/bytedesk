@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class GroupNoticeSpecification extends BaseSpecification {
+public class GroupNoticeSpecification extends BaseSpecification<GroupNoticeEntity, GroupNoticeRequest> {
     
     public static Specification<GroupNoticeEntity> search(GroupNoticeRequest request) {
         log.info("request: {}", request);
