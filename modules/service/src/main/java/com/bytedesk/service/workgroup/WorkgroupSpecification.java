@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WorkgroupSpecification extends BaseSpecification {
+public class WorkgroupSpecification extends BaseSpecification<WorkgroupEntity, WorkgroupRequest> {
 
     public static Specification<WorkgroupEntity> search(WorkgroupRequest request) {
         // log.info("request: {}", request);

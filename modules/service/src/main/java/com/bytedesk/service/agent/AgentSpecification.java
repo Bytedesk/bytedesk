@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 // import lombok.extern.slf4j.Slf4j;
 
 // @Slf4j
-public class AgentSpecification extends BaseSpecification {
+public class AgentSpecification extends BaseSpecification<AgentEntity, AgentRequest> {
 
     public static Specification<AgentEntity> search(AgentRequest request) {
         // log.info("request: {}", request);

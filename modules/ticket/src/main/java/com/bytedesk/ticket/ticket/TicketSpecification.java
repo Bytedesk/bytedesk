@@ -27,7 +27,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TicketSpecification extends BaseSpecification {
+public class TicketSpecification extends BaseSpecification<TicketEntity, TicketRequest> {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

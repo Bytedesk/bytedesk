@@ -24,7 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MessageLeaveSpecification extends BaseSpecification {
+public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEntity, MessageLeaveRequest> {
 
     public static Specification<MessageLeaveEntity> search(MessageLeaveRequest request) {
         // log.info("request: {}", request);

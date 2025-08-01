@@ -28,7 +28,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 
-public class MessageSpecification extends BaseSpecification {
+public class MessageSpecification extends BaseSpecification<MessageEntity, MessageRequest> {
 
     public static Specification<MessageEntity> search(MessageRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {

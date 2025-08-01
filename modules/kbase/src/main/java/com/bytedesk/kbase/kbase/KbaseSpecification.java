@@ -25,7 +25,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class KbaseSpecification extends BaseSpecification {
+public class KbaseSpecification extends BaseSpecification<KbaseEntity, KbaseRequest> {
 
     public static Specification<KbaseEntity> search(KbaseRequest request) {
         log.info("request: {}", request);

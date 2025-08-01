@@ -28,7 +28,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class QueueSpecification extends BaseSpecification {
+public class QueueSpecification extends BaseSpecification<QueueEntity, QueueRequest> {
 
     public static Specification <QueueEntity> search (QueueRequest request) {
         // log.info("request: {}", request);
