@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 11:09:54
+ * @LastEditTime: 2025-08-01 15:10:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,14 +32,14 @@ import lombok.AllArgsConstructor;
 @Tag(name = "Favorite Management", description = "Favorite management APIs for managing user favorites and bookmarks")
 public class FavoriteRestController extends BaseRestController<FavoriteRequest> {
 
-    private final FavoriteRestService favoriteService;
+    private final FavoriteRestService favoriteRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "Query Favorites by Organization", description = "Retrieve favorites for the current organization (Admin only)")
     @Override
     public ResponseEntity<?> queryByOrg(FavoriteRequest request) {
         
-        Page<FavoriteResponse> favorites = favoriteService.queryByOrg(request);
+        Page<FavoriteResponse> favorites = favoriteRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(favorites));
     }
@@ -48,7 +48,7 @@ public class FavoriteRestController extends BaseRestController<FavoriteRequest> 
     @Override
     public ResponseEntity<?> queryByUser(FavoriteRequest request) {
         
-        Page<FavoriteResponse> favorites = favoriteService.queryByUser(request);
+        Page<FavoriteResponse> favorites = favoriteRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(favorites));
     }
@@ -57,7 +57,7 @@ public class FavoriteRestController extends BaseRestController<FavoriteRequest> 
     @Override
     public ResponseEntity<?> create(FavoriteRequest request) {
         
-        FavoriteResponse favorite = favoriteService.create(request);
+        FavoriteResponse favorite = favoriteRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(favorite));
     }
@@ -66,7 +66,7 @@ public class FavoriteRestController extends BaseRestController<FavoriteRequest> 
     @Override
     public ResponseEntity<?> update(FavoriteRequest request) {
         
-        FavoriteResponse favorite = favoriteService.update(request);
+        FavoriteResponse favorite = favoriteRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(favorite));
     }
@@ -75,7 +75,7 @@ public class FavoriteRestController extends BaseRestController<FavoriteRequest> 
     @Override
     public ResponseEntity<?> delete(FavoriteRequest request) {
         
-        favoriteService.delete(request);
+        favoriteRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

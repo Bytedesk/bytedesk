@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 11:52:50
+ * @LastEditTime: 2025-08-01 15:14:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -522,6 +522,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     }
 
     // 创建一个机器人
+    @Transactional
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(uid) && existsByUid(uid)) {
@@ -557,6 +558,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     }
 
     // 创建一个空白智能体
+    @Transactional
     public RobotResponse createDefaultPromptRobot(String orgUid, String robotUid) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(robotUid) && existsByUid(robotUid)) {
@@ -644,6 +646,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     }
 
     // 创建智能体机器人
+    @Transactional
     public RobotResponse createPromptRobot(RobotRequest request) {
         //
         RobotEntity robot = modelMapper.map(request, RobotEntity.class);
@@ -661,6 +664,8 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return convertToResponse(savedRobot);
     }
 
+    // update prompt robot
+    @Transactional
     public RobotResponse updatePromptRobot(RobotRequest request) {
         Optional<RobotEntity> robotOptional = findByUid(request.getUid());
         if (!robotOptional.isPresent()) {
@@ -688,7 +693,8 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return convertToResponse(savedRobot);
     }
 
-    // update kbUid
+    // update kbUid for robot
+    @Transactional
     public RobotResponse updateKbUid(RobotRequest request) {
         Optional<RobotEntity> robotOptional = findByUid(request.getUid());
         if (!robotOptional.isPresent()) {
@@ -706,7 +712,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         return convertToResponse(savedRobot);
     }
 
-    public void initDemoBytedesk() {
+    // public void initDemoBytedesk() {
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // // 首先redis中是否已经初始化此数据，如果没有，继续执行演示数据初始化
         // String isInit = stringRedisTemplate.opsForValue().get(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY);
@@ -741,7 +747,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
         // } else {
         //     log.info("initDemoBytedesk already initialized");
         // }
-    }
+    // }
 
     @Override
     public RobotExcel convertToExcel(RobotEntity entity) {
