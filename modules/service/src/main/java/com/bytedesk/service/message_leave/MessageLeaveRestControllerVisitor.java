@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-27 10:55:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 06:48:57
+ * @LastEditTime: 2025-08-03 07:22:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class MessageLeaveRestControllerVisitor {
 
     @GetMapping("/query")
     @Operation(summary = "查询留言消息")
-    public ResponseEntity<?> query(@RequestBody MessageLeaveRequest request) {
+    public ResponseEntity<?> query(MessageLeaveRequest request) {
        
         Page<MessageLeaveResponse> response = messageLeaveRestService.queryByVisitor(request);
 
