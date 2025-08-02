@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 14:02:35
+ * @LastEditTime: 2025-08-03 07:08:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -88,80 +88,11 @@ AI powered Omnichannel customer service With Team Cooperation
 
 ### Open Platform
 
-## Docker Quick Start
+## Quick Start
 
-### method 1: clone project and start docker compose container，need zhipuai
-
-```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose.yaml up -d
-```
-
-#### get zhipuai [API Key](https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys)
-
-```bash
-# zhipuai
-# SPRING_AI_ZHIPUAI_BASE_URL: https://open.bigmodel.cn/api/paas
-SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx' // please replace sk-xxx with your zhipuai API key
-SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
-SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
-SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "true"
-SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
-```
-
-### method 2: run docker compose with ollama
-
-```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
-```
-
-#### docker ollama pull model
-
-```bash
-# chat model
-docker exec ollama-bytedesk ollama pull qwen3:0.6b
-# embedding model
-docker exec ollama-bytedesk ollama pull bge-m3:latest
-# rerank model
-docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
-# or download model from huggingface
-# docker exec ollama-bytedesk ollama pull hf.co/<username>/<model-repository>
-```
-
-#### stop container
-
-```bash
-docker compose -p bytedesk -f docker-compose.yaml stop
-```
-
-#### change config, otherwise upload image, file and knowledge base cannot be displayed normally
-
-- change `docker-compose.yaml` file or `docker-compose-ollama.yaml`
-
-```bash
-# please replace 127.0.0.1 with your server ip
-BYTEDESK_FEATURES_AVATAR_BASE_URL: http://127.0.0.1:9003
-BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
-BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
-```
-
-### method 3: run from source code
-
-```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk && ./mvnw install -Dmaven.test.skip=true && cd starter && ./mvnw spring-boot:run
-```
-
-## Preview
-
-local preview
-
-```bash
-# please replace 127.0.0.1 with your server ip
-http://127.0.0.1:9003/
-# open port: 9003, 9885
-demo username: admin@email.com
-demo password: admin
-```
+- [Docker Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
+- [Baota Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
+- [Source Code](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
 
 ## architecture
 

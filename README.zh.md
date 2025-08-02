@@ -87,81 +87,10 @@
 
 ### 开放平台
 
-## Docker 快速开始
+## 快速开始
 
-### 方法一：克隆项目并启动docker compose容器，默认使用云模型 智谱AI
-
-```bash
-git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose.yaml up -d
-```
-
-#### 申请智谱AI [API Key](https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys)
-
-```bash
-# zhipuai
-# SPRING_AI_ZHIPUAI_BASE_URL: https://open.bigmodel.cn/api/paas
-SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx' // 替换为智谱AI API Key
-SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
-SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
-SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
-SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "true"
-SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
-```
-
-### 方法二：使用 docker compose ollama，默认安装ollama，默认使用 qwen3:0.6b 模型
-
-```bash
-git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose-ollama.yaml up -d
-```
-
-#### docker 拉取ollama模型。配置文件中可以配置其他模型，如deepseek-r1等
-
-```bash
-# 对话模型
-docker exec ollama-bytedesk ollama pull qwen3:0.6b
-# 嵌入模型
-docker exec ollama-bytedesk ollama pull bge-m3:latest
-# 重新排序Rerank模型
-docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
-# 或者从 huggingface 下载模型
-# docker exec ollama-bytedesk ollama pull hf.co/<username>/<model-repository>
-```
-
-<!-- #### 如果不需要知识库AI问答功能，可以修改 `docker-compose.yaml` 或 `docker-compose-ollama.yaml` 关闭ollama对话和嵌入功能，以节省资源
-
-```bash
-# 关闭ollama对话
-SPRING_AI_OLLAMA_CHAT_ENABLED: false
-# 关闭ollama嵌入
-SPRING_AI_OLLAMA_EMBEDDING_ENABLED: false
-``` -->
-
-#### 停止容器
-
-```bash
-docker compose -p weiyu -f docker-compose.yaml stop
-```
-
-#### 修改配置，否则上传图片、文件和知识库无法正常显示
-
-- 修改 `docker-compose.yaml` 文件 或 `docker-compose-ollama.yaml` 文件，修改以下配置项：
-
-```bash
-# 请将服务器127.0.0.1替换为你的服务器ip
-# 头像的访问地址，请修改为服务器实际的地址
-BYTEDESK_FEATURES_AVATAR_BASE_URL: http://127.0.0.1:9003
-# 文件上传的访问地址，请修改为服务器实际的地址
-BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
-# 知识库的访问地址，请修改为服务器实际的地址
-BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
-```
-
-### 方法三：宝塔面板
-
+- [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
-
-### 方法四：源码启动
-
 - [源码启动](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
 
 ## 演示
