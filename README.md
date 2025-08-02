@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 07:08:27
+ * @LastEditTime: 2025-08-03 07:18:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,7 +86,11 @@ AI powered Omnichannel customer service With Team Cooperation
 - Supports one-click video conversations and screen sharing
 - Suitable for service scenarios requiring intuitive demonstrations
 
-### Open Platform
+### [Open Platform](./plugins/readme.md)
+
+- Provides complete RESTful API interfaces and SDK toolKits
+- Supports seamless integration with third-party systems for data interoperability
+- Multi-language SDK support to simplify development and integration processes
 
 ## Quick Start
 
