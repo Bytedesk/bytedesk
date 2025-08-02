@@ -49,7 +49,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     @Override
     public Page<BlackEntity> queryByOrgEntity(BlackRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<BlackEntity> specification = BlackSpecification.search(request);
+        Specification<BlackEntity> specification = BlackSpecification.search(request, authService);
         return repository.findAll(specification, pageable);
     }
 

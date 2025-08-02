@@ -63,14 +63,14 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
     @Override
     public Page<GroupEntity> queryByOrgEntity(GroupRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<GroupEntity> specification = GroupSpecification.search(request);
+        Specification<GroupEntity> specification = GroupSpecification.search(request, authService);
         return groupRepository.findAll(specification, pageable);
     }
 
     @Override
     public Page<GroupResponse> queryByOrg(GroupRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<GroupEntity> specification = GroupSpecification.search(request);
+        Specification<GroupEntity> specification = GroupSpecification.search(request, authService);
         Page<GroupEntity> page = groupRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
@@ -89,7 +89,7 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
 
     public Page<GroupEntity> queryForExport(GroupRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<GroupEntity> specification = GroupSpecification.search(request);
+        Specification<GroupEntity> specification = GroupSpecification.search(request, authService);
         return groupRepository.findAll(specification, pageable);
     }
 

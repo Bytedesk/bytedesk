@@ -62,7 +62,7 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
     @Override
     public Page<BookingEntity> queryByOrgEntity(BookingRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<BookingEntity> spec = BookingSpecification.search(request);
+        Specification<BookingEntity> spec = BookingSpecification.search(request, authService);
         return bookingRepository.findAll(spec, pageable);
     }
 

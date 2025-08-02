@@ -87,7 +87,7 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
     @Override
     public Page<RobotEntity> queryByOrgEntity(RobotRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<RobotEntity> spec = RobotSpecification.search(request);
+        Specification<RobotEntity> spec = RobotSpecification.search(request, authService);
         return robotRepository.findAll(spec, pageable);
     }
 
