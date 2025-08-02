@@ -118,4 +118,12 @@ public class MessageLeaveRequest extends BaseRequest {
     // 垃圾留言相关字段
     private String spamUser;
     private ZonedDateTime spamAt;
+    
+    // 确认相关字段
+    private String confirmUser;
+    private ZonedDateTime confirmedAt;
+    
+    // 拒绝相关字段
+    private String rejectUser;
+    private ZonedDateTime rejectedAt;
 }

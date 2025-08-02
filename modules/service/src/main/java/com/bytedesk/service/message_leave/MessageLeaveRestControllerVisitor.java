@@ -44,7 +44,7 @@ public class MessageLeaveRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PostMapping("/query")
+    @GetMapping("/query")
     @Operation(summary = "查询留言消息")
     public ResponseEntity<?> query(@RequestBody MessageLeaveRequest request) {
        
@@ -57,18 +57,18 @@ public class MessageLeaveRestControllerVisitor {
     @Operation(summary = "确认留言消息")
     public ResponseEntity<?> confirm(@RequestBody MessageLeaveRequest request) {
        
-        // MessageLeaveResponse response = messageLeaveService.confirm(request);
+        MessageLeaveResponse response = messageLeaveRestService.confirm(request);
 
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     @PostMapping("/reject")
     @Operation(summary = "拒绝留言消息")
     public ResponseEntity<?> reject(@RequestBody MessageLeaveRequest request) {
        
-        // MessageLeaveResponse response = messageLeaveService.reject(request);
+        MessageLeaveResponse response = messageLeaveRestService.reject(request);
 
-        return ResponseEntity.ok(JsonResult.success());
+        return ResponseEntity.ok(JsonResult.success(response));
     }
     
 }

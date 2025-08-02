@@ -244,6 +244,30 @@ public class MessageLeaveEntity extends BaseEntity {
      * Timestamp when the message was marked as spam
      */
     private ZonedDateTime spamAt;
+    
+    /**
+     * Agent who confirmed the message
+     */
+    @Builder.Default
+    @Column(name = "confirm_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String confirmUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Timestamp when the message was confirmed
+     */
+    private ZonedDateTime confirmedAt;
+    
+    /**
+     * Agent who rejected the message
+     */
+    @Builder.Default
+    @Column(name = "reject_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String rejectUser = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Timestamp when the message was rejected
+     */
+    private ZonedDateTime rejectedAt;
 
 
     public String getRepliedAtString() {
@@ -264,6 +288,14 @@ public class MessageLeaveEntity extends BaseEntity {
 
     public String getSpamAtString() {
         return BdDateUtils.formatDatetimeToString(spamAt);
+    }
+    
+    public String getConfirmedAtString() {
+        return BdDateUtils.formatDatetimeToString(confirmedAt);
+    }
+    
+    public String getRejectedAtString() {
+        return BdDateUtils.formatDatetimeToString(rejectedAt);
     }
     
 }

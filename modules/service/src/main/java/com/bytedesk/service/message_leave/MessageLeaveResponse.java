@@ -119,6 +119,14 @@ public class MessageLeaveResponse extends BaseResponse {
     // 垃圾留言相关字段
     private UserProtobuf spamUser;
     private ZonedDateTime spamAt;
+    
+    // 确认相关字段
+    private UserProtobuf confirmUser;
+    private ZonedDateTime confirmedAt;
+    
+    // 拒绝相关字段
+    private UserProtobuf rejectUser;
+    private ZonedDateTime rejectedAt;
 
     public String getRepliedAt() {
         return BdDateUtils.formatDatetimeToString(repliedAt);
@@ -138,5 +146,13 @@ public class MessageLeaveResponse extends BaseResponse {
 
     public String getSpamAt() {
         return BdDateUtils.formatDatetimeToString(spamAt);
+    }
+    
+    public String getConfirmedAt() {
+        return BdDateUtils.formatDatetimeToString(confirmedAt);
+    }
+    
+    public String getRejectedAt() {
+        return BdDateUtils.formatDatetimeToString(rejectedAt);
     }
 }

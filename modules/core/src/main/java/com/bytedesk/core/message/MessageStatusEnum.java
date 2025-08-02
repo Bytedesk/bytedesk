@@ -32,6 +32,8 @@ public enum MessageStatusEnum {
     LEAVE_MSG_TRANSFERRED, // 留言已转接
     LEAVE_MSG_CLOSED, // 留言已关闭
     LEAVE_MSG_SPAM, // 垃圾留言
+    LEAVE_MSG_CONFIRMED, // 留言已确认
+    LEAVE_MSG_REJECTED, // 留言已拒绝
     RATE_SUBMIT, // 提交会话评价
     RATE_CANCEL, // 取消会话评价
     RATE_PENDING, // 未评价

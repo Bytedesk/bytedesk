@@ -194,6 +194,16 @@ public class ServiceConvertUtils {
             messageLeaveResponse.setSpamUser(UserProtobuf.fromJson(entity.getSpamUser()));
         }
         
+        // 设置确认用户信息
+        if (entity.getConfirmUser() != null) {
+            messageLeaveResponse.setConfirmUser(UserProtobuf.fromJson(entity.getConfirmUser()));
+        }
+        
+        // 设置拒绝用户信息
+        if (entity.getRejectUser() != null) {
+            messageLeaveResponse.setRejectUser(UserProtobuf.fromJson(entity.getRejectUser()));
+        }
+        
         return messageLeaveResponse;
     }
 

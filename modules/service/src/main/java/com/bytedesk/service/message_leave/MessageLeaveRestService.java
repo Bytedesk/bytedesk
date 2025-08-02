@@ -397,6 +397,66 @@ public class MessageLeaveRestService extends
         throw new RuntimeException("MessageLeave not found");
     }
     
+    // 确认留言
+    public MessageLeaveResponse confirm(MessageLeaveRequest request) {
+        // 检查uid和orgUid是否为空
+        if (!StringUtils.hasText(request.getUid()) || !StringUtils.hasText(request.getOrgUid())) {
+            throw new RuntimeException("uid and orgUid are required");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(MessageLeaveStatusEnum.CONFIRMED.name());
+            messageLeave.setConfirmedAt(BdDateUtils.now());
+            // 设置确认用户信息（访客确认，使用访客信息）
+            if (StringUtils.hasText(request.getUser())) {
+                messageLeave.setConfirmUser(request.getUser());
+            }
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not confirmed");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.LEAVE_MSG_CONFIRMED);
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
+    // 拒绝留言
+    public MessageLeaveResponse reject(MessageLeaveRequest request) {
+        // 检查uid和orgUid是否为空
+        if (!StringUtils.hasText(request.getUid()) || !StringUtils.hasText(request.getOrgUid())) {
+            throw new RuntimeException("uid and orgUid are required");
+        }
+
+        Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());    
+        if (messageLeaveOptional.isPresent()) {
+            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
+            messageLeave.setStatus(MessageLeaveStatusEnum.REJECTED.name());
+            messageLeave.setRejectedAt(BdDateUtils.now());
+            // 设置拒绝用户信息（访客拒绝，使用访客信息）
+            if (StringUtils.hasText(request.getUser())) {
+                messageLeave.setRejectUser(request.getUser());
+            }
+            
+            MessageLeaveEntity updateMessageLeave = save(messageLeave);
+            if (updateMessageLeave == null) {
+                throw new RuntimeException("MessageLeave not rejected");
+            }
+            
+            // 更新留言提示消息状态
+            updateMessageStatus(messageLeave, MessageStatusEnum.LEAVE_MSG_REJECTED);
+            
+            return convertToResponse(updateMessageLeave);
+        }
+        throw new RuntimeException("MessageLeave not found");
+    }
+    
     // 更新消息状态的辅助方法
     private void updateMessageStatus(MessageLeaveEntity messageLeave, MessageStatusEnum status) {
         Optional<MessageEntity> messageOptional = messageRestService.findByUid(messageLeave.getMessageUid());
