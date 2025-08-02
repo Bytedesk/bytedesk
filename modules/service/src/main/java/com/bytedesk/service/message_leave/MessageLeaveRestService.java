@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-02 21:47:06
+ * @LastEditTime: 2025-08-02 21:52:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -95,8 +95,7 @@ public class MessageLeaveRestService extends
     public MessageLeaveResponse queryByUid(MessageLeaveRequest request) {
         Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());
         if (messageLeaveOptional.isPresent()) {
-            MessageLeaveEntity messageLeave = messageLeaveOptional.get();
-            return convertToResponse(messageLeave);
+            return convertToResponse(messageLeaveOptional.get());
         }
         throw new RuntimeException("MessageLeave not found");
     }
@@ -149,7 +148,7 @@ public class MessageLeaveRestService extends
         messageLeave.setStatus(MessageLeaveStatusEnum.PENDING.name());
         
         // 确保设置正确的orgUid
-        if (StringUtils.ha(messageLeave.getOrgUid())) {
+        if (!StringUtils.hasText(messageLeave.getOrgUid())) {
             UserEntity user = authService.getUser();
             if (user != null && StringUtils.hasText(user.getOrgUid())) {
                 messageLeave.setOrgUid(user.getOrgUid());
