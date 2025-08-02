@@ -17,7 +17,6 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;

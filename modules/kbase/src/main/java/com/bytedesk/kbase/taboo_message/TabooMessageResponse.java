@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 13:33:54
+ * @LastEditTime: 2025-08-02 08:24:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,10 +20,8 @@ import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
