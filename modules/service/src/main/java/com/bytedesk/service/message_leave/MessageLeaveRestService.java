@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 18:31:17
+ * @LastEditTime: 2025-08-02 21:45:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -156,7 +156,6 @@ public class MessageLeaveRestService extends
             }
         }
         
-        //
         // 保存留言
         MessageLeaveEntity savedMessageLeave = save(messageLeave);
         if (savedMessageLeave == null) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-27 10:55:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-26 11:46:42
+ * @LastEditTime: 2025-08-02 21:41:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,13 +32,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "留言消息匿名管理", description = "留言消息匿名相关接口")
 public class MessageLeaveRestControllerVisitor {
 
-    private final MessageLeaveRestService messageLeaveService;
+    private final MessageLeaveRestService messageLeaveRestService;
 
     @PostMapping("/create")
     @Operation(summary = "创建留言消息")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
-        MessageLeaveResponse response = messageLeaveService.create(request);
+        MessageLeaveResponse response = messageLeaveRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -47,12 +47,11 @@ public class MessageLeaveRestControllerVisitor {
     @Operation(summary = "查询留言消息")
     public ResponseEntity<?> query(@RequestBody MessageLeaveRequest request) {
        
-        Page<MessageLeaveResponse> response = messageLeaveService.queryByUser(request);
+        Page<MessageLeaveResponse> response = messageLeaveRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // TODO: confirm
     @PostMapping("/confirm")
     @Operation(summary = "确认留言消息")
     public ResponseEntity<?> confirm(@RequestBody MessageLeaveRequest request) {
@@ -62,7 +61,6 @@ public class MessageLeaveRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // TODO: reject
     @PostMapping("/reject")
     @Operation(summary = "拒绝留言消息")
     public ResponseEntity<?> reject(@RequestBody MessageLeaveRequest request) {
