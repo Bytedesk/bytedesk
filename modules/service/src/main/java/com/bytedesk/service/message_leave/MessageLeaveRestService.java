@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-02 21:52:54
+ * @LastEditTime: 2025-08-03 06:48:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -87,6 +87,15 @@ public class MessageLeaveRestService extends
             throw new NotLoginException("please login first.");
         }
         request.setUserUid(user.getUid());
+        //
+        return queryByOrg(request);
+    }
+
+    public Page<MessageLeaveResponse> queryByVisitor(MessageLeaveRequest request) {
+        // 检查uid和orgUid是否为空
+        if (!StringUtils.hasText(request.getUid()) || !StringUtils.hasText(request.getOrgUid())) {
+            throw new RuntimeException("uid and orgUid are required");
+        }
         //
         return queryByOrg(request);
     }
