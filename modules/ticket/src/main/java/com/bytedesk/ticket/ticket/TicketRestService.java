@@ -105,7 +105,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     @Override
     public Page<TicketEntity> queryByOrgEntity(TicketRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<TicketEntity> spec = TicketSpecification.search(request);
+        Specification<TicketEntity> spec = TicketSpecification.search(request, authService);
         return ticketRepository.findAll(spec, pageable);
     }
 

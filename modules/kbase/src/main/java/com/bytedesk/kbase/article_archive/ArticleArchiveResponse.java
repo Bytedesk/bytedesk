@@ -22,11 +22,17 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.experimental.Accessors;
 
-@Data
+@Getter
+@Setter
+@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor

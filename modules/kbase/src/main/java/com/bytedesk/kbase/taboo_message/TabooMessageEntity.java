@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:51:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 23:30:51
+ * @LastEditTime: 2025-08-02 08:03:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,13 +13,10 @@
  */
 package com.bytedesk.kbase.taboo_message;
 
-import com.bytedesk.core.message.AbstractMessageEntity;
-
+import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -33,7 +30,6 @@ import lombok.Setter;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "bytedesk_kbase_taboo_message")
 public class TabooMessageEntity extends BaseEntity {
@@ -41,4 +37,5 @@ public class TabooMessageEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     // 
+    private String content;
 }

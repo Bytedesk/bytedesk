@@ -17,11 +17,13 @@ import org.springframework.context.ApplicationEvent;
 
 import com.bytedesk.kbase.article_archive.ArticleArchiveEntity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper=false)
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 public class ArticleArchiveCreateEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 1L;

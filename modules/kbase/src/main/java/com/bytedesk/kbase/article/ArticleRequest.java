@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 12:06:14
+ * @LastEditTime: 2025-08-02 07:59:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,9 +30,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,7 +54,7 @@ public class ArticleRequest extends BaseRequest {
     private String contentHtml;
 
     // search.html 搜索用
-    private String content;
+    // private String content;
 
     // @Builder.Default
     // private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
@@ -109,7 +115,7 @@ public class ArticleRequest extends BaseRequest {
 
     private String kbUid;
 
-    private String userUid;
+    // private String userUid;
 
     // 
     // private String searchText;

@@ -69,7 +69,7 @@ public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, Queu
     @Override
     public Page<QueueEntity> queryByOrgEntity(QueueRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<QueueEntity> specification = QueueSpecification.search(request);
+        Specification<QueueEntity> specification = QueueSpecification.search(request, authService);
         return queueRepository.findAll(specification, pageable);
     }
 

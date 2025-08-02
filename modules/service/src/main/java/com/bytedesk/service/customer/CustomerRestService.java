@@ -48,7 +48,7 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
     @Override
     public Page<CustomerEntity> queryByOrgEntity(CustomerRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CustomerEntity> spec = CustomerSpecification.search(request);
+        Specification<CustomerEntity> spec = CustomerSpecification.search(request, authService);
         return customerRepository.findAll(spec, pageable);
     }
     

@@ -85,7 +85,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     public Page<AgentResponse> queryByOrg(AgentRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<AgentEntity> spec = AgentSpecification.search(request);
+        Specification<AgentEntity> spec = AgentSpecification.search(request, authService);
         Page<AgentEntity> agentPage = agentRepository.findAll(spec, pageable);
         return agentPage.map(this::convertToResponse);
     }

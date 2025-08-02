@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class IntentionCategory {
     
     /**

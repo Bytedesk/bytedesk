@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KbaseSpecification extends BaseSpecification<KbaseEntity, KbaseRequest> {
 
-    public static Specification<KbaseEntity> search(KbaseRequest request) {
+    public static Specification<KbaseEntity> search(KbaseRequest request, AuthService authService) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // 使用基类方法处理超级管理员权限和组织过滤
+            addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             
             if (request.getQueryNotebase()) {
                 predicates.add(

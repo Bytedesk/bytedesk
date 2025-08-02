@@ -63,7 +63,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     public Page<WorkgroupResponse> queryByOrg(WorkgroupRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<WorkgroupEntity> specs = WorkgroupSpecification.search(request);
+        Specification<WorkgroupEntity> specs = WorkgroupSpecification.search(request, authService);
         Page<WorkgroupEntity> workgroupPage = workgroupRepository.findAll(specs, pageable);
         return workgroupPage.map(this::convertToResponse);
     }

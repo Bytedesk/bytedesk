@@ -27,7 +27,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

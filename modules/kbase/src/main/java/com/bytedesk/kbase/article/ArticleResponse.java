@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-03 13:34:15
+ * @LastEditTime: 2025-08-02 08:01:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,11 +22,17 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.experimental.Accessors;
 
-@Data
+@Getter
+@Setter
+@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -58,7 +64,7 @@ public class ArticleResponse extends BaseResponse {
 
     private Integer readCount;
 
-    private Integer likeCount = 0;
+    private Integer likeCount;
 
     // editor 编辑者
     private String editor;

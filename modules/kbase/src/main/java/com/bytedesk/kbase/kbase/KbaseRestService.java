@@ -67,7 +67,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     @Override
     public Page<KbaseResponse> queryByOrg(KbaseRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<KbaseEntity> spec = KbaseSpecification.search(request);
+        Specification<KbaseEntity> spec = KbaseSpecification.search(request, authService);
         Page<KbaseEntity> page = kbaseRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
