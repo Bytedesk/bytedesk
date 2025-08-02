@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-02 14:20:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-27 11:06:58
+ * @LastEditTime: 2025-08-03 06:38:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,6 +40,10 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
             }
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+            // user
+            if (StringUtils.hasText(request.getUid())) {
+                predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUid() + "%"));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

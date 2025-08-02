@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 16:44:56
+ * @LastEditTime: 2025-08-03 06:37:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,7 +68,6 @@ public class MessageUnreadRestService
     public Page<MessageUnreadResponse> queryByUser(MessageUnreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            log.info("visitor request, uid: {}", request.getUid());
             request.setUid(request.getUid());
             // request.setUserUid(request.getUid());
         } else {
