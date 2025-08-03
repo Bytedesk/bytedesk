@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 07:18:51
+ * @LastEditTime: 2025-08-03 22:30:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -94,9 +94,9 @@ AI powered Omnichannel customer service With Team Cooperation
 
 ## Quick Start
 
-- [Docker Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
-- [Baota Deploy](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
-- [Source Code](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
+- [Docker Deploy](https://www.weiyuai.cn/docs/docs/deploy/docker/)
+- [Baota Deploy](https://www.weiyuai.cn/docs/docs/deploy/baota)
+- [Source Code](https://www.weiyuai.cn/docs/docs/deploy/source)
 
 ## architecture
 
