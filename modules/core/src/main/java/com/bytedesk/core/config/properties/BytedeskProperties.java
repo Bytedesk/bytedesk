@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 17:12:57
+ * @LastEditTime: 2025-08-03 17:17:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -225,6 +225,10 @@ public class BytedeskProperties {
         private String docUrl;
         // default lang: en-US, zh-CN, zh-TW
         private String lang = "zh-CN";
+        // 
+        private Boolean allowRegister = false;
+        private Boolean forceValidateMobile = false;
+        private Boolean forceValidateEmail = false;
     }
 
     @Getter
