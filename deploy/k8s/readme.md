@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 22:11:00
+ * @LastEditTime: 2025-08-04 07:18:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@
 
 ```bash
 .
-├── namespace.yaml                    # 创建微语系统专用命名空间
+├── namespace.yaml                   # 创建微语系统专用命名空间
 ├── configmap.yaml                   # 应用配置映射
 ├── secret.yaml                      # 敏感信息密钥
 ├── mysql-deployment.yaml            # MySQL 数据库部署
@@ -48,12 +48,14 @@
 ## 前置要求
 
 ### 1. Kubernetes 集群
+
 - Kubernetes 1.20+
 - kubectl 命令行工具
 - 至少 4GB 可用内存
 - 至少 20GB 可用存储空间
 
 ### 2. 存储类
+
 确保集群中有可用的 StorageClass，用于动态创建持久化卷：
 
 ```bash
@@ -65,6 +67,7 @@ kubectl patch storageclass <storage-class-name> -p '{"metadata": {"annotations":
 ```
 
 ### 3. Ingress Controller
+
 如果使用 Ingress 进行外部访问，需要安装 Ingress Controller：
 
 ```bash
@@ -228,17 +231,20 @@ kubectl exec -it deployment/ollama -n bytedesk -- ollama pull linux6200/bge-rera
 部署完成后，可以通过以下方式访问：
 
 ### 微语系统
-- **Web 界面**：http://your-domain 或 http://your-node-ip:30090
-- **API 文档**：http://your-domain/swagger-ui/index.html
-- **Knife4j 文档**：http://your-domain/doc.html
+
+- **Web 界面**：<http://your-domain> 或 <http://your-node-ip:30090>
+- **API 文档**：<http://your-domain/swagger-ui/index.html>
+- **Knife4j 文档**：<http://your-domain/doc.html>
 
 ### 管理界面
-- **MinIO Console**：http://your-domain:30091
-- **ActiveMQ Artemis Console**：http://your-domain:30181
-- **Zipkin**：http://your-domain:30411
+
+- **MinIO Console**：<http://your-domain:30091>
+- **ActiveMQ Artemis Console**：<http://your-domain:30181>
+- **Zipkin**：<http://your-domain:30411>
 
 ### 默认管理员账户
-- **邮箱**：admin@email.com
+
+- **邮箱**：<admin@email.com>
 - **密码**：admin
 - **手机号**：13345678000
 - **验证码**：123456
@@ -339,6 +345,7 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
 ### 常见问题
 
 1. **Pod 启动失败**
+
    ```bash
    # 查看 Pod 详细状态
    kubectl describe pod <pod-name> -n bytedesk
@@ -348,6 +355,7 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
    ```
 
 2. **服务无法访问**
+
    ```bash
    # 检查服务状态
    kubectl get svc -n bytedesk
@@ -357,6 +365,7 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
    ```
 
 3. **存储问题**
+
    ```bash
    # 检查 PVC 状态
    kubectl get pvc -n bytedesk
@@ -366,6 +375,7 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
    ```
 
 4. **网络问题**
+
    ```bash
    # 检查网络策略
    kubectl get networkpolicy -n bytedesk
@@ -404,13 +414,14 @@ kubectl delete pvc --all -n bytedesk
 ## 许可证说明
 
 请遵守 Business Source License 1.1 许可证条款：
+
 - 不得销售、转售或将微语系统作为服务托管
 - 违反条款将自动终止您的许可证权利
-- 详细条款：https://github.com/Bytedesk/bytedesk/blob/main/LICENSE
+- 详细条款：<https://github.com/Bytedesk/bytedesk/blob/main/LICENSE>
 
 ## 技术支持
 
-- **官方网站**：https://www.weiyuai.cn
-- **文档地址**：https://www.weiyuai.cn/docs
-- **GitHub**：https://github.com/Bytedesk/bytedesk
-- **联系方式**：270580156@qq.com
+- **官方网站**：<https://www.weiyuai.cn>
+- **文档地址**：<https://www.weiyuai.cn/docs>
+- **GitHub**：<https://github.com/Bytedesk/bytedesk>
+- **联系方式**：<270580156@qq.com>
