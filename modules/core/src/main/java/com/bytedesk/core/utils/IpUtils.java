@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 14:17:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 21:56:30
+ * @LastEditTime: 2025-08-03 12:08:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -254,7 +254,7 @@ public class IpUtils {
             }
             
             String networkAddress = parts[0];
-            int prefixLength = Integer.parseInt(parts[1]);
+            // int prefixLength = Integer.parseInt(parts[1]);
             
             // 验证IP地址格式
             if (!isValidIp(ip) || !isValidIp(networkAddress)) {
