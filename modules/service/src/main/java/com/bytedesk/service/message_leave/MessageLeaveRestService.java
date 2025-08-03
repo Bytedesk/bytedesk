@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 07:26:18
+ * @LastEditTime: 2025-08-03 10:30:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -179,6 +179,8 @@ public class MessageLeaveRestService extends
             //
             MessageLeaveExtra messageLeaveExtra = MessageLeaveExtra.builder()
                     .uid(savedMessageLeave.getUid())
+                    .nickname(request.getNickname())
+                    .type(request.getType())
                     .content(request.getContent())
                     .contact(request.getContact())
                     .images(request.getImages())
