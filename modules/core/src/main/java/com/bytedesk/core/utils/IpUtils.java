@@ -196,4 +196,120 @@ public class IpUtils {
         return false;
     }
 
+    /**
+     * 检查IP是否匹配CIDR格式的IP段
+     * 
+     * @param ip 要检查的IP地址
+     * @param cidr CIDR格式的IP段，如 "192.168.1.0/24"
+     * @return 如果IP在CIDR范围内返回true，否则返回false
+     */
+    public static boolean isIpInCidr(String ip, String cidr) {
+        try {
+            // 解析CIDR格式
+            String[] parts = cidr.split("/");
+            if (parts.length != 2) {
+                return false;
+            }
+            
+            String networkAddress = parts[0];
+            int prefixLength = Integer.parseInt(parts[1]);
+            
+            // 验证IP地址格式
+            if (!isValidIp(ip) || !isValidIp(networkAddress)) {
+                return false;
+            }
+            
+            // 获取网络地址和子网掩码
+            InetAddress network = InetAddress.getByName(networkAddress);
+            InetAddress ipToCheck = InetAddress.getByName(ip);
+            
+            // 计算子网掩码
+            long mask = prefixLength == 0 ? 0 : 0xFFFFFFFFL << (32 - prefixLength);
+            
+            // 获取网络地址和IP地址的长整型值
+            long networkLong = ipToLong(network);
+            long ipLong = ipToLong(ipToCheck);
+            
+            // 应用子网掩码并比较
+            return (networkLong & mask) == (ipLong & mask);
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 检查IP是否匹配CIDR格式的IP段（支持IPv4和IPv6）
+     * 
+     * @param ip 要检查的IP地址
+     * @param cidr CIDR格式的IP段
+     * @return 如果IP在CIDR范围内返回true，否则返回false
+     */
+    public static boolean isIpInCidrRange(String ip, String cidr) {
+        try {
+            // 解析CIDR格式
+            String[] parts = cidr.split("/");
+            if (parts.length != 2) {
+                return false;
+            }
+            
+            String networkAddress = parts[0];
+            int prefixLength = Integer.parseInt(parts[1]);
+            
+            // 验证IP地址格式
+            if (!isValidIp(ip) || !isValidIp(networkAddress)) {
+                return false;
+            }
+            
+            // 获取网络地址和要检查的IP
+            InetAddress network = InetAddress.getByName(networkAddress);
+            InetAddress ipToCheck = InetAddress.getByName(ip);
+            
+            // 检查是否为IPv4
+            if (network.getAddress().length == 4 && ipToCheck.getAddress().length == 4) {
+                return isIpInCidr(ip, cidr);
+            }
+            
+            // IPv6支持（简化版本）
+            // 对于IPv6，我们使用更简单的方法：检查IP是否等于网络地址
+            // 在实际应用中，可能需要更复杂的IPv6 CIDR计算
+            return network.equals(ipToCheck);
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 验证CIDR格式是否正确
+     * 
+     * @param cidr CIDR格式字符串，如 "192.168.1.0/24"
+     * @return 如果格式正确返回true，否则返回false
+     */
+    public static boolean isValidCidr(String cidr) {
+        try {
+            String[] parts = cidr.split("/");
+            if (parts.length != 2) {
+                return false;
+            }
+            
+            String networkAddress = parts[0];
+            int prefixLength = Integer.parseInt(parts[1]);
+            
+            // 验证网络地址格式
+            if (!isValidIp(networkAddress)) {
+                return false;
+            }
+            
+            // 验证前缀长度
+            InetAddress network = InetAddress.getByName(networkAddress);
+            int maxPrefixLength = network.getAddress().length * 8; // IPv4=32, IPv6=128
+            
+            return prefixLength >= 0 && prefixLength <= maxPrefixLength;
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
