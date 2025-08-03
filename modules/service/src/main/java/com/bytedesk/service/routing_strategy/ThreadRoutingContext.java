@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:07:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 06:00:17
+ * @LastEditTime: 2025-08-03 16:08:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,7 +44,7 @@ public class ThreadRoutingContext {
         for (ThreadRoutingStrategy strategy : strategies) {
             // 假设每个策略类都有一个与之对应的Bean名称，可以通过Bean名称和枚举值进行匹配。
             // 在实际应用中，可能需要其他机制来确保策略与枚举的正确匹配。
-            log.info("strategy: {}", strategy.getClass());
+            // log.info("strategy: {}", strategy.getClass());
             String beanName = strategy.getClass().getAnnotation(Component.class).value();
             ThreadTypeEnum type = ThreadTypeEnum.valueOf(beanName.toUpperCase().replace("THREADSTRATEGY", ""));
             strategyMap.put(type, strategy);
