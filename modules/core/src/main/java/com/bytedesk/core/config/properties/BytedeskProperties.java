@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 16:52:10
+ * @LastEditTime: 2025-08-03 17:11:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import jakarta.annotation.PostConstruct;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -57,8 +56,8 @@ public class BytedeskProperties {
                         }
 
                         // 处理 Admin 相关字段
-                        if (this.superUser != null) {
-                            this.superUser.setNickname(handleChineseText(this.superUser.getNickname(), "BYTEDESK_ADMIN_NICKNAME"));
+                        if (this.admin != null) {
+                            this.admin.setNickname(handleChineseText(this.admin.getNickname(), "BYTEDESK_ADMIN_NICKNAME"));
                         }
 
                         // 处理 Organization 相关字段
@@ -157,7 +156,7 @@ public class BytedeskProperties {
     private Custom custom = new Custom();
 
     // 管理员配置
-    private SuperUser superUser = new SuperUser();
+    private Admin admin = new Admin();
 
     // 成员配置
     private Member member = new Member();
@@ -230,7 +229,7 @@ public class BytedeskProperties {
 
     @Getter
     @Setter
-    public static class SuperUser {
+    public static class Admin {
         private String email;
         private String password;
         // private String passwordDefault;
@@ -239,6 +238,7 @@ public class BytedeskProperties {
         private List<String> mobileWhitelist = new ArrayList<>();
         private List<String> emailWhitelist = new ArrayList<>();
         private String validateCode;
+        // 
         private Boolean allowRegister;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
@@ -254,11 +254,11 @@ public class BytedeskProperties {
     @Setter
     public static class Testing {
         private Boolean enabled = false;
-        private Integer accountCount = 300;
-        private String accountUsername = "test_user";
-        private String accountPassword = "password";
-        private Boolean disableCaptcha = true;
-        private Boolean disableIpFilter = true;
+        // private Integer accountCount = 300;
+        // private String accountUsername = "test_user";
+        // private String accountPassword = "password";
+        private Boolean disableCaptcha = false;
+        private Boolean disableIpFilter = false;
     }
     @Getter
     @Setter 
@@ -391,11 +391,11 @@ public class BytedeskProperties {
 
     // 为了保持向后兼容,添加getter方法
     public String getEmail() {
-        return superUser.getEmail();
+        return admin.getEmail();
     }
 
     public String getPassword() {
-        return superUser.getPassword();
+        return admin.getPassword();
     }
 
     // 导入成员默认密码
@@ -404,23 +404,23 @@ public class BytedeskProperties {
     }
 
     public String getNickname() {
-        return superUser.getNickname();
+        return admin.getNickname();
     }
 
     public String getMobile() {
-        return superUser.getMobile();
+        return admin.getMobile();
     }
 
     public List<String> getMobileWhitelist() {
-        return superUser.getMobileWhitelist();
+        return admin.getMobileWhitelist();
     }
 
     public List<String> getEmailWhitelist() {
-        return superUser.getEmailWhitelist();
+        return admin.getEmailWhitelist();
     }
 
     public String getValidateCode() {
-        return superUser.getValidateCode();
+        return admin.getValidateCode();
     }
 
     public String getOrganizationName() {
@@ -567,18 +567,18 @@ public class BytedeskProperties {
         if (user == null || user.isEmpty()) {
             return false;
         }
-        return user.equals(superUser.getMobile()) || user.equals(superUser.getEmail());
+        return user.equals(admin.getMobile()) || user.equals(admin.getEmail());
     }
 
     public Boolean isInWhitelist(@NonNull String user) {
         if (user == null || user.isEmpty()) {
             return false;
         }
-        if (superUser.getMobileWhitelist() == null || superUser.getEmailWhitelist() == null) {
+        if (admin.getMobileWhitelist() == null || admin.getEmailWhitelist() == null) {
             return false;
         }
-        return superUser.getMobileWhitelist().contains(user) || 
-               superUser.getEmailWhitelist().contains(user);
+        return admin.getMobileWhitelist().contains(user) || 
+               admin.getEmailWhitelist().contains(user);
     }
 
     /**

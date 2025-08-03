@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 16:28:28
+ * @LastEditTime: 2025-08-03 17:03:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,9 +15,11 @@ package com.bytedesk.core.config.properties;
 
 import java.io.Serializable;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class BytedeskPropertiesResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,12 +30,11 @@ public class BytedeskPropertiesResponse implements Serializable {
 
     // 
     private Custom custom;
-    private Admin admin;
-    private Member member;
     private Features features;
     private Testing testing;
 
-    @Data
+    @Getter
+    @Setter
     public static class Custom {
         private Boolean enabled;
         private String name;
@@ -51,32 +52,25 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String docUrl;
         // default lang: en-US, zh-CN, zh-TW
         private String lang = "zh-CN";
-    }
-
-    // 
-    @Data
-    public static class Admin {
+        // 
         private Boolean allowRegister;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
     }
 
-    @Data
-    public static class Member {
-        private String password;
-    }
-
-    @Data
+    @Getter
+    @Setter
     private static class Testing {
         private Boolean enabled = false;
-        private Integer accountCount = 300;
-        private String accountUsername = "test_username";
-        private String accountPassword = "password";
-        private Boolean disableCaptcha = true;
-        private Boolean disableIpFilter = true;
+        // private Integer accountCount = 300;
+        // private String accountUsername = "test_username";
+        // private String accountPassword = "password";
+        private Boolean disableCaptcha = false;
+        private Boolean disableIpFilter = false;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Features {
         // private Integer freeDays = 30;
         private String avatarBaseUrl;
