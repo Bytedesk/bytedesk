@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bytedesk-config
+  namespace: bytedesk
+data:
+  # 基础配置
+  TZ: "Asia/Shanghai"
+  SERVER_PORT: "9003"
+  
+  # 微语配置
+  BYTEDESK_DEBUG: "false"
+  BYTEDESK_VERSION: "0.9.0"
+  BYTEDESK_LICENSE_KEY: ""
+  
+  # 管理员配置
+  BYTEDESK_ADMIN_EMAIL: "admin@email.com"
+  BYTEDESK_ADMIN_PASSWORD: "admin"
+  BYTEDESK_ADMIN_NICKNAME: "SuperAdmin"
+  BYTEDESK_ADMIN_MOBILE: "13345678000"
+  BYTEDESK_ADMIN_VALIDATE_CODE: "123456"
+  
+  # JWT 配置
+  BYTEDESK_JWT_EXPIRATION: "2592000000"
+  
+  # 数据库配置
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  
+  # AI 配置
+  SPRING_AI_MODEL_CHAT: "zhipuai"
+  SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
+  SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: "glm-4-flash"
+  
+  # 文档配置
+  SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+  KNIFE4J_ENABLED: "true" 
