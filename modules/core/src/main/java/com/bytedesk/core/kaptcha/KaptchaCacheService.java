@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 17:48:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 14:55:25
+ * @LastEditTime: 2025-08-03 16:54:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.redis.RedisConsts;
 
@@ -35,6 +36,8 @@ public class KaptchaCacheService {
     
     private final StringRedisTemplate stringRedisTemplate;
 
+    private final BytedeskProperties bytedeskProperties;
+
     public void putKaptcha(String key, String value) {
         stringRedisTemplate.opsForValue().set(RedisConsts.BYTEDESK_REDIS_PREFIX + key, value, EXPIRE_TIME, TimeUnit.MINUTES);
     }
@@ -50,6 +53,10 @@ public class KaptchaCacheService {
     public Boolean checkKaptcha(String key, String value, @NonNull String channel) {
         // flutter手机端验证码暂时不做校验
         if (ChannelEnum.FLUTTER.name().equalsIgnoreCase(channel)) {
+            return true;
+        }
+        // 如果禁用验证码，则直接返回true
+        if (bytedeskProperties.isDisableCaptcha()) {
             return true;
         }
         // log.info("checkKaptcha key: " + key + ", value: " + value);

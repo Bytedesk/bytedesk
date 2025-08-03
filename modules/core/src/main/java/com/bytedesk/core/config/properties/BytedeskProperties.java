@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 16:28:21
+ * @LastEditTime: 2025-08-03 16:52:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,10 +25,14 @@ import org.springframework.util.StringUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-@Data
+@Getter
+@Setter
 @Component
 @ConfigurationProperties(BytedeskProperties.CONFIG_PREFIX)
 public class BytedeskProperties {
@@ -53,8 +57,8 @@ public class BytedeskProperties {
                         }
 
                         // 处理 Admin 相关字段
-                        if (this.admin != null) {
-                            this.admin.setNickname(handleChineseText(this.admin.getNickname(), "BYTEDESK_ADMIN_NICKNAME"));
+                        if (this.superUser != null) {
+                            this.superUser.setNickname(handleChineseText(this.superUser.getNickname(), "BYTEDESK_ADMIN_NICKNAME"));
                         }
 
                         // 处理 Organization 相关字段
@@ -153,7 +157,7 @@ public class BytedeskProperties {
     private Custom custom = new Custom();
 
     // 管理员配置
-    private Admin admin = new Admin();
+    private SuperUser superUser = new SuperUser();
 
     // 成员配置
     private Member member = new Member();
@@ -203,7 +207,8 @@ public class BytedeskProperties {
         PLATFORM // 平台版-不限人数，付费，功能不限
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Custom {
         private Boolean enabled = false;
         private String name;
@@ -223,8 +228,9 @@ public class BytedeskProperties {
         private String lang = "zh-CN";
     }
 
-    @Data
-    public static class Admin {
+    @Getter
+    @Setter
+    public static class SuperUser {
         private String email;
         private String password;
         // private String passwordDefault;
@@ -238,12 +244,14 @@ public class BytedeskProperties {
         private Boolean forceValidateEmail;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Member {
         private String password;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Testing {
         private Boolean enabled = false;
         private Integer accountCount = 300;
@@ -252,13 +260,15 @@ public class BytedeskProperties {
         private Boolean disableCaptcha = true;
         private Boolean disableIpFilter = true;
     }
-    @Data 
+    @Getter
+    @Setter 
     public static class Organization {
         private String name;
         private String code;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Features {
         private Boolean javaAi = false;
         // private Boolean pythonAi = true;
@@ -268,33 +278,38 @@ public class BytedeskProperties {
         private String avatarBaseUrl;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Cors {
         private String allowedOrigins;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Jwt {
         private String secretKey;
         private String expiration;
         private String refreshTokenExpiration;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Cache {
         private Integer level;
         private String prefix;
         private String redisStreamKey;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Upload {
         private String type;
         private String dir;
         private String url;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Cluster {
         private Boolean enabled;
         private List<String> nodes = new ArrayList<>();
@@ -302,42 +317,48 @@ public class BytedeskProperties {
         private Integer port = 6781;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Kbase {
         private String theme;
         private String htmlPath;
         private String apiUrl;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Aliyun {
         private String accessKeyId;
         private String accessKeySecret;
         private Oss oss = new Oss();
         private Sms sms = new Sms();
 
-        @Data
+        @Getter
+    @Setter
         public static class Oss {
             private String endpoint;
             private String baseUrl;
             private String bucketName;
         }
 
-        @Data
+        @Getter
+    @Setter
         public static class Sms {
             private String signName;
             private String templateCode;
         }
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Tencent {
         private String appId;
         private String secretId;
         private String secretKey;
         private Bucket bucket = new Bucket();
 
-        @Data
+        @Getter
+        @Setter
         public static class Bucket {
             private String location;
             private String name;
@@ -345,7 +366,8 @@ public class BytedeskProperties {
         }
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class WechatPay {
         private Boolean enabled = false;
         private String certPath;
@@ -355,7 +377,8 @@ public class BytedeskProperties {
         private String notifyUrl;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class Minio {
         private Boolean enabled = false;
         private String endpoint = "http://127.0.0.1:19000";
@@ -368,11 +391,11 @@ public class BytedeskProperties {
 
     // 为了保持向后兼容,添加getter方法
     public String getEmail() {
-        return admin.getEmail();
+        return superUser.getEmail();
     }
 
     public String getPassword() {
-        return admin.getPassword();
+        return superUser.getPassword();
     }
 
     // 导入成员默认密码
@@ -381,23 +404,23 @@ public class BytedeskProperties {
     }
 
     public String getNickname() {
-        return admin.getNickname();
+        return superUser.getNickname();
     }
 
     public String getMobile() {
-        return admin.getMobile();
+        return superUser.getMobile();
     }
 
     public List<String> getMobileWhitelist() {
-        return admin.getMobileWhitelist();
+        return superUser.getMobileWhitelist();
     }
 
     public List<String> getEmailWhitelist() {
-        return admin.getEmailWhitelist();
+        return superUser.getEmailWhitelist();
     }
 
     public String getValidateCode() {
-        return admin.getValidateCode();
+        return superUser.getValidateCode();
     }
 
     public String getOrganizationName() {
@@ -411,10 +434,6 @@ public class BytedeskProperties {
     public Boolean getJavaAi() {
         return features.getJavaAi();
     }
-
-    // public Boolean getPythonAi() {
-    //     return features.getPythonAi();
-    // }
 
     public String getEmailType() {
         return features.getEmailType();
@@ -524,42 +543,42 @@ public class BytedeskProperties {
         return minio.getSecure();
     }
 
-    public Testing getTesting() {
-        return testing;
+    /**
+     * 检查是否禁用IP过滤
+     * @return 如果禁用IP过滤，返回true；否则返回false
+     */
+    public boolean isDisableIpFilter() {
+        return testing != null && 
+               Boolean.TRUE.equals(testing.getEnabled()) && 
+               Boolean.TRUE.equals(testing.getDisableIpFilter());
     }
 
     /**
-     * 检查是否启用性能测试模式
-     * @return 如果启用性能测试且禁用IP过滤，返回true；否则返回false
+     * 检查是否禁用验证码
+     * @return 如果禁用验证码，返回true；否则返回false
      */
-    public boolean isPerformanceTestingEnabled() {
-        try {
-            return testing != null && 
-                   Boolean.TRUE.equals(testing.getEnabled()) && 
-                   Boolean.TRUE.equals(testing.getDisableIpFilter());
-        } catch (Exception e) {
-            // 记录错误但不抛出异常，避免影响其他功能
-            System.err.println("Error checking performance testing configuration: " + e.getMessage());
-            return false;
-        }
+    public boolean isDisableCaptcha() {
+        return testing != null && 
+               Boolean.TRUE.equals(testing.getEnabled()) && 
+               Boolean.TRUE.equals(testing.getDisableCaptcha());
     }
 
-    public Boolean isAdmin(@NonNull String receiver) {
-        if (receiver == null || receiver.isEmpty()) {
+    public Boolean isSuperUser(@NonNull String user) {
+        if (user == null || user.isEmpty()) {
             return false;
         }
-        return receiver.equals(admin.getMobile()) || receiver.equals(admin.getEmail());
+        return user.equals(superUser.getMobile()) || user.equals(superUser.getEmail());
     }
 
-    public Boolean isInWhitelist(@NonNull String receiver) {
-        if (receiver == null || receiver.isEmpty()) {
+    public Boolean isInWhitelist(@NonNull String user) {
+        if (user == null || user.isEmpty()) {
             return false;
         }
-        if (admin.getMobileWhitelist() == null || admin.getEmailWhitelist() == null) {
+        if (superUser.getMobileWhitelist() == null || superUser.getEmailWhitelist() == null) {
             return false;
         }
-        return admin.getMobileWhitelist().contains(receiver) || 
-               admin.getEmailWhitelist().contains(receiver);
+        return superUser.getMobileWhitelist().contains(user) || 
+               superUser.getEmailWhitelist().contains(user);
     }
 
     /**

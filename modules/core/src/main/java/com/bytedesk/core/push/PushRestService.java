@@ -119,7 +119,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
 
         String code = "";
         if (bytedeskProperties.isInWhitelist(receiver) 
-            || bytedeskProperties.isAdmin(receiver)) {
+            || bytedeskProperties.isSuperUser(receiver)) {
             code = bytedeskProperties.getValidateCode();
         } else {
             code = Utils.getRandomCode();
