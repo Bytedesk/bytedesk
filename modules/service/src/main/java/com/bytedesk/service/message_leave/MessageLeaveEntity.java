@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:11:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-26 11:52:18
+ * @LastEditTime: 2025-08-03 09:36:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,6 +57,11 @@ public class MessageLeaveEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Customer nickname
+     */
+    private String nickname;
+
+    /**
      * Customer contact information such as email or phone number
      */
     private String contact;
@@ -66,6 +71,13 @@ public class MessageLeaveEntity extends BaseEntity {
      */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
+
+    /**
+     * Type of the leave message
+     */
+    @Builder.Default
+    @Column(name = "leavemsg_type")
+    private String type = MessageLeaveTypeEnum.GENERAL.name();
 
     /**
      * URLs of images attached to the leave message

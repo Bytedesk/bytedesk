@@ -521,6 +521,8 @@ public class MessageLeaveRestService extends
     public MessageLeaveExcel convertToExcel(MessageLeaveEntity entity) {
         MessageLeaveExcel excel = modelMapper.map(entity, MessageLeaveExcel.class);
         excel.setImages(Utils.convertListToString(entity.getImages()));
+        excel.setType(MessageLeaveTypeEnum.fromCode(entity.getType()) != null ? 
+                     MessageLeaveTypeEnum.fromCode(entity.getType()).getName() : "未知");
         excel.setStatus(MessageLeaveStatusEnum.fromString(entity.getStatus()).getDescription());
         // 
         UserProtobuf user = UserProtobuf.fromJson(entity.getUser());

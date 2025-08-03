@@ -41,6 +41,9 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
             // user
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUid() + "%"));

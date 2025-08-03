@@ -41,6 +41,10 @@ public class MessageLeaveExcel extends BaseExcel {
     @ColumnWidth(20)
     private String content;
     
+    @ExcelProperty(value = "留言类型")
+    @ColumnWidth(15)
+    private String type;
+    
     @ExcelProperty(value = "图片")
     @ColumnWidth(10)
     private String images;
