@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "开始部署微语系统（修复版）..."
+echo "开始部署微语系统..."
 
 # 检查 kubectl
 if ! command -v kubectl &> /dev/null; then
@@ -15,13 +15,6 @@ kubectl apply -f namespace.yaml
 # 应用密钥
 echo "应用密钥配置..."
 kubectl apply -f secret.yaml
-
-# 删除旧的 PVC（如果存在）
-echo "清理旧的 PVC..."
-kubectl delete pvc mysql-pvc redis-pvc uploads-pvc elasticsearch-pvc artemis-pvc zipkin-pvc minio-pvc -n bytedesk --ignore-not-found=true
-
-# 等待删除完成
-sleep 5
 
 # 部署持久化存储
 echo "部署持久化存储..."

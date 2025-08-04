@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-04 08:11:16
+ * @LastEditTime: 2025-08-04 11:56:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,9 +17,11 @@
 
 ```bash
 .
+├── deploy.sh                        # 自动化部署脚本（推荐使用）
 ├── namespace.yaml                   # 创建微语系统专用命名空间
 ├── configmap.yaml                   # 应用配置映射
 ├── secret.yaml                      # 敏感信息密钥
+├── cleanup.sh                       # PVC 和数据清理脚本
 ├── mysql-deployment.yaml            # MySQL 数据库部署
 ├── mysql-service.yaml               # MySQL 服务
 ├── redis-deployment.yaml            # Redis 缓存部署
@@ -61,9 +63,6 @@
 ```bash
 # 查看可用的存储类
 kubectl get storageclass
-
-# 如果没有默认存储类，需要设置一个
-kubectl patch storageclass <storage-class-name> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ```
 
 ### 3. Ingress Controller
@@ -79,9 +78,11 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-## 部署步骤
+## 快速部署
 
-### 1. 克隆项目并进入 K8s 目录
+### 使用自动化部署脚本（推荐）
+
+#### 1. 克隆项目并进入 K8s 目录
 
 ```bash
 # 克隆项目
@@ -91,97 +92,47 @@ git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/k8s
 ```
 
-### 2. 创建命名空间
-
-```bash
-# 创建微语系统专用命名空间
-kubectl apply -f namespace.yaml
-```
-
-### 3. 配置敏感信息
+#### 2. 配置敏感信息
 
 ```bash
 # 编辑 secret.yaml 文件，配置数据库密码、API密钥等敏感信息
 # 注意：请修改默认密码和密钥
+# 使用 stringData 字段，可以直接使用原文本，无需 base64 编码
 vim secret.yaml
-
-# 应用密钥配置
-kubectl apply -f secret.yaml
 ```
 
-### 4. 部署中间件服务
+#### 3. 执行自动化部署脚本
 
 ```bash
-# 部署持久化存储
-kubectl apply -f pvc-mysql.yaml
-kubectl apply -f pvc-redis.yaml
-kubectl apply -f pvc-elasticsearch.yaml
-kubectl apply -f pvc-artemis.yaml
-kubectl apply -f pvc-minio.yaml
-kubectl apply -f pvc-zipkin.yaml
-kubectl apply -f pvc-uploads.yaml
+# 给脚本执行权限
+chmod +x deploy.sh
 
-# 部署 MySQL
-kubectl apply -f mysql-deployment.yaml
-kubectl apply -f mysql-service.yaml
-
-# 部署 Redis
-kubectl apply -f redis-deployment.yaml
-kubectl apply -f redis-service.yaml
-
-# 部署 Elasticsearch
-kubectl apply -f elasticsearch-deployment.yaml
-kubectl apply -f elasticsearch-service.yaml
-
-# 部署 ActiveMQ Artemis
-kubectl apply -f artemis-deployment.yaml
-kubectl apply -f artemis-service.yaml
-
-# 部署 MinIO
-kubectl apply -f minio-deployment.yaml
-kubectl apply -f minio-service.yaml
-
-# 部署 Zipkin
-kubectl apply -f zipkin-deployment.yaml
-kubectl apply -f zipkin-service.yaml
+# 执行部署脚本
+./deploy.sh
 ```
 
-### 5. 等待中间件服务就绪
+- **deploy.sh**：安全部署，保留现有数据
+- **cleanup.sh**：独立清理脚本，用于清理所有数据
 
-```bash
-# 查看所有 Pod 状态
-kubectl get pods -n bytedesk
+### 手动部署（可选）
 
-# 等待所有中间件服务 Running 状态
-kubectl wait --for=condition=ready pod -l app=mysql -n bytedesk --timeout=300s
-kubectl wait --for=condition=ready pod -l app=redis -n bytedesk --timeout=300s
-kubectl wait --for=condition=ready pod -l app=elasticsearch -n bytedesk --timeout=300s
-kubectl wait --for=condition=ready pod -l app=artemis -n bytedesk --timeout=300s
-kubectl wait --for=condition=ready pod -l app=minio -n bytedesk --timeout=300s
-```
+如果需要手动部署，可以参考 `deploy.sh` 脚本中的步骤，或者查看各个 YAML 文件中的注释说明。
 
-### 6. 部署微语主应用
+**注意**：手动部署需要按顺序执行以下步骤：
 
-```bash
-# 应用配置映射
-kubectl apply -f configmap.yaml
+1. 创建命名空间
+2. 配置密钥
+3. 部署持久化存储
+4. 部署中间件服务
+5. 等待服务就绪
+6. 部署主应用
+7. 配置外部访问
 
-# 部署微语应用
-kubectl apply -f bytedesk-deployment.yaml
-kubectl apply -f bytedesk-service.yaml
-```
+**推荐使用自动化脚本**，可以避免手动操作错误并节省时间。
 
-### 7. 配置外部访问
+### 可选服务部署
 
-```bash
-# 部署 Ingress（可选）
-kubectl apply -f ingress.yaml
-
-# 或者使用 NodePort 服务直接访问
-kubectl get svc -n bytedesk
-```
-
-### 8. 可选：部署 Ollama AI 服务
+#### 部署 Ollama AI 服务
 
 如果需要使用本地 AI 模型，可以部署 Ollama：
 
@@ -195,7 +146,102 @@ kubectl exec -it deployment/ollama -n bytedesk -- ollama pull bge-m3:latest
 kubectl exec -it deployment/ollama -n bytedesk -- ollama pull linux6200/bge-reranker-v2-m3:latest
 ```
 
+#### 配置外部访问
+
+```bash
+# 部署 Ingress（可选）
+kubectl apply -f ingress.yaml
+
+# 或者使用 NodePort 服务直接访问
+kubectl get svc -n bytedesk
+```
+
+### 使用建议
+
+1. **首次部署**：推荐使用 `deploy.sh` 脚本
+2. **重新部署**：脚本会自动清理旧资源，适合重新部署
+3. **生产环境**：建议先测试脚本，确认无误后再在生产环境使用
+4. **自定义部署**：如需自定义部署流程，可参考脚本内容手动执行
+
+### 脚本输出示例
+
+```bash
+$ ./deploy.sh
+开始部署微语系统（修复版）...
+创建命名空间...
+应用密钥配置...
+清理旧的 PVC...
+部署持久化存储...
+等待 PVC 绑定...
+部署中间件...
+等待中间件就绪...
+尝试 1/10...
+MySQL 状态: Running
+Redis 状态: Running
+Elasticsearch 状态: Running
+Artemis 状态: Running
+Zipkin 状态: Running
+MinIO 状态: Running
+中间件启动成功！
+部署微语应用...
+部署完成！
+查看状态: kubectl get pods -n bytedesk
+查看服务: kubectl get svc -n bytedesk
+查看日志: kubectl logs -f deployment/mysql -n bytedesk
+```
+
 ## 配置说明
+
+### Secret 配置
+
+`secret.yaml` 文件包含所有敏感信息，使用 `stringData` 字段可以直接使用原文本，无需 base64 编码：
+
+```yaml
+stringData:
+  # MySQL 配置
+  mysql-root-password: r8FqfdbWUaN3
+  mysql-username: root
+  mysql-database: bytedesk
+  
+  # Redis 配置
+  redis-password: qfRxz3tVT8Nh
+  
+  # Elasticsearch 配置
+  elasticsearch-password: bytedesk123
+  elasticsearch-username: elastic
+  
+  # JWT 密钥
+  jwt-secret-key: 1dfaf8d004207b628a9a6b859c429f49a9a7ead9fd8161c1e60847aeef06dbd2
+  
+  # MinIO 配置
+  minio-root-user: minioadmin
+  minio-root-password: minioadmin123
+  
+  # Artemis 配置
+  artemis-username: admin
+  artemis-password: admin
+  
+  # AI API Keys (请替换为实际的 API 密钥)
+  zhipuai-api-key: sk-xxx
+  openai-api-key: sk-xxx
+  # ... 其他 AI 提供商
+```
+
+**重要提示**：
+
+- 生产环境中请修改所有默认密码和密钥
+- 使用 `stringData` 字段可以直接使用原文本，Kubernetes 会自动进行 base64 编码
+- 所有 AI 提供商的 API 密钥都需要替换为实际值
+- **数据安全**：deploy.sh 脚本安全部署，保留现有数据；如需清理数据请使用 cleanup.sh
+- **数据备份**：重要数据建议定期备份，可使用以下命令：
+
+  ```bash
+  # 备份 MySQL 数据
+  kubectl exec -n bytedesk deployment/mysql -- mysqldump -u root -p bytedesk > backup.sql
+  
+  # 备份 MinIO 数据
+  kubectl exec -n bytedesk deployment/minio -- mc mirror /data backup/
+  ```
 
 ### 环境变量配置
 
@@ -234,7 +280,6 @@ kubectl exec -it deployment/ollama -n bytedesk -- ollama pull linux6200/bge-rera
 
 - **Web 界面**：<http://your-domain> 或 <http://your-node-ip:30090>
 - **API 文档**：<http://your-domain/swagger-ui/index.html>
-- **Knife4j 文档**：<http://your-domain/doc.html>
 
 ### 管理界面
 
@@ -342,6 +387,81 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
 
 ## 故障排除
 
+### deploy.sh 脚本故障排除
+
+#### 脚本执行失败
+
+1. **kubectl 未安装**
+
+   ```bash
+   错误: kubectl 未安装
+   ```
+
+   **解决方案**：安装 kubectl 命令行工具
+
+   ```bash
+   # 下载 kubectl
+   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+   chmod +x kubectl
+   sudo mv kubectl /usr/local/bin/
+   ```
+
+2. **PVC 绑定失败**
+
+   ```bash
+   error: timed out waiting for the condition
+   ```
+
+   **解决方案**：检查存储类配置
+
+   ```bash
+   # 查看存储类
+   kubectl get storageclass
+   
+   # 检查 PVC 状态
+   kubectl get pvc -n bytedesk
+   kubectl describe pvc mysql-pvc -n bytedesk
+   ```
+
+3. **中间件启动超时**
+
+   ```bash
+   警告: 中间件启动超时，继续部署主应用...
+   ```
+
+   **解决方案**：手动检查中间件状态
+
+   ```bash
+   # 查看 Pod 状态
+   kubectl get pods -n bytedesk
+   
+   # 查看 Pod 详情
+   kubectl describe pod <pod-name> -n bytedesk
+   
+   # 查看 Pod 日志
+   kubectl logs <pod-name> -n bytedesk
+   ```
+
+4. **权限不足**
+
+   ```bash
+   Error from server (Forbidden): ...
+   ```
+
+   **解决方案**：检查 RBAC 权限
+
+   ```bash
+   # 检查当前用户权限
+   kubectl auth can-i create pods --namespace bytedesk
+   kubectl auth can-i create pvc --namespace bytedesk
+   ```
+
+#### 脚本优化建议
+
+1. **增加超时时间**：如果网络较慢，可以修改脚本中的超时时间
+2. **添加更多检查**：可以根据需要添加更多的健康检查
+3. **日志记录**：可以添加日志文件记录部署过程
+
 ### 常见问题
 
 1. **Pod 启动失败**
@@ -400,6 +520,23 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
 
 ## 清理资源
 
+### 使用清理脚本（推荐）
+
+```bash
+# 运行清理脚本，会提示确认
+./cleanup.sh
+```
+
+### 重新部署
+
+```bash
+# 清理后重新部署
+./cleanup.sh
+./deploy.sh
+```
+
+### 手动清理资源
+
 ```bash
 # 删除所有微语相关资源
 kubectl delete namespace bytedesk
@@ -409,6 +546,18 @@ kubectl delete -f . -n bytedesk
 
 # 删除持久化存储（谨慎操作，会删除所有数据）
 kubectl delete pvc --all -n bytedesk
+```
+
+### 清理特定服务
+
+```bash
+# 只删除主应用，保留数据
+kubectl delete deployment bytedesk -n bytedesk
+kubectl delete service bytedesk -n bytedesk
+
+# 只删除中间件，保留数据
+kubectl delete deployment mysql redis elasticsearch artemis minio zipkin -n bytedesk
+kubectl delete service mysql-service redis-service elasticsearch-service artemis-service minio-service zipkin-service -n bytedesk
 ```
 
 ## 许可证说明

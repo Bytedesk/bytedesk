@@ -447,23 +447,12 @@ services:
       ALIYUN_SMS_SIGNNAME: ''
       #阿里云短信服务的模板Code，可以在控制台找到
       ALIYUN_SMS_TEMPLATECODE: ''
-      # springdoc
-      SPRINGDOC_SHOW_ACTUATOR: "false"
-      # swagger-ui
-      # http://服务器ip:9003/swagger-ui/index.html
-      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
-      SPRINGDOC_SWAGGER_UI_PATH: /index.html
-      # api-docs
-      SPRINGDOC_API_DOCS_ENABLED: "true"
-      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
-      # 增加数据库连接超时时间
-      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 60000
-      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 10
       # Artemis JMS 配置
       SPRING_ARTEMIS_MODE: native
       SPRING_ARTEMIS_BROKER_URL: tcp://artemis-bytedesk:61616
       SPRING_ARTEMIS_USER: admin
       SPRING_ARTEMIS_PASSWORD: admin
+      SPRING_ARTEMIS_EMBEDDED_QUEUES: DLQ
       SPRING_JMS_LISTENER_CONCURRENCY: 1
       SPRING_JMS_LISTENER_MAX_CONCURRENCY: 10
       SPRING_JMS_LISTENER_ACKNOWLEDGE_MODE: client
@@ -473,8 +462,16 @@ services:
       SPRING_JMS_LISTENER_MAX_INTERVAL: 10000
       SPRING_JMS_LISTENER_MULTIPLIER: 2.0
       SPRING_JMS_LISTENER_RECEIVE_TIMEOUT: 1000
-      SPRING_ARTEMIS_EMBEDDED_QUEUES: DLQ
       SPRING_JMS_LISTENER_MISSING_QUEUES_FATAL: "false"
+      # springdoc
+      SPRINGDOC_SHOW_ACTUATOR: "false"
+      # swagger-ui
+      # http://服务器ip:9003/swagger-ui/index.html
+      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+      SPRINGDOC_SWAGGER_UI_PATH: /index.html
+      # api-docs
+      SPRINGDOC_API_DOCS_ENABLED: "true"
+      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
     ports:
       - 9003:9003
       - 9885:9885
