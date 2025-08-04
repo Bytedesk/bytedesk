@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: bytedesk-mysql
+  name: bytedesk-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: bytedesk-mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: bytedesk-mysql
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: bytedesk
+            - name: MYSQL_ROOT_PASSWORD
+              value: r8FqfdbWUaN3
+            - name: TZ
+              value: Asia/Shanghai
+          image: mysql:latest
+          name: mysql-bytedesk
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-data
+      restartPolicy: Always
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-data
