@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: registry.cn-hangzhou.aliyuncs.com/google_containers/mysql:8.0
+        image: mysql:latest
         ports:
         - containerPort: 3306
         env:

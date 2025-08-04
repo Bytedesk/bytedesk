@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: registry.cn-hangzhou.aliyuncs.com/google_containers/redis:7-alpine
+        image: registry.cn-hangzhou.aliyuncs.com/redis/redis-stack-server:latest
         ports:
         - containerPort: 6379
         env:
