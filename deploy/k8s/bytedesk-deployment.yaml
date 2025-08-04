@@ -23,119 +23,16 @@ spec:
           name: http
         - containerPort: 9885
           name: websocket
+        envFrom:
+        - configMapRef:
+            name: bytedesk-config
         env:
-        # 基础配置
-        - name: TZ
-          value: "Asia/Shanghai"
-        - name: SERVER_PORT
-          value: "9003"
-        
-        # 微语配置
-        - name: BYTEDESK_DEBUG
-          value: "false"
-        - name: BYTEDESK_VERSION
-          value: "0.9.0"
-        - name: BYTEDESK_LICENSE_KEY
-          value: ""
-        
-        # 自定义配置
-        - name: BYTEDESK_CUSTOM_ENABLED
-          value: "false"
-        - name: BYTEDESK_CUSTOM_NAME
-          value: ""
-        - name: BYTEDESK_CUSTOM_LOGO
-          value: ""
-        - name: BYTEDESK_CUSTOM_DESCRIPTION
-          value: ""
-        - name: BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT
-          value: "false"
-        - name: BYTEDESK_CUSTOM_SHOW_DEMO
-          value: "false"
-        - name: BYTEDESK_CUSTOM_PRIVACY_POLICY_URL
-          value: "https://www.weiyuai.cn/privacy.html"
-        - name: BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL
-          value: "https://www.weiyuai.cn/terms.html"
-        - name: BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE
-          value: "true"
-        - name: BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE
-          value: "true"
-        - name: BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE
-          value: "true"
-        - name: BYTEDESK_CUSTOM_DOC_URL_SHOW
-          value: "true"
-        - name: BYTEDESK_CUSTOM_DOC_URL
-          value: "https://www.weiyuai.cn/docs/zh-CN/"
-        - name: BYTEDESK_CUSTOM_LANG
-          value: "zh-CN"
-        - name: BYTEDESK_CUSTOM_ALLOW_REGISTER
-          value: "true"
-        - name: BYTEDESK_CUSTOM_FORCE_VALIDATE_MOBILE
-          value: "true"
-        - name: BYTEDESK_CUSTOM_FORCE_VALIDATE_EMAIL
-          value: "true"
-        
-        # 管理员配置
-        - name: BYTEDESK_ADMIN_EMAIL
-          value: "admin@email.com"
-        - name: BYTEDESK_ADMIN_PASSWORD
-          value: "admin"
-        - name: BYTEDESK_ADMIN_NICKNAME
-          value: "SuperAdmin"
-        - name: BYTEDESK_ADMIN_MOBILE
-          value: "13345678000"
-        - name: BYTEDESK_ADMIN_VALIDATE_CODE
-          value: "123456"
-        
-        # 管理员白名单配置
-        - name: BYTEDESK_ADMIN_MOBILE_WHITELIST
-          value: "18888888000,18888888001,18888888002,18888888003,18888888004,18888888005"
-        - name: BYTEDESK_ADMIN_EMAIL_WHITELIST
-          value: "100@email.com,101@email.com,102@email.com,103@email.com,104@email.com,105@email.com"
-        
-        # 会员配置
-        - name: BYTEDESK_MEMBER_PASSWORD
-          value: "123456"
-        
-        # 性能测试配置
-        - name: BYTEDESK_TESTING_ENABLED
-          value: "false"
-        - name: BYTEDESK_TESTING_DISABLE_CAPTCHA
-          value: "false"
-        - name: BYTEDESK_TESTING_DISABLE_IP_FILTER
-          value: "false"
-        
-        # 组织配置
-        - name: BYTEDESK_ORGANIZATION_NAME
-          value: "MyCompany"
-        - name: BYTEDESK_ORGANIZATION_CODE
-          value: "bytedesk"
-        
-        # 功能配置
-        - name: BYTEDESK_FEATURES_JAVA_AI
-          value: "true"
-        - name: BYTEDESK_FEATURES_EMAIL_TYPE
-          value: "javamail"
-        - name: BYTEDESK_FEATURES_AVATAR_BASE_URL
-          value: "http://127.0.0.1:9003"
-        
-        # CORS 配置
-        - name: BYTEDESK_CORS_ALLOWED_ORIGINS
-          value: "*"
-        
-        # JWT 配置
+        # 敏感信息配置（从 Secret 获取）
         - name: BYTEDESK_JWT_SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: jwt-secret-key
-        - name: BYTEDESK_JWT_EXPIRATION
-          value: "2592000000"
-        - name: BYTEDESK_JWT_REFRESH_TOKEN_EXPIRATION
-          value: "5184000000"
-        
-        # 数据库配置
-        - name: SPRING_DATASOURCE_URL
-          value: "jdbc:mysql://mysql-service:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true"
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -146,153 +43,11 @@ spec:
             secretKeyRef:
               name: bytedesk-secrets
               key: mysql-root-password
-        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-          value: "update"
-        
-        # 数据库连接池配置
-        - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
-          value: "60000"
-        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
-          value: "10"
-        
-        # Druid 配置
-        - name: SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_USERNAME
-          value: "admin@email.com"
-        - name: SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_PASSWORD
-          value: "admin"
-        
-        # Actuator 配置
-        - name: MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT
-          value: "false"
-        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
-          value: ""
-        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_EXCLUDE
-          value: "*"
-        - name: MANAGEMENT_ENDPOINT_HEALTH_ENABLED
-          value: "false"
-        - name: MANAGEMENT_ENDPOINT_INFO_ENABLED
-          value: "false"
-        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
-          value: "/management"
-        
-        # Zipkin 追踪配置
-        - name: MANAGEMENT_TRACING_ENABLED
-          value: "false"
-        - name: MANAGEMENT_TRACING_SAMPLING_PROBABILITY
-          value: "0.0"
-        
-        # Spring Security 配置
-        - name: SPRING_SECURITY_BASIC_ENABLED
-          value: "true"
-        
-        # 微信支付配置
-        - name: WECHAT_PAY_ENABLED
-          value: "false"
-        - name: WECHAT_PAY_CERTPATH
-          value: ""
-        
-        # 阿里云短信配置
-        - name: ALIYUN_SMS_SIGNNAME
-          value: ""
-        - name: ALIYUN_SMS_TEMPLATECODE
-          value: ""
-        
-        # Redis 配置
-        - name: SPRING_DATA_REDIS_DATABASE
-          value: "0"
-        - name: SPRING_DATA_REDIS_HOST
-          value: "redis-service"
-        - name: SPRING_DATA_REDIS_PORT
-          value: "6379"
         - name: SPRING_DATA_REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: redis-password
-        - name: SPRING_DATA_REDIS_TIMEOUT
-          value: "10000"
-        - name: SPRING_DATA_REDIS_REPOSITORIES_ENABLED
-          value: "false"
-        
-        # 缓存配置
-        - name: BYTEDESK_CACHE_LEVEL
-          value: "0"
-        - name: BYTEDESK_CACHE_PREFIX
-          value: "bytedeskim"
-        - name: BYTEDESK_CACHE_REDIS_STREAM_KEY
-          value: "bytedeskim:stream"
-        
-        # 上传配置
-        - name: BYTEDESK_UPLOAD_TYPE
-          value: "local"
-        - name: BYTEDESK_UPLOAD_DIR
-          value: "/app/uploads"
-        - name: BYTEDESK_UPLOAD_URL
-          value: "http://127.0.0.1:9003"
-        
-        # 知识库配置
-        - name: BYTEDESK_KBASE_THEME
-          value: "default"
-        - name: BYTEDESK_KBASE_HTML_PATH
-          value: "helpcenter"
-        - name: BYTEDESK_KBASE_API_URL
-          value: "http://127.0.0.1:9003"
-        
-        # Socket 配置
-        - name: BYTEDESK_SOCKET_HOST
-          value: "0.0.0.0"
-        - name: BYTEDESK_SOCKET_WEBSOCKET_PORT
-          value: "9885"
-        - name: BYTEDESK_SOCKET_LEAK_DETECTOR_LEVEL
-          value: "SIMPLE"
-        - name: BYTEDESK_SOCKET_PARENT_EVENT_LOOP_GROUP_THREAD_COUNT
-          value: "1"
-        - name: BYTEDESK_SOCKET_CHILD_EVENT_LOOP_GROUP_THREAD_COUNT
-          value: "8"
-        - name: BYTEDESK_SOCKET_MAX_PAYLOAD_SIZE
-          value: "10240"
-        
-        # 集群配置
-        - name: BYTEDESK_CLUSTER_ENABLED
-          value: "false"
-        
-        # 日志配置
-        - name: LOGGING_LEVEL_COM_BYTEDESK_AI
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_CORE
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_KBASE
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_SERVICE
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_SOCIAL
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_WECHAT
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_SHOP
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_TEAM
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_TICKET
-          value: "DEBUG"
-        - name: LOGGING_LEVEL_COM_BYTEDESK_STARTER
-          value: "DEBUG"
-        
-        # Swagger 配置
-        - name: SPRINGDOC_SHOW_ACTUATOR
-          value: "false"
-        - name: SPRINGDOC_SWAGGER_UI_ENABLED
-          value: "true"
-        - name: SPRINGDOC_SWAGGER_UI_PATH
-          value: "/index.html"
-        - name: SPRINGDOC_API_DOCS_ENABLED
-          value: "true"
-        - name: SPRINGDOC_API_DOCS_PATH
-          value: "/v3/api-docs"
-
-        # Elasticsearch 配置
-        - name: SPRING_ELASTICSEARCH_URIS
-          value: "http://elasticsearch-service:9200"
         - name: SPRING_ELASTICSEARCH_USERNAME
           valueFrom:
             secretKeyRef:
@@ -303,24 +58,6 @@ spec:
             secretKeyRef:
               name: bytedesk-secrets
               key: elasticsearch-password
-        
-        # Elasticsearch 向量存储配置
-        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED
-          value: "true"
-        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA
-          value: "true"
-        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_INDEX_NAME
-          value: "bytedesk_vs_index"
-        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_DIMENSIONS
-          value: "1024"
-        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_SIMILARITY
-          value: "cosine"
-        
-        # Artemis 配置
-        - name: SPRING_ARTEMIS_MODE
-          value: "native"
-        - name: SPRING_ARTEMIS_BROKER_URL
-          value: "tcp://artemis-service:61616"
         - name: SPRING_ARTEMIS_USER
           valueFrom:
             secretKeyRef:
@@ -331,42 +68,6 @@ spec:
             secretKeyRef:
               name: bytedesk-secrets
               key: artemis-password
-        
-        # JMS 配置
-        - name: SPRING_JMS_LISTENER_CONCURRENCY
-          value: "1"
-        - name: SPRING_JMS_LISTENER_MAX_CONCURRENCY
-          value: "10"
-        - name: SPRING_JMS_LISTENER_ACKNOWLEDGE_MODE
-          value: "client"
-        - name: SPRING_JMS_LISTENER_AUTO_STARTUP
-          value: "true"
-        - name: SPRING_JMS_LISTENER_MAX_ATTEMPTS
-          value: "5"
-        - name: SPRING_JMS_LISTENER_INITIAL_INTERVAL
-          value: "1000"
-        - name: SPRING_JMS_LISTENER_MAX_INTERVAL
-          value: "10000"
-        - name: SPRING_JMS_LISTENER_MULTIPLIER
-          value: "2.0"
-        - name: SPRING_JMS_LISTENER_RECEIVE_TIMEOUT
-          value: "1000"
-        - name: SPRING_JMS_LISTENER_MISSING_QUEUES_FATAL
-          value: "false"
-        - name: SPRING_ARTEMIS_EMBEDDED_QUEUES
-          value: "DLQ"
-        
-        # Zipkin 配置
-        - name: MANAGEMENT_ZIPKIN_TRACING_ENABLED
-          value: "false"
-        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
-          value: "http://zipkin-service:9411/api/v2/spans"
-        
-        # MinIO 配置
-        - name: BYTEDESK_MINIO_ENABLED
-          value: "false"
-        - name: BYTEDESK_MINIO_ENDPOINT
-          value: "http://minio-service:9000"
         - name: BYTEDESK_MINIO_ACCESS_KEY
           valueFrom:
             secretKeyRef:
@@ -377,241 +78,53 @@ spec:
             secretKeyRef:
               name: bytedesk-secrets
               key: minio-root-password
-        - name: BYTEDESK_MINIO_BUCKET_NAME
-          value: "bytedesk"
-        - name: BYTEDESK_MINIO_REGION
-          value: "us-east-1"
-        - name: BYTEDESK_MINIO_SECURE
-          value: "false"
         
-        # 推送配置
-        - name: BYTEDESK_PUSH_APNS_BUNDLE_ID
-          value: "com.kefux.im"
-        - name: BYTEDESK_PUSH_APNS_P12_URL
-          value: "123.p12"
-        - name: BYTEDESK_PUSH_APNS_P12_PASSWORD
-          value: "123456"
-        
-        # AI 配置
-        - name: SPRING_AI_MODEL_CHAT
-          value: "zhipuai"
+        # AI API Keys（从 Secret 获取）
         - name: SPRING_AI_ZHIPUAI_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: zhipuai-api-key
-        - name: SPRING_AI_ZHIPUAI_CHAT_ENABLED
-          value: "true"
-        - name: SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL
-          value: "glm-4-flash"
-        - name: SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        - name: SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TOP_P
-          value: "0.9"
-        - name: SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MAX_TOKENS
-          value: "4096"
-        - name: SPRING_AI_ZHIPUAI_CONNECTION_TIMEOUT
-          value: "30"
-        - name: SPRING_AI_ZHIPUAI_READ_TIMEOUT
-          value: "10"
-        - name: SPRING_AI_ZHIPUAI_WRITE_TIMEOUT
-          value: "10"
-        - name: SPRING_AI_ZHIPUAI_PING_INTERVAL
-          value: "10"
-        - name: SPRING_AI_ZHIPUAI_MAX_IDLE_CONNECTIONS
-          value: "8"
-        - name: SPRING_AI_ZHIPUAI_KEEP_ALIVE_DURATION
-          value: "1"
-        - name: SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED
-          value: "true"
-        - name: SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL
-          value: "embedding-2"
-        
-        # AI 模型配置
-        - name: SPRING_AI_MODEL_EMBEDDING
-          value: "zhipuai"
-        - name: SPRING_AI_MODEL_VISION
-          value: "zhipuai"
-        - name: SPRING_AI_MODEL_AUDIO
-          value: "zhipuai"
-        - name: SPRING_AI_MODEL_RERANK
-          value: "dashscope"
-        
-        # Ollama 配置
-        - name: SPRING_AI_OLLAMA_BASE_URL
-          value: "http://host.docker.internal:11434"
-        - name: SPRING_AI_OLLAMA_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL
-          value: "qwen3:0.6b"
-        - name: SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        - name: SPRING_AI_OLLAMA_EMBEDDING_ENABLED
-          value: "false"
-        - name: SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL
-          value: "bge-m3:latest"
-        - name: SPRING_AI_OLLAMA_INIT_PULL_MODEL_STRATEGY
-          value: "when_missing"
-        - name: SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL_RERANK
-          value: "bge-reranker-v2-m3:latest"
-        
-        # DeepSeek 配置
-        - name: SPRING_AI_DEEPSEEK_BASE_URL
-          value: "https://api.deepseek.com"
         - name: SPRING_AI_DEEPSEEK_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: deepseek-api-key
-        - name: SPRING_AI_DEEPSEEK_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL
-          value: "deepseek-chat"
-        - name: SPRING_AI_DEEPSEEK_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        - name: SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED
-          value: "false"
-        
-        # OpenAI 配置
-        - name: SPRING_AI_OPENAI_BASE_URL
-          value: "https://api.openai.com"
         - name: SPRING_AI_OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: openai-api-key
-        - name: SPRING_AI_OPENAI_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL
-          value: "gpt-4o"
-        - name: SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        - name: SPRING_AI_OPENAI_EMBEDDING_ENABLED
-          value: "false"
-        
-        # 阿里云百炼配置
-        - name: SPRING_AI_DASHSCOPE_ENABLED
-          value: "false"
-        - name: SPRING_AI_DASHSCOPE_BASE_URL
-          value: "https://dashscope.aliyuncs.com"
         - name: SPRING_AI_DASHSCOPE_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: dashscope-api-key
-        - name: SPRING_AI_DASHSCOPE_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_DASHSCOPE_CHAT_OPTIONS_MODEL
-          value: "qwen-max"
-        - name: SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        - name: SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TOP_P
-          value: "3"
-        - name: SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_ENABLED
-          value: "false"
-        - name: SPRING_AI_DASHSCOPE_IMAGE_ENABLED
-          value: "false"
-        - name: SPRING_AI_DASHSCOPE_EMBEDDING_ENABLED
-          value: "false"
-        - name: SPRING_AI_DASHSCOPE_EMBEDDING_OPTIONS_MODEL
-          value: "text-embedding-v1"
-        - name: SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_ENABLED
-          value: "false"
-        
-        # SiliconFlow 配置
-        - name: SPRING_AI_SILICONFLOW_BASE_URL
-          value: "https://api.siliconflow.cn"
         - name: SPRING_AI_SILICONFLOW_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: siliconflow-api-key
-        - name: SPRING_AI_SILICONFLOW_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_SILICONFLOW_CHAT_OPTIONS_MODEL
-          value: "Qwen/QwQ-32B"
-        - name: SPRING_AI_SILICONFLOW_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        
-        # Gitee 配置
-        - name: SPRING_AI_GITEE_BASE_URL
-          value: "https://ai.gitee.com"
         - name: SPRING_AI_GITEE_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: gitee-api-key
-        - name: SPRING_AI_GITEE_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_GITEE_CHAT_OPTIONS_MODEL
-          value: "Qwen/QwQ-32B"
-        - name: SPRING_AI_GITEE_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        
-        # 腾讯配置
-        - name: SPRING_AI_TENCENT_BASE_URL
-          value: "https://api.hunyuan.cloud.tencent.com"
         - name: SPRING_AI_TENCENT_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: tencent-api-key
-        - name: SPRING_AI_TENCENT_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_TENCENT_CHAT_OPTIONS_MODEL
-          value: "hunyuan-t1-latest"
-        - name: SPRING_AI_TENCENT_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        
-        # 百度配置
-        - name: SPRING_AI_BAIDU_BASE_URL
-          value: "https://qianfan.baidubce.com/v2"
         - name: SPRING_AI_BAIDU_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: baidu-api-key
-        - name: SPRING_AI_BAIDU_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_BAIDU_CHAT_OPTIONS_MODEL
-          value: "ernie-x1-32k-preview"
-        - name: SPRING_AI_BAIDU_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        
-        # 火山引擎配置
-        - name: SPRING_AI_VOLCENGINE_BASE_URL
-          value: "https://ark.cn-beijing.volces.com/api/v3"
         - name: SPRING_AI_VOLCENGINE_API_KEY
           valueFrom:
             secretKeyRef:
               name: bytedesk-secrets
               key: volcengine-api-key
-        - name: SPRING_AI_VOLCENGINE_CHAT_ENABLED
-          value: "false"
-        - name: SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL
-          value: "doubao-1-5-pro-32k-250115"
-        - name: SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE
-          value: "0.7"
-        
-        # 向量存储配置
-        - name: SPRING_AI_VECTORSTORE_REDIS_INITIALIZE_SCHEMA
-          value: "true"
-        - name: SPRING_AI_VECTORSTORE_REDIS_INDEX_NAME
-          value: "bytedesk_vs_index"
-        
-        # MCP 配置
-        - name: SPRING_AI_MCP_CLIENT_ENABLED
-          value: "false"
-        - name: SPRING_AI_MCP_SERVER_ENABLED
-          value: "false"
-        - name: SPRING_AI_MCP_SERVER_STDIO
-          value: "false"
-        - name: SPRING_AI_MCP_SERVER_TYPE
-          value: "SYNC"
-        
-        # Weaviate 配置
-        - name: SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED
-          value: "false"
         
         volumeMounts:
         - name: uploads-data

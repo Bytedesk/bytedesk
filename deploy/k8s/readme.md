@@ -245,7 +245,26 @@ stringData:
 
 ### 环境变量配置
 
-主要配置项在 `configmap.yaml` 中，包括：
+配置采用分层管理，避免重复：
+
+**ConfigMap (`configmap.yaml`)**：包含所有非敏感配置
+- 基础配置（时区、端口等）
+- 应用配置（调试、版本等）
+- 自定义配置（品牌、UI等）
+- 中间件配置（数据库、Redis、Elasticsearch等）
+- AI 配置（模型、参数等）
+
+**Secret (`secret.yaml`)**：包含所有敏感信息
+- 数据库密码
+- API 密钥
+- JWT 密钥
+- 中间件认证信息
+
+**Deployment (`bytedesk-deployment.yaml`)**：引用 ConfigMap 和 Secret
+- 使用 `envFrom` 引用整个 ConfigMap
+- 使用 `env` 单独引用 Secret 中的敏感信息
+
+这种设计避免了配置重复，提高了维护性。
 
 - **数据库配置**：MySQL 连接信息
 - **Redis 配置**：缓存和会话存储
