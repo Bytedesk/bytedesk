@@ -75,7 +75,51 @@ spec:
         - name: SPRING_JPA_HIBERNATE_DDL_AUTO
           value: "update"
         
+        # 数据库连接池配置
+        - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+          value: "60000"
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+          value: "10"
+        
+        # Druid 配置
+        - name: SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_USERNAME
+          value: "admin@email.com"
+        - name: SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_PASSWORD
+          value: "admin"
+        
+        # Actuator 配置
+        - name: MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          value: ""
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_EXCLUDE
+          value: "*"
+        - name: MANAGEMENT_ENDPOINT_HEALTH_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINT_INFO_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: "/management"
+        
+        # Spring Security 配置
+        - name: SPRING_SECURITY_BASIC_ENABLED
+          value: "true"
+        
+        # 微信支付配置
+        - name: WECHAT_PAY_ENABLED
+          value: "false"
+        - name: WECHAT_PAY_CERTPATH
+          value: ""
+        
+        # 阿里云短信配置
+        - name: ALIYUN_SMS_SIGNNAME
+          value: ""
+        - name: ALIYUN_SMS_TEMPLATECODE
+          value: ""
+        
         # Redis 配置
+        - name: SPRING_DATA_REDIS_DATABASE
+          value: "0"
         - name: SPRING_DATA_REDIS_HOST
           value: "redis-service"
         - name: SPRING_DATA_REDIS_PORT
@@ -85,6 +129,92 @@ spec:
             secretKeyRef:
               name: bytedesk-secrets
               key: redis-password
+        - name: SPRING_DATA_REDIS_TIMEOUT
+          value: "10000"
+        - name: SPRING_DATA_REDIS_REPOSITORIES_ENABLED
+          value: "false"
+        
+        # 缓存配置
+        - name: BYTEDESK_CACHE_LEVEL
+          value: "0"
+        - name: BYTEDESK_CACHE_PREFIX
+          value: "bytedeskim"
+        - name: BYTEDESK_CACHE_REDIS_STREAM_KEY
+          value: "bytedeskim:stream"
+        
+        # 上传配置
+        - name: BYTEDESK_UPLOAD_TYPE
+          value: "local"
+        - name: BYTEDESK_UPLOAD_DIR
+          value: "/app/uploads"
+        - name: BYTEDESK_UPLOAD_URL
+          value: "http://127.0.0.1:9003"
+        
+        # 知识库配置
+        - name: BYTEDESK_KBASE_THEME
+          value: "default"
+        - name: BYTEDESK_KBASE_HTML_PATH
+          value: "helpcenter"
+        - name: BYTEDESK_KBASE_API_URL
+          value: "http://127.0.0.1:9003"
+        
+        # Socket 配置
+        - name: BYTEDESK_SOCKET_HOST
+          value: "0.0.0.0"
+        - name: BYTEDESK_SOCKET_WEBSOCKET_PORT
+          value: "9885"
+        - name: BYTEDESK_SOCKET_LEAK_DETECTOR_LEVEL
+          value: "SIMPLE"
+        - name: BYTEDESK_SOCKET_PARENT_EVENT_LOOP_GROUP_THREAD_COUNT
+          value: "1"
+        - name: BYTEDESK_SOCKET_CHILD_EVENT_LOOP_GROUP_THREAD_COUNT
+          value: "8"
+        - name: BYTEDESK_SOCKET_MAX_PAYLOAD_SIZE
+          value: "10240"
+        
+        # 集群配置
+        - name: BYTEDESK_CLUSTER_ENABLED
+          value: "false"
+        
+        # 日志配置
+        - name: LOGGING_LEVEL_COM_BYTEDESK_AI
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_CORE
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_KBASE
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_SERVICE
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_SOCIAL
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_WECHAT
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_SHOP
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_TEAM
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_TICKET
+          value: "DEBUG"
+        - name: LOGGING_LEVEL_COM_BYTEDESK_STARTER
+          value: "DEBUG"
+        
+        # Swagger 配置
+        - name: SPRINGDOC_SHOW_ACTUATOR
+          value: "false"
+        - name: SPRINGDOC_SWAGGER_UI_ENABLED
+          value: "true"
+        - name: SPRINGDOC_SWAGGER_UI_PATH
+          value: "/index.html"
+        - name: SPRINGDOC_API_DOCS_ENABLED
+          value: "true"
+        - name: SPRINGDOC_API_DOCS_PATH
+          value: "/v3/api-docs"
+        
+        # Knife4j 配置
+        - name: KNIFE4J_ENABLED
+          value: "true"
+        - name: KNIFE4J_SETTING_LANGUAGE
+          value: "zh_cn"
         
         # Elasticsearch 配置
         - name: SPRING_ELASTICSEARCH_URIS
@@ -100,7 +230,21 @@ spec:
               name: bytedesk-secrets
               key: elasticsearch-password
         
+        # Elasticsearch 向量存储配置
+        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED
+          value: "true"
+        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA
+          value: "true"
+        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_INDEX_NAME
+          value: "bytedesk_vs_index"
+        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_DIMENSIONS
+          value: "1024"
+        - name: SPRING_AI_VECTORSTORE_ELASTICSEARCH_SIMILARITY
+          value: "cosine"
+        
         # Artemis 配置
+        - name: SPRING_ARTEMIS_MODE
+          value: "native"
         - name: SPRING_ARTEMIS_BROKER_URL
           value: "tcp://artemis-service:61616"
         - name: SPRING_ARTEMIS_USER
@@ -113,6 +257,58 @@ spec:
             secretKeyRef:
               name: bytedesk-secrets
               key: artemis-password
+        
+        # JMS 配置
+        - name: SPRING_JMS_LISTENER_CONCURRENCY
+          value: "1"
+        - name: SPRING_JMS_LISTENER_MAX_CONCURRENCY
+          value: "10"
+        - name: SPRING_JMS_LISTENER_ACKNOWLEDGE_MODE
+          value: "client"
+        - name: SPRING_JMS_LISTENER_AUTO_STARTUP
+          value: "true"
+        - name: SPRING_JMS_LISTENER_MAX_ATTEMPTS
+          value: "5"
+        - name: SPRING_JMS_LISTENER_INITIAL_INTERVAL
+          value: "1000"
+        - name: SPRING_JMS_LISTENER_MAX_INTERVAL
+          value: "10000"
+        - name: SPRING_JMS_LISTENER_MULTIPLIER
+          value: "2.0"
+        - name: SPRING_JMS_LISTENER_RECEIVE_TIMEOUT
+          value: "1000"
+        - name: SPRING_JMS_LISTENER_MISSING_QUEUES_FATAL
+          value: "false"
+        - name: SPRING_ARTEMIS_EMBEDDED_QUEUES
+          value: "DLQ"
+        
+        # Zipkin 配置
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: "http://zipkin-service:9411/api/v2/spans"
+        
+        # MinIO 配置
+        - name: BYTEDESK_MINIO_ENABLED
+          value: "false"
+        - name: BYTEDESK_MINIO_ENDPOINT
+          value: "http://minio-service:9000"
+        - name: BYTEDESK_MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bytedesk-secrets
+              key: minio-root-user
+        - name: BYTEDESK_MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bytedesk-secrets
+              key: minio-root-password
+        - name: BYTEDESK_MINIO_BUCKET_NAME
+          value: "bytedesk"
+        - name: BYTEDESK_MINIO_REGION
+          value: "us-east-1"
+        - name: BYTEDESK_MINIO_SECURE
+          value: "false"
         
         # AI 配置
         - name: SPRING_AI_MODEL_CHAT

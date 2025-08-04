@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin
+  namespace: bytedesk
+  labels:
+    app: zipkin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template:
+    metadata:
+      labels:
+        app: zipkin
+    spec:
+      containers:
+      - name: zipkin
+        image: openzipkin/zipkin:latest
+        ports:
+        - containerPort: 9411
+          name: http
+        volumeMounts:
+        - name: zipkin-data
+          mountPath: /data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9411
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9411
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      - name: zipkin-data
+        persistentVolumeClaim:
+          claimName: zipkin-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin-service
+  namespace: bytedesk
+  labels:
+    app: zipkin
+spec:
+  selector:
+    app: zipkin
+  ports:
+  - name: http
+    port: 9411
+    targetPort: 9411
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zipkin-pvc
+  namespace: bytedesk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi 

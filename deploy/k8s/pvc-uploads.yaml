@@ -9,4 +9,4 @@ spec:
   resources:
     requests:
       storage: 50Gi
-  storageClassName: ""  # 使用默认存储类，请根据实际情况修改 
+  storageClassName: "standard"  # 使用默认存储类 

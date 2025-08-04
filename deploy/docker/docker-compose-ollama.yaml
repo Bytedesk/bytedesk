@@ -486,10 +486,6 @@ services:
       # api-docs
       SPRINGDOC_API_DOCS_ENABLED: true
       SPRINGDOC_API_DOCS_PATH: /v3/api-docs
-      # knife4j
-      #  http://服务器ip:9003/doc.html
-      KNIFE4J_ENABLED: true
-      KNIFE4J_SETTING_LANGUAGE: zh_cn
     ports:
       - 9003:9003
       - 9885:9885

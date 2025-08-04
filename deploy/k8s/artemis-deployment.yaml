@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artemis
+  namespace: bytedesk
+  labels:
+    app: artemis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: artemis
+  template:
+    metadata:
+      labels:
+        app: artemis
+    spec:
+      containers:
+      - name: artemis
+        image: apache/activemq-artemis:latest
+        ports:
+        - containerPort: 61616
+          name: jms
+        - containerPort: 61617
+          name: amqp
+        - containerPort: 8161
+          name: web-console
+        - containerPort: 5672
+          name: amqp-alt
+        - containerPort: 61613
+          name: stomp
+        - containerPort: 1883
+          name: mqtt
+        env:
+        - name: ARTEMIS_USER
+          valueFrom:
+            secretKeyRef:
+              name: bytedesk-secrets
+              key: artemis-username
+        - name: ARTEMIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bytedesk-secrets
+              key: artemis-password
+        - name: ANONYMOUS_LOGIN
+          value: "false"
+        - name: EXTRA_ARGS
+          value: "--http-host 0.0.0.0 --relax-jolokia"
+        volumeMounts:
+        - name: artemis-data
+          mountPath: /var/lib/artemis/data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /console/jolokia/
+            port: 8161
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /console/jolokia/
+            port: 8161
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: artemis-data
+        persistentVolumeClaim:
+          claimName: artemis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: artemis-service
+  namespace: bytedesk
+  labels:
+    app: artemis
+spec:
+  selector:
+    app: artemis
+  ports:
+  - name: jms
+    port: 61616
+    targetPort: 61616
+  - name: amqp
+    port: 61617
+    targetPort: 61617
+  - name: web-console
+    port: 8161
+    targetPort: 8161
+  - name: amqp-alt
+    port: 5672
+    targetPort: 5672
+  - name: stomp
+    port: 61613
+    targetPort: 61613
+  - name: mqtt
+    port: 1883
+    targetPort: 1883
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: artemis-pvc
+  namespace: bytedesk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi 
