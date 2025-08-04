@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-04 11:56:40
+ * @LastEditTime: 2025-08-04 12:48:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -258,6 +258,7 @@ stringData:
 配置采用分层管理，避免重复：
 
 **ConfigMap (`configmap.yaml`)**：包含所有非敏感配置
+
 - 基础配置（时区、端口等）
 - 应用配置（调试、版本等）
 - 自定义配置（品牌、UI等）
@@ -265,12 +266,14 @@ stringData:
 - AI 配置（模型、参数等）
 
 **Secret (`secret.yaml`)**：包含所有敏感信息
+
 - 数据库密码
 - API 密钥
 - JWT 密钥
 - 中间件认证信息
 
 **Deployment (`bytedesk-deployment.yaml`)**：引用 ConfigMap 和 Secret
+
 - 使用 `envFrom` 引用整个 ConfigMap
 - 使用 `env` 单独引用 Secret 中的敏感信息
 
@@ -309,6 +312,107 @@ stringData:
 
 - **Web 界面**：<http://your-domain> 或 <http://your-node-ip:30090>
 - **API 文档**：<http://your-domain/swagger-ui/index.html>
+
+## Ingress 配置说明
+
+### 概述
+
+Ingress 提供了统一的入口点，支持以下功能：
+
+- **负载均衡**：自动分发流量到多个 Pod
+- **SSL/TLS 终止**：支持 HTTPS 访问
+- **路径路由**：根据 URL 路径路由到不同服务
+- **域名路由**：支持多域名访问
+- **WebSocket 支持**：支持实时通信
+
+### 当前配置
+
+`ingress.yaml` 文件配置了以下路由：
+
+```yaml
+# 主应用
+- path: /
+  backend: bytedesk-service:9003
+
+# API 文档
+- path: /swagger-ui
+  backend: bytedesk-service:9003
+
+# Knife4j 文档
+- path: /doc.html
+  backend: bytedesk-service:9003
+
+# 文件上传
+- path: /uploads
+  backend: bytedesk-service:9003
+
+# WebSocket 支持
+- path: /websocket
+  backend: bytedesk-service:9885
+```
+
+### 重要注解配置
+
+```yaml
+# WebSocket 超时配置
+nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+
+# 文件上传大小限制
+nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+
+# CORS 配置
+nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+
+# 安全头配置
+nginx.ingress.kubernetes.io/server-snippet: |
+  add_header X-Frame-Options "SAMEORIGIN" always;
+  add_header X-Content-Type-Options "nosniff" always;
+```
+
+### 使用步骤
+
+1. **安装 Ingress Controller**（如果尚未安装）：
+
+   ```bash
+   # 安装 NGINX Ingress Controller
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+   ```
+
+2. **修改域名**：
+
+   ```bash
+   # 编辑 ingress.yaml，将 weiyu.example.com 替换为您的实际域名
+   sed -i 's/weiyu.example.com/your-domain.com/g' ingress.yaml
+   ```
+
+3. **部署 Ingress**：
+
+   ```bash
+   # 手动部署
+   kubectl apply -f ingress.yaml
+   
+   # 或使用 deploy.sh 脚本（已包含 Ingress 部署）
+   ./scripts/deploy.sh
+   ```
+
+4. **配置 DNS**：
+   - 将域名解析到 Kubernetes 集群的入口 IP
+   - 或使用本地 hosts 文件进行测试
+
+### 本地测试
+
+如果不需要 Ingress，可以使用端口转发进行本地测试：
+
+```bash
+# 端口转发到本地
+kubectl port-forward svc/bytedesk-service 9003:9003 -n bytedesk
+
+# 访问应用
+curl http://localhost:9003
+```
 
 ### 管理界面
 
