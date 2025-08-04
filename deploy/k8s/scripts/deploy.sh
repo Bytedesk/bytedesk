@@ -26,16 +26,7 @@ kubectl apply -f ./artemis-pvc.yaml
 kubectl apply -f ./zipkin-pvc.yaml
 kubectl apply -f ./minio-pvc.yaml
 
-# 等待 PVC 绑定
-echo "等待 PVC 绑定..."
-kubectl wait --for=condition=bound pvc/mysql-pvc -n bytedesk --timeout=60s
-kubectl wait --for=condition=bound pvc/redis-pvc -n bytedesk --timeout=60s
-kubectl wait --for=condition=bound pvc/elasticsearch-pvc -n bytedesk --timeout=60s
-kubectl wait --for=condition=bound pvc/artemis-pvc -n bytedesk --timeout=60s
-kubectl wait --for=condition=bound pvc/zipkin-pvc -n bytedesk --timeout=60s
-kubectl wait --for=condition=bound pvc/minio-pvc -n bytedesk --timeout=60s
-
-# 部署中间件
+# 部署中间件（先部署Pod，触发PVC绑定）
 echo "部署中间件..."
 kubectl apply -f ./mysql-deployment.yaml
 kubectl apply -f ./mysql-service.yaml
@@ -49,6 +40,15 @@ kubectl apply -f ./zipkin-deployment.yaml
 kubectl apply -f ./zipkin-service.yaml
 kubectl apply -f ./minio-deployment.yaml
 kubectl apply -f ./minio-service.yaml
+
+# 等待 PVC 绑定（在Pod部署后等待）
+echo "等待 PVC 绑定..."
+kubectl wait --for=condition=bound pvc/mysql-pvc -n bytedesk --timeout=120s
+kubectl wait --for=condition=bound pvc/redis-pvc -n bytedesk --timeout=120s
+kubectl wait --for=condition=bound pvc/elasticsearch-pvc -n bytedesk --timeout=120s
+kubectl wait --for=condition=bound pvc/artemis-pvc -n bytedesk --timeout=120s
+kubectl wait --for=condition=bound pvc/zipkin-pvc -n bytedesk --timeout=120s
+kubectl wait --for=condition=bound pvc/minio-pvc -n bytedesk --timeout=120s
 
 # 等待中间件就绪（增加重试机制）
 echo "等待中间件就绪..."
