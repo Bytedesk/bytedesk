@@ -21,7 +21,9 @@
 ├── namespace.yaml                   # 创建微语系统专用命名空间
 ├── configmap.yaml                   # 应用配置映射
 ├── secret.yaml                      # 敏感信息密钥
-├── cleanup.sh                       # PVC 和数据清理脚本
+├── scripts/                         # 部署脚本目录
+│   ├── deploy.sh                    # 自动化部署脚本
+│   └── cleanup.sh                   # PVC 和数据清理脚本
 ├── mysql-deployment.yaml            # MySQL 数据库部署
 ├── mysql-service.yaml               # MySQL 服务
 ├── redis-deployment.yaml            # Redis 缓存部署
@@ -37,13 +39,13 @@
 ├── bytedesk-deployment.yaml         # 微语主应用部署
 ├── bytedesk-service.yaml            # 微语服务
 ├── ingress.yaml                     # Ingress 路由配置
-├── pvc-mysql.yaml                   # MySQL 持久化存储
-├── pvc-redis.yaml                   # Redis 持久化存储
-├── pvc-elasticsearch.yaml           # Elasticsearch 持久化存储
-├── pvc-artemis.yaml                 # Artemis 持久化存储
-├── pvc-minio.yaml                   # MinIO 持久化存储
-├── pvc-zipkin.yaml                  # Zipkin 持久化存储
-├── pvc-uploads.yaml                 # 文件上传持久化存储
+├── mysql-pvc.yaml                   # MySQL 持久化存储
+├── redis-pvc.yaml                   # Redis 持久化存储
+├── elasticsearch-pvc.yaml           # Elasticsearch 持久化存储
+├── artemis-pvc.yaml                 # Artemis 持久化存储
+├── minio-pvc.yaml                   # MinIO 持久化存储
+├── zipkin-pvc.yaml                  # Zipkin 持久化存储
+├── uploads-pvc.yaml                 # 文件上传持久化存储
 └── ollama-deployment.yaml           # Ollama AI 模型服务（可选）
 ```
 
@@ -105,14 +107,14 @@ vim secret.yaml
 
 ```bash
 # 给脚本执行权限
-chmod +x deploy.sh
+chmod +x scripts/deploy.sh
 
 # 执行部署脚本
-./deploy.sh
+./scripts/deploy.sh
 ```
 
-- **deploy.sh**：安全部署，保留现有数据
-- **cleanup.sh**：独立清理脚本，用于清理所有数据
+- **scripts/deploy.sh**：安全部署，保留现有数据
+- **scripts/cleanup.sh**：独立清理脚本，用于清理所有数据
 
 ### 手动部署（可选）
 
@@ -128,7 +130,15 @@ chmod +x deploy.sh
 6. 部署主应用
 7. 配置外部访问
 
-**推荐使用自动化脚本**，可以避免手动操作错误并节省时间。
+**推荐使用自动化脚本**，可以避免手动操作错误并节省时间：
+
+```bash
+# 使用自动化部署脚本
+./scripts/deploy.sh
+
+# 使用清理脚本
+./scripts/cleanup.sh
+```
 
 ### 可选服务部署
 
@@ -232,7 +242,7 @@ stringData:
 - 生产环境中请修改所有默认密码和密钥
 - 使用 `stringData` 字段可以直接使用原文本，Kubernetes 会自动进行 base64 编码
 - 所有 AI 提供商的 API 密钥都需要替换为实际值
-- **数据安全**：deploy.sh 脚本安全部署，保留现有数据；如需清理数据请使用 cleanup.sh
+- **数据安全**：scripts/deploy.sh 脚本安全部署，保留现有数据；如需清理数据请使用 scripts/cleanup.sh
 - **数据备份**：重要数据建议定期备份，可使用以下命令：
 
   ```bash
@@ -543,15 +553,15 @@ kubectl exec -i deployment/mysql -n bytedesk -- mysql -u root -p<password> byted
 
 ```bash
 # 运行清理脚本，会提示确认
-./cleanup.sh
+./scripts/cleanup.sh
 ```
 
 ### 重新部署
 
 ```bash
 # 清理后重新部署
-./cleanup.sh
-./deploy.sh
+./scripts/cleanup.sh
+./scripts/deploy.sh
 ```
 
 ### 手动清理资源

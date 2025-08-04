@@ -10,17 +10,21 @@ fi
 
 # 创建命名空间
 echo "创建命名空间..."
-kubectl apply -f namespace.yaml
+kubectl apply -f ../namespace.yaml
 
 # 应用密钥
 echo "应用密钥配置..."
-kubectl apply -f secret.yaml
+kubectl apply -f ../secret.yaml
 
 # 部署持久化存储
 echo "部署持久化存储..."
-kubectl apply -f pvc-mysql.yaml
-kubectl apply -f pvc-redis.yaml
-kubectl apply -f pvc-uploads.yaml
+kubectl apply -f ../mysql-pvc.yaml
+kubectl apply -f ../redis-pvc.yaml
+kubectl apply -f ../uploads-pvc.yaml
+kubectl apply -f ../elasticsearch-pvc.yaml
+kubectl apply -f ../artemis-pvc.yaml
+kubectl apply -f ../zipkin-pvc.yaml
+kubectl apply -f ../minio-pvc.yaml
 
 # 等待 PVC 绑定
 echo "等待 PVC 绑定..."
@@ -33,14 +37,18 @@ kubectl wait --for=condition=bound pvc/minio-pvc -n bytedesk --timeout=60s
 
 # 部署中间件
 echo "部署中间件..."
-kubectl apply -f mysql-deployment.yaml
-kubectl apply -f mysql-service.yaml
-kubectl apply -f redis-deployment.yaml
-kubectl apply -f redis-service.yaml
-kubectl apply -f elasticsearch-deployment.yaml
-kubectl apply -f artemis-deployment.yaml
-kubectl apply -f zipkin-deployment.yaml
-kubectl apply -f minio-deployment.yaml
+kubectl apply -f ../mysql-deployment.yaml
+kubectl apply -f ../mysql-service.yaml
+kubectl apply -f ../redis-deployment.yaml
+kubectl apply -f ../redis-service.yaml
+kubectl apply -f ../elasticsearch-deployment.yaml
+kubectl apply -f ../elasticsearch-service.yaml
+kubectl apply -f ../artemis-deployment.yaml
+kubectl apply -f ../artemis-service.yaml
+kubectl apply -f ../zipkin-deployment.yaml
+kubectl apply -f ../zipkin-service.yaml
+kubectl apply -f ../minio-deployment.yaml
+kubectl apply -f ../minio-service.yaml
 
 # 等待中间件就绪（增加重试机制）
 echo "等待中间件就绪..."
@@ -76,9 +84,9 @@ done
 
 # 部署微语应用
 echo "部署微语应用..."
-kubectl apply -f configmap.yaml
-kubectl apply -f bytedesk-deployment.yaml
-kubectl apply -f bytedesk-service.yaml
+kubectl apply -f ../configmap.yaml
+kubectl apply -f ../bytedesk-deployment.yaml
+kubectl apply -f ../bytedesk-service.yaml
 
 echo "部署完成！"
 echo "查看状态: kubectl get pods -n bytedesk"

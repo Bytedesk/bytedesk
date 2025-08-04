@@ -65,35 +65,4 @@ spec:
       volumes:
       - name: minio-data
         persistentVolumeClaim:
-          claimName: minio-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio-service
-  namespace: bytedesk
-  labels:
-    app: minio
-spec:
-  selector:
-    app: minio
-  ports:
-  - name: api
-    port: 9000
-    targetPort: 9000
-  - name: console
-    port: 9001
-    targetPort: 9001
-  type: ClusterIP
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: minio-pvc
-  namespace: bytedesk
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi 
+          claimName: minio-pvc 
