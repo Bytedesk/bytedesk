@@ -1,6 +1,0 @@
-# Ignore directory existence warnings during kompose conversion
-/app/uploads
-/var/lib/artemis/data
-/usr/share/elasticsearch/data
-/data
-/var/lib/mysql 
