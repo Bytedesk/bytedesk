@@ -1,18 +1,1 @@
-apiVersion: v2
-name: bytedesk
-description: A Helm chart for ByteDesk - 微语智能客服系统
-type: application
-version: 0.1.0
-appVersion: "1.0.0"
-keywords:
-  - bytedesk
-  - customer-service
-  - ai
-  - chat
-home: https://github.com/bytedesk/bytedesk
-sources:
-  - https://github.com/bytedesk/bytedesk
-maintainers:
-  - name: ByteDesk Team
-    email: support@bytedesk.com
-icon: https://raw.githubusercontent.com/bytedesk/bytedesk/main/images/logo.png 
+ 

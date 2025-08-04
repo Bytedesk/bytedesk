@@ -1,0 +1,17 @@
+{
+  "yaml.validate": false,
+  "yaml.schemas": {},
+  "yaml.customTags": [
+    "!reference sequence"
+  ],
+  "files.associations": {
+    "*.yaml": "helm",
+    "*.yml": "helm"
+  },
+  "helm-intellisense.enable": true,
+  "helm-intellisense.includeReleaseName": true,
+  "helm-intellisense.includeChartName": true,
+  "helm-intellisense.includeValues": true,
+  "helm-intellisense.includeFunctions": true,
+  "helm-intellisense.includeVariables": true
+} 

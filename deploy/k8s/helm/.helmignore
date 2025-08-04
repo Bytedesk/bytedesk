@@ -1,0 +1,30 @@
+# Helm 忽略文件
+# 告诉 IDE 和工具忽略这些文件
+
+# IDE 配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+
+# 构建产物
+charts/
+*.tgz
+
+# 测试文件
+test/
+tests/
+
+# 文档
+*.md
+!README.md
+
+# 其他
+.DS_Store
+Thumbs.db 
