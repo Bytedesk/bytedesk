@@ -1,0 +1,206 @@
+# 开发环境配置
+# 最小化部署，适合开发调试
+
+global:
+  imageRegistry: "registry.cn-hangzhou.aliyuncs.com"
+  imagePullPolicy: IfNotPresent
+
+# ByteDesk 主应用配置
+bytedesk:
+  enabled: true
+  replicaCount: 1
+  
+  image:
+    repository: bytedesk/bytedesk
+    tag: "latest"
+    pullPolicy: IfNotPresent
+    
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+      
+  service:
+    type: ClusterIP
+    httpPort: 9003
+    websocketPort: 9885
+    
+  livenessProbe:
+    enabled: true
+    path: /actuator/health
+    port: 9003
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    
+  readinessProbe:
+    enabled: true
+    path: /actuator/health
+    port: 9003
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+# MySQL 数据库配置
+mysql:
+  enabled: true
+  
+  image:
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    rootPassword: "dev123"
+    database: "bytedesk"
+    username: "bytedesk"
+    password: "dev123"
+    
+  primary:
+    persistence:
+      enabled: true
+      size: 5Gi
+      
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Redis 缓存配置
+redis:
+  enabled: true
+  
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    enabled: true
+    password: "dev123"
+    
+  master:
+    persistence:
+      enabled: true
+      size: 2Gi
+      
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 125m
+      memory: 256Mi
+
+# Elasticsearch 搜索引擎配置
+elasticsearch:
+  enabled: false  # 开发环境禁用，减少资源消耗
+  
+  image:
+    repository: elasticsearch
+    tag: "8.8.0"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    enabled: true
+    username: "elastic"
+    password: "dev123"
+    
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+      
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Apache Artemis 消息队列配置
+artemis:
+  enabled: true
+  
+  image:
+    repository: apache/activemq-artemis
+    tag: "2.31.0"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    username: "admin"
+    password: "dev123"
+    
+  persistence:
+    enabled: true
+    size: 2Gi
+    
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 125m
+      memory: 256Mi
+
+# MinIO 对象存储配置
+minio:
+  enabled: true
+  
+  image:
+    repository: minio/minio
+    tag: "RELEASE.2023-07-21T21-12-44Z"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    rootUser: "minioadmin"
+    rootPassword: "dev123"
+    
+  persistence:
+    enabled: true
+    size: 5Gi
+    
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 125m
+      memory: 256Mi
+
+# Zipkin 链路追踪配置
+zipkin:
+  enabled: false  # 开发环境禁用，减少资源消耗
+  
+  image:
+    repository: openzipkin/zipkin
+    tag: "2.23"
+    pullPolicy: IfNotPresent
+    
+  persistence:
+    enabled: true
+    size: 2Gi
+    
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 125m
+      memory: 256Mi
+
+# Ingress 配置
+ingress:
+  enabled: false  # 开发环境通常不需要 Ingress
+
+# 持久化存储配置
+persistence:
+  uploads:
+    enabled: true
+    size: 5Gi
+    accessMode: ReadWriteOnce 

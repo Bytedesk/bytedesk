@@ -1,0 +1,22 @@
+{{- if .Values.bytedesk.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bytedesk.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.bytedesk.service.type }}
+  ports:
+    - port: {{ .Values.bytedesk.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.bytedesk.service.websocketPort }}
+      targetPort: websocket
+      protocol: TCP
+      name: websocket
+  selector:
+    {{- include "bytedesk.selectorLabels" . | nindent 4 }}
+{{- end }} 

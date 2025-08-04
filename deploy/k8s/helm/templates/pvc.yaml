@@ -1,0 +1,139 @@
+{{- if .Values.persistence.uploads.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-uploads-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.uploads.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.uploads.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.mysql.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-mysql-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mysql.primary.persistence.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.redis.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-redis-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.redis.master.persistence.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.elasticsearch.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-elasticsearch-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.elasticsearch.master.persistence.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.artemis.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-artemis-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.artemis.persistence.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.minio.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-minio-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.minio.persistence.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.zipkin.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "bytedesk.fullname" . }}-zipkin-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.zipkin.persistence.size }}
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+{{- end }} 

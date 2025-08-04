@@ -1,0 +1,264 @@
+# ByteDesk Helm Chart 默认配置
+# 可以通过 --set 参数或 values 文件覆盖这些值
+
+# 全局配置
+global:
+  # 镜像仓库配置
+  imageRegistry: "registry.cn-hangzhou.aliyuncs.com"
+  imagePullPolicy: IfNotPresent
+  
+  # 存储类配置
+  storageClass: ""
+  
+  # 命名空间配置
+  namespaceOverride: ""
+  
+  # 标签配置
+  commonLabels: {}
+  
+  # 注解配置
+  commonAnnotations: {}
+
+# ByteDesk 主应用配置
+bytedesk:
+  enabled: true
+  
+  # 镜像配置
+  image:
+    repository: bytedesk/bytedesk
+    tag: "latest"
+    pullPolicy: IfNotPresent
+    
+  # 副本数配置
+  replicaCount: 1
+  
+  # 资源限制
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+      
+  # 服务配置
+  service:
+    type: ClusterIP
+    httpPort: 9003
+    websocketPort: 9885
+    
+  # 健康检查配置
+  livenessProbe:
+    enabled: true
+    path: /actuator/health
+    port: 9003
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    
+  readinessProbe:
+    enabled: true
+    path: /actuator/health
+    port: 9003
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    
+  # 环境变量配置
+  env:
+    # 数据库配置
+    SPRING_DATASOURCE_URL: "jdbc:mysql://{{ .Release.Name }}-mysql:3306/bytedesk?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai"
+    
+    # Redis 配置
+    SPRING_DATA_REDIS_HOST: "{{ .Release.Name }}-redis"
+    SPRING_DATA_REDIS_PORT: "6379"
+    
+    # Elasticsearch 配置
+    SPRING_ELASTICSEARCH_HOST: "{{ .Release.Name }}-elasticsearch"
+    SPRING_ELASTICSEARCH_PORT: "9200"
+    
+    # Artemis 配置
+    SPRING_ARTEMIS_HOST: "{{ .Release.Name }}-artemis"
+    SPRING_ARTEMIS_PORT: "61616"
+    
+    # MinIO 配置
+    BYTEDESK_MINIO_ENDPOINT: "http://{{ .Release.Name }}-minio:9000"
+    BYTEDESK_MINIO_BUCKET: "bytedesk"
+    
+    # Zipkin 配置
+    SPRING_ZIPKIN_BASE_URL: "http://{{ .Release.Name }}-zipkin:9411"
+
+# MySQL 数据库配置
+mysql:
+  enabled: true
+  
+  image:
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    rootPassword: "bytedesk123"
+    database: "bytedesk"
+    username: "bytedesk"
+    password: "bytedesk123"
+    
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Redis 缓存配置
+redis:
+  enabled: true
+  
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    enabled: true
+    password: "bytedesk123"
+    
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+      
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Elasticsearch 搜索引擎配置
+elasticsearch:
+  enabled: true
+  
+  image:
+    repository: elasticsearch
+    tag: "8.8.0"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    enabled: true
+    username: "elastic"
+    password: "bytedesk123"
+    
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+      
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Apache Artemis 消息队列配置
+artemis:
+  enabled: true
+  
+  image:
+    repository: apache/activemq-artemis
+    tag: "2.31.0"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    username: "admin"
+    password: "bytedesk123"
+    
+  persistence:
+    enabled: true
+    size: 5Gi
+    
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# MinIO 对象存储配置
+minio:
+  enabled: true
+  
+  image:
+    repository: minio/minio
+    tag: "RELEASE.2023-07-21T21-12-44Z"
+    pullPolicy: IfNotPresent
+    
+  auth:
+    rootUser: "minioadmin"
+    rootPassword: "bytedesk123"
+    
+  persistence:
+    enabled: true
+    size: 10Gi
+    
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Zipkin 链路追踪配置
+zipkin:
+  enabled: true
+  
+  image:
+    repository: openzipkin/zipkin
+    tag: "2.23"
+    pullPolicy: IfNotPresent
+    
+  persistence:
+    enabled: true
+    size: 5Gi
+    
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Ingress 配置
+ingress:
+  enabled: false
+  
+  className: "nginx"
+  
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    
+  hosts:
+    - host: bytedesk.local
+      paths:
+        - path: /
+          pathType: Prefix
+          
+  tls: []
+
+# 持久化存储配置
+persistence:
+  uploads:
+    enabled: true
+    size: 10Gi
+    accessMode: ReadWriteOnce 

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}
+  labels:
+    name: {{ .Release.Namespace }}
+    app: {{ include "bytedesk.name" . }}
+    {{- include "bytedesk.labels" . | nindent 4 }} 

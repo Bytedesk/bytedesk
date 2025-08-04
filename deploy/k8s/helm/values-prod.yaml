@@ -1,0 +1,229 @@
+# 生产环境配置
+# 高可用部署，适合生产环境
+
+global:
+  imageRegistry: "registry.cn-hangzhou.aliyuncs.com"
+  imagePullPolicy: Always  # 生产环境总是拉取最新镜像
+
+# ByteDesk 主应用配置
+bytedesk:
+  enabled: true
+  replicaCount: 3  # 生产环境多副本
+  
+  image:
+    repository: bytedesk/bytedesk
+    tag: "v1.0.0"  # 生产环境使用固定版本
+    pullPolicy: Always
+    
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+    requests:
+      cpu: 2000m
+      memory: 4Gi
+      
+  service:
+    type: ClusterIP
+    httpPort: 9003
+    websocketPort: 9885
+    
+  livenessProbe:
+    enabled: true
+    path: /actuator/health
+    port: 9003
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+    
+  readinessProbe:
+    enabled: true
+    path: /actuator/health
+    port: 9003
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# MySQL 数据库配置
+mysql:
+  enabled: true
+  
+  image:
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: Always
+    
+  auth:
+    rootPassword: "your-secure-mysql-root-password"  # 生产环境必须修改
+    database: "bytedesk"
+    username: "bytedesk"
+    password: "your-secure-mysql-password"  # 生产环境必须修改
+    
+  primary:
+    persistence:
+      enabled: true
+      size: 50Gi  # 生产环境更大的存储
+      
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+# Redis 缓存配置
+redis:
+  enabled: true
+  
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: Always
+    
+  auth:
+    enabled: true
+    password: "your-secure-redis-password"  # 生产环境必须修改
+    
+  master:
+    persistence:
+      enabled: true
+      size: 20Gi  # 生产环境更大的存储
+      
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Elasticsearch 搜索引擎配置
+elasticsearch:
+  enabled: true
+  
+  image:
+    repository: elasticsearch
+    tag: "8.8.0"
+    pullPolicy: Always
+    
+  auth:
+    enabled: true
+    username: "elastic"
+    password: "your-secure-elasticsearch-password"  # 生产环境必须修改
+    
+  master:
+    persistence:
+      enabled: true
+      size: 100Gi  # 生产环境更大的存储
+      
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+# Apache Artemis 消息队列配置
+artemis:
+  enabled: true
+  
+  image:
+    repository: apache/activemq-artemis
+    tag: "2.31.0"
+    pullPolicy: Always
+    
+  auth:
+    username: "admin"
+    password: "your-secure-artemis-password"  # 生产环境必须修改
+    
+  persistence:
+    enabled: true
+    size: 20Gi  # 生产环境更大的存储
+    
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# MinIO 对象存储配置
+minio:
+  enabled: true
+  
+  image:
+    repository: minio/minio
+    tag: "RELEASE.2023-07-21T21-12-44Z"
+    pullPolicy: Always
+    
+  auth:
+    rootUser: "minioadmin"
+    rootPassword: "your-secure-minio-password"  # 生产环境必须修改
+    
+  persistence:
+    enabled: true
+    size: 50Gi  # 生产环境更大的存储
+    
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Zipkin 链路追踪配置
+zipkin:
+  enabled: true  # 生产环境启用链路追踪
+  
+  image:
+    repository: openzipkin/zipkin
+    tag: "2.23"
+    pullPolicy: Always
+    
+  persistence:
+    enabled: true
+    size: 20Gi  # 生产环境更大的存储
+    
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Ingress 配置
+ingress:
+  enabled: true  # 生产环境启用 Ingress
+  
+  className: "nginx"
+  
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+  hosts:
+    - host: bytedesk.yourdomain.com  # 生产环境域名
+      paths:
+        - path: /
+          pathType: Prefix
+          
+  tls:
+    - secretName: bytedesk-tls
+      hosts:
+        - bytedesk.yourdomain.com
+
+# 持久化存储配置
+persistence:
+  uploads:
+    enabled: true
+    size: 50Gi  # 生产环境更大的存储
+    accessMode: ReadWriteOnce 

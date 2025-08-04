@@ -1,0 +1,156 @@
+{{- if .Values.bytedesk.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bytedesk.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bytedesk.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.bytedesk.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "bytedesk.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "bytedesk.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ include "bytedesk.name" . }}
+        image: {{ include "bytedesk.image" . }}
+        imagePullPolicy: {{ .Values.bytedesk.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.bytedesk.service.httpPort }}
+          name: http
+        - containerPort: {{ .Values.bytedesk.service.websocketPort }}
+          name: websocket
+        envFrom:
+        - configMapRef:
+            name: {{ include "bytedesk.fullname" . }}-config
+        env:
+        # 敏感信息配置（从 Secret 获取）
+        - name: BYTEDESK_JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: jwt-secret-key
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: mysql-username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: mysql-root-password
+        - name: SPRING_DATA_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: redis-password
+        - name: SPRING_ELASTICSEARCH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: elasticsearch-username
+        - name: SPRING_ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: elasticsearch-password
+        - name: SPRING_ARTEMIS_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: artemis-username
+        - name: SPRING_ARTEMIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: artemis-password
+        - name: BYTEDESK_MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: minio-root-user
+        - name: BYTEDESK_MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: minio-root-password
+        
+        # AI API Keys（从 Secret 获取）
+        - name: SPRING_AI_ZHIPUAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: zhipuai-api-key
+        - name: SPRING_AI_DEEPSEEK_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: deepseek-api-key
+        - name: SPRING_AI_OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: openai-api-key
+        - name: SPRING_AI_DASHSCOPE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: dashscope-api-key
+        - name: SPRING_AI_SILICONFLOW_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: siliconflow-api-key
+        - name: SPRING_AI_GITEE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: gitee-api-key
+        - name: SPRING_AI_TENCENT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: tencent-api-key
+        - name: SPRING_AI_BAIDU_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: baidu-api-key
+        - name: SPRING_AI_VOLCENGINE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "bytedesk.fullname" . }}-secrets
+              key: volcengine-api-key
+        
+        volumeMounts:
+        - name: uploads-data
+          mountPath: /app/uploads
+        resources:
+          {{- toYaml .Values.bytedesk.resources | nindent 10 }}
+        {{- if .Values.bytedesk.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.bytedesk.livenessProbe.path }}
+            port: {{ .Values.bytedesk.livenessProbe.port }}
+          initialDelaySeconds: {{ .Values.bytedesk.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.bytedesk.livenessProbe.periodSeconds }}
+        {{- end }}
+        {{- if .Values.bytedesk.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.bytedesk.readinessProbe.path }}
+            port: {{ .Values.bytedesk.readinessProbe.port }}
+          initialDelaySeconds: {{ .Values.bytedesk.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.bytedesk.readinessProbe.periodSeconds }}
+        {{- end }}
+      volumes:
+      - name: uploads-data
+        persistentVolumeClaim:
+          claimName: {{ include "bytedesk.fullname" . }}-uploads-pvc
+{{- end }} 
