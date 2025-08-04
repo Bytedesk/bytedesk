@@ -1,0 +1,150 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: weiyuai-ingress
+  namespace: bytedesk
+  annotations:
+    # NGINX 特定注解
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
+    # 会话亲和性（对应 nginx.conf 中的 ip_hash）
+    nginx.ingress.kubernetes.io/affinity: "ip"
+    nginx.ingress.kubernetes.io/session-cookie-name: "weiyuai-session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    
+    # WebSocket 支持（对应 nginx.conf 中的 websocket 配置）
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    
+    # 缓冲区配置（对应 nginx.conf 中的缓存配置）
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "4k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    
+    # 文件上传大小限制（对应 nginx.conf 中的 client_max_body_size）
+    nginx.ingress.kubernetes.io/proxy-body-size: "1024m"
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "1024m"
+    
+    # CORS 配置
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    
+    # 安全配置（对应 nginx.conf 中的安全头）
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # 安全头
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header X-Via $server_addr;
+      add_header X-Cache $upstream_cache_status;
+      
+      # 隐藏 NGINX 版本
+      server_tokens off;
+    
+    # 日志配置（对应 nginx.conf 中的日志格式）
+    nginx.ingress.kubernetes.io/log-format: '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"'
+    
+    # 缓存配置（对应 nginx.conf 中的 proxy_cache）
+    nginx.ingress.kubernetes.io/enable-caching: "true"
+    nginx.ingress.kubernetes.io/cache-zone: "weiyuai_cache"
+    nginx.ingress.kubernetes.io/cache-key: "$scheme$request_method$host$request_uri"
+    nginx.ingress.kubernetes.io/cache-valid: "200 302 10m, 404 10m"
+    
+    # 限流配置
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.weiyuai.cn
+    secretName: weiyuai-tls
+  rules:
+  - host: api.weiyuai.cn
+    http:
+      paths:
+      # 主应用（对应 nginx.conf 中的 location /）
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # STOMP 连接（对应 nginx.conf 中的 location /stomp）
+      - path: /stomp
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # WebSocket 连接（对应 nginx.conf 中的 location /websocket）
+      - path: /websocket
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9885
+      
+      # API 文档
+      - path: /swagger-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # Knife4j 文档
+      - path: /doc.html
+        pathType: Exact
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # 文件上传
+      - path: /uploads
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+
+---
+# HTTP 重定向到 HTTPS（对应 nginx.conf 中的 80 端口配置）
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: weiyuai-ingress-http
+  namespace: bytedesk
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.weiyuai.cn
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003 

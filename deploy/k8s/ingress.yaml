@@ -1,0 +1,109 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bytedesk-ingress
+  namespace: bytedesk
+  annotations:
+    # NGINX 特定注解
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    
+    # 负载均衡配置
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+    
+    # 会话亲和性
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "bytedesk-session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    
+    # 超时配置（支持 WebSocket）
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    
+    # 缓冲区配置
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "4k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    
+    # 文件上传大小限制
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "1024m"
+    
+    # CORS 配置
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    
+    # 安全配置
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # 安全头
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      
+      # 隐藏 NGINX 版本
+      server_tokens off;
+    
+    # 日志配置
+    nginx.ingress.kubernetes.io/log-format: '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"'
+    
+    # 限流配置（可选）
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+spec:
+  ingressClassName: nginx
+  rules:
+  # 主应用路由
+  - host: weiyu.example.com  # 请替换为您的域名
+    http:
+      paths:
+      # 主应用
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # API 文档
+      - path: /swagger-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # Knife4j 文档
+      - path: /doc.html
+        pathType: Exact
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # 文件上传
+      - path: /uploads
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9003
+      
+      # WebSocket 支持
+      - path: /websocket
+        pathType: Prefix
+        backend:
+          service:
+            name: bytedesk-service
+            port:
+              number: 9885 
