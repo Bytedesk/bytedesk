@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 12:06:22
+ * @LastEditTime: 2025-08-04 22:05:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -168,4 +168,7 @@ docker exec -it mysql-bytedesk mysql -u root -p
 
 # 查看容器资源使用情况
 docker stats
+
+# 查看容器镜像架构
+docker inspect registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest --format='{{.Architecture}}'
 ```
