@@ -2,7 +2,7 @@
 # https://hub.docker.com/r/jackning/bytedesk
 # maven
 # https://hub.docker.com/_/eclipse-temurin
-FROM --platform=linux/amd64 eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jdk
 # maintainer
 LABEL maintainer="270580156@qq.com"
 # Set the working directory in the container
