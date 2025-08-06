@@ -1,0 +1,465 @@
+# General configuration: folders where the configuration and the plugins
+# can be found, how output should be logged, whether Janus should run as
+# a daemon or in foreground, default interface to use, debug/logging level
+# and, if needed, shared apisecret and/or token authentication mechanism
+# between application(s) and Janus.
+general: {
+	configs_folder = "/opt/janus/etc/janus"			# Configuration files folder
+	plugins_folder = "/opt/janus/lib/janus/plugins"			# Plugins folder
+	transports_folder = "/opt/janus/lib/janus/transports"	# Transports folder
+	events_folder = "/opt/janus/lib/janus/events"			# Event handlers folder
+	loggers_folder = "/opt/janus/lib/janus/loggers"			# External loggers folder
+
+		# The next settings configure logging
+	#log_to_stdout = false					# Whether the Janus output should be written
+											# to stdout or not (default=true)
+	#log_to_file = "/path/to/janus.log"		# Whether to use a log file or not
+	#log_rotate_sig = "SIGUSR1"				# Signal to handle for log rotation, valid values
+											# are "SIGUSR1" and "SIGHUP".
+											# Default is no setting, which disables the
+											# signal handler for log rotation.
+	debug_level = 4							# Debug/logging level, valid values are 0-7
+	#debug_timestamps = true				# Whether to show a timestamp for each log line
+	#debug_colors = false					# Whether colors should be disabled in the log
+	#debug_locks = true						# Whether to enable debugging of locks (very verbose!)
+	#log_prefix = "[janus] "				# In case you want log lines to be prefixed by some
+											# custom text, you can use the 'log_prefix' property.
+											# It supports terminal colors, meaning something like
+											# "[\x1b[32mjanus\x1b[0m] " would show a green "janus"
+											# string in square brackets (assuming debug_colors=true).
+
+		# This is what you configure if you want to launch Janus as a daemon
+	#daemonize = true						# Whether Janus should run as a daemon
+											# or not (default=run in foreground)
+	#pid_file = "/path/to/janus.pid"		# PID file to create when Janus has been
+											# started, and to destroy at shutdown
+
+		# There are different ways you can authenticate the Janus and Admin APIs
+	#api_secret = "janusrocks"		# String that all Janus requests must contain
+									# to be accepted/authorized by the Janus core.
+									# Useful if you're wrapping all Janus API requests
+									# in your servers (that is, not in the browser,
+									# where you do the things your way) and you
+									# don't want other application to mess with
+									# this Janus instance.
+	#token_auth = true				# Enable a token based authentication
+									# mechanism to force users to always provide
+									# a valid token in all requests. Useful if
+									# you want to authenticate requests from web
+									# users.
+	#token_auth_secret = "janus"	# Use HMAC-SHA1 signed tokens (with token_auth). Note that
+									# without this, the Admin API MUST
+									# be enabled, as tokens are added and removed
+									# through messages sent there.
+	admin_secret = "janusoverlord"	# String that all Janus requests must contain
+									# to be accepted/authorized by the admin/monitor.
+									# only needed if you enabled the admin API
+									# in any of the available transports.
+
+		# Generic settings
+	#interface = "1.2.3.4"			# Interface to use (will be used in SDP)
+	#server_name = "MyJanusInstance"# Public name of this Janus instance
+									# as it will appear in an info request
+	#session_timeout = 60			# How long (in seconds) we should wait before
+									# deciding a Janus session has timed out. A
+									# session times out when no request is received
+									# for session_timeout seconds (default=60s).
+									# Setting this to 0 will disable the timeout
+									# mechanism, which is NOT suggested as it may
+									# risk having orphaned sessions (sessions not
+									# controlled by any transport and never freed).
+									# To avoid timeouts, keep-alives can be used.
+	#candidates_timeout = 45		# How long (in seconds) we should keep hold of
+									# pending (trickle) candidates before discarding
+									# them (default=45s). Notice that setting this
+									# to 0 will NOT disable the timeout, but will
+									# be considered an invalid value and ignored.
+	#reclaim_session_timeout = 0	# How long (in seconds) we should wait for a
+									# janus session to be reclaimed after the transport
+									# is gone. After the transport is gone, a session
+									# times out when no request is received for
+									# reclaim_session_timeout seconds (default=0s).
+									# Setting this to 0 will disable the timeout
+									# mechanism, and sessions will be destroyed immediately
+									# if the transport is gone.
+	#recordings_tmp_ext = "tmp"		# The extension for recordings, in Janus, is
+									# .mjr, a custom format we devised ourselves.
+									# By default, we save to .mjr directly. If you'd
+									# rather the recording filename have a temporary
+									# extension while it's being saved, and only
+									# have the .mjr extension when the recording
+									# is over (e.g., to automatically trigger some
+									# external scripts), then uncomment and set the
+									# recordings_tmp_ext property to the extension
+									# to add to the base (e.g., tmp --> .mjr.tmp).
+	#event_loops = 8				# By default, Janus handles each have their own
+									# event loop and related thread for all the media
+									# routing and management. If for some reason you'd
+									# rather limit the number of loop/threads, and
+									# you want handles to share those, you can do that
+									# configuring the event_loops property: this will
+									# spawn the specified amount of threads at startup,
+									# run a separate event loop on each of them, and
+									# add new handles to one of them when attaching.
+									# Notice that, while cutting the number of threads
+									# and possibly reducing context switching, this
+									# might have an impact on the media delivery,
+									# especially if the available loops can't take
+									# care of all the handles and their media in time.
+									# As such, if you want to use this you should
+									# provision the correct value according to the
+									# available resources (e.g., CPUs available).
+	#allow_loop_indication = true	# In case a static number of event loops is
+									# configured as explained above, by default
+									# new handles will be allocated on one loop or
+									# another by the Janus core itself. In some cases
+									# it may be helpful to manually tell the Janus
+									# core which loop a handle should be added to,
+									# e.g., to group viewers of the same stream on
+									# the same loop. This is possible via the Janus
+									# API when performing the 'attach' request, but
+									# only if allow_loop_indication is set to true;
+									# it's set to false by default to avoid abuses.
+									# Don't change if you don't know what you're doing!
+	#task_pool_size = 100			# By default, while the Janus core is single thread
+									# when it comes to processing incoming messages, it
+									# also uses a task pool with an indefinite amount
+									# of helper threads spawned on demand to handle
+									# messages addressed to plugins. If you want to
+									# limit this task pool size with a maximum number
+									# of concurrent threads, set the 'task_pool_size'
+									# property accordingly: a value of '0' means
+									# 'indefinite' and is the default. Notice that
+									# threads are automatically destroyed when unused
+									# for a while, so whatever value you choose simply
+									# puts a cap on the maximum concurrency.
+									# Don't change if you don't know what you're doing!
+	#opaqueid_in_api = true			# Opaque IDs set by applications are typically
+									# only passed to event handlers for correlation
+									# purposes, but not sent back to the user or
+									# application in the related Janus API responses
+									# or events; in case you need them to be in the
+									# Janus API too, set this property to 'true'.
+	#hide_dependencies = true		# By default, a call to the "info" endpoint of
+									# either the Janus or Admin API now also returns
+									# the versions of the main dependencies (e.g.,
+									# libnice, libsrtp, which crypto library is in
+									# use and so on). Should you want that info not
+									# to be disclose, set 'hide_dependencies' to true.
+	#exit_on_dl_error = false		# If a Janus shared libary cannot be loaded or an expected
+									# symbol is not found, exit immediately.
+
+		# The following is ONLY useful when debugging RTP/RTCP packets,
+		# e.g., to look at unencrypted live traffic with a browser. By
+		# default it is obviously disabled, as WebRTC mandates encryption.
+	#no_webrtc_encryption = true
+
+		# Janus provides ways via its API to specify custom paths to save
+		# files to (e.g., recordings, pcap captures and the like). In order
+		# to avoid people can mess with folders they're not supposed to,
+		# you can configure an array of folders that Janus should prevent
+		# creating files in. If the 'protected_folder' property below is
+		# commented, no folder is protected.
+		# Notice that at the moment this only covers attempts to start
+		# an .mjr recording and pcap/text2pcap packet captures.
+	protected_folders = [
+		"/bin",
+		"/boot",
+		"/dev",
+		"/etc",
+		"/initrd",
+		"/lib",
+		"/lib32",
+		"/lib64",
+		"/proc",
+		"/sbin",
+		"/sys",
+		"/usr",
+		"/var",
+			# We add what are usually the folders Janus is installed to
+			# as well: we don't just put "/opt/janus" because that would
+			# include folders like "/opt/janus/share" that is where
+			# recordings might be saved to by some plugins
+		"/opt/janus/bin",
+		"/opt/janus/etc",
+		"/opt/janus/include",
+		"/opt/janus/lib",
+		"/opt/janus/lib32",
+		"/opt/janus/lib64",
+		"/opt/janus/sbin"
+	]
+}
+
+# Certificate and key to use for DTLS (and passphrase if needed). If missing,
+# Janus will autogenerate a self-signed certificate to use. Notice that
+# self-signed certificates are fine for the purpose of WebRTC DTLS
+# connectivity, for the time being, at least until Identity Providers
+# are standardized and implemented in browsers. If for some reason you
+# want to enforce the DTLS stack in Janus to enforce valid certificates
+# from peers, though, you can do that setting 'dtls_accept_selfsigned' to
+# 'false' below: DO NOT TOUCH THAT IF YOU DO NOT KNOW WHAT YOU'RE DOING!
+# You can also configure the DTLS ciphers to offer: the default if not
+# set is "DEFAULT:!NULL:!aNULL:!SHA256:!SHA384:!aECDH:!AESGCM+AES256:!aPSK"
+# Finally, by default NIST P-256 certificates are generated (see #1997),
+# but RSA generation is still supported if you set 'rsa_private_key' to 'true'.
+certificates: {
+	#cert_pem = "/path/to/certificate.pem"
+	#cert_key = "/path/to/key.pem"
+	#cert_pwd = "secretpassphrase"
+	#dtls_accept_selfsigned = false
+	#dtls_ciphers = "your-desired-openssl-ciphers"
+	#rsa_private_key = false
+}
+
+# Media-related stuff: you can configure whether if you want to enable IPv6
+# support (and link-local IPs), the minimum size of the NACK queue (in ms,
+# defaults to 200ms) for retransmissions no matter the RTT, the range of
+# ports to use for RTP and RTCP (by default, no range is envisaged), the
+# starting MTU for DTLS (1200 by default, it adapts automatically),
+# how much time, in seconds, should pass with no media (audio or
+# video) being received before Janus notifies you about this (default=1s,
+# 0 disables these events entirely), how many lost packets should trigger a
+# 'slowlink' event to users (default=0, disabled), and how often, in milliseconds,
+# to send the Transport Wide Congestion Control feedback information back
+# to senders, if negotiated (default=200ms). Finally, if you're using BoringSSL
+# you can customize the frequency of retransmissions: OpenSSL has a fixed
+# value of 1 second (the default), while BoringSSL can override that. Notice
+# that lower values (e.g., 100ms) will typically get you faster connection
+# times, but may not work in case the RTT of the user is high: as such,
+# you should pick a reasonable trade-off (usually 2*max expected RTT).
+media: {
+	#ipv6 = true
+	#ipv6_linklocal = true
+	#min_nack_queue = 500
+	#rtp_port_range = "20000-40000"
+	#dtls_mtu = 1200
+	#no_media_timer = 1
+	#slowlink_threshold = 4
+	#twcc_period = 100
+	#dtls_timeout = 500
+
+	# Janus can do some optimizations on the NACK queue, specifically when
+	# keyframes are involved. Namely, you can configure Janus so that any
+	# time a keyframe is sent to a user, the NACK buffer for that connection
+	# is emptied. This allows Janus to ignore NACK requests for packets
+	# sent shortly before the keyframe was sent, since it can be assumed
+	# that the keyframe will restore a complete working image for the user
+	# anyway (which is the main reason why video retransmissions are typically
+	# required). While this optimization is known to work fine in most cases,
+	# it can backfire in some edge cases, and so is disabled by default.
+	#nack_optimizations = true
+
+	# If you need DSCP packet marking and prioritization, you can configure
+	# the 'dscp' property to a specific values, and Janus will try to
+	# set it on all outgoing packets using libnice. Normally, the specs
+	# suggest to use different values depending on whether audio, video
+	# or data are used, but since all PeerConnections in Janus are bundled,
+	# we can only use one. You can refer to this document for more info:
+	# https://tools.ietf.org/html/draft-ietf-tsvwg-rtcweb-qos-18#page-6
+	# That said, DON'T TOUCH THIS IF YOU DON'T KNOW WHAT IT MEANS!
+	#dscp = 46
+}
+
+# NAT-related stuff: specifically, you can configure the STUN/TURN
+# servers to use to gather candidates if the gateway is behind a NAT,
+# and srflx/relay candidates are needed. In case STUN is not enough and
+# this is needed (it shouldn't), you can also configure Janus to use a
+# TURN server# please notice that this does NOT refer to TURN usage in
+# browsers, but in the gathering of relay candidates by Janus itself,
+# e.g., if you want to limit the ports used by a Janus instance on a
+# private machine. Furthermore, you can choose whether Janus should be
+# configured to do full-trickle (Janus also trickles its candidates to
+# users) rather than the default half-trickle (Janus supports trickle
+# candidates from users, but sends its own within the SDP), and whether
+# it should work in ICE-Lite mode (by default it doesn't). If libnice is
+# at least 0.1.15, you can choose which ICE nomination mode to use: valid
+# values are "regular" and "aggressive" (the default depends on the libnice
+# version itself; if we can set it, we set aggressive nomination). If
+# libnice is at least 0.1.19, you can enable consent freshness checks for
+# PeerConnections as well: this will issue regular checks to check whether
+# or not the WebRTC peer isn't available anymore. Enabling consent freshness
+# will automatically also enable using connectivity checks as keep-alives, which
+# might help detecting when a peer is no longer available (notice that
+# current libnice master is breaking connections after 50 seconds when
+# keepalive-conncheck is being used, so if you want to use it, better
+# sticking to 0.1.18 until the issue is addressed upstream). Finally,
+# you can also enable ICE-TCP support (beware that this may lead to problems
+# if you do not enable ICE Lite as well), choose which interfaces should
+# be used for gathering candidates.
+nat: {
+	#stun_server = "stun.voip.eutelia.it"
+	#stun_port = 3478
+	#nice_debug = "nice_debug option is NOT SUPPORTED ANYMORE! Please set NICE_DEBUG and G_MESSAGES_DEBUG env vars when starting Janus"
+	#full_trickle = true
+	#ice_nomination = "regular"
+	#ice_consent_freshness = true
+	#ice_keepalive_conncheck = true
+	#ice_lite = true
+	#ice_tcp = true
+
+	# By default, Janus implements a grace period when detecting ICE
+	# failures in PeerConnections, to give time to applications to react
+	# to that, e.g., by enforcing an ICE restart. If you want an ICE
+	# failure to result in the PeerConnection being closed right away
+	# (e.g., with the help of consent freshness) then you can do that
+	# by uncommenting the following property and set it to true
+	#hangup_on_failed = true
+
+	# By default Janus tries to resolve mDNS (.local) candidates: even
+	# though this is now done asynchronously and shouldn't keep the API
+	# busy, even in case mDNS resolution takes a long time to timeout,
+	# you can choose to drop all .local candidates instead, which is
+	# helpful in case you know clients will never be in the same private
+	# network as the one the Janus instance is running from. Notice that
+	# this will cause ICE to fail if mDNS is the only way to connect!
+	#ignore_mdns = true
+
+	# In case you're deploying Janus on a server which is configured with
+	# a 1:1 NAT (e.g., Amazon EC2), you might want to also specify the public
+	# address of the machine using the setting below. This will result in
+	# all host candidates (which normally have a private IP address) to
+	# be rewritten with the public address provided in the settings. As
+	# such, use the option with caution and only if you know what you're doing.
+	# Make sure you keep ICE Lite disabled, though, as it's not strictly
+	# speaking a publicly reachable server, and a NAT is still involved.
+	# If you'd rather keep the private IP address in place, rather than
+	# replacing it (and so have both of them as advertised candidates),
+	# then set the 'keep_private_host' property to true.
+	# Multiple public IP addresses can be specified as a comma separated list
+	# if the Janus is deployed in a DMZ between two 1-1 NAT for internal and
+	# external users.
+	#nat_1_1_mapping = "1.2.3.4"
+	#keep_private_host = true
+
+	# You can configure a TURN server in two different ways: specifying a
+	# statically configured TURN server, and thus provide the address of the
+	# TURN server, the transport (udp/tcp/tls) to use, and a set of valid
+	# credentials to authenticate. Notice that you should NEVER configure
+	# a TURN server for Janus unless it's really what you want! If you want
+	# *users* to use TURN, then you need to configure that on the client
+	# side, and NOT in Janus. The following TURN configuration should ONLY
+	# be enabled when Janus itself is sitting behind a restrictive firewall
+	# (e.g., it's part of a service installed on a box in a private home).
+	#turn_server = "myturnserver.com"
+	#turn_port = 3478
+	#turn_type = "udp"
+	#turn_user = "myuser"
+	#turn_pwd = "mypassword"
+
+	# You can also make use of the TURN REST API to get info on one or more
+	# TURN services dynamically. This makes use of the proposed standard of
+	# such an API (https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00)
+	# which is currently available in both rfc5766-turn-server and coturn.
+	# You enable this by specifying the address of your TURN REST API backend,
+	# the HTTP method to use (GET or POST) and, if required, the API key Janus
+	# must provide. The timeout can be configured in seconds, with a default of
+	# 10 seconds and a minimum of 1 second. Notice that the 'opaque_id' provided
+	# via Janus API will be used as the username for a specific PeerConnection
+	# by default; if that one is missing, the 'session_id' will be used as the
+	# username instead.
+	#turn_rest_api = "http://yourbackend.com/path/to/api"
+	#turn_rest_api_key = "anyapikeyyoumayhaveset"
+	#turn_rest_api_method = "GET"
+	#turn_rest_api_timeout = 10
+
+	# In case a TURN server is provided, you can allow applications to force
+	# Janus to use TURN (https://github.com/meetecho/janus-gateway/pull/2774).
+	# This is NOT allowed by default: only enable it if you know what you're doing.
+	#allow_force_relay = true
+
+	# You can also choose which interfaces should be explicitly used by the
+	# gateway for the purpose of ICE candidates gathering, thus excluding
+	# others that may be available. To do so, use the 'ice_enforce_list'
+	# setting and pass it a comma-separated list of interfaces or IP addresses
+	# to enforce. This is especially useful if the server hosting the gateway
+	# has several interfaces, and you only want a subset to be used. Any of
+	# the following examples are valid:
+	#     ice_enforce_list = "eth0"
+	#     ice_enforce_list = "eth0,eth1"
+	#     ice_enforce_list = "eth0,192.168."
+	#     ice_enforce_list = "eth0,192.168.0.1"
+	# By default, no interface is enforced, meaning Janus will try to use them all.
+	#ice_enforce_list = "eth0"
+
+	# In case you don't want to specify specific interfaces to use, but would
+	# rather tell Janus to use all the available interfaces except some that
+	# you don't want to involve, you can also choose which interfaces or IP
+	# addresses should be excluded and ignored by the gateway for the purpose
+	# of ICE candidates gathering. To do so, use the 'ice_ignore_list' setting
+	# and pass it a comma-separated list of interfaces or IP addresses to
+	# ignore. This is especially useful if the server hosting the gateway
+	# has several interfaces you already know will not be used or will simply
+	# always slow down ICE (e.g., virtual interfaces created by VMware).
+	# Partial strings are supported, which means that any of the following
+	# examples are valid:
+	#     ice_ignore_list = "vmnet8,192.168.0.1,10.0.0.1"
+	#     ice_ignore_list = "vmnet,192.168."
+	# Just beware that the ICE ignore list is not used if an enforce list
+	# has been configured. By default, Janus ignores all interfaces whose
+	# name starts with 'vmnet', to skip VMware interfaces:
+	ice_ignore_list = "vmnet"
+
+	# In case you want to allow Janus to start even if the configured STUN or TURN
+	# server is unreachable, you can set 'ignore_unreachable_ice_server' to true.
+	# WARNING: We do not recommend to ignore reachability problems, particularly
+	# if you run Janus in the cloud. Before enabling this flag, make sure your
+	# system is correctly configured and Janus starts after the network layer of
+	# your machine is ready. Note that Linux distributions offer such directives.
+	# You could use the following directive in systemd: 'After=network-online.target'
+	# https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Before=
+	#ignore_unreachable_ice_server = true
+}
+
+# You can choose which of the available plugins should be
+# enabled or not. Use the 'disable' directive to prevent Janus from
+# loading one or more plugins: use a comma separated list of plugin file
+# names to identify the plugins to disable. By default all available
+# plugins are enabled and loaded at startup.
+plugins: {
+	#disable = "libjanus_echotest.so,libjanus_recordplay.so"
+}
+
+# You can choose which of the available transports should be enabled or
+# not. Use the 'disable' directive to prevent Janus from loading one
+# or more transport: use a comma separated list of transport file names
+# to identify the transports to disable. By default all available
+# transports are enabled and loaded at startup.
+transports: {
+	#disable = "libjanus_rabbitmq.so"
+}
+
+# As a core feature, Janus can log either on the standard output, or to
+# a local file. Should you need more advanced logging functionality, you
+# can make use of one of the custom loggers, or write one yourself. Use the
+# 'disable' directive to prevent Janus from loading one or more loggers:
+# use a comma separated list of logger file names to identify the loggers
+# to disable. By default all available loggers are enabled and loaded at startup.
+loggers: {
+	#disable = "libjanus_jsonlog.so"
+}
+
+# Event handlers allow you to receive live events from Janus happening
+# in core and/or plugins. Since this can require some more resources,
+# the feature is disabled by default. Setting 'broadcast' to 'true' will
+# enable them. You can then choose which of the available event handlers
+# should be loaded or not. Use the 'disable' directive to prevent Janus
+# from loading one or more event handlers: use a comma separated list of
+# file names to identify the event handlers to disable. By default, if
+# broadcast is set to 'true' all available event handlers are enabled and
+# loaded at startup. Finally, you can choose how often media statistics
+# (packets sent/received, losses, etc.) should be sent: by default it's
+# once per second (audio and video statistics sent separately), but may
+# considered too verbose, or you may want to limit the number of events,
+# especially if you have many PeerConnections active. To change this,
+# just set 'stats_period' to the number of seconds that should pass in
+# between statistics for each handle. Setting it to 0 disables them (but
+# not other media-related events). By default Janus sends single media
+# statistic events per media (audio, video and simulcast layers as separate
+# events): if you'd rather receive a single containing all media stats in a
+# single array, set 'combine_media_stats' to 'true'.
+events: {
+	#broadcast = true
+	#combine_media_stats = true
+	#disable = "libjanus_sampleevh.so"
+	#stats_period = 5
+}

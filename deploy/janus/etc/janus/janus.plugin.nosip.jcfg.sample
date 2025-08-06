@@ -1,0 +1,23 @@
+general: {
+	# Specify which local IP address to bind to for media.
+	# If not set it will be automatically guessed from the system
+	#local_ip = "1.2.3.4"
+
+	# Specify which (public) IP address to advertise in the SDP.
+	# If not set, the value above or anything autodetected will be used
+	#sdp_ip = "1.2.3.4"
+
+	# Range of ports to use for RTP/RTCP (default=10000-60000)
+	rtp_port_range = "20000-40000"
+
+	# Whether events should be sent to event handlers (default=true)
+	#events = false
+
+	# If you need DSCP packet marking and prioritization, you can configure
+	# the 'dscp_audio_rtp' and/or 'dscp_video_rtp' property to specific values,
+	# and the plugin will set it on all outgoing audio/video RTP packets.
+	# No packet marking is done if this parameter is undefined or equal to 0
+	#dscp_audio_rtp = 46
+	#dscp_video_rtp = 26
+
+}

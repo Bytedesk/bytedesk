@@ -1,0 +1,55 @@
+general: {
+	# Specify which local IP address to bind to for SIP stack.
+	# If not set it will be automatically guessed from the system
+	#local_ip = "1.2.3.4"
+
+	# Specify which local IP address to bind for the media stack.
+	# If not set it will be automatically set to the value of local_ip
+	#local_media_ip = "1.2.3.4"
+
+	# Specify which (public) IP address to advertise in the SDP.
+	# If not set, the value above or anything autodetected will be used
+	#sdp_ip = "1.2.3.4"
+
+	# Enable local keep-alives to keep the registration open. Keep-alives are
+	# sent in the form of OPTIONS requests, at the given interval inseconds.
+	# (0 to disable)
+	keepalive_interval = 120
+
+	# Indicate if the server is behind NAT. If so, the server will use STUN
+	# to guess its own public IP address and use it in the Contact header of
+	# outgoing requests
+	behind_nat = false
+
+	# User-Agent string to be used
+	# user_agent = "Cool WebRTC Gateway"
+
+	# Expiration time for registrations
+	register_ttl = 3600
+
+	# Range of ports to use for RTP/RTCP (default=10000-60000)
+	rtp_port_range = "20000-40000"
+
+	# Whether events should be sent to event handlers (default=true)
+	#events = false
+
+	# If you need DSCP packet marking and prioritization, you can configure
+	# the 'dscp_audio_rtp' and/or 'dscp_video_rtp' property to specific values,
+	# and the plugin will set it on all outgoing audio/video RTP packets.
+	# No packet marking is done if this parameter is undefined or equal to 0
+	#dscp_audio_rtp = 46
+	#dscp_video_rtp = 26
+
+	# In case you want to use SIPS for some sessions, Sofia may need to
+	# have access to a certificate to use: this is especially true for
+	# Sofia >= 1.13, which will fail to create the agent if no certificate
+	# is available. By default, Sofia looks for 'agent.pem' and 'cafile.pem'
+	# in the '$HOME/.sip/auth' folder, but you can specify a different
+	# one by uncommenting and setting the property below.
+	#sips_certs_dir = "/etc/sip/certs"
+
+	# Set the T1x64 timeout value (in milliseconds) used by the SIP transaction
+	# engine (default 32000 milliseconds)
+	sip_timer_t1x64 = 32000
+
+}

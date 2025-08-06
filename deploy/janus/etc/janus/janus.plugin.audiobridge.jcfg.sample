@@ -1,0 +1,83 @@
+# room-<unique room ID>: {
+# description = "This is my awesome room"
+# is_private = true|false (whether this room should be in the public list, default=true)
+# secret = "<optional password needed for manipulating (e.g. destroying) the room>"
+# pin = "<optional password needed for joining the room>"
+# sampling_rate = <sampling rate> (e.g., 16000 for wideband mixing)
+# spatial_audio = true|false (if true, the mix will be stereo to spatially place users, default=false)
+# audiolevel_ext = true|false (whether the ssrc-audio-level RTP extension must
+#		be negotiated/used or not for new joins, default=true)
+# audiolevel_event = true|false (whether to emit event to other users or not, default=false)
+# audio_active_packets = 100 (number of packets with audio level, default=100, 2 seconds)
+# audio_level_average = 25 (average value of audio level, 127=muted, 0='too loud', default=25)
+# default_expectedloss = percent of packets we expect participants may miss, to help with outgoing FEC (default=0, max=20; automatically used for forwarders too)
+# default_bitrate = default bitrate in bps to use for the all participants (default=0, which means libopus decides; automatically used for forwarders too)
+# denoise = true|false (whether denoising via RNNoise should be performed for each participant by default)
+# record = true|false (whether this room should be recorded, default=false)
+# record_file = "/path/to/recording.wav" (where to save the recording)
+# record_dir = "/path/to/" (path to save the recording to, makes record_file a relative path if provided)
+# mjrs = true|false (whether all participants in the room should be individually recorded to mjr files, default=false)
+# mjrs_dir = "/path/to/" (path to save the mjr files to)
+# allow_rtp_participants = true|false (whether participants should be allowed to join
+#		via plain RTP as well, rather than just WebRTC, default=false)
+# groups = optional, non-hierarchical, array of groups to tag participants, for external forwarding purposes only
+#
+#     The following lines are only needed if you want the mixed audio
+#     to be automatically forwarded via plain RTP to an external component
+#     (e.g., an ffmpeg script, or a gstreamer pipeline) for processing
+#     By default plain RTP is used, SRTP must be configured if needed
+# rtp_forward_id = numeric RTP forwarder ID for referencing it via API (optional: random ID used if missing)
+# rtp_forward_host = "<host address to forward RTP packets of mixed audio to>"
+# rtp_forward_host_family = "<ipv4|ipv6; by default, first family returned by DNS request>"
+# rtp_forward_port = port to forward RTP packets of mixed audio to
+# rtp_forward_ssrc = SSRC to use to use when streaming (optional: stream_id used if missing)
+# rtp_forward_codec = opus (default), pcma (A-Law) or pcmu (mu-Law)
+# rtp_forward_ptype = payload type to use when streaming (optional: only read for Opus, 100 used if missing)
+# rtp_forward_group = group of participants to forward, if enabled in the room (optional: forwards full mix if missing)
+# rtp_forward_srtp_suite = length of authentication tag (32 or 80)
+# rtp_forward_srtp_crypto = "<key to use as crypto (base64 encoded key as in SDES)>"
+# rtp_forward_always_on = true|false, whether silence should be forwarded when the room is empty (optional: false used if missing)
+#}
+
+general: {
+	#admin_key = "supersecret"		# If set, rooms can be created via API only
+									# if this key is provided in the request
+	#lock_rtp_forward = true		# Whether the admin_key above should be
+									# enforced for RTP forwarding requests too
+	#lock_play_file = true			# Whether the admin_key above should be
+									# enforced for playing .opus files too
+	#record_tmp_ext = "tmp"			# Optional temporary extension to add to filenames
+									# while recording: e.g., setting "tmp" would mean
+									# .wav --> .wav.tmp until the file is closed
+	#events = false					# Whether events should be sent to event
+									# handlers (default=true)
+
+	# By default, integers are used as a unique ID for both rooms and participants.
+	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
+	#string_ids = true
+
+	# Normally, all AudioBridge participants will join by negotiating a WebRTC
+	# PeerConnection: the plugin also supports adding participants that will
+	# use plain RTP, though, be it for supporting legacy users (e.g., SIP
+	# participants who an orchestrator can add to the bridge) or more simply
+	# to temporarily inject external audio in a room from a live source. To
+	# support plain RTP, the plugin needs to have a range of ports it can bind
+	# to: notice this should be configured so that it doesn't conflict with other
+	# plugins (e.g., Streaming, SIP, NoSIP) and applications (e.g., Janus itself).
+	# The default if you don't specify anything is 10000-60000.
+	#rtp_port_range = "50000-60000"
+	# In case we need to support plain RTP participants, we'll also need to know
+	# what local IP address to bind to for media. If no address is set in the
+	# property below, then one will be automatically guessed from the system.
+	#local_ip = "1.2.3.4"
+
+}
+
+room-1234: {
+	description = "Demo Room"
+	secret = "adminpwd"
+	sampling_rate = 16000
+	record = false
+	#record_dir = "/path/to/"
+	#record_file = "recording.wav"
+}

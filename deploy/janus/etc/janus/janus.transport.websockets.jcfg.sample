@@ -1,0 +1,72 @@
+# WebSockets stuff: whether they should be enabled, which ports they
+# should use, and so on.
+general: {
+	#events = true					# Whether to notify event handlers about transport events (default=true)
+	json = "indented"				# Whether the JSON messages should be indented (default),
+									# plain (no indentation) or compact (no indentation and no spaces)
+	#pingpong_trigger = 30			# After how many seconds of idle, a PING should be sent
+	#pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
+
+	ws = true						# Whether to enable the WebSockets API
+	ws_port = 8188					# WebSockets server port
+	#ws_interface = "eth0"			# Whether we should bind this server to a specific interface only
+	#ws_ip = "192.168.0.1"			# Whether we should bind this server to a specific IP address only
+	#ws_unix = "/run/ws.sock"		# Use WebSocket server over UNIX socket instead of TCP
+	wss = false						# Whether to enable secure WebSockets
+	#wss_port = 8989				# WebSockets server secure port, if enabled
+	#wss_interface = "eth0"			# Whether we should bind this server to a specific interface only
+	#wss_ip = "192.168.0.1"			# Whether we should bind this server to a specific IP address only
+	#wss_unix = "/run/wss.sock"		# Use WebSocket server over UNIX socket instead of TCP
+	#ws_logging = "err,warn"		# libwebsockets debugging level as a comma separated list of things
+									# to debug, supported values: err, warn, notice, info, debug, parser,
+									# header, ext, client, latency, user, count (plus 'none' and 'all')
+	#ws_acl = "127.,192.168.0."		# Only allow requests coming from this comma separated list of addresses
+	#ws_acl_forwarded = true		# Whether we should check the X-Forwarded-For header too for the ACL
+									# (default=false, since without a proxy in the middle this could be abused)
+}
+
+# If you want to expose the Admin API via WebSockets as well, you need to
+# specify a different server instance, as you cannot mix Janus API and
+# Admin API messaging. Notice that by default the Admin API support via
+# WebSockets is disabled.
+admin: {
+	admin_ws = false					# Whether to enable the Admin API WebSockets API
+	admin_ws_port = 7188				# Admin API WebSockets server port, if enabled
+	#admin_ws_interface = "eth0"		# Whether we should bind this server to a specific interface only
+	#admin_ws_ip = "192.168.0.1"		# Whether we should bind this server to a specific IP address only
+	#admin_ws_unix = "/run/aws.sock"	# Use WebSocket server over UNIX socket instead of TCP
+	admin_wss = false					# Whether to enable the Admin API secure WebSockets
+	#admin_wss_port = 7989				# Admin API WebSockets server secure port, if enabled
+	#admin_wss_interface = "eth0"		# Whether we should bind this server to a specific interface only
+	#admin_wss_ip = "192.168.0.1"		# Whether we should bind this server to a specific IP address only
+	#admin_wss_unix = "/run/awss.sock"	# Use WebSocket server over UNIX socket instead of TCP
+	#admin_ws_acl = "127.,192.168.0."	# Only allow requests coming from this comma separated list of addresses
+	#admin_ws_acl_forwarded = true		# Whether we should check the X-Forwarded-For header too for the ACL
+										# (default=false, since without a proxy in the middle this could be abused)
+}
+
+# The HTTP servers created in Janus support CORS out of the box, but by
+# default they return a wildcard (*) in the 'Access-Control-Allow-Origin'
+# header. This works fine in most situations, except when we have to
+# respond to a credential request (withCredentials=true in the XHR). If
+# you need that, uncomment and set the 'allow_origin' below to specify
+# what must be returned in 'Access-Control-Allow-Origin'. More details:
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+# In case you want to enforce the Origin validation, rather than leave
+# it to browsers, you can set 'enforce_cors' to 'true' to have Janus
+# return a '403 Forbidden' for all requests that don't comply.
+cors: {
+	#allow_origin = "http://foo.example"
+	#enforce_cors = true
+}
+
+# Certificate and key to use for any secure WebSocket server, if enabled (and passphrase if needed).
+# You can also disable insecure protocols and ciphers by configuring the
+# 'ciphers' property accordingly (no limitation by default).
+# Examples of recommended cipher strings at https://cheatsheetseries.owasp.org/cheatsheets/TLS_Cipher_String_Cheat_Sheet.html
+certificates: {
+	#cert_pem = "/path/to/cert.pem"
+	#cert_key = "/path/to/key.pem"
+	#cert_pwd = "secretpassphrase"
+	#ciphers = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256"
+}
