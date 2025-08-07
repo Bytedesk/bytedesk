@@ -1,0 +1,39 @@
+syntax = "proto3";
+// prevent naming conflicts between different projects.
+// package protobuf.proto;
+
+// [START java_declaration]
+option java_package = "com.bytedesk.socket.protobuf.model";
+option java_outer_classname = "ThreadProto";
+// [END java_declaration]
+
+// 类名前缀
+// [START objc_declaration]
+//option objc_class_prefix = "Proto";
+// [END objc_declaration]
+
+import "user.proto";
+// import "group.proto";
+//import "google/protobuf/any.proto";
+
+// 注意 1: 每个字段后面的序号一旦投入生产不能随便修改
+// 注意 2: 前1~15序号仅需一个字节编码，尽量用在常用字段
+// 注意 3: 被删除的field要作为reserved变量，不能重新赋值
+// types: bool, int32/int64/uint32/uint64/sint32/sint64/fixed32/fixed64/sfixed32/sfixed64, bytes, float, double, and string
+
+message Thread {
+    // ID
+    string uid = 1;
+    // 订阅主题
+    string topic = 2;
+    // 会话类型
+    string type = 3;
+    // 会话状态
+    string state = 4;
+    // 头像昵称等信息
+    User user = 5;
+    // 会话来源客户端
+    string channel = 6;
+    // 自定义扩展/附加信息
+    string extra = 7;
+}

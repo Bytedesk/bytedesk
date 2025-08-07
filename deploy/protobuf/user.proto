@@ -1,0 +1,33 @@
+syntax = "proto3";
+// prevent naming conflicts between different projects.
+// package protobuf.proto;
+
+// [START java_declaration]
+option java_package = "com.bytedesk.socket.protobuf.model";
+option java_outer_classname = "UserProto";
+// [END java_declaration]
+
+// 类名前缀
+// [START objc_declaration]
+//option objc_class_prefix = "Proto";
+// [END objc_declaration]
+
+//import "other_protos.proto";
+
+// 注意 1: 每个字段后面的序号一旦投入生产不能随便修改
+// 注意 2: 前1~15序号仅需一个字节编码，尽量用在常用字段
+// 注意 3: 被删除的field要作为reserved变量，不能重新赋值
+// types: bool, int32/int64/uint32/uint64/sint32/sint64/fixed32/fixed64/sfixed32/sfixed64, bytes, float, double, and string
+
+message User {
+    // uuID
+    string uid = 1;
+    // 昵称
+    string nickname = 2;
+    // 头像
+    string avatar = 3;
+    // 类型
+    string type = 4;
+    // 自定义扩展/附加信息
+    string extra = 5;
+}
