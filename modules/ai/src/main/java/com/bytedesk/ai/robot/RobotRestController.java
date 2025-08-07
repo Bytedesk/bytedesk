@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:37:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:25:37
+ * @LastEditTime: 2025-08-07 17:21:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,7 +89,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize("hasAuthority('ROBOT_CREATE')")
+    // @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "机器人", action = "新建", description = "create robot")
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
@@ -103,7 +103,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponse.class)))
-    @PreAuthorize("hasAuthority('ROBOT_CREATE')")
+    // @PreAuthorize("hasAuthority('ROBOT_CREATE')")
     @ActionAnnotation(title = "机器人", action = "新建", description = "create robot thread")
     @PostMapping("/create/llm/thread")
     public ResponseEntity<?> createLlmThread(@RequestBody ThreadRequest request) {
@@ -117,7 +117,7 @@ public class RobotRestController extends BaseRestController<RobotRequest> {
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponse.class)))
-    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
+    // @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
     @ActionAnnotation(title = "机器人", action = "更新", description = "update robot thread")
     @PostMapping("/update/llm/thread")
     public ResponseEntity<?> updateLlmThread(@RequestBody ThreadRequest request) {
