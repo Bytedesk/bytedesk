@@ -1,0 +1,142 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ykfui-conf
+  namespace: ykf
+data:
+    nginx.conf: | 
+        user  nginx;
+        worker_processes  1;
+        error_log  /var/log/nginx/error.log notice;
+        pid        /var/run/nginx.pid;
+        events {
+            worker_connections  102400;
+        }
+        http {
+            include       /etc/nginx/mime.types;
+            default_type  application/octet-stream;
+            log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                              '$status $body_bytes_sent "$http_referer" '
+                              '"$http_user_agent" "$http_x_forwarded_for"';
+            access_log  /var/log/nginx/access.log  main;
+            sendfile        on;
+            keepalive_timeout  65;
+            server {
+                listen 80;
+                listen [::]:80;
+                root /usr/share/nginx/html/;
+                index index.html index.htm index.nginx-debian.html;
+                server_name _;
+                location /api/ {
+                    proxy_pass http://ykfcore:9003;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include fastcgi_params;
+                }
+                location /visitor/ {
+                    proxy_pass http://ykfcore:9003;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include fastcgi_params;
+                }
+                location /config/ {
+                    proxy_pass http://ykfcore:9003;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include fastcgi_params;
+                }
+                location /auth/ {
+                    proxy_pass http://ykfcore:9003;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include fastcgi_params;
+                }
+                location /kaptcha/ {
+                    proxy_pass http://ykfcore:9003;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include fastcgi_params;
+                }
+                location /stomp {
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection "upgrade";
+                    proxy_pass http://ykfcore:9003/stomp;
+                    proxy_set_header  Host            $host;
+                    proxy_set_header  X-Real-IP       $remote_addr;
+                    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include           fastcgi_params;
+                }
+                location /websocket {
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection "upgrade";
+                    proxy_pass http://ykfcore:9885/websocket;
+                    proxy_set_header  Host            $host;
+                    proxy_set_header  X-Real-IP       $remote_addr;
+                    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include           fastcgi_params;
+                }
+                location /download/ {
+                    alias /usr/share/nginx/html/download/;
+                    charset utf-8; # 设置字符编码为UTF-8，解决中文乱码问题
+                    autoindex on;
+                    autoindex_format html; #以html风格将目录展示在浏览器中
+                    autoindex_exact_size off; #切换为 off 后，以可读的方式显示文件大小，单位为 KB、MB 或者 GB
+                    autoindex_localtime on; #以服务器的文件时间作为显示的时间
+                    client_max_body_size 4048M;
+                    proxy_max_temp_file_size 4048M;
+                    proxy_send_timeout 600; #后端服务器数据回传时间(代理发送超时)
+                    proxy_read_timeout 600; #连接成功后，后端服务器响应时间(代理接收超时)
+                    if ($request_filename ~* ^.*?\.(txt|doc|pdf|rar|gz|zip|docx|exe|xlsx|ppt|pptx)$){
+                        add_header Content-Disposition attachment;
+                    }
+                }
+                location /admin/ {
+                    try_files $uri $uri/ /admin/index.html;
+                }
+                location /agent/ {
+                    try_files $uri $uri/ /agent/index.html;
+                }
+                location /chat/ {
+                    try_files $uri $uri/ /chat/index.html;
+                }
+                location /frame/ {
+                    try_files $uri $uri/ /chat/index.html;
+                }
+                location /docs/ {
+                    try_files $uri $uri/ /docs/index.html;
+                }
+                location /agenticflow/ {
+                    try_files $uri $uri/ /agenticflow/index.html;
+                }
+                location /notebase/ {
+                    try_files $uri $uri/ /notebase/index.html;
+                }
+                location /kanban/ {
+                    try_files $uri $uri/ /kanban/index.html;
+                }
+                location /helpcenter/ {
+                    try_files $uri $uri/ /helpcenter/index.html;
+                }
+                location / {
+                    try_files $uri $uri/ /index.html;
+                }
+                add_header X-Via $server_addr;
+                add_header X-Cache $upstream_cache_status;
+                location @springboot {
+                    proxy_pass http://ykfcore:9003;
+                    proxy_set_header  Host            $host;
+                    proxy_set_header  X-Real-IP       $remote_addr;
+                    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+                    include           fastcgi_params;
+                    proxy_cache_valid  404      10m;
+                }
+                }
+                }

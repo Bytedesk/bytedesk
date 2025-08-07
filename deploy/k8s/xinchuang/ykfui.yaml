@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ykfui
+  namespace: ykf
+  labels:
+    app: ykfui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ykfui
+  template:
+    metadata:
+      labels: 
+        app: ykfui
+    spec:
+      containers:
+        - name: ykfui
+          image: easzlab.io.local:5000/dev/ykfui:20250807
+          imagePullPolicy: IfNotPresent
+          resources:              
+            requests:
+              cpu: 0.5
+              memory: 0.5Gi
+            limits:
+              cpu: 0.5
+              memory: 0.5Gi
+          ports:
+            - containerPort: 80
+          volumeMounts:
+          - mountPath: /etc/nginx/nginx.conf
+            name: nginx-conf
+            subPath: nginx.conf
+      volumes:       
+        - name: nginx-conf
+          configMap:
+            name: ykfui-conf
