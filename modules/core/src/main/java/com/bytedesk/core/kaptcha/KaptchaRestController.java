@@ -43,7 +43,7 @@ public class KaptchaRestController {
     
     private final Producer captchaProducer;
 
-    private final KaptchaCacheService kaptchaCacheService;
+    private final KaptchaRedisService kaptchaCacheService;
 
     // 获取验证码
     // http://127.0.0.1:9003/kaptcha/api/v1/get

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 17:48:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 16:54:12
+ * @LastEditTime: 2025-08-07 14:57:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class KaptchaCacheService {
+public class KaptchaRedisService {
     
     // 验证码5分钟过期
     private static final long EXPIRE_TIME = 5; // 5分钟
