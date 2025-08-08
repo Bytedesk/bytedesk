@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 13:43:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 20:26:15
+ * @LastEditTime: 2025-08-08 22:27:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,14 +28,16 @@ import com.bytedesk.kbase.llm_text.TextInitializer;
 import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class KbaseInitializer implements SmartInitializingSingleton {
 
-    private final KbaseRestService kbaseService;
+    private final KbaseRestService kbaseRestService;
 
-    private final AuthorityRestService authorityService;
+    private final AuthorityRestService authorityRestService;
 
     private final FaqInitializer faqInitializer;
 
@@ -53,6 +55,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
+        log.info("KbaseInitializer initialization started...");
+
         // 初始化权限
         initPermissions();
         // 初始化知识库
@@ -78,13 +82,13 @@ public class KbaseInitializer implements SmartInitializingSingleton {
     public void initKbase() {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 初始化知识库
-        kbaseService.initKbase(orgUid);
+        kbaseRestService.initKbase(orgUid);
     }
 
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = KbasePermissions.KBASE_PREFIX + permission.name();
-            authorityService.createForPlatform(permissionValue);
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
     

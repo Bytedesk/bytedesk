@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 21:29:13
+ * @LastEditTime: 2025-08-08 22:23:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,8 +38,11 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.bytedesk.core.utils.Utils;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoReplyFixedEntity, AutoReplyFixedRequest, AutoReplyFixedResponse, AutoReplyFixedExcel> {
@@ -242,8 +245,10 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     public void initData(String orgUid) {
         // 检查是否已经有数据，如果有则不初始化
         if (autoReplyFixedRepository.count() > 0) {
+            log.info("AutoReplyFixed data already exists, skipping initialization.");
             return;
         }
+        log.info("Initializing AutoReplyFixed data...");
 
         String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
         

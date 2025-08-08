@@ -280,8 +280,10 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     public void initData(String orgUid) {
         // 检查是否已经有数据，如果有则不初始化
         if (autoReplyKeywordRepository.count() > 0) {
+            log.info("AutoReplyKeyword data already exists, skipping initialization.");
             return;
         }
+        log.info("AutoReplyData initialization started...");
 
         String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
         
