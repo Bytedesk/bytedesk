@@ -33,13 +33,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 自动回复-关键词匹配
  */
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

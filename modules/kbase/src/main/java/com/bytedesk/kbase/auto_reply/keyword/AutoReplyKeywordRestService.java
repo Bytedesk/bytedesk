@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 20:15:43
+ * @LastEditTime: 2025-08-08 21:20:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.ArrayList;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -36,6 +38,7 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -275,7 +278,76 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     }
 
     public void initData(String orgUid) {
+        // 检查是否已经有数据，如果有则不初始化
+        if (keywordRepository.count() > 0) {
+            return;
+        }
+
+        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
         
+        // 创建默认分类
+        CategoryRequest categoryRequest = CategoryRequest.builder()
+                .name("默认分类")
+                .type(CategoryTypeEnum.AUTOREPLY.name())
+                .kbUid(kbUid)
+                .orgUid(orgUid)
+                .build();
+        CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+        String categoryUid = categoryResponse.getUid();
+
+        // 创建示例关键词自动回复数据
+        List<AutoReplyKeywordEntity> keywordList = new ArrayList<>();
+        
+        // 问候关键词
+        AutoReplyKeywordEntity greetingKeyword = AutoReplyKeywordEntity.builder().build();
+        greetingKeyword.setUid(uidUtils.getUid());
+        greetingKeyword.setKeywordList(Arrays.asList("你好", "您好", "hi", "hello", "在吗", "在么"));
+        greetingKeyword.setReplyList(Arrays.asList("您好！欢迎使用我们的客服系统，请问有什么可以帮助您的吗？", "您好！很高兴为您服务，请问有什么可以帮助您的吗？"));
+        greetingKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
+        greetingKeyword.setEnabled(true);
+        greetingKeyword.setCategoryUid(categoryUid);
+        greetingKeyword.setKbUid(kbUid);
+        greetingKeyword.setOrgUid(orgUid);
+        keywordList.add(greetingKeyword);
+
+        // 工作时间关键词
+        AutoReplyKeywordEntity workTimeKeyword = AutoReplyKeywordEntity.builder().build();
+        workTimeKeyword.setUid(uidUtils.getUid());
+        workTimeKeyword.setKeywordList(Arrays.asList("工作时间", "上班时间", "营业时间", "几点上班", "几点下班"));
+        workTimeKeyword.setReplyList(Arrays.asList("我们的工作时间是周一至周五 9:00-18:00，周末和节假日休息。如有紧急问题，请留言，我们会在下一个工作日尽快回复您。"));
+        workTimeKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
+        workTimeKeyword.setEnabled(true);
+        workTimeKeyword.setCategoryUid(categoryUid);
+        workTimeKeyword.setKbUid(kbUid);
+        workTimeKeyword.setOrgUid(orgUid);
+        keywordList.add(workTimeKeyword);
+
+        // 联系方式关键词
+        AutoReplyKeywordEntity contactKeyword = AutoReplyKeywordEntity.builder().build();
+        contactKeyword.setUid(uidUtils.getUid());
+        contactKeyword.setKeywordList(Arrays.asList("联系方式", "电话", "手机", "邮箱", "怎么联系", "联系你们"));
+        contactKeyword.setReplyList(Arrays.asList("您可以通过以下方式联系我们：\n1. 客服热线：400-123-4567\n2. 邮箱：support@example.com\n3. 在线客服：工作时间在线"));
+        contactKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
+        contactKeyword.setEnabled(true);
+        contactKeyword.setCategoryUid(categoryUid);
+        contactKeyword.setKbUid(kbUid);
+        contactKeyword.setOrgUid(orgUid);
+        keywordList.add(contactKeyword);
+
+        // 价格关键词
+        AutoReplyKeywordEntity priceKeyword = AutoReplyKeywordEntity.builder().build();
+        priceKeyword.setUid(uidUtils.getUid());
+        priceKeyword.setKeywordList(Arrays.asList("价格", "多少钱", "费用", "收费", "价格表", "报价"));
+        priceKeyword.setReplyList(Arrays.asList("关于价格信息，建议您联系我们的销售团队获取详细报价。您可以拨打客服热线400-123-4567或发送邮件至sales@example.com咨询。"));
+        priceKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
+        priceKeyword.setEnabled(true);
+        priceKeyword.setCategoryUid(categoryUid);
+        priceKeyword.setKbUid(kbUid);
+        priceKeyword.setOrgUid(orgUid);
+        keywordList.add(priceKeyword);
+
+        // 保存所有数据
+        save(keywordList);
     }
 
 }

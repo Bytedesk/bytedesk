@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:29:52
+ * @LastEditTime: 2025-08-08 21:20:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.kbase.auto_reply.fixed;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -36,6 +38,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
+import com.bytedesk.core.utils.Utils;
 
 @Service
 @AllArgsConstructor
@@ -238,7 +241,64 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     }
 
     public void initData(String orgUid) {
+        // 检查是否已经有数据，如果有则不初始化
+        if (autoReplyRepository.count() > 0) {
+            return;
+        }
+
+        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID);
         
+        // 创建默认分类
+        CategoryRequest categoryRequest = CategoryRequest.builder()
+                .name("默认分类")
+                .type(CategoryTypeEnum.AUTOREPLY.name())
+                .kbUid(kbUid)
+                .orgUid(orgUid)
+                .build();
+        CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+        String categoryUid = categoryResponse.getUid();
+
+        // 创建示例固定自动回复数据
+        List<AutoReplyFixedEntity> autoReplyList = new ArrayList<>();
+        
+        // 欢迎消息
+        AutoReplyFixedEntity welcomeReply = AutoReplyFixedEntity.builder()
+                .uid(uidUtils.getUid())
+                .content("您好！欢迎使用我们的客服系统，请问有什么可以帮助您的吗？")
+                .type(MessageTypeEnum.TEXT.name())
+                .enabled(true)
+                .categoryUid(categoryUid)
+                .kbUid(kbUid)
+                .orgUid(orgUid)
+                .build();
+        autoReplyList.add(welcomeReply);
+
+        // 工作时间消息
+        AutoReplyFixedEntity workTimeReply = AutoReplyFixedEntity.builder()
+                .uid(uidUtils.getUid())
+                .content("我们的工作时间是周一至周五 9:00-18:00，周末和节假日休息。如有紧急问题，请留言，我们会在下一个工作日尽快回复您。")
+                .type(MessageTypeEnum.TEXT.name())
+                .enabled(true)
+                .categoryUid(categoryUid)
+                .kbUid(kbUid)
+                .orgUid(orgUid)
+                .build();
+        autoReplyList.add(workTimeReply);
+
+        // 联系方式消息
+        AutoReplyFixedEntity contactReply = AutoReplyFixedEntity.builder()
+                .uid(uidUtils.getUid())
+                .content("您可以通过以下方式联系我们：\n1. 客服热线：400-123-4567\n2. 邮箱：support@example.com\n3. 在线客服：工作时间在线")
+                .type(MessageTypeEnum.TEXT.name())
+                .enabled(true)
+                .categoryUid(categoryUid)
+                .kbUid(kbUid)
+                .orgUid(orgUid)
+                .build();
+        autoReplyList.add(contactReply);
+
+        // 保存所有数据
+        save(autoReplyList);
     }
     
 }

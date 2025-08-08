@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-27 10:27:32
+ * @LastEditTime: 2025-08-08 21:20:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -273,7 +273,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
     public void initKbase(String orgUid) {
 
         // 初始化帮助文档知识库
-        KbaseRequest kownledgebaseRequestHelpdoc = KbaseRequest.builder()
+        KbaseRequest kbaseHelpdocRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID))
                 .type(KbaseTypeEnum.HELPCENTER.name())
                 .name(KbaseConsts.KB_HELPCENTER_NAME)
@@ -281,10 +281,10 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        create(kownledgebaseRequestHelpdoc);
+        create(kbaseHelpdocRequest);
 
         // 初始化内部知识库 NOTEBASE
-        KbaseRequest kownledgebaseRequestNotebase = KbaseRequest.builder()
+        KbaseRequest kbaseNotebaseRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_NOTEBASE_UID))
                 .type(KbaseTypeEnum.NOTEBASE.name())
                 .name(KbaseConsts.KB_NOTEBASE_NAME)
@@ -292,10 +292,10 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        create(kownledgebaseRequestNotebase);
+        create(kbaseNotebaseRequest);
 
         // 初始化LLM知识库
-        KbaseRequest kownledgebaseRequestLlm = KbaseRequest.builder()
+        KbaseRequest kbaseLlmRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID))
                 .type(KbaseTypeEnum.LLM.name())
                 .name(KbaseConsts.KB_LLM_NAME)
@@ -303,21 +303,21 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        create(kownledgebaseRequestLlm);
+        create(kbaseLlmRequest);
 
-        // 初始化关键词知识库
-        KbaseRequest kownledgebaseRequestKeyword = KbaseRequest.builder()
-                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_KEYWORD_UID))
-                .type(KbaseTypeEnum.KEYWORD.name())
-                .name(KbaseConsts.KB_KEYWORD_NAME)
-                .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
-                .language(LanguageEnum.ZH_CN.name())
-                .orgUid(orgUid)
-                .build();
-        create(kownledgebaseRequestKeyword);
+        // 初始化自动回复关键词知识库
+        // KbaseRequest kbaseAutoReplyKeywordRequest = KbaseRequest.builder()
+        //         .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_KEYWORD_UID))
+        //         .type(KbaseTypeEnum.KEYWORD.name())
+        //         .name(KbaseConsts.KB_KEYWORD_NAME)
+        //         .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
+        //         .language(LanguageEnum.ZH_CN.name())
+        //         .orgUid(orgUid)
+        //         .build();
+        // create(kbaseAutoReplyKeywordRequest);
 
-        // 初始化自动回复知识库
-        KbaseRequest kownledgebaseRequestAutoReply = KbaseRequest.builder()
+        // 初始化自动回复固定回复知识库
+        KbaseRequest kbaseAutoReplyRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_UID))
                 .type(KbaseTypeEnum.AUTOREPLY.name())
                 .name(KbaseConsts.KB_AUTOREPLY_NAME)
@@ -325,10 +325,10 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        create(kownledgebaseRequestAutoReply);
+        create(kbaseAutoReplyRequest);
 
         // 初始化快捷回复知识库
-        KbaseRequest kownledgebaseRequestQuickReply = KbaseRequest.builder()
+        KbaseRequest kbaseQuickReplyRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
                 .type(KbaseTypeEnum.QUICKREPLY.name())
                 .name(KbaseConsts.KB_QUICKREPLY_NAME)
@@ -336,10 +336,10 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        create(kownledgebaseRequestQuickReply);
+        create(kbaseQuickReplyRequest);
 
         // 初始化敏感词/屏蔽词知识库
-        KbaseRequest kownledgebaseRequestTaboo = KbaseRequest.builder()
+        KbaseRequest kbaseTabooRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID))
                 .type(KbaseTypeEnum.TABOO.name())
                 .name(KbaseConsts.KB_TABOO_NAME)
@@ -347,7 +347,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
                 .build();
-        create(kownledgebaseRequestTaboo);
+        create(kbaseTabooRequest);
     }
 
     public LlmProviderConfigDefault getLlmProviderConfigDefault() {

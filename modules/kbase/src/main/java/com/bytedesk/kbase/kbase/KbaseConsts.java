@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-24 11:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-07 10:14:12
+ * @LastEditTime: 2025-08-08 21:22:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,7 +58,7 @@ public class KbaseConsts {
 
     public static final String KB_LLM_NAME = "大语言模型";
 
-    public static final String KB_KEYWORD_NAME = "关键词";
+    // public static final String KB_KEYWORD_NAME = "关键词";
 
     public static final String KB_FAQ_NAME = "常见问题";
 

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
+import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedInitializer;
+import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordInitializer;
 import com.bytedesk.kbase.faq.FaqInitializer;
 import com.bytedesk.kbase.file.FileInitializer;
 import com.bytedesk.kbase.llm_chunk.ChunkInitializer;
@@ -45,6 +47,10 @@ public class KbaseInitializer implements SmartInitializingSingleton {
 
     private final ChunkInitializer chunkInitializer;
 
+    private final AutoReplyFixedInitializer autoReplyFixedInitializer;
+
+    private final AutoReplyKeywordInitializer autoReplyKeywordInitializer;
+
     @Override
     public void afterSingletonsInstantiated() {
         // 初始化权限
@@ -57,9 +63,9 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         quickReplyInitializer.init();
         
         // 初始化固定自动回复
-        // autoReplyFixedInitializer.init();
+        autoReplyFixedInitializer.init();
         // 初始化关键词自动回复
-        // autoReplyKeywordInitializer.init();
+        autoReplyKeywordInitializer.init();
 
         // 初始化文本
         textInitializer.init();

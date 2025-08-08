@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 21:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-06 21:47:27
+ * @LastEditTime: 2025-08-08 21:11:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,14 +16,27 @@ package com.bytedesk.kbase.auto_reply.keyword;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
+
+import lombok.AllArgsConstructor;
+
 @Component
+@AllArgsConstructor
 public class AutoReplyKeywordInitializer implements SmartInitializingSingleton {
+
+    private final AutoReplyKeywordRestService autoReplyKeywordRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        // init();
     }
 
-    private void init() {}
+    // 迁移到kbaseInitializer
+    public void init() {
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_KEYWORD_UID);
+        // 初始化关键词自动回复数据
+        autoReplyKeywordRestService.initData(orgUid);
+    }
     
 }
