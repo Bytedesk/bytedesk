@@ -30,7 +30,6 @@ import com.bytedesk.kbase.llm_text.event.TextDeleteEvent;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 

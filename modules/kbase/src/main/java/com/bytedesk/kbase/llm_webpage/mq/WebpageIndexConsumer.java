@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-28 09:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-28 09:40:00
+ * @LastEditTime: 2025-08-08 19:47:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 import com.bytedesk.kbase.llm_webpage.service.WebpageCrawlerService;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
