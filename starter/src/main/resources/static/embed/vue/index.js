@@ -1,13 +1,13 @@
-import { defineComponent as c, onMounted as u, onUnmounted as a, h as r } from "vue";
-import { createI18n as d } from "vue-i18n";
-import m from "../core/BytedeskWeb/index.js";
-import { messages as y } from "../locales/index/index.js";
-const f = d({
+import { defineComponent as a, onMounted as c, onUnmounted as r, h as m } from "vue";
+import { createI18n as u } from "vue-i18n";
+import d from "../core/BytedeskWeb/index.js";
+import { messages as f } from "../locales/index/index.js";
+const p = u({
   locale: "zh-cn",
-  messages: y
+  messages: f
 });
-let e = null, o = 0;
-const V = c({
+let e = null, t = 0;
+const b = a({
   name: "BytedeskVue",
   props: {
     locale: {
@@ -16,26 +16,26 @@ const V = c({
     }
   },
   emits: ["init"],
-  setup(t, { attrs: s, emit: l }) {
+  setup(o, { attrs: i, emit: l }) {
     let n = null;
-    return u(() => {
-      o++, f.global.locale = t.locale;
-      const i = {
-        ...s,
-        locale: t.locale
+    return c(() => {
+      t++, p.global.locale = o.locale;
+      const s = {
+        ...i,
+        locale: o.locale
       };
       if (e) {
-        console.log("BytedeskVue: 使用现有全局实例，当前活跃组件数:", o), n = e, l("init", n);
+        n = e, l("init", n);
         return;
       }
-      console.log("BytedeskVue: 创建新的全局实例"), e = new m(i), n = e, e.init(), l("init", n);
-    }), a(() => {
-      o--, console.log("BytedeskVue: 组件卸载，当前活跃组件数:", o), n = null, o <= 0 && (console.log("BytedeskVue: 没有活跃组件，清理全局实例"), setTimeout(() => {
-        e && o <= 0 && (e.destroy(), e = null, o = 0);
-      }, 100));
-    }), () => r("div", { style: { display: "none" } });
+      e = new d(s), n = e, e.init(), l("init", n);
+    }), r(() => {
+      t--, n = null, t <= 0 && setTimeout(() => {
+        e && t <= 0 && (e.destroy(), e = null, t = 0);
+      }, 100);
+    }), () => m("div", { style: { display: "none" } });
   }
 });
 export {
-  V as BytedeskVue
+  b as BytedeskVue
 };
