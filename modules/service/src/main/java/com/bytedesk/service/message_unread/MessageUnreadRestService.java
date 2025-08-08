@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 16:37:20
+ * @LastEditTime: 2025-08-08 19:35:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -137,7 +137,7 @@ public class MessageUnreadRestService
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
-        String threadTopic = messageProtobuf.getThread().getTopic();
+        // String threadTopic = messageProtobuf.getThread().getTopic();
 
         // 目前只记录文本、图片和文件类型的未读消息
         if (!MessageTypeEnum.TEXT.equals(type) &&
