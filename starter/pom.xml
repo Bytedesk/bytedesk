@@ -412,7 +412,7 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>5.2.0</version>
+			<version>${jedis.version}</version>
 		</dependency>
 
 		<!-- jedis pool config -->

@@ -117,7 +117,7 @@ public class BatchConfig {
     // /**
     //  * 配置JobLauncher
     //  * JobLauncher用于启动Job
-    //  * Spring Boot 3.4.4 中使用TaskExecutorJobLauncher替代SimpleJobLauncher
+    //  * Spring Boot 3.5.0 中使用TaskExecutorJobLauncher替代SimpleJobLauncher
     //  */
     // @Bean
     // public JobLauncher jobLauncher() throws Exception {
