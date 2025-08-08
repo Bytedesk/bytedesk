@@ -99,8 +99,8 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         } else if (StringUtils.hasText(authRequest.getPasswordHash())
                 && StringUtils.hasText(authRequest.getPasswordSalt())) {
-            // TODO: 使用密码哈希登录
-            log.debug("Using password hash authentication");
+            // 使用密码哈希登录（AES解密）
+            log.debug("Using password hash authentication with AES decryption");
             authentication = authService.authenticateWithPasswordHash(authRequest);
             if (authentication == null) {
                 return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));

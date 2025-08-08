@@ -20,7 +20,6 @@
 
 	<dependencies>
 
-
 		<!-- reader -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
@@ -52,7 +51,6 @@
 			<artifactId>spring-ai-tika-document-reader</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-
 
 		<!-- vector store -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->

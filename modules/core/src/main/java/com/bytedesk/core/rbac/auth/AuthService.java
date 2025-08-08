@@ -3,8 +3,8 @@
  * @Date: 2024-01-23 07:53:01
  * @LastEditors: jackning 270580156@qq.com
  * @LastEditTime: 2025-07-23 08:09:19
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- * Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ * @Description: bytedesk.com https://github.com/Bytedesk/by        }
+    }ease be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  仅支持企业内部员工自用，严禁用于销售、二次销售或者部署SaaS方式销售 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
@@ -35,6 +35,7 @@ import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
+import com.bytedesk.core.utils.PasswordCryptoUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -161,7 +162,8 @@ public class AuthService {
     }
 
     /**
-     * TODO: 密码哈希登录
+     * 密码哈希登录 - 支持AES解密
+     * 前端使用AES加密密码，后端解密后验证
      */
     public Authentication authenticateWithPasswordHash(AuthRequest authRequest) {
         // 1. 查询用户
@@ -181,10 +183,35 @@ public class AuthService {
         // String plainPassword = dbPassword;
         // boolean valid = PasswordHashUtils.verifyPasswordHash(plainPassword, authRequest.getPasswordSalt(), authRequest.getPasswordHash());
         //
-        // 实际情况：如果数据库存储BCrypt，则无法支持前端hash+salt方式
-        // 这里直接返回null，提示不支持
-        log.warn("当前系统仅支持明文密码登录，BCrypt加密无法支持前端hash+salt方式");
-        return null;
+        // 实际情况：现在支持AES解密前端加密的密码
+        try {
+            // 2. 使用AES解密前端发送的加密密码
+            String decryptedPassword = PasswordCryptoUtils.decryptPassword(
+                authRequest.getPasswordHash(), 
+                authRequest.getPasswordSalt()
+            );
+            log.debug("Password decrypted successfully for user: {}", authRequest.getUsername());
+
+            // 3. 验证解密后的密码与数据库中存储的BCrypt密码
+            org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = 
+                new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+            
+            String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
+            boolean isValid = encoder.matches(decryptedPassword, dbPassword);
+            
+            if (!isValid) {
+                log.warn("Password verification failed for user: {}", authRequest.getUsername());
+                return null;
+            }
+
+            // 4. 密码验证成功，构造认证对象
+            log.info("Password hash authentication successful for user: {}", authRequest.getUsername());
+            return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            
+        } catch (Exception e) {
+            log.error("Password hash authentication error for user: {}: {}", authRequest.getUsername(), e.getMessage());
+            return null;
+        }
 
         // 3. 用 passwordHash 作为“明文”去匹配
         // org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
