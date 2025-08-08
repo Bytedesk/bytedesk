@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-30 21:52:57
+ * @LastEditTime: 2025-08-08 16:25:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -33,6 +34,7 @@ import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.message_unread.MessageUnreadEntity;
+import com.bytedesk.service.message_unread.MessageUnreadResponse;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueResponse;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -159,6 +161,29 @@ public class ServiceConvertUtils {
 
     public static QueueResponse convertToQueueResponse(QueueEntity entity) {
         return getModelMapper().map(entity, QueueResponse.class);
+    }
+
+    public static MessageUnreadResponse convertToMessageUnreadResponse(MessageUnreadEntity message) {
+
+        MessageUnreadResponse messageResponse = getModelMapper().map(message, MessageUnreadResponse.class);
+        //
+        if (message.getUser() != null) {
+            UserProtobuf user = UserProtobuf.fromJson(message.getUser());
+            if (user != null) {
+                if (user.getExtra() == null) {
+                    user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+                }
+                messageResponse.setUser(user);
+            }
+        }
+
+        // thread
+        if (message.getThread() != null) {
+            ThreadResponse thread = ConvertUtils.convertToThreadResponse(message.getThread());
+            messageResponse.setThread(thread);
+        }
+
+        return messageResponse;
     }
     
     public static MessageLeaveResponse convertToMessageLeaveResponse(MessageLeaveEntity entity) {

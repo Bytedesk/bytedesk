@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:15:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 10:53:24
+ * @LastEditTime: 2025-08-08 16:34:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,14 @@
 package com.bytedesk.service.message_unread;
 
 import com.bytedesk.core.message.AbstractMessageEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,7 +46,60 @@ public class MessageUnreadEntity extends AbstractMessageEntity  {
 
     private static final long serialVersionUID = 1L;
 
-    private String threadUid;
+    /**
+     * Associated conversation thread containing this message
+     * Many-to-one relationship: multiple messages can belong to one thread
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "thread_id", referencedColumnName = "id")
+    @JsonBackReference
+    private ThreadEntity thread;
 
-    private String threadTopic;
+    // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
+    public UserProtobuf getUserProtobuf() {
+        return UserProtobuf.fromJson(getUser());
+    }
+
+    // 通过解析user字段中的type字段来判断 type=robot则为机器人，否则为访客
+    public Boolean isFromRobot() {
+        return getUserProtobuf().isRobot();
+    }
+
+    // 通过解析user字段中的type字段来判断 type=visitor则为访客，否则为客服
+    public Boolean isFromVisitor() {
+        return getUserProtobuf().isVisitor();
+    }
+
+    public Boolean isFromUser() {
+        return getUserProtobuf().isUser();
+    }
+
+    public Boolean isFromMember() {
+        return getUserProtobuf().isMember();
+    }
+
+    // 是否系统消息
+    public Boolean isFromSystem() {
+        return getUserProtobuf().isSystem();
+    }
+
+    // 是否客服消息
+    public Boolean isFromAgent() {
+        return getUserProtobuf().isAgent();
+    }
+
+    /**
+     * 重写toString方法避免循环引用
+     */
+    @Override
+    public String toString() {
+        return "MessageEntity{" +
+                "id=" + getId() +
+                ", uid='" + getUid() + '\'' +
+                ", type='" + getType() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", createdAt=" + getCreatedAt() +
+                ", userUid='" + getUserUid() + '\'' +
+                '}';
+    }
 }

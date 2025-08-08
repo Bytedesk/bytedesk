@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:39:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:31:28
+ * @LastEditTime: 2025-08-08 16:38:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,9 @@ public class MessageUnreadRequest extends BaseRequest {
 
     private String visitorUid;
 
-    private String threadUid;
+    // private String threadUid;
 
-    private String threadTopic;
+    // private String threadTopic;
+
+    private Boolean clearUnread;
 }

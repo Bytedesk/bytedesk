@@ -37,13 +37,13 @@ public class MessageUnreadSpecification extends BaseSpecification<MessageUnreadE
             // uid 是系统自动生成访客uid
             if (StringUtils.hasText(request.getUid())) {
                 // log.info("search message unread by uid: {}", request.getUid());
-                // threadTopic contains uid
-                predicates.add(criteriaBuilder.like(root.get("threadTopic"), "%" + request.getUid() + "%"));
+                // thread.topic contains uid
+                predicates.add(criteriaBuilder.like(root.get("thread").get("topic"), "%" + request.getUid() + "%"));
                 // 而且 user not contains uid
                 predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + request.getUid() + "%")));
             }
 
-            // 客服端加载未读，根据用户订阅的threadTopic加载
+            // 客服端加载未读，根据用户订阅的thread.topic加载
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

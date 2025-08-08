@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 17:17:29
+ * @LastEditTime: 2025-08-08 16:21:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -249,18 +249,6 @@ public class ConvertUtils {
                 messageResponse.setUser(user);
             }
         }
-
-        // extra格式不固定，前端需要根据type字段来解析，所以此处不能使用MessageExtra
-        // extra
-        // if (message.getExtra() != null) {
-        // // MessageExtra extra = JSON.parseObject(message.getExtra(),
-        // MessageExtra.class);
-        // MessageExtra extra = MessageExtra.fromJson(message.getExtra());
-        // if (extra.getFeedback() == null) {
-        // extra.setFeedback(BytedeskConsts.EMPTY_JSON_STRING);
-        // }
-        // messageResponse.setExtra(extra);
-        // }
 
         // thread
         if (message.getThread() != null) {

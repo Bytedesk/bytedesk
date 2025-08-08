@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 06:37:53
+ * @LastEditTime: 2025-08-08 16:37:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,8 +32,11 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.redis.RedisService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.service.utils.ServiceConvertUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +77,12 @@ public class MessageUnreadRestService
             request.setUid(user.getUid());
         }
         //
-        return queryByOrg(request);
+        Page<MessageUnreadResponse> page = queryByOrg(request);
+        // 如果需要清空未读消息，则清空
+        if (request.getClearUnread() != null && request.getClearUnread()) {
+            clearUnreadMessages(request);
+        }
+        return page;
     }
 
     @Override
@@ -162,8 +170,12 @@ public class MessageUnreadRestService
         if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
             messageUnread.setStatus(MessageStatusEnum.SUCCESS.name());
         }
-        messageUnread.setThreadUid(threadUid);
-        messageUnread.setThreadTopic(threadTopic);
+        // messageUnread.setThreadUid(threadUid);
+        // messageUnread.setThreadTopic(threadTopic);
+        Optional<ThreadEntity> threadEntityOptional = threadRestService.findByUid(threadUid);
+        if (threadEntityOptional.isPresent()) {
+            messageUnread.setThread(threadEntityOptional.get());
+        }
         messageUnread.setUser(messageProtobuf.getUser().toJson());
         messageUnread.setUserUid(messageProtobuf.getUser().getUid());
         //
@@ -326,7 +338,7 @@ public class MessageUnreadRestService
 
     @Override
     public MessageUnreadResponse convertToResponse(MessageUnreadEntity entity) {
-        return modelMapper.map(entity, MessageUnreadResponse.class);
+        return ServiceConvertUtils.convertToMessageUnreadResponse(entity);
     }
 
 }

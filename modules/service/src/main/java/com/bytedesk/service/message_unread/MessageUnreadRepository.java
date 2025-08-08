@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:23:33
+ * @LastEditTime: 2025-08-08 16:37:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    void deleteByThreadTopicContainsAndUserNotContains(String uid1, String uid2);
+    void deleteByThreadTopicContainsAndUserNotContains(String threadTopic, String userUid);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
