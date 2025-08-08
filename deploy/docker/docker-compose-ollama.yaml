@@ -177,7 +177,7 @@ services:
       SERVER_PORT: 9003
       # bytedesk config
       BYTEDESK_DEBUG: "false"
-      BYTEDESK_VERSION: 0.9.0
+      BYTEDESK_VERSION: 0.9.1
       # 申请licenseKey
       # https://www.weiyuai.cn/docs/zh-CN/docs/faq#%E9%97%AE%E9%A2%9813%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E8%AF%95%E7%94%A8%E7%89%88license
       BYTEDESK_LICENSE_KEY: 

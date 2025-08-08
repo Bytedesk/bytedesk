@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 19:23:26
+ * @LastEditTime: 2025-08-08 09:47:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,7 +55,7 @@ public class AuthController {
 
     private PushRestService pushRestService;
 
-    private KaptchaRedisService kaptchaCacheService;
+    private KaptchaRedisService kaptchaRestService;
 
     private AuthenticationManager authenticationManager;
 
@@ -64,7 +64,7 @@ public class AuthController {
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
-        if (!kaptchaCacheService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(),
+        if (!kaptchaRestService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(),
                 userRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -85,7 +85,7 @@ public class AuthController {
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -118,7 +118,7 @@ public class AuthController {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getChannel(),
                 authRequest.getType());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -137,7 +137,7 @@ public class AuthController {
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -186,7 +186,7 @@ public class AuthController {
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
 
-        if (!kaptchaCacheService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
