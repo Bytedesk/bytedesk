@@ -33,6 +33,7 @@ import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 /**
  * Chunk向量检索服务
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
 public class ChunkVectorService {
     
     private final ElasticsearchVectorStore vectorStore;

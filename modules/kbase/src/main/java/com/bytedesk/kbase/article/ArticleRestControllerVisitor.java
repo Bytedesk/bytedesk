@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-30 10:06:45
+ * @LastEditTime: 2025-08-08 17:28:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,13 +30,13 @@ import lombok.AllArgsConstructor;
 @Tag(name = "文章匿名管理", description = "文章匿名相关接口")
 public class ArticleRestControllerVisitor {
 
-    private final ArticleRestService articleService;
+    private final ArticleRestService articleRestService;
 
     @RequestMapping("/search")
     @Operation(summary = "搜索文章", description = "访客搜索文章")
     public ResponseEntity<?> searchKb(ArticleRequest request) {
         
-        Page<ArticleResponse> page = articleService.queryByOrg(request);
+        Page<ArticleResponse> page = articleRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }

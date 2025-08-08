@@ -26,6 +26,7 @@ import com.bytedesk.kbase.faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.faq.vector.FaqVectorService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,13 +35,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
 public class FaqIndexConsumer {
 
     private final FaqElasticService faqElasticService;
-    private final FaqVectorService faqVectorService;
+    @Autowired(required = false)
+    private FaqVectorService faqVectorService;
     private final FaqRestService faqRestService;
     private final Random random = new Random();
+
+    public FaqIndexConsumer(FaqElasticService faqElasticService, FaqRestService faqRestService) {
+        this.faqElasticService = faqElasticService;
+        this.faqRestService = faqRestService;
+    }
 
     /**
      * 处理FAQ索引队列中的消息

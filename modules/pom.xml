@@ -16,6 +16,7 @@
 
     <modules>
         <module>ai</module>
+        <module>call</module>
         <module>core</module>
         <module>forum</module>
         <module>kbase</module>

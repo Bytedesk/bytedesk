@@ -34,6 +34,7 @@ import com.bytedesk.kbase.llm_text.TextRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 /**
  * Text向量检索服务
@@ -43,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
 public class TextVectorService {
     
     private final ElasticsearchVectorStore vectorStore;

@@ -35,11 +35,11 @@ import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
 public class ChunkEventListener {
 
     private final ChunkElasticService chunkElasticService;
@@ -48,7 +48,14 @@ public class ChunkEventListener {
 
     private final FileRestService fileRestService;
 
-    private final ChunkVectorService chunkVectorService;
+    @Autowired(required = false)
+    private ChunkVectorService chunkVectorService;
+
+    public ChunkEventListener(ChunkElasticService chunkElasticService, ChunkRestService chunkRestService, FileRestService fileRestService) {
+        this.chunkElasticService = chunkElasticService;
+        this.chunkRestService = chunkRestService;
+        this.fileRestService = fileRestService;
+    }
 
 
     @EventListener
@@ -104,10 +111,12 @@ public class ChunkEventListener {
         // 仅做全文索引
         chunkElasticService.indexChunk(chunk);
         /// 索引向量
-        try {
-            chunkVectorService.indexChunkVector(chunk);
-        } catch (Exception e) {
-            log.error("Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
+        if (chunkVectorService != null) {
+            try {
+                chunkVectorService.indexChunkVector(chunk);
+            } catch (Exception e) {
+                log.error("Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
+            }
         }
     }
 
@@ -119,14 +128,16 @@ public class ChunkEventListener {
         // 更新全文索引
         chunkElasticService.indexChunk(chunk);
         // 更新向量索引
-        try {
-            // 先删除旧的向量索引
-            chunkVectorService.deleteChunkVector(chunk);
-            // 再创建新的向量索引
-            chunkVectorService.indexChunkVector(chunk);
-            
-        } catch (Exception e) {
-            log.error("文本向量索引更新失败: {}, 错误: {}", chunk.getContent(), e.getMessage());
+        if (chunkVectorService != null) {
+            try {
+                // 先删除旧的向量索引
+                chunkVectorService.deleteChunkVector(chunk);
+                // 再创建新的向量索引
+                chunkVectorService.indexChunkVector(chunk);
+                
+            } catch (Exception e) {
+                log.error("文本向量索引更新失败: {}, 错误: {}", chunk.getContent(), e.getMessage());
+            }
         }
     }
 

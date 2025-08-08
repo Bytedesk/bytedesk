@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 16:35:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 14:51:23
+ * @LastEditTime: 2025-08-08 17:39:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,13 +34,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
 public class ArticleMessageConsumer {
 
     private final ArticleElasticService articleElasticService;
     private final ArticleRestService articleRestService;
-    private final ArticleVectorService articleVectorService;
+    @Autowired(required = false)
+    private ArticleVectorService articleVectorService;
     private final Random random = new Random();
+
+    public ArticleMessageConsumer(ArticleElasticService articleElasticService, ArticleRestService articleRestService) {
+        this.articleElasticService = articleElasticService;
+        this.articleRestService = articleRestService;
+    }
 
     /**
      * 处理文章索引队列中的消息
@@ -149,7 +154,7 @@ public class ArticleMessageConsumer {
             }
             
             // 这里可以添加对向量索引的处理，如果需要
-            if (message.getUpdateVectorIndex()) {
+            if (message.getUpdateVectorIndex() && articleVectorService != null) {
                 log.info("更新文章向量索引: {}", articleUid);
                 // 如果有文章向量服务，在这里调用
                 articleVectorService.indexVector(article);
@@ -184,7 +189,7 @@ public class ArticleMessageConsumer {
             }
             
             // 这里可以添加对向量索引删除的处理，如果需要
-            if (message.getUpdateVectorIndex()) {
+            if (message.getUpdateVectorIndex() && articleVectorService != null) {
                 log.info("从向量引擎中删除文章索引: {}", articleUid);
                 // 如果有文章向量服务，在这里调用
                 boolean vectorDeleted = articleVectorService.deleteArticle(article);

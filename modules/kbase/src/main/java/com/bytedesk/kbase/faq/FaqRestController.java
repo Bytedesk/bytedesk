@@ -30,6 +30,7 @@ import com.bytedesk.kbase.faq.vector.FaqVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,14 +41,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Tag(name = "常见问题管理", description = "常见问题管理相关接口")
 @RestController
 @RequestMapping("/api/v1/faq")
-@AllArgsConstructor
 public class FaqRestController extends BaseRestController<FaqRequest> {
 
     private final FaqRestService faqRestService;
 
     private final FaqElasticService faqElasticService;
 
-    private final FaqVectorService faqVectorService;
+    @Autowired(required = false)
+    private FaqVectorService faqVectorService;
+
+    public FaqRestController(FaqRestService faqRestService, FaqElasticService faqElasticService) {
+        this.faqRestService = faqRestService;
+        this.faqElasticService = faqElasticService;
+    }
 
     @Operation(summary = "查询组织下的常见问题", description = "根据组织ID查询常见问题列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -186,7 +192,9 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
 
-        faqVectorService.updateVectorIndex(request);
+        if (faqVectorService != null) {
+            faqVectorService.updateVectorIndex(request);
+        }
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
@@ -208,7 +216,9 @@ public class FaqRestController extends BaseRestController<FaqRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {
 
-        faqVectorService.updateAllVectorIndex(request);
+        if (faqVectorService != null) {
+            faqVectorService.updateAllVectorIndex(request);
+        }
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }

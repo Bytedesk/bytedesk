@@ -30,7 +30,7 @@ import com.bytedesk.kbase.article.elastic.ArticleElasticService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.bytedesk.core.annotation.ActionAnnotation;
 
@@ -44,7 +44,6 @@ import org.springframework.context.annotation.Description;
 @Tag(name = "文章管理", description = "文章管理相关接口")
 @RestController
 @RequestMapping("/api/v1/article")
-@AllArgsConstructor
 @Description("Article Management Controller - Knowledge base article content management APIs")
 public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
@@ -52,7 +51,13 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
 
     private final ArticleElasticService articleElasticService;
 
-    private final ArticleVectorService articleVectorService;
+    @Autowired(required = false)
+    private ArticleVectorService articleVectorService;
+
+    public ArticleRestController(ArticleRestService articleRestService, ArticleElasticService articleElasticService) {
+        this.articleRestService = articleRestService;
+        this.articleElasticService = articleElasticService;
+    }
 
     @Operation(summary = "查询组织下的文章", description = "根据组织ID查询文章列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -167,9 +172,12 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody ArticleRequest request) {
 
-        articleVectorService.updateVectorIndex(request);
-
-        return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+        if (articleVectorService != null) {
+            articleVectorService.updateVectorIndex(request);
+            return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+        } else {
+            return ResponseEntity.ok(JsonResult.error("Vector service is not available"));
+        }
     }
 
     @Operation(summary = "更新所有文章索引", description = "更新所有文章的Elasticsearch索引")
@@ -189,9 +197,12 @@ public class ArticleRestController extends BaseRestController<ArticleRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ArticleRequest request) {
 
-        articleVectorService.updateAllVectorIndex(request);
-
-        return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
+        if (articleVectorService != null) {
+            articleVectorService.updateAllVectorIndex(request);
+            return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
+        } else {
+            return ResponseEntity.ok(JsonResult.error("Vector service is not available"));
+        }
     }
 
     @Operation(summary = "搜索文章", description = "输入联想搜索文章")

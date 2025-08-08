@@ -27,6 +27,7 @@ import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 import com.bytedesk.kbase.llm_webpage.service.WebpageCrawlerService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,13 +36,19 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
 public class WebpageIndexConsumer {
 
     private final WebpageElasticService webpageElasticService;
-    private final WebpageVectorService webpageVectorService;
+    @Autowired(required = false)
+    private WebpageVectorService webpageVectorService;
     private final WebpageRestService webpageRestService;
     private final WebpageCrawlerService webpageCrawlerService;
+
+    public WebpageIndexConsumer(WebpageElasticService webpageElasticService, WebpageRestService webpageRestService, WebpageCrawlerService webpageCrawlerService) {
+        this.webpageElasticService = webpageElasticService;
+        this.webpageRestService = webpageRestService;
+        this.webpageCrawlerService = webpageCrawlerService;
+    }
     private final Random random = new Random();
 
     /**

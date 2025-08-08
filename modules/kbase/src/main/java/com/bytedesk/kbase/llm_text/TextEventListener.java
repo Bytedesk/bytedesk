@@ -31,17 +31,24 @@ import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
 public class TextEventListener {
 
     private final TextRestService textRestService;
     private final TextElasticService textElasticService;
-    private final TextVectorService textVectorService;
+    @Autowired(required = false)
+    private TextVectorService textVectorService;
     private final UploadRestService uploadRestService;
+
+    public TextEventListener(TextRestService textRestService, TextElasticService textElasticService, UploadRestService uploadRestService) {
+        this.textRestService = textRestService;
+        this.textElasticService = textElasticService;
+        this.uploadRestService = uploadRestService;
+    }
 
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -87,10 +94,12 @@ public class TextEventListener {
         textElasticService.indexText(text);
         
         // 进行向量索引
-        try {
-            textVectorService.indexTextVector(text);
-        } catch (Exception e) {
-            log.error("文本向量索引创建失败: {}, 错误: {}", text.getTitle(), e.getMessage());
+        if (textVectorService != null) {
+            try {
+                textVectorService.indexTextVector(text);
+            } catch (Exception e) {
+                log.error("文本向量索引创建失败: {}, 错误: {}", text.getTitle(), e.getMessage());
+            }
         }
     }
 
@@ -103,13 +112,15 @@ public class TextEventListener {
         textElasticService.indexText(text);
         
         // 更新向量索引
-        try {
-            // 先删除旧的向量索引
-            textVectorService.deleteTextVector(text);
-            // 再创建新的向量索引
-            textVectorService.indexTextVector(text);
-        } catch (Exception e) {
-            log.error("文本向量索引更新失败: {}, 错误: {}", text.getTitle(), e.getMessage());
+        if (textVectorService != null) {
+            try {
+                // 先删除旧的向量索引
+                textVectorService.deleteTextVector(text);
+                // 再创建新的向量索引
+                textVectorService.indexTextVector(text);
+            } catch (Exception e) {
+                log.error("文本向量索引更新失败: {}, 错误: {}", text.getTitle(), e.getMessage());
+            }
         }
     }
 
@@ -125,9 +136,11 @@ public class TextEventListener {
         }
         
         // 从向量索引中删除
-        boolean vectorDeleted = textVectorService.deleteTextVector(text);
-        if (!vectorDeleted) {
-            log.warn("从向量存储中删除Text索引失败: {}", text.getUid());
+        if (textVectorService != null) {
+            boolean vectorDeleted = textVectorService.deleteTextVector(text);
+            if (!vectorDeleted) {
+                log.warn("从向量存储中删除Text索引失败: {}", text.getUid());
+            }
         }
         if (!deleted) {
             log.warn("从Elasticsearch中删除Text索引失败: {}", text.getUid());

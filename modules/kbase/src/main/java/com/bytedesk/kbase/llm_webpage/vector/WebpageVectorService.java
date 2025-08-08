@@ -34,6 +34,7 @@ import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 /**
  * 网页向量检索服务
@@ -44,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
 public class WebpageVectorService {
 
     private final ElasticsearchVectorStore vectorStore;

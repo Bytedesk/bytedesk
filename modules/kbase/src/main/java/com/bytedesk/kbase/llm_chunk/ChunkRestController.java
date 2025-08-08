@@ -28,17 +28,23 @@ import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/v1/llm/chunk")
-@AllArgsConstructor
 public class ChunkRestController extends BaseRestController<ChunkRequest> {
 
     private final ChunkRestService chunkRestService;
     
     private final ChunkElasticService chunkElasticService;
 
-    private final ChunkVectorService chunkVectorService;
+    @Autowired(required = false)
+    private ChunkVectorService chunkVectorService;
+
+    public ChunkRestController(ChunkRestService chunkRestService, ChunkElasticService chunkElasticService) {
+        this.chunkRestService = chunkRestService;
+        this.chunkElasticService = chunkElasticService;
+    }
 
     // @PreAuthorize("hasAuthority('KBASE_READ')")
     @Override
@@ -138,7 +144,9 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody ChunkRequest request) {
 
-        chunkVectorService.updateVectorIndex(request);
+        if (chunkVectorService != null) {
+            chunkVectorService.updateVectorIndex(request);
+        }
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
@@ -158,7 +166,9 @@ public class ChunkRestController extends BaseRestController<ChunkRequest> {
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ChunkRequest request) {
 
-        chunkVectorService.updateAllVectorIndex(request);
+        if (chunkVectorService != null) {
+            chunkVectorService.updateAllVectorIndex(request);
+        }
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
     }

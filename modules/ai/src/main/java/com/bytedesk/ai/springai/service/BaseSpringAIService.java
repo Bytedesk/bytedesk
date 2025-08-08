@@ -63,19 +63,19 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired
     protected FaqElasticService faqElasticService;
 
-    @Autowired
+    @Autowired(required = false)
     protected FaqVectorService faqVectorService;
 
     @Autowired
     protected TextElasticService textElasticService;
 
-    @Autowired
+    @Autowired(required = false)
     protected TextVectorService textVectorService;
 
     @Autowired
     protected ChunkElasticService chunkElasticService;
 
-    @Autowired
+    @Autowired(required = false)
     protected ChunkVectorService chunkVectorService;
 
     @Autowired
@@ -544,28 +544,49 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     private void executeVectorSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
-        List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
-        for (FaqVectorSearchResult withScore : searchResults) {
-            FaqVector faqVector = withScore.getFaqVector();
-            //
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
-            searchResultList.add(faqProtobuf);
+        // 检查 FaqVectorService 是否可用
+        if (faqVectorService != null) {
+            try {
+                List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
+                for (FaqVectorSearchResult withScore : searchResults) {
+                    FaqVector faqVector = withScore.getFaqVector();
+                    //
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
+                    searchResultList.add(faqProtobuf);
+                }
+            } catch (Exception e) {
+                log.warn("FaqVectorService search failed: {}", e.getMessage());
+            }
         }
         //
-        List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null, 5);
-        for (TextVectorSearchResult withScore : textResults) {
-            TextVector textVector = withScore.getTextVector();
-            //
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
-            searchResultList.add(faqProtobuf);
+        // 检查 TextVectorService 是否可用
+        if (textVectorService != null) {
+            try {
+                List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null, 5);
+                for (TextVectorSearchResult withScore : textResults) {
+                    TextVector textVector = withScore.getTextVector();
+                    //
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
+                    searchResultList.add(faqProtobuf);
+                }
+            } catch (Exception e) {
+                log.warn("TextVectorService search failed: {}", e.getMessage());
+            }
         }
         //
-        List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null, null, 5);
-        for (ChunkVectorSearchResult withScore : chunkResults) {
-            ChunkVector chunkVector = withScore.getChunkVector();
-            //
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
-            searchResultList.add(faqProtobuf);
+        // 检查 ChunkVectorService 是否可用
+        if (chunkVectorService != null) {
+            try {
+                List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null, null, 5);
+                for (ChunkVectorSearchResult withScore : chunkResults) {
+                    ChunkVector chunkVector = withScore.getChunkVector();
+                    //
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
+                    searchResultList.add(faqProtobuf);
+                }
+            } catch (Exception e) {
+                log.warn("ChunkVectorService search failed: {}", e.getMessage());
+            }
         }
     }
 

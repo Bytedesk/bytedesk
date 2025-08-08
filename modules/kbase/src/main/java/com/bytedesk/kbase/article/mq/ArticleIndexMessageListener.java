@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 18:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 18:10:00
+ * @LastEditTime: 2025-08-08 17:36:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,8 @@ import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 文章索引消息监听器
@@ -32,12 +32,16 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ArticleIndexMessageListener {
 
     private final ArticleRestService articleRestService;
-    private final ArticleVectorService articleVectorService;
+    @Autowired(required = false)
+    private ArticleVectorService articleVectorService;
     // private final ArticleElasticService articleElasticService;
+
+    public ArticleIndexMessageListener(ArticleRestService articleRestService) {
+        this.articleRestService = articleRestService;
+    }
 
     /**
      * 监听文章索引队列，处理索引和删除操作
@@ -69,7 +73,7 @@ public class ArticleIndexMessageListener {
                 log.info("处理文章删除索引: {}", article.getTitle());
                 
                 // 删除向量索引
-                if (message.getUpdateVectorIndex()) {
+                if (message.getUpdateVectorIndex() && articleVectorService != null) {
                     try {
                         articleVectorService.deleteArticle(article);
                     } catch (Exception e) {
@@ -91,7 +95,7 @@ public class ArticleIndexMessageListener {
                 log.info("处理文章创建/更新索引: {}", article.getTitle());
                 
                 // 创建/更新向量索引
-                if (message.getUpdateVectorIndex()) {
+                if (message.getUpdateVectorIndex() && articleVectorService != null) {
                     try {
                         articleVectorService.indexVector(article);
                     } catch (Exception e) {

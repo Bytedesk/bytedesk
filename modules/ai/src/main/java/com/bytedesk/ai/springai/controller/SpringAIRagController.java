@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-07-17 16:20:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
  *  contact: 270580156@qq.com 
  * 
@@ -65,7 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/spring/ai/rag")
 @RequiredArgsConstructor
-@ConditionalOnBean(ChatModel.class)
+@ConditionalOnBean({ChatModel.class, VectorStore.class, EmbeddingModel.class})
 public class SpringAIRagController {
 
     private final VectorStore vectorStore;
