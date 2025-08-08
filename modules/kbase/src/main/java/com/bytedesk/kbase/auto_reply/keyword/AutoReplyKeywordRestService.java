@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 21:20:29
+ * @LastEditTime: 2025-08-08 21:26:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -48,13 +48,13 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoReplyKeywordEntity, AutoReplyKeywordRequest, AutoReplyKeywordResponse, AutoReplyKeywordExcel> {
 
-    private final AutoReplyKeywordRepository keywordRepository;
+    private final AutoReplyKeywordRepository autoReplyKeywordRepository;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
     private final AuthService authService;
 
@@ -62,7 +62,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     public Page<AutoReplyKeywordEntity> queryByOrgEntity(AutoReplyKeywordRequest request) {
         Pageable pageable = request.getPageable();
         Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
-        return keywordRepository.findAll(spec, pageable);
+        return autoReplyKeywordRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     @Cacheable(value = "keyword", key = "#uid", unless = "#result == null")
     @Override
     public Optional<AutoReplyKeywordEntity> findByUid(String uid) {
-        return keywordRepository.findByUid(uid);
+        return autoReplyKeywordRepository.findByUid(uid);
     }
 
     public String getKeywordReply(String keyword, String kbUid, String orgUid) {
@@ -95,7 +95,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
         request.setOrgUid(orgUid);
         //
         Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
-        List<AutoReplyKeywordEntity> keywordObjects = keywordRepository.findAll(spec);
+        List<AutoReplyKeywordEntity> keywordObjects = autoReplyKeywordRepository.findAll(spec);
         if (keywordObjects.isEmpty()) {
             return null;
         }
@@ -165,19 +165,19 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
 
     @Override
     protected AutoReplyKeywordEntity doSave(AutoReplyKeywordEntity entity) {
-        return keywordRepository.save(entity);
+        return autoReplyKeywordRepository.save(entity);
     }
 
     @Override
     public AutoReplyKeywordEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyKeywordEntity entity) {
         // 乐观锁处理实现
         try {
-            Optional<AutoReplyKeywordEntity> latest = keywordRepository.findByUid(entity.getUid());
+            Optional<AutoReplyKeywordEntity> latest = autoReplyKeywordRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 AutoReplyKeywordEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return keywordRepository.save(latestEntity);
+                return autoReplyKeywordRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
@@ -186,7 +186,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     }
 
     public void save(List<AutoReplyKeywordEntity> keywords) {
-        keywordRepository.saveAll(keywords);
+        autoReplyKeywordRepository.saveAll(keywords);
     }
 
     // 启用/禁用关键词自动回复
@@ -230,7 +230,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     @Override
     public AutoReplyKeywordExcel convertToExcel(AutoReplyKeywordEntity entity) {
         // categoryUid
-        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(entity.getCategoryUid());
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(entity.getCategoryUid());
         AutoReplyKeywordExcel keywordExcel = modelMapper.map(entity, AutoReplyKeywordExcel.class);
         keywordExcel.setKeywordList(String.join("|", entity.getKeywordList()));
         keywordExcel.setReplyList(String.join("|", entity.getReplyList()));
@@ -255,7 +255,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
         keyword.setTransfer(false);
         // 
         // keyword.setCategoryUid(categoryUid);
-        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             keyword.setCategoryUid(categoryOptional.get().getUid());
         } else {
@@ -267,7 +267,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
             categoryRequest.setType(CategoryTypeEnum.AUTOREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             //
-            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
             keyword.setCategoryUid(categoryResponse.getUid());
         }
         // 
@@ -279,7 +279,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
 
     public void initData(String orgUid) {
         // 检查是否已经有数据，如果有则不初始化
-        if (keywordRepository.count() > 0) {
+        if (autoReplyKeywordRepository.count() > 0) {
             return;
         }
 
@@ -287,64 +287,32 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
         
         // 创建默认分类
         CategoryRequest categoryRequest = CategoryRequest.builder()
-                .name("默认分类")
+                .name(AutoReplyKeywordInitData.DEFAULT_CATEGORY_NAME)
                 .type(CategoryTypeEnum.AUTOREPLY.name())
                 .kbUid(kbUid)
                 .orgUid(orgUid)
                 .build();
-        CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+        CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
         String categoryUid = categoryResponse.getUid();
 
-        // 创建示例关键词自动回复数据
+        // 从AutoReplyKeywordInitData获取默认自动回复关键词数据
+        List<AutoReplyKeywordInitData.AutoReplyKeywordData> defaultDataList = AutoReplyKeywordInitData.getDefaultAutoReplyKeywordData();
+        
+        // 创建关键词自动回复数据
         List<AutoReplyKeywordEntity> keywordList = new ArrayList<>();
         
-        // 问候关键词
-        AutoReplyKeywordEntity greetingKeyword = AutoReplyKeywordEntity.builder().build();
-        greetingKeyword.setUid(uidUtils.getUid());
-        greetingKeyword.setKeywordList(Arrays.asList("你好", "您好", "hi", "hello", "在吗", "在么"));
-        greetingKeyword.setReplyList(Arrays.asList("您好！欢迎使用我们的客服系统，请问有什么可以帮助您的吗？", "您好！很高兴为您服务，请问有什么可以帮助您的吗？"));
-        greetingKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
-        greetingKeyword.setEnabled(true);
-        greetingKeyword.setCategoryUid(categoryUid);
-        greetingKeyword.setKbUid(kbUid);
-        greetingKeyword.setOrgUid(orgUid);
-        keywordList.add(greetingKeyword);
-
-        // 工作时间关键词
-        AutoReplyKeywordEntity workTimeKeyword = AutoReplyKeywordEntity.builder().build();
-        workTimeKeyword.setUid(uidUtils.getUid());
-        workTimeKeyword.setKeywordList(Arrays.asList("工作时间", "上班时间", "营业时间", "几点上班", "几点下班"));
-        workTimeKeyword.setReplyList(Arrays.asList("我们的工作时间是周一至周五 9:00-18:00，周末和节假日休息。如有紧急问题，请留言，我们会在下一个工作日尽快回复您。"));
-        workTimeKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
-        workTimeKeyword.setEnabled(true);
-        workTimeKeyword.setCategoryUid(categoryUid);
-        workTimeKeyword.setKbUid(kbUid);
-        workTimeKeyword.setOrgUid(orgUid);
-        keywordList.add(workTimeKeyword);
-
-        // 联系方式关键词
-        AutoReplyKeywordEntity contactKeyword = AutoReplyKeywordEntity.builder().build();
-        contactKeyword.setUid(uidUtils.getUid());
-        contactKeyword.setKeywordList(Arrays.asList("联系方式", "电话", "手机", "邮箱", "怎么联系", "联系你们"));
-        contactKeyword.setReplyList(Arrays.asList("您可以通过以下方式联系我们：\n1. 客服热线：400-123-4567\n2. 邮箱：support@example.com\n3. 在线客服：工作时间在线"));
-        contactKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
-        contactKeyword.setEnabled(true);
-        contactKeyword.setCategoryUid(categoryUid);
-        contactKeyword.setKbUid(kbUid);
-        contactKeyword.setOrgUid(orgUid);
-        keywordList.add(contactKeyword);
-
-        // 价格关键词
-        AutoReplyKeywordEntity priceKeyword = AutoReplyKeywordEntity.builder().build();
-        priceKeyword.setUid(uidUtils.getUid());
-        priceKeyword.setKeywordList(Arrays.asList("价格", "多少钱", "费用", "收费", "价格表", "报价"));
-        priceKeyword.setReplyList(Arrays.asList("关于价格信息，建议您联系我们的销售团队获取详细报价。您可以拨打客服热线400-123-4567或发送邮件至sales@example.com咨询。"));
-        priceKeyword.setMatchType(AutoReplyKeywordMatchEnum.FUZZY.name());
-        priceKeyword.setEnabled(true);
-        priceKeyword.setCategoryUid(categoryUid);
-        priceKeyword.setKbUid(kbUid);
-        priceKeyword.setOrgUid(orgUid);
-        keywordList.add(priceKeyword);
+        for (AutoReplyKeywordInitData.AutoReplyKeywordData data : defaultDataList) {
+            AutoReplyKeywordEntity keyword = AutoReplyKeywordEntity.builder().build();
+            keyword.setUid(uidUtils.getUid());
+            keyword.setKeywordList(data.getKeywordList());
+            keyword.setReplyList(data.getReplyList());
+            keyword.setMatchType(data.getMatchType());
+            keyword.setEnabled(data.isEnabled());
+            keyword.setCategoryUid(categoryUid);
+            keyword.setKbUid(kbUid);
+            keyword.setOrgUid(orgUid);
+            keywordList.add(keyword);
+        }
 
         // 保存所有数据
         save(keywordList);

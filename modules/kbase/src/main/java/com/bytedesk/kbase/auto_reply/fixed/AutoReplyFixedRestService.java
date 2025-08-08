@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 21:20:35
+ * @LastEditTime: 2025-08-08 21:29:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,13 +44,13 @@ import com.bytedesk.core.utils.Utils;
 @AllArgsConstructor
 public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoReplyFixedEntity, AutoReplyFixedRequest, AutoReplyFixedResponse, AutoReplyFixedExcel> {
 
-    private final AutoReplyFixedRepository autoReplyRepository;
+    private final AutoReplyFixedRepository autoReplyFixedRepository;
 
     private final UidUtils uidUtils;
 
     private final ModelMapper modelMapper;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
     private final AuthService authService;
 
@@ -58,7 +58,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     public Page<AutoReplyFixedEntity> queryByOrgEntity(AutoReplyFixedRequest request) {
         Pageable pageable = request.getPageable();
         Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
-        return autoReplyRepository.findAll(specification, pageable);
+        return autoReplyFixedRepository.findAll(specification, pageable);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     @Cacheable(value = "auto_reply", key="#uid", unless = "#result == null")
     @Override
     public Optional<AutoReplyFixedEntity> findByUid(String uid) {
-        return autoReplyRepository.findByUid(uid);
+        return autoReplyFixedRepository.findByUid(uid);
     }
 
     @Override
@@ -136,19 +136,19 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
 
     @Override
     protected AutoReplyFixedEntity doSave(AutoReplyFixedEntity entity) {
-        return autoReplyRepository.save(entity);
+        return autoReplyFixedRepository.save(entity);
     }
 
     @Override
     public AutoReplyFixedEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AutoReplyFixedEntity entity) {
         // 乐观锁处理实现
         try {
-            Optional<AutoReplyFixedEntity> latest = autoReplyRepository.findByUid(entity.getUid());
+            Optional<AutoReplyFixedEntity> latest = autoReplyFixedRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 AutoReplyFixedEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return autoReplyRepository.save(latestEntity);
+                return autoReplyFixedRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
@@ -157,7 +157,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     }
 
     public void save(List<AutoReplyFixedEntity> entities) {
-        autoReplyRepository.saveAll(entities);
+        autoReplyFixedRepository.saveAll(entities);
     }
 
     // 启用/禁用固定自动回复
@@ -198,7 +198,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     @Override
     public AutoReplyFixedExcel convertToExcel(AutoReplyFixedEntity autoReply) {
         // categoryUid
-        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(autoReply.getCategoryUid());
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(autoReply.getCategoryUid());
         // 
         AutoReplyFixedExcel excel = modelMapper.map(autoReply, AutoReplyFixedExcel.class);
         if (categoryOptional.isPresent()) {
@@ -218,7 +218,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
         autoReply.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         // 
         // autoReply.setCategoryUid(categoryUid);
-        Optional<CategoryEntity> categoryOptional = categoryService.findByNameAndKbUid(excel.getCategory(), kbUid);
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
         if (categoryOptional.isPresent()) {
             autoReply.setCategoryUid(categoryOptional.get().getUid());
         } else {
@@ -230,19 +230,18 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
             categoryRequest.setType(CategoryTypeEnum.AUTOREPLY.name());
             categoryRequest.setOrgUid(orgUid);
             // 
-            CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
             autoReply.setCategoryUid(categoryResponse.getUid());
         }
         // 
         autoReply.setKbUid(kbUid);
         autoReply.setOrgUid(orgUid);
-
         return autoReply;
     }
 
     public void initData(String orgUid) {
         // 检查是否已经有数据，如果有则不初始化
-        if (autoReplyRepository.count() > 0) {
+        if (autoReplyFixedRepository.count() > 0) {
             return;
         }
 
@@ -250,52 +249,32 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
         
         // 创建默认分类
         CategoryRequest categoryRequest = CategoryRequest.builder()
-                .name("默认分类")
+                .name(AutoReplyFixedInitData.DEFAULT_CATEGORY_NAME)
                 .type(CategoryTypeEnum.AUTOREPLY.name())
                 .kbUid(kbUid)
                 .orgUid(orgUid)
                 .build();
-        CategoryResponse categoryResponse = categoryService.create(categoryRequest);
+        CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
         String categoryUid = categoryResponse.getUid();
 
-        // 创建示例固定自动回复数据
+        // 从AutoReplyFixedInitData获取默认自动回复数据
+        List<AutoReplyFixedInitData.AutoReplyData> defaultDataList = AutoReplyFixedInitData.getDefaultAutoReplyData();
+        
+        // 创建固定自动回复数据
         List<AutoReplyFixedEntity> autoReplyList = new ArrayList<>();
         
-        // 欢迎消息
-        AutoReplyFixedEntity welcomeReply = AutoReplyFixedEntity.builder()
-                .uid(uidUtils.getUid())
-                .content("您好！欢迎使用我们的客服系统，请问有什么可以帮助您的吗？")
-                .type(MessageTypeEnum.TEXT.name())
-                .enabled(true)
-                .categoryUid(categoryUid)
-                .kbUid(kbUid)
-                .orgUid(orgUid)
-                .build();
-        autoReplyList.add(welcomeReply);
-
-        // 工作时间消息
-        AutoReplyFixedEntity workTimeReply = AutoReplyFixedEntity.builder()
-                .uid(uidUtils.getUid())
-                .content("我们的工作时间是周一至周五 9:00-18:00，周末和节假日休息。如有紧急问题，请留言，我们会在下一个工作日尽快回复您。")
-                .type(MessageTypeEnum.TEXT.name())
-                .enabled(true)
-                .categoryUid(categoryUid)
-                .kbUid(kbUid)
-                .orgUid(orgUid)
-                .build();
-        autoReplyList.add(workTimeReply);
-
-        // 联系方式消息
-        AutoReplyFixedEntity contactReply = AutoReplyFixedEntity.builder()
-                .uid(uidUtils.getUid())
-                .content("您可以通过以下方式联系我们：\n1. 客服热线：400-123-4567\n2. 邮箱：support@example.com\n3. 在线客服：工作时间在线")
-                .type(MessageTypeEnum.TEXT.name())
-                .enabled(true)
-                .categoryUid(categoryUid)
-                .kbUid(kbUid)
-                .orgUid(orgUid)
-                .build();
-        autoReplyList.add(contactReply);
+        for (AutoReplyFixedInitData.AutoReplyData data : defaultDataList) {
+            AutoReplyFixedEntity autoReply = AutoReplyFixedEntity.builder()
+                    .uid(uidUtils.getUid())
+                    .content(data.getContent())
+                    .type(data.getType())
+                    .enabled(data.isEnabled())
+                    .categoryUid(categoryUid)
+                    .kbUid(kbUid)
+                    .orgUid(orgUid)
+                    .build();
+            autoReplyList.add(autoReply);
+        }
 
         // 保存所有数据
         save(autoReplyList);
