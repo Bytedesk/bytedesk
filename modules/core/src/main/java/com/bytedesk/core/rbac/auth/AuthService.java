@@ -1,15 +1,13 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-01-23 07:53:01
+ * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-23 08:09:19
- * @Description: bytedesk.com https://github.com/Bytedesk/by        }
-    }ease be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  仅支持企业内部员工自用，严禁用于销售、二次销售或者部署SaaS方式销售 
+ * @LastEditTime: 2025-08-08 09:47:28
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
+ *  contact: 270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.rbac.auth;
@@ -20,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +54,8 @@ public class AuthService {
     private final UidUtils uidUtils;
     
     private final TokenRepository tokenRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public UserEntity getUser() {
         // not logged in
@@ -172,17 +173,6 @@ public class AuthService {
             log.warn("User not found: {}", authRequest.getUsername());
             return null;
         }
-        // 2. 验证哈希
-        // String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
-        // 由于数据库存储的是BCrypt加密后的密码，无法直接反向获取明文
-        // 这里假设数据库还存储了明文密码或有其他方式校验（实际生产环境不推荐明文存储）
-        // 这里演示：如果数据库存储明文密码，则直接用PasswordHashUtils校验
-        // 如果存储的是BCrypt，则无法支持前端hash+salt方式，建议前端直接传明文密码
-        //
-        // 这里假设数据库存储明文密码（仅演示，实际应存BCrypt）
-        // String plainPassword = dbPassword;
-        // boolean valid = PasswordHashUtils.verifyPasswordHash(plainPassword, authRequest.getPasswordSalt(), authRequest.getPasswordHash());
-        //
         // 实际情况：现在支持AES解密前端加密的密码
         try {
             // 2. 使用AES解密前端发送的加密密码
@@ -193,12 +183,9 @@ public class AuthService {
             log.debug("Password decrypted successfully for user: {}", authRequest.getUsername());
 
             // 3. 验证解密后的密码与数据库中存储的BCrypt密码
-            org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = 
-                new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
-            
             String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
-            boolean isValid = encoder.matches(decryptedPassword, dbPassword);
-            
+            boolean isValid = passwordEncoder.matches(decryptedPassword, dbPassword);
+            // 密码验证失败
             if (!isValid) {
                 log.warn("Password verification failed for user: {}", authRequest.getUsername());
                 return null;
@@ -212,16 +199,6 @@ public class AuthService {
             log.error("Password hash authentication error for user: {}: {}", authRequest.getUsername(), e.getMessage());
             return null;
         }
-
-        // 3. 用 passwordHash 作为“明文”去匹配
-        // org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
-        // boolean valid = encoder.matches(authRequest.getPasswordHash(), dbPassword);
-        // if (!valid) {
-        //     log.warn("Password hash verification failed for user: {}", authRequest.getUsername());
-        //     return null;
-        // }
-        // 4. 构造认证对象
-        // return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
 

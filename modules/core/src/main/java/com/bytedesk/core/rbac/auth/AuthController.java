@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 09:47:28
+ * @LastEditTime: 2025-08-08 11:45:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,7 +70,6 @@ public class AuthController {
         }
 
         // validate sms code
-        // 验证手机验证码
         if (!pushRestService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
@@ -100,10 +99,15 @@ public class AuthController {
         } else if (StringUtils.hasText(authRequest.getPasswordHash())
                 && StringUtils.hasText(authRequest.getPasswordSalt())) {
             // 使用密码哈希登录（AES解密）
-            log.debug("Using password hash authentication with AES decryption");
-            authentication = authService.authenticateWithPasswordHash(authRequest);
-            if (authentication == null) {
-                return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+            log.debug("Using password hash authentication with AES decryption for user: {}", authRequest.getUsername());
+            try {
+                authentication = authService.authenticateWithPasswordHash(authRequest);
+                if (authentication == null) {
+                    return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                }
+            } catch (Exception e) {
+                log.error("Password hash authentication failed for user: {}: {}", authRequest.getUsername(), e.getMessage());
+                return ResponseEntity.ok().body(JsonResult.error("密码解密失败，请检查密码格式", -1, false));
             }
         } else {
             return ResponseEntity.ok().body(JsonResult.error("Password or password hash is required", -1, false));
@@ -142,7 +146,6 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // validate mobile & code
-        // 验证手机验证码
         if (!pushRestService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }

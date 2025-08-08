@@ -19,6 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 密码加密解密工具类
  * 与前端JavaScript实现保持一致的AES加密解密
+ * 
+ * 修复说明：
+ * - 统一前后端密钥生成方式，解决 BadPaddingException 问题
+ * - 对于特定盐值 "bytedesk_salt"，使用固定密钥 "bytedesk_license"（与前端保持一致）
+ * - 对于其他盐值，使用SHA-256哈希生成16字节密钥（128位AES）
+ * - 加密算法：AES/ECB/PKCS5Padding
  */
 @Slf4j
 public class PasswordCryptoUtils {
@@ -44,6 +50,9 @@ public class PasswordCryptoUtils {
             // 使用盐值生成固定长度的密钥（与前端保持一致）
             String key = generateKeyFromSalt(salt);
             
+            log.debug("加密参数: password长度={}, salt={}, generatedKey={}", 
+                     password.length(), salt, key);
+            
             // 创建密钥规范
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
             
@@ -55,7 +64,11 @@ public class PasswordCryptoUtils {
             byte[] encryptedBytes = cipher.doFinal(password.getBytes(StandardCharsets.UTF_8));
             
             // 返回Base64编码的结果
-            return Base64.getEncoder().encodeToString(encryptedBytes);
+            String result = Base64.getEncoder().encodeToString(encryptedBytes);
+            
+            log.debug("加密完成，结果长度: {}", result.length());
+            
+            return result;
             
         } catch (Exception e) {
             log.error("密码加密失败", e);
@@ -81,6 +94,9 @@ public class PasswordCryptoUtils {
             // 使用盐值生成固定长度的密钥（与前端保持一致）
             String key = generateKeyFromSalt(salt);
             
+            log.debug("解密参数: encryptedPassword={}, salt={}, generatedKey={}", 
+                     encryptedPassword, salt, key);
+            
             // 创建密钥规范
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
             
@@ -91,6 +107,8 @@ public class PasswordCryptoUtils {
             // 解码Base64
             byte[] encryptedBytes = Base64.getDecoder().decode(encryptedPassword);
             
+            log.debug("Base64解码后数据长度: {}", encryptedBytes.length);
+            
             // 解密
             byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
             
@@ -99,6 +117,8 @@ public class PasswordCryptoUtils {
             if (decryptedPassword.isEmpty()) {
                 throw new RuntimeException("解密失败，可能是密钥错误");
             }
+            
+            log.debug("解密成功，密码长度: {}", decryptedPassword.length());
             
             return decryptedPassword;
             
@@ -110,13 +130,18 @@ public class PasswordCryptoUtils {
 
     /**
      * 从盐值生成密钥
-     * 使用SHA-256对盐值进行哈希，取前32位作为AES密钥
-     * 与前端JavaScript实现保持一致
+     * 根据盐值确定密钥生成方式，与前端JavaScript实现保持一致
      * @param salt 盐值
-     * @return 32位密钥字符串
+     * @return 密钥字符串
      */
     private static String generateKeyFromSalt(String salt) {
         try {
+            // 如果盐值是特定的值，使用固定密钥（与前端 crypto-js 保持一致）
+            if ("bytedesk_salt".equals(salt) || salt == null || salt.isEmpty()) {
+                return "bytedesk_license"; // 与前端保持一致的16字节密钥
+            }
+            
+            // 对于其他盐值，使用SHA-256哈希生成密钥
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(salt.getBytes(StandardCharsets.UTF_8));
             
@@ -130,8 +155,8 @@ public class PasswordCryptoUtils {
                 hexString.append(hex);
             }
             
-            // 取前32位作为密钥（与前端保持一致）
-            return hexString.toString().substring(0, 32);
+            // 取前16个字符作为密钥（128位AES，与前端保持一致）
+            return hexString.toString().substring(0, 16);
             
         } catch (Exception e) {
             throw new RuntimeException("生成密钥失败: " + e.getMessage());
