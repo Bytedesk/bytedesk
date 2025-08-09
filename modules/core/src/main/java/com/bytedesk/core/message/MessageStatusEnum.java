@@ -23,9 +23,11 @@ public enum MessageStatusEnum {
     RECALL, // 撤回
     DELIVERED, // 送达
     READ, // 已读
+    // 
     DESTROYED, // destroyed after read
     UNPROCESSED, // leave message unprocessed
     PROCESSED, // leave message processed
+    // 
     LEAVE_MSG_SUBMIT, // 提交留言
     LEAVE_MSG_REPLIED, // 留言已回复
     LEAVE_MSG_READ, // 留言已读
@@ -34,6 +36,7 @@ public enum MessageStatusEnum {
     LEAVE_MSG_SPAM, // 垃圾留言
     LEAVE_MSG_CONFIRMED, // 留言已确认
     LEAVE_MSG_REJECTED, // 留言已拒绝
+    // 
     RATE_SUBMIT, // 提交会话评价
     RATE_CANCEL, // 取消会话评价
     RATE_PENDING, // 未评价
@@ -41,11 +44,13 @@ public enum MessageStatusEnum {
     RATE_DOWN, // 评价消息down
     RATE_FEEDBACK, // 评价消息feedback
     RATE_TRANSFER, // 评价消息-转人工
+    // 
     TRANSFER_PENDING, // 转接待处理
     TRANSFER_ACCEPTED, // 接受转接
     TRANSFER_REJECTED, // 拒绝转接
     TRANSFER_TIMEOUT, // 转接超时
     TRANSFER_CANCELED, // 取消转接
+    // 
     INVITE_PENDING, // 邀请处理
     INVITE_ACCEPTED, // 接受邀请
     INVITE_REJECTED, // 拒绝邀请
@@ -53,6 +58,7 @@ public enum MessageStatusEnum {
     INVITE_CANCELED, // 取消邀请
     INVITE_EXITED, // 邀请退出
     INVITE_REMOVED, // 邀请移除
+    // 
     INVITE_VISITOR_PENDING, // 邀请访客处理
     INVITE_VISITOR_ACCEPTED, // 接受访客邀请
     INVITE_VISITOR_REJECTED, // 拒绝访客邀请

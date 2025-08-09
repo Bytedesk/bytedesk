@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-07 08:11:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 16:07:08
+ * @LastEditTime: 2025-08-09 13:13:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,5 +29,4 @@ public class ThreadExtra implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    // private Boolean isOffline; // 标记此会话是否曾经处于离线状态
 }
