@@ -1,7 +1,7 @@
 /**
- * FreeSwitch Gateway Package
+ * Call Gateway Package
  * 
- * This package provides the gateway management functionality for FreeSwitch integration.
+ * This package provides the gateway management functionality for Call integration.
  * 
  * Documentation:
  * - English: /docs/gateway/README.md

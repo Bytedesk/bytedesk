@@ -22,7 +22,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import com.bytedesk.call.config.FreeSwitchService;
+import com.bytedesk.call.config.CallService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebRTCSignalingController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final FreeSwitchService freeSwitchService;
+    private final CallService freeSwitchService;
 
     /**
      * 处理WebRTC Offer
@@ -52,7 +52,7 @@ public class WebRTCSignalingController {
         log.info("收到WebRTC Offer: {} -> {}, Session: {}", fromUser, toUser, sessionId);
 
         try {
-            // 创建FreeSwitch通道
+            // 创建Call通道
             String result = freeSwitchService.originate(fromUser, toUser, "default");
             
             if (result != null) {
@@ -67,7 +67,7 @@ public class WebRTCSignalingController {
             } else {
                 // 发送错误消息
                 messagingTemplate.convertAndSendToUser(fromUser, "/queue/webrtc/error", Map.of(
-                    "error", "Failed to create FreeSwitch channel",
+                    "error", "Failed to create Call channel",
                     "sessionId", sessionId
                 ));
             }
@@ -135,7 +135,7 @@ public class WebRTCSignalingController {
         log.info("收到挂断请求: {} -> {}, UUID: {}, Session: {}", fromUser, toUser, uuid, sessionId);
 
         try {
-            // 通过FreeSwitch挂断通话
+            // 通过Call挂断通话
             if (uuid != null) {
                 freeSwitchService.hangup(uuid, "NORMAL_CLEARING");
             }
@@ -208,7 +208,7 @@ public class WebRTCSignalingController {
 
         try {
             if (uuid != null) {
-                // 这里可以通过FreeSwitch API控制音频
+                // 这里可以通过Call API控制音频
                 // freeSwitchService.executeApiCommand("uuid_audio", uuid + " " + (muted ? "pause" : "resume"));
             }
 
