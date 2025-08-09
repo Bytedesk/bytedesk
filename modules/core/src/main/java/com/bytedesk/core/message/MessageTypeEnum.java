@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-26 08:02:33
+ * @LastEditTime: 2025-08-09 08:54:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -140,6 +140,7 @@ public enum MessageTypeEnum {
     WEBRTC_VIDEO_INVITE_ACCEPT,
     WEBRTC_AUDIO_INVITE_CANCEL,
     WEBRTC_VIDEO_INVITE_CANCEL,
+    // 
     GROUP_CREATE,
     GROUP_INVITE,
     GROUP_DISMISS,
