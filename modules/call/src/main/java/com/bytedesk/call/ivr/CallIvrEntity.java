@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-10 15:05:41
+ * @LastEditTime: 2025-08-10 20:55:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,10 +29,10 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * CallIvr entity for content categorization and organization
- * Provides tagging functionality for various system entities
+ * Provides ivr functionality for various system entities
  * 
- * Database Table: bytedesk_core_tag
- * Purpose: Stores tag definitions, colors, and organization settings
+ * Database Table: bytedesk_call_ivr
+ * Purpose: Stores ivr definitions, colors, and organization settings
  */
 @Entity
 @Data
@@ -46,34 +46,21 @@ import lombok.experimental.SuperBuilder;
 public class CallIvrEntity extends BaseEntity {
 
     /**
-     * Name of the tag
+     * Name of the ivr
      */
     private String name;
 
     /**
-     * Description of the tag
+     * Description of the ivr
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of tag (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of ivr (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "tag_type")
+    @Column(name = "ivr_type")
     private String type = CallIvrTypeEnum.CUSTOMER.name();
 
-    /**
-     * Color theme for the tag display
-     */
-    @Builder.Default
-    @Column(name = "tag_color")
-    private String color = "red";
-
-    /**
-     * Display order of the tag
-     */
-    @Builder.Default
-    @Column(name = "tag_order")
-    private Integer order = 0;
 }

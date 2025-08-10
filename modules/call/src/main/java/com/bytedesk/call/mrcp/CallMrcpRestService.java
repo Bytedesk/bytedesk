@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:05:26
+ * @LastEditTime: 2025-08-10 20:54:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CallMrcpRestService extends BaseRestServiceWithExcel<CallMrcpEntity, CallMrcpRequest, CallMrcpResponse, CallMrcpExcel> {
 
-    private final CallMrcpRepository tagRepository;
+    private final CallMrcpRepository mrcpRepository;
 
     private final ModelMapper modelMapper;
 
@@ -52,7 +52,7 @@ public class CallMrcpRestService extends BaseRestServiceWithExcel<CallMrcpEntity
     public Page<CallMrcpEntity> queryByOrgEntity(CallMrcpRequest request) {
         Pageable pageable = request.getPageable();
         Specification<CallMrcpEntity> spec = CallMrcpSpecification.search(request);
-        return tagRepository.findAll(spec, pageable);
+        return mrcpRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -86,16 +86,16 @@ public class CallMrcpRestService extends BaseRestServiceWithExcel<CallMrcpEntity
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
     public Optional<CallMrcpEntity> findByUid(String uid) {
-        return tagRepository.findByUid(uid);
+        return mrcpRepository.findByUid(uid);
     }
 
     @Cacheable(value = "tag", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
     public Optional<CallMrcpEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return tagRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+        return mrcpRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
 
     public Boolean existsByUid(String uid) {
-        return tagRepository.existsByUid(uid);
+        return mrcpRepository.existsByUid(uid);
     }
 
     @Transactional
@@ -133,7 +133,7 @@ public class CallMrcpRestService extends BaseRestServiceWithExcel<CallMrcpEntity
     @Transactional
     @Override
     public CallMrcpResponse update(CallMrcpRequest request) {
-        Optional<CallMrcpEntity> optional = tagRepository.findByUid(request.getUid());
+        Optional<CallMrcpEntity> optional = mrcpRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             CallMrcpEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -151,20 +151,20 @@ public class CallMrcpRestService extends BaseRestServiceWithExcel<CallMrcpEntity
 
     @Override
     protected CallMrcpEntity doSave(CallMrcpEntity entity) {
-        return tagRepository.save(entity);
+        return mrcpRepository.save(entity);
     }
 
     @Override
     public CallMrcpEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CallMrcpEntity entity) {
         try {
-            Optional<CallMrcpEntity> latest = tagRepository.findByUid(entity.getUid());
+            Optional<CallMrcpEntity> latest = mrcpRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 CallMrcpEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
-                return tagRepository.save(latestEntity);
+                return mrcpRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -176,7 +176,7 @@ public class CallMrcpRestService extends BaseRestServiceWithExcel<CallMrcpEntity
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<CallMrcpEntity> optional = tagRepository.findByUid(uid);
+        Optional<CallMrcpEntity> optional = mrcpRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());

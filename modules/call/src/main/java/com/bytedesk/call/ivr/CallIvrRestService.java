@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-02 11:05:26
+ * @LastEditTime: 2025-08-10 20:54:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, CallIvrRequest, CallIvrResponse, CallIvrExcel> {
 
-    private final CallIvrRepository tagRepository;
+    private final CallIvrRepository ivrRepository;
 
     private final ModelMapper modelMapper;
 
@@ -52,7 +52,7 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
     public Page<CallIvrEntity> queryByOrgEntity(CallIvrRequest request) {
         Pageable pageable = request.getPageable();
         Specification<CallIvrEntity> spec = CallIvrSpecification.search(request);
-        return tagRepository.findAll(spec, pageable);
+        return ivrRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -86,16 +86,16 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
     public Optional<CallIvrEntity> findByUid(String uid) {
-        return tagRepository.findByUid(uid);
+        return ivrRepository.findByUid(uid);
     }
 
     @Cacheable(value = "tag", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
     public Optional<CallIvrEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return tagRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+        return ivrRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
 
     public Boolean existsByUid(String uid) {
-        return tagRepository.existsByUid(uid);
+        return ivrRepository.existsByUid(uid);
     }
 
     @Transactional
@@ -133,7 +133,7 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
     @Transactional
     @Override
     public CallIvrResponse update(CallIvrRequest request) {
-        Optional<CallIvrEntity> optional = tagRepository.findByUid(request.getUid());
+        Optional<CallIvrEntity> optional = ivrRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             CallIvrEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -151,20 +151,20 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
 
     @Override
     protected CallIvrEntity doSave(CallIvrEntity entity) {
-        return tagRepository.save(entity);
+        return ivrRepository.save(entity);
     }
 
     @Override
     public CallIvrEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CallIvrEntity entity) {
         try {
-            Optional<CallIvrEntity> latest = tagRepository.findByUid(entity.getUid());
+            Optional<CallIvrEntity> latest = ivrRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 CallIvrEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
-                return tagRepository.save(latestEntity);
+                return ivrRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -176,7 +176,7 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<CallIvrEntity> optional = tagRepository.findByUid(uid);
+        Optional<CallIvrEntity> optional = ivrRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());

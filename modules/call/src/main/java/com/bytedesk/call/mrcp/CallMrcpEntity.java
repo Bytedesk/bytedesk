@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-10 15:20:23
+ * @LastEditTime: 2025-08-10 20:55:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,10 +29,10 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * CallMrcp entity for content categorization and organization
- * Provides tagging functionality for various system entities
+ * Provides mrcp functionality for various system entities
  * 
- * Database Table: bytedesk_core_tag
- * Purpose: Stores tag definitions, colors, and organization settings
+ * Database Table: bytedesk_call_mrcp
+ * Purpose: Stores mrcp definitions, colors, and organization settings
  */
 @Entity
 @Data
@@ -46,34 +46,21 @@ import lombok.experimental.SuperBuilder;
 public class CallMrcpEntity extends BaseEntity {
 
     /**
-     * Name of the tag
+     * Name of the mrcp
      */
     private String name;
 
     /**
-     * Description of the tag
+     * Description of the mrcp
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of tag (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of mrcp (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "tag_type")
+    @Column(name = "mrcp_type")
     private String type = CallMrcpTypeEnum.CUSTOMER.name();
 
-    /**
-     * Color theme for the tag display
-     */
-    @Builder.Default
-    @Column(name = "tag_color")
-    private String color = "red";
-
-    /**
-     * Display order of the tag
-     */
-    @Builder.Default
-    @Column(name = "tag_order")
-    private Integer order = 0;
 }
