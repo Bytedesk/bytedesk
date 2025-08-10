@@ -1,0 +1,355 @@
+services:
+  bytedesk-mysql:
+    image: mysql:latest
+    container_name: mysql-bytedesk
+    environment:
+      MYSQL_DATABASE: bytedesk
+      MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
+      TZ: Asia/Shanghai  # 添加这一行
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  bytedesk-redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-bytedesk
+    ports:
+      - "16379:6379"
+    environment:
+      - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "qfRxz3tVT8Nh", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # http://127.0.0.1:21434
+  bytedesk-ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-bytedesk
+    ports:
+      - "21434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=qwen3:0.6b
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ActiveMQ Artemis 消息队列
+  # http://localhost:18161/console，使用 admin/admin 作为登录凭据
+  bytedesk-artemis:
+    image: apache/activemq-artemis:latest
+    container_name: artemis-bytedesk
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+      - ANONYMOUS_LOGIN=false
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - "16161:61616"   # JMS
+      - "16162:61617"   # AMQP
+      - "18161:8161"     # Web Console
+      - "15672:5672"     # AMQP
+      - "16163:61613"   # STOMP
+      - "11883:1883"     # MQTT
+    volumes:
+      - artemis_data:/var/lib/artemis/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "-u", "admin:admin", "http://localhost:8161/console/jolokia/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=bytedesk123
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  bytedesk-zipkin:
+    image: 'openzipkin/zipkin:latest'
+    container_name: zipkin-bytedesk
+    ports:
+      - '9411:9411'
+    volumes:
+      - zipkin_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # bytedesk-ldap:
+  #   image: osixia/openldap:latest
+  #   container_name: ldap-bytedesk
+  #   ports:
+  #     - "389:389"
+  #     - "636:636"
+  #   environment:
+  #     - LDAP_ORGANISATION=ByteDesk
+  #     - LDAP_DOMAIN=example.com
+  #     - LDAP_BASE_DN=dc=example,dc=com
+  #     - LDAP_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - ldap_data:/var/lib/ldap
+  #     - ldap_config:/etc/ldap/slapd.d
+  #   networks:
+  #     - bytedesk-network
+
+  # http://localhost:18080
+  # 登录凭据：
+  # - DN: cn=admin,dc=example,dc=com
+  # - 密码: admin
+  # bytedesk-phpldapadmin:
+  #   image: osixia/phpldapadmin:latest
+  #   container_name: phpldapadmin-bytedesk
+  #   ports:
+  #     - "18080:80"
+  #   environment:
+  #     - PHPLDAPADMIN_LDAP_HOSTS=bytedesk-ldap
+  #     - PHPLDAPADMIN_HTTPS=false
+  #   depends_on:
+  #     - bytedesk-ldap
+  #   networks:
+  #     - bytedesk-network
+
+  # http://127.0.0.1:19090/
+  # bytedesk-prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus-bytedesk
+  #   ports:
+  #     - "19090:9090"
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.enable-lifecycle'
+  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+  #     - '--web.console.templates=/usr/share/prometheus/consoles'
+  #     - '--storage.tsdb.retention.time=15d'
+  #     - '--web.enable-admin-api'
+  #     - '--web.external-url=http://localhost:19090'
+  #   volumes:
+  #     - prometheus_data:/prometheus
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   networks:
+  #     - bytedesk-network
+
+  # http://127.0.0.1:13000/
+  # bytedesk-grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana-bytedesk
+  #   ports:
+  #     - "13000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   networks:
+  #     - bytedesk-network
+  #   depends_on:
+  #     - bytedesk-prometheus
+
+  # Chroma 向量数据库
+  # bytedesk-chroma:
+  #   image: ghcr.io/chroma-core/chroma:latest
+  #   container_name: chroma-bytedesk
+  #   ports:
+  #     - "18000:8000"
+  #   volumes:
+  #     - chroma_data:/chroma/chroma
+  #   environment:
+  #     - CHROMA_SERVER_CORS_ALLOW_ORIGINS=*
+  #     - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.basic.BasicAuthCredentialsProvider
+  #     - CHROMA_SERVER_AUTH_CREDENTIALS_FILE=/chroma/chroma_users.json
+  #     - PERSIST_DIRECTORY=/chroma/chroma
+  #   networks:
+  #     - bytedesk-network
+
+  # Weaviate 向量数据库
+  # bytedesk-weaviate:
+  #   image: semitechnologies/weaviate:1.24.5
+  #   container_name: weaviate-bytedesk
+  #   ports:
+  #     - "18080:8080"
+  #   environment:
+  #     - QUERY_DEFAULTS_LIMIT=25
+  #     - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+  #     - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+  #     - DEFAULT_VECTORIZER_MODULE=none
+  #     - CLUSTER_HOSTNAME=node1
+  #   volumes:
+  #     - weaviate_data:/var/lib/weaviate
+  #   networks:
+  #     - bytedesk-network
+
+  # Milvus 向量数据库
+  # bytedesk-milvus:
+  #   image: milvusdb/milvus:v2.3.7
+  #   container_name: milvus-bytedesk
+  #   command: ["milvus", "run", "standalone"]
+  #   environment:
+  #     - ETCD_ENDPOINTS=etcd:2379
+  #     - MINIO_ADDRESS=minio:9000
+  #   volumes:
+  #     - milvus_data:/var/lib/milvus
+  #   ports:
+  #     - "19530:19530"
+  #     - "19531:9091"
+  #   networks:
+  #     - bytedesk-network
+  #   depends_on:
+  #     - bytedesk-etcd
+  #     - bytedesk-minio
+
+  # bytedesk-etcd:
+  #   image: quay.io/coreos/etcd:v3.5.5
+  #   container_name: etcd-bytedesk
+  #   environment:
+  #     - ETCD_AUTO_COMPACTION_MODE=revision
+  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
+  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
+  #     - ETCD_SNAPSHOT_COUNT=50000
+  #   volumes:
+  #     - etcd_data:/etcd
+  #   command:
+  #     - /usr/local/bin/etcd
+  #     - --advertise-client-urls=http://etcd:2379
+  #     - --listen-client-urls=http://0.0.0.0:2379
+  #     - --data-dir=/etcd
+  #   networks:
+  #     - bytedesk-network
+
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FreeSwitch 语音通话服务
+  # bytedesk-freeswitch:
+  #   image: safarov/freeswitch:latest # linux镜像
+  #   container_name: freeswitch-bytedesk
+  #   ports:
+  #     - "15060:5060/tcp"   # SIP
+  #     - "15060:5060/udp"   # SIP
+  #     - "15080:5080/tcp"   # SIP 安全端口
+  #     - "15080:5080/udp"   # SIP 安全端口
+  #     - "8021:8021"        # 控制台
+  #     - "18081-18082:8081-8082"  # 事件
+  #     - "17443:7443"       # WebRTC HTTPS
+  #     - "15066:5066"       # WebSocket 信令
+  #     - "16000-16129:16000-16129/udp" # RTP 媒体端口范围
+  #   environment:
+  #     - FREESWITCH_PASSWORD=bytedesk123
+  #   volumes:
+  #     - freeswitch_data:/usr/local/freeswitch/
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+
+volumes:
+  mysql_data:
+    name: bytedesk_mysql_data
+  redis_data:
+    name: bytedesk_redis_data
+  ollama_models:
+    name: bytedesk_ollama_models
+  prometheus_data:
+    name: bytedesk_prometheus_data
+  grafana_data:
+    name: bytedesk_grafana_data
+  ldap_data:
+    name: bytedesk_ldap_data
+  ldap_config:
+    name: bytedesk_ldap_config
+  # chroma_data:
+  #   name: bytedesk_chroma_data
+  elasticsearch_data:
+    name: bytedesk_elasticsearch_data
+  zipkin_data:
+    name: bytedesk_zipkin_data
+  artemis_data:
+    name: bytedesk_artemis_data
+  # weaviate_data:
+  #   name: bytedesk_weaviate_data
+  # milvus_data:
+  #   name: bytedesk_milvus_data
+  # etcd_data:
+  #   name: bytedesk_etcd_data
+  minio_data:
+    name: bytedesk_minio_data
+  freeswitch_data:
+    name: bytedesk_freeswitch_data
+
+networks:
+  bytedesk-network:
+    driver: bridge
