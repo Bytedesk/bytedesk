@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 15:46:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:40:42
+ * @LastEditTime: 2025-08-10 21:04:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,30 +36,5 @@ public class RobotMessageUtils {
                         .createdAt(BdDateUtils.now())
                         .build();
         }
-
-        // public static MessageProtobuf createRobotMessage(ThreadEntity thread,
-        // ThreadProtobuf threadProtobuf,
-        // RobotEntity robot,
-        // MessageProtobuf messageProtobuf) {
-        // MessageExtra extraObject = JSONObject.parseObject(messageProtobuf.getExtra(),
-        // MessageExtra.class);
-        // UserProtobuf user = UserProtobuf.builder()
-        // .nickname(robot.getNickname())
-        // .avatar(robot.getAvatar())
-        // .type(UserTypeEnum.ROBOT.name())
-        // .build();
-        // user.setUid(robot.getUid());
-        // String messageUid = UidUtils.getInstance().getUid();
-        // MessageProtobuf message = MessageProtobuf.builder()
-        // .uid(messageUid)
-        // .status(MessageStatusEnum.SUCCESS)
-        // .thread(threadProtobuf)
-        // .user(user)
-        // .channel(ChannelEnum.ROBOT)
-        // .extra(JSONObject.toJSONString(extraObject))
-        // .createdAt(BdDateUtils.now())
-        // .build();
-        // return message;
-        // }
 
 }

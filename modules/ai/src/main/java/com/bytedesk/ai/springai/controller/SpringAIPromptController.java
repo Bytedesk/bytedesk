@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-20 10:42:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 18:53:45
+ * @LastEditTime: 2025-08-10 21:32:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,7 +63,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/prompt")
+@RequestMapping("/spring/ai/api/v1/prompt")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "ollama", matchIfMissing = false)
 public class SpringAIPromptController {
@@ -92,7 +92,7 @@ public class SpringAIPromptController {
 	@Value("classpath:/aidemo/prompts/system-qa.st")
 	private Resource systemBikePrompt;
 
-	// http://127.0.0.1:9003/springai/prompt/templating?adjective=funny&topic=cows
+	// http://127.0.0.1:9003/spring/ai/api/v1/prompt/templating?adjective=funny&topic=cows
 	@GetMapping("/templating")
 	public ResponseEntity<JsonResult<?>> templating(
 			@RequestParam(value = "adjective", defaultValue = "funny") String adjective,
@@ -113,7 +113,7 @@ public class SpringAIPromptController {
 		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
-	// http://127.0.0.1:9003/springai/prompt/roles?message=&name=&voice=pirate
+	// http://127.0.0.1:9003/spring/ai/api/v1/prompt/roles?message=&name=&voice=pirate
 	@GetMapping("/roles")
 	public ResponseEntity<JsonResult<?>> roles(
 			@RequestParam(value = "message", defaultValue = "Tell me about three famous pirates from the Golden Age of Piracy and why they did.  Write at least a sentence for each pirate.") String message,
@@ -141,7 +141,7 @@ public class SpringAIPromptController {
 	}
 
 	// 通过stuff=true，将文档内容添加到上下文
-	// http://127.0.0.1:9003/springai/prompt/stuff?message=&stuff=true
+	// http://127.0.0.1:9003/spring/ai/api/v1/prompt/stuff?message=&stuff=true
 	@GetMapping("/stuff")
 	public ResponseEntity<JsonResult<?>> stuff(
 			@RequestParam(value = "message", defaultValue = "Which athletes won the mixed doubles gold medal in curling at the 2022 Winter Olympics?'") String message,
@@ -174,7 +174,7 @@ public class SpringAIPromptController {
 	}
 
 	// rag
-	// http://127.0.0.1:9003/springai/prompt/rag?message=
+	// http://127.0.0.1:9003/spring/ai/api/v1/prompt/rag?message=
 	@GetMapping("/rag")
 	public ResponseEntity<JsonResult<?>> rag(
 			@RequestParam(value = "message", defaultValue = "What is the most popular bike brand?") String message) {
@@ -218,7 +218,7 @@ public class SpringAIPromptController {
 		return ResponseEntity.ok(JsonResult.success(chatResponse));
 	}
 
-	// http://127.0.0.1:9003/springai/prompt/format?actor=
+	// http://127.0.0.1:9003/spring/ai/api/v1/prompt/format?actor=
 	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
 	@GetMapping("/format")
 	public ResponseEntity<JsonResult<?>> generate(
@@ -263,7 +263,7 @@ public class SpringAIPromptController {
 	}
 
 	// structured output
-	// http://127.0.0.1:9003/springai/prompt/structured?message=
+	// http://127.0.0.1:9003/spring/ai/api/v1/prompt/structured?message=
 	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
 	@GetMapping("/structured")
 	public ResponseEntity<JsonResult<?>> structured(

@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/tools")
+@RequestMapping("/spring/ai/api/v1/tools")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "zhipuai", matchIfMissing = false)
 public class SpringAIToolsController {
@@ -55,7 +55,7 @@ public class SpringAIToolsController {
     
     private final ChatClient primaryChatClient;
     
-    // http://127.0.0.1:9003/springai/tools/time?message=
+    // http://127.0.0.1:9003/spring/ai/api/v1/tools/time?message=
     // get current date and time
     @GetMapping("/time")
     public ResponseEntity<JsonResult<?>> time(
@@ -83,7 +83,7 @@ public class SpringAIToolsController {
     }
 
     // set alarm
-    // http://127.0.0.1:9003/springai/tools/alarm?message=
+    // http://127.0.0.1:9003/spring/ai/api/v1/tools/alarm?message=
     @GetMapping("/alarm")
     public ResponseEntity<JsonResult<?>> alarm(
             @RequestParam(value = "message", defaultValue = "Can you set an alarm 10 minutes from now?") String message) {
@@ -103,7 +103,7 @@ public class SpringAIToolsController {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // http://127.0.0.1:9003/springai/tools/method-tool-callback?message=
+    // http://127.0.0.1:9003/spring/ai/api/v1/tools/method-tool-callback?message=
     @GetMapping("/method-tool-callback")
     public ResponseEntity<JsonResult<?>> methodToolCallback(
             @RequestParam(value = "message", defaultValue = "What is the current date and time?") String message) {
@@ -133,7 +133,7 @@ public class SpringAIToolsController {
     }
 
     // weather 
-    // http://127.0.0.1:9003/springai/tools/weather?message=
+    // http://127.0.0.1:9003/spring/ai/api/v1/tools/weather?message=
     // https://docs.spring.io/spring-ai/reference/api/tools.html#_programmatic_specification_functiontoolcallback
     @GetMapping("/weather")
     public ResponseEntity<JsonResult<?>> weather(
