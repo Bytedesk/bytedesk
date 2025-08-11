@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 18:07:10
+ * @LastEditTime: 2025-08-11 17:16:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -111,13 +111,11 @@ public class ThreadRestService
         return queryByOrg(request);
     }
 
-    public ThreadResponse queryByTopic(ThreadRequest request) {
-        Optional<ThreadEntity> threadOptional = findFirstByTopic(request.getTopic());
-        if (threadOptional.isPresent()) {
-            return convertToResponse(threadOptional.get());
-        } else {
-            throw new NotFoundException("thread not found");
-        }
+    public Page<ThreadResponse> queryByTopic(ThreadRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<ThreadEntity> specs = ThreadSpecification.search(request, authService);
+        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
+        return threadPage.map(this::convertToResponse);
     }
 
     public ThreadResponse queryByTopicAndOwner(ThreadRequest request) {
