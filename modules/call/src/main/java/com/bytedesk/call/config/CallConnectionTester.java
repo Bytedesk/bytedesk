@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 14:30:00
+ * @LastEditTime: 2025-08-11 09:37:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class CallConnectionTester implements CommandLineRunner {
 
-    private final CallProperties freeSwitchProperties;
+    private final CallProperties callProperties;
 
     @Override
     public void run(String... args) {
@@ -46,8 +46,8 @@ public class CallConnectionTester implements CommandLineRunner {
      * 测试Call连接
      */
     public void testConnection() {
-        String server = freeSwitchProperties.getServer();
-        int port = freeSwitchProperties.getEslPort();
+        String server = callProperties.getServer();
+        int port = callProperties.getEslPort();
         
         log.info("测试连接到Call ESL: {}:{}", server, port);
         
@@ -101,7 +101,7 @@ public class CallConnectionTester implements CommandLineRunner {
             }
             
             log.error("当前配置: 服务器={}, 端口={}, 密码={}", 
-                    server, port, freeSwitchProperties.getEslPassword());
+                    server, port, callProperties.getEslPassword());
         }
         
         log.info("Call连接测试完成");
@@ -112,10 +112,10 @@ public class CallConnectionTester implements CommandLineRunner {
      */
     public void printDiagnosticInfo() {
         log.info("=== Call ESL 连接诊断信息 ===");
-        log.info("服务器地址: {}", freeSwitchProperties.getServer());
-        log.info("ESL端口: {}", freeSwitchProperties.getEslPort());
-        log.info("ESL密码: {}", freeSwitchProperties.getEslPassword());
-        log.info("启用状态: {}", freeSwitchProperties.isEnabled());
+        log.info("服务器地址: {}", callProperties.getServer());
+        log.info("ESL端口: {}", callProperties.getEslPort());
+        log.info("ESL密码: {}", callProperties.getEslPassword());
+        log.info("启用状态: {}", callProperties.isEnabled());
         
         log.info("\n=== 故障排除指南 ===");
         log.info("1. 检查Call服务状态:");
@@ -127,7 +127,7 @@ public class CallConnectionTester implements CommandLineRunner {
         log.info("   或 ss -tlnp | grep 8021");
         
         log.info("\n3. 测试端口连通性:");
-        log.info("   telnet {} {}", freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
+        log.info("   telnet {} {}", callProperties.getServer(), callProperties.getEslPort());
         
         log.info("\n4. 检查Call配置:");
         log.info("   配置文件: conf/autoload_configs/event_socket.conf.xml");
