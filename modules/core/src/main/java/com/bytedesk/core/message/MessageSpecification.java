@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-02 08:17:14
+ * @LastEditTime: 2025-08-11 18:01:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,8 +82,8 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
             }
             // 
-            String topic = request.getTopic();
-            if (StringUtils.hasText(topic)) {
+            if (StringUtils.hasText(request.getTopic())) {
+                String topic = request.getTopic();
                 Predicate topicPredicate = criteriaBuilder.equal(threadJoin.get("topic"), topic);
                 if (TopicUtils.isOrgMemberTopic(topic)) {
                     String reverseTopic = TopicUtils.getOrgMemberTopicReverse(topic);
