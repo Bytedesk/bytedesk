@@ -69,6 +69,11 @@ public class CallGatewayEntity extends BaseEntity {
     private String password;
 
     /**
+     * 域
+     */
+    private String realm;
+
+    /**
      * 从号码
      */
     private String fromUser;

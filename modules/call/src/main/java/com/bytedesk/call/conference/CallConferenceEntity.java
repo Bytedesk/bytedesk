@@ -50,6 +50,12 @@ public class CallConferenceEntity extends BaseEntity {
     private String conferenceName;
 
     /**
+     * 会议室配置文件
+     */
+    @Builder.Default
+    private String profile = "default";
+
+    /**
      * 会议室描述
      */
     private String description;
@@ -58,6 +64,11 @@ public class CallConferenceEntity extends BaseEntity {
      * 会议室密码
      */
     private String password;
+
+    /**
+     * 主持人密码
+     */
+    private String moderatorPassword;
 
     /**
      * 最大参与者数量

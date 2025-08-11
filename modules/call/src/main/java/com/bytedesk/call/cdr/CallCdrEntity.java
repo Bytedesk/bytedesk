@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 11:33:00
+ * @LastEditTime: 2025-08-11 09:58:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,6 +29,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
+ * FreeSwitch通话详单表 (CDR)
+ * 
  * Call call detail record entity
  * Stores detailed information about voice calls processed by Call
  * 
