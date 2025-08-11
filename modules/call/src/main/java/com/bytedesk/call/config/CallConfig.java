@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 10:14:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-10 14:16:51
+ * @LastEditTime: 2025-08-11 09:20:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,13 +34,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-// @ComponentScan("com.bytedesk.call")
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class CallConfig {
         
-    private final CallProperties freeSwitchProperties;
+    private final CallProperties callProperties;
     
-    private final CallEventListener freeSwitchEventListener;
+    private final CallEventListener callEventListener;
 
     /**
      * 配置Call ESL客户端
@@ -56,25 +55,25 @@ public class CallConfig {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 log.info("第{}次尝试连接Call ESL: {}:{}", 
-                        attempt, freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
+                        attempt, callProperties.getServer(), callProperties.getEslPort());
                         
                 // 设置更长的超时时间
                 inboundClient.connect(
-                    freeSwitchProperties.getServer(), 
-                    freeSwitchProperties.getEslPort(), 
-                    freeSwitchProperties.getEslPassword(),
+                    callProperties.getServer(), 
+                    callProperties.getEslPort(), 
+                    callProperties.getEslPassword(),
                     20); // 增加超时时间到20秒
                     
                 // 验证连接是否真正建立
                 if (inboundClient.canSend()) {
                     // 注册事件监听器
-                    inboundClient.addEventListener(freeSwitchEventListener);
+                    inboundClient.addEventListener(callEventListener);
                     
                     // 订阅所有事件
                     inboundClient.setEventSubscriptions("plain", "all");
                     
                     log.info("Call ESL连接成功，服务器: {}:{}", 
-                            freeSwitchProperties.getServer(), freeSwitchProperties.getEslPort());
+                            callProperties.getServer(), callProperties.getEslPort());
                     
                     // 连接成功，跳出重试循环
                     break;
@@ -90,7 +89,7 @@ public class CallConfig {
                 if (e.getMessage() != null) {
                     if (e.getMessage().contains("rude-rejection") || e.getMessage().contains("Access Denied")) {
                         log.error("Call ESL拒绝连接 - 可能的原因:");
-                        log.error("1. ESL密码错误 (当前密码: {})", freeSwitchProperties.getEslPassword());
+                        log.error("1. ESL密码错误 (当前密码: {})", callProperties.getEslPassword());
                         log.error("2. IP地址不在Call的访问控制列表(ACL)中");
                         log.error("3. Call的event_socket.conf.xml配置限制了外部连接");
                         log.error("4. 防火墙阻止了连接");
@@ -102,7 +101,7 @@ public class CallConfig {
                     } else if (e.getMessage().contains("Connection refused") || e.getMessage().contains("timeout")) {
                         log.error("网络连接问题 - 可能的原因:");
                         log.error("1. Call服务未运行");
-                        log.error("2. 端口{}未开放或被防火墙阻止", freeSwitchProperties.getEslPort());
+                        log.error("2. 端口{}未开放或被防火墙阻止", callProperties.getEslPort());
                         log.error("3. 网络连接超时");
                     }
                 }

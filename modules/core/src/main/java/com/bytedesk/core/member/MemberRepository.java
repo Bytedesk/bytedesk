@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 11:40:06
+ * @LastEditTime: 2025-08-11 09:25:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 // import org.springframework.data.repository.query.Param;
 // import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Repository;
 
 import com.bytedesk.core.rbac.user.UserEntity;
 
@@ -32,7 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
  * https://docs.spring.io/spring-security/reference/
  */
-@Repository
 @Tag(name = "member - 成员")
 // @RepositoryRestResource(path = "mem", itemResourceRel = "mems", collectionResourceRel = "mems")
 // @PreAuthorize("hasRole('ROLE_USER')")

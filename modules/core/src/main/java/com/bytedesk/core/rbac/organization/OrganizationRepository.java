@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-29 08:37:20
+ * @LastEditTime: 2025-08-11 09:25:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,7 +26,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 // import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.lang.NonNull;
 // import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Repository;
 // import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -38,7 +37,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 // https://docs.spring.io/spring-data/rest/reference/customizing/configuring-cors.html
 // @CrossOrigin
-@Repository
 @Tag(name = "organization - 公司/组织")
 // https://docs.spring.io/spring-data/rest/reference/security.html
 // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER')")

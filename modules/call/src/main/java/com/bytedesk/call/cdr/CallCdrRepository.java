@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 22:46:21
+ * @LastEditTime: 2025-08-11 09:24:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,14 +23,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 /**
  * Call CDR仓库接口
  */
-@Repository
-public interface CallCdrRepository extends JpaRepository<CallCdrEntity, Long>, 
-        JpaSpecificationExecutor<CallCdrEntity> {
+public interface CallCdrRepository extends JpaRepository<CallCdrEntity, Long>, JpaSpecificationExecutor<CallCdrEntity> {
 
     /**
      * 根据UID查找CDR记录

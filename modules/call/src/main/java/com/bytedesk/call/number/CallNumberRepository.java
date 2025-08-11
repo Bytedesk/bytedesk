@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 22:49:05
+ * @LastEditTime: 2025-08-11 09:24:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,14 +23,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 /**
  * Call用户仓库接口
  */
-@Repository
-public interface CallNumberRepository extends JpaRepository<CallNumberEntity, Long>, 
-        JpaSpecificationExecutor<CallNumberEntity> {
+public interface CallNumberRepository extends JpaRepository<CallNumberEntity, Long>, JpaSpecificationExecutor<CallNumberEntity> {
 
     /**
      * 根据UID查找用户

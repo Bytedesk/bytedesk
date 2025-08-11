@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-29 08:36:21
+ * @LastEditTime: 2025-08-11 09:28:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *  Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,14 +21,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-// import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Repository;
-
 import com.bytedesk.service.agent.AgentEntity;
 
-// import io.swagger.v3.oas.annotations.tags.Tag;
-
-@Repository
 public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long>, JpaSpecificationExecutor<WorkgroupEntity> {
 
     Optional<WorkgroupEntity> findByUid(String uid);

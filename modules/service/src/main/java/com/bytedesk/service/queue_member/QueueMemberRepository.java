@@ -21,9 +21,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.ZonedDateTime;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, Long>, JpaSpecificationExecutor<QueueMemberEntity> {
 
     Optional<QueueMemberEntity> findByUid(String uid);

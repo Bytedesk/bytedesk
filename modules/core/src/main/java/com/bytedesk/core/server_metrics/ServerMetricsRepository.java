@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-24 21:36:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 21:36:17
+ * @LastEditTime: 2025-08-11 09:26:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.Optional;
  * Provides database operations for server metrics historical data
  * Note: Only super administrators can access server monitoring data
  */
-@Repository
 public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEntity, Long>, JpaSpecificationExecutor<ServerMetricsEntity> {
 
     /**

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-04 16:05:19
+ * @LastEditTime: 2025-08-11 09:25:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk@
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ package com.bytedesk.core.rbac.authority;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +26,6 @@ import java.util.Optional;
 /**
  * @author im.bytedesk.com
  */
-@Repository
 @Tag(name = "authority - 权限")
 public interface AuthorityRepository extends JpaRepository<AuthorityEntity, Long>, JpaSpecificationExecutor<AuthorityEntity> {
 
