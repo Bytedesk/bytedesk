@@ -1,4 +1,4 @@
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import java.util.Optional;
 
@@ -24,9 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEntity, CallNumberRequest, CallNumberResponse, CallNumberExcel> {
+public class CallUserRestService extends BaseRestServiceWithExcel<CallUserEntity, CallUserRequest, CallUserResponse, CallUserExcel> {
 
-    private final CallNumberRepository freeSwitchNumberRepository;
+    private final CallUserRepository freeSwitchNumberRepository;
 
     private final ModelMapper modelMapper;
 
@@ -35,51 +35,51 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
     private final AuthService authService;
 
     @Override
-    public Page<CallNumberEntity> queryByOrgEntity(CallNumberRequest request) {
+    public Page<CallUserEntity> queryByOrgEntity(CallUserRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallNumberEntity> specification = CallNumberSpecification.search(request);
+        Specification<CallUserEntity> specification = CallUserSpecification.search(request);
         return freeSwitchNumberRepository.findAll(specification, pageable);
     }
 
     @Override
-    public Page<CallNumberResponse> queryByOrg(CallNumberRequest request) {
-        Page<CallNumberEntity> entities = queryByOrgEntity(request);
+    public Page<CallUserResponse> queryByOrg(CallUserRequest request) {
+        Page<CallUserEntity> entities = queryByOrgEntity(request);
         return entities.map(this::convertToResponse);
     }
 
-    public Page<CallNumberEntity> queryByNumberEntity(CallNumberRequest request) {
+    public Page<CallUserEntity> queryByNumberEntity(CallUserRequest request) {
         // NumberEntity user = authService.getUser();
         // request.setOrgUid(user.getOrgUid());
         return queryByOrgEntity(request);
     }
 
     @Override
-    public Page<CallNumberResponse> queryByUser(CallNumberRequest request) {
-        Page<CallNumberEntity> entities = queryByNumberEntity(request);
+    public Page<CallUserResponse> queryByUser(CallUserRequest request) {
+        Page<CallUserEntity> entities = queryByNumberEntity(request);
         return entities.map(this::convertToResponse);
     }
 
     @Override
-    public Optional<CallNumberEntity> findByUid(String uid) {
+    public Optional<CallUserEntity> findByUid(String uid) {
         return freeSwitchNumberRepository.findByUid(uid);
     }
 
     @Override
-    public CallNumberResponse convertToResponse(CallNumberEntity entity) {
-        return modelMapper.map(entity, CallNumberResponse.class);
+    public CallUserResponse convertToResponse(CallUserEntity entity) {
+        return modelMapper.map(entity, CallUserResponse.class);
     }
 
-    public CallNumberEntity convertToEntity(CallNumberRequest request) {
-        return modelMapper.map(request, CallNumberEntity.class);
-    }
-
-    @Override
-    public CallNumberExcel convertToExcel(CallNumberEntity entity) {
-        return modelMapper.map(entity, CallNumberExcel.class);
+    public CallUserEntity convertToEntity(CallUserRequest request) {
+        return modelMapper.map(request, CallUserEntity.class);
     }
 
     @Override
-    public CallNumberResponse create(CallNumberRequest request) {
+    public CallUserExcel convertToExcel(CallUserEntity entity) {
+        return modelMapper.map(entity, CallUserExcel.class);
+    }
+
+    @Override
+    public CallUserResponse create(CallUserRequest request) {
         UserEntity user = authService.getUser();
         if (!StringUtils.hasText(request.getOrgUid())) {
             request.setOrgUid(user.getOrgUid());
@@ -94,11 +94,11 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
             throw new RuntimeException("用户名已存在: " + request.getUsername() + "@" + request.getDomain());
         }
 
-        CallNumberEntity entity = convertToEntity(request);
+        CallUserEntity entity = convertToEntity(request);
         entity.setLevel(LevelEnum.PLATFORM.name());
         entity.setPlatform(BytedeskConsts.PLATFORM_BYTEDESK);
 
-        CallNumberEntity savedEntity = save(entity);
+        CallUserEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("创建Call用户失败");
         }
@@ -107,13 +107,13 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
     }
 
     @Override
-    public CallNumberResponse update(CallNumberRequest request) {
-        Optional<CallNumberEntity> optional = findByUid(request.getUid());
+    public CallUserResponse update(CallUserRequest request) {
+        Optional<CallUserEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
             throw new RuntimeException("Call用户不存在");
         }
 
-        CallNumberEntity entity = optional.get();
+        CallUserEntity entity = optional.get();
         
         // 更新字段
         if (StringUtils.hasText(request.getDisplayName())) {
@@ -132,7 +132,7 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
             entity.setRemarks(request.getRemarks());
         }
 
-        CallNumberEntity updatedEntity = save(entity);
+        CallUserEntity updatedEntity = save(entity);
         if (updatedEntity == null) {
             throw new RuntimeException("更新Call用户失败");
         }
@@ -141,7 +141,7 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
     }
 
     @Override
-    public CallNumberEntity save(CallNumberEntity entity) {
+    public CallUserEntity save(CallUserEntity entity) {
         try {
             return freeSwitchNumberRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
@@ -150,13 +150,13 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
     }
 
     @Override
-    public CallNumberEntity doSave(CallNumberEntity entity) {
+    public CallUserEntity doSave(CallUserEntity entity) {
         return freeSwitchNumberRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<CallNumberEntity> optional = findByUid(uid);
+        Optional<CallUserEntity> optional = findByUid(uid);
         optional.ifPresent(entity -> {
             entity.setDeleted(true);
             save(entity);
@@ -164,14 +164,14 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
     }
 
     @Override
-    public void delete(CallNumberRequest request) {
+    public void delete(CallUserRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
     @Cacheable(value = "freeswitch_user", key = "#uid", unless = "#result == null")
-    public CallNumberResponse queryByUid(CallNumberRequest request) {
-        Optional<CallNumberEntity> optional = findByUid(request.getUid());
+    public CallUserResponse queryByUid(CallUserRequest request) {
+        Optional<CallUserEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             return convertToResponse(optional.get());
         }
@@ -179,13 +179,13 @@ public class CallNumberRestService extends BaseRestServiceWithExcel<CallNumberEn
     }
 
     @Override
-    public CallNumberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CallNumberEntity entity) {
+    public CallUserEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, CallUserEntity entity) {
         log.warn("Call用户保存时发生乐观锁异常 uid: {}, version: {}", entity.getUid(), entity.getVersion());
         // 重新查询最新版本并重试
         try {
-            Optional<CallNumberEntity> latest = findByUid(entity.getUid());
+            Optional<CallUserEntity> latest = findByUid(entity.getUid());
             if (latest.isPresent()) {
-                CallNumberEntity latestEntity = latest.get();
+                CallUserEntity latestEntity = latest.get();
                 // 将当前修改应用到最新版本
                 latestEntity.setPassword(entity.getPassword());
                 latestEntity.setEnabled(entity.getEnabled());

@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -29,58 +29,58 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/freeswitch/number")
 @AllArgsConstructor
-public class CallNumberRestController extends BaseRestController<CallNumberRequest> {
+public class CallUserRestController extends BaseRestController<CallUserRequest> {
 
-    private final CallNumberRestService freeSwitchNumberRestService;
+    private final CallUserRestService freeSwitchNumberRestService;
 
     @ActionAnnotation(title = "Call用户", action = "组织查询", description = "query freeswitch number by org")
     @Override
-    public ResponseEntity<?> queryByOrg(CallNumberRequest request) {
+    public ResponseEntity<?> queryByOrg(CallUserRequest request) {
         
-        Page<CallNumberResponse> numbers = freeSwitchNumberRestService.queryByOrg(request);
+        Page<CallUserResponse> numbers = freeSwitchNumberRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(numbers));
     }
 
     @ActionAnnotation(title = "Call用户", action = "用户查询", description = "query freeswitch number by number")
     @Override
-    public ResponseEntity<?> queryByUser(CallNumberRequest request) {
+    public ResponseEntity<?> queryByUser(CallUserRequest request) {
         
-        Page<CallNumberResponse> numbers = freeSwitchNumberRestService.queryByUser(request);
+        Page<CallUserResponse> numbers = freeSwitchNumberRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(numbers));
     }
 
     @ActionAnnotation(title = "Call用户", action = "查询", description = "query freeswitch number by uid")
     @Override
-    public ResponseEntity<?> queryByUid(CallNumberRequest request) {
+    public ResponseEntity<?> queryByUid(CallUserRequest request) {
 
-        CallNumberResponse number = freeSwitchNumberRestService.queryByUid(request);
+        CallUserResponse number = freeSwitchNumberRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(number));
     }
 
     @ActionAnnotation(title = "Call用户", action = "创建", description = "create freeswitch number")
     @Override
-    public ResponseEntity<?> create(CallNumberRequest request) {
+    public ResponseEntity<?> create(CallUserRequest request) {
 
-        CallNumberResponse number = freeSwitchNumberRestService.create(request);
+        CallUserResponse number = freeSwitchNumberRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(number));
     }
 
     @ActionAnnotation(title = "Call用户", action = "更新", description = "update freeswitch number")
     @Override
-    public ResponseEntity<?> update(CallNumberRequest request) {
+    public ResponseEntity<?> update(CallUserRequest request) {
 
-        CallNumberResponse number = freeSwitchNumberRestService.update(request);
+        CallUserResponse number = freeSwitchNumberRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(number));
     }
 
     @ActionAnnotation(title = "Call用户", action = "删除", description = "delete freeswitch number")
     @Override
-    public ResponseEntity<?> delete(CallNumberRequest request) {
+    public ResponseEntity<?> delete(CallUserRequest request) {
 
         freeSwitchNumberRestService.deleteByUid(request.getUid());
 
@@ -90,12 +90,12 @@ public class CallNumberRestController extends BaseRestController<CallNumberReque
     @ActionAnnotation(title = "Call用户", action = "导出", description = "export freeswitch number to excel")
     @Override
     @GetMapping("/export")
-    public Object export(CallNumberRequest request, HttpServletResponse response) {
+    public Object export(CallUserRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             freeSwitchNumberRestService,
-            CallNumberExcel.class,
+            CallUserExcel.class,
             "Call用户",
             "freeswitch_number"
         );

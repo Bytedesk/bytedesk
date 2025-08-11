@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -27,47 +27,47 @@ import org.springframework.data.repository.query.Param;
 /**
  * Call用户仓库接口
  */
-public interface CallNumberRepository extends JpaRepository<CallNumberEntity, Long>, JpaSpecificationExecutor<CallNumberEntity> {
+public interface CallUserRepository extends JpaRepository<CallUserEntity, Long>, JpaSpecificationExecutor<CallUserEntity> {
 
     /**
      * 根据UID查找用户
      */
-    Optional<CallNumberEntity> findByUid(String uid);
+    Optional<CallUserEntity> findByUid(String uid);
 
     /**
      * 根据用户名查找用户
      */
-    Optional<CallNumberEntity> findByUsername(String username);
+    Optional<CallUserEntity> findByUsername(String username);
 
     /**
      * 根据用户名和域名查找用户
      */
-    Optional<CallNumberEntity> findByUsernameAndDomain(String username, String domain);
+    Optional<CallUserEntity> findByUsernameAndDomain(String username, String domain);
 
     /**
      * 根据邮箱查找用户
      */
-    List<CallNumberEntity> findByEmail(String email);
+    List<CallUserEntity> findByEmail(String email);
 
     /**
      * 查找启用的用户
      */
-    List<CallNumberEntity> findByEnabledTrue();
+    List<CallUserEntity> findByEnabledTrue();
 
     /**
      * 根据域名查找用户
      */
-    List<CallNumberEntity> findByDomain(String domain);
+    List<CallUserEntity> findByDomain(String domain);
 
     /**
      * 根据域名查找用户（分页）
      */
-    Page<CallNumberEntity> findByDomain(String domain, Pageable pageable);
+    Page<CallUserEntity> findByDomain(String domain, Pageable pageable);
 
     /**
      * 根据账户代码查找用户
      */
-    List<CallNumberEntity> findByAccountcode(String accountcode);
+    List<CallUserEntity> findByAccountcode(String accountcode);
 
     /**
      * 检查用户名是否存在
@@ -82,7 +82,7 @@ public interface CallNumberRepository extends JpaRepository<CallNumberEntity, Lo
     /**
      * 查找在线用户（最近指定时间内有注册记录）
      */
-    List<CallNumberEntity> findByEnabledTrueAndLastRegisterAfter(ZonedDateTime cutoffTime);
+    List<CallUserEntity> findByEnabledTrueAndLastRegisterAfter(ZonedDateTime cutoffTime);
 
     /**
      * 统计域名下的用户数量
@@ -97,18 +97,18 @@ public interface CallNumberRepository extends JpaRepository<CallNumberEntity, Lo
     /**
      * 查找在线用户（最近5分钟内有注册记录）
      */
-    @Query("SELECT u FROM CallNumberEntity u WHERE u.enabled = true AND u.lastRegister > :cutoffTime")
-    List<CallNumberEntity> findOnlineNumbers(@Param("cutoffTime") ZonedDateTime cutoffTime);
+    @Query("SELECT u FROM CallUserEntity u WHERE u.enabled = true AND u.lastRegister > :cutoffTime")
+    List<CallUserEntity> findOnlineNumbers(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     /**
      * 根据用户名模糊搜索
      */
-    Page<CallNumberEntity> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
+    Page<CallUserEntity> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 
     /**
      * 根据显示名称模糊搜索
      */
-    Page<CallNumberEntity> findByDisplayNameContainingIgnoreCase(String displayName, Pageable pageable);
+    Page<CallUserEntity> findByDisplayNameContainingIgnoreCase(String displayName, Pageable pageable);
 
     /**
      * 统计启用的用户数量
@@ -118,13 +118,13 @@ public interface CallNumberRepository extends JpaRepository<CallNumberEntity, Lo
     /**
      * 统计在线用户数量
      */
-    @Query("SELECT COUNT(u) FROM CallNumberEntity u WHERE u.enabled = true AND u.lastRegister > :cutoffTime")
+    @Query("SELECT COUNT(u) FROM CallUserEntity u WHERE u.enabled = true AND u.lastRegister > :cutoffTime")
     long countOnlineNumbers(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     /**
      * 更新用户最后注册时间和IP
      */
-    @Query("UPDATE CallNumberEntity u SET u.lastRegister = :registerTime, u.registerIp = :registerIp WHERE u.username = :username AND u.domain = :domain")
+    @Query("UPDATE CallUserEntity u SET u.lastRegister = :registerTime, u.registerIp = :registerIp WHERE u.username = :username AND u.domain = :domain")
     int updateLastRegister(@Param("username") String username, 
                           @Param("domain") String domain,
                           @Param("registerTime") ZonedDateTime registerTime, 

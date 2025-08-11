@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
@@ -37,17 +37,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/freeswitch/api/v1/users")
 @AllArgsConstructor
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
-public class CallNumberController {
+public class CallUserController {
 
-    private final CallNumberService userService;
+    private final CallUserService userService;
 
     /**
      * 创建用户
      */
     @PostMapping
-    public ResponseEntity<JsonResult<?>> createNumber(@Valid @RequestBody CallNumberRequest request) {
+    public ResponseEntity<JsonResult<?>> createNumber(@Valid @RequestBody CallUserRequest request) {
         try {
-            CallNumberEntity user = userService.createNumber(
+            CallUserEntity user = userService.createNumber(
                     request.getUsername(),
                     request.getDomain(),
                     request.getPassword(),
@@ -56,7 +56,7 @@ public class CallNumberController {
                     request.getAccountcode()
             );
             
-            CallNumberResponse response = CallNumberResponse.fromEntitySafe(user);
+            CallUserResponse response = CallUserResponse.fromEntitySafe(user);
             return ResponseEntity.ok(JsonResult.success("用户创建成功", response));
         } catch (Exception e) {
             log.error("创建用户失败", e);
@@ -69,9 +69,9 @@ public class CallNumberController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<JsonResult<?>> getNumber(@PathVariable Long id) {
-        Optional<CallNumberEntity> user = userService.findById(id);
+        Optional<CallUserEntity> user = userService.findById(id);
         if (user.isPresent()) {
-            CallNumberResponse response = CallNumberResponse.fromEntitySafe(user.get());
+            CallUserResponse response = CallUserResponse.fromEntitySafe(user.get());
             return ResponseEntity.ok(JsonResult.success("获取用户详情成功", response));
         } else {
             return ResponseEntity.notFound().build();
@@ -83,9 +83,9 @@ public class CallNumberController {
      */
     @GetMapping("/username/{username}")
     public ResponseEntity<JsonResult<?>> getNumberByNumbername(@PathVariable String username) {
-        Optional<CallNumberEntity> user = userService.findByNumbername(username);
+        Optional<CallUserEntity> user = userService.findByNumbername(username);
         if (user.isPresent()) {
-            CallNumberResponse response = CallNumberResponse.fromEntitySafe(user.get());
+            CallUserResponse response = CallUserResponse.fromEntitySafe(user.get());
             return ResponseEntity.ok(JsonResult.success("获取用户详情成功", response));
         } else {
             return ResponseEntity.notFound().build();
@@ -98,9 +98,9 @@ public class CallNumberController {
     @GetMapping("/username/{username}/domain/{domain}")
     public ResponseEntity<JsonResult<?>> getNumberByNumbernameAndDomain(
             @PathVariable String username, @PathVariable String domain) {
-        Optional<CallNumberEntity> user = userService.findByNumbernameAndDomain(username, domain);
+        Optional<CallUserEntity> user = userService.findByNumbernameAndDomain(username, domain);
         if (user.isPresent()) {
-            CallNumberResponse response = CallNumberResponse.fromEntitySafe(user.get());
+            CallUserResponse response = CallUserResponse.fromEntitySafe(user.get());
             return ResponseEntity.ok(JsonResult.success("获取用户详情成功", response));
         } else {
             return ResponseEntity.notFound().build();
@@ -121,8 +121,8 @@ public class CallNumberController {
                 Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         
-        Page<CallNumberEntity> userPage = userService.findAll(pageable);
-        Page<CallNumberResponse> responsePage = userPage.map(CallNumberResponse::fromEntitySafe);
+        Page<CallUserEntity> userPage = userService.findAll(pageable);
+        Page<CallUserResponse> responsePage = userPage.map(CallUserResponse::fromEntitySafe);
         
         return ResponseEntity.ok(JsonResult.success("获取用户列表成功", responsePage));
     }
@@ -132,9 +132,9 @@ public class CallNumberController {
      */
     @GetMapping("/domain/{domain}")
     public ResponseEntity<JsonResult<?>> getNumbersByDomain(@PathVariable String domain) {
-        List<CallNumberEntity> users = userService.findByDomain(domain);
-        List<CallNumberResponse> responses = users.stream()
-                .map(CallNumberResponse::fromEntitySafe)
+        List<CallUserEntity> users = userService.findByDomain(domain);
+        List<CallUserResponse> responses = users.stream()
+                .map(CallUserResponse::fromEntitySafe)
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(JsonResult.success("获取域名用户列表成功", responses));
@@ -145,9 +145,9 @@ public class CallNumberController {
      */
     @GetMapping("/enabled")
     public ResponseEntity<JsonResult<?>> getEnabledNumbers() {
-        List<CallNumberEntity> users = userService.findEnabledNumbers();
-        List<CallNumberResponse> responses = users.stream()
-                .map(CallNumberResponse::fromEntitySafe)
+        List<CallUserEntity> users = userService.findEnabledNumbers();
+        List<CallUserResponse> responses = users.stream()
+                .map(CallUserResponse::fromEntitySafe)
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(JsonResult.success("获取启用用户列表成功", responses));
@@ -158,9 +158,9 @@ public class CallNumberController {
      */
     @GetMapping("/online")
     public ResponseEntity<JsonResult<?>> getOnlineNumbers() {
-        List<CallNumberEntity> users = userService.findOnlineNumbers();
-        List<CallNumberResponse> responses = users.stream()
-                .map(CallNumberResponse::fromEntitySafe)
+        List<CallUserEntity> users = userService.findOnlineNumbers();
+        List<CallUserResponse> responses = users.stream()
+                .map(CallUserResponse::fromEntitySafe)
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(JsonResult.success("获取在线用户列表成功", responses));
@@ -171,9 +171,9 @@ public class CallNumberController {
      */
     @GetMapping("/email/{email}")
     public ResponseEntity<JsonResult<?>> getNumbersByEmail(@PathVariable String email) {
-        List<CallNumberEntity> users = userService.findByEmail(email);
-        List<CallNumberResponse> responses = users.stream()
-                .map(CallNumberResponse::fromEntitySafe)
+        List<CallUserEntity> users = userService.findByEmail(email);
+        List<CallUserResponse> responses = users.stream()
+                .map(CallUserResponse::fromEntitySafe)
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(JsonResult.success("获取用户列表成功", responses));
@@ -184,9 +184,9 @@ public class CallNumberController {
      */
     @GetMapping("/accountcode/{accountcode}")
     public ResponseEntity<JsonResult<?>> getNumbersByAccountcode(@PathVariable String accountcode) {
-        List<CallNumberEntity> users = userService.findByAccountcode(accountcode);
-        List<CallNumberResponse> responses = users.stream()
-                .map(CallNumberResponse::fromEntitySafe)
+        List<CallUserEntity> users = userService.findByAccountcode(accountcode);
+        List<CallUserResponse> responses = users.stream()
+                .map(CallUserResponse::fromEntitySafe)
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(JsonResult.success("获取用户列表成功", responses));
@@ -198,9 +198,9 @@ public class CallNumberController {
     @PutMapping("/{id}")
     public ResponseEntity<JsonResult<?>> updateNumber(
             @PathVariable Long id,
-            @Valid @RequestBody CallNumberRequest request) {
+            @Valid @RequestBody CallUserRequest request) {
         try {
-            CallNumberEntity user = userService.updateNumber(
+            CallUserEntity user = userService.updateNumber(
                     id,
                     request.getPassword(),
                     request.getDisplayName(),
@@ -208,7 +208,7 @@ public class CallNumberController {
                     request.getAccountcode()
             );
             
-            CallNumberResponse response = CallNumberResponse.fromEntitySafe(user);
+            CallUserResponse response = CallUserResponse.fromEntitySafe(user);
             return ResponseEntity.ok(JsonResult.success("用户更新成功", response));
         } catch (Exception e) {
             log.error("更新用户失败", e);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:30:46
+ * @LastEditTime: 2025-08-11 10:14:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,15 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.call.config.CallEventPublisher;
-import com.bytedesk.call.number.event.CallNumberCreateEvent;
-import com.bytedesk.call.number.event.CallNumberUpdateEvent;
+import com.bytedesk.call.users.event.CallUserCreateEvent;
+import com.bytedesk.call.users.event.CallUserUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -30,25 +30,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class CallNumberEntityListener {
+public class CallUserEntityListener {
 
     @PostPersist
-    public void postPersist(CallNumberEntity entity) {
+    public void postPersist(CallUserEntity entity) {
         log.info("Call用户创建: username={}, domain={}", 
                 entity.getUsername(), entity.getDomain());
                 
-        CallNumberEntity cloneEntity = SerializationUtils.clone(entity);
+        CallUserEntity cloneEntity = SerializationUtils.clone(entity);
         CallEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(CallEventPublisher.class);
-        freeSwitchEventPublisher.publishEvent(new CallNumberCreateEvent(cloneEntity));
+        freeSwitchEventPublisher.publishEvent(new CallUserCreateEvent(cloneEntity));
     }
 
     @PostUpdate
-    public void postUpdate(CallNumberEntity entity) {
+    public void postUpdate(CallUserEntity entity) {
         log.info("Call用户更新: username={}, enabled={}", 
                 entity.getUsername(), entity.getEnabled());
                 
-        CallNumberEntity cloneEntity = SerializationUtils.clone(entity);
+        CallUserEntity cloneEntity = SerializationUtils.clone(entity);
         CallEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(CallEventPublisher.class);
-        freeSwitchEventPublisher.publishEvent(new CallNumberUpdateEvent(cloneEntity));
+        freeSwitchEventPublisher.publishEvent(new CallUserUpdateEvent(cloneEntity));
     }
 }

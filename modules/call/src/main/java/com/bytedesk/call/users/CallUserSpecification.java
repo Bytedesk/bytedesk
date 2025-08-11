@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CallNumberSpecification extends BaseSpecification<CallNumberEntity, CallNumberRequest> {
+public class CallUserSpecification extends BaseSpecification<CallUserEntity, CallUserRequest> {
     
-    public static Specification<CallNumberEntity> search(CallNumberRequest request) {
+    public static Specification<CallUserEntity> search(CallUserRequest request) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

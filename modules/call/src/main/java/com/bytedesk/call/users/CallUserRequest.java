@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:31:53
+ * @LastEditTime: 2025-06-08 18:47:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,110 +11,81 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
-import java.time.ZonedDateTime;
+import com.bytedesk.core.base.BaseRequest;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.utils.BdDateUtils;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Call用户实体
- * 对应数据库表：freeswitch_users
+ * Call用户请求实体
  */
-@Entity
 @Data
 @SuperBuilder
-@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({CallNumberEntityListener.class})
-@Table(name = "bytedesk_call_number")
-public class CallNumberEntity extends BaseEntity {
+@AllArgsConstructor
+public class CallUserRequest extends BaseRequest {
 
     /**
      * 用户名（SIP用户名）
      */
-    @Column(unique = true)
+    @NotBlank(message = "用户名不能为空")
+    @Size(max = 50, message = "用户名长度不能超过50字符")
     private String username;
 
     /**
      * SIP域名
      */
+    @NotBlank(message = "SIP域名不能为空")
+    @Size(max = 100, message = "SIP域名长度不能超过100字符")
     private String domain;
 
     /**
      * 密码
      */
+    @NotBlank(message = "密码不能为空")
+    @Size(max = 255, message = "密码长度不能超过255字符")
     private String password;
 
     /**
      * 显示名称
      */
+    @Size(max = 100, message = "显示名称长度不能超过100字符")
     private String displayName;
 
     /**
      * 邮箱
      */
+    @Email(message = "邮箱格式不正确")
+    @Size(max = 100, message = "邮箱长度不能超过100字符")
     private String email;
 
     /**
      * 账户代码
      */
+    @Size(max = 50, message = "账户代码长度不能超过50字符")
     private String accountcode;
 
     /**
      * 是否启用
      */
     @Builder.Default
-    @Column(name = "is_enabled")
+    @NotNull(message = "启用标志不能为空")
     private Boolean enabled = true;
-
-    /**
-     * 最后注册时间
-     */
-    private ZonedDateTime lastRegister;
-
-    /**
-     * 注册IP地址
-     */
-    private String registerIp;
-
-    /**
-     * 用户代理
-     */
-    private String userAgent;
 
     /**
      * 备注
      */
+    @Size(max = 500, message = "备注长度不能超过500字符")
     private String remarks;
-
-    /**
-     * 获取完整的SIP地址
-     */
-    public String getSipAddress() {
-        return username + "@" + domain;
-    }
-
-    /**
-     * 检查用户是否在线
-     */
-    public boolean isOnline() {
-        return enabled && lastRegister != null && 
-               lastRegister.isAfter(BdDateUtils.now().minusMinutes(5));
-    }
 }

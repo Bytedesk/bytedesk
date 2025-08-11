@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 22:00:00
+ * @LastEditTime: 2025-08-11 10:18:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,16 +13,19 @@
  */
 package com.bytedesk.call.conference.event;
 
+import org.springframework.context.ApplicationEvent;
+
 import com.bytedesk.call.conference.CallConferenceEntity;
 
 import lombok.Getter;
 
 @Getter
-public class CallConferenceUpdateEvent {
+public class CallConferenceUpdateEvent extends ApplicationEvent {
     
     private final CallConferenceEntity conference;
     
     public CallConferenceUpdateEvent(CallConferenceEntity conference) {
+        super(conference);
         this.conference = conference;
     }
 }

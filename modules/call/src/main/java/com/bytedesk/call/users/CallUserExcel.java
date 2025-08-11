@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import java.time.ZonedDateTime;
 
@@ -26,7 +26,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class CallNumberExcel {
+public class CallUserExcel {
 
     @ExcelProperty(index = 0, value = "用户名")
     @ColumnWidth(20)

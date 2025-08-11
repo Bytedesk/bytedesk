@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import com.bytedesk.core.base.BaseResponse;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ import java.time.ZonedDateTime;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CallNumberResponse extends BaseResponse {
+public class CallUserResponse extends BaseResponse {
 
     /**
      * 用户名（SIP用户名）
@@ -97,12 +97,12 @@ public class CallNumberResponse extends BaseResponse {
     /**
      * 从实体安全转换为响应对象
      */
-    public static CallNumberResponse fromEntitySafe(CallNumberEntity entity) {
+    public static CallUserResponse fromEntitySafe(CallUserEntity entity) {
         if (entity == null) {
             return null;
         }
         
-        return CallNumberResponse.builder()
+        return CallUserResponse.builder()
                 .uid(entity.getUid())
                 .username(entity.getUsername())
                 .domain(entity.getDomain())

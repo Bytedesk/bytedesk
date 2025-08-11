@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:55:00
+ * @LastEditTime: 2025-08-11 10:16:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,8 +23,8 @@ import com.bytedesk.call.conference.event.CallConferenceCreateEvent;
 import com.bytedesk.call.conference.event.CallConferenceUpdateEvent;
 import com.bytedesk.call.gateway.event.CallGatewayCreateEvent;
 import com.bytedesk.call.gateway.event.CallGatewayUpdateEvent;
-import com.bytedesk.call.number.event.CallNumberCreateEvent;
-import com.bytedesk.call.number.event.CallNumberUpdateEvent;
+import com.bytedesk.call.users.event.CallUserCreateEvent;
+import com.bytedesk.call.users.event.CallUserUpdateEvent;
 
 import lombok.AllArgsConstructor;
 
@@ -66,11 +66,11 @@ public class CallEventPublisher {
     }
     
     // User事件
-    public void publishEvent(CallNumberCreateEvent event) {
+    public void publishEvent(CallUserCreateEvent event) {
         applicationEventPublisher.publishEvent(event);
     }
     
-    public void publishEvent(CallNumberUpdateEvent event) {
+    public void publishEvent(CallUserUpdateEvent event) {
         applicationEventPublisher.publishEvent(event);
     }
 }

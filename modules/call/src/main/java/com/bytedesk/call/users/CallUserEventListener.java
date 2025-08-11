@@ -11,14 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.number;
+package com.bytedesk.call.users;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.call.number.event.CallNumberCreateEvent;
-import com.bytedesk.call.number.event.CallNumberUpdateEvent;
+import com.bytedesk.call.users.event.CallUserCreateEvent;
+import com.bytedesk.call.users.event.CallUserUpdateEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class CallNumberEventListener {
+public class CallUserEventListener {
     
     @Order(1)
     @EventListener
-    public void onCallNumberCreateEvent(CallNumberCreateEvent event) {
-        CallNumberEntity user = event.getUser();
+    public void onCallUserCreateEvent(CallUserCreateEvent event) {
+        CallUserEntity user = event.getUser();
         log.info("收到Call用户创建事件: username={}, domain={}", 
                 user.getUsername(), user.getDomain());
         
@@ -43,8 +43,8 @@ public class CallNumberEventListener {
     
     @Order(1)
     @EventListener
-    public void onCallNumberUpdateEvent(CallNumberUpdateEvent event) {
-        CallNumberEntity user = event.getUser();
+    public void onCallUserUpdateEvent(CallUserUpdateEvent event) {
+        CallUserEntity user = event.getUser();
         log.info("收到Call用户更新事件: username={}, enabled={}", 
                 user.getUsername(), user.getEnabled());
         
