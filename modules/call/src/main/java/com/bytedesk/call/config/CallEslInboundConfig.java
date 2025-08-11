@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-05 20:19:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-10 09:34:34
+ * @LastEditTime: 2025-08-11 10:31:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class CallEslInboundConfig {
 
-    private final CallProperties freeSwitchProperties;
+    private final CallProperties callProperties;
 
     /**
      * 配置基于 thingscloud 的 Call ESL 客户端
@@ -51,14 +51,14 @@ public class CallEslInboundConfig {
         InboundClientOption option = new InboundClientOption();
 
         log.info("配置 thingscloud ESL 客户端: {}:{}", 
-                freeSwitchProperties.getServer(), 
-                freeSwitchProperties.getEslPort());
+                callProperties.getServer(), 
+                callProperties.getEslPort());
 
         // 配置服务器连接信息
-        option.defaultPassword(freeSwitchProperties.getEslPassword())
+        option.defaultPassword(callProperties.getEslPassword())
                 .addServerOption(new ServerOption(
-                    freeSwitchProperties.getServer(), 
-                    freeSwitchProperties.getEslPort()
+                    callProperties.getServer(), 
+                    callProperties.getEslPort()
                 ));
         
         // 订阅所有事件
@@ -109,25 +109,25 @@ public class CallEslInboundConfig {
                 if (e.getMessage().contains("Connection refused")) {
                     log.error("连接被拒绝 - 可能的解决方案:");
                     log.error("1. 确认Call服务正在运行");
-                    log.error("2. 检查端口{}是否正确并且可访问", freeSwitchProperties.getEslPort());
+                    log.error("2. 检查端口{}是否正确并且可访问", callProperties.getEslPort());
                     log.error("3. 确认防火墙设置允许连接到该端口");
                 } else if (e.getMessage().contains("Authentication") || e.getMessage().contains("password")) {
                     log.error("认证失败 - 可能的解决方案:");
-                    log.error("1. 检查ESL密码是否正确: {}", freeSwitchProperties.getEslPassword());
+                    log.error("1. 检查ESL密码是否正确: {}", callProperties.getEslPassword());
                     log.error("2. 确认Call的event_socket.conf.xml配置正确");
                 } else if (e.getMessage().contains("timeout")) {
                     log.error("连接超时 - 可能的解决方案:");
                     log.error("1. 检查网络连接");
                     log.error("2. 增加连接超时时间");
-                    log.error("3. 确认服务器地址正确: {}", freeSwitchProperties.getServer());
+                    log.error("3. 确认服务器地址正确: {}", callProperties.getServer());
                 }
             }
             
             // 记录当前配置信息用于调试
             log.error("当前ESL配置 - 服务器: {}:{}, 密码: {}", 
-                    freeSwitchProperties.getServer(), 
-                    freeSwitchProperties.getEslPort(),
-                    freeSwitchProperties.getEslPassword());
+                    callProperties.getServer(), 
+                    callProperties.getEslPort(),
+                    callProperties.getEslPassword());
         }
 
         return inboundClient;
