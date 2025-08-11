@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 14:50:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 14:50:00
+ * @LastEditTime: 2025-08-11 08:59:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
 public class CallManagementController {
 
-    private final CallProperties freeSwitchProperties;
+    private final CallProperties callProperties;
     private final CallConnectionTester connectionTester;
     private final CallHealthIndicator healthIndicator;
 
@@ -49,18 +49,18 @@ public class CallManagementController {
     public ResponseEntity<?> getConfig() {
         try {
             ConfigInfo config = new ConfigInfo();
-            config.setEnabled(freeSwitchProperties.isEnabled());
-            config.setServer(freeSwitchProperties.getServer());
-            config.setEslPort(freeSwitchProperties.getEslPort());
-            config.setSipPort(freeSwitchProperties.getSipPort());
-            config.setWebrtcPort(freeSwitchProperties.getWebrtcPort());
-            config.setWsPort(freeSwitchProperties.getWsPort());
-            config.setCallTimeout(freeSwitchProperties.getCallTimeout());
-            config.setRtpPortStart(freeSwitchProperties.getRtpPortStart());
-            config.setRtpPortEnd(freeSwitchProperties.getRtpPortEnd());
+            config.setEnabled(callProperties.isEnabled());
+            config.setServer(callProperties.getServer());
+            config.setEslPort(callProperties.getEslPort());
+            config.setSipPort(callProperties.getSipPort());
+            config.setWebrtcPort(callProperties.getWebrtcPort());
+            config.setWsPort(callProperties.getWsPort());
+            config.setCallTimeout(callProperties.getCallTimeout());
+            config.setRtpPortStart(callProperties.getRtpPortStart());
+            config.setRtpPortEnd(callProperties.getRtpPortEnd());
             // 密码不返回给客户端
-            config.setPasswordConfigured(freeSwitchProperties.getEslPassword() != null && 
-                                       !freeSwitchProperties.getEslPassword().isEmpty());
+            config.setPasswordConfigured(callProperties.getEslPassword() != null && 
+                                       !callProperties.getEslPassword().isEmpty());
             
             return ResponseEntity.ok(config);
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class CallManagementController {
         guide.setDiagnosticCommands(new String[]{
             "sudo systemctl status freeswitch",
             "netstat -tlnp | grep 8021",
-            "telnet " + freeSwitchProperties.getServer() + " " + freeSwitchProperties.getEslPort(),
+            "telnet " + callProperties.getServer() + " " + callProperties.getEslPort(),
             "fs_cli -x 'status'",
             "tail -f /usr/local/freeswitch/log/freeswitch.log"
         });

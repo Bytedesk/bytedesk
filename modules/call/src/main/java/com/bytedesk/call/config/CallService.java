@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-07 16:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-07 19:47:54
+ * @LastEditTime: 2025-08-11 08:59:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,7 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CallService {
 
     private final Client eslClient;
-    private final CallProperties freeSwitchProperties;
+    
+    private final CallProperties callProperties;
 
     /**
      * 执行Call API命令
@@ -229,6 +230,6 @@ public class CallService {
      * 获取配置信息
      */
     public CallProperties getProperties() {
-        return freeSwitchProperties;
+        return callProperties;
     }
 }
