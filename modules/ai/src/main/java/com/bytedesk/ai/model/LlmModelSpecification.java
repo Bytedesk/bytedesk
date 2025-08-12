@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:08:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-26 18:22:40
+ * @LastEditTime: 2025-08-12 23:43:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,11 +30,14 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 
-            if (StringUtils.hasText(request.getOrgUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // if (StringUtils.hasText(request.getOrgUid())) {
+            //     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            // }
+            // enabled
+            if (request.getEnabled() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));
             }
             // 
             if (StringUtils.hasText(request.getLevel())) {
@@ -47,6 +50,16 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
             // providerName
             if (StringUtils.hasText(request.getProviderName())) {
                 predicates.add(criteriaBuilder.equal(root.get("providerName"), request.getProviderName()));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("providerName"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

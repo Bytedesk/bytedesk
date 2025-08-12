@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 18:35:04
+ * @LastEditTime: 2025-08-12 23:44:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,11 +31,10 @@ public class LlmProviderSpecification extends BaseSpecification<LlmProviderEntit
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 
-            if (StringUtils.hasText(request.getOrgUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // enabled
+            if (request.getEnabled() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));
             }
             // 
             if (StringUtils.hasText(request.getLevel())) {
@@ -43,6 +42,16 @@ public class LlmProviderSpecification extends BaseSpecification<LlmProviderEntit
             }
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
